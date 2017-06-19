@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonFactory;
-import nl.esciencecenter.xenon.adaptors.ssh.SSHJobTestConfig;
+import nl.esciencecenter.xenon.adaptors.job.ssh.SSHJobTestConfig;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.util.Utils;
 

@@ -25,6 +25,7 @@ import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
@@ -89,18 +90,7 @@ public class FileSystemImplementationTest {
 
     @Test
     public void test_getCredential2() throws Exception {
-        Credential c = new Credential() {
-
-            @Override
-            public Map<String, String> getProperties() {
-                return null;
-            }
-
-            @Override
-            public String getAdaptorName() {
-                return "test";
-            }
-        };
+        Credential c = new PasswordCredential("aap", "noot".toCharArray());
 
         FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", "file", "/", new RelativePath("aap"),
                 c, null);

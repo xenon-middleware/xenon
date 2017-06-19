@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.ssh;
+package nl.esciencecenter.xenon.adaptors.job.ssh;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.adaptors.JobTestConfig;
+import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.credentials.Credentials;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.jobs.Jobs;
@@ -77,30 +79,30 @@ public class SSHJobTestConfig extends JobTestConfig {
     }
     
     @Override
-    public Credential getDefaultCredential(Credentials credentials) throws Exception {
-        return credentials.getDefaultCredential("ssh");
+    public Credential getDefaultCredential() throws Exception {
+        return new DefaultCredential();
     }
 
     @Override
-    public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ssh", username, passwd, new HashMap<String, String>(0));
+    public Credential getPasswordCredential() throws Exception {
+        return new PasswordCredential(username, passwd);
     }
 
     @Override
-    public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ssh", username, "wrongpassword".toCharArray(), new HashMap<String, String>(0));
+    public Credential getInvalidCredential() throws Exception {
+        return new PasswordCredential(username, "wrongpassword".toCharArray());
     }
 
-    public Credential getOpenCredential(Credentials credentials) throws Exception {
-        return credentials.newCertificateCredential("ssh", openCredential, username, null, null);
+    public Credential getOpenCredential() throws Exception {
+        return new CertificateCredential(username, openCredential, null);
     }
 
-    public Credential getProtectedCredential(Credentials credentials) throws Exception {
-        return credentials.newCertificateCredential("ssh", protectedCredential, username, credentialPassphrase.toCharArray(), null);
+    public Credential getProtectedCredential() throws Exception {
+        return new CertificateCredential(username, protectedCredential, credentialPassphrase.toCharArray());
     }
     
-    public Credential getInvalidProtectedCredential(Credentials credentials) throws Exception {
-        return credentials.newCertificateCredential("ssh", protectedCredential, username, "aap".toCharArray(), null);
+    public Credential getInvalidProtectedCredential() throws Exception {
+        return new CertificateCredential(username, protectedCredential, "aap".toCharArray());
     }
     
     @Override
@@ -109,8 +111,8 @@ public class SSHJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public Credential getNonDefaultCredential(Credentials credentials) throws Exception {
-        return getPasswordCredential(credentials);
+    public Credential getNonDefaultCredential() throws Exception {
+        return getPasswordCredential();
     }
 
     @Override
@@ -124,13 +126,13 @@ public class SSHJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public Scheduler getDefaultScheduler(Jobs jobs, Credentials credentials) throws Exception {
-        return jobs.newScheduler("ssh", correctLocation, getDefaultCredential(credentials), getDefaultProperties());
+    public Scheduler getDefaultScheduler(Jobs jobs) throws Exception {
+        return jobs.newScheduler("ssh", correctLocation, getDefaultCredential(), getDefaultProperties());
     }
 
     @Override
-    public Path getWorkingDir(Files files, Credentials credentials) throws Exception {
-        return files.newFileSystem("sftp", correctLocation, getDefaultCredential(credentials), getDefaultProperties()).getEntryPath();
+    public Path getWorkingDir(Files files) throws Exception {
+        return files.newFileSystem("sftp", correctLocation, getDefaultCredential(), getDefaultProperties()).getEntryPath();
     }
 
     @Override

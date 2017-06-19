@@ -94,59 +94,59 @@ public class XenonEngineTest {
         XenonEngine.newXenon(properties);
     }
 
-    @Test
-    public void getAdaptorInfo_LocalAdaptor_Succeeds() throws Exception {
-        XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
-        AdaptorDescription adaptorInfo = x.getAdaptorStatus("local");
-        assertEquals("The adaptor info for the local adaptor should contain the name \"local\"", "local", adaptorInfo.getName());
-    }
+//    @Test
+//    public void getAdaptorInfo_LocalAdaptor_Succeeds() throws Exception {
+//        XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
+//        AdaptorDescription adaptorInfo = x.getAdaptorStatus("local");
+//        assertEquals("The adaptor info for the local adaptor should contain the name \"local\"", "local", adaptorInfo.getName());
+//    }
+//
+//    @Test
+//    public void getAdaptorInfo_UnknownAdaptor_ThrowsException() throws Exception {
+//        XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
+//        try {
+//            x.getAdaptorStatus("hupsefluts");
+//            fail();
+//        } catch (XenonException e) {
+//            assertEquals("XenonEngine adaptor: Could not find adaptor named hupsefluts", e.getMessage());
+//        }
+//    }
+//
+//    @Test
+//    public void getAdaptorFor_LocalFile_Succeeds() throws Exception {
+//        XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
+//        Adaptor adaptor = x.getAdaptorFor("file");
+//        assertEquals("The local adaptor should be returned", "local", adaptor.getName());
+//    }
 
-    @Test
-    public void getAdaptorInfo_UnknownAdaptor_ThrowsException() throws Exception {
-        XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
-        try {
-            x.getAdaptorStatus("hupsefluts");
-            fail();
-        } catch (XenonException e) {
-            assertEquals("XenonEngine adaptor: Could not find adaptor named hupsefluts", e.getMessage());
-        }
-    }
-
-    @Test
-    public void getAdaptorFor_LocalFile_Succeeds() throws Exception {
-        XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
-        Adaptor adaptor = x.getAdaptorFor("file");
-        assertEquals("The local adaptor should be returned", "local", adaptor.getName());
-    }
-
-    @Test
-    public void getAdaptorFor_UnknownScheme_ThrowsException() throws Exception {
-        XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
-        try {
-            x.getAdaptorFor("hupsefluts");
-            fail();
-        } catch (XenonException e) {
-            assertEquals("XenonEngine adaptor: Could not find adaptor for scheme hupsefluts", e.getMessage());
-        }
-    }
-
-    @Test
-    public void getAdaptor_LocalAdaptor_Succeeds() throws Exception {
-        XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
-        Adaptor adaptor = x.getAdaptor("local");
-        assertEquals("The local adaptor should be returned", "local", adaptor.getName());
-    }
-
-    @Test
-    public void getAdaptor_UnknownAdaptor_ThrowsException() throws Exception {
-        XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
-        try {
-            x.getAdaptor("hupsefluts");
-            fail();
-        } catch (XenonException e) {
-            assertEquals("XenonEngine adaptor: Could not find adaptor named hupsefluts", e.getMessage());
-        }
-    }
+//    @Test
+//    public void getAdaptorFor_UnknownScheme_ThrowsException() throws Exception {
+//        XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
+//        try {
+//            x.getAdaptorFor("hupsefluts");
+//            fail();
+//        } catch (XenonException e) {
+//            assertEquals("XenonEngine adaptor: Could not find adaptor for scheme hupsefluts", e.getMessage());
+//        }
+//    }
+//
+//    @Test
+//    public void getAdaptor_LocalAdaptor_Succeeds() throws Exception {
+//        XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
+//        Adaptor adaptor = x.getAdaptor("local");
+//        assertEquals("The local adaptor should be returned", "local", adaptor.getName());
+//    }
+//
+//    @Test
+//    public void getAdaptor_UnknownAdaptor_ThrowsException() throws Exception {
+//        XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
+//        try {
+//            x.getAdaptor("hupsefluts");
+//            fail();
+//        } catch (XenonException e) {
+//            assertEquals("XenonEngine adaptor: Could not find adaptor named hupsefluts", e.getMessage());
+//        }
+//    }
 
     //    @Test
     //    public void testGetAdaptors() throws Exception {
@@ -163,6 +163,8 @@ public class XenonEngineTest {
 
         // We currently have adaptors:
         // local, ssh, gridengine, slurm, ftp, torque, webdav
+    	
+/*    	
         int count = 7;
 
         XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
@@ -171,6 +173,7 @@ public class XenonEngineTest {
 
         assertNotNull("Expected AdaptorStatus array", tmp);
         assertTrue("Expected " + count + " adaptors to be returned", tmp.length == count);
+*/
     }
 
     @Test

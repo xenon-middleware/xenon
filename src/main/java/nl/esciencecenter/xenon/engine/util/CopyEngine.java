@@ -429,7 +429,7 @@ public final class CopyEngine {
 
         try {
             in = owner.newInputStream(source);
-
+            
             if (replace) {
                 out = owner.newOutputStream(target, OpenOption.OPEN_OR_CREATE, OpenOption.TRUNCATE);
             } else {

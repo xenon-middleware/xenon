@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.ssh;
+package nl.esciencecenter.xenon.adaptors.job.ssh;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
-import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.jobs.Jobs;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 
@@ -33,13 +33,12 @@ import org.junit.Test;
  * @since 1.0
  *
  */
-public class SSHRemoteAccessTestWithAgent {
+public class SSHRemoteAccessTestWithoutAgent {
 
     public static SSHJobTestConfig config;
     
     protected Xenon xenon;
     protected Jobs jobs;
-    protected Credentials credentials;
     
     @BeforeClass
     public static void prepareSSHConfig() throws Exception {
@@ -52,56 +51,51 @@ public class SSHRemoteAccessTestWithAgent {
         //properties.put(SshAdaptor.POLLING_DELAY, "100");
 
         Map<String, String> properties = new HashMap<>();
-        properties.put("xenon.adaptors.ssh.agent", "true");
+        properties.put("xenon.adaptors.ssh.agent", "false");
         
         xenon = XenonFactory.newXenon(properties);
         jobs = xenon.jobs();
-        credentials = xenon.credentials();
     }
     
     @Test
     public void test01_defaultAccess() throws Exception {
         Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
-                config.getDefaultCredential(credentials), null);
+                config.getDefaultCredential(), null);
         jobs.close(s);
     }
 
     @Test
     public void test02_PasswordAccess() throws Exception {
         Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
-                config.getPasswordCredential(credentials), null);
+                config.getPasswordCredential(), null);
         jobs.close(s);
     }
     
     @Test
     public void test03_OpenCertificateAccess() throws Exception {
         Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
-                config.getOpenCredential(credentials), null);
+                config.getOpenCredential(), null);
         jobs.close(s);
     }
     
     @Test
     public void test04_ProtectedCertificateAccess() throws Exception {
         Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
-                config.getProtectedCredential(credentials), null);
+                config.getProtectedCredential(), null);
         jobs.close(s);
     }
 
-    @Test
+    @Test(expected = XenonException.class)
     public void test05_FailedProtectedCertificateAccess() throws Exception {
-        // NOTE: The incorrect password should now be ignored, since the ssh-agent takes care of this.         
         Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
-                config.getInvalidProtectedCredential(credentials), null);
+                config.getInvalidProtectedCredential(), null);
         jobs.close(s);
     }
 
-    @Test
+    @Test(expected = XenonException.class)
     public void test06_InvalidPasswordAccess() throws Exception {
-        // NOTE: The incorrect password should now be ignored, since the ssh-agent takes care of this.
         Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
-                config.getInvalidCredential(credentials), null);
+                config.getInvalidCredential(), null);
         jobs.close(s);
     }
-
-    
 }

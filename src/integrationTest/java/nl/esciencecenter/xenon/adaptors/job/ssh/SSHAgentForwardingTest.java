@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.ssh;
+package nl.esciencecenter.xenon.adaptors.job.ssh;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,7 +29,6 @@ import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
@@ -41,7 +40,6 @@ public class SSHAgentForwardingTest {
 
     protected Xenon xenon;
     protected Jobs jobs;
-    protected Credentials credentials;
     protected Scheduler scheduler;
 
     @BeforeClass
@@ -57,10 +55,9 @@ public class SSHAgentForwardingTest {
 
         xenon = XenonFactory.newXenon(properties);
         jobs = xenon.jobs();
-        credentials = xenon.credentials();
         String gateway = config.getPropertyOrFail("test.ssh.gateway");
         // NOTE: The incorrect password should now be ignored, since the ssh-agent takes care of this.
-        Credential credential = config.getInvalidProtectedCredential(credentials);
+        Credential credential = config.getInvalidProtectedCredential();
 
         scheduler = jobs.newScheduler(config.getScheme(), gateway, credential, null);
     }

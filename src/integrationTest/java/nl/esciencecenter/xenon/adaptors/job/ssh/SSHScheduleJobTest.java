@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.file.sftp;
+package nl.esciencecenter.xenon.adaptors.job.ssh;
 
-import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.GenericScheduleJobTestParent;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 /**
- * Signals that an I/O operation was requested that is not supported.   
  * 
- * @version 1.0
- * @since 1.0
  */
-public class UnsupportedIOOperationException extends XenonException {
+public class SSHScheduleJobTest extends GenericScheduleJobTestParent {
 
-    private static final long serialVersionUID = 1L;
-
-    public UnsupportedIOOperationException(String adaptorName, String message, Throwable t) {
-        super(adaptorName, message, t);
+    @BeforeClass
+    public static void prepareSSHScheduleJobTest() throws Exception {
+        GenericScheduleJobTestParent.prepareClass(new SSHJobTestConfig(null));
     }
 
-    public UnsupportedIOOperationException(String adaptorName, String message) {
-        super(adaptorName, message);
+    @AfterClass
+    public static void cleanupSSHScheduleJobTest() throws Exception {
+        GenericScheduleJobTestParent.cleanupClass();
     }
 }

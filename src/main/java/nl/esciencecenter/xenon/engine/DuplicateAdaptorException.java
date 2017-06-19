@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package nl.esciencecenter.xenon.engine;
 
-package nl.esciencecenter.xenon.engine.credentials;
-
-import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
+ * Signals that an invalid scheme was provided.  
+ * 
  * @version 1.0
  * @since 1.0
- *
  */
-public class CredentialTestUtil {
+public class DuplicateAdaptorException extends XenonException {
 
-    
-    public static Credential createPasswordCredential(String adaptorName, String uniqueID, String username, String password) 
-            throws Exception {
+    private static final long serialVersionUID = 1L;
 
-        return new PasswordCredentialImplementation(adaptorName, uniqueID, null, username, password.toCharArray());
-        
+    public DuplicateAdaptorException(String adaptorName, String message, Throwable t) {
+        super(adaptorName, message, t);
+    }
+
+    public DuplicateAdaptorException(String adaptorName, String message) {
+        super(adaptorName, message);
     }
 }

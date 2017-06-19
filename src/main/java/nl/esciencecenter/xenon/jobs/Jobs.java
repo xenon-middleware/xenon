@@ -60,7 +60,7 @@ public interface Jobs {
      * @param adaptor
      *          the adaptor for which to retrieve the information.
      * @return
-     *          a <code>JobAdaptorDescription<code> containing information on the adaptor.
+     *          a <code>JobAdaptorDescription</code> containing information on the adaptor.
      * @throws InvalidAdaptorException
      *          if the adaptor was not found.
      */

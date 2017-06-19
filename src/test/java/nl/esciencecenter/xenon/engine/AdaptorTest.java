@@ -27,7 +27,6 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
-import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
@@ -39,6 +38,8 @@ import org.junit.Test;
  */
 public class AdaptorTest {
 
+	/*
+	
     class TestAdaptor extends Adaptor {
 
         public TestAdaptor(XenonEngine xenonEngine, String name, String description, ImmutableArray<String> supportedSchemes,
@@ -69,7 +70,7 @@ public class AdaptorTest {
         }
 
         @Override
-        public void end() { /* noop */ }
+        public void end() { }
 
     }
 
@@ -169,5 +170,5 @@ public class AdaptorTest {
 
         new TestAdaptor(null, "test", "DESCRIPTION", schemes, locations, supportedProperties, prop);
     }
-
+*/
 }

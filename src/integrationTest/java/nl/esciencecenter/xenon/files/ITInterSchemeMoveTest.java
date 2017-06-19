@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.files;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.ssh.SSHJobTestConfig;
+import nl.esciencecenter.xenon.adaptors.job.ssh.SSHJobTestConfig;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.util.Utils;
 

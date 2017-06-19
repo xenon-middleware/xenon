@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.ssh;
-
-import nl.esciencecenter.xenon.adaptors.GenericScheduleJobTestParent;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+package nl.esciencecenter.xenon;
 
 /**
+ * Signals that there was no connection.  
  * 
+ * @version 1.0
+ * @since 1.0
  */
-public class SSHScheduleJobTest extends GenericScheduleJobTestParent {
+public class NotConnectedException extends XenonException {
 
-    @BeforeClass
-    public static void prepareSSHScheduleJobTest() throws Exception {
-        GenericScheduleJobTestParent.prepareClass(new SSHJobTestConfig(null));
+    private static final long serialVersionUID = 1L;
+
+    public NotConnectedException(String adaptorName, String message, Throwable t) {
+        super(adaptorName, message, t);
     }
 
-    @AfterClass
-    public static void cleanupSSHScheduleJobTest() throws Exception {
-        GenericScheduleJobTestParent.cleanupClass();
+    public NotConnectedException(String adaptorName, String message) {
+        super(adaptorName, message);
     }
 }

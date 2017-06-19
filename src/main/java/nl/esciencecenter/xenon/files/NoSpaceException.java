@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.local;
+package nl.esciencecenter.xenon.files;
 
-import nl.esciencecenter.xenon.adaptors.GenericJobAdaptorTestParent;
-import nl.esciencecenter.xenon.adaptors.job.local.LocalJobTestConfig;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
+ * Signals that an end-of-file was encountered.  
  * 
+ * @version 1.0
+ * @since 1.0
  */
-public class LocalJobAdaptorTest extends GenericJobAdaptorTestParent {
+public class NoSpaceException extends XenonException {
 
-    @BeforeClass
-    public static void prepareLocalJobAdaptorTest() throws Exception {
-        GenericJobAdaptorTestParent.prepareClass(new LocalJobTestConfig());
+    private static final long serialVersionUID = 1L;
+
+    public NoSpaceException(String adaptorName, String message, Throwable t) {
+        super(adaptorName, message, t);
     }
 
-    @AfterClass
-    public static void cleanupAltLocalJobsTest() throws Exception {
-        GenericJobAdaptorTestParent.cleanupClass();
+    public NoSpaceException(String adaptorName, String message) {
+        super(adaptorName, message);
     }
 }

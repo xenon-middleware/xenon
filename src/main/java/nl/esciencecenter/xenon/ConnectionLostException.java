@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.file.sftp;
-
-import nl.esciencecenter.xenon.XenonException;
+package nl.esciencecenter.xenon;
 
 /**
- * Signals that an end-of-file was encountered.  
+ * Signals that a connection was lost.  
  * 
  * @version 1.0
  * @since 1.0
  */
-public class NoSpaceException extends XenonException {
+public class ConnectionLostException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 
-    public NoSpaceException(String adaptorName, String message, Throwable t) {
+    public ConnectionLostException(String adaptorName, String message, Throwable t) {
         super(adaptorName, message, t);
     }
 
-    public NoSpaceException(String adaptorName, String message) {
+    public ConnectionLostException(String adaptorName, String message) {
         super(adaptorName, message);
     }
 }

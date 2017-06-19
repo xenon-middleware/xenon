@@ -18,11 +18,8 @@ package nl.esciencecenter.xenon.engine.jobs;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import nl.esciencecenter.xenon.DuplicateAdaptorException;
 import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineAdaptorFactory;
@@ -30,7 +27,9 @@ import nl.esciencecenter.xenon.adaptors.job.local.LocalJobAdaptorFactory;
 import nl.esciencecenter.xenon.adaptors.job.slurm.SlurmAdaptorFactory;
 import nl.esciencecenter.xenon.adaptors.job.torque.TorqueAdaptorFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.engine.DuplicateAdaptorException;
 import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.util.PropertyUtils;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobAdaptorDescription;
 import nl.esciencecenter.xenon.jobs.JobDescription;
@@ -63,32 +62,12 @@ public class JobsEngine implements Jobs {
         this.xenonEngine = xenonEngine;
         loadAdaptors(properties);
     }
-   
-    // TODO: Move to shared utils ?
-    private Map<String, String> extract(Map<String, String> source, String prefix) {
-
-        HashMap<String, String> tmp = new HashMap<>(source.size());
-
-        Iterator<Entry<String, String>> itt = source.entrySet().iterator();
-
-        while (itt.hasNext()) {
-
-            Entry<String, String> e = itt.next();
-
-            if (e.getKey().startsWith(prefix)) {
-                tmp.put(e.getKey(), e.getValue());
-                itt.remove();
-            }
-        }
-
-        return tmp;
-    }
     
     private void loadAdaptors(Map<String, String> properties) throws XenonException {
         
         for (JobAdaptorFactory a : ADAPTOR_FACTORIES) {
         	
-        	JobAdaptor adaptor = a.createAdaptor(this, extract(properties, a.getPropertyPrefix()));
+        	JobAdaptor adaptor = a.createAdaptor(this, PropertyUtils.extract(properties, a.getPropertyPrefix()));
         	
         	String name = adaptor.getName();
             
@@ -99,8 +78,6 @@ public class JobsEngine implements Jobs {
             adaptors.put(name, adaptor);	
         }
     }
-
-    
     
     public XenonEngine getXenonEngine() { 
         return xenonEngine;

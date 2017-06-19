@@ -87,7 +87,7 @@ public abstract class FileAdaptor extends Adaptor {
         LOGGER.debug("copy source = {} target = {} options = {}", source, target, options);
         CopyEngine ce = filesEngine.getCopyEngine();
 
-        CopyInfo info = CopyInfo.createCopyInfo(getName(), ce.getNextID("FTP_COPY_"), source, target, options);
+        CopyInfo info = CopyInfo.createCopyInfo(getName(), ce.getNextID("COPY_" + getName()), source, target, options);
 
         ce.copy(info);
 

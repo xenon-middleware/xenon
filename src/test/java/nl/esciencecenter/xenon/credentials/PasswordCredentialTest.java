@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.file.sftp;
+package nl.esciencecenter.xenon.credentials;
 
-import nl.esciencecenter.xenon.XenonException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.HashMap;
 
 /**
- * Signals that an end-of-file was encountered.  
  * 
- * @version 1.0
- * @since 1.0
  */
-public class InvalidPathException extends XenonException {
+public class PasswordCredentialTest {
 
-    private static final long serialVersionUID = 1L;
-
-    public InvalidPathException(String adaptorName, String message, Throwable t) {
-        super(adaptorName, message, t);
-    }
-
-    public InvalidPathException(String adaptorName, String message) {
-        super(adaptorName, message);
+    @org.junit.Test
+    public void test_getters_and_setters() throws Exception {
+        PasswordCredential pwc = new PasswordCredential("username", "password".toCharArray());
+        assertEquals(pwc.getUsername(), "username");
+        assertTrue(Arrays.equals(pwc.getPassword(), "password".toCharArray()));
+        assertTrue(pwc.toString().equals("PasswordCredential [username=username]"));
     }
 }

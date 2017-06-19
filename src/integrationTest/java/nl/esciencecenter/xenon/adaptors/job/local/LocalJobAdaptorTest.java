@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.ssh;
+package nl.esciencecenter.xenon.adaptors.job.local;
 
 import nl.esciencecenter.xenon.adaptors.GenericJobAdaptorTestParent;
+import nl.esciencecenter.xenon.adaptors.job.local.LocalJobTestConfig;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -23,15 +24,15 @@ import org.junit.BeforeClass;
 /**
  * 
  */
-public class SSHJobAdaptorTest extends GenericJobAdaptorTestParent {
+public class LocalJobAdaptorTest extends GenericJobAdaptorTestParent {
 
     @BeforeClass
-    public static void prepareSSHJobAdaptorTest() throws Exception {
-        GenericJobAdaptorTestParent.prepareClass(new SSHJobTestConfig(null));
+    public static void prepareLocalJobAdaptorTest() throws Exception {
+        GenericJobAdaptorTestParent.prepareClass(new LocalJobTestConfig());
     }
 
     @AfterClass
-    public static void cleanupSSHJobAdaptorTest() throws Exception {
+    public static void cleanupAltLocalJobsTest() throws Exception {
         GenericJobAdaptorTestParent.cleanupClass();
     }
 }

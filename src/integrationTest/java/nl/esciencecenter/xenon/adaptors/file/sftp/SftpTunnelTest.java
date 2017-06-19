@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.ssh;
+package nl.esciencecenter.xenon.adaptors.file.sftp;
 
 import java.util.HashMap;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonFactory;
-import nl.esciencecenter.xenon.credentials.Credentials;
+import nl.esciencecenter.xenon.adaptors.job.ssh.SSHJobTestConfig;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
 
 /**
  * 
  */
-public class ITSSHTunnelTest {
+public class SftpTunnelTest {
 
     @org.junit.Test
     public void test_sshViaTunnel() throws Exception {
@@ -42,7 +43,6 @@ public class ITSSHTunnelTest {
         
         Xenon xenon = XenonFactory.newXenon(null);
         Files files = xenon.files();
-        Credentials credentials = xenon.credentials();
 
         HashMap<String, String> properties = new HashMap<>(3);
         properties.put("xenon.adaptors.ssh.gateway", gateway);
@@ -53,14 +53,14 @@ public class ITSSHTunnelTest {
 //        System.out.println("credential = " + credentials.getDefaultCredential("sftp"));
 //        
         // Will thrown an exception if the tunnel fails ?
-        FileSystem filesystem = files.newFileSystem("ssh", location, credentials.getDefaultCredential("sftp"), properties);
+        FileSystem filesystem = files.newFileSystem("ssh", location, new DefaultCredential(), properties);
 
         files.close(filesystem);
         XenonFactory.endXenon(xenon);
     }
 
     public static void main(String [] args) throws Exception { 
-        new ITSSHTunnelTest().test_sshViaTunnel();
+        new SftpTunnelTest().test_sshViaTunnel();
     }
     
     

@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.file.sftp;
+package nl.esciencecenter.xenon.files;
 
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that an end-of-file was encountered.  
+ * Signals that an I/O operation was requested that is not supported.   
  * 
  * @version 1.0
  * @since 1.0
  */
-public class InvalidAttributesException extends XenonException {
+public class UnsupportedIOOperationException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 
-    public InvalidAttributesException(String adaptorName, String message, Throwable t) {
+    public UnsupportedIOOperationException(String adaptorName, String message, Throwable t) {
         super(adaptorName, message, t);
     }
 
-    public InvalidAttributesException(String adaptorName, String message) {
+    public UnsupportedIOOperationException(String adaptorName, String message) {
         super(adaptorName, message);
     }
 }

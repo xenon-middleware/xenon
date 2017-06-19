@@ -40,6 +40,7 @@ import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.InvalidOpenOptionsException;
+import nl.esciencecenter.xenon.files.InvalidPathException;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
@@ -77,9 +78,6 @@ public class LocalFiles extends FileAdaptor {
     
     /** The properties supported by this adaptor */
     protected static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<>();
-    
-//    /** The parent adaptor */
-//    private final LocalAdaptor localAdaptor;
 
     /** The next ID for a FileSystem */
     private static int fsID = 0;
@@ -106,7 +104,7 @@ public class LocalFiles extends FileAdaptor {
         RelativePath parentName = path.getRelativePath().getParent();
         
         if (parentName == null) { 
-            throw new XenonException(ADAPTOR_NAME, "Parent directory does not exist!");
+            throw new InvalidPathException(ADAPTOR_NAME, "Parent directory does not exist!");
         }
         
         Path parent = newPath(path.getFileSystem(), parentName);
@@ -199,7 +197,7 @@ public class LocalFiles extends FileAdaptor {
         FileAttributes att = getAttributes(dir);
 
         if (!att.isDirectory()) {
-            throw new XenonException(ADAPTOR_NAME, "File is not a directory.");
+            throw new InvalidPathException(ADAPTOR_NAME, "File is not a directory.");
         }
 
         if (filter == null) {
@@ -216,7 +214,7 @@ public class LocalFiles extends FileAdaptor {
         FileAttributes att = getAttributes(dir);
 
         if (!att.isDirectory()) {
-            throw new XenonException(ADAPTOR_NAME, "File is not a directory.");
+            throw new InvalidPathException(ADAPTOR_NAME, "File is not a directory.");
         }
 
         if (filter == null) {
@@ -236,7 +234,7 @@ public class LocalFiles extends FileAdaptor {
         FileAttributes att = getAttributes(path);
 
         if (att.isDirectory()) {
-            throw new XenonException(ADAPTOR_NAME, "Path " + path + " is a directory!");
+            throw new InvalidPathException(ADAPTOR_NAME, "Path " + path + " is a directory!");
         }
 
         return LocalUtils.newInputStream(path);
@@ -312,11 +310,6 @@ public class LocalFiles extends FileAdaptor {
                 relativePath, credential, p);
     }
 
-//    @Override
-//    public Path newPath(FileSystem filesystem, RelativePath location) {
-//        return new PathImplementation(filesystem, location);
-//    }
-
     @Override
     public void close(FileSystem filesystem) throws XenonException {
         // ignored!
@@ -326,22 +319,6 @@ public class LocalFiles extends FileAdaptor {
     public boolean isOpen(FileSystem filesystem) throws XenonException {
         return true;
     }
-
-//    @Override
-//    public void createDirectories(Path dir) throws XenonException {
-//
-//        if (exists(dir)) {
-//            throw new PathAlreadyExistsException(ADAPTOR_NAME, "Directory " + dir + " already exists!");
-//        }
-//
-//        for (RelativePath superDirectory : dir.getRelativePath()) {
-//            Path tmp = newPath(dir.getFileSystem(), superDirectory);
-//
-//            if (!exists(tmp)) {
-//                createDirectory(tmp);
-//            }
-//        }
-//    }
 
     @Override
     public void createDirectory(Path dir) throws XenonException {
@@ -394,38 +371,4 @@ public class LocalFiles extends FileAdaptor {
     public void end() {
         // Nothing to do here...
     }
-       
-//    @Override
-//    public Copy copy(Path source, Path target, CopyOption... options) throws XenonException {
-//
-//        CopyInfo info = CopyInfo.createCopyInfo(ADAPTOR_NAME, copyEngine.getNextID("LOCAL_COPY_"), source,
-//                target, options);
-//         
-//        copyEngine.copy(info);
-//
-//        if (info.isAsync()) {
-//            return info.getCopy();
-//        } else {
-//
-//            Exception e = info.getException();
-//
-//            if (e != null) {
-//                throw new XenonException(ADAPTOR_NAME, "Copy failed!", e);
-//            }
-//
-//            return null;
-//        }
-//    }
-//
-//    @Override
-//    public CopyStatus getCopyStatus(Copy copy) throws XenonException {
-//        return copyEngine.getStatus(copy);
-//    }
-//
-//    @Override
-//    public CopyStatus cancelCopy(Copy copy) throws XenonException {
-//        return copyEngine.cancel(copy);
-//    }
-
-   
 }

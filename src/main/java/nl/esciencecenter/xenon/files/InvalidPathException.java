@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon;
+package nl.esciencecenter.xenon.files;
 
+import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that an invalid scheme was provided.  
+ * Signals that an end-of-file was encountered.  
  * 
  * @version 1.0
  * @since 1.0
  */
-public class DuplicateAdaptorException extends XenonException {
+public class InvalidPathException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 
-    public DuplicateAdaptorException(String adaptorName, String message, Throwable t) {
+    public InvalidPathException(String adaptorName, String message, Throwable t) {
         super(adaptorName, message, t);
     }
 
-    public DuplicateAdaptorException(String adaptorName, String message) {
+    public InvalidPathException(String adaptorName, String message) {
         super(adaptorName, message);
     }
 }

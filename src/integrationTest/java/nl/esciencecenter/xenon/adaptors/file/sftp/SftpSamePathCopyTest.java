@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.esciencecenter.xenon.adaptors.ssh;
+package nl.esciencecenter.xenon.adaptors.file.sftp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -32,7 +32,7 @@ import org.junit.Test;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
-import nl.esciencecenter.xenon.credentials.Credentials;
+import nl.esciencecenter.xenon.adaptors.job.ssh.SSHJobTestConfig;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
@@ -46,13 +46,12 @@ import nl.esciencecenter.xenon.util.Utils;
  * @since 1.0
  *
  */
-public class SSHSamePathCopyTest {
+public class SftpSamePathCopyTest {
  
     public static SSHJobTestConfig config;
     
     protected Xenon xenon;
     protected Files files;
-    protected Credentials credentials;
     
     @BeforeClass
     public static void prepareSSHConfig() throws Exception {
@@ -68,7 +67,6 @@ public class SSHSamePathCopyTest {
         
         xenon = XenonFactory.newXenon(properties);
         files = xenon.files();
-        credentials = xenon.credentials();
     }
     
     public Path resolve(Path root, String... path) throws XenonException {
@@ -107,7 +105,7 @@ public class SSHSamePathCopyTest {
         
         // Create two filesystems, one local, one SSH
         FileSystem fs1 = files.newFileSystem("local", "/", null, null);
-        FileSystem fs2 = files.newFileSystem("ssh", config.getCorrectLocation(), config.getDefaultCredential(credentials), null);
+        FileSystem fs2 = files.newFileSystem("ssh", config.getCorrectLocation(), config.getDefaultCredential(), null);
         
         // Create to paths to /tmp, one local, one remote.
         Path p1 = files.newPath(fs1, new RelativePath("/tmp"));

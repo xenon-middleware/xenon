@@ -89,7 +89,7 @@ public interface FileAttributes {
     long lastModifiedTime();
 
     /**
-     * Get the size of this file.
+     * Get the size of this file in bytes.
      * 
      * If the file is not a regular file, <code>0</code> will be returned. 
      * 

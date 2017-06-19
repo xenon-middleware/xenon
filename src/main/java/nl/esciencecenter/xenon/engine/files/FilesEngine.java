@@ -18,14 +18,10 @@ package nl.esciencecenter.xenon.engine.files;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
-import nl.esciencecenter.xenon.DuplicateAdaptorException;
 import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonRuntimeException;
@@ -34,8 +30,10 @@ import nl.esciencecenter.xenon.adaptors.file.ftp.FtpFileAdaptorFactory;
 import nl.esciencecenter.xenon.adaptors.file.sftp.SftpFileAdaptorFactory;
 import nl.esciencecenter.xenon.adaptors.file.webdav.WebdavFileAdaptorFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.engine.DuplicateAdaptorException;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.util.CopyEngine;
+import nl.esciencecenter.xenon.engine.util.PropertyUtils;
 import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.CopyStatus;
@@ -88,32 +86,12 @@ public class FilesEngine implements Files {
         this.copyEngine = new CopyEngine(this);
         loadAdaptors(properties);
     }
-
-    // TODO: Move to shared utils ?
-    private Map<String, String> extract(Map<String, String> source, String prefix) {
-
-        HashMap<String, String> tmp = new HashMap<>(source.size());
-
-        Iterator<Entry<String, String>> itt = source.entrySet().iterator();
-
-        while (itt.hasNext()) {
-
-            Entry<String, String> e = itt.next();
-
-            if (e.getKey().startsWith(prefix)) {
-                tmp.put(e.getKey(), e.getValue());
-                itt.remove();
-            }
-        }
-
-        return tmp;
-    }
     
     private void loadAdaptors(Map<String, String> properties) throws XenonException {
         
         for (FileAdaptorFactory a : ADAPTOR_FACTORIES) {
         	
-        	FileAdaptor adaptor = a.createAdaptor(this, extract(properties, a.getPropertyPrefix()));
+        	FileAdaptor adaptor = a.createAdaptor(this, PropertyUtils.extract(properties, a.getPropertyPrefix()));
         	
         	String name = adaptor.getName();
             

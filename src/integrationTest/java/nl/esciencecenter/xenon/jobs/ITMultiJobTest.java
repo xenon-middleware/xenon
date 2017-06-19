@@ -22,7 +22,7 @@ import java.util.HashMap;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonFactory;
-import nl.esciencecenter.xenon.adaptors.ssh.SSHJobTestConfig;
+import nl.esciencecenter.xenon.adaptors.job.ssh.SSHJobTestConfig;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;

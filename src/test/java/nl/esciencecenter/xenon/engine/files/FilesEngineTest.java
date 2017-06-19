@@ -37,7 +37,7 @@ public class FilesEngineTest {
     public void testFilesEngine() throws Exception {
 
         XenonEngine oe = Util.createXenonEngine(new HashMap<String, String>());
-        FilesEngine engine = new FilesEngine(oe);
+        FilesEngine engine = new FilesEngine(oe, null);
         String tmp = engine.toString();
         assertNotNull(tmp);
     }
@@ -46,7 +46,7 @@ public class FilesEngineTest {
     public void testUnknownFileSystem() throws Exception {
 
         XenonEngine oe = Util.createXenonEngine(new HashMap<String, String>());
-        FilesEngine engine = new FilesEngine(oe);
+        FilesEngine engine = new FilesEngine(oe, null);
 
         FileSystemImplementation fsi = new FileSystemImplementation("test", "test1", "test", "/", new RelativePath(),
                 null, null);
@@ -59,7 +59,7 @@ public class FilesEngineTest {
     public void testInterSchemeCopy() throws Exception {
 
         XenonEngine oe = Util.createXenonEngine(new HashMap<String, String>());
-        FilesEngine engine = new FilesEngine(oe);
+        FilesEngine engine = new FilesEngine(oe, null);
 
         FileSystemImplementation fs1 = new FileSystemImplementation("aap", "test1", "test", "/", new RelativePath(),
                 null, null);

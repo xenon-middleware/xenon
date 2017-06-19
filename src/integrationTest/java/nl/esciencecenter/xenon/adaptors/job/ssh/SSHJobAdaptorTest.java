@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.file.sftp;
+package nl.esciencecenter.xenon.adaptors.job.ssh;
 
-import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.GenericJobAdaptorTestParent;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 /**
- * Signals that there was no connection.  
  * 
- * @version 1.0
- * @since 1.0
  */
-public class NotConnectedException extends XenonException {
+public class SSHJobAdaptorTest extends GenericJobAdaptorTestParent {
 
-    private static final long serialVersionUID = 1L;
-
-    public NotConnectedException(String adaptorName, String message, Throwable t) {
-        super(adaptorName, message, t);
+    @BeforeClass
+    public static void prepareSSHJobAdaptorTest() throws Exception {
+        GenericJobAdaptorTestParent.prepareClass(new SSHJobTestConfig(null));
     }
 
-    public NotConnectedException(String adaptorName, String message) {
-        super(adaptorName, message);
+    @AfterClass
+    public static void cleanupSSHJobAdaptorTest() throws Exception {
+        GenericJobAdaptorTestParent.cleanupClass();
     }
 }

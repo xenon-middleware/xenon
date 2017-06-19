@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.local;
+package nl.esciencecenter.xenon.adaptors.file.file;
 
 import static org.junit.Assert.assertEquals;
 
@@ -21,6 +21,7 @@ import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.adaptors.GenericFileAdaptorTestParent;
 import nl.esciencecenter.xenon.adaptors.file.file.LocalFileTestConfig;
 import nl.esciencecenter.xenon.adaptors.file.file.LocalFiles;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.util.Utils;
 
@@ -89,7 +90,7 @@ public class LocalFileAdaptorTest extends GenericFileAdaptorTestParent {
 
     @Test
     public void test_newFileSystem_nullLocation() throws Exception {
-        FileSystem fs = files.newFileSystem("local", null, credentials.getDefaultCredential("local"), null);
+        FileSystem fs = files.newFileSystem("local", null, new DefaultCredential(), null);
         if (Utils.isWindows()) {
             assertEquals("", fs.getLocation());
         } else {
@@ -99,7 +100,7 @@ public class LocalFileAdaptorTest extends GenericFileAdaptorTestParent {
 
     @Test
     public void test_newFileSystem_emptyLocation() throws Exception {
-        FileSystem fs = files.newFileSystem("local", "", credentials.getDefaultCredential("local"), null);
+        FileSystem fs = files.newFileSystem("local", "", new DefaultCredential(), null);
         if (Utils.isWindows()) {
             assertEquals("", fs.getLocation());
         } else {
@@ -125,6 +126,6 @@ public class LocalFileAdaptorTest extends GenericFileAdaptorTestParent {
             throw new InvalidLocationException(null, null);
         }
 
-        files.newFileSystem("local", "mynetwork", credentials.getDefaultCredential("local"), null);
+        files.newFileSystem("local", "mynetwork", new DefaultCredential(), null);
     }
 }

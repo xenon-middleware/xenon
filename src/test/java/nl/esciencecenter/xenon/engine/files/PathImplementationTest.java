@@ -20,8 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.credentials.Credentials;
-import nl.esciencecenter.xenon.engine.credentials.CredentialTestUtil;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.RelativePath;
@@ -155,8 +154,8 @@ public class PathImplementationTest {
     @Test
     public void test_notEqualsCredentials() throws Exception {
         
-        Credential c1 = CredentialTestUtil.createPasswordCredential("aap", "aap0", "jason", "welcome01");
-        Credential c2 = CredentialTestUtil.createPasswordCredential("aap", "aap0", "stefan", "welcome01");
+        Credential c1 = new PasswordCredential("jason", "welcome01".toCharArray());
+        Credential c2 = new PasswordCredential("stefan", "welcome01".toCharArray());
         
         // NOTE: the identifier (second argument) cannot be the same if any of the other parameters is different... 
         FileSystem fs1 = new FileSystemImplementation("local", "local-fs-0", "file", "/", new RelativePath("/"), c1, null);

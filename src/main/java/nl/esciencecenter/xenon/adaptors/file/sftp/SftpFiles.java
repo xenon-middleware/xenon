@@ -39,6 +39,8 @@ import org.apache.sshd.common.subsystem.sftp.SftpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.xenon.ConnectionLostException;
+import nl.esciencecenter.xenon.NotConnectedException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -51,17 +53,24 @@ import nl.esciencecenter.xenon.engine.util.OpenOptions;
 import nl.esciencecenter.xenon.engine.util.PosixFileUtils;
 import nl.esciencecenter.xenon.files.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.files.DirectoryStream;
+import nl.esciencecenter.xenon.files.EndOfFileException;
 import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
+import nl.esciencecenter.xenon.files.InvalidAttributeException;
 import nl.esciencecenter.xenon.files.InvalidOpenOptionsException;
+import nl.esciencecenter.xenon.files.InvalidPathException;
+import nl.esciencecenter.xenon.files.NoSpaceException;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.files.PathAttributesPair;
+import nl.esciencecenter.xenon.files.PermissionDeniedException;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.files.RelativePath;
+import nl.esciencecenter.xenon.files.UnsupportedIOOperationException;
+
 
 //import com.jcraft.jsch.ChannelSftp;
 //import com.jcraft.jsch.ChannelSftp.LsEntry;
@@ -851,7 +860,7 @@ public class SftpFiles extends FileAdaptor {
     			return new UnsupportedIOOperationException(ADAPTOR_NAME, "Unsupported operation", e);
 
     		case SftpConstants.SSH_FX_FILE_ALREADY_EXISTS:
-    			return new FileAlreadyExistsException(ADAPTOR_NAME, "Already exists", e);
+    			return new PathAlreadyExistsException(ADAPTOR_NAME, "Already exists", e);
 
     		case SftpConstants.SSH_FX_WRITE_PROTECT:
     			return new PermissionDeniedException(ADAPTOR_NAME, "Write protected", e);
@@ -888,10 +897,10 @@ public class SftpFiles extends FileAdaptor {
     			return new InvalidPathException(ADAPTOR_NAME, "File is a directory", e);
 
     		case SftpConstants.SSH_FX_OWNER_INVALID:
-    			return new InvalidAttributesException(ADAPTOR_NAME, "Invalid owner", e);
+    			return new InvalidAttributeException(ADAPTOR_NAME, "Invalid owner", e);
 
     		case SftpConstants.SSH_FX_GROUP_INVALID:
-    			return new InvalidAttributesException(ADAPTOR_NAME, "Invalid group", e);
+    			return new InvalidAttributeException(ADAPTOR_NAME, "Invalid group", e);
 
 
     		case SftpConstants.SSH_FX_INVALID_HANDLE:

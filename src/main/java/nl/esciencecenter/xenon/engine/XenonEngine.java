@@ -191,7 +191,7 @@ public final class XenonEngine implements Xenon {
         // NOTE: Order is important here! We initialize the abstract engines first, as the adaptors may want to use them!
        
         // Copy the map so we can manipulate it.
-        Map<String, String> tmp = new HashMap<>(properties);
+        Map<String, String> tmp = new HashMap<>(this.properties);
         
         filesEngine = new FilesEngine(this, tmp);
         jobsEngine = new JobsEngine(this, tmp);

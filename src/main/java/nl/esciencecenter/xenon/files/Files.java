@@ -63,7 +63,7 @@ public interface Files {
      * @param adaptor
      *          the adaptor for which to retrieve the information.
      * @return
-     *          a <code>FileAdaptorDescription<code> containing information on the adaptor.
+     *          a <code>FileAdaptorDescription</code> containing information on the adaptor.
      * @throws InvalidAdaptorException
      *          if the adaptor was not found.
      */

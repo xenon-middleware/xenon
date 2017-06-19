@@ -31,33 +31,32 @@ public class SchedulerImplementationTest {
 
     @org.junit.Test
     public void test_constructor0() throws Exception {
-        new SchedulerImplementation("test", "id1", "test", "", new String[] { "aap", "noot" }, null, null, true, true,
+        new SchedulerImplementation("test", "id1", "", new String[] { "aap", "noot" }, null, null, true, true,
                 true);
     }
 
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_constructor1() throws Exception {
-        new SchedulerImplementation(null, "id1", "test", "", new String[] { "aap", "noot" }, null, null, true, true,
+        new SchedulerImplementation(null, "id1", "", new String[] { "aap", "noot" }, null, null, true, true,
                 true);
     }
 
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_constructor2() throws Exception {
-        new SchedulerImplementation("test", null, "test", "", new String[] { "aap", "noot" }, null, null, true, true,
+        new SchedulerImplementation("test", null, "", new String[] { "aap", "noot" }, null, null, true, true,
                 true);
     }
 
     @org.junit.Test
     public void test_getters_and_setters() throws Exception {
 
-        SchedulerImplementation si = new SchedulerImplementation("test", "id1", "test", "",
+        SchedulerImplementation si = new SchedulerImplementation("test", "id1", "",
                 new String[] { "aap", "noot" }, null, null, true, true, true);
 
         assertEquals("test", si.getAdaptorName());
         assertEquals("id1", si.getUniqueID());
         assertEquals(null, si.getCredential());
         assertEquals(new HashMap<String, String>(), si.getProperties());
-        assertEquals("test", si.getScheme());
         assertEquals("", si.getLocation());
         
         assertTrue(Arrays.equals(new String[] { "aap", "noot" }, si.getQueueNames()));
@@ -70,7 +69,7 @@ public class SchedulerImplementationTest {
     @org.junit.Test
     public void test_toString() throws Exception {
 
-        SchedulerImplementation si = new SchedulerImplementation("test", "id1", "test", "",
+        SchedulerImplementation si = new SchedulerImplementation("test", "id1", "",
                 new String[] { "aap", "noot" }, null, null, true, true, true);
 
         System.err.println("SI: " + si.toString());
@@ -83,7 +82,7 @@ public class SchedulerImplementationTest {
     @org.junit.Test
     public void test_hashcode_equals() throws Exception {
 
-        SchedulerImplementation si = new SchedulerImplementation("test", "id1", "test", "",
+        SchedulerImplementation si = new SchedulerImplementation("test", "id1", "",
                 new String[] { "aap", "noot" }, null, null, true, true, true);
 
         int hash = (31 + "test".hashCode()) * 31 + "id1".hashCode();
@@ -94,17 +93,17 @@ public class SchedulerImplementationTest {
         assertFalse(si.equals(null));
         assertFalse(si.equals("AAP"));
 
-        SchedulerImplementation si2 = new SchedulerImplementation("test2", "id1", "test", "", new String[] { "aap",
+        SchedulerImplementation si2 = new SchedulerImplementation("test2", "id1", "", new String[] { "aap",
                 "noot" }, null, null, true, true, true);
 
         assertFalse(si.equals(si2));
 
-        SchedulerImplementation si3 = new SchedulerImplementation("test", "id2", "test", "", new String[] { "aap",
+        SchedulerImplementation si3 = new SchedulerImplementation("test", "id2", "", new String[] { "aap",
                 "noot" }, null, null, true, true, true);
 
         assertFalse(si.equals(si3));
 
-        SchedulerImplementation si4 = new SchedulerImplementation("test", "id1", "test", "", new String[] { "aap",
+        SchedulerImplementation si4 = new SchedulerImplementation("test", "id1", "", new String[] { "aap",
                 "noot" }, null, null, true, true, true);
 
         assertTrue(si.equals(si4));

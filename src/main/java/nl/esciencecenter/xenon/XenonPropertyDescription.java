@@ -79,8 +79,8 @@ public interface XenonPropertyDescription {
         FILESYSTEM, 
         
         /** 
-         * Properties for <code>CREDENTIAL</code> components can be passed to the various <code>newCredential</code> calls in 
-         * {@link nl.esciencecenter.xenon.credentials.Credentials}. 
+         * Properties for <code>CREDENTIAL</code> components can be passed to the various <code>newCredential</code> calls in Credentials 
+         * 
          */        
         CREDENTIALS,
     }
