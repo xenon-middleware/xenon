@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.file;
 
+import static nl.esciencecenter.xenon.adaptors.file.file.LocalProperties.ADAPTOR_NAME;
+
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -69,7 +71,7 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
             FileAttributes attributes = localFiles.getAttributes(path);
             return new PathAttributesPairImplementation(path, attributes);
         } catch (XenonException e) {
-            throw new XenonRuntimeException(LocalFiles.ADAPTOR_NAME, "Failed to get next element.", e);
+            throw new XenonRuntimeException(ADAPTOR_NAME, "Failed to get next element.", e);
         }
     }
 

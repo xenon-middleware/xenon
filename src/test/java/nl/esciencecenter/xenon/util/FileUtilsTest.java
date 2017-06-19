@@ -32,7 +32,7 @@ import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.InvalidCopyOptionsException;
+import nl.esciencecenter.xenon.files.InvalidOptionsException;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.util.Utils;
 
@@ -63,7 +63,7 @@ public class FileUtilsTest {
     
     @Test
     public void testRecursiveCopy_SingleFile_CopiedFile() throws XenonException,
-            InvalidCopyOptionsException {
+            InvalidOptionsException {
         Files files = mock(Files.class);
         Path srcFile = mock(Path.class);
         Path dstFile = mock(Path.class);
@@ -85,7 +85,7 @@ public class FileUtilsTest {
 
     @Test
     public void testRecursiveCopy_SingleDirectory_MkdirTarget() throws XenonException,
-            InvalidCopyOptionsException {
+            InvalidOptionsException {
         Files files = mock(Files.class);
         Path srcDir = mock(Path.class);
         Path dstDir = mock(Path.class);
@@ -114,7 +114,7 @@ public class FileUtilsTest {
 
     @Test
     public void testRecursiveCopy_DirectoryWithAFile_MkdirAndCopy() throws XenonException,
-            InvalidCopyOptionsException {
+            InvalidOptionsException {
 // FIXME: 
 //        
 //        Files files = mock(Files.class);
@@ -160,7 +160,7 @@ public class FileUtilsTest {
 
     @Test
     public void testRecursiveCopy_SingleFileExists_FileAlreadyExistsException() throws XenonException,
-            InvalidCopyOptionsException {
+            InvalidOptionsException {
 // FIXME:        
 //        
 //        Files files = mock(Files.class);
@@ -191,7 +191,7 @@ public class FileUtilsTest {
 
     @Test
     public void testRecursiveCopy_SingleDirectoryExists_FileAlreadyExistsException() throws XenonException,
-            InvalidCopyOptionsException {
+            InvalidOptionsException {
 // FIXME:        
 //        
 //        
@@ -230,7 +230,7 @@ public class FileUtilsTest {
 
     @Test
     public void testRecursiveCopy_DirectoryWithAFileExists_FileAlreadyExistsException() throws XenonException,
-            InvalidCopyOptionsException {
+            InvalidOptionsException {
 //        Files files = mock(Files.class);
 //        Path srcDir = mock(Path.class); // foo
 //        Path srcFile = mock(Path.class); // foo/myfile
@@ -280,7 +280,7 @@ public class FileUtilsTest {
 
     @Test
     public void recursiveCopy_IgnoreDir_DirNotCopied() throws XenonException,
-            InvalidCopyOptionsException {
+            InvalidOptionsException {
 // FIXME:        
 //        
 //        Files files = mock(Files.class);
@@ -315,7 +315,7 @@ public class FileUtilsTest {
 
     @Test
     public void recursiveCopy_IgnoreFile_FileNotCopied() throws XenonException,
-            InvalidCopyOptionsException {
+            InvalidOptionsException {
 // FIXME:        
 //        
 //        Files files = mock(Files.class);
@@ -350,13 +350,13 @@ public class FileUtilsTest {
         try {
             Utils.recursiveCopy(files, srcDir, dstDir, CopyOption.IGNORE, CopyOption.REPLACE);
             fail("UnsupportedOperationException not thrown");
-        } catch (InvalidCopyOptionsException e) {
+        } catch (InvalidOptionsException e) {
             assertEquals(e.getMessage(), "FileUtils adaptor: Can not replace and ignore existing files at the same time");
         }
     }
 
     @Test
-    public void recursiveCopy_SingleFileReplace_CopyWithReplace() throws XenonException, InvalidCopyOptionsException {
+    public void recursiveCopy_SingleFileReplace_CopyWithReplace() throws XenonException, InvalidOptionsException {
         Files files = mock(Files.class);
         Path srcFile = mock(Path.class);
         Path dstFile = mock(Path.class);

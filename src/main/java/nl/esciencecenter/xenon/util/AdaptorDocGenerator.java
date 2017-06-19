@@ -47,13 +47,7 @@ public class AdaptorDocGenerator {
         out.println("<td>" + d.getDescription() + "</td>");
         out.println("<td>" + d.getType() + "</td>");
         out.println("<td>" +  d.getDefaultValue() + "</td>");
-        out.println("<td>");
-        Set<XenonPropertyDescription.Component> levels = d.getLevels();
-        for (XenonPropertyDescription.Component level : levels) {
-            out.println("<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#" + level + " "+ level + "}</b></p>");
-        }
-        out.println("</td>");
-
+        
         out.println("</tr>");
     }
 

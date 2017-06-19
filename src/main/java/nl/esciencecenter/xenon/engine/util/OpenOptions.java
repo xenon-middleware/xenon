@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.engine.util;
 
-import nl.esciencecenter.xenon.files.InvalidOpenOptionsException;
+import nl.esciencecenter.xenon.files.InvalidOptionsException;
 import nl.esciencecenter.xenon.files.OpenOption;
 
 /**
@@ -32,10 +32,10 @@ public class OpenOptions {
         return openMode;
     }
 
-    public void setOpenMode(String adaptorName, OpenOption openMode) throws InvalidOpenOptionsException {
+    public void setOpenMode(String adaptorName, OpenOption openMode) throws InvalidOptionsException {
 
         if (this.openMode != null && openMode != this.openMode) {
-            throw new InvalidOpenOptionsException(adaptorName, "Conflicting open options: " + openMode + " and " + this.openMode);
+            throw new InvalidOptionsException(adaptorName, "Conflicting open options: " + openMode + " and " + this.openMode);
         }
 
         this.openMode = openMode;
@@ -45,10 +45,10 @@ public class OpenOptions {
         return appendMode;
     }
 
-    public void setAppendMode(String adaptorName, OpenOption appendMode) throws InvalidOpenOptionsException {
+    public void setAppendMode(String adaptorName, OpenOption appendMode) throws InvalidOptionsException {
 
         if (this.appendMode != null && appendMode != this.appendMode) {
-            throw new InvalidOpenOptionsException(adaptorName, "Conflicting append options: " + appendMode + " and "
+            throw new InvalidOptionsException(adaptorName, "Conflicting append options: " + appendMode + " and "
                     + this.appendMode);
         }
 
@@ -71,10 +71,10 @@ public class OpenOptions {
         this.writeMode = writeMode;
     }
 
-    public static OpenOptions processOptions(String adaptorName, OpenOption... options) throws InvalidOpenOptionsException {
+    public static OpenOptions processOptions(String adaptorName, OpenOption... options) throws InvalidOptionsException {
 
         if (options == null || options.length == 0) {
-            throw new InvalidOpenOptionsException(adaptorName, "Missing open options!");
+            throw new InvalidOptionsException(adaptorName, "Missing open options!");
         }
 
         OpenOptions result = new OpenOptions();
@@ -100,12 +100,12 @@ public class OpenOptions {
                 break;
             default:
                 // All case should have been handled above
-                throw new InvalidOpenOptionsException(adaptorName, "Unknown open mode " + opt);
+                throw new InvalidOptionsException(adaptorName, "Unknown open mode " + opt);
             }
         }
 
         if (result.getOpenMode() == null) {
-            throw new InvalidOpenOptionsException(adaptorName, "No open mode provided!");
+            throw new InvalidOptionsException(adaptorName, "No open mode provided!");
         }
 
         return result;

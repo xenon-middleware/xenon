@@ -15,6 +15,12 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.file;
 
+import static nl.esciencecenter.xenon.adaptors.file.file.LocalProperties.ADAPTOR_DESCRIPTION;
+import static nl.esciencecenter.xenon.adaptors.file.file.LocalProperties.ADAPTOR_LOCATIONS;
+import static nl.esciencecenter.xenon.adaptors.file.file.LocalProperties.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.adaptors.file.file.LocalProperties.ADAPTOR_SCHEME;
+import static nl.esciencecenter.xenon.adaptors.file.file.LocalProperties.VALID_PROPERTIES;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,22 +30,18 @@ import java.util.Set;
 
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.files.FileAdaptor;
 import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
-import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.engine.util.OpenOptions;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.InvalidOpenOptionsException;
+import nl.esciencecenter.xenon.files.InvalidOptionsException;
 import nl.esciencecenter.xenon.files.InvalidPathException;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
 import nl.esciencecenter.xenon.files.OpenOption;
@@ -60,24 +62,6 @@ import nl.esciencecenter.xenon.util.Utils;
  */
 public class LocalFiles extends FileAdaptor {
 
-    /** Name of the local adaptor is defined in the engine. */
-    public static final String ADAPTOR_NAME = "file";
-
-    /** Local properties start with this prefix. */
-    public static final String PREFIX = XenonEngine.ADAPTORS_PREFIX + "file.";
-    
-    /** Description of the adaptor */
-    public static final String ADAPTOR_DESCRIPTION = "This is the local file adaptor that implements"
-            + " file functionality for local access.";
-    
-    /** The schemes supported by the adaptor */
-    private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>("file");
-
-    /** The locations supported by the adaptor */
-    private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("(null)", "(empty string)", "/");
-    
-    /** The properties supported by this adaptor */
-    protected static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<>();
 
     /** The next ID for a FileSystem */
     private static int fsID = 0;
@@ -88,7 +72,7 @@ public class LocalFiles extends FileAdaptor {
 
     public LocalFiles(FilesEngine filesEngine, Map<String, String> properties) throws XenonException {
         super(filesEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-            new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
+            new XenonProperties(VALID_PROPERTIES, properties));
     }
     
     /**
@@ -246,11 +230,11 @@ public class LocalFiles extends FileAdaptor {
         OpenOptions tmp = OpenOptions.processOptions(ADAPTOR_NAME, options);
 
         if (tmp.getReadMode() != null) {
-            throw new InvalidOpenOptionsException(ADAPTOR_NAME, "Disallowed open option: READ");
+            throw new InvalidOptionsException(ADAPTOR_NAME, "Disallowed open option: READ");
         }
 
         if (tmp.getAppendMode() == null) {
-            throw new InvalidOpenOptionsException(ADAPTOR_NAME, "No append mode provided!");
+            throw new InvalidOptionsException(ADAPTOR_NAME, "No append mode provided!");
         }
 
         if (tmp.getWriteMode() == null) {
@@ -301,7 +285,7 @@ public class LocalFiles extends FileAdaptor {
         checkFileLocation(location);
         LocalUtils.checkCredential(ADAPTOR_NAME, credential);
 
-        XenonProperties p = new XenonProperties(getSupportedProperties(Component.FILESYSTEM), properties);
+        XenonProperties p = new XenonProperties(VALID_PROPERTIES, properties);
 
         String root = Utils.getLocalRoot(location);
         RelativePath relativePath = new RelativePath(root).relativize(new RelativePath(location));

@@ -16,6 +16,9 @@
 
 package nl.esciencecenter.xenon.adaptors.file.webdav;
 
+import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavProperties.PREFIX;
+import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavProperties.VALID_PROPERTIES;
+
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
@@ -33,12 +36,12 @@ public class WebdavFileAdaptorFactory implements FileAdaptorFactory {
 
     @Override
     public String getPropertyPrefix() {
-        return WebdavFiles.PREFIX;
+        return PREFIX;
     }
 
     @Override
     public XenonPropertyDescription [] getSupportedProperties() {
-        return WebdavFiles.VALID_PROPERTIES.asArray();
+        return VALID_PROPERTIES.asArray();
     }
 
     @Override

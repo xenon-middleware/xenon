@@ -25,7 +25,6 @@ import java.util.Map.Entry;
 import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.util.Utils;
@@ -98,40 +97,6 @@ public class XenonProperties {
 
         for (XenonPropertyDescription d : supportedProperties) {
             this.supportedProperties.put(d.getName(), d);
-        }
-
-        addProperties(properties);
-    }
-
-    /**
-     * Create a new XenonProperties that will support the properties in <code>supportedProperties</code> that are valid at level
-     * <code>level</code>. All properties in <code>properties</code> will be added.
-     * 
-     * @param supportedProperties
-     *            the properties to support
-     * @param level
-     *          the level at which the property is valid
-     * @param properties
-     *            the set of properties to store
-     * @throws UnknownPropertyException
-     *             if key is found in <code>properties</code> that is not listed in <code>supportedProperties</code>, or not
-     *             listed at level <code>level</code>.
-     * @throws InvalidPropertyException
-     *             if a key from <code>properties</code> has a value that does not match the type as listed in
-     *             <code>supportedProperties</code>.
-     */
-    public XenonProperties(ImmutableArray<XenonPropertyDescription> supportedProperties, Component level, 
-            Map<String, String> properties) throws UnknownPropertyException, InvalidPropertyException {
-
-        super();
-
-        this.supportedProperties = Utils.emptyMap(supportedProperties.length());
-        this.properties = Utils.emptyMap(supportedProperties.length());
-
-        for (XenonPropertyDescription d : supportedProperties) {
-            if (d.getLevels().contains(level)) {
-                this.supportedProperties.put(d.getName(), d);
-            }
         }
 
         addProperties(properties);
@@ -499,31 +464,6 @@ public class XenonProperties {
         for (String key : supportedProperties.keySet()) {
             if (key.startsWith(tmp)) {
                 remaining.put(key, supportedProperties.get(key));
-
-                if (properties.containsKey(key)) {
-                    p.put(key, properties.get(key));
-                }
-            }
-        }
-
-        return new XenonProperties(remaining, p);
-    }
-
-    /**
-     * Returns a new XenonProperties that contains only the properties with a given level.
-     * 
-     * @return an XenonProperties containing only the properties with the matching level.
-     * @param level
-     *            the desired prefix
-     */
-    public XenonProperties filter(Component level) {
-        Map<String, XenonPropertyDescription> remaining = Utils.emptyMap(supportedProperties.size());
-        Map<String, String> p = Utils.emptyMap(properties.size());
-
-        for (XenonPropertyDescription d : supportedProperties.values()) {
-            if (d.getLevels().contains(level)) {
-                String key = d.getName();
-                remaining.put(key, d);
 
                 if (properties.containsKey(key)) {
                     p.put(key, properties.get(key));

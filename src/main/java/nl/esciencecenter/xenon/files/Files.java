@@ -218,11 +218,9 @@ public interface Files {
      *             exist and the <code>APPEND</code> or <code>RESUME</code> option is provided.
      * @throws PathAlreadyExistsException
      *             If the target file already exists.
-     * @throws IllegalSourcePathException
-     *             If the source is a directory.
-     * @throws IllegalTargetPathException
-     *             If the target is a directory.
-     * @throws InvalidCopyOptionsException
+     * @throws InvalidPathException
+     *             If the source or target path is not a file.
+     * @throws InvalidOptionsException
      *             If a conflicting set of copy options is provided.
      * @throws InvalidResumeTargetException
      *             If the data in the target of a resume does not match the data in the source. 
@@ -363,7 +361,7 @@ public interface Files {
      * 
      * @throws NoSuchPathException
      *             If a directory does not exists.
-     * @throws IllegalSourcePathException
+     * @throws InvalidPathException
      *             If dir is not a directory.
      * @throws XenonException
      *             If an I/O error occurred.
@@ -382,7 +380,7 @@ public interface Files {
      * 
      * @throws NoSuchPathException
      *             If a directory does not exists.
-     * @throws IllegalSourcePathException
+     * @throws InvalidPathException
      *             If dir is not a directory.
      * @throws XenonException
      *             If an I/O error occurred.
@@ -399,7 +397,7 @@ public interface Files {
      * 
      * @throws NoSuchPathException
      *             If a directory does not exists.
-     * @throws IllegalSourcePathException
+     * @throws InvalidPathException
      *             If dir is not a directory.
      * @throws XenonException
      *             If an I/O error occurred.
@@ -419,7 +417,7 @@ public interface Files {
      * 
      * @throws NoSuchPathException
      *             If a directory does not exists.
-     * @throws IllegalSourcePathException
+     * @throws InvalidPathException
      *             If dir is not a directory.
      * @throws XenonException
      *             If an I/O error occurred.
@@ -437,7 +435,7 @@ public interface Files {
      * 
      * @throws NoSuchPathException
      *             If a file does not exists.
-     * @throws IllegalSourcePathException
+     * @throws InvalidPathException
      *             If path not file.
      * @throws XenonException
      *             If an I/O error occurred.
@@ -493,9 +491,9 @@ public interface Files {
      * 
      * @return the {@link OutputStream} to write to the file.
      * 
-     * @throws IllegalSourcePathException
+     * @throws InvalidPathException
      *             If path is not a file.
-     * @throws InvalidOpenOptionsException
+     * @throws InvalidOptionsException
      *             If an invalid combination of OpenOptions was provided.
      * @throws XenonException
      *             If an I/O error occurred.
@@ -527,7 +525,7 @@ public interface Files {
      * 
      * @throws NoSuchPathException
      *             If the link does not exists.
-     * @throws IllegalSourcePathException
+     * @throws InvalidPathException
      *             If the source is not a link.
      * @throws XenonException
      *             If an I/O error occurred.

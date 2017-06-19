@@ -19,7 +19,6 @@ package nl.esciencecenter.xenon.adaptors.job.gridengine;
 import java.util.EnumSet;
 
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
@@ -59,15 +58,13 @@ public class GridEngineProperties {
             + " This adaptor uses either the local or the ssh adaptor to gain access to the scheduler machine.";
 
     /** List of all properties supported by this adaptor */
-    public static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = 
-            new ImmutableArray<XenonPropertyDescription>(
-        new XenonPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER),
+    public static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
+        new XenonPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, 
                 "false", "Skip version check is skipped when connecting to remote machines. "
                         + "WARNING: it is not recommended to use this setting in production environments!"),
-        new XenonPropertyDescriptionImplementation(ACCOUNTING_GRACE_TIME_PROPERTY, Type.LONG, EnumSet.of(Component.SCHEDULER),
+        new XenonPropertyDescriptionImplementation(ACCOUNTING_GRACE_TIME_PROPERTY, Type.NATURAL, 
                 "60000", "Number of milliseconds a job is allowed to take going from the queue to the qacct output."),
-
-        new XenonPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
-                "Number of milliseconds between polling the status of a job."));
+        new XenonPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.NATURAL, 
+        		"1000", "Number of milliseconds between polling the status of a job."));
     
 }

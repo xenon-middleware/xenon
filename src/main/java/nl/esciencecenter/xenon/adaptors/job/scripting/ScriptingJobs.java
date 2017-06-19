@@ -20,7 +20,6 @@ import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonProperties;
@@ -107,7 +106,7 @@ public class ScriptingJobs extends JobAdaptor {
     public Scheduler newScheduler(String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
 
-        XenonProperties p = new XenonProperties(getSupportedProperties(Component.SCHEDULER), properties);
+        XenonProperties p = new XenonProperties(validProperties, properties);
 
         SchedulerConnection connection = connectionFactory.newSchedulerConnection(location, credential, p, 
                 getJobEngine().getXenonEngine());

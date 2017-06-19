@@ -17,7 +17,7 @@ package nl.esciencecenter.xenon.engine.util;
 
 import nl.esciencecenter.xenon.engine.files.CopyImplementation;
 import nl.esciencecenter.xenon.files.CopyOption;
-import nl.esciencecenter.xenon.files.InvalidCopyOptionsException;
+import nl.esciencecenter.xenon.files.InvalidOptionsException;
 import nl.esciencecenter.xenon.files.Path;
 
 /**
@@ -111,10 +111,10 @@ public class CopyInfo {
 
     
     private static CopyOption checkMode(String adaptorName, CopyOption previous, CopyOption current) 
-            throws InvalidCopyOptionsException { 
+            throws InvalidOptionsException { 
         
         if (previous != null && !previous.equals(current)) {
-            throw new InvalidCopyOptionsException(adaptorName, "Conflicting copy options: " + previous + " and " + 
+            throw new InvalidOptionsException(adaptorName, "Conflicting copy options: " + previous + " and " + 
                     current);
         }
 
@@ -122,7 +122,7 @@ public class CopyInfo {
     }
     
     public static CopyInfo createCopyInfo(String adaptorName, String nextID, Path source, Path target,
-            CopyOption ... options) throws InvalidCopyOptionsException {
+            CopyOption ... options) throws InvalidOptionsException {
 
         boolean async = false;
         boolean verify = false;
@@ -146,7 +146,7 @@ public class CopyInfo {
                 break;
             default:
                 // All cases should have been handled above
-                throw new InvalidCopyOptionsException(adaptorName, "Unknown copy option: " + opt);                           
+                throw new InvalidOptionsException(adaptorName, "Unknown copy option: " + opt);                           
             }
         }
 
@@ -155,7 +155,7 @@ public class CopyInfo {
         }
 
         if (verify && mode != CopyOption.RESUME) {
-            throw new InvalidCopyOptionsException(adaptorName, "Conflicting copy options: " + mode + " and VERIFY");
+            throw new InvalidOptionsException(adaptorName, "Conflicting copy options: " + mode + " and VERIFY");
         }
 
         CopyImplementation copy = new CopyImplementation(adaptorName, nextID, source, target);

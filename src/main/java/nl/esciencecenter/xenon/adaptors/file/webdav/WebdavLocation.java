@@ -15,27 +15,33 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.webdav;
 
+import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavProperties.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavProperties.ADAPTOR_SCHEME;
+
+
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.adaptors.file.util.Location;
 
 public class WebdavLocation extends Location {
 
+	private static final int DEFAULT_PORT = 80; 
+	
     public WebdavLocation(String user, String host, int port) {
         super(user, host, port);
     }
 
     protected WebdavLocation(String location) throws InvalidLocationException {
-        super(location, WebdavFiles.ADAPTOR_SCHEME.get(0));
+        super(location, ADAPTOR_SCHEME.get(0));
     }
 
     @Override
     protected String getAdaptorName() {
-        return WebdavFiles.ADAPTOR_NAME;
+        return ADAPTOR_NAME;
     }
 
     @Override
     protected int getDefaultPort() {
-        return WebdavFiles.DEFAULT_PORT;
+        return DEFAULT_PORT;
     }
 
     public static WebdavLocation parse(String location) throws InvalidLocationException {

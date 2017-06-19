@@ -1,9 +1,6 @@
 package nl.esciencecenter.xenon.adaptors.job.ssh;
 
-import java.util.EnumSet;
-
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
@@ -82,27 +79,27 @@ public class SshProperties {
 
     /** List of properties supported by this SSH adaptor */
     protected static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
-            new XenonPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
-                    Component.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."),
-            new XenonPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
-                    Component.FILESYSTEM), "true", "Enable strict host key checking."),
-            new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER),
+            new XenonPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN,
+            		"true", "Automatically add unknown host keys to known_hosts."),
+            new XenonPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, 
+            		"true", "Enable strict host key checking."),
+            new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, 
                     "true", "Load the standard known_hosts file."),
-            new XenonPropertyDescriptionImplementation(LOAD_SSH_CONFIG, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER),
+            new XenonPropertyDescriptionImplementation(LOAD_SSH_CONFIG, Type.BOOLEAN, 
                     "true", "Load the OpenSSH config file."),
-            new XenonPropertyDescriptionImplementation(SSH_CONFIG_FILE, Type.STRING, EnumSet.of(Component.SCHEDULER),
+            new XenonPropertyDescriptionImplementation(SSH_CONFIG_FILE, Type.STRING, 
                     null, "OpenSSH config filename."),
-            new XenonPropertyDescriptionImplementation(AGENT, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER),
+            new XenonPropertyDescriptionImplementation(AGENT, Type.BOOLEAN,
                     "false", "Use a (local) ssh-agent."),
-            new XenonPropertyDescriptionImplementation(AGENT_FORWARDING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER), "false", 
-                    "Use ssh-agent forwarding"),
-            new XenonPropertyDescriptionImplementation(TIMEOUT, Type.LONG, EnumSet.of(Component.SCHEDULER), "10000",
-                    "The timeout for the connection setup and authetication (in milliseconds)."),
-            new XenonPropertyDescriptionImplementation(POLLING_DELAY, Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
-                    "The polling delay for monitoring running jobs (in milliseconds)."),
-            new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4",
-                    "The maximum number of concurrent jobs in the multiq.."),
-            new XenonPropertyDescriptionImplementation(GATEWAY, Type.STRING, EnumSet.of(Component.SCHEDULER, 
-                    Component.FILESYSTEM), null, "The gateway machine used to create an SSH tunnel to the target."));
+            new XenonPropertyDescriptionImplementation(AGENT_FORWARDING, Type.BOOLEAN,  
+            		"false", "Use ssh-agent forwarding"),
+            new XenonPropertyDescriptionImplementation(TIMEOUT, Type.LONG,  
+            		"10000", "The timeout for the connection setup and authetication (in milliseconds)."),
+            new XenonPropertyDescriptionImplementation(POLLING_DELAY, Type.LONG,  
+            		"1000", "The polling delay for monitoring running jobs (in milliseconds)."),
+            new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER,  
+            		"4", "The maximum number of concurrent jobs in the multiq.."),
+            new XenonPropertyDescriptionImplementation(GATEWAY, Type.STRING, 
+            		null, "The gateway machine used to create an SSH tunnel to the target."));
 
 }

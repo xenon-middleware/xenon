@@ -41,7 +41,7 @@ import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.InvalidCopyOptionsException;
+import nl.esciencecenter.xenon.files.InvalidOptionsException;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
@@ -652,7 +652,7 @@ public final class Utils {
      * @throws nl.esciencecenter.xenon.files.DirectoryNotEmptyException
      *             the {@code REPLACE_EXISTING} option is specified but the file cannot be replaced because it is a non-empty
      *             directory <i>(optional specific exception)</i> *
-     * @throws InvalidCopyOptionsException
+     * @throws InvalidOptionsException
      *             if {@code options} contains a copy option that is not supported
      * @throws XenonException
      *             if an I/O error occurs when reading or writing
@@ -1043,7 +1043,7 @@ public final class Utils {
      * @param options
      *            the options to use while copying. See {@link CopyOption} for details.
      *
-     * @throws InvalidCopyOptionsException
+     * @throws InvalidOptionsException
      *             if an invalid combination of options is used.
      * @throws XenonException
      *             if an I/O error occurs during the copying
@@ -1055,7 +1055,7 @@ public final class Utils {
         boolean replace = CopyOption.REPLACE.occursIn(options);
         boolean ignore = CopyOption.IGNORE.occursIn(options);
         if (replace && ignore) {
-            throw new InvalidCopyOptionsException(NAME, "Can not replace and ignore existing files at the same time");
+            throw new InvalidOptionsException(NAME, "Can not replace and ignore existing files at the same time");
         }
 
         FileAttributes att = files.getAttributes(source);

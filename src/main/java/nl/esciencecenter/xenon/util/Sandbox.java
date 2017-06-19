@@ -21,9 +21,9 @@ import java.util.UUID;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.CopyOption;
-import nl.esciencecenter.xenon.files.InvalidCopyOptionsException;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
+import nl.esciencecenter.xenon.files.InvalidOptionsException;
 
 /**
  * Sandbox represents a (possibly remote and usually temporary) directory used for running jobs. 
@@ -275,7 +275,7 @@ public class Sandbox {
      * 
      * @param options
      *          the options to use while copying. See {@link CopyOption} for details.
-     * @throws InvalidCopyOptionsException
+     * @throws InvalidOptionsException
      *           if an invalid combination of options is used.
      * @throws XenonException
      *           if an I/O error occurs during the copying
@@ -292,7 +292,7 @@ public class Sandbox {
      * 
      * @param options
      *          the options to use while copying. See {@link CopyOption} for details.
-     * @throws InvalidCopyOptionsException
+     * @throws InvalidOptionsException
      *           if an invalid combination of options is used.
      * @throws XenonException
      *           if an I/O error occurs during the copying

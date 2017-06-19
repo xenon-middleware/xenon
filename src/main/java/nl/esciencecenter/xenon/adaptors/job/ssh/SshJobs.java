@@ -14,7 +14,6 @@ import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.session.ClientSession;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.adaptors.file.sftp.SSHUtil;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonProperties;
@@ -65,7 +64,7 @@ public class SshJobs extends JobAdaptor {
 	 
 	protected SshJobs(JobsEngine jobsEngine, Map<String, String> properties) throws XenonException {
 		super(jobsEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-                new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
+                new XenonProperties(VALID_PROPERTIES, properties));
 	}
 
 	@Override

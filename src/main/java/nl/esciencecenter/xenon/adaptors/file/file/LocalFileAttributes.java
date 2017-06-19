@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.file;
 
+import static nl.esciencecenter.xenon.adaptors.file.file.LocalProperties.ADAPTOR_NAME;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -85,7 +87,6 @@ public class LocalFileAttributes implements FileAttributes {
     /** Is this a windows file ? */
     private final boolean isWindows;
     
-    
     public LocalFileAttributes(Path path) throws XenonException {
         try {
             java.nio.file.Path javaPath = LocalUtils.javaPath(path);
@@ -142,7 +143,7 @@ public class LocalFileAttributes implements FileAttributes {
             }
             
         } catch (IOException e) {
-            throw new XenonException(LocalFiles.ADAPTOR_NAME, "Cannot read attributes.", e);
+            throw new XenonException(ADAPTOR_NAME, "Cannot read attributes.", e);
         }
     }
 
@@ -190,7 +191,7 @@ public class LocalFileAttributes implements FileAttributes {
     public String group() throws AttributeNotSupportedException {
         
         if (isWindows) { 
-            throw new AttributeNotSupportedException(LocalFiles.ADAPTOR_NAME, "Attribute not supported: group");
+            throw new AttributeNotSupportedException(ADAPTOR_NAME, "Attribute not supported: group");
         }
 
         return group;
@@ -200,7 +201,7 @@ public class LocalFileAttributes implements FileAttributes {
     public String owner() throws AttributeNotSupportedException {
         
         if (isWindows) { 
-            throw new AttributeNotSupportedException(LocalFiles.ADAPTOR_NAME, "Attribute not supported: owner");
+            throw new AttributeNotSupportedException(ADAPTOR_NAME, "Attribute not supported: owner");
         }
 
         return owner;
@@ -210,7 +211,7 @@ public class LocalFileAttributes implements FileAttributes {
     public Set<PosixFilePermission> permissions() throws AttributeNotSupportedException {
         
         if (isWindows) { 
-            throw new AttributeNotSupportedException(LocalFiles.ADAPTOR_NAME, "Attribute not supported: permissions");            
+            throw new AttributeNotSupportedException(ADAPTOR_NAME, "Attribute not supported: permissions");            
         } else { 
             return permissions;
         }

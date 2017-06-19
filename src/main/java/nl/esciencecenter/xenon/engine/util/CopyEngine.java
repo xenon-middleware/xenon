@@ -33,8 +33,7 @@ import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.CopyStatus;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.IllegalSourcePathException;
-import nl.esciencecenter.xenon.files.IllegalTargetPathException;
+import nl.esciencecenter.xenon.files.InvalidPathException;
 import nl.esciencecenter.xenon.files.InvalidResumeTargetException;
 import nl.esciencecenter.xenon.files.NoSuchCopyException;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
@@ -259,11 +258,11 @@ public final class CopyEngine {
         FileAttributes sourceAtt = owner.getAttributes(source);
 
         if (sourceAtt.isDirectory()) {
-            throw new IllegalSourcePathException(NAME, "Source " + source + " is a directory");
+            throw new InvalidPathException(NAME, "Source " + source + " is a directory");
         }
 
         if (sourceAtt.isSymbolicLink()) {
-            throw new IllegalSourcePathException(NAME, "Source " + source + " is a link");
+            throw new InvalidPathException(NAME, "Source " + source + " is a link");
         }
 
         if (!owner.exists(target)) {
@@ -273,11 +272,11 @@ public final class CopyEngine {
         FileAttributes targetAtt = owner.getAttributes(target);
 
         if (targetAtt.isDirectory()) {
-            throw new IllegalTargetPathException(NAME, "Target " + target + " is a directory");
+            throw new InvalidPathException(NAME, "Target " + target + " is a directory");
         }
 
         if (targetAtt.isSymbolicLink()) {
-            throw new IllegalTargetPathException(NAME, "Target " + target + " is a link");
+            throw new InvalidPathException(NAME, "Target " + target + " is a link");
         }
 
         RelativePath sourceName = source.getRelativePath().normalize();
@@ -348,7 +347,7 @@ public final class CopyEngine {
         FileAttributes sourceAtt = owner.getAttributes(source);
 
         if (sourceAtt.isDirectory()) {
-            throw new IllegalSourcePathException(NAME, "Source " + source + " is a directory");
+            throw new InvalidPathException(NAME, "Source " + source + " is a directory");
         }
 
         if (!owner.exists(target)) {
@@ -358,14 +357,14 @@ public final class CopyEngine {
         FileAttributes targetAtt = owner.getAttributes(target);
 
         if (targetAtt.isDirectory()) {
-            throw new IllegalSourcePathException(NAME, "Target " + target + " is a directory");
+            throw new InvalidPathException(NAME, "Target " + target + " is a directory");
         }
         
         RelativePath sourceName = source.getRelativePath().normalize();
         RelativePath targetName = target.getRelativePath().normalize();
         
         if (sourceName.equals(targetName)) {
-            throw new IllegalTargetPathException(NAME, "Can not append a file to itself (source " + source + " equals target " 
+            throw new InvalidPathException(NAME, "Can not append a file to itself (source " + source + " equals target " 
                     + target + ")");
         }
 
@@ -398,7 +397,7 @@ public final class CopyEngine {
         FileAttributes sourceAtt = owner.getAttributes(source);
 
         if (sourceAtt.isDirectory()) {
-            throw new IllegalSourcePathException(NAME, "Source " + source + " is a directory");
+            throw new InvalidPathException(NAME, "Source " + source + " is a directory");
         }
 
         if (source.equals(target)) { 

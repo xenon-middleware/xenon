@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.file;
 
+import static nl.esciencecenter.xenon.adaptors.file.file.LocalProperties.ADAPTOR_NAME;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -157,7 +159,7 @@ final class LocalUtils {
         try {
             return Files.newInputStream(javaPath(path));
         } catch (IOException e) {
-            throw new XenonException(LocalFiles.ADAPTOR_NAME, "Failed to create InputStream.", e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to create InputStream.", e);
         }
     }
 
@@ -171,7 +173,7 @@ final class LocalUtils {
             PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
             view.setPermissions(LocalUtils.javaPermissions(permissions));
         } catch (IOException e) {
-            throw new XenonException(LocalFiles.ADAPTOR_NAME, "Failed to set permissions " + path, e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to set permissions " + path, e);
         }
     }
 
@@ -185,7 +187,7 @@ final class LocalUtils {
         try {
             Files.createFile(LocalUtils.javaPath(path));
         } catch (IOException e) {
-            throw new XenonException(LocalFiles.ADAPTOR_NAME, "Failed to create file " + path, e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to create file " + path, e);
         }
     }
 
@@ -199,11 +201,11 @@ final class LocalUtils {
         try {
             Files.delete(LocalUtils.javaPath(path));
         } catch (java.nio.file.NoSuchFileException e1) {
-            throw new NoSuchPathException(LocalFiles.ADAPTOR_NAME, "File " + path + " does not exist!", e1);
+            throw new NoSuchPathException(ADAPTOR_NAME, "File " + path + " does not exist!", e1);
         } catch (java.nio.file.DirectoryNotEmptyException e2) {            
-            throw new DirectoryNotEmptyException(LocalFiles.ADAPTOR_NAME, "Directory " + path + " not empty!", e2);
+            throw new DirectoryNotEmptyException(ADAPTOR_NAME, "Directory " + path + " not empty!", e2);
         } catch (IOException e) {
-            throw new XenonException(LocalFiles.ADAPTOR_NAME, "Failed to delete file " + path, e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to delete file " + path, e);
         }
     }
 
@@ -212,7 +214,7 @@ final class LocalUtils {
         try {
             Files.move(LocalUtils.javaPath(source), LocalUtils.javaPath(target));
         } catch (IOException e) {
-            throw new XenonException(LocalFiles.ADAPTOR_NAME, "Failed to move " + source + " to " + target, e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to move " + source + " to " + target, e);
         }
     }
 

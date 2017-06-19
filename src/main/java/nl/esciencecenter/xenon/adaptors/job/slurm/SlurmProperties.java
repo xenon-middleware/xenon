@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors.job.slurm;
 import java.util.EnumSet;
 
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
@@ -61,14 +60,14 @@ public class SlurmProperties  {
     /** List of all properties supported by this adaptor */
     public static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = 
             new ImmutableArray<XenonPropertyDescription>(
-        new XenonPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER),
+        new XenonPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, 
                 "false", "Skip version check is skipped when connecting to remote machines. "
                  + "WARNING: it is not recommended to use this setting in production environments!"),
         
-        new XenonPropertyDescriptionImplementation(DISABLE_ACCOUNTING_USAGE, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER),
+        new XenonPropertyDescriptionImplementation(DISABLE_ACCOUNTING_USAGE, Type.BOOLEAN,
                 "false", "Do not use accounting info of slurm, even when available. Mostly for testing purposes"),
                 
-        new XenonPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
-                "Number of milliseconds between polling the status of a job."));
+        new XenonPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, 
+        		"1000", "Number of milliseconds between polling the status of a job."));
 
 }

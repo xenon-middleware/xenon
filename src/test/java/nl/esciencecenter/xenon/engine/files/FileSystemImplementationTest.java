@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
@@ -117,7 +116,7 @@ public class FileSystemImplementationTest {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation(
-                "test", Type.STRING, EnumSet.of(Component.XENON), "test", "test property"));
+                "test", Type.STRING, "test", "test property"));
 
         XenonProperties p = new XenonProperties(valid, tmp);
 

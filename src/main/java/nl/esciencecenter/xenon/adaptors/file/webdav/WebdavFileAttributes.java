@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.webdav;
 
+import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavProperties.ADAPTOR_NAME;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,7 +39,7 @@ public class WebdavFileAttributes implements FileAttributes {
 
     public WebdavFileAttributes(DavPropertySet properties) throws XenonException {
         if (properties == null) {
-            throw new XenonException(WebdavFiles.ADAPTOR_NAME, "Cannot create webdav file attributes based on null");
+            throw new XenonException(ADAPTOR_NAME, "Cannot create webdav file attributes based on null");
         }
 
         this.properties = properties;

@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.job.local;
 
+import static nl.esciencecenter.xenon.adaptors.job.local.LocalProperties.ADAPTOR_NAME;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -24,6 +26,7 @@ import nl.esciencecenter.xenon.engine.jobs.StreamsImplementation;
 import nl.esciencecenter.xenon.engine.util.InteractiveProcess;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.Streams;
+
 
 /**
  * LocalInteractiveProcess implements a {@link InteractiveProcess} for local interactive processes.
@@ -58,7 +61,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
         try { 
             process = builder.start();
         } catch (IOException e) { 
-            throw new XenonException(LocalJobs.ADAPTOR_NAME, "Failed to start local process!", e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to start local process!", e);
         }
         streams = new StreamsImplementation(job, process.getInputStream(), process.getOutputStream(), process.getErrorStream());
     }

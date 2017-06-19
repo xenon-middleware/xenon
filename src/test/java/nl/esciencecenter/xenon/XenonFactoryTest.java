@@ -73,9 +73,6 @@ public class XenonFactoryTest {
         XenonPropertyDescription [] tmp = XenonFactory.getSupportedProperties();
    
         assertNotNull(tmp);
-        
-        for (XenonPropertyDescription x : tmp) { 
-            assertTrue(x.getLevels().contains(XenonPropertyDescription.Component.XENON));
-        }
+       
     }
 }

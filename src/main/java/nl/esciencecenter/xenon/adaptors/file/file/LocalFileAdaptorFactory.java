@@ -16,6 +16,9 @@
 
 package nl.esciencecenter.xenon.adaptors.file.file;
 
+import static nl.esciencecenter.xenon.adaptors.file.file.LocalProperties.PREFIX;
+import static nl.esciencecenter.xenon.adaptors.file.file.LocalProperties.VALID_PROPERTIES;
+
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
@@ -33,12 +36,12 @@ public class LocalFileAdaptorFactory implements FileAdaptorFactory {
 
     @Override
     public String getPropertyPrefix() {
-        return LocalFiles.PREFIX;
+        return PREFIX;
     }
 
     @Override
     public XenonPropertyDescription [] getSupportedProperties() {
-        return LocalFiles.VALID_PROPERTIES.asArray();
+        return VALID_PROPERTIES.asArray();
     }
 
     @Override

@@ -15,6 +15,12 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.webdav;
 
+import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavProperties.ADAPTOR_DESCRIPTION;
+import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavProperties.ADAPTOR_LOCATIONS;
+import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavProperties.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavProperties.ADAPTOR_SCHEME;
+import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavProperties.VALID_PROPERTIES;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,15 +63,12 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.files.FileAdaptor;
 import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
-import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.engine.util.OpenOptions;
 import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.CopyOption;
@@ -74,8 +77,7 @@ import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.InvalidOpenOptionsException;
+import nl.esciencecenter.xenon.files.InvalidOptionsException;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
@@ -88,33 +90,13 @@ public class WebdavFiles extends FileAdaptor {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(WebdavFiles.class);
     
-    /** The name of this adaptor */
-    public static final String ADAPTOR_NAME = "webdav";
-
-    /** The default SSH port */
-    protected static final int DEFAULT_PORT = 80;
-
-    /** A description of this adaptor */
-    private static final String ADAPTOR_DESCRIPTION = "The webdav file adaptor implements file access to remote webdav servers.";
-
-    /** The schemes supported by this adaptor */
-    protected static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>("http");
-
-    /** The locations supported by this adaptor */
-    private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("[user@]host[:port]");
-
-    /** All our own properties start with this prefix. */
-    public static final String PREFIX = XenonEngine.ADAPTORS_PREFIX + "webdav.";
-
-    /** List of properties supported by this FTP adaptor */
-    protected static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = 
-            new ImmutableArray<XenonPropertyDescription>();
-       
     private final Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
     private static int currentID = 1;
     public static final int OK_CODE = 200;
+
     
+
     /** The default buffer size for copy. Webdav doesn't use the standard copy engine. */
     private static final int BUFFER_SIZE = 4 * 1024;
 
@@ -156,7 +138,7 @@ public class WebdavFiles extends FileAdaptor {
    
     public WebdavFiles(FilesEngine filesEngine, Map<String, String> properties) throws XenonException {
         super(filesEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-                new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
+                new XenonProperties(VALID_PROPERTIES, properties));
     }
 
     @Override
@@ -189,7 +171,7 @@ public class WebdavFiles extends FileAdaptor {
         String cwd = webdavLocation.getPath();
         RelativePath entryPath = new RelativePath(cwd);
         String uniqueID = getNewUniqueID();
-        XenonProperties xenonProperties = new XenonProperties(getSupportedProperties(Component.FILESYSTEM), properties);
+        XenonProperties xenonProperties = new XenonProperties(VALID_PROPERTIES, properties);
         FileSystemImplementation fileSystem = new FileSystemImplementation(ADAPTOR_NAME, uniqueID, webdavLocation.getScheme(),
                 webdavLocation.getHost(), entryPath, credential, xenonProperties);
         fileSystems.put(uniqueID, new FileSystemInfo(fileSystem, client, credential));
@@ -271,20 +253,20 @@ public class WebdavFiles extends FileAdaptor {
 
     }
 
-    private void assertValidOptionsForCopy(CopyOption... options) throws InvalidOpenOptionsException {
+    private void assertValidOptionsForCopy(CopyOption... options) throws InvalidOptionsException {
         if (CopyOption.APPEND.occursIn(options)) {
-            throw new InvalidOpenOptionsException(ADAPTOR_NAME,
+            throw new InvalidOptionsException(ADAPTOR_NAME,
                     "Webdav adaptor does not support appending when copying files.");
         }
         if (CopyOption.RESUME.occursIn(options)) {
-            throw new InvalidOpenOptionsException(ADAPTOR_NAME,
+            throw new InvalidOptionsException(ADAPTOR_NAME,
                     "Webdav adaptor does not support resuming when copying files.");
         }
         if (CopyOption.REPLACE.occursIn(options) && CopyOption.CREATE.occursIn(options)) {
-            throw new InvalidOpenOptionsException(ADAPTOR_NAME, "Conflicting copy options REPLACE and CREATE.");
+            throw new InvalidOptionsException(ADAPTOR_NAME, "Conflicting copy options REPLACE and CREATE.");
         }
         if (CopyOption.REPLACE.occursIn(options) && CopyOption.VERIFY.occursIn(options)) {
-            throw new InvalidOpenOptionsException(ADAPTOR_NAME, "Conflicting copy options REPLACE and VERIFY.");
+            throw new InvalidOptionsException(ADAPTOR_NAME, "Conflicting copy options REPLACE and VERIFY.");
         }
     }
 
@@ -523,15 +505,15 @@ public class WebdavFiles extends FileAdaptor {
 
     private void assertValidArgumentsForNewOutputStream(Path path, OpenOptions processedOptions) throws XenonException {
         if (processedOptions.getReadMode() != null) {
-            throw new InvalidOpenOptionsException(ADAPTOR_NAME, "Disallowed open option: READ");
+            throw new InvalidOptionsException(ADAPTOR_NAME, "Disallowed open option: READ");
         }
 
         if (processedOptions.getAppendMode() == null) {
-            throw new InvalidOpenOptionsException(ADAPTOR_NAME, "No append mode provided!");
+            throw new InvalidOptionsException(ADAPTOR_NAME, "No append mode provided!");
         }
 
         if (processedOptions.getAppendMode() == OpenOption.APPEND) {
-            throw new InvalidOpenOptionsException(ADAPTOR_NAME,
+            throw new InvalidOptionsException(ADAPTOR_NAME,
                     "Webdav adaptor does not support appending when writing files.");
         }
 

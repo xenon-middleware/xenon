@@ -15,11 +15,9 @@
  */
 package nl.esciencecenter.xenon.engine;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 
 /**
@@ -33,10 +31,11 @@ public abstract class Adaptor {
     private final String description;
     private final ImmutableArray<String> supportedSchemes;
     private final ImmutableArray<String> supportedLocations;
-    private final ImmutableArray<XenonPropertyDescription> validProperties;
+    
+    protected final ImmutableArray<XenonPropertyDescription> validProperties;
+    
     private final XenonProperties properties;
-    ///private final XenonEngine xenonEngine;
-
+    
     protected Adaptor(String name, String description, ImmutableArray<String> supportedSchemes,
             ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties, 
             XenonProperties properties) {
@@ -79,27 +78,6 @@ public abstract class Adaptor {
         return validProperties.asArray();
     }
 
-    public ImmutableArray<XenonPropertyDescription> getSupportedProperties(Component level) {
-
-        ArrayList<XenonPropertyDescription> tmp = new ArrayList<>();
-
-        for (int i = 0; i < validProperties.length(); i++) {
-
-            XenonPropertyDescription d = validProperties.get(i);
-
-            if (d.getLevels().contains(level)) {
-                tmp.add(d);
-            }
-        }
-
-        return new ImmutableArray<>(tmp.toArray(new XenonPropertyDescription[tmp.size()]));
-    }
-
-//    public AdaptorDescription getAdaptorStatus() {
-//        return new AdaptorStatusImplementation(name, description, supportedSchemes, supportedLocations, validProperties,
-//                getAdaptorSpecificInformation());
-//    }
-
     public String[] getSupportedSchemes() {
         return supportedSchemes.asArray();
     }
@@ -114,12 +92,6 @@ public abstract class Adaptor {
     }
 
     public abstract Map<String, String> getAdaptorSpecificInformation();
-
-//    public abstract Files filesAdaptor() throws XenonException;
-
-//    public abstract Jobs jobsAdaptor() throws XenonException;
-
-//    public abstract Credentials credentialsAdaptor() throws XenonException;
 
     public abstract void end();
 }

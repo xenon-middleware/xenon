@@ -18,20 +18,20 @@ package nl.esciencecenter.xenon.files;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that the target path of an operation is invalid.  
+ * Signals that an invalid combination of OpenOptions have been specified.  
  * 
  * @version 1.0
  * @since 1.0
  */
-public class IllegalTargetPathException extends XenonException {
+public class InvalidOptionsException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 
-    public IllegalTargetPathException(String adaptorName, String message, Throwable t) {
+    public InvalidOptionsException(String adaptorName, String message, Throwable t) {
         super(adaptorName, message, t);
     }
 
-    public IllegalTargetPathException(String adaptorName, String message) {
+    public InvalidOptionsException(String adaptorName, String message) {
         super(adaptorName, message);
     }
 }

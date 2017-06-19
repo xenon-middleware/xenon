@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
@@ -52,7 +51,7 @@ import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.InvalidOpenOptionsException;
+import nl.esciencecenter.xenon.files.InvalidOptionsException;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
@@ -128,7 +127,7 @@ public class FtpFileAdaptor extends FileAdaptor {
 
     public FtpFileAdaptor(FilesEngine filesEngine, Map<String, String> properties) throws XenonException {
         super(filesEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-                new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
+                new XenonProperties(VALID_PROPERTIES, properties));
     }
 
 
@@ -152,7 +151,7 @@ public class FtpFileAdaptor extends FileAdaptor {
             throw new InvalidCredentialException(getName(), "Credentials was null.");
         }
 
-        XenonProperties xenonProperties = new XenonProperties(getSupportedProperties(Component.FILESYSTEM), properties);
+        XenonProperties xenonProperties = new XenonProperties(VALID_PROPERTIES, properties);
 
         FtpLocation ftpLocation = FtpLocation.parse(location);
         FTPClient ftpClient = new FTPClient();
@@ -575,11 +574,11 @@ public class FtpFileAdaptor extends FileAdaptor {
 
     private void assertValidArgumentsForNewOutputStream(Path path, OpenOptions processedOptions) throws XenonException {
         if (processedOptions.getReadMode() != null) {
-            throw new InvalidOpenOptionsException(getName(), "Disallowed open option: READ");
+            throw new InvalidOptionsException(getName(), "Disallowed open option: READ");
         }
 
         if (processedOptions.getAppendMode() == null) {
-            throw new InvalidOpenOptionsException(getName(), "No append mode provided!");
+            throw new InvalidOptionsException(getName(), "No append mode provided!");
         }
 
         if (processedOptions.getWriteMode() == null) {

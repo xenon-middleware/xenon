@@ -15,9 +15,6 @@
  */
 package nl.esciencecenter.xenon.engine;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 
 /**
@@ -30,12 +27,10 @@ public class XenonPropertyDescriptionImplementation implements XenonPropertyDesc
 
     private final String name;
     private final XenonPropertyDescription.Type type;
-    private final Set<XenonPropertyDescription.Component> levels;
     private final String defaultValue;
     private final String description;
 
-    public XenonPropertyDescriptionImplementation(String name, Type type, Set<Component> levels, String defaultValue,
-            String description) {
+    public XenonPropertyDescriptionImplementation(String name, Type type, String defaultValue, String description) {
 
         if (name == null) {
             throw new IllegalArgumentException("Name is null!");
@@ -48,17 +43,6 @@ public class XenonPropertyDescriptionImplementation implements XenonPropertyDesc
         }
 
         this.type = type;
-
-        if (levels == null) {
-            throw new IllegalArgumentException("Levels is null!");
-        }
-
-        if (levels.size() == 0) {
-            throw new IllegalArgumentException("No level specified!");
-        }
-
-        this.levels = new HashSet<>(levels);
-
         this.defaultValue = defaultValue;
 
         if (description == null) {
@@ -76,10 +60,6 @@ public class XenonPropertyDescriptionImplementation implements XenonPropertyDesc
         return type;
     }
 
-    public Set<Component> getLevels() {
-        return levels;
-    }
-
     public String getDefaultValue() {
         return defaultValue;
     }
@@ -90,7 +70,7 @@ public class XenonPropertyDescriptionImplementation implements XenonPropertyDesc
 
     @Override
     public String toString() {
-        return "XenonPropertyDescriptionImplementation [name=" + name + ", type=" + type + ", levels=" + levels
-                + ", defaultValue=" + defaultValue + ", description=" + description + "]";
+        return "XenonPropertyDescriptionImplementation [name=" + name + ", type=" + type + 
+        		", defaultValue=" + defaultValue + ", description=" + description + "]";
     }
 }

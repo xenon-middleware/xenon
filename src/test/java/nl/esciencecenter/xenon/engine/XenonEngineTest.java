@@ -52,12 +52,12 @@ public class XenonEngineTest {
         XenonEngine.newXenon(properties);
     }
 
-    @Test
-    public void newEngine_CorrectProperties_Success() throws Exception {
-        Map<String, String> properties = new HashMap<>();
-        properties.put("xenon.adaptors.ssh.loadKnownHosts", "false");
-        XenonEngine.newXenon(properties);
-    }
+//    @Test
+//    public void newEngine_CorrectProperties_Success() throws Exception {
+//        Map<String, String> properties = new HashMap<>();
+//        properties.put("xenon.adaptors.ssh.loadKnownHosts", "false");
+//        XenonEngine.newXenon(properties);
+//    }
 
     @Test(expected = UnknownPropertyException.class)
     public void newEngine_CorrectPropertiesAtWrongLevel_ThrowsException() throws Exception {
@@ -67,13 +67,13 @@ public class XenonEngineTest {
         XenonEngine.newXenon(properties);
     }
 
-    @Test
-    public void newEngine_MultipleCorrectProperties_Success() throws Exception {
-        Map<String, String> properties = new HashMap<>();
-        properties.put("xenon.adaptors.ssh.loadKnownHosts", "false");
-        properties.put("xenon.adaptors.local.queue.pollingDelay", "1500");
-        XenonEngine.newXenon(properties);
-    }
+//    @Test
+//    public void newEngine_MultipleCorrectProperties_Success() throws Exception {
+//        Map<String, String> properties = new HashMap<>();
+//        properties.put("xenon.adaptors.ssh.loadKnownHosts", "false");
+//        properties.put("xenon.adaptors.local.queue.pollingDelay", "1500");
+//        XenonEngine.newXenon(properties);
+//    }
 
     @Test(expected = UnknownPropertyException.class)
     public void newEngine_CorrectAndIncorrectProperties_ThrowsException() throws Exception {

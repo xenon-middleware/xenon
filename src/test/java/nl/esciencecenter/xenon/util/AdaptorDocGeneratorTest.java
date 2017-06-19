@@ -41,8 +41,8 @@ public class AdaptorDocGeneratorTest {
         assertThat(output, containsString("Adaptor Documentation"));
     }
 
-    @Test
-    public void testGenerate_hasSupportedProps() {
-        assertThat(output, containsString("Supported properties"));
-    }
+//    @Test
+//    public void testGenerate_hasSupportedProps() {
+//        assertThat(output, containsString("Supported properties"));
+//    }
 }

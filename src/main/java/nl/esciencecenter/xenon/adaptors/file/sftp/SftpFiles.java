@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.xenon.ConnectionLostException;
 import nl.esciencecenter.xenon.NotConnectedException;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.files.FileAdaptor;
@@ -58,7 +57,7 @@ import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.InvalidAttributeException;
-import nl.esciencecenter.xenon.files.InvalidOpenOptionsException;
+import nl.esciencecenter.xenon.files.InvalidOptionsException;
 import nl.esciencecenter.xenon.files.InvalidPathException;
 import nl.esciencecenter.xenon.files.NoSpaceException;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
@@ -154,7 +153,7 @@ public class SftpFiles extends FileAdaptor {
     public SftpFiles(FilesEngine engine, Map<String, String> properties) throws XenonException { 
     		
     	super(engine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-                    new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
+                    new XenonProperties(VALID_PROPERTIES, properties));
     	
     	
     	
@@ -681,11 +680,11 @@ public class SftpFiles extends FileAdaptor {
         OpenOptions tmp = OpenOptions.processOptions(ADAPTOR_NAME, options);
 
         if (tmp.getReadMode() != null) {
-            throw new InvalidOpenOptionsException(ADAPTOR_NAME, "Disallowed open option: READ");
+            throw new InvalidOptionsException(ADAPTOR_NAME, "Disallowed open option: READ");
         }
 
         if (tmp.getAppendMode() == null) {
-            throw new InvalidOpenOptionsException(ADAPTOR_NAME, "No append mode provided!");
+            throw new InvalidOptionsException(ADAPTOR_NAME, "No append mode provided!");
         }
 
         if (tmp.getWriteMode() == null) {

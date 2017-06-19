@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.file;
 
+import static nl.esciencecenter.xenon.adaptors.file.file.LocalProperties.ADAPTOR_NAME;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Iterator;
@@ -55,7 +57,7 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
             iterator = stream.iterator();
             this.filter = filter;
         } catch (IOException e) {
-            throw new XenonException(LocalFiles.ADAPTOR_NAME, "Could not create directory stream for " + dir, e);
+            throw new XenonException(ADAPTOR_NAME, "Could not create directory stream for " + dir, e);
         }
     }
 
