@@ -27,6 +27,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.adaptors.file.file.LocalFileAdaptorFactory;
 import nl.esciencecenter.xenon.adaptors.file.ftp.FtpFileAdaptorFactory;
+import nl.esciencecenter.xenon.adaptors.file.s3.S3FileAdaptorFactory;
 import nl.esciencecenter.xenon.adaptors.file.sftp.SftpFileAdaptorFactory;
 import nl.esciencecenter.xenon.adaptors.file.webdav.WebdavFileAdaptorFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -66,7 +67,8 @@ public class FilesEngine implements Files {
             new LocalFileAdaptorFactory(),
             new SftpFileAdaptorFactory(),
             new FtpFileAdaptorFactory(), 
-            new WebdavFileAdaptorFactory()
+            new WebdavFileAdaptorFactory(),
+            new S3FileAdaptorFactory()
     };    
     
     public static final DirectoryStream.Filter ACCEPT_ALL_FILTER = new DirectoryStream.Filter() {
