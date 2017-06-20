@@ -26,7 +26,6 @@ import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.engine.XenonProperties;
-import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.RelativePath;
 
@@ -115,7 +114,7 @@ public class FileSystemImplementationTest {
         tmp.put("test", "test");
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation(
+                new XenonPropertyDescription(
                 "test", Type.STRING, "test", "test property"));
 
         XenonProperties p = new XenonProperties(valid, tmp);

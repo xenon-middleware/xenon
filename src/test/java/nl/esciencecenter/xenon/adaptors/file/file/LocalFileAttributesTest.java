@@ -22,7 +22,6 @@ import java.nio.file.attribute.PosixFilePermissions;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.adaptors.file.file.LocalFileAttributes;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.Files;
@@ -45,16 +44,14 @@ public class LocalFileAttributesTest {
 
     @org.junit.Test(expected = XenonException.class)
     public void testNonExistingFile() throws Exception {
-        Xenon o = XenonFactory.newXenon(null);
-        Files files = o.files();
+        Files files = Xenon.files();
         Path path = resolve(files, Utils.getLocalCWD(files), "noot" + System.currentTimeMillis() + ".txt");
         new LocalFileAttributes(path);
     }
 
     @org.junit.Test
     public void testCreationTime() throws Exception {
-        Xenon o = XenonFactory.newXenon(null);
-        Files files = o.files();
+        Files files = Xenon.files();
         
         long now = System.currentTimeMillis();
 
@@ -69,16 +66,16 @@ public class LocalFileAttributesTest {
         System.out.println("NOW " + now + " CREATE " + time);
 
         files.delete(path);
-        XenonFactory.endXenon(o);
-
+        
+        Xenon.endAll();
+        
         assertTrue(time >= now - 5000);
         assertTrue(time <= now + 5000);
     }
 
     @org.junit.Test
     public void testHashCode() throws Exception {
-        Xenon o = XenonFactory.newXenon(null);
-        Files files = o.files();
+        Files files = Xenon.files();
         Path path = resolve(files, Utils.getLocalCWD(files), "aap.txt");
         
         if (!files.exists(path)) { 
@@ -92,7 +89,7 @@ public class LocalFileAttributesTest {
         // TODO: check hashcode ?
 
         files.delete(path);
-        XenonFactory.endXenon(o);
+        Xenon.endAll();
     }
 
     @org.junit.Test
@@ -102,8 +99,7 @@ public class LocalFileAttributesTest {
             return;
         }
         
-        Xenon o = XenonFactory.newXenon(null);
-        Files files = o.files();
+        Files files = Xenon.files();
         Path cwd = Utils.getLocalCWD(files);
         Path path1 = resolve(files, cwd, "aap.txt");
 
@@ -153,7 +149,7 @@ public class LocalFileAttributesTest {
         files.delete(path1);
         files.delete(path2);
 
-        XenonFactory.endXenon(o);
+        Xenon.endAll();
     }
 
 }

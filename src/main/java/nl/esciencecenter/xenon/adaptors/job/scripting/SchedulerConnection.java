@@ -23,12 +23,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.job.ssh.SshProperties;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.files.FileSystem;
+import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.jobs.IncompleteJobDescriptionException;
@@ -36,6 +37,7 @@ import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
+import nl.esciencecenter.xenon.jobs.Jobs;
 import nl.esciencecenter.xenon.jobs.NoSuchQueueException;
 import nl.esciencecenter.xenon.jobs.QueueStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
@@ -58,10 +60,9 @@ public abstract class SchedulerConnection {
 
     private final String adaptorName;
     private final String id;
-    protected final XenonEngine engine;
     private final Scheduler subScheduler;
     private final FileSystem subFileSystem;
-
+    
     private final XenonProperties properties;
 
     private final long pollDelay;
@@ -187,13 +188,12 @@ public abstract class SchedulerConnection {
     }
 
     protected SchedulerConnection(String adaptorName, String location, Credential credential,
-            XenonProperties properties, XenonEngine engine, long pollDelay) throws XenonException {
+            XenonProperties properties, long pollDelay) throws XenonException {
 
         this.adaptorName = adaptorName;
-        this.engine = engine;
         this.properties = properties;
         this.pollDelay = pollDelay;
-
+        
 //        if (!supportsScheme(scheme, adaptor.getSupportedSchemes())) {
 //            throw new InvalidLocationException(adaptorName, "Adaptor does not support scheme \"" + scheme + "\"");
 //        }
@@ -221,10 +221,10 @@ public abstract class SchedulerConnection {
         if (subJobScheme.equals("ssh")) {
             subSchedulerProperties.put(SshProperties.POLLING_DELAY, "100");
         }
-        subScheduler = engine.jobs().newScheduler(subJobScheme, subLocation, credential, subSchedulerProperties);
+        subScheduler = Xenon.jobs().newScheduler(subJobScheme, subLocation, credential, subSchedulerProperties);
 
         LOGGER.debug("creating file system for {} adaptor at {}://{}", adaptorName, subFileScheme, subLocation);
-        subFileSystem = engine.files().newFileSystem(subFileScheme, subLocation, credential, null);
+        subFileSystem = Xenon.files().newFileSystem(subFileScheme, subLocation, credential, null);
     }
 
     protected String getAdaptorName() { 
@@ -258,7 +258,7 @@ public abstract class SchedulerConnection {
      *          if an error occurs
      */
     public RemoteCommandRunner runCommand(String stdin, String executable, String... arguments) throws XenonException {
-        return new RemoteCommandRunner(engine, subScheduler, adaptorName, stdin, executable, arguments);
+        return new RemoteCommandRunner(subScheduler, adaptorName, stdin, executable, arguments);
     }
 
     /**
@@ -276,7 +276,7 @@ public abstract class SchedulerConnection {
      *          if an error occurred
      */
     public String runCheckedCommand(String stdin, String executable, String... arguments) throws XenonException {
-        RemoteCommandRunner runner = new RemoteCommandRunner(engine, subScheduler, adaptorName, stdin, executable,
+        RemoteCommandRunner runner = new RemoteCommandRunner(subScheduler, adaptorName, stdin, executable,
                 arguments);
 
         if (!runner.success()) {
@@ -307,7 +307,7 @@ public abstract class SchedulerConnection {
         description.setExecutable(executable);
         description.setArguments(arguments);
 
-        return engine.jobs().submitJob(subScheduler, description);
+        return Xenon.jobs().submitJob(subScheduler, description);
     }
 
     /**
@@ -420,21 +420,24 @@ public abstract class SchedulerConnection {
             return;
         }
 
+        Files files = Xenon.files();
+        
         Path path;
         if (workingDirectory.startsWith("/")) {
-            path = engine.files().newPath(subFileSystem, new RelativePath(workingDirectory));
+            path = files.newPath(subFileSystem, new RelativePath(workingDirectory));
         } else {
             //make relative path absolute
             Path fsEntryPath = getFsEntryPath();
-            path = engine.files().newPath(fsEntryPath.getFileSystem(), fsEntryPath.getRelativePath().resolve(workingDirectory));
+            path = files.newPath(fsEntryPath.getFileSystem(), fsEntryPath.getRelativePath().resolve(workingDirectory));
         }
-        if (!engine.files().exists(path)) {
+        if (!files.exists(path)) {
             throw new InvalidJobDescriptionException(adaptorName, "Working directory does not exist: " + path);
         }
     }
 
     public void close() throws XenonException {
-        engine.jobs().close(subScheduler);
+    	Xenon.jobs().close(subScheduler);
+    	Xenon.files().close(subFileSystem);
     }
 
     //implemented by sub-class

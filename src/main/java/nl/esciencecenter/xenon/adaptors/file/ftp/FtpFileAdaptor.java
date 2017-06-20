@@ -35,10 +35,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.engine.files.FileAdaptor;
@@ -80,7 +80,7 @@ public class FtpFileAdaptor extends FileAdaptor {
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("ftp://host[:port]");
 
     /** All our own properties start with this prefix. */
-    public static final String PREFIX = XenonEngine.ADAPTORS_PREFIX + "ftp.";
+    public static final String PREFIX = Xenon.ADAPTORS_PREFIX + "ftp.";
 
     /** List of properties supported by this FTP adaptor */
     protected static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = 
@@ -125,9 +125,8 @@ public class FtpFileAdaptor extends FileAdaptor {
        
     private final Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
-    public FtpFileAdaptor(FilesEngine filesEngine, Map<String, String> properties) throws XenonException {
-        super(filesEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-                new XenonProperties(VALID_PROPERTIES, properties));
+    public FtpFileAdaptor(FilesEngine filesEngine) throws XenonException {
+        super(filesEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
     }
 
 

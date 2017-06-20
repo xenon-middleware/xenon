@@ -21,7 +21,6 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 
 import nl.esciencecenter.xenon.Xenon;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.adaptors.job.ssh.SSHJobTestConfig;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -44,9 +43,8 @@ public class ITMultiJobTest {
         
         String TEST_ROOT = "xenon_test_SSH_" + System.currentTimeMillis();
 
-        Xenon xenon = XenonFactory.newXenon(null);
-        Files files = xenon.files();
-        Jobs jobs = xenon.jobs();
+        Files files = Xenon.files();
+        Jobs jobs = Xenon.jobs();
      
         FileSystem filesystem = files.newFileSystem("sftp", user + "@" + location, new DefaultCredential(),
                 new HashMap<String, String>(0));
@@ -139,7 +137,7 @@ public class ITMultiJobTest {
         files.delete(root);
         files.close(filesystem);
 
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
 
     @org.junit.Test

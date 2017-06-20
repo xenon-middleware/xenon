@@ -16,8 +16,6 @@
 
 package nl.esciencecenter.xenon.engine.files;
 
-import java.util.Map;
-
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.AdaptorFactory;
 
@@ -28,5 +26,5 @@ import nl.esciencecenter.xenon.engine.AdaptorFactory;
  */
 public interface FileAdaptorFactory extends AdaptorFactory {
     
-    FileAdaptor createAdaptor(FilesEngine engine, Map<String, String> properties) throws XenonException; 
+    FileAdaptor createAdaptor(FilesEngine engine) throws XenonException; 
 }

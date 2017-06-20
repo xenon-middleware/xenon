@@ -28,8 +28,6 @@ import nl.esciencecenter.xenon.adaptors.job.slurm.SlurmAdaptorFactory;
 import nl.esciencecenter.xenon.adaptors.job.torque.TorqueAdaptorFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.DuplicateAdaptorException;
-import nl.esciencecenter.xenon.engine.XenonEngine;
-import nl.esciencecenter.xenon.engine.util.PropertyUtils;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobAdaptorDescription;
 import nl.esciencecenter.xenon.jobs.JobDescription;
@@ -54,20 +52,17 @@ public class JobsEngine implements Jobs {
             new TorqueAdaptorFactory(),
     };
     
-    private final XenonEngine xenonEngine;
-
     private final HashMap<String, JobAdaptor> adaptors = new HashMap<>();
     
-    public JobsEngine(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
-        this.xenonEngine = xenonEngine;
-        loadAdaptors(properties);
+    public JobsEngine() throws XenonException {
+    	loadAdaptors();
     }
     
-    private void loadAdaptors(Map<String, String> properties) throws XenonException {
+    private void loadAdaptors() throws XenonException {
         
         for (JobAdaptorFactory a : ADAPTOR_FACTORIES) {
         	
-        	JobAdaptor adaptor = a.createAdaptor(this, PropertyUtils.extract(properties, a.getPropertyPrefix()));
+        	JobAdaptor adaptor = a.createAdaptor(this);
         	
         	String name = adaptor.getName();
             
@@ -77,21 +72,6 @@ public class JobsEngine implements Jobs {
             
             adaptors.put(name, adaptor);	
         }
-    }
-    
-    public XenonEngine getXenonEngine() { 
-        return xenonEngine;
-    }
-    
-    public void registerJobAdaptor(JobAdaptor adaptor) throws DuplicateAdaptorException { 
-        
-        String name = adaptor.getName();
-        
-        if (adaptors.containsKey(name)) { 
-            throw new DuplicateAdaptorException(COMPONENT_NAME, "Job adaptor " + name + " already exists!");
-        }
-        
-        adaptors.put(name, adaptor);
     }
     
     public JobAdaptorDescription [] getAdaptorDescriptions() { 
@@ -273,7 +253,11 @@ public class JobsEngine implements Jobs {
 
     @Override
     public String toString() {
-        return "JobsEngine [xenonEngine=" + xenonEngine + "]";
+        return "JobsEngine";
+    }
+    
+    public void end() { 
+        // TODO: close all schedulers and filesystems in use...
     }
 
 }

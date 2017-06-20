@@ -70,9 +70,8 @@ public class LocalFiles extends FileAdaptor {
         return fsID++;
     }
 
-    public LocalFiles(FilesEngine filesEngine, Map<String, String> properties) throws XenonException {
-        super(filesEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-            new XenonProperties(VALID_PROPERTIES, properties));
+    public LocalFiles(FilesEngine filesEngine) throws XenonException {
+        super(filesEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
     }
     
     /**

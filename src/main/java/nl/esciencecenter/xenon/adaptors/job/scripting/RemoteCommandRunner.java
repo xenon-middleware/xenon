@@ -20,6 +20,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
+import nl.esciencecenter.xenon.jobs.Jobs;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 import nl.esciencecenter.xenon.jobs.Streams;
 import nl.esciencecenter.xenon.util.InputWriter;
@@ -60,7 +61,7 @@ public class RemoteCommandRunner {
      * @throws XenonException
      *             if the job could not be run successfully.
      */
-    public RemoteCommandRunner(Xenon xenon, Scheduler scheduler, String adaptorName, String stdin, String executable,
+    public RemoteCommandRunner(Scheduler scheduler, String adaptorName, String stdin, String executable,
             String... arguments) throws XenonException {
         long start = System.currentTimeMillis();
 
@@ -70,9 +71,11 @@ public class RemoteCommandRunner {
         description.setArguments(arguments);
         description.setQueueName("unlimited");
 
-        Job job = xenon.jobs().submitJob(scheduler, description);
+        Jobs jobs = Xenon.jobs();
+        
+        Job job = jobs.submitJob(scheduler, description);
 
-        Streams streams = xenon.jobs().getStreams(job);
+        Streams streams = jobs.getStreams(job);
 
         InputWriter in = new InputWriter(stdin, streams.getStdin());
 
@@ -84,10 +87,10 @@ public class RemoteCommandRunner {
         out.waitUntilFinished();
         err.waitUntilFinished();
 
-        JobStatus status = xenon.jobs().getJobStatus(job);
+        JobStatus status = jobs.getJobStatus(job);
 
         if (!status.isDone()) {
-            status = xenon.jobs().waitUntilDone(job, 0);
+            status = jobs.waitUntilDone(job, 0);
         }
 
         if (status.hasException()) {

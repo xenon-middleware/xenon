@@ -47,7 +47,6 @@ import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.XenonTestWatcher;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.files.PathAttributesPairImplementation;
@@ -79,7 +78,6 @@ public abstract class GenericFileAdaptorTestParent {
 
     public static FileTestConfig config;
 
-    protected Xenon xenon;
     protected Files files;
     protected Path cwd;
     protected Path testDir;
@@ -97,9 +95,7 @@ public abstract class GenericFileAdaptorTestParent {
         config = testConfig;
         TEST_ROOT = "xenon_test_" + config.getAdaptorName() + "_" + System.currentTimeMillis();
 
-        Xenon xenon = XenonFactory.newXenon(null);
-
-        Files files = xenon.files();
+        Files files = Xenon.files();
 
         Path p = config.getWorkingDir(files);
         Path root = files.newPath(p.getFileSystem(), p.getRelativePath().resolve(TEST_ROOT));
@@ -111,16 +107,14 @@ public abstract class GenericFileAdaptorTestParent {
             files.createDirectory(root);
         }
 
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
 
     // MUST be invoked by a @AfterClass method of the subclass!
     public static void cleanupClass() throws Exception {
         logger.debug("GenericFileAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
 
-        Xenon xenon = XenonFactory.newXenon(null);
-
-        Files files = xenon.files();
+        Files files = Xenon.files();
 
         Path p = config.getWorkingDir(files);
         Path root = files.newPath(p.getFileSystem(), p.getRelativePath().resolve(TEST_ROOT));
@@ -129,7 +123,7 @@ public abstract class GenericFileAdaptorTestParent {
             Utils.recursiveDelete(files, root);
         }
 
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
 
     public Path resolve(Path root, String... path) throws XenonException {
@@ -138,8 +132,7 @@ public abstract class GenericFileAdaptorTestParent {
 
     @Before
     public void prepare() throws Exception {
-        xenon = XenonFactory.newXenon(null);
-        files = xenon.files();
+        files = Xenon.files();
         cwd = config.getWorkingDir(files);
         testDir = null;
     }
@@ -156,7 +149,7 @@ public abstract class GenericFileAdaptorTestParent {
             } catch (Exception ex) {
                 // that's fine
             }
-            XenonFactory.endXenon(xenon);
+            Xenon.endAll();
         }
     }
 

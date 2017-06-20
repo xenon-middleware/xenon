@@ -40,7 +40,6 @@ import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.XenonTestWatcher;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
@@ -67,7 +66,6 @@ public abstract class GenericJobAdaptorTestParent {
 
     protected static JobTestConfig config;
 
-    protected Xenon xenon;
     protected Files files;
     protected Jobs jobs;
  
@@ -88,9 +86,7 @@ public abstract class GenericJobAdaptorTestParent {
     public static void cleanupClass() throws Exception {
         logger.info("GenericJobAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
 
-        Xenon xenon = XenonFactory.newXenon(null);
-
-        Files files = xenon.files();
+        Files files = Xenon.files();
  
         Path cwd = config.getWorkingDir(files);
         Path root = files.newPath(cwd.getFileSystem(), cwd.getRelativePath().resolve(TEST_ROOT));
@@ -99,7 +95,7 @@ public abstract class GenericJobAdaptorTestParent {
             Utils.recursiveDelete(files, root);
         }
 
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
 
     @Before
@@ -107,15 +103,13 @@ public abstract class GenericJobAdaptorTestParent {
         // This is not an adaptor option, so it will throw an exception!
         //Map<String, String> properties = new HashMap<>();
         //properties.put(SshAdaptor.POLLING_DELAY, "100");
-        xenon = XenonFactory.newXenon(null);
-        files = xenon.files();
-        jobs = xenon.jobs();
+        files = Xenon.files();
+        jobs = Xenon.jobs();
     }
 
     @After
     public void cleanup() throws XenonException {
-        // XenonFactory.endXenon(xenon);
-        XenonFactory.endAll();
+        Xenon.endAll();
     }
 
     protected String getWorkingDir(String testName) {

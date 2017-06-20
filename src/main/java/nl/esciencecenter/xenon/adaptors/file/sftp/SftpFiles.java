@@ -150,15 +150,9 @@ public class SftpFiles extends FileAdaptor {
     
     private final Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
     
-    public SftpFiles(FilesEngine engine, Map<String, String> properties) throws XenonException { 
+    public SftpFiles(FilesEngine engine) throws XenonException { 
     		
-    	super(engine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-                    new XenonProperties(VALID_PROPERTIES, properties));
-    	
-    	
-    	
-    	
-    
+    	super(engine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
     }
 
     private void checkParent(Path path) throws XenonException {

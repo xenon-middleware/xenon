@@ -26,7 +26,6 @@ import java.io.ByteArrayOutputStream;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 import nl.esciencecenter.xenon.engine.jobs.StreamsImplementation;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -130,7 +129,6 @@ public class JobQueueTest {
     }
 
     private static Scheduler scheduler;
-    private static Xenon xenon;
     private static Path cwd;
     private static Files files;
     private static FileSystem filesystem;
@@ -145,9 +143,8 @@ public class JobQueueTest {
 
     @BeforeClass
     public static void prepare() throws Exception {
-        xenon = XenonFactory.newXenon(null);
-        scheduler = xenon.jobs().newScheduler("local", null, null, null);
-        files = xenon.files();
+        scheduler = Xenon.jobs().newScheduler("local", "local://test", null, null);
+        files = Xenon.files();
         cwd = Utils.getLocalCWD(files);
         filesystem = cwd.getFileSystem();
         myFactory = new MyFactory();

@@ -18,8 +18,6 @@ package nl.esciencecenter.xenon.adaptors.job.ssh;
 
 import static nl.esciencecenter.xenon.adaptors.job.ssh.SshProperties.*;
 
-import java.util.Map;
-
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.engine.jobs.JobAdaptor;
@@ -45,7 +43,7 @@ public class SshJobAdaptorFactory implements JobAdaptorFactory {
     }
 
     @Override
-    public JobAdaptor createAdaptor(JobsEngine engine, Map<String, String> properties) throws XenonException {
-        return new SshJobs(engine, properties);
+    public JobAdaptor createAdaptor(JobsEngine engine) throws XenonException {
+        return new SshJobs(engine);
     }
 }

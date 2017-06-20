@@ -44,12 +44,12 @@ package nl.esciencecenter.xenon;
  * @version 1.0
  * @since 1.0
  */
-public interface XenonPropertyDescription {
+public class XenonPropertyDescription {
     
     /**
      * This Type enumeration lists all possible types of properties recognized by Xenon.
      */
-    enum Type {
+    public enum Type {
         /** 
          * Properties of type <code>BOOLEAN</code> can be either <code>"true"</code> or <code>"false"</code>.  
          */        
@@ -92,32 +92,73 @@ public interface XenonPropertyDescription {
          */                
         SIZE,
     }
+    
+    private final String name;
+    private final XenonPropertyDescription.Type type;
+    private final String defaultValue;
+    private final String description;
+
+    public XenonPropertyDescription(String name, Type type, String defaultValue, String description) {
+
+        if (name == null) {
+            throw new IllegalArgumentException("Name is null!");
+        }
+
+        this.name = name;
+
+        if (type == null) {
+            throw new IllegalArgumentException("Type is null!");
+        }
+
+        this.type = type;
+        this.defaultValue = defaultValue;
+
+        if (description == null) {
+            throw new IllegalArgumentException("Description is null!");
+        }
+
+        this.description = description;
+    }
 
     /**
      * Returns the name of the property.
      * 
      * @return the name of the property.
      */
-    String getName();
+    public String getName() {
+        return name;
+    }
 
     /**
      * Returns the type of the property.
      * 
      * @return the type of the property.
      */
-    Type getType();
+    public Type getType() {
+        return type;
+    }
 
     /**
      * Returns the default value for this property.
      * 
      * @return the default value for this property or <code>null</code> is no default is set.
      */
-    String getDefaultValue();
+    public String getDefaultValue() {
+        return defaultValue;
+    }
 
     /**
      * Returns a human readable description of this property.
      * 
      * @return a human readable description of this property.
      */
-    String getDescription();
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public String toString() {
+        return "XenonPropertyDescriptionImplementation [name=" + name + ", type=" + type + 
+        		", defaultValue=" + defaultValue + ", description=" + description + "]";
+    }
 }

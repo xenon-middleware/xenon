@@ -13,18 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package nl.esciencecenter.xenon;
 
-package nl.esciencecenter.xenon.engine.jobs;
+import org.junit.Test;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.engine.AdaptorFactory;
+public class XenonTest {
 
-/**
- * @version 1.0
- * @since 1.0
- *
- */
-public interface JobAdaptorFactory extends AdaptorFactory {
-    
-    JobAdaptor createAdaptor(JobsEngine engine) throws XenonException; 
+    @Test
+    public void testNewXenon() throws XenonException {
+    	// For coverage
+    	new Xenon();
+    }
+
+    @Test
+    public void testEndXenon() throws XenonException {
+        Xenon.endAll();
+    }
+
 }

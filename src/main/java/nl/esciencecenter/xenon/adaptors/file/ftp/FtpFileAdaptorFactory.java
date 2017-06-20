@@ -16,8 +16,6 @@
 
 package nl.esciencecenter.xenon.adaptors.file.ftp;
 
-import java.util.Map;
-
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.engine.files.FileAdaptor;
@@ -42,7 +40,7 @@ public class FtpFileAdaptorFactory implements FileAdaptorFactory {
     }
 
     @Override
-    public FileAdaptor createAdaptor(FilesEngine engine, Map<String, String> properties) throws XenonException {
-        return new FtpFileAdaptor(engine, properties);
+    public FileAdaptor createAdaptor(FilesEngine engine) throws XenonException {
+        return new FtpFileAdaptor(engine);
     }
 }

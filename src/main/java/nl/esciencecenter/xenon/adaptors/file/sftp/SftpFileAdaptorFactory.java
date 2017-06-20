@@ -42,7 +42,7 @@ public class SftpFileAdaptorFactory implements FileAdaptorFactory {
     }
 
     @Override
-    public FileAdaptor createAdaptor(FilesEngine engine, Map<String, String> properties) throws XenonException {
-        return new SftpFiles(engine, properties);
+    public FileAdaptor createAdaptor(FilesEngine engine) throws XenonException {
+        return new SftpFiles(engine);
     }
 }

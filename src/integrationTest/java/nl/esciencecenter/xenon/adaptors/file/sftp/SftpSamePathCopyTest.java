@@ -31,7 +31,6 @@ import org.junit.Test;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.adaptors.job.ssh.SSHJobTestConfig;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -50,7 +49,6 @@ public class SftpSamePathCopyTest {
  
     public static SSHJobTestConfig config;
     
-    protected Xenon xenon;
     protected Files files;
     
     @BeforeClass
@@ -65,8 +63,7 @@ public class SftpSamePathCopyTest {
 
         Map<String, String> properties = new HashMap<>();
         
-        xenon = XenonFactory.newXenon(properties);
-        files = xenon.files();
+        files = Xenon.files();
     }
     
     public Path resolve(Path root, String... path) throws XenonException {

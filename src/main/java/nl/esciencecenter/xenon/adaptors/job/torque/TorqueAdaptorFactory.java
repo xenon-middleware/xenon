@@ -50,8 +50,8 @@ public class TorqueAdaptorFactory implements JobAdaptorFactory {
     }
 
     @Override
-    public JobAdaptor createAdaptor(JobsEngine engine, Map<String, String> properties) throws XenonException {
+    public JobAdaptor createAdaptor(JobsEngine engine) throws XenonException {
         return new ScriptingJobs(engine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-                new XenonProperties(VALID_PROPERTIES, properties), new TorqueSchedulerConnectionFactory());
+                new TorqueSchedulerConnectionFactory());
     }
 }

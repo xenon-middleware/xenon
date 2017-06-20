@@ -136,9 +136,8 @@ public class WebdavFiles extends FileAdaptor {
     }
 
    
-    public WebdavFiles(FilesEngine filesEngine, Map<String, String> properties) throws XenonException {
-        super(filesEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-                new XenonProperties(VALID_PROPERTIES, properties));
+    public WebdavFiles(FilesEngine filesEngine) throws XenonException {
+        super(filesEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
     }
 
     @Override

@@ -18,9 +18,7 @@ package nl.esciencecenter.xenon.files;
 import static org.junit.Assert.assertTrue;
 
 import nl.esciencecenter.xenon.Xenon;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.adaptors.job.ssh.SSHJobTestConfig;
-import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.Test;
@@ -32,13 +30,12 @@ public class ITInterSchemeCopyTest {
 
     @Test
     public void test_copy_local_ssh() throws Exception {
-        Xenon xenon = XenonEngine.newXenon(null);
         SSHJobTestConfig config = new SSHJobTestConfig(null);
 
         String user = config.getPropertyOrFail("test.ssh.user");
         String location = config.getPropertyOrFail("test.ssh.location");
         
-        Files files = xenon.files();
+        Files files = Xenon.files();
 
         Path localCWD = Utils.getLocalCWD(files);
         Path sshCWD = files.newFileSystem("ssh", user + "@" + location, null, null).getEntryPath();
@@ -79,6 +76,6 @@ public class ITInterSchemeCopyTest {
         files.delete(localDir);
         files.delete(sshDir);
 
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
 }

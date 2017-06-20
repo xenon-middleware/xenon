@@ -19,7 +19,6 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.job.scripting.SchedulerConnection;
 import nl.esciencecenter.xenon.adaptors.job.scripting.SchedulerConnectionFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 
 /**
@@ -29,9 +28,9 @@ import nl.esciencecenter.xenon.engine.XenonProperties;
 public class TorqueSchedulerConnectionFactory implements SchedulerConnectionFactory {
 
     @Override
-    public SchedulerConnection newSchedulerConnection(String location, Credential credential, XenonProperties properties, 
-            XenonEngine engine) throws XenonException {
-        return new TorqueSchedulerConnection(location, credential, properties, engine);
+    public SchedulerConnection newSchedulerConnection(String location, Credential credential, 
+    		XenonProperties properties) throws XenonException {
+        return new TorqueSchedulerConnection(location, credential, properties);
     }
 
 }

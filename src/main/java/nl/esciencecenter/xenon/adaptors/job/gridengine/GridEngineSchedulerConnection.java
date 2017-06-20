@@ -15,7 +15,10 @@
  */
 package nl.esciencecenter.xenon.adaptors.job.gridengine;
 
-import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineProperties.*;
+import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineProperties.ACCOUNTING_GRACE_TIME_PROPERTY;
+import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineProperties.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineProperties.IGNORE_VERSION_PROPERTY;
+import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineProperties.POLL_DELAY_PROPERTY;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +38,6 @@ import nl.esciencecenter.xenon.adaptors.job.scripting.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.job.scripting.SchedulerConnection;
 import nl.esciencecenter.xenon.adaptors.job.scripting.ScriptingParser;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 import nl.esciencecenter.xenon.engine.jobs.JobStatusImplementation;
@@ -182,11 +184,10 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     private final GridEngineSetup setupInfo;
 
-    GridEngineSchedulerConnection(String location, Credential credential, XenonProperties properties, XenonEngine engine) 
+    GridEngineSchedulerConnection(String location, Credential credential, XenonProperties properties) 
             throws XenonException {
 
-        super(ADAPTOR_NAME, location, credential, properties, engine, properties
-                .getLongProperty(POLL_DELAY_PROPERTY));
+        super(ADAPTOR_NAME, location, credential, properties, properties.getLongProperty(POLL_DELAY_PROPERTY));
 
         boolean ignoreVersion = properties.getBooleanProperty(IGNORE_VERSION_PROPERTY);
         accountingGraceTime = properties.getLongProperty(ACCOUNTING_GRACE_TIME_PROPERTY);

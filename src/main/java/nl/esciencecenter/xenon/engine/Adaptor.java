@@ -34,11 +34,8 @@ public abstract class Adaptor {
     
     protected final ImmutableArray<XenonPropertyDescription> validProperties;
     
-    private final XenonProperties properties;
-    
     protected Adaptor(String name, String description, ImmutableArray<String> supportedSchemes,
-            ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties, 
-            XenonProperties properties) {
+            ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties) {
 
         super();
         this.name = name;
@@ -51,12 +48,6 @@ public abstract class Adaptor {
         } else { 
             this.validProperties = validProperties;
         }
-         
-        this.properties = properties;
-    }
-
-    public XenonProperties getProperties() {
-        return properties;
     }
 
     public String getName() {

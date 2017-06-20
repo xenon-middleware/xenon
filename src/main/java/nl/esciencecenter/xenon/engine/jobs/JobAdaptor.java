@@ -22,7 +22,6 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.Adaptor;
-import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobAdaptorDescription;
@@ -53,9 +52,8 @@ public abstract class JobAdaptor extends Adaptor {
      * @param properties
      */
     protected JobAdaptor(JobsEngine jobsEngine, String name, String description, ImmutableArray<String> supportedSchemes,
-            ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties,
-            XenonProperties properties) {
-        super(name, description, supportedSchemes, supportedLocations, validProperties, properties);
+            ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties) {
+        super(name, description, supportedSchemes, supportedLocations, validProperties);
     
         this.jobsEngine = jobsEngine;
     }

@@ -23,12 +23,9 @@ import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineProperti
 import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineProperties.PREFIX;
 import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineProperties.VALID_PROPERTIES;
 
-import java.util.Map;
-
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.job.scripting.ScriptingJobs;
-import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.jobs.JobAdaptor;
 import nl.esciencecenter.xenon.engine.jobs.JobAdaptorFactory;
 import nl.esciencecenter.xenon.engine.jobs.JobsEngine;
@@ -51,8 +48,8 @@ public class GridEngineAdaptorFactory implements JobAdaptorFactory {
     }
 
     @Override
-    public JobAdaptor createAdaptor(JobsEngine engine, Map<String, String> properties) throws XenonException {
+    public JobAdaptor createAdaptor(JobsEngine engine) throws XenonException {
         return new ScriptingJobs(engine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-                new XenonProperties(VALID_PROPERTIES, properties), new GridEngineSchedulerConnectionFactory());
+                new GridEngineSchedulerConnectionFactory());
     }
 }

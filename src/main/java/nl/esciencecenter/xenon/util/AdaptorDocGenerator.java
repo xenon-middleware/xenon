@@ -23,7 +23,6 @@ import java.util.Set;
 
 import nl.esciencecenter.xenon.AdaptorDescription;
 import nl.esciencecenter.xenon.Xenon;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 
 /**
@@ -110,7 +109,7 @@ public class AdaptorDocGenerator {
 
     public void generate(PrintWriter out) {
         try {
-            Xenon xenon = XenonFactory.newXenon(null);
+    //        Xenon xenon = XenonFactory.newXenon(null);
 
 // FIXME: currently being changed!            
 //            AdaptorDescription[] adaptors = xenon.getAdaptorStatuses();
@@ -134,7 +133,7 @@ public class AdaptorDocGenerator {
 //                printAdaptorDoc(out, a);
 //            }
 
-            XenonFactory.endAll();
+       //     XenonFactory.endAll();
 
             out.println("</body></html>");
 

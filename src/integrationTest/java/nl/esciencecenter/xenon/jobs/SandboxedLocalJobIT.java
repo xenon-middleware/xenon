@@ -22,10 +22,13 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import nl.esciencecenter.xenon.JobException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
@@ -33,26 +36,20 @@ import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.util.Sandbox;
 import nl.esciencecenter.xenon.util.Utils;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 public class SandboxedLocalJobIT {
-    private Xenon xenon;
     private Scheduler scheduler;
     private Files files;
 
     @Before
     public void setupXenon() throws XenonException {
-        xenon = XenonFactory.newXenon(null);
-        files = xenon.files();
-        scheduler = xenon.jobs().newScheduler("local", "", null, null);
+        files = Xenon.files();
+        scheduler = Xenon.jobs().newScheduler("local", "", null, null);
     }
 
     @After
     public void cleanupXenon() throws XenonException {
-        xenon.jobs().close(scheduler);
-        XenonFactory.endAll();
+        Xenon.jobs().close(scheduler);
+        Xenon.endAll();
     }
 
     /**
@@ -115,8 +112,8 @@ public class SandboxedLocalJobIT {
             description.setStderr("stderr.txt");
             description.setWorkingDirectory(sandbox.getPath().getRelativePath().getAbsolutePath());
 
-            Job job = xenon.jobs().submitJob(scheduler, description);
-            JobStatus status = xenon.jobs().waitUntilDone(job, 1000);
+            Job job = Xenon.jobs().submitJob(scheduler, description);
+            JobStatus status = Xenon.jobs().waitUntilDone(job, 1000);
 
             sandbox.download();
 

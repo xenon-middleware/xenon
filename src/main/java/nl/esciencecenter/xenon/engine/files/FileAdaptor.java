@@ -28,7 +28,6 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.Adaptor;
-import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.util.CopyEngine;
 import nl.esciencecenter.xenon.engine.util.CopyInfo;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
@@ -64,10 +63,8 @@ public abstract class FileAdaptor extends Adaptor {
      * @param properties
      */
     protected FileAdaptor(FilesEngine filesEngine, String name, String description, ImmutableArray<String> supportedSchemes,
-            ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties,
-            XenonProperties properties) {
-        super(name, description, supportedSchemes, supportedLocations, validProperties, properties);
-    
+            ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties) {
+        super(name, description, supportedSchemes, supportedLocations, validProperties);
         this.filesEngine = filesEngine;
     }
     

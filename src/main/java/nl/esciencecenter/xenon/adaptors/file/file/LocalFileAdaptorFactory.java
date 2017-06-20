@@ -19,8 +19,6 @@ package nl.esciencecenter.xenon.adaptors.file.file;
 import static nl.esciencecenter.xenon.adaptors.file.file.LocalProperties.PREFIX;
 import static nl.esciencecenter.xenon.adaptors.file.file.LocalProperties.VALID_PROPERTIES;
 
-import java.util.Map;
-
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.engine.files.FileAdaptor;
@@ -45,7 +43,7 @@ public class LocalFileAdaptorFactory implements FileAdaptorFactory {
     }
 
     @Override
-    public FileAdaptor createAdaptor(FilesEngine engine, Map<String, String> properties) throws XenonException {
-        return new LocalFiles(engine, properties);
+    public FileAdaptor createAdaptor(FilesEngine engine) throws XenonException {
+        return new LocalFiles(engine);
     }
 }

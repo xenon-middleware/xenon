@@ -26,7 +26,6 @@ import java.util.Iterator;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileAttributes;
@@ -43,8 +42,7 @@ public class FileUtilsTest {
     @Test
     public void testGetLocalFileSystems() throws XenonException { 
     
-        Xenon xenon = XenonFactory.newXenon(null);
-        Files files = xenon.files();
+        Files files = Xenon.files();
 
         FileSystem [] result = Utils.getLocalFileSystems(files);
         
@@ -55,7 +53,7 @@ public class FileUtilsTest {
             files.close(f);
         }
         
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
     
     // Replace these!

@@ -36,7 +36,6 @@ import nl.esciencecenter.xenon.adaptors.job.scripting.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.job.scripting.SchedulerConnection;
 import nl.esciencecenter.xenon.adaptors.job.scripting.ScriptingParser;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 import nl.esciencecenter.xenon.engine.jobs.JobStatusImplementation;
@@ -152,9 +151,9 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
     private final String[] queueNames;
 
     TorqueSchedulerConnection(String location, Credential credential, 
-            XenonProperties properties, XenonEngine engine) throws XenonException {
+            XenonProperties properties) throws XenonException {
 
-        super(ADAPTOR_NAME, location, credential, properties, engine, properties.getLongProperty(POLL_DELAY_PROPERTY));
+        super(ADAPTOR_NAME, location, credential, properties, properties.getLongProperty(POLL_DELAY_PROPERTY));
 
         accountingGraceTime = properties.getLongProperty(ACCOUNTING_GRACE_TIME_PROPERTY);
 

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.session.ClientSession;
 
+import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.file.sftp.SSHUtil;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -62,9 +63,8 @@ public class SshJobs extends JobAdaptor {
 	
 	private final Map<String, SchedulerInfo> schedulers = new HashMap<>();
 	 
-	protected SshJobs(JobsEngine jobsEngine, Map<String, String> properties) throws XenonException {
-		super(jobsEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-                new XenonProperties(VALID_PROPERTIES, properties));
+	protected SshJobs(JobsEngine jobsEngine) throws XenonException {
+		super(jobsEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public class SshJobs extends JobAdaptor {
 		  SshInteractiveProcessFactory factory = new SshInteractiveProcessFactory(session);
 
 		  // Create a file system that point to the same location as the scheduler.
-		  Files files = getJobEngine().getXenonEngine().files();
+		  Files files = Xenon.files();
 		  FileSystem fs = files.newFileSystem("sftp", location, credential, properties);
 
 		  long pollingDelay = xp.getLongProperty(POLLING_DELAY);

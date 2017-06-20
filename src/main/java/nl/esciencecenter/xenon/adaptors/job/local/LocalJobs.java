@@ -24,15 +24,22 @@ import static nl.esciencecenter.xenon.adaptors.job.local.LocalProperties.POLLING
 import static nl.esciencecenter.xenon.adaptors.job.local.LocalProperties.SUBMITTED;
 import static nl.esciencecenter.xenon.adaptors.job.local.LocalProperties.VALID_PROPERTIES;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.sshd.client.session.ClientSession;
 
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
+import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.jobs.JobAdaptor;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
+import nl.esciencecenter.xenon.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.xenon.engine.jobs.JobsEngine;
 import nl.esciencecenter.xenon.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.xenon.engine.util.InteractiveProcess;
@@ -60,38 +67,34 @@ import nl.esciencecenter.xenon.util.Utils;
  */
 public class LocalJobs extends JobAdaptor implements InteractiveProcessFactory {
     
-    /** The parent adaptor */
-    //private final LocalAdaptor localAdaptor;
+	static class SchedulerInfo {
 
-   
-    
-    
-    private final Scheduler localScheduler;
-    private final JobQueues jobQueues;
+		private final String name; 
+		private final JobQueues jobQueues;
+		
+        private SchedulerInfo(String name, JobQueues jobQueues) {
+            this.name = name;
+            this.jobQueues = jobQueues;
+        }
 
-    public LocalJobs(JobsEngine jobsEngine, Map<String, String> properties) throws XenonException {
-        
-      //  this.localAdaptor = localAdaptor;
-        super(jobsEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-                new XenonProperties(VALID_PROPERTIES, properties));
-        
-        localScheduler = new SchedulerImplementation(ADAPTOR_NAME, "LocalScheduler", "/", 
-                new String[] { "single", "multi", "unlimited" }, null, getProperties(), true, true, true);
+        private JobQueues getJobQueues() {
+            return jobQueues;
+        }
 
-        int processors = Runtime.getRuntime().availableProcessors();
-        int multiQThreads = getProperties().getIntegerProperty(MULTIQ_MAX_CONCURRENT, processors);
-        int pollingDelay = getProperties().getIntegerProperty(POLLING_DELAY);
-        
-        
-        Files files = jobsEngine.getXenonEngine().files();
-        Files localFiles = files; // TODO: is this correct ?
-        
-        Path cwd = Utils.getLocalCWD(localFiles);
-        
-        jobQueues = new JobQueues(ADAPTOR_NAME, files, localScheduler, cwd, this, multiQThreads,
-                pollingDelay);
+        private void end() throws IOException {
+            jobQueues.end();
+        }
     }
+	
+	//private final Scheduler localScheduler;
+    //private final JobQueues jobQueues;
 
+    private final Map<String, SchedulerInfo> schedulers = new ConcurrentHashMap<>();
+    
+    public LocalJobs(JobsEngine jobsEngine) throws XenonException {
+    	super(jobsEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
+    }
+        
     @Override
     public InteractiveProcess createInteractiveProcess(JobImplementation job) throws XenonException {
         return new LocalInteractiveProcess(job);
@@ -101,67 +104,135 @@ public class LocalJobs extends JobAdaptor implements InteractiveProcessFactory {
     public Scheduler newScheduler(String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
 
-        if (!(location == null || location.isEmpty() || location.equals("/"))) {
+    	// Location should be: local://<name> 
+    	
+        if (location == null || location.isEmpty() || !location.startsWith("local://") || location.equals("local://")) {
             throw new InvalidLocationException(ADAPTOR_NAME, "Cannot create local scheduler with location: " 
                     + location);
         }
         
+        String schedulerID = location.substring("local://".length()).trim();
+        
+        if (schedulerID.isEmpty()) { 
+        	throw new InvalidLocationException(ADAPTOR_NAME, "Cannot create local scheduler without a unique name"); 
+        }
+     
+        if (schedulers.containsKey(schedulerID)) { 
+        	throw new InvalidLocationException(ADAPTOR_NAME, "Local scheduler " + schedulerID + " already exists!"); 
+        }
+        
+        XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
+
         LocalUtils.checkCredential(ADAPTOR_NAME, credential);
 
         if (properties != null && properties.size() > 0) {
             throw new UnknownPropertyException(ADAPTOR_NAME, "Cannot create local scheduler with additional properties!");
         }
-
-        return localScheduler;
+        
+        int processors = Runtime.getRuntime().availableProcessors();
+        int multiQThreads = xp.getIntegerProperty(MULTIQ_MAX_CONCURRENT, processors);
+        int pollingDelay = xp.getIntegerProperty(POLLING_DELAY);
+        
+        Scheduler s = new SchedulerImplementation(ADAPTOR_NAME, schedulerID, location, 
+                new String[] { "single", "multi", "unlimited" }, null, xp, true, true, true);
+        
+        Files files = Xenon.files();
+        
+        Path cwd = Utils.getLocalCWD(files);
+        
+        JobQueues jobQueues = new JobQueues(ADAPTOR_NAME, files, s, cwd, this, multiQThreads, pollingDelay);
+   
+        schedulers.put(schedulerID, new SchedulerInfo(schedulerID, jobQueues));
+        
+        return s;
     }
 
+    private SchedulerInfo getSchedulerInfo(Scheduler s) throws XenonException {
+    
+    	if (s == null) { 
+    		throw new IllegalArgumentException("Scheduler may not be null");
+    	}
+    	
+    	SchedulerImplementation si = (SchedulerImplementation)s;
+    	
+    	if (!ADAPTOR_NAME.equals(si.getAdaptorName())) { 
+    		throw new XenonException(ADAPTOR_NAME, "Scheduler was not created by this adaptor!");
+    	}
+    	
+    	String id = si.getUniqueID();
+    	
+    	SchedulerInfo info = schedulers.get(id);
+    	
+    	if (info == null) { 
+    		throw new XenonException(ADAPTOR_NAME, "Scheduler " + id + " is no longer active");
+    	}
+    	
+    	return info;
+    }
+    
     @Override
     public Job[] getJobs(Scheduler scheduler, String... queueNames) throws XenonException {
-        return jobQueues.getJobs(queueNames);
+    	return getSchedulerInfo(scheduler).jobQueues.getJobs(queueNames);
     }
 
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws XenonException {
-        return jobQueues.submitJob(description);
+        return getSchedulerInfo(scheduler).jobQueues.submitJob(description);
     }
 
     @Override
     public JobStatus getJobStatus(Job job) throws XenonException {
-        return jobQueues.getJobStatus(job);
+        return getSchedulerInfo(job.getScheduler()).jobQueues.getJobStatus(job);
     }
 
     @Override
     public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
-        return jobQueues.waitUntilDone(job, timeout);
+        return getSchedulerInfo(job.getScheduler()).jobQueues.waitUntilDone(job, timeout);
     }
 
     @Override
     public JobStatus waitUntilRunning(Job job, long timeout) throws XenonException {
-        return jobQueues.waitUntilRunning(job, timeout);
+        return getSchedulerInfo(job.getScheduler()).jobQueues.waitUntilRunning(job, timeout);
     }
 
     @Override
     public JobStatus[] getJobStatuses(Job... jobs) {
-        return jobQueues.getJobStatuses(jobs);
+    	
+    	JobStatus [] result = new JobStatus[jobs.length];
+    	
+    	for (int i=0;i<jobs.length;i++) {
+    		
+    		if (jobs[i] == null) { 
+    			result[i] = null;
+    		} else { 
+    			try { 
+    				result[i] = getJobStatus(jobs[i]);
+    			} catch (XenonException e) {
+    				result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, false, null);
+    			}
+    		}
+    	}
+    	
+    	return result;
     }
 
     @Override
     public JobStatus cancelJob(Job job) throws XenonException {
-        return jobQueues.cancelJob(job);
+        return getSchedulerInfo(job.getScheduler()).jobQueues.cancelJob(job);
     }
 
     public void end() {
-        jobQueues.end();
+        // TODO: jobQueues.end();
     }
 
     @Override
     public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws XenonException {
-        return jobQueues.getQueueStatus(scheduler, queueName);
+        return getSchedulerInfo(scheduler).jobQueues.getQueueStatus(scheduler, queueName);
     }
 
     @Override
     public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws XenonException {
-        return jobQueues.getQueueStatuses(scheduler, queueNames);
+        return getSchedulerInfo(scheduler).jobQueues.getQueueStatuses(scheduler, queueNames);
     }
 
     @Override
@@ -176,12 +247,12 @@ public class LocalJobs extends JobAdaptor implements InteractiveProcessFactory {
 
     @Override
     public String getDefaultQueueName(Scheduler scheduler) throws XenonException {
-        return jobQueues.getDefaultQueueName(scheduler);
+        return getSchedulerInfo(scheduler).jobQueues.getDefaultQueueName(scheduler);
     }
 
     @Override
     public Streams getStreams(Job job) throws XenonException {
-        return jobQueues.getStreams(job);
+        return getSchedulerInfo(job.getScheduler()).jobQueues.getStreams(job);
     }
 
     /**
@@ -190,9 +261,9 @@ public class LocalJobs extends JobAdaptor implements InteractiveProcessFactory {
      * @param result
      *          the map to add information to. 
      */
-    public void getAdaptorSpecificInformation(Map<String, String> result) {
-        result.put(SUBMITTED, Long.toString(jobQueues.getCurrentJobID()));
-    }
+//    public void getAdaptorSpecificInformation(Map<String, String> result) {
+//        result.put(SUBMITTED, Long.toString(jobQueues.getCurrentJobID()));
+//    }
 
     /* (non-Javadoc)
      * @see nl.esciencecenter.xenon.engine.jobs.JobAdaptor#getAdaptorSpecificInformation()

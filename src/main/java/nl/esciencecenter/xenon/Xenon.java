@@ -15,62 +15,83 @@
  */
 package nl.esciencecenter.xenon;
 
-import java.util.Map;
-
+import nl.esciencecenter.xenon.engine.files.FilesEngine;
+import nl.esciencecenter.xenon.engine.jobs.JobsEngine;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
 
 /**
- * Main Xenon interface.
- * 
- * This interface provides an access point to all packages of Xenon and several utility functions.
+ * XenonFactory is used to create and end Xenon instances. Make sure to always 
+ * end instances when you no longer need them, otherwise they remain allocated.
  * 
  * @version 1.0
  * @since 1.0
  */
-public interface Xenon {
+public final class Xenon {
 
-    /**
-     * Retrieve the <code>Files</code> interface.
-     * 
-     * @return a reference to the Files interface.
-     */
-    Files files();
+	/** The local adaptor is a special case, therefore we publish its name here. */
+	public static final String LOCAL_FILE_ADAPTOR_NAME = "file";
 
+	/** All our own properties start with this prefix. */
+	public static final String PREFIX = "xenon.";
+
+	/** All our own adaptor properties start with this prefix. */
+	public static final String ADAPTORS_PREFIX = PREFIX + "adaptors.";
+
+	private static FilesEngine files;
+	private static JobsEngine jobs;
+	
+    public static synchronized Files files() throws XenonException { 
+    	
+    	if (files == null) { 
+    		files = new FilesEngine();
+    	}
+    	
+    	return files;
+    }
+    
+    public static synchronized Jobs jobs() throws XenonException { 
+
+    	if (jobs == null) { 
+    		jobs = new JobsEngine();
+    	}
+    	
+    	return jobs;
+    }
+    
+    
     /**
-     * Retrieve the <code>Jobs</code> interface.
+     * Return the description of the properties that can be set a creation time of 
+     * a Xenon instance. These properties may be passed when invoking 
+     * <code>newXenon</code>.
      * 
-     * @return a reference to the Files package interface.
+     * Note that the set of property descriptions returned here will depend on the 
+     * set of scheme adaptors Xenon has available.
+     * 
+     * @return a XenonPropertyDescription describing the properties.
+     * 
+     * @throws XenonException
+     *             If the XenonPropertyDescription could not be created.
      */
-    Jobs jobs();
+    public static XenonPropertyDescription [] getSupportedProperties() throws XenonException {
+        ///return XenonEngine.getSupportedProperties();
+    	return null;
+    }
+    
+   
    
     /**
-     * Returns the properties that where used to create this Xenon.
+     * End all Xenon instances created by this factory.
      * 
-     * @return the properties used to create this Xenon.
+     * All exceptions thrown during endAll are ignored.
      */
-    Map<String, String> getProperties();
-
-    /**
-     * TODO: Remove this. Should be in Files, Jobs and Credentials ? 
-     * 
-     * Returns information about the specified adaptor.
-     * 
-     * @param adaptorName
-     *            the adaptor for which to return the information.            
-     * @return an AdaptorInfo containing information about the specified adaptor.
-     * @throws XenonException
-     *             if the adaptor does not exist, or no information could be retrieved.
-     */
-    //AdaptorDescription getAdaptorStatus(String adaptorName) throws XenonException;
-
-    /**
-     * TODO: Remove this. Should be in Files, Jobs and Credentials ? 
-     * 
-     * Returns information on all adaptors available to this Xenon.
-     * 
-     * @return information on all adaptors.
-     */
-    //AdaptorDescription[] getAdaptorStatuses();
-
+    public static synchronized void endAll() {
+    	if (jobs != null) { 
+    		jobs.end();
+    	}
+    	
+    	if (files != null) { 
+    		files.end();
+    	}
+    }
 }

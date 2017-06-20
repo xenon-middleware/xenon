@@ -37,7 +37,7 @@ public class XenonPropertiesTest {
     public void testXenonProperties_supportsProperty_propertySet_true() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.STRING, "bla", 
+                new XenonPropertyDescription("key", Type.STRING, "bla", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -52,7 +52,7 @@ public class XenonPropertiesTest {
     public void testXenonProperties_supportsProperty_useDefault_true() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.STRING,  "bla", 
+                new XenonPropertyDescription("key", Type.STRING,  "bla", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(0);
@@ -66,7 +66,7 @@ public class XenonPropertiesTest {
     public void testXenonProperties_supportsProperty_propertySet_false() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.STRING,  "bla", 
+                new XenonPropertyDescription("key", Type.STRING,  "bla", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -81,7 +81,7 @@ public class XenonPropertiesTest {
     public void testXenonProperties_supportsProperty_useDefault_false() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.STRING, "bla", 
+                new XenonPropertyDescription("key", Type.STRING, "bla", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -95,7 +95,7 @@ public class XenonPropertiesTest {
     public void testXenonProperties_propertySet_true() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.STRING, "bla", 
+                new XenonPropertyDescription("key", Type.STRING, "bla", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -110,7 +110,7 @@ public class XenonPropertiesTest {
     public void testXenonProperties_propertySet_false() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.STRING, "bla", 
+                new XenonPropertyDescription("key", Type.STRING, "bla", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -124,7 +124,7 @@ public class XenonPropertiesTest {
     public void testXenonProperties_propertySet_fails() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.STRING, "bla", 
+                new XenonPropertyDescription("key", Type.STRING, "bla", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -138,7 +138,7 @@ public class XenonPropertiesTest {
     public void testXenonProperties_getProperty_propertySet() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.STRING, "bla", 
+                new XenonPropertyDescription("key", Type.STRING, "bla", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -153,7 +153,7 @@ public class XenonPropertiesTest {
     public void testXenonProperties_getProperty_default() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.STRING, "bla", 
+                new XenonPropertyDescription("key", Type.STRING, "bla", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -167,7 +167,7 @@ public class XenonPropertiesTest {
     public void testXenonProperties_getProperty_fails() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.STRING, "bla", 
+                new XenonPropertyDescription("key", Type.STRING, "bla", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -181,7 +181,7 @@ public class XenonPropertiesTest {
     public void testXenonProperties_fromProperties() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.STRING, "bla", 
+                new XenonPropertyDescription("key", Type.STRING, "bla", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -196,7 +196,7 @@ public class XenonPropertiesTest {
     public void testXenonProperties_fromDefaultsAndProperties_noOverlap() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.STRING, "value", 
+                new XenonPropertyDescription("key", Type.STRING, "value", 
                         "test property"));
         
         Map<String, String> props = new HashMap<>(2);
@@ -209,9 +209,9 @@ public class XenonPropertiesTest {
     public void testXenonProperties_fromDefaultsAndProperties_withOverlap() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.STRING, "value",
+                new XenonPropertyDescription("key", Type.STRING, "value",
                         "test property"),
-                new XenonPropertyDescriptionImplementation("key2", Type.STRING, "value",
+                new XenonPropertyDescription("key2", Type.STRING, "value",
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -226,7 +226,7 @@ public class XenonPropertiesTest {
     public void testGetBooleanProperty_true() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.BOOLEAN, "true", 
+                new XenonPropertyDescription("key", Type.BOOLEAN, "true", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -240,7 +240,7 @@ public class XenonPropertiesTest {
     public void testGetBooleanProperty_false() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.BOOLEAN, "true", 
+                new XenonPropertyDescription("key", Type.BOOLEAN, "true", 
                         "test property"));
         
         Map<String, String> props = new HashMap<>(2);
@@ -254,7 +254,7 @@ public class XenonPropertiesTest {
     public void testGetBooleanProperty_default() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.BOOLEAN, "true", 
+                new XenonPropertyDescription("key", Type.BOOLEAN, "true", 
                         "test property"));
         
         Map<String, String> props = new HashMap<>(2);
@@ -267,7 +267,7 @@ public class XenonPropertiesTest {
     public void testGetBooleanProperty_emptyString_False() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.BOOLEAN, "true", 
+                new XenonPropertyDescription("key", Type.BOOLEAN, "true", 
                         "test property"));
         
         Map<String, String> props = new HashMap<>(2);
@@ -279,7 +279,7 @@ public class XenonPropertiesTest {
     public void testGetBooleanProperty_invalidDefault() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.BOOLEAN, "aap", 
+                new XenonPropertyDescription("key", Type.BOOLEAN, "aap", 
                         "test property"));
         
         Map<String, String> props = new HashMap<>(2);
@@ -290,7 +290,7 @@ public class XenonPropertiesTest {
     public void testGetBooleanProperty_invalidName() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.BOOLEAN, "true", 
+                new XenonPropertyDescription("key", Type.BOOLEAN, "true", 
                         "test property"));
         
         Map<String, String> props = new HashMap<>(2);
@@ -301,7 +301,7 @@ public class XenonPropertiesTest {
     public void testGetBooleanProperty_wrongType() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.STRING, "value", 
+                new XenonPropertyDescription("key", Type.STRING, "value", 
                         "test property"));
         
         Map<String, String> props = new HashMap<>(2);
@@ -313,7 +313,7 @@ public class XenonPropertiesTest {
     public void testGetIntProperty_1() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.INTEGER, "42", 
+                new XenonPropertyDescription("key", Type.INTEGER, "42", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -327,7 +327,7 @@ public class XenonPropertiesTest {
     public void testGetIntProperty_default() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.INTEGER, "42", 
+                new XenonPropertyDescription("key", Type.INTEGER, "42", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -340,7 +340,7 @@ public class XenonPropertiesTest {
     public void testGetIntProperty_invalidDefault() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.INTEGER, "aap", 
+                new XenonPropertyDescription("key", Type.INTEGER, "aap", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -351,7 +351,7 @@ public class XenonPropertiesTest {
     public void testGetDoubleProperty_1() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.DOUBLE, "42.0", 
+                new XenonPropertyDescription("key", Type.DOUBLE, "42.0", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -365,7 +365,7 @@ public class XenonPropertiesTest {
     public void testGetDoubleProperty_default() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.DOUBLE, "42.0", 
+                new XenonPropertyDescription("key", Type.DOUBLE, "42.0", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(0);
@@ -378,7 +378,7 @@ public class XenonPropertiesTest {
     public void testGetDoubleProperty_invalidDefault() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.DOUBLE, "aap", 
+                new XenonPropertyDescription("key", Type.DOUBLE, "aap", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(0);
@@ -390,7 +390,7 @@ public class XenonPropertiesTest {
     public void testGetSizeProperty_g() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.SIZE, "42g", 
+                new XenonPropertyDescription("key", Type.SIZE, "42g", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -405,7 +405,7 @@ public class XenonPropertiesTest {
     public void testGetSizeProperty_G() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.SIZE, "42g", 
+                new XenonPropertyDescription("key", Type.SIZE, "42g", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -420,7 +420,7 @@ public class XenonPropertiesTest {
     public void testGetSizeProperty_m() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.SIZE, "42g", 
+                new XenonPropertyDescription("key", Type.SIZE, "42g", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -435,7 +435,7 @@ public class XenonPropertiesTest {
     public void testGetSizeProperty_M() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.SIZE, "42g", 
+                new XenonPropertyDescription("key", Type.SIZE, "42g", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -450,7 +450,7 @@ public class XenonPropertiesTest {
     public void testGetSizeProperty_k() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.SIZE, "42g", 
+                new XenonPropertyDescription("key", Type.SIZE, "42g", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -465,7 +465,7 @@ public class XenonPropertiesTest {
     public void testGetSizeProperty_K() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.SIZE, "42g", 
+                new XenonPropertyDescription("key", Type.SIZE, "42g", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -480,7 +480,7 @@ public class XenonPropertiesTest {
     public void testGetSizeProperty() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.SIZE, "42g", 
+                new XenonPropertyDescription("key", Type.SIZE, "42g", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -494,7 +494,7 @@ public class XenonPropertiesTest {
     public void testGetSizeProperty_X_fails() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("key", Type.SIZE, "42g", 
+                new XenonPropertyDescription("key", Type.SIZE, "42g", 
                         "test property"));
 
         Map<String, String> props = new HashMap<>(2);
@@ -507,9 +507,9 @@ public class XenonPropertiesTest {
     public void testXenonProperties_filter_withPropertiesSet() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("aap.key", Type.STRING, "aap",
+                new XenonPropertyDescription("aap.key", Type.STRING, "aap",
                         "test property"),
-                new XenonPropertyDescriptionImplementation("noot.key", Type.STRING, "noot",
+                new XenonPropertyDescription("noot.key", Type.STRING, "noot",
                         "test property"));
 
         Map<String, String> props = new HashMap<>(3);
@@ -525,9 +525,9 @@ public class XenonPropertiesTest {
     public void testXenonProperties_filter_noPropertiesSet() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("aap.key", Type.STRING, "aap",
+                new XenonPropertyDescription("aap.key", Type.STRING, "aap",
                         "test property"),
-                new XenonPropertyDescriptionImplementation("noot.key", Type.STRING, "noot",
+                new XenonPropertyDescription("noot.key", Type.STRING, "noot",
                         "test property"));
 
         Map<String, String> props = new HashMap<>(0);
@@ -541,9 +541,9 @@ public class XenonPropertiesTest {
     public void testXenonProperties_filter_wrongPrefix() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("aap.key", Type.STRING, "aap",
+                new XenonPropertyDescription("aap.key", Type.STRING, "aap",
                         "test property"),
-                new XenonPropertyDescriptionImplementation("noot.key", Type.STRING, "noot",
+                new XenonPropertyDescription("noot.key", Type.STRING, "noot",
                         "test property"));
 
         Map<String, String> props = new HashMap<>(0);
@@ -557,9 +557,9 @@ public class XenonPropertiesTest {
     public void testXenonProperties_exclude_withPropertiesSet() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("aap.key", Type.STRING, "aap",
+                new XenonPropertyDescription("aap.key", Type.STRING, "aap",
                         "test property"),
-                new XenonPropertyDescriptionImplementation("noot.key", Type.STRING, "noot",
+                new XenonPropertyDescription("noot.key", Type.STRING, "noot",
                         "test property"));
 
         Map<String, String> props = new HashMap<>(0);
@@ -575,9 +575,9 @@ public class XenonPropertiesTest {
     public void testXenonProperties_exclude_noPropertiesSet() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("aap.key", Type.STRING, "aap",
+                new XenonPropertyDescription("aap.key", Type.STRING, "aap",
                         "test property"),
-                new XenonPropertyDescriptionImplementation("noot.key", Type.STRING, "noot",
+                new XenonPropertyDescription("noot.key", Type.STRING, "noot",
                         "test property"));
 
         Map<String, String> props = new HashMap<>(0);
@@ -591,7 +591,7 @@ public class XenonPropertiesTest {
     public void testXenonProperties_exclude_wrongPrefix() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("aap.key", Type.STRING, "aap",
+                new XenonPropertyDescription("aap.key", Type.STRING, "aap",
                         "test property"));
 
         Map<String, String> props = new HashMap<>(0);
@@ -615,7 +615,7 @@ public class XenonPropertiesTest {
         public void testGetIntegerProperty_emptyString_False() throws Exception {
 
             XenonPropertyDescription [] valid = new XenonPropertyDescription [] { 
-                 new XenonPropertyDescriptionImplementation("key", Type.INTEGER, EnumSet.of(Level.XENON), "42", "test property")
+                 new XenonPropertyDescription("key", Type.INTEGER, EnumSet.of(Level.XENON), "42", "test property")
             };
 
             Map<String,String> props = new HashMap<>();
@@ -627,7 +627,7 @@ public class XenonPropertiesTest {
         public void testGetIntegerProperty_emptyString_False() throws Exception {
 
             XenonPropertyDescription [] valid = new XenonPropertyDescription [] { 
-                 new XenonPropertyDescriptionImplementation("key", Type.INTEGER, EnumSet.of(Level.XENON), "42", "test property")
+                 new XenonPropertyDescription("key", Type.INTEGER, EnumSet.of(Level.XENON), "42", "test property")
             };
 
             Map<String,String> props = new HashMap<>();

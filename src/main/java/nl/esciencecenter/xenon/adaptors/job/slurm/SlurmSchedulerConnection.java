@@ -25,12 +25,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.job.scripting.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.job.scripting.SchedulerConnection;
 import nl.esciencecenter.xenon.adaptors.job.scripting.ScriptingParser;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 import nl.esciencecenter.xenon.engine.jobs.JobStatusImplementation;
@@ -333,11 +333,9 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private final Map<String, Job> interactiveJobs;
 
-    protected SlurmSchedulerConnection(String location, Credential credential, XenonProperties properties,
-            XenonEngine engine) throws XenonException {
+    protected SlurmSchedulerConnection(String location, Credential credential, XenonProperties properties) throws XenonException {
 
-        super(ADAPTOR_NAME, location, credential, properties, engine, properties
-                .getLongProperty(POLL_DELAY_PROPERTY));
+        super(ADAPTOR_NAME, location, credential, properties, properties.getLongProperty(POLL_DELAY_PROPERTY));
 
         //map containing references to interactive jobs (normally ssh jobs)
         interactiveJobs = new HashMap<>();
@@ -518,7 +516,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         JobStatus status;
         
         try {
-            status = engine.jobs().getJobStatus(interactiveJob);
+            status = Xenon.jobs().getJobStatus(interactiveJob);
         } catch (XenonException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to submit interactive job");
         }
@@ -767,7 +765,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             throw new NoSuchJobException(ADAPTOR_NAME, "Unknown Job, or not an interactive job: " + job);
         }
         
-        return engine.jobs().getStreams(interactiveJob);
+        return Xenon.jobs().getStreams(interactiveJob);
     }
 
 }

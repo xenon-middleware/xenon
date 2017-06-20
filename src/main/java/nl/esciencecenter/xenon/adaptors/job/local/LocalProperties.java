@@ -1,11 +1,8 @@
 package nl.esciencecenter.xenon.adaptors.job.local;
 
-import java.util.EnumSet;
-
+import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
-import nl.esciencecenter.xenon.engine.XenonEngine;
-import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 
 public class LocalProperties {
@@ -14,7 +11,7 @@ public class LocalProperties {
     public static final String ADAPTOR_NAME = "local";
 
     /** Local properties start with this prefix. */
-    public static final String PREFIX = XenonEngine.ADAPTORS_PREFIX + "local.";
+    public static final String PREFIX = Xenon.ADAPTORS_PREFIX + "local.";
 
     /** Description of the adaptor */
     public static final String ADAPTOR_DESCRIPTION = "The local jobs adaptor implements all functionality "
@@ -53,9 +50,9 @@ public class LocalProperties {
     /** The properties supported by this adaptor */
     public static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = 
             new ImmutableArray<XenonPropertyDescription>(
-                    new XenonPropertyDescriptionImplementation(POLLING_DELAY, Type.INTEGER, 
+                    new XenonPropertyDescription(POLLING_DELAY, Type.INTEGER, 
                             "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
-                    new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER,  
+                    new XenonPropertyDescription(MULTIQ_MAX_CONCURRENT, Type.INTEGER,  
                             "4", "The maximum number of concurrent jobs in the multiq.."));
 	
 }

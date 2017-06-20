@@ -19,8 +19,6 @@ package nl.esciencecenter.xenon.adaptors.job.local;
 import static nl.esciencecenter.xenon.adaptors.job.local.LocalProperties.PREFIX;
 import static nl.esciencecenter.xenon.adaptors.job.local.LocalProperties.VALID_PROPERTIES;
 
-import java.util.Map;
-
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.engine.jobs.JobAdaptor;
@@ -45,7 +43,7 @@ public class LocalJobAdaptorFactory implements JobAdaptorFactory {
     }
 
     @Override
-    public JobAdaptor createAdaptor(JobsEngine engine, Map<String, String> properties) throws XenonException {
-        return new LocalJobs(engine, properties);
+    public JobAdaptor createAdaptor(JobsEngine engine) throws XenonException {
+        return new LocalJobs(engine);
     }
 }

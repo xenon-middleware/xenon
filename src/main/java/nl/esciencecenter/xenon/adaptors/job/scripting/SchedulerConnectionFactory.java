@@ -17,7 +17,6 @@ package nl.esciencecenter.xenon.adaptors.job.scripting;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 
 /**
@@ -27,5 +26,5 @@ import nl.esciencecenter.xenon.engine.XenonProperties;
 public interface SchedulerConnectionFactory {
 
     SchedulerConnection newSchedulerConnection(String location, Credential credential,
-            XenonProperties properties, XenonEngine engine) throws XenonException;
+            XenonProperties properties) throws XenonException;
 }

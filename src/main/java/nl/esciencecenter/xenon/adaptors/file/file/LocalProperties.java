@@ -1,7 +1,7 @@
 package nl.esciencecenter.xenon.adaptors.file.file;
 
+import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 
 public class LocalProperties {
@@ -10,7 +10,7 @@ public class LocalProperties {
     public static final String ADAPTOR_NAME = "file";
 
     /** Local properties start with this prefix. */
-    public static final String PREFIX = XenonEngine.ADAPTORS_PREFIX + "file.";
+    public static final String PREFIX = Xenon.ADAPTORS_PREFIX + "file.";
     
     /** Description of the adaptor */
     public static final String ADAPTOR_DESCRIPTION = "This is the local file adaptor that implements"

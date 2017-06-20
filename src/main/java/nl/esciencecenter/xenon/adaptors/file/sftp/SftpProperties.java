@@ -15,12 +15,9 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.sftp;
 
-import java.util.EnumSet;
-
+import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
-import nl.esciencecenter.xenon.engine.XenonEngine;
-import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 
 public class SftpProperties {
@@ -41,7 +38,7 @@ public class SftpProperties {
     public static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("sftp://[user@]host[:port]");
 
     /** All our own properties start with this prefix. */
-    public static final String PREFIX = XenonEngine.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
+    public static final String PREFIX = Xenon.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
 
     /** Enable strict host key checking. */
     public static final String STRICT_HOST_KEY_CHECKING = PREFIX + "strictHostKeyChecking";
@@ -72,21 +69,21 @@ public class SftpProperties {
 
     /** List of properties supported by this SSH adaptor */
     protected static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
-            new XenonPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, 
+            new XenonPropertyDescription(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, 
             		"true", "Automatically add unknown host keys to known_hosts."),
-            new XenonPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN,  
+            new XenonPropertyDescription(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN,  
             		"true", "Enable strict host key checking."),
-            new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN,
+            new XenonPropertyDescription(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN,
                     "true", "Load the standard known_hosts file."),
-            new XenonPropertyDescriptionImplementation(LOAD_SSH_CONFIG, Type.BOOLEAN,
+            new XenonPropertyDescription(LOAD_SSH_CONFIG, Type.BOOLEAN,
                     "true", "Load the OpenSSH config file."),
-            new XenonPropertyDescriptionImplementation(SSH_CONFIG_FILE, Type.STRING,
+            new XenonPropertyDescription(SSH_CONFIG_FILE, Type.STRING,
                     null, "OpenSSH config filename."),
-            new XenonPropertyDescriptionImplementation(AGENT, Type.BOOLEAN,
+            new XenonPropertyDescription(AGENT, Type.BOOLEAN,
                     "false", "Use a (local) ssh-agent."),
-            new XenonPropertyDescriptionImplementation(AGENT_FORWARDING, Type.BOOLEAN, 
+            new XenonPropertyDescription(AGENT_FORWARDING, Type.BOOLEAN, 
             		"false", "Use ssh-agent forwarding"),
-            new XenonPropertyDescriptionImplementation(CONNECTION_TIMEOUT, Type.NATURAL, 
+            new XenonPropertyDescription(CONNECTION_TIMEOUT, Type.NATURAL, 
             		"10000", "The timeout for creating and authenticating connections (in milliseconds)."));
 
 /*    

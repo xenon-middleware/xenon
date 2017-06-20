@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.esciencecenter.xenon.InvalidAdaptorException;
+import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.adaptors.file.file.LocalFileAdaptorFactory;
@@ -31,9 +32,7 @@ import nl.esciencecenter.xenon.adaptors.file.sftp.SftpFileAdaptorFactory;
 import nl.esciencecenter.xenon.adaptors.file.webdav.WebdavFileAdaptorFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.DuplicateAdaptorException;
-import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.util.CopyEngine;
-import nl.esciencecenter.xenon.engine.util.PropertyUtils;
 import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.CopyStatus;
@@ -77,21 +76,18 @@ public class FilesEngine implements Files {
     
     private final HashMap<String, FileAdaptor> adaptors = new HashMap<>();
     
-    private final XenonEngine xenonEngine;
-
     private final CopyEngine copyEngine;
     
-    public FilesEngine(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
-        this.xenonEngine = xenonEngine;
+    public FilesEngine() throws XenonException {
         this.copyEngine = new CopyEngine(this);
-        loadAdaptors(properties);
+        loadAdaptors();
     }
     
-    private void loadAdaptors(Map<String, String> properties) throws XenonException {
+    private void loadAdaptors() throws XenonException {
         
         for (FileAdaptorFactory a : ADAPTOR_FACTORIES) {
         	
-        	FileAdaptor adaptor = a.createAdaptor(this, PropertyUtils.extract(properties, a.getPropertyPrefix()));
+        	FileAdaptor adaptor = a.createAdaptor(this);
         	
         	String name = adaptor.getName();
             
@@ -209,9 +205,9 @@ public class FilesEngine implements Files {
         FileSystem targetfs = target.getFileSystem();
 
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName()) ||
-                targetfs.getAdaptorName().equals(XenonEngine.LOCAL_ADAPTOR_NAME)) {
+                targetfs.getAdaptorName().equals(Xenon.LOCAL_FILE_ADAPTOR_NAME)) {
             return getFileAdaptor(source).copy(source, target, options);
-        } else if (sourcefs.getAdaptorName().equals(XenonEngine.LOCAL_ADAPTOR_NAME)) {
+        } else if (sourcefs.getAdaptorName().equals(Xenon.LOCAL_FILE_ADAPTOR_NAME)) {
             return getFileAdaptor(target).copy(source, target, options);
         } else {
             throw new XenonException(COMPONENT_NAME, "Cannot do inter-scheme third party copy!");
@@ -290,10 +286,12 @@ public class FilesEngine implements Files {
     
     @Override
     public String toString() {
-        return "FilesEngine [XenonEngine=" + xenonEngine + "]";
+        return "FilesEngine";
     }
     
     public void end() { 
         copyEngine.done();
+    
+        // TODO: close all filesystems
     }    
 }

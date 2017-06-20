@@ -59,9 +59,9 @@ public class ScriptingJobs extends JobAdaptor {
 
     public ScriptingJobs(JobsEngine jobsEngine, String name, String description, ImmutableArray<String> supportedSchemes,
             ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties,
-            XenonProperties properties, SchedulerConnectionFactory connectionFactory) {
+            SchedulerConnectionFactory connectionFactory) {
         
-        super(jobsEngine, name, description, supportedSchemes, supportedLocations, validProperties, properties);
+        super(jobsEngine, name, description, supportedSchemes, supportedLocations, validProperties);
         
         this.connectionFactory = connectionFactory;
 
@@ -108,9 +108,8 @@ public class ScriptingJobs extends JobAdaptor {
 
         XenonProperties p = new XenonProperties(validProperties, properties);
 
-        SchedulerConnection connection = connectionFactory.newSchedulerConnection(location, credential, p, 
-                getJobEngine().getXenonEngine());
-
+        SchedulerConnection connection = connectionFactory.newSchedulerConnection(location, credential, p);
+     
         addConnection(connection);
 
         return connection.getScheduler();

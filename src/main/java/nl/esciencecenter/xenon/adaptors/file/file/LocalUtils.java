@@ -32,7 +32,6 @@ import java.util.Set;
 
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.file.file.LocalFiles;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.util.CommandRunner;
 import nl.esciencecenter.xenon.files.DirectoryNotEmptyException;
