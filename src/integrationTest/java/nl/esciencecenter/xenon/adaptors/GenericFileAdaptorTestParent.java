@@ -74,7 +74,7 @@ public abstract class GenericFileAdaptorTestParent {
 
     private static final Logger logger = LoggerFactory.getLogger(GenericFileAdaptorTestParent.class);
 
-    protected static String TEST_ROOT;
+	protected static String TEST_ROOT;
 
     public static FileTestConfig config;
 
@@ -100,14 +100,15 @@ public abstract class GenericFileAdaptorTestParent {
         Path p = config.getWorkingDir(files);
         Path root = files.newPath(p.getFileSystem(), p.getRelativePath().resolve(TEST_ROOT));
 
+        System.out.println("WORKING DIR = " + p);
+        System.out.println("ROOT = " + root);
+        
         if (!files.exists(p)) {
             files.createDirectory(p);
         }
         if (!files.exists(root)) {
             files.createDirectory(root);
         }
-
-        Xenon.endAll();
     }
 
     // MUST be invoked by a @AfterClass method of the subclass!
@@ -149,7 +150,6 @@ public abstract class GenericFileAdaptorTestParent {
             } catch (Exception ex) {
                 // that's fine
             }
-            Xenon.endAll();
         }
     }
 
@@ -3189,7 +3189,7 @@ public abstract class GenericFileAdaptorTestParent {
         CopyStatus status = files.getCopyStatus(copy);
 
         // Deadline for operation is 60 seconds 
-        long deadline = System.currentTimeMillis() + 60*1000;
+        long deadline = System.currentTimeMillis() + 6*1000;
         
         while (!status.isDone() && System.currentTimeMillis() < deadline) {
             try {

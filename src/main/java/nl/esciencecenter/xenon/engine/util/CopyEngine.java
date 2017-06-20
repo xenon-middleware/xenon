@@ -478,14 +478,18 @@ public final class CopyEngine {
 
     public void copy(CopyInfo info) {
         if (info.isAsync()) {
-            enqueue(info);
+            System.out.println("ASYNC COPY");
+        	enqueue(info);
         } else {
             startCopy(info);
         }
     }
 
     public synchronized void done() {
-        LOGGER.debug("Sending CopyEngine termination signal");
+        
+    	System.out.println("SET DONE");
+    	
+    	LOGGER.debug("Sending CopyEngine termination signal");
         done = true;
         notifyAll();
     }
@@ -493,13 +497,15 @@ public final class CopyEngine {
     private synchronized void enqueue(CopyInfo info) {
 
         LOGGER.debug("CopyEngine queueing copy: {}", info);
-
         pending.addLast(info);
         notifyAll();
+        System.out.println("ENQ");        
     }
 
     private synchronized CopyInfo dequeue() {
 
+    	System.out.println("DEQ");
+    	
         LOGGER.debug("CopyEngine dequeueing copy");
 
         if (running != null) {
@@ -510,7 +516,8 @@ public final class CopyEngine {
 
         while (!done && pending.isEmpty()) {
             try {
-                wait(POLLING_DELAY);
+            	System.out.println("DEQ WAIT");
+            	wait(POLLING_DELAY);
             } catch (InterruptedException e) {
                 LOGGER.warn("CopyEngine.dequeue interrupted!");
                 Thread.currentThread().interrupt();
@@ -519,10 +526,13 @@ public final class CopyEngine {
         }
 
         if (done) {
+        	System.out.println("GOT DONE");
+        	
             LOGGER.debug("CopyEngine received termination signal with {} pending copies.", pending.size());
             return null;
         }
 
+        System.out.println("RET DEQ");
         running = pending.removeFirst();
         return running;
     }

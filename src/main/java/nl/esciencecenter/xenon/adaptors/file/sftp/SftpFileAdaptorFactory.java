@@ -16,8 +16,6 @@
 
 package nl.esciencecenter.xenon.adaptors.file.sftp;
 
-import java.util.Map;
-
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.engine.files.FileAdaptor;

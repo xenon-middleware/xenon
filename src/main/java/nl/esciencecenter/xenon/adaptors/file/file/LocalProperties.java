@@ -10,7 +10,7 @@ public class LocalProperties {
     public static final String ADAPTOR_NAME = "file";
 
     /** Local properties start with this prefix. */
-    public static final String PREFIX = Xenon.ADAPTORS_PREFIX + "file.";
+    public static final String PREFIX = Xenon.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
     
     /** Description of the adaptor */
     public static final String ADAPTOR_DESCRIPTION = "This is the local file adaptor that implements"

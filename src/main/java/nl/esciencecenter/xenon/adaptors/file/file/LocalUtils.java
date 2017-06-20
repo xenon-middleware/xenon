@@ -33,6 +33,7 @@ import java.util.Set;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.engine.util.CommandRunner;
 import nl.esciencecenter.xenon.files.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -249,7 +250,7 @@ final class LocalUtils {
     
     public static void checkCredential(String adaptorName, Credential credential) throws XenonException {
 
-        if (credential == null) {
+        if (credential == null || credential instanceof DefaultCredential) {
             return;
         }
        
