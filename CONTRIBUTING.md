@@ -2,7 +2,7 @@
 
 We welcome any kind of contribution to our software, from simple comment or question to a full fledged [pull request](https://help.github.com/articles/about-pull-requests/).
 
-Ideally, the process of making a contribution can be threefold, as follows:
+A contribution can be one of the following cases:
 
 1. you have a question;
 1. you think you may have found a bug (including unexpected behavior);
