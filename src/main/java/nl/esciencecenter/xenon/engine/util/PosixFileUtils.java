@@ -59,6 +59,9 @@ public class PosixFileUtils {
     /** execute/search by others */
     public static final int EXEC_OTHERS = 00001;
 
+    /** Bit mask for bits used */
+    private static final int MASK = ~(READ_OWNER | WRITE_OWNER | EXEC_OWNER | READ_GROUP | WRITE_GROUP | EXEC_GROUP | READ_OTHERS | WRITE_OTHERS | EXEC_OTHERS);
+    
     protected PosixFileUtils() {
         // do not use
     }
@@ -101,6 +104,21 @@ public class PosixFileUtils {
         return result;
     }
 
+    public static int permissionsToBits(Set<PosixFilePermission> permissions, int otherbits) {
+    	
+    	System.out.println("OLD BITS: " + otherbits + " " + bitsToPermissions(otherbits));
+    	
+    	System.out.println("OLD BITS AFTER MASK: " + (otherbits&MASK) + " " + bitsToPermissions(otherbits&MASK));
+    	
+    	System.out.println("NEW BITS: " + permissionsToBits(permissions) + " " + permissions);
+    	
+    	System.out.println("NEW BITS AFTER MASK: " + ((otherbits & MASK) | permissionsToBits(permissions)) + " " + bitsToPermissions((otherbits & MASK) | permissionsToBits(permissions)));
+    	
+    	
+    	return (otherbits & MASK) | permissionsToBits(permissions); 
+    }
+
+    
     public static int permissionsToBits(Set<PosixFilePermission> permissions) {
 
         int bits = 0;

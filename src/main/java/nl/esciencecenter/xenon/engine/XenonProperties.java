@@ -362,6 +362,39 @@ public class XenonProperties {
     }
 
     /**
+     * Retrieves the value of an natural number property (e.g. a long with value >= 0) with the given name.
+     * 
+     * @return the value of an natural number property with the given name.
+     * @param name
+     *            the name of the property
+     * 
+     * @throws UnknownPropertyException
+     *             if the given name is not a supported property.
+     * @throws PropertyTypeException
+     *             if the property is not of type long.
+     * @throws InvalidPropertyException
+     *             if the property value cannot be converted into a long.
+     */
+    public long getNaturalProperty(String name) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
+
+        String value = getProperty(name, Type.NATURAL);
+
+        try {
+            long result = Long.parseLong(value);
+
+            if (result < 0) { 
+            	throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected NATURAL NUMBER)");
+            }
+        
+            return result;
+        } catch (NumberFormatException e) {
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected NATURAL NUMBER)", e);
+        }
+    }
+
+    
+    
+    /**
      * Retrieves the value of an double property with the given name.
      * 
      * @return the value of an double property with the given name.

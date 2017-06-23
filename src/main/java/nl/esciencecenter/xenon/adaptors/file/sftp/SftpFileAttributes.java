@@ -151,6 +151,15 @@ public class SftpFileAttributes implements FileAttributes {
             return false;
         }
 
+        System.out.println("COMPARE ATTR");
+        System.out.println("Flags = " + (a1.getFlags() == a2.getFlags()));
+        System.out.println("UserID = " + (a1.getUserId() == a2.getUserId()));
+        System.out.println("Permissions = " + (a1.getPermissions() == a2.getPermissions()));
+        System.out.println("Size = " + (a1.getSize() == a2.getSize()));
+        System.out.println("Group = " + a1.getGroup().equals(a2.getGroup()));
+        System.out.println("ModifyTime = " + a1.getModifyTime().equals(a2.getModifyTime()));
+        System.out.println("AccessTime = " + a1.getAccessTime().equals(a2.getAccessTime()));
+        
         // Test all fields
         return  a1.getFlags() == a2.getFlags()
                 && a1.getUserId() == a2.getUserId() 

@@ -7,8 +7,18 @@ package nl.esciencecenter.xenon.credentials;
  */
 public class DefaultCredential implements Credential {
 
+	private final String username;
+	
+	public DefaultCredential() {
+		username = System.getProperty("user.name");
+	}
+	
+	public DefaultCredential(String username) {
+		this.username = username;
+	}
+	
 	@Override
 	public String getUsername() {
-		return System.getProperty("user.name");
+		return username;
 	}
 }

@@ -46,9 +46,9 @@ public class SftpFileTestConfig extends FileTestConfig {
         username = getPropertyOrFail("test.ssh.user");
         passwd = getPropertyOrFail("test.ssh.password").toCharArray();
 
-        correctLocation = username + "@" + location;
-        wrongLocation = username + "@doesnotexist.com";
-        correctLocationWrongUser = "incorrect@" + location;
+        correctLocation = /*username + "@" + */ location;
+        wrongLocation = /*username + "@*/ "doesnotexist.com";
+        correctLocationWrongUser = /*"incorrect@" +*/ location;
     }
 
     @Override
@@ -83,7 +83,7 @@ public class SftpFileTestConfig extends FileTestConfig {
 
     @Override
     public Credential getDefaultCredential() throws XenonException {
-        return new DefaultCredential();
+        return new DefaultCredential(username);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class SftpFileTestConfig extends FileTestConfig {
 
     @Override
     public boolean supportNullCredential() {
-        return true;
+        return false;
     }
 
     @Override

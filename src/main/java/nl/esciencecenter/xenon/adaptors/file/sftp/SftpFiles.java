@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.ConnectionLostException;
+import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.NotConnectedException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -246,6 +247,10 @@ public class SftpFiles extends FileAdaptor {
 
         LOGGER.debug("newFileSystem scheme = SFTP location = {} credential = {} properties = {}", location, credential, properties);
         
+		if (credential == null) { 
+			throw new InvalidCredentialException(ADAPTOR_NAME, "Credential may not be null");
+		}
+
         XenonProperties xp = new XenonProperties(SftpProperties.VALID_PROPERTIES, properties);
         
         boolean loadKnownHosts = xp.getBooleanProperty(SftpProperties.LOAD_STANDARD_KNOWN_HOSTS);
@@ -255,7 +260,7 @@ public class SftpFiles extends FileAdaptor {
         
         SshClient client = SSHUtil.createSSHClient(loadKnownHosts, loadSSHConfig, useSSHAgent, useAgentForwarding);
      
-        long timeout = xp.getLongProperty(SftpProperties.CONNECTION_TIMEOUT);
+        long timeout = xp.getNaturalProperty(SftpProperties.CONNECTION_TIMEOUT);
         
         ClientSession session = SSHUtil.connect(ADAPTOR_NAME, client, location, credential, timeout);
         
@@ -379,6 +384,8 @@ public class SftpFiles extends FileAdaptor {
 
         LOGGER.debug("createDirectory dir = {}", dir);
         
+        System.out.println("SFTP CREATE DIR: " + dir);
+        
         if (exists(dir)) {
             throw new PathAlreadyExistsException(ADAPTOR_NAME, "Directory " + dir + " already exists!");
         }
@@ -391,6 +398,9 @@ public class SftpFiles extends FileAdaptor {
         SftpClient client = getSftpClient(dir);
         
         try {
+        	
+        	System.out.println("SFTP MKDIR: " + dir.getRelativePath().getAbsolutePath());
+           
         	client.mkdir(dir.getRelativePath().getAbsolutePath());
         	// channel.mkdir(dir.getRelativePath().getAbsolutePath());
         } catch (IOException e) {
@@ -440,7 +450,7 @@ public class SftpFiles extends FileAdaptor {
         OutputStream out = null;
 
         try {
-            out = newOutputStream(path, OpenOption.CREATE, OpenOption.WRITE, OpenOption.APPEND);
+            out = newOutputStream(path, OpenOption.CREATE, OpenOption.WRITE, OpenOption.TRUNCATE);
         } finally {
             try {
                 if (out != null) {
@@ -458,6 +468,11 @@ public class SftpFiles extends FileAdaptor {
     public void delete(Path path) throws XenonException {
 
         LOGGER.debug("delete path = {}", path);
+        
+
+        System.out.println("SFTP DELETE: " + path);
+
+        new Exception().printStackTrace(System.out);
         
         if (!exists(path)) {
             throw new NoSuchPathException(getClass().getName(), "Cannot delete file, as it does not exist");
@@ -477,10 +492,15 @@ public class SftpFiles extends FileAdaptor {
                             + " as it is not empty");
                 }
 
+                System.out.println("SFTP REMOVE DIR: " + path.getRelativePath().getAbsolutePath());
+
                 client.rmdir(path.getRelativePath().getAbsolutePath());
 //                channel.rmdir(path.getRelativePath().getAbsolutePath());
             } else {
-            	client.rmdir(path.getRelativePath().getAbsolutePath());
+
+                System.out.println("SFTP REMOVE: " + path.getRelativePath().getAbsolutePath());
+
+            	client.remove(path.getRelativePath().getAbsolutePath());
 //                channel.rm(path.getRelativePath().getAbsolutePath());
             }
         } catch (IOException e) {
@@ -685,19 +705,27 @@ public class SftpFiles extends FileAdaptor {
             tmp.setWriteMode(OpenOption.WRITE);
         }
 
-        if (tmp.getOpenMode() == OpenOption.CREATE && exists(path)) {
-            throw new PathAlreadyExistsException(ADAPTOR_NAME, "File already exists: " + path);
-        } else if (tmp.getOpenMode() == OpenOption.OPEN && !exists(path)) {
-            throw new NoSuchPathException(ADAPTOR_NAME, "File does not exist: " + path);
-        }
+        SftpClient.OpenMode mode = SftpClient.OpenMode.Create;
 
-        SftpClient.OpenMode mode = SftpClient.OpenMode.Truncate;
-
-        if (OpenOption.APPEND.occursIn(options)) {
-            mode = SftpClient.OpenMode.Append;
-        }
+        if (exists(path)) { 
         
-//        SshMultiplexedSession session = getSession(path);
+        	if (tmp.getOpenMode() == OpenOption.CREATE) { 
+                throw new PathAlreadyExistsException(ADAPTOR_NAME, "File already exists: " + path);
+        	} 
+        	
+        	if (OpenOption.APPEND.occursIn(options)) {
+        		mode = SftpClient.OpenMode.Append;
+        	} else if (OpenOption.TRUNCATE.occursIn(options)) { 
+        		mode = SftpClient.OpenMode.Truncate;
+        	}
+       
+        } else {         
+        	if (tmp.getOpenMode() == OpenOption.OPEN) {
+                throw new NoSuchPathException(ADAPTOR_NAME, "File does not exist: " + path);
+            }
+        }
+       
+        //        SshMultiplexedSession session = getSession(path);
 //        ChannelSftp channel = session.getSftpChannel();
         
         SftpClient client = getSftpClient(path);
@@ -705,7 +733,9 @@ public class SftpFiles extends FileAdaptor {
         OutputStream out;
         
         try {
-        	out = client.write(path.getRelativePath().getAbsolutePath(), mode);      	
+        	System.out.println("OPEN STREAM TO: " + path.getRelativePath().getAbsolutePath() + " " + mode);
+        	
+        	out = client.write(path.getRelativePath().getAbsolutePath(), SftpClient.OpenMode.Write, mode);      	
             //out = channel.put(path.getRelativePath().getAbsolutePath(), mode);
 //        } catch (SftpException e) {
 //            session.failedSftpChannel(channel);
@@ -781,51 +811,20 @@ public class SftpFiles extends FileAdaptor {
 
         LOGGER.debug("setPosixFilePermissions path = {} permissions = {}", path, permissions);
         
-//        SshMultiplexedSession session = getSession(path);
-//        ChannelSftp channel = session.getSftpChannel();
-
         SftpClient client = getSftpClient(path);
-        
+   
         try {
-        	SftpClient.Attributes a = client.stat(path.getRelativePath().getAbsolutePath());
+        	// We need to create a new Attributes object here. SFTP will only forward the fields that are actually set 
+        	// when we call setStat. If we retrieve the existing attributes, change permissions and send the lot back 
+        	// we'll receive an error since some of the other attributes cannot be changed (learned this the hard way).
+        	SftpClient.Attributes a = new SftpClient.Attributes();
         	a.setPermissions(PosixFileUtils.permissionsToBits(permissions));
         	client.setStat(path.getRelativePath().getAbsolutePath(), a);
-        	// channel.chmod(PosixFileUtils.permissionsToBits(permissions), path.getRelativePath().getAbsolutePath());
         } catch (IOException e) {
-            //session.failedSftpChannel(channel);
-            //throw SshUtil.sftpExceptionToXenonException(e);
         	throw new XenonException(ADAPTOR_NAME, "Failed to set permissions on: " + path, e);
         }
-
-        // session.releaseSftpChannel(channel);
-
         LOGGER.debug("setPosixFilePermissions OK");
     }
-
-    /*
-    private SftpATTRS stat(Path path) throws XenonException {
-
-        LOGGER.debug("* stat path = {}", path);
-        
-        SshMultiplexedSession session = getSession(path);
-        ChannelSftp channel = session.getSftpChannel();
-
-        SftpATTRS result;
-
-        try {
-            result = channel.lstat(path.getRelativePath().getAbsolutePath());
-        } catch (SftpException e) {
-            session.failedSftpChannel(channel);
-            throw SshUtil.sftpExceptionToXenonException(e);
-        }
-
-        session.releaseSftpChannel(channel);
-        
-        LOGGER.debug("* stat OK result = {}", result);
-        
-        return result;
-    }
-     */
 
     private static XenonException sftpExceptionToXenonException(IOException e, String message) {
     	

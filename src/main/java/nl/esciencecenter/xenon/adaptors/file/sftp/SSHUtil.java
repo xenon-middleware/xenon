@@ -155,7 +155,7 @@ public class SSHUtil {
 		
 		// location should be hostname or hostname:port. If port unset it defaults to port 22
 		
-		// Credential may be DEFAULT, username/password or username / certificate / passphrase.   
+		// Credential may be DEFAULT with username, username/password or username / certificate / passphrase.   
 		
 		// TODO: Add option DEFAULT with password ? 
 		
@@ -181,6 +181,10 @@ public class SSHUtil {
 		
 		try {
 			// Connect to remote machine and retrieve a session. Will throw exception on timeout
+
+			System.out.println("CONNECT TO " + host + ":" + port + " as " + username + " within " + timeout + " ms.");
+			
+			
 			session = client.connect(username, host, port).verify(timeout).getSession();
 		} catch (IOException e) {
 			throw new XenonException(adaptorName, "Connection setup timeout: " + host + ":" + port, e);

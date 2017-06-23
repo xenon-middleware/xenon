@@ -114,7 +114,13 @@ public class FilesEngine implements Files {
     }
     
     private FileAdaptor getFileAdaptorByName(String adaptorName) throws InvalidAdaptorException {
-        FileAdaptor adaptor = adaptors.get(adaptorName);
+       
+    	if (adaptorName == null) {
+            throw new InvalidAdaptorException(COMPONENT_NAME, "Adaptor name may not be null");
+    	}
+    	
+    	
+    	FileAdaptor adaptor = adaptors.get(adaptorName);
         
         if (adaptor == null) { 
             throw new InvalidAdaptorException(COMPONENT_NAME, "Could not find file adaptor named " + adaptorName);
