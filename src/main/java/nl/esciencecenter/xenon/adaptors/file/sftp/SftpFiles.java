@@ -976,7 +976,6 @@ public class SftpFiles extends FileAdaptor {
 
 	@Override
 	public Map<String, String> getAdaptorSpecificInformation() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

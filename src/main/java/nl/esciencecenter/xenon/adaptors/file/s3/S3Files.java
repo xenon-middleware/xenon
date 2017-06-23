@@ -3,52 +3,32 @@ package nl.esciencecenter.xenon.adaptors.file.s3;
 
 
 import static nl.esciencecenter.xenon.adaptors.file.sftp.SftpProperties.ADAPTOR_NAME;
-import io.minio.MinioClient;
-import io.minio.errors.ErrorResponseException;
-import io.minio.errors.InsufficientDataException;
-import io.minio.errors.InternalException;
-import io.minio.errors.InvalidArgumentException;
-import io.minio.errors.InvalidBucketNameException;
-import io.minio.errors.InvalidEndpointException;
-import io.minio.errors.InvalidPortException;
-import io.minio.errors.NoResponseException;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+
+import java.io.*;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.*;
+import nl.esciencecenter.xenon.engine.files.*;
+import nl.esciencecenter.xenon.files.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xmlpull.v1.XmlPullParserException;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
-import nl.esciencecenter.xenon.adaptors.file.sftp.InvalidPathException;
-import nl.esciencecenter.xenon.adaptors.file.sftp.PermissionDeniedException;
-import nl.esciencecenter.xenon.adaptors.file.sftp.SftpFiles;
-import nl.esciencecenter.xenon.adaptors.file.sftp.SftpProperties;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.engine.XenonProperties;
-import nl.esciencecenter.xenon.engine.files.FileAdaptor;
-import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
-import nl.esciencecenter.xenon.engine.files.FilesEngine;
-import nl.esciencecenter.xenon.engine.util.ImmutableArray;
-import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
-import nl.esciencecenter.xenon.files.FileAttributes;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.NoSuchPathException;
-import nl.esciencecenter.xenon.files.OpenOption;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.files.PathAttributesPair;
-import nl.esciencecenter.xenon.files.PosixFilePermission;
-import nl.esciencecenter.xenon.files.RelativePath;
 
 public class S3Files extends FileAdaptor {
 	
@@ -62,6 +42,35 @@ public class S3Files extends FileAdaptor {
         return res;
     }
     
+   
+    /**
+     * Used to store all state attached to a filesystem. This way, FileSystemImplementation is immutable.
+     */
+    static class FileSystemInfo {
+        private final FileSystemImplementation impl;
+        private final String bucket;
+        private final String
+        private final AmazonS3 client;
+        boolean isShutdown;
+
+		public FileSystemInfo(FileSystemImplementation impl, AmazonS3 client, String bucket) {
+        	super();
+        	this.impl = impl;
+        	this.bucket = bucket;
+        	this.client = client;
+        	this.isShutdown = false;
+        }
+
+        FileSystemImplementation getImpl() {
+        	return impl;
+        }
+
+        AmazonS3 getClient(){ return client; }
+
+    }
+    
+    private final Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
+    
 	protected S3Files(FilesEngine engine, Map<String, String> properties) throws XenonException {
 		super(engine, S3Properties.ADAPTOR_NAME, S3Properties.ADAPTOR_DESCRIPTION, S3Properties.ADAPTOR_SCHEME, S3Properties.ADAPTOR_LOCATIONS, S3Properties.VALID_PROPERTIES,
                 new XenonProperties(S3Properties.VALID_PROPERTIES, Component.XENON, properties));
@@ -70,198 +79,341 @@ public class S3Files extends FileAdaptor {
 	@Override
 	public FileSystem newFileSystem(String location, Credential credential,
 			Map<String, String> properties) throws XenonException {
+
+		int split = location.lastIndexOf("/");
+		if(split < 0){
+			throw new InvalidPathException("s3","No bucket found in url: " + location);
+		} 
 		
-       LOGGER.debug("newFileSystem scheme = S3 location = {} credential = {} properties = {}", location, credential, properties);
-        
+		String server = location.substring(0,split);
+		String bucket = location.substring(split + 1);
+		
         XenonProperties xp = new XenonProperties(S3Properties.VALID_PROPERTIES, properties);
         
         if (!(credential instanceof PasswordCredential)){
-        	throw new PermissionDeniedException("s3", "No secret key given for s3 connection.");
+        	throw new nl.esciencecenter.xenon.files.PermissionDeniedException("s3", "No secret key given for s3 connection.");
         }
+		if(properties == null) { properties = new HashMap<>(); }
+        String signingRegion = properties.get(S3Properties.SIGNING_REGION);
+        if(signingRegion == null) { signingRegion = ""; }
+
         PasswordCredential c = (PasswordCredential)credential;
-        
-        MinioClient minioClient;
-        
-		try {
-			minioClient = new MinioClient(location, c.getUsername(), new String(c.getPassword()));
-		} catch (InvalidEndpointException | InvalidPortException e) {
-        	throw new XenonException(ADAPTOR_NAME, "Failed to create S3 session", e);
+		AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard();
+		builder.setEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(server,signingRegion));
+		builder.setCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(c.getUsername(),new String(c.getPassword()))));
+		AmazonS3 client = builder.build();
+
+
+
+		if(!client.doesBucketExist(bucket)){
+			throw new InvalidPathException("s3","Bucket does not exist: " + bucket);
 		}
+
 		
-        RelativePath entryPath = new RelativePath("");
+
 		String id = getNewUniqueID();
-		return new S3FileSystem(minioClient,ADAPTOR_NAME, id,  location, 
-				entryPath, credential, xp);
+        RelativePath entryPath = new RelativePath("");
+        
+        FileSystemImplementation result = new FileSystemImplementation(S3Properties.ADAPTOR_NAME, id, "s3", location, 
+                entryPath, credential, xp);
+        
+
+        fileSystems.put(id, new FileSystemInfo(result, client,bucket));
+        return result;
 	}
-	
-	private S3FileSystem castFileSystem(FileSystem system) throws XenonException{
-		if(!(system instanceof S3FileSystem)){
-			throw new XenonException("s3", "Internal invariant broken: cannot cast filesystem to s3 system. This is a bug, please report!");
-		}
-		return (S3FileSystem)system;
-	}
-	
-	private RelativePath checkS3Path(RelativePath p) throws InvalidPathException{
-		if (p.getNameCount() < 2){
-			throw new InvalidPathException("s3", "s3 paths must be \"<bucket-name>/<file-name>\"");
-		}
-		return p;
-	}
+
+
+
 
 	@Override
 	public void close(FileSystem filesystem) throws XenonException {
-		S3FileSystem system = castFileSystem(filesystem);
-		// minio does not need closing
+		FileSystemInfo info = getFileSystemInfo(filesystem);
+		info.client.shutdown();
+		info.isShutdown = true;
 
 	}
 
 	@Override
 	public boolean isOpen(FileSystem filesystem) throws XenonException {
-		S3FileSystem system = castFileSystem(filesystem);
-		// minio client cannot open/close
-		return true;
+		FileSystemInfo info = getFileSystemInfo(filesystem);
+		return !info.isShutdown;
 	}
 
 	@Override
 	public void move(Path source, Path target) throws XenonException {
-		// TODO Auto-generated method stub
+		FileSystemInfo infoSource = getFileSystemInfo(source.getFileSystem());
+		FileSystemInfo targetSource = getFileSystemInfo(source.getFileSystem());
+
 
 	}
+
+	public Copy copySync(Path source, Path target, CopyOption... options) throws XenonException {
+        FileSystemInfo infoSource = getFileSystemInfo(source.getFileSystem());
+        FileSystemInfo targetSource = getFileSystemInfo(source.getFileSystem());
+        if(!infoSource.impl.getLocation().equals(targetSource.impl.getLocation())){
+            return super.copy(source,target);
+        }
+        CopyObjectResult res = infoSource.client.copyObject(infoSource.bucket,source.getRelativePath().getRelativePath(),
+                targetSource.bucket, target.getRelativePath().getRelativePath());
+
+    }
+
+    public Copy copy(Path source, Path target, CopyOption... options) throws XenonException {
+        F
+        res.
+    }
 
 	@Override
 	public void createDirectory(Path dir) throws XenonException {
-		// TODO Auto-generated method stub
+		// No (real) directories in s3
 
 	}
 
+	FileSystemInfo getFileSystemInfo(FileSystem fs){
+		FileSystemImplementation fsimp = (FileSystemImplementation) fs;
+        return fileSystems.get(fsimp.getUniqueID());
+	}
+	
 	@Override
 	public void createFile(Path path) throws XenonException {
-		// TODO Auto-generated method stub
+		FileSystemInfo info = getFileSystemInfo(path.getFileSystem());
+		AmazonS3 client =  info.client;
+        if (client.doesObjectExist(info.bucket,path.getRelativePath().getRelativePath())) {
+            throw new PathAlreadyExistsException(ADAPTOR_NAME, "File " + path + " already exists!");
+        }
+        FileSystemInfo fsi = getFileSystemInfo(path.getFileSystem());
+		client.putObject(info.bucket,path.getRelativePath().getRelativePath(),"");
+
+
 
 	}
 
 	@Override
 	public void delete(Path path) throws XenonException {
-		RelativePath p ;
-		path.getRelativePath().getParent();
+		// TODO: What happens if file not exists? What if it was intended to be a directory? Should succeed?
+		FileSystemInfo info = getFileSystemInfo(path.getFileSystem());
+		AmazonS3 client =  info.client;
+		String objectName = path.getRelativePath().getRelativePath();
+		if(client.doesObjectExist(info.bucket, objectName)){
+			client.deleteObject(info.bucket,objectName);
+		}
 
 	}
 
 	@Override
 	public boolean exists(Path path) throws XenonException {
-		// TODO Auto-generated method stub
-		return false;
+		// Everything exists, since there are no directories in S3, and we want do not want to fail
+		// if we query for existence of a directory?
+        return true;
 	}
 
 	@Override
 	public DirectoryStream<Path> newDirectoryStream(Path dir)
 			throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
+		// Todo : This is the same for each adapter
+		return newDirectoryStream(dir,DirectoryStream.filterNothing);
 	}
 
 	@Override
 	public DirectoryStream<Path> newDirectoryStream(Path dir, Filter filter)
 			throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
+	    final DirectoryStream<PathAttributesPair> st = newAttributesDirectoryStream(dir,filter);
+        return new DirectoryStream<Path>() {
+            @Override
+            public Iterator<Path> iterator() {
+                final Iterator<PathAttributesPair> pa = st.iterator();
+                return new Iterator<Path>() {
+                    @Override
+                    public boolean hasNext() {
+                        return pa.hasNext();
+                    }
+
+                    @Override
+                    public Path next() {
+
+                        return pa.next().path();
+                    }
+
+                    @Override
+                    public void remove() { }
+                };
+            }
+
+            @Override
+            public void close() throws IOException {
+
+            }
+        };
 	}
 
 	@Override
 	public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(
 			Path dir) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
+        // Todo : This is the same for each adapter
+        return newAttributesDirectoryStream(dir, DirectoryStream.filterNothing);
 	}
 
 	@Override
 	public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(
-			Path dir, Filter filter) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
+			final Path dir, final  Filter filter) throws XenonException {
+        final FileSystemInfo info = getFileSystemInfo(dir.getFileSystem());
+        final AmazonS3 client =  info.client;
+
+        return new DirectoryStream<PathAttributesPair>() {
+            @Override
+            public Iterator<PathAttributesPair> iterator() {
+                final ObjectListing list = client.listObjects(info.bucket,dir.getRelativePath().getRelativePath());
+                return new ObjectIterator(info.getImpl(),info.client,list,filter);
+            }
+
+            @Override
+            public void close() throws IOException {
+
+            }
+        };
 	}
 
 	@Override
 	public InputStream newInputStream(Path path) throws XenonException {
-		S3FileSystem system = castFileSystem(path.getFileSystem());
-		RelativePath p = checkS3Path(path.getRelativePath());
-		String bucket = p.getName(0).toString();
-		String fileName = p.subpath(1,p.getNameCount()).toString();
-			try {
-				return system.minioClient.getObject(bucket, fileName);
-			} catch (InvalidBucketNameException e) {
-				throw new NoSuchPathException("s3", "No such bucket : " + bucket);
-			}catch (InvalidKeyException 
-					| NoSuchAlgorithmException | InsufficientDataException
-					| NoResponseException | ErrorResponseException
-					| InternalException | InvalidArgumentException
-					| IOException | XmlPullParserException e) {
-				throw new XenonException("s3", e.getMessage());
-			}
-
+        final FileSystemInfo info = getFileSystemInfo(path.getFileSystem());
+        final AmazonS3 client =  info.client;
+        S3Object obj = client.getObject(info.bucket,path.getRelativePath().getRelativePath());
+        S3ObjectInputStream str = obj.getObjectContent();
+        return str;
 	}
-	
-	static class OutputEater implements Runnable{
 
-		
-		
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			
-		}
-		
-	}
+
+
+    public OutputStream newOutputStream(final Path path, long size, OpenOption... options)
+            throws XenonException {
+        final FileSystemInfo info = getFileSystemInfo(path.getFileSystem());
+        final AmazonS3 client =  info.client;
+        final ObjectMetadata md = new ObjectMetadata();
+        md.setContentLength(size);
+	    try {
+            final PipedInputStream read = new PipedInputStream();
+            final OutputStream out = new PipedOutputStream(read);
+            new Thread(new Runnable(){
+
+                @Override
+                public void run() {
+                    client.putObject(info.bucket, path.getRelativePath().getRelativePath(), read, md);
+                }
+            }).start();
+            return out;
+        } catch (IOException e){
+            // Todo: Handle this
+        }
+    }
+
 
 	@Override
 	public OutputStream newOutputStream(Path path, OpenOption... options)
 			throws XenonException {
-		S3FileSystem system = castFileSystem(path.getFileSystem());
-		RelativePath p = checkS3Path(path.getRelativePath());
-		String bucket = p.getName(0).toString();
-		String fileName = p.subpath(1,p.getNameCount()).toString();
-			try {
-				system.minioClient.putObject(bucket, ;
-			} catch (InvalidBucketNameException e) {
-				throw new NoSuchPathException("s3", "No such bucket : " + bucket);
-			}catch (InvalidKeyException 
-					| NoSuchAlgorithmException | InsufficientDataException
-					| NoResponseException | ErrorResponseException
-					| InternalException | InvalidArgumentException
-					| IOException | XmlPullParserException e) {
-				throw new XenonException("s3", e.getMessage());
-			}
-	}
-
-	@Override
-	public FileAttributes getAttributes(Path path) throws XenonException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
+	public FileAttributes getAttributes(Path path) throws XenonException {
+		Iterator<PathAttributesPair> it = newAttributesDirectoryStream(path).iterator();
+		if(!it.hasNext()){
+		    throw new InvalidPathException("s3","Path for getAttributes does not exist");
+        }
+		return it.next().attributes();
+
+	}
+
+	@Override
 	public Path readSymbolicLink(Path link) throws XenonException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void setPosixFilePermissions(Path path,
 			Set<PosixFilePermission> permissions) throws XenonException {
-		// TODO Auto-generated method stub
+		// No Posix with S3
 
 	}
 
 	@Override
 	public Map<String, String> getAdaptorSpecificInformation() {
-		// TODO Auto-generated method stub
-		return null;
+		// Todo: What is this?
+        return null;
 	}
 
 	@Override
 	public void end() {
-		// TODO Auto-generated method stub
+		// Todo: This is a general thing, do not implement this for each adapter
+		for (FileSystemInfo fsi : fileSystems.values()){
+			FileSystem fs = fsi.getImpl();
+			try {
+				close(fs);
+			} catch (XenonException e) {
+				// ignore for now
+			}
+
+		}
+
 
 	}
+
+	class ObjectIterator implements Iterator<PathAttributesPair>{
+	    ObjectListing listing;
+	    Iterator<S3ObjectSummary> curIterator;
+	    S3ObjectSummary s3Sum;
+	    final FileSystem fs;
+        final AmazonS3 client;
+        final Filter filter;
+
+	    ObjectIterator(FileSystem fs, AmazonS3 client, ObjectListing first, Filter filter){
+            this.client = client;
+            listing = first;
+            this.fs = fs;
+            this.filter = filter;
+            nextListing();
+            getNext();
+        }
+
+        void getNext() {
+            do {
+                if (!curIterator.hasNext()) {
+                    if (listing.isTruncated()) {
+                        System.out.println("MORE!!");
+                        listing = client.listNextBatchOfObjects(listing);
+                        nextListing();
+                    } else {
+                        s3Sum = null;
+                        return;
+                    }
+                }
+                s3Sum = curIterator.next();
+
+            } while(!filter.accept(new PathImplementation(fs, new RelativePath(s3Sum.getKey()))));
+
+        }
+
+        void nextListing(){
+	        curIterator = listing.getObjectSummaries().iterator();
+        }
+
+	    public boolean hasNext(){
+	        return s3Sum != null;
+        }
+
+        public PathAttributesPair next(){
+            if(s3Sum == null){
+                throw new NoSuchElementException("Called next on directory stream while we have no next.");
+            }
+            S3ObjectSummary sumPrev = s3Sum;
+            Path p = new PathImplementation(fs, new RelativePath(sumPrev.getKey()));
+            getNext();
+            return new PathAttributesPairImplementation(p,new S3FileAttributes(sumPrev));
+
+        }
+
+        public void remove(){ throw new Error("Cannot remove from this list."); }
+
+    }
+
 
 }

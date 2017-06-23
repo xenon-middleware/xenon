@@ -27,6 +27,13 @@ import java.util.Iterator;
  */
 public interface DirectoryStream<T> extends Closeable, Iterable<T> {
 
+    static final Filter filterNothing = new Filter() {
+        @Override
+        public boolean accept(Path entry) {
+            return true;
+        }
+    };
+
     /**
      * A filter use to decides if the given directory entry should be accepted.
      */

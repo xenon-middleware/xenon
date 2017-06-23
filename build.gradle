@@ -53,7 +53,8 @@ dependencies {
 //    compile group: 'com.jcraft', name: 'jsch.agentproxy.jsch', version: jschAgentproxyVersion
 //    compile group: 'com.jcraft', name: 'jsch.agentproxy.connector-factory', version: jschAgentproxyVersion
 
-    compile 'io.minio:minio:1.0.1'
+//	  compile 'com.amazonaws:aws-java-sdk-s3'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.154'
     compile group: 'commons-net', name: 'commons-net', version: apacheCommonsNetVersion
     compile group: 'com.google.code.findbugs', name: 'findbugs', version: '2.0.2'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.5'

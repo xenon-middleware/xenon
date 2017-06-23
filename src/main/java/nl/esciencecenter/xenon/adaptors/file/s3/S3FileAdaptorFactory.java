@@ -4,6 +4,7 @@ import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.adaptors.file.sftp.SftpProperties;
 import nl.esciencecenter.xenon.engine.files.FileAdaptor;
 import nl.esciencecenter.xenon.engine.files.FileAdaptorFactory;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
@@ -17,15 +18,13 @@ public class S3FileAdaptorFactory implements FileAdaptorFactory {
 
 	@Override
 	public XenonPropertyDescription[] getSupportedProperties() {
-		// TODO Auto-generated method stub
-		return null;
+		 return S3Properties.VALID_PROPERTIES.asArray();
 	}
 
 	@Override
 	public FileAdaptor createAdaptor(FilesEngine engine,
 			Map<String, String> properties) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
+		return new S3Files(engine, properties);
 	}
 
 }
