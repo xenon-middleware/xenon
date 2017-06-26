@@ -1,5 +1,13 @@
 Please cite Xenon (1.2.2) as follows:
 
+- [BibTeX](https://github.com/NLeSC/Xenon/blob/citation/CITATION.md#bibtex)
+- [CSL](https://github.com/NLeSC/Xenon/blob/citation/CITATION.md#csl)
+- [DataCite](https://github.com/NLeSC/Xenon/blob/citation/CITATION.md#datacite)
+- [Dublin Core](https://github.com/NLeSC/Xenon/blob/citation/CITATION.md#dublin-core)
+- [JSON](https://github.com/NLeSC/Xenon/blob/citation/CITATION.md#json)
+- [MARKCXML](https://github.com/NLeSC/Xenon/blob/citation/CITATION.md#markcxml)
+
+
 # BibTeX
 
 ```text
