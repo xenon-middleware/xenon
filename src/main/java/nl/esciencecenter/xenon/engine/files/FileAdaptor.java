@@ -147,7 +147,10 @@ public abstract class FileAdaptor extends Adaptor {
 
     public abstract boolean isOpen(FileSystem filesystem) throws XenonException;
 
-    public abstract void move(Path source, Path target) throws XenonException; 
+    public void move(Path source, Path target) throws XenonException{
+        copy(source,target,CopyOption.CREATE);
+        delete(source);
+    }
   
     public abstract void createDirectory(Path dir) throws XenonException;
 

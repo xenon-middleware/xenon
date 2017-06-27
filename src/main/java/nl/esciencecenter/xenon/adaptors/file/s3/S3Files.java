@@ -5,6 +5,7 @@ package nl.esciencecenter.xenon.adaptors.file.s3;
 import static nl.esciencecenter.xenon.adaptors.file.sftp.SftpProperties.ADAPTOR_NAME;
 
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
@@ -49,7 +50,6 @@ public class S3Files extends FileAdaptor {
     static class FileSystemInfo {
         private final FileSystemImplementation impl;
         private final String bucket;
-        private final String
         private final AmazonS3 client;
         boolean isShutdown;
 
@@ -103,9 +103,13 @@ public class S3Files extends FileAdaptor {
 		builder.setCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(c.getUsername(),new String(c.getPassword()))));
 		AmazonS3 client = builder.build();
 
-
-
-		if(!client.doesBucketExist(bucket)){
+        boolean exists;
+        try{
+            exists = client.doesBucketExist(bucket);
+        } catch (SdkClientException e){
+            throw new XenonException("s3",e.getMessage());
+        }
+		if(!exists){
 			throw new InvalidPathException("s3","Bucket does not exist: " + bucket);
 		}
 
@@ -139,13 +143,7 @@ public class S3Files extends FileAdaptor {
 		return !info.isShutdown;
 	}
 
-	@Override
-	public void move(Path source, Path target) throws XenonException {
-		FileSystemInfo infoSource = getFileSystemInfo(source.getFileSystem());
-		FileSystemInfo targetSource = getFileSystemInfo(source.getFileSystem());
 
-
-	}
 
 	public Copy copySync(Path source, Path target, CopyOption... options) throws XenonException {
         FileSystemInfo infoSource = getFileSystemInfo(source.getFileSystem());
@@ -155,13 +153,11 @@ public class S3Files extends FileAdaptor {
         }
         CopyObjectResult res = infoSource.client.copyObject(infoSource.bucket,source.getRelativePath().getRelativePath(),
                 targetSource.bucket, target.getRelativePath().getRelativePath());
-
+        // Todo: Finish this
+        return null;
     }
 
-    public Copy copy(Path source, Path target, CopyOption... options) throws XenonException {
-        F
-        res.
-    }
+
 
 	@Override
 	public void createDirectory(Path dir) throws XenonException {
@@ -302,7 +298,7 @@ public class S3Files extends FileAdaptor {
             }).start();
             return out;
         } catch (IOException e){
-            // Todo: Handle this
+            throw new XenonException("s3", e.getMessage());
         }
     }
 
@@ -378,7 +374,6 @@ public class S3Files extends FileAdaptor {
             do {
                 if (!curIterator.hasNext()) {
                     if (listing.isTruncated()) {
-                        System.out.println("MORE!!");
                         listing = client.listNextBatchOfObjects(listing);
                         nextListing();
                     } else {
