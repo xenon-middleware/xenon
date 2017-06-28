@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.adaptors.file.ftp;
 import java.util.List;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.file.util.DirectoryStreamBase;
+import nl.esciencecenter.xenon.adaptors.file.DirectoryStreamBase;
 import nl.esciencecenter.xenon.files.Path;
 
 import org.apache.commons.net.ftp.FTPFile;

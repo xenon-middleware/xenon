@@ -15,13 +15,13 @@
  */
 package nl.esciencecenter.xenon.adaptors.job.gridengine;
 
-import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineProperties.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineSchedulerAdaptor.ADAPTOR_NAME;
 
 import java.util.Arrays;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.job.scripting.ScriptingParser;
+import nl.esciencecenter.xenon.adaptors.job.ScriptingParser;
 
 /**
  * Class that holds some info on queues used in Grid Engine.

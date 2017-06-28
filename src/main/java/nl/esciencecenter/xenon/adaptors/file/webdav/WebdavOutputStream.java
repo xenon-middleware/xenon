@@ -30,13 +30,13 @@ import nl.esciencecenter.xenon.files.Path;
  *
  */
 public class WebdavOutputStream extends OutputStream {
-    private final WebdavFiles files;
+    private final WebdavFileSystem filesystem;
     private final Path path;
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-    public WebdavOutputStream(Path path, WebdavFiles webdavFiles) {
+    public WebdavOutputStream(Path path, WebdavFileSystem filesystem) {
         this.path = path;
-        files = webdavFiles;
+        this.filesystem = filesystem;
     }
 
     @Override
@@ -47,11 +47,11 @@ public class WebdavOutputStream extends OutputStream {
     @Override
     public void close() throws IOException {
         try {
-            if (files.exists(path)) {
+            if (filesystem.exists(path)) {
                 // first delete the file otherwise we get a 405 when executing the put
-                files.delete(path);
+                filesystem.delete(path);
             }
-            files.createFile(path, outputStream.toByteArray());
+            filesystem.createFile(path, outputStream.toByteArray());
         } catch (XenonException e) {
             throw new IOException(e);
         }

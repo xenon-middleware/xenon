@@ -20,7 +20,6 @@ import java.util.List;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.engine.files.PathAttributesPairImplementation;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PathAttributesPair;
 
@@ -33,6 +32,6 @@ public class WebdavDirectoryAttributeStream extends WebdavDirectoryStreamBase<Pa
 
     @Override
     protected PathAttributesPair getStreamElementFromEntry(MultiStatusResponse entry, Path entryPath) throws XenonException {
-        return new PathAttributesPairImplementation(entryPath, new WebdavFileAttributes(entry.getProperties(WebdavFiles.OK_CODE)));
+        return new PathAttributesPair(entryPath, new WebdavFileAttributes(entry.getProperties(WebdavFileAdaptor.OK_CODE)));
     }
 }

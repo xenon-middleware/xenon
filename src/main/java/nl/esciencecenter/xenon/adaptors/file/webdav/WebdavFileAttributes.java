@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.webdav;
 
-import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavProperties.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavFileAdaptor.ADAPTOR_NAME;
 
 import java.util.HashSet;
 import java.util.Set;

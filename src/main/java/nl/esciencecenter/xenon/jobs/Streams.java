@@ -26,33 +26,65 @@ import java.io.OutputStream;
  * @version 1.0
  * @since 1.0
  */
-public interface Streams {
+public class Streams {
 
-    /**
-     * Get the job for which this Streams was created.
-     * 
-     * @return the Job.
-     */
-    Job getJob();
+	private final Job job;
+	private final InputStream stdout;
+	private final InputStream stderr;
+	private final OutputStream stdin;
 
-    /**
-     * Returns the standard output stream of job.
-     * 
-     * @return the standard output stream of job.
-     */
-    InputStream getStdout();
+	/**
+	 * Create a Streams containing the job and its standard streams.
+	 * 
+	 * @param job
+	 *            the job.
+	 * @param stdout
+	 *            the standard output stream.
+	 * @param stdin
+	 *            the standard input stream.
+	 * @param stderr
+	 *            the standard error stream.
+	 */
+	public Streams(Job job, InputStream stdout, OutputStream stdin, InputStream stderr) {
+		this.job = job;
+		this.stdout = stdout;
+		this.stdin = stdin;
+		this.stderr = stderr;
+	}
 
-    /**
-     * Returns the standard error stream of job.
-     * 
-     * @return the standard error stream of job.
-     */
-    InputStream getStderr();
+	/**
+	 * Get the job for which this Streams was created.
+	 * 
+	 * @return the Job.
+	 */
+	public Job getJob() {
+		return job;
+	}
 
-    /**
-     * Returns the standard input stream of job.
-     * 
-     * @return the standard input stream of this job.
-     */
-    OutputStream getStdin();
+	/**
+	 * Returns the standard output stream of job.
+	 * 
+	 * @return the standard output stream of job.
+	 */
+	public InputStream getStdout() {
+		return stdout;
+	}
+
+	/**
+	 * Returns the standard error stream of job.
+	 * 
+	 * @return the standard error stream of job.
+	 */
+	public InputStream getStderr() {
+		return stderr;
+	}
+
+	/**
+	 * Returns the standard input stream of job.
+	 * 
+	 * @return the standard input stream of this job.
+	 */
+	public OutputStream getStdin() {
+		return stdin;
+	}
 }

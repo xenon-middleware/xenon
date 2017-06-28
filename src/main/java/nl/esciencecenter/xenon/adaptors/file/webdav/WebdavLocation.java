@@ -15,12 +15,10 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.webdav;
 
-import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavProperties.ADAPTOR_NAME;
-import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavProperties.ADAPTOR_SCHEME;
+import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavFileAdaptor.ADAPTOR_NAME;
 
-
-import nl.esciencecenter.xenon.InvalidLocationException;
-import nl.esciencecenter.xenon.adaptors.file.util.Location;
+import nl.esciencecenter.xenon.adaptors.InvalidLocationException;
+import nl.esciencecenter.xenon.adaptors.file.Location;
 
 public class WebdavLocation extends Location {
 
@@ -31,7 +29,7 @@ public class WebdavLocation extends Location {
     }
 
     protected WebdavLocation(String location) throws InvalidLocationException {
-        super(location, ADAPTOR_SCHEME.get(0));
+        super(location, "http");
     }
 
     @Override

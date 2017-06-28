@@ -43,7 +43,7 @@ public abstract class FtpCommand {
     public abstract void doWork(FTPClient ftpClient, String path) throws IOException;
 
     public void execute(FTPClient ftpClient, Path path, String messageInCaseOfError) throws XenonException {
-        String absolutePath = path.getRelativePath().getAbsolutePath();
+        String absolutePath = path.getAbsolutePath();
         try {
             doWork(ftpClient, absolutePath);
             replyString = ftpClient.getReplyString();

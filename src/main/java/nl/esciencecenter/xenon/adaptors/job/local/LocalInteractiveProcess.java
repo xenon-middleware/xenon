@@ -15,15 +15,18 @@
  */
 package nl.esciencecenter.xenon.adaptors.job.local;
 
-import static nl.esciencecenter.xenon.adaptors.job.local.LocalProperties.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.adaptors.job.local.LocalSchedulerAdaptor.ADAPTOR_NAME;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
-import nl.esciencecenter.xenon.engine.jobs.StreamsImplementation;
-import nl.esciencecenter.xenon.engine.util.InteractiveProcess;
+import nl.esciencecenter.xenon.adaptors.job.InteractiveProcess;
+import nl.esciencecenter.xenon.adaptors.job.JobImplementation;
+import nl.esciencecenter.xenon.adaptors.shared.local.LocalUtil;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.Streams;
 
@@ -63,7 +66,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
         } catch (IOException e) { 
             throw new XenonException(ADAPTOR_NAME, "Failed to start local process!", e);
         }
-        streams = new StreamsImplementation(job, process.getInputStream(), process.getOutputStream(), process.getErrorStream());
+        streams = new Streams(job, process.getInputStream(), process.getOutputStream(), process.getErrorStream());
     }
 
     public Streams getStreams() {
@@ -100,6 +103,32 @@ class LocalInteractiveProcess implements InteractiveProcess {
             return;
         }
 
-        LocalUtils.unixDestroy(process);
+        boolean success = false;
+
+        if (!LocalUtil.isWindows()) { 
+            try {
+                final Field pidField = process.getClass().getDeclaredField("pid");
+
+                AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                    public Object run() {
+                        pidField.setAccessible(true);
+                        return null;
+                    }
+                });
+
+                int pid = pidField.getInt(process);
+
+                if (pid > 0) {
+                    CommandRunner killRunner = new CommandRunner("kill", "-9", "" + pid);
+                    success = (killRunner.getExitCode() == 0);
+                }
+            } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException | XenonException e) {
+                // Failed, so use the regular Java destroy.
+            }
+        }
+            
+        if (!success) {
+            process.destroy();
+        }
     }
 }

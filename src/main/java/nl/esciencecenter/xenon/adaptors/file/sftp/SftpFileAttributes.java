@@ -19,7 +19,7 @@ import java.util.Set;
 
 import org.apache.sshd.client.subsystem.sftp.SftpClient;
 
-import nl.esciencecenter.xenon.engine.util.PosixFileUtils;
+import nl.esciencecenter.xenon.adaptors.file.PosixFileUtils;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
@@ -113,7 +113,7 @@ public class SftpFileAttributes implements FileAttributes {
 
     @Override
     public boolean isHidden() {
-        return path.getRelativePath().getFileNameAsString().startsWith(".");
+        return path.getFileNameAsString().startsWith(".");
     }
 
     @Override

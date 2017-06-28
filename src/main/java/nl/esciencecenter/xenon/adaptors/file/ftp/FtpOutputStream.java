@@ -18,30 +18,21 @@ package nl.esciencecenter.xenon.adaptors.file.ftp;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.files.Path;
-
 import org.apache.commons.net.ftp.FTPClient;
 
 /**
  * Wraps an OutputStream instance. Only functionality added is sending a pending command completed signal after closing the output
  * stream.
- *
- *
  */
 public class FtpOutputStream extends OutputStream {
 
     private final OutputStream outputStream;
     private final FTPClient ftpClient;
     private boolean completedPendingFtpCommand = false;
-    private final Path path;
-    private final FtpFileAdaptor ftpFiles;
 
-    public FtpOutputStream(OutputStream outputStream, FTPClient ftpClient, Path path, FtpFileAdaptor ftpFiles) {
+    public FtpOutputStream(OutputStream outputStream, FTPClient ftpClient) {
         this.outputStream = outputStream;
-        this.path = path;
         this.ftpClient = ftpClient;
-        this.ftpFiles = ftpFiles;
     }
 
     @Override
@@ -67,11 +58,7 @@ public class FtpOutputStream extends OutputStream {
         if (!completedPendingFtpCommand) {
             ftpClient.completePendingCommand();
             completedPendingFtpCommand = true;
-            try {
-                ftpFiles.close(path.getFileSystem());
-            } catch (XenonException e) {
-                throw new IOException("Could not close file system for ftp output stream", e);
-            }
+            ftpClient.disconnect();
         }
     }
 

@@ -15,17 +15,16 @@
  */
 package nl.esciencecenter.xenon.adaptors.job.gridengine;
 
-import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineProperties.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineSchedulerAdaptor.ADAPTOR_NAME;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.job.CommandLineUtils;
+import nl.esciencecenter.xenon.adaptors.job.RemoteCommandRunner;
+import nl.esciencecenter.xenon.adaptors.job.ScriptingParser;
 import nl.esciencecenter.xenon.adaptors.job.gridengine.ParallelEnvironmentInfo.AllocationRule;
-import nl.esciencecenter.xenon.adaptors.job.scripting.RemoteCommandRunner;
-import nl.esciencecenter.xenon.adaptors.job.scripting.SchedulerConnection;
-import nl.esciencecenter.xenon.adaptors.job.scripting.ScriptingParser;
-import nl.esciencecenter.xenon.engine.util.CommandLineUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,15 +59,15 @@ public class GridEngineSetup {
         return result;
     }
     
-    private static String[] getQueueNames(SchedulerConnection schedulerConnection) throws XenonException {
-        String queueListOutput = schedulerConnection.runCheckedCommand(null, "qconf", "-sql");
+    private static String[] getQueueNames(GridEngineScheduler scheduler) throws XenonException {
+        String queueListOutput = scheduler.runCheckedCommand(null, "qconf", "-sql");
 
         return ScriptingParser.parseList(queueListOutput);
     }
 
-    private static Map<String, QueueInfo> getQueues(String[] queueNames, SchedulerConnection schedulerConnection)
+    private static Map<String, QueueInfo> getQueues(String[] queueNames, GridEngineScheduler scheduler)
             throws XenonException {
-        String output = schedulerConnection.runCheckedCommand(null, "qconf", "-sq", CommandLineUtils.asCSList(queueNames));
+        String output = scheduler.runCheckedCommand(null, "qconf", "-sq", CommandLineUtils.asCSList(queueNames));
 
         Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(output, "qname",
                 ScriptingParser.WHITESPACE_REGEX, ADAPTOR_NAME);
@@ -82,21 +81,21 @@ public class GridEngineSetup {
         return result;
     }
 
-    public GridEngineSetup(SchedulerConnection schedulerConnection) throws XenonException {
+    public GridEngineSetup(GridEngineScheduler scheduler) throws XenonException {
             
-        this.queueNames = getQueueNames(schedulerConnection);
+        this.queueNames = getQueueNames(scheduler);
 
-        this.queues = getQueues(queueNames, schedulerConnection);
+        this.queues = getQueues(queueNames, scheduler);
 
-        this.parallelEnvironments = getParallelEnvironments(schedulerConnection);
+        this.parallelEnvironments = getParallelEnvironments(scheduler);
 
         LOGGER.debug("Created setup info, queues = {}, parallel environments = {}", this.queues, this.parallelEnvironments);
     }
     
-    private static Map<String, ParallelEnvironmentInfo> getParallelEnvironments(SchedulerConnection schedulerConnection)
+    private static Map<String, ParallelEnvironmentInfo> getParallelEnvironments(GridEngineScheduler scheduler)
             throws XenonException {
         //first retrieve a list of parallel environments
-        RemoteCommandRunner runner = schedulerConnection.runCommand(null, "qconf", "-spl");
+        RemoteCommandRunner runner = scheduler.runCommand(null, "qconf", "-spl");
 
         //qconf returns an error if there are no parallel environments
         if (runner.getExitCode() == 1 && runner.getStderr().contains("no parallel environment defined")) {
@@ -111,7 +110,7 @@ public class GridEngineSetup {
         String[] parallelEnvironmentNames = ScriptingParser.parseList(runner.getStdout());
 
         //then get the details of each parallel environment
-        String peDetailsOutput = schedulerConnection.runCheckedCommand(null, "qconf",
+        String peDetailsOutput = scheduler.runCheckedCommand(null, "qconf",
                 qconfPeDetailsArguments(parallelEnvironmentNames));
 
         Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(peDetailsOutput, "pe_name",
