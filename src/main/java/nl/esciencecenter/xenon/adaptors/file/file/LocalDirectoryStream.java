@@ -15,14 +15,17 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.file;
 
+import static nl.esciencecenter.xenon.adaptors.file.file.LocalFileAdaptor.ADAPTOR_NAME;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.engine.files.PathImplementation;
+import nl.esciencecenter.xenon.adaptors.shared.local.LocalUtil;
 import nl.esciencecenter.xenon.files.DirectoryStream;
+import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
 
 /**
@@ -48,19 +51,19 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
     /** A buffer to read ahead. */
     private Path readAhead;
 
-    LocalDirectoryStream(Path dir, DirectoryStream.Filter filter) throws XenonException {
+    LocalDirectoryStream(FileSystem fs, Path dir, DirectoryStream.Filter filter) throws XenonException {
         try {
             this.dir = dir;
-            stream = Files.newDirectoryStream(LocalUtils.javaPath(dir));
+            stream = Files.newDirectoryStream(LocalUtil.javaPath(fs, dir));
             iterator = stream.iterator();
             this.filter = filter;
         } catch (IOException e) {
-            throw new XenonException(LocalFiles.ADAPTOR_NAME, "Could not create directory stream for " + dir, e);
+            throw new XenonException(ADAPTOR_NAME, "Could not create directory stream for " + dir, e);
         }
     }
 
     private Path getPath(java.nio.file.Path path) {
-        return new PathImplementation(dir.getFileSystem(), dir.getRelativePath().resolve(path.getFileName().toString()));
+        return new Path(dir.resolve(path.getFileName().toString()));
     }
 
     @Override

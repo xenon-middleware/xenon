@@ -19,44 +19,92 @@ import java.util.Map;
 
 /**
  * QueueStatus contains status information for a specific queue.
- * 
- * @version 1.0
- * @since 1.0
  */
-public interface QueueStatus {
+public class QueueStatus {
 
-    /**
-     * Get the Scheduler that produced this QueueStatus.
-     * 
-     * @return the Scheduler.
-     */
-    Scheduler getScheduler();
+	private final Scheduler scheduler;
+	private final String queueName;
+	private final Exception exception;
+	private final Map<String, String> schedulerSpecificInformation;
 
-    /**
-     * Get the queue name.
-     * 
-     * @return the queue name.
-     */
-    String getQueueName();
+	/**
+	 * Create a Queue status.
+	 * 
+	 * @param scheduler
+	 * 		the <code>Scheduler</code> to which the queue belongs.
+	 * @param queueName
+	 * 		the name of the queue.
+	 * @param exception
+	 * 		the exception produced when retrieving the queue status (if any).
+	 * @param schedulerSpecificInformation
+	 * 		scheduler implementation specific information on the status of the queue.
+	 */
+	public QueueStatus(Scheduler scheduler, String queueName, Exception exception,
+			Map<String, String> schedulerSpecificInformation) {
 
-    /**
-     * Did the queue produce an exception ?
-     * 
-     * @return if the queue produced an exception ?
-     */
-    boolean hasException();
+		if (scheduler == null) {
+			throw new IllegalArgumentException("Scheduler may not be null!");
+		}
 
-    /**
-     * Get the exception produced by the queue, or <code>null</code> if <code>hasException()</code> returns <code>false</code>.
-     * 
-     * @return the exception.
-     */
-    Exception getException();
+		if (queueName == null) {
+			throw new IllegalArgumentException("QueueName may not be null!");
+		}
 
-    /**
-     * Get scheduler specific information on the queue.
-     * 
-     * @return Scheduler specific information on the queue.
-     */
-    Map<String, String> getSchedulerSpecficInformation();
+		this.scheduler = scheduler;
+		this.queueName = queueName;
+		this.exception = exception;
+		this.schedulerSpecificInformation = schedulerSpecificInformation;
+	}
+
+	/**
+	 * Get the Scheduler that produced this QueueStatus.
+	 * 
+	 * @return the Scheduler.
+	 */
+	public Scheduler getScheduler() {
+		return scheduler;
+	}
+
+	/**
+	 * Get the queue name.
+	 * 
+	 * @return the queue name.
+	 */
+	public String getQueueName() {
+		return queueName;
+	}
+
+	/**
+	 * Did the queue produce an exception ?
+	 * 
+	 * @return if the queue produced an exception ?
+	 */
+	public boolean hasException() {
+		return (exception != null);
+	}
+
+	/**
+	 * Get the exception produced by the queue, or <code>null</code> if <code>hasException()</code> returns <code>false</code>.
+	 * 
+	 * @return the exception.
+	 */
+	public Exception getException() {
+		return exception;
+	}
+
+	/**
+	 * Get scheduler specific information on the queue.
+	 * 
+	 * @return Scheduler specific information on the queue.
+	 */
+	public Map<String, String> getSchedulerSpecficInformation() {
+		return schedulerSpecificInformation;
+	}
+	
+	@Override
+	public String toString() {
+		return "QueueStatus [scheduler=" + scheduler + ", queueName=" + queueName + ", exception=" + exception
+				+ ", schedulerSpecificInformation=" + schedulerSpecificInformation + "]";
+	}
+
 }

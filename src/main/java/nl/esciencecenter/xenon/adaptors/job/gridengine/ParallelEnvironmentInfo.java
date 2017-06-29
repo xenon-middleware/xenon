@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.job.gridengine;
 
-import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineProperties.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineSchedulerAdaptor.ADAPTOR_NAME;
 
 import java.util.Map;
 

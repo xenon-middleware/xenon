@@ -56,14 +56,9 @@ public enum CopyOption {
     RESUME,
 
     /**
-     * When resuming a copy, verify that the destination file is a head of the source file.
+     * When resuming a copy, first verifying that the destination file is the head of the source file.
      */
-    VERIFY,
-
-    /**
-     * Perform the copy asynchronously.
-     */
-    ASYNCHRONOUS;
+    VERIFY_AND_RESUME;
 
     /**
      * Check if the CopyOption is listed in a sequence.
@@ -75,17 +70,17 @@ public enum CopyOption {
      * 
      * @return if <code>options</code> contains <code>CopyOption</code>.
      */
-    public boolean occursIn(CopyOption... options) {
-        if (options == null) {
-            return false;
-        }
-
-        for (CopyOption option : options) {
-            if (this == option) {
-                return true;
-            }
-        }
-
-        return false;
-    }
+//    public boolean occursIn(CopyOption... options) {
+//        if (options == null) {
+//            return false;
+//        }
+//
+//        for (CopyOption option : options) {
+//            if (this == option) {
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//    }
 }

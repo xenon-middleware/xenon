@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.files.FilesEngine;
 
 /**
  * 
@@ -35,12 +35,11 @@ public class Util {
      * @throws Exception
      *             if the XenonEngine could not be created or throws an exception.
      */
-    public static XenonEngine createXenonEngine(HashMap<String, String> properties) throws Exception {
-        Constructor<XenonEngine> constructor = XenonEngine.class.getDeclaredConstructor(Map.class);
-        constructor.setAccessible(true);
-        return constructor.newInstance(properties);
+	public static FilesEngine createFileEngine() throws Exception {
+        return new FilesEngine();
     }
 
+    
     /**
      * Invoke the private end method of XenonEngine. Needed in some tests.
      * 
@@ -49,10 +48,8 @@ public class Util {
      * @throws Exception
      *             if the method could not be invoked.
      */
-    public static void endXenonEngine(XenonEngine e) throws Exception {
-        Method method = XenonEngine.class.getDeclaredMethod("end");
-        method.setAccessible(true);
-        method.invoke(e);
+    public static void endFilesEngine(FilesEngine e) throws Exception {
+    	e.end();
     }
 
     private Util() {

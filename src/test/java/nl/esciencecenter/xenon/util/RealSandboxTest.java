@@ -25,7 +25,6 @@ import java.util.List;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
@@ -40,7 +39,6 @@ import org.junit.Test;
 
 public class RealSandboxTest {
 
-    private static Xenon xenon;
     private static Files files;
     private static FileSystem fileSystem;
 
@@ -53,8 +51,7 @@ public class RealSandboxTest {
 
     @BeforeClass
     public static void prepare() throws Exception {
-        xenon = XenonFactory.newXenon(null);
-        files = xenon.files();
+        files = Xenon.files();
         
         Path cwd = Utils.getLocalCWD(files);
         
@@ -72,7 +69,7 @@ public class RealSandboxTest {
     @AfterClass
     public static void cleanup() throws Exception {
         Utils.recursiveDelete(files, testDir);
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
 
     public static synchronized String getNextSandbox() {
@@ -340,21 +337,6 @@ public class RealSandboxTest {
     public void testEquals_otherNull_notEqual() throws URISyntaxException, XenonException {
         Sandbox sandbox = new Sandbox(files, testDir, getNextSandbox());
         assertFalse(sandbox.equals(null));
-    }
-
-    @Test
-    public void testEquals_otherXenon_notEqual() throws URISyntaxException, XenonException {
-
-        Xenon xenon2 = XenonFactory.newXenon(null);
-
-        String name = getNextSandbox();
-
-        Sandbox sandbox1 = new Sandbox(files, testDir, name);
-        Sandbox sandbox2 = new Sandbox(xenon2.files(), testDir, name);
-
-        assertNotEquals(sandbox1, sandbox2);
-
-        XenonFactory.endXenon(xenon2);
     }
 
     @Test

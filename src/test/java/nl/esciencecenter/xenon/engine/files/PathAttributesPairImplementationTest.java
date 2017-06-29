@@ -19,7 +19,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.engine.files.PathAttributesPairImplementation;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -36,7 +35,6 @@ import org.junit.Test;
  */
 public class PathAttributesPairImplementationTest {
 
-    private Xenon xenon;
     private Files files;
     private FileSystem filesystem;
     private Path root;
@@ -45,8 +43,7 @@ public class PathAttributesPairImplementationTest {
     @Before
     public void prepare() throws XenonException, XenonException {
 
-        xenon = XenonFactory.newXenon(null);
-        files = xenon.files();
+        files = Xenon.files();
         root = Utils.getLocalCWD(files);
         filesystem = root.getFileSystem();
         att = files.getAttributes(root);
@@ -55,7 +52,7 @@ public class PathAttributesPairImplementationTest {
     @After
     public void cleanup() throws XenonException, XenonException {
         files.close(filesystem);
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
 
     @Test

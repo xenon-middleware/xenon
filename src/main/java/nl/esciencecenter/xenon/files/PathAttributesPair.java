@@ -17,23 +17,81 @@ package nl.esciencecenter.xenon.files;
 
 /**
  * Path with its associated Attributes.
- * 
- * @version 1.0
- * @since 1.0
  */
-public interface PathAttributesPair {
+public class PathAttributesPair {
 
+	private final Path path;
+    private final FileAttributes attributes;
+
+    public PathAttributesPair(Path path, FileAttributes attributes) {
+        this.path = path;
+        this.attributes = attributes;
+    }
+	
     /**
      * Get the Path in this PathAttributesPair.
      * 
      * @return the Path.
      */
-    Path path();
+    public Path path() {
+        return path;
+    }
 
     /**
      * Get the FileAttributes in this PathAttributesPair.
      * 
      * @return the FileAttributes.
      */
-    FileAttributes attributes();
+    public FileAttributes attributes() {
+        return attributes;
+    }
+
+    @Override
+    public String toString() {
+        return "PathAttributesPair [path=" + path + ", attributes=" + attributes + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
+        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        PathAttributesPair other = (PathAttributesPair) obj;
+
+        if (attributes == null) {
+            if (other.attributes != null) {
+                return false;
+            }
+        } else if (!attributes.equals(other.attributes)) {
+            return false;
+        }
+
+        if (path == null) {
+            if (other.path != null) {
+                return false;
+            }
+        } else if (!path.equals(other.path)) {
+            return false;
+        }
+        return true;
+    }
+    
 }

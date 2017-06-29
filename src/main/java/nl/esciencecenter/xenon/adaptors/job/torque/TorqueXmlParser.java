@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.job.torque;
 
-import static nl.esciencecenter.xenon.adaptors.job.torque.TorqueProperties.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.adaptors.job.torque.TorqueSchedulerAdaptor.ADAPTOR_NAME;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

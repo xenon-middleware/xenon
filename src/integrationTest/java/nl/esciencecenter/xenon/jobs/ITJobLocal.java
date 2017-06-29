@@ -21,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import nl.esciencecenter.xenon.Xenon;
-import nl.esciencecenter.xenon.XenonFactory;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,7 +41,6 @@ public class ITJobLocal {
      */
     @Test
     public void WorkingDirectoryRelativlyToCwd() throws Exception {
-        Xenon xenon = XenonFactory.newXenon(null);
         Path testdir = testFolder.newFolder("xenontest").toPath();
         // testdir == /tmp/junit<random>/xenontest/
         logger.info("Absolute tmp dir {}", testdir);
@@ -55,10 +53,10 @@ public class ITJobLocal {
         description.setStdout("stdout.txt");
         description.setStderr("stderr.txt");
 
-        Scheduler scheduler = xenon.jobs().newScheduler("local", null, null, null);
-        Job job = xenon.jobs().submitJob(scheduler, description);
+        Scheduler scheduler = Xenon.jobs().newScheduler("local", null, null, null);
+        Job job = Xenon.jobs().submitJob(scheduler, description);
 
-        xenon.jobs().waitUntilDone(job, 5000);
+        Xenon.jobs().waitUntilDone(job, 5000);
 
         // Expect files in /tmp/junit<random>/xenontest/
         assertTrue(Files.exists(testdir.resolve("bla")));
@@ -67,6 +65,6 @@ public class ITJobLocal {
         assertTrue(Files.exists(testdir.resolve("stdout.txt")));
         assertTrue(Files.exists(testdir.resolve("stderr.txt")));
 
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
 }

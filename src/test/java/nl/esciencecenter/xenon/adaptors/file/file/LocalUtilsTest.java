@@ -24,7 +24,6 @@ import java.util.Set;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
@@ -139,14 +138,11 @@ public class LocalUtilsTest {
     @org.junit.Test
     public void test_javaPath_home() throws Exception {
 
-        Xenon xenon = XenonFactory.newXenon(null);
-        Files files = xenon.files();
+        Files files = Xenon.files();
         
         Path cwd = Utils.getLocalCWD(files);
         
         String tmp = LocalUtils.javaPath(files.newPath(cwd.getFileSystem(), new RelativePath("~"))).toString();
-
-        XenonFactory.endXenon(xenon);
 
         assertEquals(System.getProperty("user.home"), tmp);
     }

@@ -18,8 +18,7 @@ package nl.esciencecenter.xenon.adaptors.file.ftp;
 import java.util.List;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.file.util.DirectoryStreamBase;
-import nl.esciencecenter.xenon.engine.files.PathAttributesPairImplementation;
+import nl.esciencecenter.xenon.adaptors.file.DirectoryStreamBase;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PathAttributesPair;
 
@@ -34,7 +33,7 @@ public class FtpDirectoryAttributeStream extends DirectoryStreamBase<FTPFile, Pa
 
     @Override
     protected PathAttributesPair getStreamElementFromEntry(FTPFile entry, Path entryPath) throws XenonException {
-        return new PathAttributesPairImplementation(entryPath, new FtpFileAttributes(entry));
+        return new PathAttributesPair(entryPath, new FtpFileAttributes(entry));
     }
 
     @Override

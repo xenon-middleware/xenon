@@ -23,62 +23,127 @@ import java.util.Map;
  * @version 1.0
  * @since 1.0
  */
-public interface JobStatus {
+public class JobStatus {
+
+    private final Job job;
+    private final String state;
+    private final Integer exitCode;
+    private final Exception exception;
+    private final boolean running;
+    private final boolean done;
+    private final Map<String, String> schedulerSpecificInformation;
+
+    /**
+     * Create a JobStatus. 
+     * 
+     * @param job
+     * 		the <code>Job</code> for which this status was created.
+     * @param state
+     * 		the state of the <code>Job</code> at the time this status was created.
+     * @param exitCode
+     * 		the exit code of the <code>Job</code> (if the jobs has finished).
+     * @param exception
+     * 		the exception produced when running <code>Job</code> (if the jobs has failed).
+     * @param running
+     * 		is the <code>Job</code> running ?
+     * @param done
+     * 		is the <code>Job</code> finished ?
+     * @param schedulerSpecificInformation
+     * 		a map of scheduler implementation specific information on the job.
+     */
+    public JobStatus(Job job, String state, Integer exitCode, Exception exception, boolean running, boolean done,
+            Map<String, String> schedulerSpecificInformation) {
+
+        if (job == null) {
+            throw new IllegalArgumentException("Job may not be null!");
+        }
+
+        this.job = job;
+        this.state = state;
+        this.exitCode = exitCode;
+        this.exception = exception;
+        this.running = running;
+        this.done = done;
+        this.schedulerSpecificInformation = schedulerSpecificInformation;
+    }
 
     /**
      * Get the job for which this JobStatus was created.
      * 
      * @return the Job.
      */
-    Job getJob();
+    public Job getJob() {
+        return job;
+    }
 
     /**
      * Get the state of the Job.
      * 
      * @return the state of the Job.
      */
-    String getState();
+    public String getState() {
+        return state;
+    }
 
     /**
      * Get the exit code for the Job.
      * 
      * @return the exit code for the Job.
      */
-    Integer getExitCode();
-
+    public Integer getExitCode() {
+        return exitCode;
+    }
+    
     /**
      * Get the exception produced by the Job or while retrieving the status. If a job was canceled, will return a
      * JobCanceledException.
      * 
      * @return the exception.
      */
-    Exception getException();
+    public Exception getException() {
+        return exception;
+    }
 
     /**
      * Is the Job running.
      * 
      * @return if the Job is running.
      */
-    boolean isRunning();
+    public boolean isRunning() {
+        return running;
+    }
 
     /**
      * Is the Job done.
      * 
      * @return if the Job is done.
      */
-    boolean isDone();
+    public boolean isDone() {
+        return done;
+    }
 
     /**
      * Has the Job or job retrieval produced a exception ?
      * 
      * @return if the Job has an exception.
      */
-    boolean hasException();
+    public boolean hasException() {
+        return (exception != null);
+    }
 
     /**
      * Get scheduler specific information on the Job.
      * 
      * @return scheduler specific information on the Job.
      */
-    Map<String, String> getSchedulerSpecficInformation();
+    public Map<String, String> getSchedulerSpecficInformation() {
+        return schedulerSpecificInformation;
+    }
+    
+    @Override
+    public String toString() {
+        return "JobStatus [job=" + job + ", state=" + state + ", exitCode=" + exitCode + ", exception=" + exception
+                + ", running=" + running + ", done=" + done + ", schedulerSpecificInformation=" + schedulerSpecificInformation
+                + "]";
+    }
 }

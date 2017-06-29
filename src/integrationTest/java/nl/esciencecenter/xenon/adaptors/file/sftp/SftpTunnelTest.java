@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors.file.sftp;
 import java.util.HashMap;
 
 import nl.esciencecenter.xenon.Xenon;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.adaptors.job.ssh.SSHJobTestConfig;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -41,8 +40,7 @@ public class SftpTunnelTest {
             location = username + "@" + location;
         }
         
-        Xenon xenon = XenonFactory.newXenon(null);
-        Files files = xenon.files();
+        Files files = Xenon.files();
 
         HashMap<String, String> properties = new HashMap<>(3);
         properties.put("xenon.adaptors.ssh.gateway", gateway);
@@ -56,7 +54,7 @@ public class SftpTunnelTest {
         FileSystem filesystem = files.newFileSystem("ssh", location, new DefaultCredential(), properties);
 
         files.close(filesystem);
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
 
     public static void main(String [] args) throws Exception { 

@@ -20,7 +20,7 @@ import java.util.List;
 import org.apache.sshd.client.subsystem.sftp.SftpClient;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.file.util.DirectoryStreamBase;
+import nl.esciencecenter.xenon.adaptors.file.DirectoryStreamBase;
 import nl.esciencecenter.xenon.files.Path;
 
 public class SftpDirectoryStream extends DirectoryStreamBase<SftpClient.DirEntry, Path> {

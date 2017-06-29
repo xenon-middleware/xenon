@@ -21,8 +21,8 @@ import java.util.UUID;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.CopyOption;
-import nl.esciencecenter.xenon.files.InvalidCopyOptionsException;
-import nl.esciencecenter.xenon.files.Files;
+import nl.esciencecenter.xenon.files.FileSystem;
+import nl.esciencecenter.xenon.files.InvalidOptionsException;
 import nl.esciencecenter.xenon.files.Path;
 
 /**
@@ -47,10 +47,14 @@ import nl.esciencecenter.xenon.files.Path;
  */
 public class Sandbox {
 
-    private final Files files;
+    private final FileSystem sourceFS;
+    private final Path sourceRoot;
 
+    private final FileSystem targetFS;
+    private final Path targetRoot;
+    
     private final Path path;
-
+    
     private List<Pair> uploadFiles = new LinkedList<>();
     private final List<Pair> downloadFiles = new LinkedList<>();
 
@@ -59,11 +63,16 @@ public class Sandbox {
      */
     public static class Pair {
 
+        private final FileSystem sourceFS;
         private final Path source;
+        
+        private final FileSystem destinationFS;
         private final Path destination;
 
-        public Pair(Path source, Path destination) {
+        public Pair(FileSystem sourceFS, Path source, FileSystem destinationFS, Path destination) {
+        	this.sourceFS = sourceFS;
             this.source = source;
+            this.destinationFS = destinationFS;
             this.destination = destination;
         }
 
@@ -133,29 +142,42 @@ public class Sandbox {
      * @throws XenonException
      *            If an I/O error occurred.
      */
-    public Sandbox(Files files, Path root, String sandboxName) throws XenonException {
+    public Sandbox(FileSystem sourceFS, Path sourceRoot, FileSystem targetFS, Path targetRoot, String sandboxName) throws XenonException {
 
         String name = sandboxName;
 
-        if (files == null) {
-            throw new XenonException("Sandbox", "Need an files interface to create a sandbox!");
+        if (sourceFS == null) {
+            throw new XenonException("Sandbox", "Need an source filesystem to create a sandbox!");
         }
 
-        if (root == null) {
-            throw new XenonException("Sandbox", "Need an root directory to create a sandbox!");
+        if (sourceRoot == null) {
+            throw new XenonException("Sandbox", "Need an source root directory to create a sandbox!");
+        }
+        
+        if (targetFS == null) {
+            throw new XenonException("Sandbox", "Need an target filesystem to create a sandbox!");
         }
 
+        if (targetRoot == null) {
+            throw new XenonException("Sandbox", "Need an target root directory to create a sandbox!");
+        }
+        
         if (name == null) {
             name = "xenon_sandbox_" + UUID.randomUUID();
         }
 
-        this.files = files;
-        this.path = resolve(files, root, name);
+        this.sourceFS = sourceFS;
+        this.targetFS = targetFS;
+        
+        this.sourceRoot = sourceRoot;
+        this.targetRoot = targetRoot;
+        
+        path = targetRoot.resolve(name); 
     }
 
-    private static Path resolve(Files files, Path root, String path) throws XenonException {
-        return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
-    }
+//    private Path resolve(Path root, String path) throws XenonException {
+//        return fs.newPath(root.getRelativePath().resolve(path));
+//    }
     
     /**
      * The sandbox directory.
@@ -222,10 +244,10 @@ public class Sandbox {
         }
         
         if (destination == null) {
-            destination = src.getRelativePath().getFileNameAsString();
+            destination = src.getFileNameAsString();
         } 
 
-        uploadFiles.add(new Pair(src, resolve(files, path, destination)));
+        uploadFiles.add(new Pair(sourceFS, src, targetFS, path.resolve(destination)));
     }
 
     /**
@@ -256,15 +278,15 @@ public class Sandbox {
         }
         
         if (source == null) {
-            source = dest.getRelativePath().getFileNameAsString();
+            source = dest.getFileNameAsString();
         }
 
-        downloadFiles.add(new Pair(resolve(files, path, source), dest));
+        downloadFiles.add(new Pair(targetFS, path.resolve(source), sourceFS, dest));
     }
 
-    private void copy(List<Pair> pairs, CopyOption... options) throws XenonException {
+    private void copy(List<Pair> pairs, CopyOption option) throws XenonException {
         for (Pair pair : pairs) {
-            Utils.recursiveCopy(files, pair.source, pair.destination, options);
+            FileSystemUtil.recursiveCopy(pair.sourceFS, pair.source, pair.destinationFS, pair.destination, option);
         }
     }
 
@@ -275,16 +297,18 @@ public class Sandbox {
      * 
      * @param options
      *          the options to use while copying. See {@link CopyOption} for details.
-     * @throws InvalidCopyOptionsException
+     * @throws InvalidOptionsException
      *           if an invalid combination of options is used.
      * @throws XenonException
      *           if an I/O error occurs during the copying
      */
-    public void upload(CopyOption... options) throws XenonException {
-        if (!files.exists(path)) {
-            files.createDirectory(path);
+    public void upload(CopyOption option) throws XenonException {
+    	
+        if (!targetFS.exists(path)) {
+            targetFS.createDirectory(path);
         }
-        copy(uploadFiles, options);
+        
+        copy(uploadFiles, option);
     }
 
     /**
@@ -292,13 +316,13 @@ public class Sandbox {
      * 
      * @param options
      *          the options to use while copying. See {@link CopyOption} for details.
-     * @throws InvalidCopyOptionsException
+     * @throws InvalidOptionsException
      *           if an invalid combination of options is used.
      * @throws XenonException
      *           if an I/O error occurs during the copying
      */
-    public void download(CopyOption... options) throws XenonException {
-        copy(downloadFiles, options);
+    public void download(CopyOption option) throws XenonException {
+        copy(downloadFiles, option);
     }
 
     /**
@@ -308,39 +332,12 @@ public class Sandbox {
      *         if an I/O error occurs during deletion 
      */
     public void delete() throws XenonException {
-        Utils.recursiveDelete(files, path);
+        FileSystemUtil.recursiveDelete(targetFS, path);
     }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + files.hashCode();
-        result = prime * result + path.hashCode();
-        result = prime * result + uploadFiles.hashCode();
-        result = prime * result + downloadFiles.hashCode();
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        Sandbox other = (Sandbox) obj;
-        return files.equals(other.files)
-                && path.equals(other.path)
-                && downloadFiles.equals(other.downloadFiles)
-                && uploadFiles.equals(other.uploadFiles);
-    }
-
+    
     @Override
     public String toString() {
-        return "Sandbox [files=" + files + ", path=" + path + ", uploadFiles=" +
-                uploadFiles + ", downloadFiles=" + downloadFiles + "]";
+        return "Sandbox [source filesystem=" + sourceFS + ", source path=" + sourceRoot + "destination filesystem=" + targetFS + ", destination path=" + path +  
+        		", uploadFiles=" + uploadFiles + ", downloadFiles=" + downloadFiles + "]";
     }
 }

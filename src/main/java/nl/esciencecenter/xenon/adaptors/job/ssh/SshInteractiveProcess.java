@@ -15,22 +15,22 @@
  */
 package nl.esciencecenter.xenon.adaptors.job.ssh;
 
-import static nl.esciencecenter.xenon.adaptors.job.ssh.SshProperties.*;
+import static nl.esciencecenter.xenon.adaptors.job.ssh.SshSchedulerAdaptor.ADAPTOR_NAME;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.engine.jobs.StreamsImplementation;
-import nl.esciencecenter.xenon.engine.util.CommandLineUtils;
-import nl.esciencecenter.xenon.engine.util.InteractiveProcess;
+import nl.esciencecenter.xenon.adaptors.job.CommandLineUtils;
+import nl.esciencecenter.xenon.adaptors.job.InteractiveProcess;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.Streams;
 
 import org.apache.sshd.client.channel.ChannelExec;
 import org.apache.sshd.client.session.ClientSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +67,7 @@ class SshInteractiveProcess implements InteractiveProcess {
 			}
 
 			// set the streams first, then connect the channel.
-            streams = new StreamsImplementation(job, channel.getInvertedOut(), channel.getInvertedIn(), channel.getInvertedErr());           
+            streams = new Streams(job, channel.getInvertedOut(), channel.getInvertedIn(), channel.getInvertedErr());           
             
             // TODO: Add agent FW
             // channel.setAgentForwarding(session.useAgentForwarding());

@@ -15,48 +15,75 @@
  */
 package nl.esciencecenter.xenon;
 
-import java.util.Map;
-
 /**
  * AdaptorStatus contains information on a specific adaptor.
  * 
  * @version 1.0
  * @since 1.0
  */
-public interface AdaptorDescription {
+public class AdaptorDescription {
    
-    /**
+	private final String name;
+	private final String description;
+	private final String [] supportedLocations;
+	private final XenonPropertyDescription [] supportedProperties;
+	
+	public AdaptorDescription(String name, String description, String[] supportedLocations, 
+			XenonPropertyDescription[] supportedProperties) {
+		super();
+		this.name = name;
+		this.description = description;
+		this.supportedLocations = supportedLocations;
+		this.supportedProperties = supportedProperties;
+	}
+
+	/**
      * Get the name of the adaptor.
      * 
      * @return the name of the adaptor.
      */
-    String getName();
+    public String getName() { 
+    	return name;
+    }
 
     /**
      * Get the description of the adaptor.
      * 
      * @return the description of the adaptor.
      */
-    String getDescription();
+    public String getDescription() { 
+    	return description;
+    }
 
     /**
      * Get the supported locations for this adaptor.
      * 
      * @return the locations supported by this adaptor.
      */
-    String[] getSupportedLocations();
+    public String[] getSupportedLocations() { 
+    	return supportedLocations.clone();
+    }
     
     /**
      * Returns an array containing all properties this adaptor supports.
      * 
      * @return an array containing all properties this adaptor supports.
      */
-    XenonPropertyDescription[] getSupportedProperties();
+    public XenonPropertyDescription[] getSupportedProperties() { 
+    	return supportedProperties.clone();
+    }
 
+    @Override
+    public String toString() {
+        return "AdaptorDescription [name=" + name + ", description=" + description + 
+        		", supportedLocations=" + supportedLocations +
+        		", supportedProperties=" + supportedProperties + "]";
+    }
+    
     /**
      * Returns a map containing adaptor specific status information.
      * 
      * @return a map containing adaptor specific status information.
      */
-    Map<String, String> getAdaptorSpecificInformation();
+    //Map<String, String> getAdaptorSpecificInformation();
 }

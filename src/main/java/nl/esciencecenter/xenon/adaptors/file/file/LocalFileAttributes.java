@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.file;
 
+import static nl.esciencecenter.xenon.adaptors.file.file.LocalFileAdaptor.ADAPTOR_NAME;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -23,11 +25,12 @@ import java.nio.file.attribute.PosixFileAttributes;
 import java.util.Set;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.shared.local.LocalUtil;
 import nl.esciencecenter.xenon.files.AttributeNotSupportedException;
 import nl.esciencecenter.xenon.files.FileAttributes;
+import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
-import nl.esciencecenter.xenon.util.Utils;
 
 /**
  * LocalFileAttributes implements a {@link FileAttributes} for local files.
@@ -85,16 +88,15 @@ public class LocalFileAttributes implements FileAttributes {
     /** Is this a windows file ? */
     private final boolean isWindows;
     
-    
-    public LocalFileAttributes(Path path) throws XenonException {
+    public LocalFileAttributes(FileSystem filesystem, Path path) throws XenonException {
         try {
-            java.nio.file.Path javaPath = LocalUtils.javaPath(path);
+            java.nio.file.Path javaPath = LocalUtil.javaPath(filesystem, path);
 
             executable = Files.isExecutable(javaPath);
             readable = Files.isReadable(javaPath);
             writable = Files.isWritable(javaPath);
             
-            isWindows = Utils.isWindows(); 
+            isWindows = LocalUtil.isWindows(); 
 
             BasicFileAttributes basicAttributes;
             
@@ -123,7 +125,7 @@ public class LocalFileAttributes implements FileAttributes {
     
                 owner = posixAttributes.owner().getName();
                 group = posixAttributes.group().getName();
-                permissions = LocalUtils.xenonPermissions(posixAttributes.permissions());
+                permissions = LocalUtil.xenonPermissions(posixAttributes.permissions());
             }
             
             creationTime = basicAttributes.creationTime().toMillis();
@@ -142,7 +144,7 @@ public class LocalFileAttributes implements FileAttributes {
             }
             
         } catch (IOException e) {
-            throw new XenonException(LocalFiles.ADAPTOR_NAME, "Cannot read attributes.", e);
+            throw new XenonException(ADAPTOR_NAME, "Cannot read attributes.", e);
         }
     }
 
@@ -190,7 +192,7 @@ public class LocalFileAttributes implements FileAttributes {
     public String group() throws AttributeNotSupportedException {
         
         if (isWindows) { 
-            throw new AttributeNotSupportedException(LocalFiles.ADAPTOR_NAME, "Attribute not supported: group");
+            throw new AttributeNotSupportedException(ADAPTOR_NAME, "Attribute not supported: group");
         }
 
         return group;
@@ -200,7 +202,7 @@ public class LocalFileAttributes implements FileAttributes {
     public String owner() throws AttributeNotSupportedException {
         
         if (isWindows) { 
-            throw new AttributeNotSupportedException(LocalFiles.ADAPTOR_NAME, "Attribute not supported: owner");
+            throw new AttributeNotSupportedException(ADAPTOR_NAME, "Attribute not supported: owner");
         }
 
         return owner;
@@ -210,7 +212,7 @@ public class LocalFileAttributes implements FileAttributes {
     public Set<PosixFilePermission> permissions() throws AttributeNotSupportedException {
         
         if (isWindows) { 
-            throw new AttributeNotSupportedException(LocalFiles.ADAPTOR_NAME, "Attribute not supported: permissions");            
+            throw new AttributeNotSupportedException(ADAPTOR_NAME, "Attribute not supported: permissions");            
         } else { 
             return permissions;
         }

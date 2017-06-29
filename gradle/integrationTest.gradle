@@ -38,6 +38,10 @@ task prepareIntegrationTest(dependsOn: testPropertiesFileExists) {
         }
 
         // Initialize testing symlinks on remote side
+        ssh.settings {
+           knownHosts = allowAnyHosts
+        }
+
         ssh.run {
             session(host: integrationTestProperties.getProperty("test.ssh.location"),
                     user: integrationTestProperties.getProperty("test.ssh.user"),

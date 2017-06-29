@@ -75,7 +75,7 @@ public class SchedulerImplementationTest {
         System.err.println("SI: " + si.toString());
 
         assertTrue(si.toString().equals(
-                "SchedulerImplementation [uniqueID=id1, adaptorName=test, scheme=test, location=, properties={}, " +
+                "SchedulerImplementation [uniqueID=id1, adaptorName=test, location=, properties={}, " +
                 "queueNames=[aap, noot], isOnline=true, supportsInteractive=true, supportsBatch=true]"));
     }
 

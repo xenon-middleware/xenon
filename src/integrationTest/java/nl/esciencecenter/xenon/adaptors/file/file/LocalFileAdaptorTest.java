@@ -90,7 +90,7 @@ public class LocalFileAdaptorTest extends GenericFileAdaptorTestParent {
 
     @Test
     public void test_newFileSystem_nullLocation() throws Exception {
-        FileSystem fs = files.newFileSystem("local", null, new DefaultCredential(), null);
+        FileSystem fs = files.newFileSystem("file", null, new DefaultCredential(), null);
         if (Utils.isWindows()) {
             assertEquals("", fs.getLocation());
         } else {
@@ -100,7 +100,7 @@ public class LocalFileAdaptorTest extends GenericFileAdaptorTestParent {
 
     @Test
     public void test_newFileSystem_emptyLocation() throws Exception {
-        FileSystem fs = files.newFileSystem("local", "", new DefaultCredential(), null);
+        FileSystem fs = files.newFileSystem("file", "", new DefaultCredential(), null);
         if (Utils.isWindows()) {
             assertEquals("", fs.getLocation());
         } else {
@@ -126,6 +126,6 @@ public class LocalFileAdaptorTest extends GenericFileAdaptorTestParent {
             throw new InvalidLocationException(null, null);
         }
 
-        files.newFileSystem("local", "mynetwork", new DefaultCredential(), null);
+        files.newFileSystem("file", "mynetwork", new DefaultCredential(), null);
     }
 }

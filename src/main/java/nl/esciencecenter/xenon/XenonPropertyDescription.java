@@ -15,11 +15,8 @@
  */
 package nl.esciencecenter.xenon;
 
-import java.util.Set;
-
 /**
- * <p>XenonPropertyDescription contains all necessary information about a property that is recognized by Xenon or one of its
- * components.</p> 
+ * <p>XenonPropertyDescription contains all necessary information about a property that is recognized by Xenon</p> 
  * 
  * <p>Each XenonPropertyDescription contains the following information:</p>
  * 
@@ -42,53 +39,17 @@ import java.util.Set;
  * <li>
  * The default value of the property. 
  * </li>
- * 
- * <li>
- * The components by which this property is accepted (a <code>Set</code> of {@link Component}).
- * Properties are only valid for certain components of Xenon. For example, some properties may be used when creating an new 
- * <code>Xenon</code>, while others can be used when creating a new <code>Scheduler</code>, <code>FileSystem</code>, or 
- * <code>Credential</code>. 
- * </li>
  * </ul>
  * 
  * @version 1.0
  * @since 1.0
  */
-public interface XenonPropertyDescription {
-
-    /**
-     * The Component enumeration lists all possible parts of Xenon for which a property can be provided. 
-     */
-    enum Component {
-        /** 
-         * Properties for <code>XENON</code> components can be passed to 
-         * {@link nl.esciencecenter.xenon.XenonFactory#newXenon(Map)}. 
-         */        
-        XENON, 
-        
-        /** 
-         * Properties for <code>SCHEDULER</code> components can be passed to 
-         * {@link nl.esciencecenter.xenon.jobs.Jobs#newScheduler(String, String, Credential, Map)}. 
-         */        
-        SCHEDULER, 
-        
-        /** 
-         * Properties for <code>FILESYSTEM</code> components can be passed to 
-         * {@link nl.esciencecenter.xenon.files.Files#newFileSystem(String, String, Credential, Map)}. 
-         */        
-        FILESYSTEM, 
-        
-        /** 
-         * Properties for <code>CREDENTIAL</code> components can be passed to the various <code>newCredential</code> calls in Credentials 
-         * 
-         */        
-        CREDENTIALS,
-    }
-
+public class XenonPropertyDescription {
+    
     /**
      * This Type enumeration lists all possible types of properties recognized by Xenon.
      */
-    enum Type {
+    public enum Type {
         /** 
          * Properties of type <code>BOOLEAN</code> can be either <code>"true"</code> or <code>"false"</code>.  
          */        
@@ -99,13 +60,19 @@ public interface XenonPropertyDescription {
          * {@link java.lang.Integer#valueOf(String)}.  
          */                
         INTEGER, 
-
+        
         /** 
          * Properties of type <code>LONG</code> can be converted into a 64-bit signed long using 
          * {@link java.lang.Long#valueOf(String)}.  
          */                
         LONG, 
-        
+
+        /** 
+         * Properties of type <code>NATURAL</code> may contain only positive values, including <code>0</code>. 
+         * They will be converted into a 64-bit signed long using {@link java.lang.Long#valueOf(String)}.  
+         */                
+        NATURAL, 
+
         /** 
          * Properties of type <code>DOUBLE</code> can be converted into a 64-bit floating point number using 
          * {@link java.lang.Double#valueOf(String)}.  
@@ -125,39 +92,73 @@ public interface XenonPropertyDescription {
          */                
         SIZE,
     }
+    
+    private final String name;
+    private final XenonPropertyDescription.Type type;
+    private final String defaultValue;
+    private final String description;
+
+    public XenonPropertyDescription(String name, Type type, String defaultValue, String description) {
+
+        if (name == null) {
+            throw new IllegalArgumentException("Name is null!");
+        }
+
+        this.name = name;
+
+        if (type == null) {
+            throw new IllegalArgumentException("Type is null!");
+        }
+
+        this.type = type;
+        this.defaultValue = defaultValue;
+
+        if (description == null) {
+            throw new IllegalArgumentException("Description is null!");
+        }
+
+        this.description = description;
+    }
 
     /**
      * Returns the name of the property.
      * 
      * @return the name of the property.
      */
-    String getName();
+    public String getName() {
+        return name;
+    }
 
     /**
      * Returns the type of the property.
      * 
      * @return the type of the property.
      */
-    Type getType();
-
-    /**
-     * Return a set containing all components that accept this property.
-     * 
-     * @return a set containing all components that accept this property.
-     */
-    Set<Component> getLevels();
+    public Type getType() {
+        return type;
+    }
 
     /**
      * Returns the default value for this property.
      * 
      * @return the default value for this property or <code>null</code> is no default is set.
      */
-    String getDefaultValue();
+    public String getDefaultValue() {
+        return defaultValue;
+    }
 
     /**
      * Returns a human readable description of this property.
      * 
      * @return a human readable description of this property.
      */
-    String getDescription();
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public String toString() {
+        return "XenonPropertyDescriptionImplementation [name=" + name + ", type=" + type + 
+        		", defaultValue=" + defaultValue + ", description=" + description + "]";
+    }
 }

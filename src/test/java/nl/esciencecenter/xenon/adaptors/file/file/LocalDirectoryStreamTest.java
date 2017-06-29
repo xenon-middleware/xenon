@@ -21,7 +21,6 @@ import java.util.NoSuchElementException;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.adaptors.file.file.LocalDirectoryStream;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.files.DirectoryStream;
@@ -45,9 +44,8 @@ public class LocalDirectoryStreamTest {
     @org.junit.BeforeClass
     public static void prepareClass() throws XenonException, XenonException {
 
-        Xenon xenon = XenonFactory.newXenon(null);
 
-        Files files = xenon.files();
+        Files files = Xenon.files();
         Path root = Utils.getLocalCWD(files);
         Path testDir = resolve(files, root, TEST_DIR);
         files.createDirectory(testDir);
@@ -60,15 +58,13 @@ public class LocalDirectoryStreamTest {
         files.createFile(file1);
         files.createFile(file2);
 
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
 
     @org.junit.AfterClass
     public static void cleanupClass() throws XenonException, XenonException {
 
-        Xenon xenon = XenonFactory.newXenon(null);
-
-        Files files = xenon.files();
+    	Files files = Xenon.files();
         Path root = Utils.getLocalCWD(files);
         Path testDir = resolve(files, root, TEST_DIR);
         
@@ -83,7 +79,7 @@ public class LocalDirectoryStreamTest {
             files.delete(testDir);
         }
 
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
 
     private Xenon xenon;
@@ -106,16 +102,14 @@ public class LocalDirectoryStreamTest {
     @org.junit.Before
     public void prepareTest() throws XenonException, XenonException {
 
-        xenon = XenonFactory.newXenon(null);
-
-        Files files = xenon.files();
+        Files files = Xenon.files();
         Path root = Utils.getLocalCWD(files);
         testDir = resolve(files, root, TEST_DIR);
     }
 
     @org.junit.After
     public void cleanupTest() throws XenonException, XenonException {
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
 
     @org.junit.Test(expected = XenonException.class)

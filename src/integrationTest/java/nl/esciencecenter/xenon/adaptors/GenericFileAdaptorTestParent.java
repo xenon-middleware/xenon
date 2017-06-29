@@ -47,7 +47,6 @@ import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.XenonTestWatcher;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.files.PathAttributesPairImplementation;
@@ -75,11 +74,10 @@ public abstract class GenericFileAdaptorTestParent {
 
     private static final Logger logger = LoggerFactory.getLogger(GenericFileAdaptorTestParent.class);
 
-    protected static String TEST_ROOT;
+	protected static String TEST_ROOT;
 
     public static FileTestConfig config;
 
-    protected Xenon xenon;
     protected Files files;
     protected Path cwd;
     protected Path testDir;
@@ -97,30 +95,27 @@ public abstract class GenericFileAdaptorTestParent {
         config = testConfig;
         TEST_ROOT = "xenon_test_" + config.getAdaptorName() + "_" + System.currentTimeMillis();
 
-        Xenon xenon = XenonFactory.newXenon(null);
-
-        Files files = xenon.files();
+        Files files = Xenon.files();
 
         Path p = config.getWorkingDir(files);
         Path root = files.newPath(p.getFileSystem(), p.getRelativePath().resolve(TEST_ROOT));
 
+        System.out.println("WORKING DIR = " + p);
+        System.out.println("ROOT = " + root);
+        
         if (!files.exists(p)) {
             files.createDirectory(p);
         }
         if (!files.exists(root)) {
             files.createDirectory(root);
         }
-
-        XenonFactory.endXenon(xenon);
     }
 
     // MUST be invoked by a @AfterClass method of the subclass!
     public static void cleanupClass() throws Exception {
         logger.debug("GenericFileAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
 
-        Xenon xenon = XenonFactory.newXenon(null);
-
-        Files files = xenon.files();
+        Files files = Xenon.files();
 
         Path p = config.getWorkingDir(files);
         Path root = files.newPath(p.getFileSystem(), p.getRelativePath().resolve(TEST_ROOT));
@@ -129,7 +124,7 @@ public abstract class GenericFileAdaptorTestParent {
             Utils.recursiveDelete(files, root);
         }
 
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
 
     public Path resolve(Path root, String... path) throws XenonException {
@@ -138,15 +133,14 @@ public abstract class GenericFileAdaptorTestParent {
 
     @Before
     public void prepare() throws Exception {
-        xenon = XenonFactory.newXenon(null);
-        files = xenon.files();
+        files = Xenon.files();
         cwd = config.getWorkingDir(files);
         testDir = null;
     }
 
     @After
     public void cleanup() throws Exception {
-        try {
+    	try {
             if (testDir != null && files.exists(testDir)) {
                 Utils.recursiveDelete(files, testDir);
             }
@@ -156,7 +150,6 @@ public abstract class GenericFileAdaptorTestParent {
             } catch (Exception ex) {
                 // that's fine
             }
-            XenonFactory.endXenon(xenon);
         }
     }
 
@@ -271,11 +264,14 @@ public abstract class GenericFileAdaptorTestParent {
         try {
             out = files.newOutputStream(testFile, OpenOption.OPEN, OpenOption.TRUNCATE, OpenOption.WRITE);
 
+        	System.out.println("WRITE DATA " + data.length);
+        	
             if (data != null) {
-                out.write(data);
+                out.write(data, 0, data.length);
             }
         } finally {
             try {
+            	out.flush();
                 out.close();
             } catch (Exception e) {
                 //ignore
@@ -373,26 +369,26 @@ public abstract class GenericFileAdaptorTestParent {
         test00_newFileSystem(config.getScheme(), config.getWrongLocation(), config.getDefaultCredential(), null);
     }
 
-    @Test
-    public void test00_newFileSystem_userInUriIfSupported_noThrow() throws Exception {
-        if (!config.supportUserInUri()) {
-            return;
-        }
+//    @Test
+//    public void test00_newFileSystem_userInUriIfSupported_noThrow() throws Exception {
+//        if (!config.supportUserInUri()) {
+//            return;
+//        }
+//
+//        String uriWithUsername = config.getCorrectLocationWithUser();
+//        test00_newFileSystem(config.getScheme(), uriWithUsername, null, null);
+//    }
 
-        String uriWithUsername = config.getCorrectLocationWithUser();
-        test00_newFileSystem(config.getScheme(), uriWithUsername, null, null);
-    }
-
-    @Test
-    public void test00_newFileSystem_wrongUserInUriIfSupported_throw() throws Exception {
-        if (!config.supportUserInUri()) {
-            return;
-        }
-
-        String uriWithWrongUser = config.getCorrectLocationWithWrongUser();
-        exception.expect(InvalidCredentialException.class);
-        test00_newFileSystem(config.getScheme(), uriWithWrongUser, null, null);
-    }
+//    @Test
+//    public void test00_newFileSystem_wrongUserInUriIfSupported_throw() throws Exception {
+//        if (!config.supportUserInUri()) {
+//            return;
+//        }
+//
+//        String uriWithWrongUser = config.getCorrectLocationWithWrongUser();
+//        exception.expect(InvalidCredentialException.class);
+//        test00_newFileSystem(config.getScheme(), uriWithWrongUser, null, null);
+//    }
 
     @Test
     public void test00_newFileSystem_nonDefaultCredentialIfSupported_noThrow() throws Exception {
@@ -1597,13 +1593,22 @@ public abstract class GenericFileAdaptorTestParent {
         }
         prepareTestDir("test14_setPosixFilePermissions");
         Path existingFile = createTestFile(testDir, null);
+
+        // Get original permissions so we can reset later.
+        FileAttributes attributes = files.getAttributes(existingFile);
+        
+        // Create new permissions
         Set<PosixFilePermission> emptyPermissions = EnumSet.noneOf(PosixFilePermission.class);
 
         try {
-            test14_setPosixFilePermissions(existingFile, emptyPermissions, false);
+        	test14_setPosixFilePermissions(existingFile, emptyPermissions, false);
         } finally {
             // Set the permissions to write again before we can remove it
-            files.setPosixFilePermissions(existingFile, getVariousPosixPermissions());
+        //	try { 
+        		files.setPosixFilePermissions(existingFile, attributes.permissions());
+//        	} catch (Exception e) {
+        		// We ignore the exception here, as we may get an 'not allowed' due to the empty permissions we have just set.
+  //      	}
         }
 
         deleteTestFile(existingFile);
@@ -1655,18 +1660,22 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @Test
-    public void test14_setPosixFilePermissions_existingDir_throw() throws Exception {
+    public void test14_setPosixFilePermissions_existingDir_noThrow() throws Exception {
         if (!config.supportsPosixPermissions()) {
             return;
         }
         prepareTestDir("test14_setPosixFilePermissions");
-        Set<PosixFilePermission> permissions = getVariousPosixPermissions();
         Path existingDir = createTestDir(testDir);
 
+        Set<PosixFilePermission> permissions = EnumSet.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE);
+        
+        
+        
+        
         test14_setPosixFilePermissions(existingDir, permissions, false);
 
         // cleanup
-        deleteTestDir(existingDir);
+        // deleteTestDir(existingDir);
     }
 
     @Test
@@ -1740,13 +1749,21 @@ public abstract class GenericFileAdaptorTestParent {
         for (PathAttributesPair p : in) {
             logger.debug("Got input " + p.path() + " " + p.attributes());
 
+            System.out.println("GOT ELT: " + p);
+            
             PathAttributesPair found = null;
 
             for (PathAttributesPair x : tmp) {
                 logger.debug("  Comparing to " + x.path() + " " + x.attributes());
 
+                System.out.println("COMPARE TO: " + x + "PATH COMPARE=" + (x.path().equals(p.path())) 
+                		+ " ATTR COMPARE=" + x.attributes().equals(p.attributes()));
+                
                 if (x.path().equals(p.path()) && x.attributes().equals(p.attributes())) {
                     logger.debug("Found!");
+                    
+                    System.out.println("FOUND ELT: " + x);
+                    
                     found = x;
                     break;
                 }
@@ -1757,6 +1774,9 @@ public abstract class GenericFileAdaptorTestParent {
             if (found != null) {
                 tmp.remove(found);
             } else {
+            	
+            	System.out.println("DID NOT FIND ELT: " + p);
+            	
                 logger.debug("NOT Found!");
                 close(in);
                 throwUnexpectedElement("test15_newAttributesDirectoryStream", p.path());
@@ -2755,7 +2775,7 @@ public abstract class GenericFileAdaptorTestParent {
         test23_copy(file0, file1, new CopyOption[] { CopyOption.CREATE, CopyOption.IGNORE }, null, true);
 
         // cleanup
-        deleteTestFile(file0);
+        //  deleteTestFile(file0);
     }
 
     @Test
@@ -3068,8 +3088,8 @@ public abstract class GenericFileAdaptorTestParent {
         test23_copy(file0, file1, new CopyOption[] { CopyOption.APPEND }, data4, config.supportsAppending() == false);
 
         // cleanup
-        deleteTestFile(file1);
-        deleteTestFile(file0);
+        //deleteTestFile(file1);
+        //deleteTestFile(file0);
     }
 
     @Test
@@ -3196,7 +3216,7 @@ public abstract class GenericFileAdaptorTestParent {
         CopyStatus status = files.getCopyStatus(copy);
 
         // Deadline for operation is 60 seconds 
-        long deadline = System.currentTimeMillis() + 60*1000;
+        long deadline = System.currentTimeMillis() + 6*1000;
         
         while (!status.isDone() && System.currentTimeMillis() < deadline) {
             try {

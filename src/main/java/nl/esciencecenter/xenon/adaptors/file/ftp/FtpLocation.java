@@ -15,8 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.ftp;
 
-import nl.esciencecenter.xenon.InvalidLocationException;
-import nl.esciencecenter.xenon.adaptors.file.util.Location;
+import nl.esciencecenter.xenon.adaptors.InvalidLocationException;
+import nl.esciencecenter.xenon.adaptors.file.Location;
 
 public class FtpLocation extends Location {
 
@@ -25,7 +25,7 @@ public class FtpLocation extends Location {
     }
 
     protected FtpLocation(String location) throws InvalidLocationException {
-        super(location, FtpFileAdaptor.ADAPTOR_SCHEME.get(0));
+        super(location, "ftp");
     }
 
     @Override

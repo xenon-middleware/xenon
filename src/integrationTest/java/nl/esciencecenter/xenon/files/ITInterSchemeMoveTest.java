@@ -19,7 +19,6 @@ package nl.esciencecenter.xenon.files;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.job.ssh.SSHJobTestConfig;
-import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.Test;
@@ -35,9 +34,7 @@ public class ITInterSchemeMoveTest {
         String user = config.getPropertyOrFail("test.ssh.user");
         String location = config.getPropertyOrFail("test.ssh.location");
         
-        Xenon xenon = XenonEngine.newXenon(null);
-
-        Files files = xenon.files();
+        Files files = Xenon.files();
 
         FileSystem fs1 = Utils.getLocalCWD(files).getFileSystem();
         FileSystem fs2 = files.newFileSystem("ssh", user + "@" + location, null, null);

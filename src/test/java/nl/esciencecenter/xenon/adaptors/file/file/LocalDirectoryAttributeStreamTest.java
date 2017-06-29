@@ -15,18 +15,12 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.file;
 
-import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.XenonRuntimeException;
-import nl.esciencecenter.xenon.Util;
-import nl.esciencecenter.xenon.adaptors.file.file.LocalDirectoryAttributeStream;
-import nl.esciencecenter.xenon.adaptors.file.file.LocalDirectoryStream;
-import nl.esciencecenter.xenon.adaptors.file.file.LocalFiles;
-import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.files.FilesEngine;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -34,7 +28,6 @@ import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.util.Utils;
-import nl.esciencecenter.xenon.engine.files.FilesEngine;
 /**
  * 
  */
@@ -53,9 +46,7 @@ public class LocalDirectoryAttributeStreamTest {
     @org.junit.BeforeClass
     public static void prepareClass() throws XenonException, XenonException {
 
-        Xenon xenon = XenonFactory.newXenon(null);
-
-        Files files = xenon.files();
+    	Files files = Xenon.files();
         Path root = Utils.getLocalCWD(files);
         Path testDir = resolve(files, root, TEST_DIR);
         files.createDirectory(testDir);
@@ -68,15 +59,13 @@ public class LocalDirectoryAttributeStreamTest {
         files.createFile(file1);
         files.createFile(file2);
 
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
 
     @org.junit.AfterClass
     public static void cleanupClass() throws XenonException, XenonException {
 
-        Xenon xenon = XenonFactory.newXenon(null);
-
-        Files files = xenon.files();
+        Files files = Xenon.files();
         Path root = Utils.getLocalCWD(files);
         Path testDir = resolve(files, root, TEST_DIR);
         Path file0 = resolve(files, testDir, "file0");
@@ -102,10 +91,10 @@ public class LocalDirectoryAttributeStreamTest {
             files.delete(testDir);
         }
 
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
-
-    private XenonEngine xenon;
+    
+    private FilesEngine engine;
     private FileSystem fs;
     private Path testDir;
 
@@ -127,16 +116,16 @@ public class LocalDirectoryAttributeStreamTest {
 
     @org.junit.Before
     public void prepareTest() throws Exception {
-        xenon = Util.createXenonEngine(null);
-        localFiles = new LocalFiles((FilesEngine)xenon.files(), new HashMap<String, String>(0));
-        Path root = Utils.getLocalCWD(xenon.files());
+        engine = new FilesEngine();
+        localFiles = new LocalFiles(engine);
+        Path root = Utils.getLocalCWD(Xenon.files());
         fs = root.getFileSystem();
         testDir = resolve(localFiles, root, TEST_DIR);
     }
 
     @org.junit.After
     public void cleanupTest() throws Exception {
-        Util.endXenonEngine(xenon);
+        engine.end();
     }
 
     @org.junit.Test(expected = XenonException.class)

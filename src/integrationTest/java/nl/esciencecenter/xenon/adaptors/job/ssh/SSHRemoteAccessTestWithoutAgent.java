@@ -18,15 +18,14 @@ package nl.esciencecenter.xenon.adaptors.job.ssh;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.Xenon;
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
-import nl.esciencecenter.xenon.jobs.Jobs;
-import nl.esciencecenter.xenon.jobs.Scheduler;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.jobs.Jobs;
+import nl.esciencecenter.xenon.jobs.Scheduler;
 
 /**
  * @version 1.0
@@ -37,7 +36,6 @@ public class SSHRemoteAccessTestWithoutAgent {
 
     public static SSHJobTestConfig config;
     
-    protected Xenon xenon;
     protected Jobs jobs;
     
     @BeforeClass
@@ -53,8 +51,7 @@ public class SSHRemoteAccessTestWithoutAgent {
         Map<String, String> properties = new HashMap<>();
         properties.put("xenon.adaptors.ssh.agent", "false");
         
-        xenon = XenonFactory.newXenon(properties);
-        jobs = xenon.jobs();
+        jobs = Xenon.jobs();
     }
     
     @Test

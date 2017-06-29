@@ -15,12 +15,13 @@
  */
 package nl.esciencecenter.xenon.adaptors.file.file;
 
+import static nl.esciencecenter.xenon.adaptors.file.file.LocalFileAdaptor.ADAPTOR_NAME;
+
 import java.io.IOException;
 import java.util.Iterator;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonRuntimeException;
-import nl.esciencecenter.xenon.engine.files.PathAttributesPairImplementation;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.Path;
@@ -35,13 +36,13 @@ import nl.esciencecenter.xenon.files.PathAttributesPair;
 class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>, Iterator<PathAttributesPair> {
 
     /** LocalFiles to retrieve the attributes of a file */
-    private final LocalFiles localFiles;
+    private final LocalFileSystem localFS;
 
     /** The LocalDirectoryStream to retrieve the files */
     private final LocalDirectoryStream stream;
 
-    LocalDirectoryAttributeStream(LocalFiles localFiles, LocalDirectoryStream stream) {
-        this.localFiles = localFiles;
+    LocalDirectoryAttributeStream(LocalFileSystem localFS, LocalDirectoryStream stream) {
+        this.localFS = localFS;
         this.stream = stream;
     }
 
@@ -66,10 +67,10 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
         Path path = stream.next();
 
         try {
-            FileAttributes attributes = localFiles.getAttributes(path);
-            return new PathAttributesPairImplementation(path, attributes);
+            FileAttributes attributes = localFS.getAttributes(path);
+            return new PathAttributesPair(path, attributes);
         } catch (XenonException e) {
-            throw new XenonRuntimeException(LocalFiles.ADAPTOR_NAME, "Failed to get next element.", e);
+            throw new XenonRuntimeException(ADAPTOR_NAME, "Failed to get next element.", e);
         }
     }
 

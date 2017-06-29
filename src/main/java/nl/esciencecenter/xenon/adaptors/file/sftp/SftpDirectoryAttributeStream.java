@@ -20,8 +20,7 @@ import java.util.List;
 import org.apache.sshd.client.subsystem.sftp.SftpClient;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.file.util.DirectoryStreamBase;
-import nl.esciencecenter.xenon.engine.files.PathAttributesPairImplementation;
+import nl.esciencecenter.xenon.adaptors.file.DirectoryStreamBase;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PathAttributesPair;
 
@@ -35,7 +34,7 @@ class SftpDirectoryAttributeStream extends DirectoryStreamBase<SftpClient.DirEnt
     @Override
     protected PathAttributesPair getStreamElementFromEntry(SftpClient.DirEntry entry, Path entryPath) {
         SftpFileAttributes attributes = new SftpFileAttributes(entry.getAttributes(), entryPath);
-        return new PathAttributesPairImplementation(entryPath, attributes);
+        return new PathAttributesPair(entryPath, attributes);
     }
 
     @Override

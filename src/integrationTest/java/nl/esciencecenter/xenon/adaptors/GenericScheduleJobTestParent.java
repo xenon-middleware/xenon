@@ -31,7 +31,6 @@ import java.util.Arrays;
 import nl.esciencecenter.xenon.JobException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.XenonTestWatcher;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.OpenOption;
@@ -68,7 +67,6 @@ public abstract class GenericScheduleJobTestParent {
 
     protected static JobTestConfig config;
 
-    protected Xenon xenon;
     protected Files files;
     protected Jobs jobs;
     protected Scheduler scheduler;
@@ -93,9 +91,7 @@ public abstract class GenericScheduleJobTestParent {
     public static void cleanupClass() throws Exception {
         logger.info("GenericJobAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
 
-        Xenon xenon = XenonFactory.newXenon(null);
-
-        Files files = xenon.files();
+        Files files = Xenon.files();
     
         Path cwd = config.getWorkingDir(files);
         Path root = files.newPath(cwd.getFileSystem(), cwd.getRelativePath().resolve(TEST_ROOT));
@@ -104,7 +100,7 @@ public abstract class GenericScheduleJobTestParent {
             Utils.recursiveDelete(files, root);
         }
 
-        XenonFactory.endXenon(xenon);
+        Xenon.endAll();
     }
 
     @Before
@@ -112,9 +108,8 @@ public abstract class GenericScheduleJobTestParent {
         // This is not an adaptor option, so it will throw an exception!
         //Map<String, String> properties = new HashMap<>();
         //properties.put(SshAdaptor.POLLING_DELAY, "100");
-        xenon = XenonFactory.newXenon(null);
-        files = xenon.files();
-        jobs = xenon.jobs();
+        files = Xenon.files();
+        jobs = Xenon.jobs();
         scheduler = config.getDefaultScheduler(jobs);
         job = null;
     }
@@ -123,7 +118,7 @@ public abstract class GenericScheduleJobTestParent {
     public void cleanup() throws XenonException {
         jobs.close(scheduler);
         // XenonFactory.endXenon(xenon);
-        XenonFactory.endAll();
+        Xenon.endAll();
     }
 
     protected String getWorkingDir(String testName) {

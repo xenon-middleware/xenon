@@ -15,8 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.job.gridengine;
 
-import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineProperties.ADAPTOR_NAME;
-import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineProperties.IGNORE_VERSION_PROPERTY;
+import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineSchedulerAdaptor.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineSchedulerAdaptor.IGNORE_VERSION_PROPERTY;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -28,8 +28,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import nl.esciencecenter.xenon.IncompatibleVersionException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.job.IncompatibleVersionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

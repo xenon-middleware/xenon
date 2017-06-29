@@ -37,10 +37,8 @@ import nl.esciencecenter.xenon.files.AttributeNotSupportedException;
 import nl.esciencecenter.xenon.files.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.files.EndOfFileException;
 import nl.esciencecenter.xenon.files.FileSystemClosedException;
-import nl.esciencecenter.xenon.files.IllegalSourcePathException;
-import nl.esciencecenter.xenon.files.IllegalTargetPathException;
-import nl.esciencecenter.xenon.files.InvalidCopyOptionsException;
-import nl.esciencecenter.xenon.files.InvalidOpenOptionsException;
+import nl.esciencecenter.xenon.files.InvalidOptionsException;
+import nl.esciencecenter.xenon.files.InvalidPathException;
 import nl.esciencecenter.xenon.files.InvalidResumeTargetException;
 import nl.esciencecenter.xenon.files.NoSuchCopyException;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
@@ -173,17 +171,6 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void testDirectoryIteratorException1() throws Exception {
-        testException(new InvalidCopyOptionsException("name", "message"));
-    }
-
-    @Test
-    public void testDirectoryIteratorException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new InvalidCopyOptionsException("name", "message", t), t);
-    }
-
-    @Test
     public void testDirectoryNotEmptyException1() throws Exception {
         testException(new DirectoryNotEmptyException("name", "message"));
     }
@@ -218,24 +205,13 @@ public class ExceptionsTest {
 
     @Test
     public void testIllegalSourcePathException1() throws Exception {
-        testException(new IllegalSourcePathException("name", "message"));
+        testException(new InvalidPathException("name", "message"));
     }
 
     @Test
     public void testIllegalSourcePathException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new IllegalSourcePathException("name", "message", t), t);
-    }
-
-    @Test
-    public void testIllegalTargetPathException1() throws Exception {
-        testException(new IllegalTargetPathException("name", "message"));
-    }
-
-    @Test
-    public void testIllegalTargetPathException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new IllegalTargetPathException("name", "message", t), t);
+        testException(new InvalidPathException("name", "message", t), t);
     }
 
     @Test
@@ -325,17 +301,6 @@ public class ExceptionsTest {
     public void testInvalidLocationException2() throws Exception {
         Throwable t = new Throwable();
         testException(new InvalidLocationException("name", "message", t), t);
-    }
-
-    @Test
-    public void testInvalidOpenOptionsException1() throws Exception {
-        testException(new InvalidOpenOptionsException("name", "message"));
-    }
-
-    @Test
-    public void testInvalidOpenOptionsException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new InvalidOpenOptionsException("name", "message", t), t);
     }
 
     @Test
@@ -471,14 +436,14 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void testUnsupportedOperationException1() throws Exception {
-        testException(new InvalidCopyOptionsException("name", "message"));
+    public void testInvalidOptionsException1() throws Exception {
+        testException(new InvalidOptionsException("name", "message"));
     }
 
     @Test
-    public void testUnsupportedOperationException2() throws Exception {
+    public void testInvalidOptionsException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new InvalidCopyOptionsException("name", "message", t), t);
+        testException(new InvalidOptionsException("name", "message", t), t);
     }
 
     @Test

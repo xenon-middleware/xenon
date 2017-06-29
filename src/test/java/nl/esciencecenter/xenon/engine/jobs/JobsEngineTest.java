@@ -19,36 +19,27 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
+import org.junit.Test;
 
-import nl.esciencecenter.xenon.Util;
-import nl.esciencecenter.xenon.engine.XenonEngine;
-import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
-import nl.esciencecenter.xenon.engine.jobs.JobsEngine;
-import nl.esciencecenter.xenon.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
-
-import org.junit.Test;
 
 public class JobsEngineTest {
 
     @Test
     public void testToString() throws Exception {
 
-        XenonEngine oe = Util.createXenonEngine(new HashMap<String, String>());
-        JobsEngine je = new JobsEngine(oe, null);
+        JobsEngine je = new JobsEngine();
 
-        assertTrue(je.toString().equals("JobsEngine [xenonEngine=" + oe + "]"));
+        assertTrue(je.toString().equals("JobsEngine"));
     }
 
     @Test
     public void testGetJobStatusesWithException() throws Exception {
 
-        XenonEngine oe = Util.createXenonEngine(new HashMap<String, String>());
-        JobsEngine je = new JobsEngine(oe, null);
+    	JobsEngine je = new JobsEngine();
 
         JobDescription desc = new JobDescription();
 
@@ -68,8 +59,7 @@ public class JobsEngineTest {
     @Test
     public void testGetJobStatusesWithException2() throws Exception {
 
-        XenonEngine oe = Util.createXenonEngine(new HashMap<String, String>());
-        JobsEngine je = new JobsEngine(oe, null);
+    	JobsEngine je = new JobsEngine();
 
         JobDescription desc = new JobDescription();
 

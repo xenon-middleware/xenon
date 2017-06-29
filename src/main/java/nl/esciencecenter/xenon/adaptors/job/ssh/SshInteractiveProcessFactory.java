@@ -1,40 +1,49 @@
-/**
- * Copyright 2013 Netherlands eScience Center
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package nl.esciencecenter.xenon.adaptors.job.ssh;
+
+import static nl.esciencecenter.xenon.adaptors.job.ssh.SshSchedulerAdaptor.ADAPTOR_NAME;
 
 import org.apache.sshd.client.session.ClientSession;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
-import nl.esciencecenter.xenon.engine.util.InteractiveProcess;
-import nl.esciencecenter.xenon.engine.util.InteractiveProcessFactory;
+import nl.esciencecenter.xenon.adaptors.job.InteractiveProcess;
+import nl.esciencecenter.xenon.adaptors.job.InteractiveProcessFactory;
+import nl.esciencecenter.xenon.adaptors.job.JobImplementation;
+import nl.esciencecenter.xenon.adaptors.job.SchedulerClosedException;
 
-/**
- * 
- * 
- */
-class SshInteractiveProcessFactory implements InteractiveProcessFactory {
-    ClientSession session;
-
-    SshInteractiveProcessFactory(ClientSession session) {
-        this.session = session;
-    }
-
-    @Override
+public class SshInteractiveProcessFactory implements InteractiveProcessFactory {
+	
+	private final ClientSession session;
+	
+	protected SshInteractiveProcessFactory(ClientSession session) { 
+		this.session = session;
+	}
+	
+	@Override
     public InteractiveProcess createInteractiveProcess(JobImplementation job) throws XenonException {
-        return new SshInteractiveProcess(session, job);
+		
+		if (session.isClosed()) { 
+			throw new SchedulerClosedException(ADAPTOR_NAME, "Scheduler is closed");
+		}
+		
+     	return new SshInteractiveProcess(session, job);
     }
+
+	@Override
+	public void close() throws XenonException {
+		
+		if (session.isClosed()) { 
+			throw new SchedulerClosedException(ADAPTOR_NAME, "Scheduler already closed");
+		}
+		
+		try { 
+			session.close();
+		} catch (Exception e) {
+			throw new XenonException(ADAPTOR_NAME, "Scheduler failed to close", e);
+		}
+	}
+
+	@Override
+	public boolean isOpen() throws XenonException {
+		return session.isOpen();
+	}
 }

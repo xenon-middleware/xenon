@@ -18,9 +18,6 @@ package nl.esciencecenter.xenon.adaptors.file.ftp;
 import java.io.IOException;
 import java.io.InputStream;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.files.Path;
-
 import org.apache.commons.net.ftp.FTPClient;
 
 /**
@@ -29,19 +26,14 @@ import org.apache.commons.net.ftp.FTPClient;
  *
  *
  */
-@SuppressWarnings("CanBeFinal")
 public class FtpInputStream extends InputStream {
     private final InputStream inputStream;
     private final FTPClient ftpClient;
     private boolean completedPendingFtpCommand = false;
-    private final Path path;
-    private final FtpFileAdaptor ftpFiles;
 
-    public FtpInputStream(InputStream inputStream, FTPClient ftpClient, Path path, FtpFileAdaptor ftpFiles) {
+    public FtpInputStream(InputStream inputStream, FTPClient ftpClient) {
         this.inputStream = inputStream;
         this.ftpClient = ftpClient;
-        this.path = path;
-        this.ftpFiles = ftpFiles;
     }
 
     @Override
@@ -57,11 +49,7 @@ public class FtpInputStream extends InputStream {
         if (!completedPendingFtpCommand) {
             ftpClient.completePendingCommand();
             completedPendingFtpCommand = true;
-            try {
-                ftpFiles.close(path.getFileSystem());
-            } catch (XenonException e) {
-                throw new IOException("Could not close file system for ftp input stream", e);
-            }
+            ftpClient.disconnect();
         }
     }
 
