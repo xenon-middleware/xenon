@@ -16,6 +16,7 @@
 package nl.esciencecenter.xenon.adaptors.file;
 
 import nl.esciencecenter.xenon.files.CopyDescription;
+import nl.esciencecenter.xenon.files.FileSystem;
 
 /**
  * CopyInfo contains all necessary information needed for asynchronous copy operations.
@@ -25,6 +26,7 @@ import nl.esciencecenter.xenon.files.CopyDescription;
  */
 public class CopyInfo {
 
+	private final FileSystem destinationFS;
 	private final CopyDescription description;
 	private final CopyHandleImplementation copy;
     
@@ -33,12 +35,17 @@ public class CopyInfo {
     private long bytesToCopy = -1;
     private long bytesCopied = 0;
 
-    public CopyInfo(CopyDescription description, CopyHandleImplementation copy) {
+    public CopyInfo(FileSystem destinationFS, CopyDescription description, CopyHandleImplementation copy) {
         super();
+        this.destinationFS = destinationFS;
         this.description = description;
         this.copy = copy;
     }
 
+    public FileSystem getDestinationFileSystem() {
+    	return destinationFS;
+    }
+    
     public CopyHandleImplementation getCopy() {
         return copy;
     }

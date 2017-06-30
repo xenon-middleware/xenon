@@ -17,8 +17,8 @@ package nl.esciencecenter.xenon.adaptors.file.webdav;
 
 import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavFileAdaptor.ADAPTOR_NAME;
 
-import nl.esciencecenter.xenon.adaptors.InvalidLocationException;
 import nl.esciencecenter.xenon.adaptors.file.Location;
+import nl.esciencecenter.xenon.jobs.InvalidLocationException;
 
 public class WebdavLocation extends Location {
 

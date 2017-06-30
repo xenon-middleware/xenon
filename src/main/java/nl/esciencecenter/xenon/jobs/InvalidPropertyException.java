@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.file.sftp;
+package nl.esciencecenter.xenon.jobs;
 
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that an end-of-file was encountered.  
+ * Signals that a property has an invalid value.  
  * 
  * @version 1.0
  * @since 1.0
  */
-public class EndOfFileException extends XenonException {
+public class InvalidPropertyException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 
-    public EndOfFileException(String adaptorName, String message, Throwable t) {
+    public InvalidPropertyException(String adaptorName, String message, Throwable t) {
         super(adaptorName, message, t);
     }
 
-    public EndOfFileException(String adaptorName, String message) {
+    public InvalidPropertyException(String adaptorName, String message) {
         super(adaptorName, message);
     }
 }

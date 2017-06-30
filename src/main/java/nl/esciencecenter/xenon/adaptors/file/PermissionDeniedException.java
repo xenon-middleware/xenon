@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.file.webdav;
+package nl.esciencecenter.xenon.adaptors.file;
 
 import nl.esciencecenter.xenon.XenonException;
 
-import org.apache.jackrabbit.webdav.property.DavPropertySet;
+/**
+ * Signals that the user does not have sufficient permissions to perform the operation.
+ * 
+ * @version 1.0
+ * @since 1.0
+ */
+public class PermissionDeniedException extends XenonException {
 
-public class WebdavRegularFileAttributes extends WebdavFileAttributes {
+    private static final long serialVersionUID = 1L;
 
-    public WebdavRegularFileAttributes(DavPropertySet properties) throws XenonException {
-        super(properties);
+    public PermissionDeniedException(String adaptorName, String message, Throwable t) {
+        super(adaptorName, message, t);
     }
 
-    @Override
-    public boolean isRegularFile() {
-        return true;
+    public PermissionDeniedException(String adaptorName, String message) {
+        super(adaptorName, message);
     }
-
 }

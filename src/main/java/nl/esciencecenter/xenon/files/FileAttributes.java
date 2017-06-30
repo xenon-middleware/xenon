@@ -20,11 +20,57 @@ import java.util.Set;
 
 /**
  * FileAttributes represents a set of attributes of a path.
- * 
- * @version 1.0
- * @since 1.0
  */
-public interface FileAttributes {
+public class FileAttributes {
+	
+	 /** Is this a directory ? */
+    private boolean isDirectory;
+
+    /** Is this a regular file ? */
+    private boolean isRegular;
+
+    /** Is this a symbolic link ? */
+    private boolean isSymbolicLink;
+    
+    /** Is this an other type of file ? */
+    private boolean isOther;
+    
+    /** Is the file executable ? */
+    private boolean executable;
+
+    /** Is the file readable ? */
+    private boolean readable;
+
+    /** Is the file writable ? */
+    private boolean writable;
+
+    /** Is the file hidden ? */
+    private boolean hidden;
+
+    /** The creation time of this file */
+    private long creationTime;
+    
+    /** The last access time of this file */
+    private long lastAccessTime;
+    
+    /** The last modified time of this file */
+    private long lastModifiedTime;
+
+    /** The size of this file */
+    private long size;
+    
+    /** The owner of this file */
+    private String owner;
+    
+    /** The group of this file */
+    private String group;
+    
+    /** The permissions of this file (POSIX only) */
+    private Set<PosixFilePermission> permissions;
+    
+    public FileAttributes() { 
+    	// EMPTY
+    }
 
     /**
      * Does the path refer to a directory ?
@@ -32,23 +78,28 @@ public interface FileAttributes {
      * @return
      *          if the path refers to a directory.
      */
-    boolean isDirectory(); 
+    public boolean isDirectory() {
+		return isDirectory;
+	}
 
-    /**
-     * Is the path not a file, link or directory ?
-     * 
-     * @return 
-     *          if the path does not refer to a file, link or directory.
-     */
-    boolean isOther();
+	public void setDirectory(boolean isDirectory) {
+		this.isDirectory = isDirectory;
+	}
 
-    /**
+	/**
      * Does the path refer to a regular file ?
      * 
      * @return 
      *          if the path refers to a regular file.
      */
-    boolean isRegularFile();
+	public boolean isRegular() {
+		return isRegular;
+	}
+
+	public void setRegular(boolean isRegular) {
+		this.isRegular = isRegular;
+	}
+
 
     /**
      * Does the path refer to a symbolic link ?
@@ -56,9 +107,87 @@ public interface FileAttributes {
      * @return 
      *          if the path refers to a symbolic link.
      */
-    boolean isSymbolicLink();
+	public boolean isSymbolicLink() {
+		return isSymbolicLink;
+	}
+
+	public void setSymbolicLink(boolean isSymbolicLink) {
+		this.isSymbolicLink = isSymbolicLink;
+	}
 
     /**
+     * Is the path not a file, link or directory ?
+     * 
+     * @return 
+     *          if the path does not refer to a file, link or directory.
+     */
+	public boolean isOther() {
+		return isOther;
+	}
+
+	public void setOther(boolean isOther) {
+		this.isOther = isOther;
+	}
+	
+    /**
+     * Does the path refer to an executable file ?
+     * 
+     * @return 
+     *          if the path refers an executable file ?
+     */
+	public boolean isExecutable() {
+		return executable;
+	}
+
+	public void setExecutable(boolean executable) {
+		this.executable = executable;
+	}
+
+	
+	   /**
+     * Does the path refer to an readable file ?
+     * 
+     * @return 
+     *          if the path refers an readable file ?
+     */
+	public boolean isReadable() {
+		return readable;
+	}
+
+	public void setReadable(boolean readable) {
+		this.readable = readable;
+	}
+
+    /**
+     * Does the path refer to a writable file ?
+     * 
+     * @return 
+     *          if the path refers a writable file ?
+     */
+	public boolean isWritable() {
+		return writable;
+	}
+
+	public void setWritable(boolean writable) {
+		this.writable = writable;
+	}
+
+    /**
+     * Does the path refer to an hidden file ?
+     * 
+     * @return 
+     *          if the path refers an hidden file ?
+     */
+	public boolean isHidden() {
+		return hidden;
+	}
+
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
+	}
+
+	
+	/**
      * Get the creation time for this file.
      * 
      * If creationTime is not supported by the adaptor, the {@link #lastModifiedTime()} will be returned instead.
@@ -66,7 +195,13 @@ public interface FileAttributes {
      * @return 
      *          the creation time for this file.
      */
-    long creationTime();
+	public long getCreationTime() {
+		return creationTime;
+	}
+
+	public void setCreationTime(long creationTime) {
+		this.creationTime = creationTime;
+	}
 
     /**
      * Get the last access time for this file.
@@ -76,7 +211,13 @@ public interface FileAttributes {
      * @return 
      *          the last access time for this file.
      */
-    long lastAccessTime();
+	public long getLastAccessTime() {
+		return lastAccessTime;
+	}
+
+	public void setLastAccessTime(long lastAccessTime) {
+		this.lastAccessTime = lastAccessTime;
+	}
 
     /**
      * Get the last modified time for this file.
@@ -86,8 +227,15 @@ public interface FileAttributes {
      * @return 
      *          the last modified time for this file.
      */
-    long lastModifiedTime();
+	public long getLastModifiedTime() {
+		return lastModifiedTime;
+	}
 
+	public void setLastModifiedTime(long lastModifiedTime) {
+		this.lastModifiedTime = lastModifiedTime;
+	}
+
+	
     /**
      * Get the size of this file in bytes.
      * 
@@ -96,51 +244,15 @@ public interface FileAttributes {
      * @return 
      *          the size of this file.
      */
-    long size();
-    
-    /**
-     * Does the path refer to an executable file ?
-     * 
-     * @return 
-     *          if the path refers an executable file ?
-     */
-    boolean isExecutable();
+	public long getSize() {
+		return size;
+	}
 
-    /**
-     * Does the path refer to an hidden file ?
-     * 
-     * @return 
-     *          if the path refers an hidden file ?
-     */
-    boolean isHidden();
+	public void setSize(long size) {
+		this.size = size;
+	}
 
-    /**
-     * Does the path refer to an readable file ?
-     * 
-     * @return 
-     *          if the path refers an readable file ?
-     */
-    boolean isReadable();
-
-    /**
-     * Does the path refer to a writable file ?
-     * 
-     * @return 
-     *          if the path refers a writable file ?
-     */
-    boolean isWritable();
-
-    /**
-     * Get the group of this file.
-     * 
-     * @return 
-     *          the group of this file.
-     * 
-     * @throws AttributeNotSupportedException
-     *          If the attribute is not supported by the adaptor.
-     */
-    String group() throws AttributeNotSupportedException;
-
+	
     /**
      * Get the owner of this file.
      * 
@@ -150,7 +262,31 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
-    String owner() throws AttributeNotSupportedException;
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
+	 /**
+     * Get the group of this file.
+     * 
+     * @return 
+     *          the group of this file.
+     * 
+     * @throws AttributeNotSupportedException
+     *          If the attribute is not supported by the adaptor.
+     */
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
+	}
+
 
     /**
      * Get the permissions of this file.
@@ -161,5 +297,11 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
-    Set<PosixFilePermission> permissions() throws AttributeNotSupportedException;
+	public Set<PosixFilePermission> getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(Set<PosixFilePermission> permissions) {
+		this.permissions = permissions;
+	}   
 }

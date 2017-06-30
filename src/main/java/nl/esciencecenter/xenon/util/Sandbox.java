@@ -286,7 +286,8 @@ public class Sandbox {
 
     private void copy(List<Pair> pairs, CopyOption option) throws XenonException {
         for (Pair pair : pairs) {
-            FileSystemUtil.recursiveCopy(pair.sourceFS, pair.source, pair.destinationFS, pair.destination, option);
+        	// TODO: reimplement!
+        	// FileSystemUtil.recursiveCopy(pair.sourceFS, pair.source, pair.destinationFS, pair.destination, option);
         }
     }
 
@@ -332,7 +333,8 @@ public class Sandbox {
      *         if an I/O error occurs during deletion 
      */
     public void delete() throws XenonException {
-        FileSystemUtil.recursiveDelete(targetFS, path);
+    	// TODO: reimplement
+    	// FileSystemUtil.recursiveDelete(targetFS, path);
     }
     
     @Override

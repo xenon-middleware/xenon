@@ -19,11 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.InvalidAdaptorException;
-import nl.esciencecenter.xenon.adaptors.InvalidCredentialException;
-import nl.esciencecenter.xenon.adaptors.InvalidLocationException;
-import nl.esciencecenter.xenon.adaptors.InvalidPropertyException;
-import nl.esciencecenter.xenon.adaptors.UnknownPropertyException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.job.SchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineSchedulerAdaptor;
@@ -32,6 +27,7 @@ import nl.esciencecenter.xenon.adaptors.job.slurm.SlurmSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.job.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.job.torque.TorqueSchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 
 /**
  * Scheduler represents a (possibly remote) scheduler that can be used to submit jobs and retrieve queue information.
@@ -119,6 +115,18 @@ public abstract class Scheduler {
 	public static Scheduler create(String adaptor, String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
 		return getAdaptorByName(adaptor).createScheduler(location, credential, properties);
+	}
+	
+	public static Scheduler create(String adaptor, String location, Credential credential) throws XenonException {
+		return create(adaptor, location, credential, new HashMap<String, String>(0));
+	}
+	
+	public static Scheduler create(String adaptor, String location) throws XenonException {
+		return create(adaptor, location, new DefaultCredential());
+	}
+	
+	public static Scheduler create(String adaptor) throws XenonException {
+		return create(adaptor, null);
 	}
 	
 	private final String uniqueID;

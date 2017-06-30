@@ -36,7 +36,7 @@ public enum CopyOption {
     CREATE,
 
     /**
-     * Replace the destination file if it already exists.
+     * Replace the destination file if it already exists. 
      */
     REPLACE,
 
@@ -48,17 +48,17 @@ public enum CopyOption {
     /**
      * Append to destination file, failing if the file does not exists.
      */
-    APPEND,
+//    APPEND,
 
     /**
      * Resume the copy to destination file, failing if the file does not exists.
      */
-    RESUME,
+//    RESUME,
 
     /**
      * When resuming a copy, first verifying that the destination file is the head of the source file.
      */
-    VERIFY_AND_RESUME;
+//    VERIFY_AND_RESUME;
 
     /**
      * Check if the CopyOption is listed in a sequence.

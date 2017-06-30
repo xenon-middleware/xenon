@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.file.webdav;
-
-import java.util.List;
-
-import org.apache.jackrabbit.webdav.MultiStatusResponse;
+package nl.esciencecenter.xenon.jobs;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.files.Path;
 
-public class WebdavDirectoryStream extends WebdavDirectoryStreamBase<Path> {
-    public WebdavDirectoryStream(Path dir, Filter filter, List<MultiStatusResponse> listing) throws XenonException {
-        super(dir, filter, listing);
+/**
+ * Signals that an invalid credential was used to access a resource.  
+ * 
+ * @version 1.0
+ * @since 1.0
+ */
+public class InvalidCredentialException extends XenonException {
+
+    private static final long serialVersionUID = 1L;
+
+    public InvalidCredentialException(String adaptorName, String message, Throwable t) {
+        super(adaptorName, message, t);
     }
 
-    @Override
-    protected Path getStreamElementFromEntry(MultiStatusResponse entry, Path entryPath) throws XenonException {
-        return entryPath;
+    public InvalidCredentialException(String adaptorName, String message) {
+        super(adaptorName, message);
     }
-
 }

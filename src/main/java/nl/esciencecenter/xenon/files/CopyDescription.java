@@ -5,29 +5,107 @@ public class CopyDescription {
 	private FileSystem sourceFileSystem;
 	private Path sourcePath;
 	
-	private FileSystem destinationFileSystem;
 	private Path destinationPath;
 	
 	private CopyOption option = CopyOption.CREATE;
 		
-	public CopyDescription(FileSystem sourceFS, Path sourcePath, FileSystem destinationFS, Path destinationPath, CopyOption option) { 
+	private boolean recursive;
+
+	/**
+	 * Perform a (optionally recursive) copy of from a different filesystem to the given destination path.
+	 * 
+	 * The provided {@link CopyOption} determines the course of action if the target path exists.   
+     *
+	 * A recursive copy will only be performed if <code>recursive</code> is set to <code>true</code>. 
+	 * If it is set to <code>false</code> only files will be accepted as source and destination paths.
+	 * 
+	 * @param sourceFS
+	 * 		the filesystem to copy from (may not be null).
+	 * @param sourcePath
+	 * 		the source file to copy from 
+	 * @param destinationPath
+	 * 		the destination file to copy to 
+	 * @param option
+	 * 		the {@link CopyOption} which determines the course of action if the target path exists. 
+	 * @param recursive
+	 * 		if the copy must be done recursively
+	 */
+	public CopyDescription(FileSystem sourceFS, Path sourcePath, Path destinationPath, CopyOption option, boolean recursive) { 
 		this.sourceFileSystem = sourceFS;
 		this.sourcePath = sourcePath;
-		this.destinationFileSystem = destinationFS;
 		this.destinationPath = destinationPath;
 		this.option = option;
-	}
-	
-	public CopyDescription(FileSystem sourceFS, Path sourcePath, FileSystem destinationFS, Path destinationPath) { 
-		this(sourceFS, sourcePath, destinationFS, destinationPath, CopyOption.CREATE);
-	}
-		
-	public CopyDescription(FileSystem filesystem, Path sourcePath, Path destinationPath, CopyOption option) { 
-		this(filesystem, sourcePath, filesystem, destinationPath, option);
+		this.recursive = recursive;
 	}
 
-	public CopyDescription(FileSystem filesystem, Path sourcePath, Path destinationPath) { 
-		this(filesystem, sourcePath, filesystem, destinationPath);
+	/**
+	 * Perform a (optionally recursive) copy of from a different filesystem to the given destination path.
+	 * 
+	 * The destination file or directory must not exist yet. 
+     *
+	 * A recursive copy will only be performed if <code>recursive</code> is set to <code>true</code>. 
+	 * If it is set to <code>false</code> only files will be accepted as source and destination paths.
+	 * 
+	 * @param sourceFS
+	 * 		the filesystem to copy from (may not be null).
+	 * @param sourcePath
+	 * 		the source file to copy from 
+	 * @param destinationPath
+	 * 		the destination file to copy to 
+	 * @param recursive
+	 * 		if the copy must be done recursively
+	 */
+	public CopyDescription(FileSystem sourceFS, Path sourcePath, Path destinationPath, boolean recursive) { 
+		this(sourceFS, sourcePath, destinationPath, CopyOption.CREATE, recursive);
+	}
+	
+	/**
+	 * Copy a file from a different filesystem to the given destination path.
+	 * 
+	 * The destination file must not exist yet. 
+	 * 
+	 * @param sourceFS
+	 * 		the filesystem to copy from (may not be null).
+	 * @param sourcePath
+	 * 		the source file to copy from 
+	 * @param destinationPath
+	 * 		the destination file to copy to 
+	 */
+	public CopyDescription(FileSystem sourceFS, Path sourcePath, Path destinationPath) { 
+		this(sourceFS, sourcePath, destinationPath, CopyOption.CREATE, false);
+	}
+
+	/**
+	 * Perform a (optionally recursive) copy of a file or directory within a single {@link FileSystem}.
+	 * 
+	 * The destination file or directory must not exist yet. 
+	 *  
+	 * A recursive copy will only be performed if <code>recursive</code> is set to <code>true</code>. 
+	 * If it is set to <code>false</code> only files will be accepted as source and destination paths.
+	 *  
+	 * @param sourcePath
+	 * 		the source file or directory to copy from
+	 * @param destinationPath
+	 * 		the destination file directory to copy to 
+	 * @param recursive
+	 * 		if the copy must be done recursively
+	 */
+	public CopyDescription(Path sourcePath, Path destinationPath, boolean recursive) { 
+		this(null, sourcePath, destinationPath,CopyOption.CREATE, true);
+	}
+
+	/**
+	 * Perform a copy of two files within a single {@link FileSystem}.
+	 * 
+	 * The destination file must not exist yet. 
+	 *  
+	 * @param sourcePath
+	 * 		the source file to copy from 
+	 * @param destinationPath
+	 * 		the destination file to copy to 
+	 */
+	public CopyDescription(Path sourcePath, Path destinationPath) { 
+		this(null, sourcePath, destinationPath,CopyOption.CREATE, false);
 	}
 	
 	public FileSystem getSourceFileSystem() {
@@ -38,10 +116,6 @@ public class CopyDescription {
 		return sourcePath;
 	}
 
-	public FileSystem getDestinationFileSystem() {
-		return destinationFileSystem;
-	}
-
 	public Path getDestinationPath() {
 		return destinationPath;
 	}
@@ -50,4 +124,9 @@ public class CopyDescription {
 		return option;
 	}
 
+	public boolean isRecursive() {
+		return recursive;
+	}
+
+	
 }

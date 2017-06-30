@@ -77,6 +77,19 @@ public class WebdavFileAdaptor extends FileAdaptor {
         return path.endsWith("/") ? path : path + "/";
     }
     
+    protected static boolean isFolderPath(String path) {
+        return path.endsWith("/");
+    }
+	
+    protected static String toFilePath(String path) {
+		// Removes all, if any, trailing slashes
+		return path.replaceAll("/+$", "");
+	}
+    
+    protected boolean isFilePath(String path) {
+		return !isFolderPath(path);
+	}
+    
     @Override
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties)
             throws XenonException {
@@ -161,11 +174,5 @@ public class WebdavFileAdaptor extends FileAdaptor {
     }
 
 
-
-   
-    private String toFilePath(String path) {
-        // Removes all, if any, trailing slashes
-        return path.replaceAll("/+$", "");
-    }
 
 }

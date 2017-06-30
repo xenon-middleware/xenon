@@ -17,16 +17,13 @@ package nl.esciencecenter.xenon.files;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.InvalidAdaptorException;
-import nl.esciencecenter.xenon.adaptors.InvalidCredentialException;
-import nl.esciencecenter.xenon.adaptors.InvalidLocationException;
-import nl.esciencecenter.xenon.adaptors.InvalidPropertyException;
-import nl.esciencecenter.xenon.adaptors.UnknownPropertyException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.file.CopyEngine;
 import nl.esciencecenter.xenon.adaptors.file.FileAdaptor;
@@ -35,6 +32,12 @@ import nl.esciencecenter.xenon.adaptors.file.ftp.FtpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.file.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.file.webdav.WebdavFileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.jobs.InvalidAdaptorException;
+import nl.esciencecenter.xenon.jobs.InvalidCredentialException;
+import nl.esciencecenter.xenon.jobs.InvalidLocationException;
+import nl.esciencecenter.xenon.jobs.InvalidPropertyException;
+import nl.esciencecenter.xenon.jobs.UnknownPropertyException;
 
 /**
  * FileSystem represent a (possibly remote) file system that can be used to access data.
@@ -133,6 +136,18 @@ public abstract class FileSystem {
 		return getAdaptorByName(type).createFileSystem(location, credential, properties);
 	}
 
+	public static FileSystem create(String type, String location, Credential credential) throws XenonException {
+		return create(type, location, credential, new HashMap<String, String>(0));
+	}
+
+	public static FileSystem create(String type, String location) throws XenonException {
+		return create(type, location, new DefaultCredential());
+	}
+
+	public static FileSystem create(String type) throws XenonException {
+		return create(type, null);
+	}
+	
 	private final String uniqueID;
 	private final String adaptor;
 	private final String location;
@@ -242,6 +257,8 @@ public abstract class FileSystem {
 	 *             If the source file does not exist or the target parent directory does not exist.
 	 * @throws PathAlreadyExistsException
 	 *             If the target file already exists.
+	 * @throws NotConnectedException
+	 *             If file system is closed.
 	 * @throws XenonException
 	 *             If the move failed.
 	 */
@@ -304,14 +321,37 @@ public abstract class FileSystem {
 	 * 
 	 * If path is a symbolic link the symbolic link is removed and the symbolic link's target is not deleted.
 	 * 
-	 * @param path
-	 *            the path to delete.
+	 * If the path is a directory and <code>recursive</code> is set to true, the contents of the directory will 
+	 * also be deleted. If <code>recursive</code> is set to <code>false</code>, a directory will only be removed 
+	 * if it is empty. 
 	 * 
+	 * @param path
+	 *          the path to delete.
+	 * @param recursive
+	 * 			if the delete must be done recursively
 	 * @throws XenonException
 	 *             If an I/O error occurred.
 	 */
-	public abstract void delete(Path path) throws XenonException;
-
+	public void delete(Path path, boolean recursive) throws XenonException {
+		
+		if (isDotDot(path)) { 
+			return;
+		}
+		
+		if (getAttributes(path).isDirectory()) {
+			
+			if (recursive) { 
+				for (PathAttributesPair p : list(path, false)) { 
+					delete(p.path(), true);
+				}
+			}
+			
+			deleteDirectory(path);
+		} else {
+			deleteFile(path);
+		}
+	}   
+	
 	/**
 	 * Tests if a path exists.
 	 * 
@@ -326,155 +366,114 @@ public abstract class FileSystem {
 	public abstract boolean exists(Path path) throws XenonException;
 
 	/**
-	 * Create a DirectoryStream that iterates over all entries in the directory <code>dir</code>.
+	 * List all entries in the directory <code>dir</code>. 
+	 * 
+	 * All entries in the directory are returned, but subdirectories will not be traversed by default. 
+	 * Set <code>recursive</code> to <code>true</code>, include the listing of all subdirectories.  
 	 * 
 	 * @param dir
 	 *            the target directory.
-	 * @return a new DirectoryStream that iterates over all entries in the given directory.
+	 * 
+	 * @return a {@link Iterable} of {@PathAttributePair}s that iterates over all entries in the directory <code>dir</code>.
 	 * 
 	 * @throws NoSuchPathException
 	 *             If a directory does not exists.
 	 * @throws InvalidPathException
-	 *             If dir is not a directory.
+	 *             If <code>dir</code> is not a directory.
 	 * @throws XenonException
 	 *             If an I/O error occurred.
 	 */
-	public DirectoryStream<Path> newDirectoryStream(Path dir) throws XenonException { 
-		return newDirectoryStream(dir, ACCEPT_ALL_FILTER);
+	public Iterable<PathAttributesPair> list(Path dir, boolean recursive) throws XenonException { 
+		ArrayList<PathAttributesPair> result = new ArrayList<>();
+		list(dir, result, recursive);
+		return result;
 	}
-
-	/**
-	 * Create a DirectoryStream that iterates over all entries in the directory <code>dir</code> that are accepted by the filter.
-	 * 
-	 * @param dir
-	 *            the target directory.
-	 * @param filter
-	 *            the filter.
-	 * 
-	 * @return a new DirectoryStream that iterates over all entries in the directory <code>dir</code>.
-	 * 
-	 * @throws NoSuchPathException
-	 *             If a directory does not exists.
-	 * @throws InvalidPathException
-	 *             If dir is not a directory.
-	 * @throws XenonException
-	 *             If an I/O error occurred.
-	 */
-	public abstract DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws XenonException;
-
-	/**
-	 * Create a DirectoryStream that iterates over all PathAttributePair entries in the directory <code>dir</code>.
-	 * 
-	 * @param dir
-	 *            the target directory.
-	 * 
-	 * @return a new DirectoryStream that iterates over all PathAttributePair entries in the directory <code>dir</code>.
-	 * 
-	 * @throws NoSuchPathException
-	 *             If a directory does not exists.
-	 * @throws InvalidPathException
-	 *             If dir is not a directory.
-	 * @throws XenonException
-	 *             If an I/O error occurred.
-	 */
-	public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws XenonException {
-		return newAttributesDirectoryStream(dir, ACCEPT_ALL_FILTER);
-	}
-
-	/**
-	 * Create a DirectoryStream that iterates over all PathAttributePair entries in the directory <code>dir</code> that are
-	 * accepted by the filter.
-	 * 
-	 * @param dir
-	 *            the target directory.
-	 * @param filter
-	 *            the filter.
-	 * 
-	 * @return a new DirectoryStream that iterates over all entries in the directory <code>dir</code>.
-	 * 
-	 * @throws NoSuchPathException
-	 *             If a directory does not exists.
-	 * @throws InvalidPathException
-	 *             If dir is not a directory.
-	 * @throws XenonException
-	 *             If an I/O error occurred.
-	 */
-	public abstract DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir, DirectoryStream.Filter filter) throws XenonException;
-
+    
 	/**
 	 * Open an existing file and return an {@link InputStream} to read from this file.
 	 * 
-	 * @param path
-	 *            the existing file to read.
+	 * @param file
+	 *            the to read.
 	 * 
 	 * @return the {@link InputStream} to read from the file.
 	 * 
 	 * @throws NoSuchPathException
-	 *             If a file does not exists.
+	 *             If the file does not exists.
 	 * @throws InvalidPathException
-	 *             If path not file.
+	 *             If the file is not regular file.
 	 * @throws XenonException
 	 *             If an I/O error occurred.
 	 */
-	public abstract InputStream newInputStream(Path path) throws XenonException;
+	public abstract InputStream readFromFile(Path file) throws XenonException;
 
 	/**
-	 * Open an file and return an {@link OutputStream} to write to this file.
+	 * Open a file and return an {@link OutputStream} to write to this file.
 	 * <p>
-	 * The options determine how the file is opened, if a new file is created, if the existing data in the file is preserved, and
-	 * if the file should be written or read:
-	 * </p>
-	 * <ul>
-	 * <li>
-	 * If the <code>CREATE</code> option is specified, a new file will be created and an exception is thrown if the file already
-	 * exists.
-	 * </li>
-	 * <li>
-	 * If the <code>OPEN_EXISTING</code> option is specified, an existing file will be opened, and an exception is thrown if the
-	 * file does not exist.
-	 * </li>
-	 * <li>
-	 * If the <code>OPEN_OR_CREATE</code> option is specified, an attempt will be made to open an existing file. If it does not
-	 * exist a new file will be created.
-	 * </li>
-	 * <li>
-	 * If the <code>APPEND</code> option is specified, data will be added to the end of the file. No existing data will be
-	 * overwritten.
-	 * </li>
-	 * <li>
-	 * If the <code>TRUNCATE</code> option is specified, any existing data in the file will be deleted (resulting in a file of
-	 * size 0). The data will then be appended from the beginning of the file.
-	 * </li>
-	 * </ul>
-	 * <p>
-	 * One of <code>CREATE</code>, <code>OPEN_EXISTING</code> or <code>OPEN_OR_CREATE</code> must be specified. Specifying more
-	 * than one will result in an exception.
-	 * </p>
-	 * <p>
-	 * Either <code>APPEND</code> or <code>TRUNCATE</code> must be specified. Specifying both will result in an exception.
-	 * </p>
-	 * <p>
-	 * The <code>READ</code> option must not be set. If it is set, an exception will be thrown.
-	 * </p>
-	 * <p>
-	 * If the <code>WRITE</code> option is specified, the file is opened for writing. As this is the default behavior, the
-	 * <code>WRITE</code> option may be omitted.
+	 * If the file already exists it will be replaced and its data will be lost. 
+	 * 
+	 * The size of the file (once all data has been written) must be specified using 
+	 * the <code>size</code> parameter. This is required by some implementations 
+	 * (typically blob-stores).
+	 * 
 	 * </p>
 	 * @param path
 	 *            the target file for the OutputStream.
-	 * @param options
-	 *            the options to use for opening this file.
+	 * @param size
+	 *            the size of the file once fully written.
 	 * 
 	 * @return the {@link OutputStream} to write to the file.
 	 * 
 	 * @throws InvalidPathException
-	 *             If path is not a file.
-	 * @throws InvalidOptionsException
-	 *             If an invalid combination of OpenOptions was provided.
+	 *             If the file could not be created.
+	 *             
 	 * @throws XenonException
 	 *             If an I/O error occurred.
 	 */
-	public abstract OutputStream newOutputStream(Path path, OpenOption... options) throws XenonException;
+	public abstract OutputStream writeToFile(Path path, long size) throws XenonException;
+
+	/**
+	 * Open a file and return an {@link OutputStream} to write to this file.
+	 * <p>
+	 * If the file already exists it will be replaced and its data will be lost.
+	 * 
+	 * The amount of data that will be written to the file is not specified in advance. 
+	 * This operation may not be supported by all implementations. 
+	 *  
+	 * </p>
+	 * @param file
+	 *            the target file for the OutputStream.
+	 * 
+	 * @return the {@link OutputStream} to write to the file.
+	 * 
+	 * @throws InvalidPathException
+	 *             If the file could not be created.
+	 * @throws XenonException
+	 *             If an I/O error occurred.
+	 */
+	public abstract OutputStream writeToFile(Path file) throws XenonException;
+	
+	/**
+	 * Open an existing file and return an {@link OutputStream} to append data to this file.
+	 * <p>
+	 * If the file does not exist, an exception will be thrown.
+	 * 
+	 * This operation may not be supported by all implementations. 
+	 *  
+	 * </p>
+	 * @param file
+	 *            the target file for the OutputStream.
+	 * 
+	 * @return the {@link OutputStream} to write to the file.
+	 * 
+	 * @throws InvalidPathException
+	 *             If the file is not a regula file.
+	 * @throws NoSuchPathException
+	 *             If the file does not exist.
+	 * @throws XenonException
+	 *             If an I/O error occurred.
+	 */
+	public abstract OutputStream appendToFile(Path file) throws XenonException;
+	
 
 	/**
 	 * Get the {@link FileAttributes} of an existing path.
@@ -545,8 +544,226 @@ public abstract class FileSystem {
 	 * @throws XenonException
 	 *             If an I/O error occurred.
 	 */
-	public abstract CopyHandle copy(CopyDescription description) throws XenonException;
+	public CopyHandle copy(CopyDescription description) throws XenonException { 
+		// TODO: implement!
+		return null;
+	}
+	
+//	public abstract CopyHandle copy(Path sourcePath, Path destinationPath, CopyOption option, boolean recursive) throws XenonException;
+	
+//	public abstract CopyHandle copy(FileSystem sourceFS, Path sourcePath, Path destinationPath, CopyOption option, boolean recursive) throws XenonException;
+	
+//	public abstract CopyHandle copyRecursive(Path sourcePath, Path destinationPath, CopyOption option) throws XenonException;
+//	
+//	public abstract CopyHandle copyRecursive(FileSystem sourceFS, Path sourcePath, Path destinationPath, CopyOption option) throws XenonException;
+//	
+	
+	/**
+     * Retrieve the status of an copy.
+     * 
+     * @param copy
+     *            the copy for which to retrieve the status.
+     * 
+     * @return a {@link CopyStatus} containing the status of the asynchronous copy.
+     * 
+     * @throws NoSuchCopyException
+     *             If the copy is not known.
+     * @throws XenonException
+     *             If an I/O error occurred.
+     */
+    public CopyStatus getStatus(CopyHandle copy) throws XenonException { 
+    	// TODO: implement!
+		return null;
+    }
 
+    /**
+     * Cancel a copy operation.
+     * 
+     * @param copy
+     *            the copy operation which to cancel.
+     *            
+     * @return a {@link CopyStatus} containing the status of the copy.
+     * 
+     * @throws NoSuchCopyException
+     *             If the copy is not known.
+     * @throws XenonException
+     *             If an I/O error occurred.
+     */
+    public CopyStatus cancel(CopyHandle copy) throws XenonException { 
+    	// TODO: implement!
+		return null;
+    }
+	
+    /**
+     * Wait until a copy operation is done or until a timeout expires.
+     * <p>
+     * This method will wait until a copy operation is done (either gracefully or by producing an error), or until
+     * the timeout expires, whichever comes first. If the timeout expires, the copy operation will continue to run.
+     * </p>
+     * <p>
+     * The timeout is in milliseconds and must be &gt;= 0. When timeout is 0, it will be ignored and this method will wait until
+     * the copy operation is done.  
+     * </p>
+     * <p>
+     * A {@link Copystatus} is returned that can be used to determine why the call returned.
+     * </p>
+     * @param copy
+     *            a handle for the copy operation 
+     * @param timeout
+     *            the maximum time to wait for the copy operation in milliseconds.     
+     *            
+     * @return a {@link CopyStatus} containing the status of the copy.
+     * 
+     * @throws IllegalArgumentException 
+     *             If the value of timeout is negative
+     * @throws NoSuchCopyException
+     *             If the copy handle is not known.
+     * @throws XenonException
+     *             If the status of the copy operation could not be retrieved.
+     */    
+    public CopyStatus waitUntilDone(CopyHandle copy, long timeout) throws XenonException { 
+    	// TODO: implement!
+		return null;
+    }
+    
+    /**
+     * Delete a file. If the file does not exist, an exception will be thrown.
+     * 
+     * This operation must be implemented by the various implementations of FileSystem.
+     * 
+     * @param file
+     * 		the file to remove
+     * @throws InvalidPathException 
+     * 		if the provide path is not a file.
+     * @throws NoSuchPathException
+     * 		if the provides file does not exist.
+     * @throws XenonException.
+     *      If the file could not be removed.
+     */    
+    protected abstract void deleteFile(Path file) throws XenonException;
+    
+    /**
+     * Delete an empty directory. If the directory is not empty, an exception will be thrown.
+     * 
+     * This operation can only delete empty directories (analogous to <code>rmdir</code> in Linux). 
+     * 
+     * This operation must be implemented by the various implementations of FileSystem.
+     * 
+     * @param dir
+     * 		the directory to remove
+     * @throws DirectoryNotEmptyException
+     * 		if the directory was not empty.
+     * @throws InvalidPathException 
+     * 		if the provide path is not a directory.
+     * @throws NoSuchPathException
+     * 		if the provides path does not exist.
+     * @throws XenonException.
+     *      If the directory could not be removed.
+     */    
+    protected abstract void deleteDirectory(Path path) throws XenonException;
+    
+    /**
+     * Return the list of entries in a directory. 
+     * 
+     * This operation is non-recursive; any subdirectories in <code>dir</code> will be returned as
+     * part of the list, but they will not be listed themselves.   
+     * 
+     * This operation must be implemented by the various implementations of FileSystem.
+     * 
+     * @param dir
+     * 		the directory to list
+     * @return
+     * 		a list of all entries in <code>dir</code>
+     * @throws XenonException
+     *      If the list could not be retrieved.
+     */    
+    protected abstract List<PathAttributesPair> listDirectory(Path dir) throws XenonException;
+    
+    /**
+     * Returns an (optionally recursive) listing of the entries in a directory <code>dir</code>. 
+     * 
+     * This is a generic implementation which relies on <code>listDirectory</code> to provide 
+     * listings of individal directories.
+     * 
+     * @param dir
+     * 		the directory to list.
+     * @param list
+     * 		the list to which the directory entries will be added.
+     * @param recursive
+     * 		if the listing should be done recursively.
+     * @throws XenonException
+     *      If the list could not be retrieved.
+     */
+    protected void list(Path dir, ArrayList<PathAttributesPair> list, boolean recursive) throws XenonException {
+		
+		List<PathAttributesPair> tmp = listDirectory(dir);
+		list.addAll(tmp);
+		
+		if (recursive) { 
+			for (PathAttributesPair current : tmp) { 
+				// traverse subdirs provided they are not "." or "..". 
+				if (current.attributes().isDirectory() && !isDotDot(dir)) { 
+					list(dir.resolve(current.path().getFileNameAsString()), list, recursive);
+				}
+			}
+		}
+	}
+	
+    protected void assertPathExists(Path path) throws XenonException {
+   		if (!exists(path)) { 
+   			throw new NoSuchPathException(getAdaptorName(), "Path does not exist: " + path);
+    	}   	
+	}
+
+    protected void assertPathNotExists(Path path) throws XenonException {
+    	if (exists(path)) {
+    		throw new PathAlreadyExistsException(getAdaptorName(), "File already exists: " + path);
+    	}
+    }
+
+   	protected void assertPathIsFile(Path path) throws XenonException {
+    	if (!getAttributes(path).isRegular()) { 
+   			throw new InvalidPathException(getAdaptorName(), "Path is not a file: " + path);
+    	}
+   	}
+   	
+   	protected void assertPathIsDirectory(Path path) throws XenonException {
+    	if (!getAttributes(path).isDirectory()) { 
+   			throw new InvalidPathException(getAdaptorName(), "Path is not a directory: " + path);
+    	}
+   	}
+   	
+    protected void assertFileExists(Path file) throws XenonException { 
+    	assertPathExists(file);
+    	assertPathIsFile(file);
+    }
+    
+    protected void assertDirectoryExists(Path dir) throws XenonException { 
+    	assertPathExists(dir);
+    	assertPathIsDirectory(dir);
+    }
+    
+	protected void assertParentDirectoryExists(Path path) throws XenonException {
+		Path parent = path.getParent();
+        
+        if (parent == null) { 
+            throw new InvalidPathException(getAdaptorName(), "Parent directory does not exist: " + path);
+        }
+            
+        assertDirectoryExists(parent);
+	}
+
+	protected boolean areSamePaths(Path source, Path target) {
+		Path sourceName = source.normalize();
+		Path targetName = target.normalize();
+		return sourceName.equals(targetName);
+	}
+	
+	protected boolean isDotDot(Path path) {
+		String filename = path.getFileNameAsString();
+		return ".".equals(filename) || "..".equals(filename);
+	}
+    
 	@Override
 	public int hashCode() {
 		return uniqueID.hashCode();

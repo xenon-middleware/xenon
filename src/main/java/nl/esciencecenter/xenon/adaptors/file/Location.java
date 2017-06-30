@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.adaptors.file;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import nl.esciencecenter.xenon.adaptors.InvalidLocationException;
+import nl.esciencecenter.xenon.jobs.InvalidLocationException;
 
 public abstract class Location {
     private final String user;

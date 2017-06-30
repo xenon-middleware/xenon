@@ -39,7 +39,6 @@ import nl.esciencecenter.xenon.files.NoSuchPathException;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
-import nl.esciencecenter.xenon.files.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,12 +54,12 @@ public final class CopyEngine {
     private class CopyThread extends Thread {
         @Override
         public void run() {
-            CopyInfo ac = dequeue();
-
-            while (ac != null) {
-                startCopy(ac);
-                ac = dequeue();
-            }
+//            CopyInfo ac = dequeue();
+//
+//            while (ac != null) {
+//                startCopy(ac);
+//                ac = dequeue();
+//            }
         }
     }
 
@@ -97,6 +96,10 @@ public final class CopyEngine {
         copyThread.start();
     }
 
+    // TODO: reimplement!
+    
+    /*
+    
     private void close(Closeable c) {
 
         try {
@@ -244,7 +247,7 @@ public final class CopyEngine {
         FileSystem sourceFS = copy.getSourceFileSystem();
         Path source = copy.getSourcePath();
         
-        FileSystem targetFS = copy.getDestinationFileSystem();
+        FileSystem targetFS = ac.getDestinationFileSystem();
         Path target = copy.getDestinationPath();
 
         LOGGER.debug("Resume copy from {} to {} verify={}", source, target, mustVerify);
@@ -336,7 +339,7 @@ public final class CopyEngine {
         FileSystem sourceFS = copy.getSourceFileSystem();
         Path source = copy.getSourcePath();
         
-        FileSystem targetFS = copy.getDestinationFileSystem();
+        FileSystem targetFS = ac.getDestinationFileSystem();
         Path target = copy.getDestinationPath();
         
         LOGGER.debug("Append from {} to {} verify={}", source, target);
@@ -386,7 +389,7 @@ public final class CopyEngine {
         FileSystem sourceFS = copy.getSourceFileSystem();
         Path source = copy.getSourcePath();
         
-        FileSystem targetFS = copy.getDestinationFileSystem();
+        FileSystem targetFS = ac.getDestinationFileSystem();
         Path target = copy.getDestinationPath();
         
         LOGGER.debug("Copy from {} to {} replace={}", source, target, replaceExisting);
@@ -481,16 +484,16 @@ public final class CopyEngine {
         LOGGER.debug("Finished copy: {}", info);
     }
 
-    public synchronized CopyHandle copy(CopyDescription description) {
+    public synchronized CopyHandle copy(FileSystem destinationFS, CopyDescription description) {
     	
     	LOGGER.debug("CopyEngine queueing copy: {}", description);
  
     	String ID = getNextID(description.getSourceFileSystem().getAdaptorName() + "_TO_" 
-    					+ description.getDestinationFileSystem().getAdaptorName() + "_");
+    					+ destinationFS.getAdaptorName() + "_");
     	
     	CopyHandleImplementation c = new CopyHandleImplementation(ID, description);
     	
-    	CopyInfo info = new CopyInfo(description, c);
+    	CopyInfo info = new CopyInfo(destinationFS, description, c);
     	
     	pending.addLast(info);
  
@@ -657,4 +660,6 @@ public final class CopyEngine {
     public synchronized String getNextID(String prefix) {
         return prefix + nextID++;
     }
+*/    
+    
 }

@@ -21,8 +21,8 @@ import java.io.OutputStream;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.shared.local.LocalUtil;
 import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
+import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.Streams;
 
@@ -79,7 +79,7 @@ class BatchProcess implements Process {
             stdinForwarder = null;
             streams.getStdin().close();
         } else {
-            stdinForwarder = new StreamForwarder(filesystem.newInputStream(stdin), streams.getStdin());
+            stdinForwarder = new StreamForwarder(filesystem.readFromFile(stdin), streams.getStdin());
         }
     }
 
@@ -106,10 +106,12 @@ class BatchProcess implements Process {
         Path file = processPath(filesystem, workdir, filename);
 
         // Create the files for the output stream. Will fail if the files already exist!
-        filesystem.createFile(file);
-
+        if (filesystem.exists(file)) { 
+        	throw new PathAlreadyExistsException(filesystem.getAdaptorName(), "File already exists: " + file);	
+        }
+        
         // Create the output stream and return it. 
-        return filesystem.newOutputStream(file, OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE);
+        return filesystem.writeToFile(file);
     }
 
     private synchronized void closeStreams() {

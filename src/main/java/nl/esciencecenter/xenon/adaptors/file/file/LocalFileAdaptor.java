@@ -20,13 +20,13 @@ import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.adaptors.InvalidLocationException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.file.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.shared.local.LocalUtil;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
+import nl.esciencecenter.xenon.jobs.InvalidLocationException;
 
 /**
  * LocalFiles implements an Xenon <code>Files</code> adaptor for local file operations.

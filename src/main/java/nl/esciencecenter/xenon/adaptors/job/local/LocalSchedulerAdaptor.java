@@ -20,9 +20,6 @@ import java.util.Map;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
-import nl.esciencecenter.xenon.adaptors.InvalidCredentialException;
-import nl.esciencecenter.xenon.adaptors.InvalidLocationException;
-import nl.esciencecenter.xenon.adaptors.UnknownPropertyException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.job.InteractiveProcess;
 import nl.esciencecenter.xenon.adaptors.job.InteractiveProcessFactory;
@@ -33,7 +30,10 @@ import nl.esciencecenter.xenon.adaptors.job.SchedulerClosedException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.files.FileSystem;
+import nl.esciencecenter.xenon.jobs.InvalidCredentialException;
+import nl.esciencecenter.xenon.jobs.InvalidLocationException;
 import nl.esciencecenter.xenon.jobs.Scheduler;
+import nl.esciencecenter.xenon.jobs.UnknownPropertyException;
 
 /**
  * LocalFiles implements an Xenon <code>Jobs</code> adaptor for local job operations.

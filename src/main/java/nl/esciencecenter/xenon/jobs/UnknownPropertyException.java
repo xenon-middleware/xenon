@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.file.webdav;
+package nl.esciencecenter.xenon.jobs;
 
 import nl.esciencecenter.xenon.XenonException;
 
-import org.apache.jackrabbit.webdav.property.DavPropertySet;
+/**
+ * Signals that an unknown property was provided.  
+ * 
+ * @version 1.0
+ * @since 1.0
+ */
+public class UnknownPropertyException extends XenonException {
 
-public class WebdavDirectoryAttributes extends WebdavFileAttributes {
+    private static final long serialVersionUID = 1L;
 
-    public WebdavDirectoryAttributes(DavPropertySet properties) throws XenonException {
-        super(properties);
+    public UnknownPropertyException(String adaptorName, String message, Throwable t) {
+        super(adaptorName, message, t);
     }
 
-    @Override
-    public boolean isDirectory() {
-        return true;
+    public UnknownPropertyException(String adaptorName, String message) {
+        super(adaptorName, message);
     }
-
 }
