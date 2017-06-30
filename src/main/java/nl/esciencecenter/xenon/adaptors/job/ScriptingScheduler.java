@@ -31,7 +31,7 @@ import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.jobs.IncompleteJobDescriptionException;
 import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
-import nl.esciencecenter.xenon.jobs.Job;
+import nl.esciencecenter.xenon.jobs.JobHandle;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 import nl.esciencecenter.xenon.jobs.NoSuchQueueException;
@@ -144,11 +144,11 @@ public abstract class ScriptingScheduler extends Scheduler {
      * @param arguments
      *          the arguments to pass to the executable
      * @return
-     *          the {@link Job} that represents the interactive command 
+     *          the {@link JobHandle} that represents the interactive command 
      * @throws XenonException
      *          if an error occurred
      */    
-    public Job startInteractiveCommand(String executable, String... arguments) throws XenonException {
+    public JobHandle startInteractiveCommand(String executable, String... arguments) throws XenonException {
         JobDescription description = new JobDescription();
         description.setInteractive(true);
         description.setQueueName("unlimited");        
@@ -197,7 +197,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      * @throws XenonException
      *          if an error occurs
      */
-    public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
+    public JobStatus waitUntilDone(JobHandle job, long timeout) throws XenonException {
         
         long deadline = Deadline.getDeadline(timeout);
               
@@ -234,7 +234,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      * @throws XenonException
      *          if an error occurs
      */
-    public JobStatus waitUntilRunning(Job job, long timeout) throws XenonException {
+    public JobStatus waitUntilRunning(JobHandle job, long timeout) throws XenonException {
 
         long deadline = Deadline.getDeadline(timeout);
         

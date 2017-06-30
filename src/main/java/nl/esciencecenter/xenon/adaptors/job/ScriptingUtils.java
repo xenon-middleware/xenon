@@ -5,7 +5,7 @@ import java.util.Map;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.jobs.IncompleteJobDescriptionException;
 import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
-import nl.esciencecenter.xenon.jobs.Job;
+import nl.esciencecenter.xenon.jobs.JobHandle;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 //import nl.esciencecenter.xenon.util.Utils;
 
@@ -92,7 +92,7 @@ public class ScriptingUtils {
 	 * @throws XenonException
 	 *             if any fields are missing or incorrect
 	 */
-	public static void verifyJobInfo(Map<String, String> jobInfo, Job job, String adaptorName, String jobIDField,
+	public static void verifyJobInfo(Map<String, String> jobInfo, JobHandle job, String adaptorName, String jobIDField,
 			String... additionalFields) throws XenonException {
 		if (jobInfo == null) {
 			//redundant check, calling functions usually already check for this and return null.

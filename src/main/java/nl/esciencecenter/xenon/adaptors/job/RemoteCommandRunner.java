@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.jobs.Job;
+import nl.esciencecenter.xenon.jobs.JobHandle;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
@@ -67,7 +67,7 @@ public class RemoteCommandRunner {
         description.setArguments(arguments);
         description.setQueueName("unlimited");
             
-        Job job = scheduler.submitJob(description);
+        JobHandle job = scheduler.submitJob(description);
 
         Streams streams = scheduler.getStreams(job);
 

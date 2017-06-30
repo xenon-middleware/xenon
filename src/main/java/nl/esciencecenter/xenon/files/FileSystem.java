@@ -50,12 +50,6 @@ public abstract class FileSystem {
 	/** The name of this component, for use in exceptions */
 	private static final String COMPONENT_NAME = "FileSystem";
 
-	public static final DirectoryStream.Filter ACCEPT_ALL_FILTER = new DirectoryStream.Filter() {
-		public boolean accept(Path file) {
-			return true;
-		}
-	};
-
 	private static final HashMap<String, FileAdaptor> adaptors = new HashMap<>();
 
 	private static final CopyEngine copyEngine = new CopyEngine();

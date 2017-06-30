@@ -29,7 +29,7 @@ import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.jobs.IncompleteJobDescriptionException;
 import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
-import nl.esciencecenter.xenon.jobs.Job;
+import nl.esciencecenter.xenon.jobs.JobHandle;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 import nl.esciencecenter.xenon.jobs.NoSuchQueueException;
@@ -145,7 +145,7 @@ public class JobQueueScheduler extends Scheduler {
         }
     }
 
-    private void getJobs(List<JobExecutor> list, List<Job> out) {
+    private void getJobs(List<JobExecutor> list, List<JobHandle> out) {
         for (JobExecutor e : list) {
             out.add(e.getJob());
         }
@@ -155,11 +155,11 @@ public class JobQueueScheduler extends Scheduler {
         return SINGLE_QUEUE_NAME;
     }
 
-    public Job[] getJobs(String... queueNames) throws NoSuchQueueException {
+    public JobHandle[] getJobs(String... queueNames) throws NoSuchQueueException {
 
         LOGGER.debug("{}: getJobs for queues {}", adaptorName, queueNames);
 
-        LinkedList<Job> out = new LinkedList<>();
+        LinkedList<JobHandle> out = new LinkedList<>();
 
         if (queueNames == null || queueNames.length == 0) {
             getJobs(singleQ, out);
@@ -181,7 +181,7 @@ public class JobQueueScheduler extends Scheduler {
 
         LOGGER.debug("{}: getJobs for queues {} returns {}", adaptorName, queueNames, out);
 
-        return out.toArray(new Job[out.size()]);
+        return out.toArray(new JobHandle[out.size()]);
     }
 
     private List<JobExecutor> findQueue(String queueName) throws XenonException {
@@ -197,7 +197,7 @@ public class JobQueueScheduler extends Scheduler {
         }
     }
 
-    private JobExecutor findJob(List<JobExecutor> queue, Job job) throws XenonException {
+    private JobExecutor findJob(List<JobExecutor> queue, JobHandle job) throws XenonException {
         
         LOGGER.debug("{}: findJob for job {}", adaptorName, job.getIdentifier());
         
@@ -210,14 +210,14 @@ public class JobQueueScheduler extends Scheduler {
         throw new XenonException(adaptorName, "Job not found: " + job.getIdentifier());
     }
 
-    private JobExecutor findJob(Job job) throws XenonException {
+    private JobExecutor findJob(JobHandle job) throws XenonException {
 
         LOGGER.debug("{}: findJob for job {}", adaptorName, job.getIdentifier());
 
         return findJob(findQueue(job.getJobDescription().getQueueName()), job);
     }
 
-    private void cleanupJob(List<JobExecutor> queue, Job job) {
+    private void cleanupJob(List<JobExecutor> queue, JobHandle job) {
 
         LOGGER.debug("{}: cleanupJob for job {}", adaptorName, job.getIdentifier());
 
@@ -233,7 +233,7 @@ public class JobQueueScheduler extends Scheduler {
         }
     }
 
-    public JobStatus getJobStatus(Job job) throws XenonException {
+    public JobStatus getJobStatus(JobHandle job) throws XenonException {
         LOGGER.debug("{}: getJobStatus for job {}", adaptorName, job.getIdentifier());
 
         checkScheduler(job.getScheduler());
@@ -248,7 +248,7 @@ public class JobQueueScheduler extends Scheduler {
         return status;
     }
 
-    public JobStatus[] getJobStatuses(Job... jobs) {
+    public JobStatus[] getJobStatuses(JobHandle... jobs) {
 
         LOGGER.debug("{}: getJobStatuses for jobs {}", adaptorName, jobs);
 
@@ -269,7 +269,7 @@ public class JobQueueScheduler extends Scheduler {
         return result;
     }
 
-    public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
+    public JobStatus waitUntilDone(JobHandle job, long timeout) throws XenonException {
         LOGGER.debug("{}: Waiting for job {} for {} ms.", adaptorName, job.getIdentifier(), timeout);
 
         checkScheduler(job.getScheduler());
@@ -287,7 +287,7 @@ public class JobQueueScheduler extends Scheduler {
         return status;
     }
 
-    public JobStatus waitUntilRunning(Job job, long timeout) throws XenonException {
+    public JobStatus waitUntilRunning(JobHandle job, long timeout) throws XenonException {
 
         LOGGER.debug("{}: Waiting for job {} to start for {} ms.", adaptorName, job.getIdentifier(), timeout);
 
@@ -360,7 +360,7 @@ public class JobQueueScheduler extends Scheduler {
         }
     }
 
-    public Job submitJob(JobDescription description) throws XenonException {
+    public JobHandle submitJob(JobDescription description) throws XenonException {
 
         LOGGER.debug("{}: Submitting job", adaptorName);
 
@@ -409,7 +409,7 @@ public class JobQueueScheduler extends Scheduler {
         return result;
     }
 
-    public JobStatus cancelJob(Job job) throws XenonException {
+    public JobStatus cancelJob(JobHandle job) throws XenonException {
         LOGGER.debug("{}: Cancel job {}", adaptorName, job);
 
         checkScheduler(job.getScheduler());
@@ -483,7 +483,7 @@ public class JobQueueScheduler extends Scheduler {
         return result;
     }
 
-    public Streams getStreams(Job job) throws XenonException {
+    public Streams getStreams(JobHandle job) throws XenonException {
         checkScheduler(job.getScheduler());
         return findJob(job).getStreams();
     }

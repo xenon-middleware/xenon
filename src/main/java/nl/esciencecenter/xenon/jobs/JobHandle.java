@@ -28,7 +28,7 @@ package nl.esciencecenter.xenon.jobs;
  * @version 1.0
  * @since 1.0
  */
-public interface Job {
+public interface JobHandle {
 
     /**
      * Returns the {@link JobDescription} that was used to create this Job.

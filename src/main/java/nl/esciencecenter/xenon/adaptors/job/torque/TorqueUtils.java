@@ -27,7 +27,7 @@ import nl.esciencecenter.xenon.adaptors.job.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.job.ScriptingUtils;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
-import nl.esciencecenter.xenon.jobs.Job;
+import nl.esciencecenter.xenon.jobs.JobHandle;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 
@@ -86,7 +86,7 @@ final class TorqueUtils {
         ScriptingUtils.verifyJobDescription(description, ADAPTOR_NAME);
     }
 
-    protected static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, Job job) throws XenonException {
+    protected static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, JobHandle job) throws XenonException {
         boolean done = false;
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 

@@ -49,7 +49,7 @@ import nl.esciencecenter.xenon.adaptors.job.ScriptingParser;
 import nl.esciencecenter.xenon.adaptors.job.ScriptingScheduler;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.jobs.Job;
+import nl.esciencecenter.xenon.jobs.JobHandle;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 import nl.esciencecenter.xenon.jobs.NoSuchJobException;
@@ -71,7 +71,7 @@ public class SlurmScheduler extends ScriptingScheduler {
 
     private final String defaultQueueName;
 
-    private final Map<String, Job> interactiveJobs;
+    private final Map<String, JobHandle> interactiveJobs;
 
     private final boolean accountingAvailable;
 
@@ -158,7 +158,7 @@ public class SlurmScheduler extends ScriptingScheduler {
     }
 
     @Override
-    public Job submitJob(JobDescription description) throws XenonException {
+    public JobHandle submitJob(JobDescription description) throws XenonException {
 
         verifyJobDescription(description);
 
@@ -169,7 +169,7 @@ public class SlurmScheduler extends ScriptingScheduler {
         }
     }
 
-    private Job submitBatchJob(JobDescription description) throws XenonException {
+    private JobHandle submitBatchJob(JobDescription description) throws XenonException {
         String output;
         Path fsEntryPath = getFsEntryPath();
 
@@ -199,8 +199,8 @@ public class SlurmScheduler extends ScriptingScheduler {
         return new JobImplementation(this, jobID, description, false, false);
     }
 
-    private Job findInteractiveJobInMap(Map<String, Map<String, String>> queueInfo, String tag, JobDescription description, 
-            Job interactiveJob) {
+    private JobHandle findInteractiveJobInMap(Map<String, Map<String, String>> queueInfo, String tag, JobDescription description, 
+            JobHandle interactiveJob) {
 
         //find job with "tag" as a comment in the job info
         for (Map.Entry<String, Map<String, String>> entry : queueInfo.entrySet()) {
@@ -211,7 +211,7 @@ public class SlurmScheduler extends ScriptingScheduler {
                 
                 LOGGER.debug("Found interactive job ID: %s", jobID);
 
-                Job result = new JobImplementation(this, jobID, description, true, true);
+                JobHandle result = new JobImplementation(this, jobID, description, true, true);
                 
                 synchronized (this) {
                     //add to set of interactive jobs so we can find it
@@ -226,10 +226,10 @@ public class SlurmScheduler extends ScriptingScheduler {
     }
 
     
-    private Job findInteractiveJob(String tag, JobDescription description, Job interactiveJob) throws XenonException {
+    private JobHandle findInteractiveJob(String tag, JobDescription description, JobHandle interactiveJob) throws XenonException {
 
         // See if the job can be found in the queue.
-        Job result = findInteractiveJobInMap(getSqueueInfo(), tag, description, interactiveJob);
+        JobHandle result = findInteractiveJobInMap(getSqueueInfo(), tag, description, interactiveJob);
 
         if (result != null) { 
             return result;
@@ -239,7 +239,7 @@ public class SlurmScheduler extends ScriptingScheduler {
         return findInteractiveJobInMap(getSacctInfo(), tag, description, interactiveJob);
     }
     
-    private Job submitInteractiveJob(JobDescription description) throws XenonException {
+    private JobHandle submitInteractiveJob(JobDescription description) throws XenonException {
         Path fsEntryPath = getFsEntryPath();
         
         checkWorkingDirectory(description.getWorkingDirectory());
@@ -250,11 +250,11 @@ public class SlurmScheduler extends ScriptingScheduler {
 
         // There is a two step job submission here, since we submit a job to via a subscheduler (typically SSH). 
         // So the job we get back here is the local SSH job that connects to the remote machine running slurm. 
-        Job interactiveJob = startInteractiveCommand("salloc", arguments);
+        JobHandle interactiveJob = startInteractiveCommand("salloc", arguments);
         
         // Next we try to find information on the remote slurm job. Note that this job may not be visible in the queue yet, or
         // if may already have finished. 
-        Job result = findInteractiveJob(tag.toString(), description, interactiveJob);
+        JobHandle result = findInteractiveJob(tag.toString(), description, interactiveJob);
 
         long end = System.currentTimeMillis() + SLURM_UPDATE_TIMEOUT; 
         
@@ -296,7 +296,7 @@ public class SlurmScheduler extends ScriptingScheduler {
     }
 
     @Override
-    public JobStatus cancelJob(Job job) throws XenonException {
+    public JobStatus cancelJob(JobHandle job) throws XenonException {
         String identifier = job.getIdentifier();
         String output = runCheckedCommand(null, "scancel", identifier);
 
@@ -308,7 +308,7 @@ public class SlurmScheduler extends ScriptingScheduler {
     }
 
     @Override
-    public Job[] getJobs(String... queueNames) throws XenonException {
+    public JobHandle[] getJobs(String... queueNames) throws XenonException {
         String output;
 
         if (queueNames == null || queueNames.length == 0) {
@@ -324,7 +324,7 @@ public class SlurmScheduler extends ScriptingScheduler {
         //Job id's are on separate lines, on their own.
         String[] jobIdentifiers = ScriptingParser.parseList(output);
 
-        Job[] result = new Job[jobIdentifiers.length];
+        JobHandle[] result = new JobHandle[jobIdentifiers.length];
 
         for (int i = 0; i < result.length; i++) {
             result[i] = new JobImplementation(this, jobIdentifiers[i], false, false);
@@ -333,7 +333,7 @@ public class SlurmScheduler extends ScriptingScheduler {
         return result;
     }
 
-    private Map<String, String> getSControlInfo(Job job) throws XenonException {
+    private Map<String, String> getSControlInfo(JobHandle job) throws XenonException {
         RemoteCommandRunner runner = runCommand(null, "scontrol", "show", "job", job.getIdentifier());
 
         if (!runner.success()) {
@@ -345,7 +345,7 @@ public class SlurmScheduler extends ScriptingScheduler {
         return ScriptingParser.parseKeyValuePairs(runner.getStdout(), ADAPTOR_NAME, "WorkDir=", "Command=");
     }
 
-    private Map<String, Map<String, String>> getSqueueInfo(Job... jobs) throws XenonException {
+    private Map<String, Map<String, String>> getSqueueInfo(JobHandle... jobs) throws XenonException {
         
         String squeueOutput;
         
@@ -368,7 +368,7 @@ public class SlurmScheduler extends ScriptingScheduler {
                 "~");
     }
 
-    private Map<String, Map<String, String>> getSacctInfo(Job... jobs) throws XenonException {
+    private Map<String, Map<String, String>> getSacctInfo(JobHandle... jobs) throws XenonException {
         if (!accountingAvailable) {
             return new HashMap<>();
         }
@@ -401,7 +401,7 @@ public class SlurmScheduler extends ScriptingScheduler {
     }
 
     @Override
-    public JobStatus getJobStatus(Job job) throws XenonException {
+    public JobStatus getJobStatus(JobHandle job) throws XenonException {
 
         //try the queue first
         Map<String, Map<String, String>> sQueueInfo = getSqueueInfo(job);
@@ -428,7 +428,7 @@ public class SlurmScheduler extends ScriptingScheduler {
     }
 
     @Override
-    public JobStatus[] getJobStatuses(Job... jobs) throws XenonException {
+    public JobStatus[] getJobStatuses(JobHandle... jobs) throws XenonException {
         JobStatus[] result = new JobStatus[jobs.length];
 
         //fetch queue info for all jobs in one go
@@ -516,8 +516,8 @@ public class SlurmScheduler extends ScriptingScheduler {
     }
 
     @Override
-    public Streams getStreams(Job job) throws XenonException {
-        Job interactiveJob;
+    public Streams getStreams(JobHandle job) throws XenonException {
+        JobHandle interactiveJob;
         
         synchronized (this) {
             interactiveJob = interactiveJobs.get(job.getIdentifier());

@@ -20,7 +20,7 @@ import java.io.IOException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.jobs.Job;
+import nl.esciencecenter.xenon.jobs.JobHandle;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 import nl.esciencecenter.xenon.jobs.Streams;
@@ -102,7 +102,7 @@ public class JobExecutor implements Runnable {
         return done;
     }
 
-    public Job getJob() {
+    public JobHandle getJob() {
         return job;
     }
 

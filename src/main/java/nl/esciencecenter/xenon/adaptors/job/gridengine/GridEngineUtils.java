@@ -28,7 +28,7 @@ import nl.esciencecenter.xenon.adaptors.job.ScriptingScheduler;
 import nl.esciencecenter.xenon.adaptors.job.ScriptingUtils;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
-import nl.esciencecenter.xenon.jobs.Job;
+import nl.esciencecenter.xenon.jobs.JobHandle;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 
@@ -225,7 +225,7 @@ final class GridEngineUtils {
     }
 
     @SuppressWarnings("PMD.EmptyIfStmt")
-    protected static JobStatus getJobStatusFromQacctInfo(Map<String, String> info, Job job) throws XenonException {
+    protected static JobStatus getJobStatusFromQacctInfo(Map<String, String> info, JobHandle job) throws XenonException {
         Integer exitcode;
         Exception exception = null;
         String state = "done";
@@ -259,7 +259,7 @@ final class GridEngineUtils {
         return new JobStatus(job, state, exitcode, exception, false, true, info);
     }
 
-    protected static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, Job job) throws XenonException {
+    protected static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, JobHandle job) throws XenonException {
         boolean done = false;
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 

@@ -29,7 +29,7 @@ import nl.esciencecenter.xenon.adaptors.job.JobCanceledException;
 import nl.esciencecenter.xenon.adaptors.job.ScriptingUtils;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
-import nl.esciencecenter.xenon.jobs.Job;
+import nl.esciencecenter.xenon.jobs.JobHandle;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 import nl.esciencecenter.xenon.jobs.QueueStatus;
@@ -82,9 +82,9 @@ public final class SlurmUtils {
     /** In completed state, the job has terminated and all processes have returned exit code 0. */ 
     private static final String DONE_STATE = "COMPLETED";
     
- 	protected static String identifiersAsCSList(Job[] jobs) {
+ 	protected static String identifiersAsCSList(JobHandle[] jobs) {
  		String result = null;
- 		for (Job job : jobs) {
+ 		for (JobHandle job : jobs) {
  			if (job != null) {
  				if (result == null) {
  					result = job.getIdentifier();
@@ -113,7 +113,7 @@ public final class SlurmUtils {
 
     }
 
-    protected static JobStatus getJobStatusFromSacctInfo(Map<String, Map<String, String>> info, Job job) throws XenonException {
+    protected static JobStatus getJobStatusFromSacctInfo(Map<String, Map<String, String>> info, JobHandle job) throws XenonException {
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 
         if (jobInfo == null) {
@@ -146,7 +146,7 @@ public final class SlurmUtils {
         return result;
     }
 
-    protected static JobStatus getJobStatusFromScontrolInfo(Map<String, String> jobInfo, Job job) throws XenonException {
+    protected static JobStatus getJobStatusFromScontrolInfo(Map<String, String> jobInfo, JobHandle job) throws XenonException {
         if (jobInfo == null) {
             LOGGER.debug("job {} not found in scontrol output", job.getIdentifier());
             return null;
@@ -181,7 +181,7 @@ public final class SlurmUtils {
         return result;
     }
 
-    protected static JobStatus getJobStatusFromSqueueInfo(Map<String, Map<String, String>> info, Job job) throws XenonException {
+    protected static JobStatus getJobStatusFromSqueueInfo(Map<String, Map<String, String>> info, JobHandle job) throws XenonException {
 
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 

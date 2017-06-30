@@ -289,7 +289,7 @@ public abstract class Scheduler {
      * @throws XenonException
      *             If the Scheduler failed to get jobs.
      */
-    public abstract Job[] getJobs(String... queueNames) throws XenonException;
+    public abstract JobHandle[] getJobs(String... queueNames) throws XenonException;
 
     /**
      * Get the status of the <code>queue</code>.
@@ -341,7 +341,7 @@ public abstract class Scheduler {
      * @throws XenonException
      *             If the Scheduler failed to get submit the job.
      */
-    public abstract Job submitJob(JobDescription description) throws XenonException;
+    public abstract JobHandle submitJob(JobDescription description) throws XenonException;
 
     /**
      * Get the status of a Job.
@@ -356,7 +356,7 @@ public abstract class Scheduler {
      * @throws XenonException
      *             If the status of the job could not be retrieved.
      */
-    public abstract JobStatus getJobStatus(Job job) throws XenonException;
+    public abstract JobStatus getJobStatus(JobHandle job) throws XenonException;
 
     /**
      * Get the status of all specified <code>jobs</code>.
@@ -373,7 +373,7 @@ public abstract class Scheduler {
      * @return an array of the resulting JobStatusses.
      * 
      */
-    public abstract JobStatus[] getJobStatuses(Job... jobs) throws XenonException;
+    public abstract JobStatus[] getJobStatuses(JobHandle... jobs) throws XenonException;
 
     /**
      * Returns the standard streams of a job.
@@ -389,7 +389,7 @@ public abstract class Scheduler {
      * @throws XenonException
      *             if the job is not interactive.
      */
-    public abstract Streams getStreams(Job job) throws XenonException;
+    public abstract Streams getStreams(JobHandle job) throws XenonException;
 
     /**
      * Cancel a job.
@@ -399,7 +399,7 @@ public abstract class Scheduler {
      * </p>
      * <p>
      * A {@link JobStatus} is returned that can be used to determine the state of the job after cancelJob returns. Note that it 
-     * may take some time before the job has actually terminated. The {@link #waitUntilDone(Job, long) waitUntilDone} method can 
+     * may take some time before the job has actually terminated. The {@link #waitUntilDone(JobHandle, long) waitUntilDone} method can 
      * be used to wait until the job is terminated.
      * </p>
      * @param job
@@ -411,7 +411,7 @@ public abstract class Scheduler {
      * @throws XenonException
      *             If the status of the job could not be retrieved.
      */
-    public abstract JobStatus cancelJob(Job job) throws XenonException;
+    public abstract JobStatus cancelJob(JobHandle job) throws XenonException;
 
     /**
      * Wait until a job is done or until a timeout expires.
@@ -439,7 +439,7 @@ public abstract class Scheduler {
      * @throws XenonException
      *             If the status of the job could not be retrieved.
      */
-    public abstract JobStatus waitUntilDone(Job job, long timeout) throws XenonException;
+    public abstract JobStatus waitUntilDone(JobHandle job, long timeout) throws XenonException;
 
     /**
      * Wait while a job is waiting in a queue, or until a timeout expires.
@@ -468,7 +468,7 @@ public abstract class Scheduler {
      * @throws XenonException
      *             If the status of the job could not be retrieved.
      */
-    public abstract JobStatus waitUntilRunning(Job job, long timeout) throws XenonException;
+    public abstract JobStatus waitUntilRunning(JobHandle job, long timeout) throws XenonException;
 
     
 	@Override

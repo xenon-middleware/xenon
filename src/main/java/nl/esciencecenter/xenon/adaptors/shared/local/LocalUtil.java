@@ -44,7 +44,6 @@ import nl.esciencecenter.xenon.files.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
-import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PathAttributesPair;
 import nl.esciencecenter.xenon.files.PosixFilePermission;

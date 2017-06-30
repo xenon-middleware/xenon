@@ -36,7 +36,6 @@ import nl.esciencecenter.xenon.files.InvalidPathException;
 import nl.esciencecenter.xenon.files.InvalidResumeTargetException;
 import nl.esciencecenter.xenon.files.NoSuchCopyException;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
-import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
 

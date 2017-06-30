@@ -15,11 +15,11 @@
  */
 package nl.esciencecenter.xenon.adaptors.job;
 
-import nl.esciencecenter.xenon.jobs.Job;
+import nl.esciencecenter.xenon.jobs.JobHandle;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 
-public class JobImplementation implements Job {
+public class JobImplementation implements JobHandle {
 
     private JobDescription description;
 

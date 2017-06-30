@@ -18,14 +18,14 @@ package nl.esciencecenter.xenon.jobs;
 import java.util.Map;
 
 /**
- * JobStatus contains status information for a specific {@link Job}.
+ * JobStatus contains status information for a specific {@link JobHandle}.
  * 
  * @version 1.0
  * @since 1.0
  */
 public class JobStatus {
 
-    private final Job job;
+    private final JobHandle job;
     private final String state;
     private final Integer exitCode;
     private final Exception exception;
@@ -51,7 +51,7 @@ public class JobStatus {
      * @param schedulerSpecificInformation
      * 		a map of scheduler implementation specific information on the job.
      */
-    public JobStatus(Job job, String state, Integer exitCode, Exception exception, boolean running, boolean done,
+    public JobStatus(JobHandle job, String state, Integer exitCode, Exception exception, boolean running, boolean done,
             Map<String, String> schedulerSpecificInformation) {
 
         if (job == null) {
@@ -72,7 +72,7 @@ public class JobStatus {
      * 
      * @return the Job.
      */
-    public Job getJob() {
+    public JobHandle getJob() {
         return job;
     }
 

@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.job.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.job.InteractiveProcess;
-import nl.esciencecenter.xenon.jobs.Job;
+import nl.esciencecenter.xenon.jobs.JobHandle;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.Streams;
 
@@ -52,7 +52,7 @@ class SshInteractiveProcess implements InteractiveProcess {
     // FIXME: should be property or parameter!
     private final long timeout = 10*1000;
     
-    SshInteractiveProcess(ClientSession session, Job job) throws XenonException {
+    SshInteractiveProcess(ClientSession session, JobHandle job) throws XenonException {
         this.session = session;
       
         JobDescription description = job.getJobDescription();
