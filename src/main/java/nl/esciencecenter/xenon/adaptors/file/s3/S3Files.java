@@ -2,36 +2,15 @@ package nl.esciencecenter.xenon.adaptors.file.s3;
 
 
 
-import static nl.esciencecenter.xenon.adaptors.file.sftp.SftpProperties.ADAPTOR_NAME;
 
 
-import com.amazonaws.SdkClientException;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-
-import java.io.*;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
-
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.*;
-import nl.esciencecenter.xenon.engine.files.*;
-import nl.esciencecenter.xenon.files.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
-import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.credentials.PasswordCredential;
-import nl.esciencecenter.xenon.engine.XenonProperties;
-import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
 
-public class S3Files extends FileAdaptor {
+
+public class S3Files  {
+
 	
     private static final Logger LOGGER = LoggerFactory.getLogger(S3Files.class);
 
@@ -47,6 +26,7 @@ public class S3Files extends FileAdaptor {
     /**
      * Used to store all state attached to a filesystem. This way, FileSystemImplementation is immutable.
      */
+    /*
     static class FileSystemInfo {
         private final FileSystemImplementation impl;
         private final String bucket;
@@ -409,6 +389,6 @@ public class S3Files extends FileAdaptor {
         public void remove(){ throw new Error("Cannot remove from this list."); }
 
     }
-
+    */
 
 }
