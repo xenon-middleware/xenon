@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.files;
 /**
  * Copy represents an asynchronous copy operation.
  * <p>
- * A <code>Copy</code> is returned as the result of the {@link Files#copy(Path, Path, CopyOption []) Files.copy} 
- * method, when the option {@link CopyOption#ASYNCHRONOUS CopyOption.ASYNCHRONOUS} is provided. This <code>Copy</code> can then 
+ * A <code>Copy</code> is returned as the result of the {@link Files#copy(Path, Path, CopyMode []) Files.copy} 
+ * method, when the option {@link CopyMode#ASYNCHRONOUS CopyOption.ASYNCHRONOUS} is provided. This <code>Copy</code> can then 
  * be used to retrieve the status of the copy operation using {@link Files#getCopyStatus(Copy) Files.getCopyStatus} or cancel it 
  * using {@link Files#cancelCopy(Copy) Files.cancelCopy}.
  * </p>
@@ -27,14 +27,23 @@ package nl.esciencecenter.xenon.files;
  * @version 1.0
  * @since 1.0
  * @see Files
- * @see CopyOption
+ * @see CopyMode
  */
 public interface CopyHandle {
 
-    /**
-     * Retrieve the description of the copy operation.
-     * 
-     * @return the description of the copy operation.
-     */
-	public CopyDescription getDescription(); 
+    public FileSystem getSourceFileSystem();
+	
+    public Path getSourcePath();
+	
+    public FileSystem getDestinatonFileSystem();
+    
+    public Path getDestinationPath();
+	
+	public CopyMode getMode();
+	
+	public boolean isRecursive();
+	
+	
+    
+    
 }

@@ -158,28 +158,4 @@ public class LocalFileSystem extends FileSystem {
 
 		LocalUtil.setPosixFilePermissions(this, path, permissions);
 	}
-
-	@Override
-	public CopyHandle copy(CopyDescription description) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CopyStatus getStatus(CopyHandle copy) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CopyStatus cancel(CopyHandle copy) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CopyStatus waitUntilDone(CopyHandle copy, long timeout) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

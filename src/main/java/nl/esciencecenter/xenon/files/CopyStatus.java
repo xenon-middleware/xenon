@@ -24,17 +24,12 @@ public class CopyStatus {
 	private final String state;
 	private final Exception exception;
 
-	private final boolean isRunning;
-	private final boolean isDone;
-
 	private final long bytesToCopy;
 	private final long bytesCopied;
 
-	public CopyStatus(CopyHandle copy, String state, boolean isRunning, boolean isDone, long bytesToCopy, long bytesCopied, Exception exception) {
+	public CopyStatus(CopyHandle copy, String state, long bytesToCopy, long bytesCopied, Exception exception) {
 		super();
 		this.copy = copy;
-		this.isRunning = isRunning;
-		this.isDone = isDone;
 		this.state = state;
 		this.bytesToCopy = bytesToCopy;
 		this.bytesCopied = bytesCopied;
@@ -74,7 +69,7 @@ public class CopyStatus {
 	 * @return if the Copy is running.
 	 */
 	public boolean isRunning() {
-		return isRunning;
+		return "RUNNING".equals(state);
 	}
 
 	/**
@@ -83,7 +78,7 @@ public class CopyStatus {
 	 * @return if the Copy is done.
 	 */
 	public boolean isDone() {
-		return isDone;
+		return "DONE".equals(state) || "FAILED".equals(state);
 	}
 
 	/**
@@ -115,7 +110,7 @@ public class CopyStatus {
 
 	@Override
 	public String toString() {
-		return "CopyStatus [copy=" + copy + ", state=" + state + ", exception=" + exception + ", isRunning="
-				+ isRunning + ", isDone=" + isDone + ", bytesToCopy=" + bytesToCopy + ", bytesCopied=" + bytesCopied + "]";
+		return "CopyStatus [copy=" + copy + ", state=" + state + ", exception=" + exception + 
+				", bytesToCopy=" + bytesToCopy + ", bytesCopied=" + bytesCopied + "]";
 	}
 }

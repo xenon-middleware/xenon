@@ -7,14 +7,14 @@ public class CopyDescription {
 	
 	private Path destinationPath;
 	
-	private CopyOption option = CopyOption.CREATE;
+	private CopyMode option = CopyMode.CREATE;
 		
 	private boolean recursive;
 
 	/**
 	 * Perform a (optionally recursive) copy of from a different filesystem to the given destination path.
 	 * 
-	 * The provided {@link CopyOption} determines the course of action if the target path exists.   
+	 * The provided {@link CopyMode} determines the course of action if the target path exists.   
      *
 	 * A recursive copy will only be performed if <code>recursive</code> is set to <code>true</code>. 
 	 * If it is set to <code>false</code> only files will be accepted as source and destination paths.
@@ -26,11 +26,11 @@ public class CopyDescription {
 	 * @param destinationPath
 	 * 		the destination file to copy to 
 	 * @param option
-	 * 		the {@link CopyOption} which determines the course of action if the target path exists. 
+	 * 		the {@link CopyMode} which determines the course of action if the target path exists. 
 	 * @param recursive
 	 * 		if the copy must be done recursively
 	 */
-	public CopyDescription(FileSystem sourceFS, Path sourcePath, Path destinationPath, CopyOption option, boolean recursive) { 
+	public CopyDescription(FileSystem sourceFS, Path sourcePath, Path destinationPath, CopyMode option, boolean recursive) { 
 		this.sourceFileSystem = sourceFS;
 		this.sourcePath = sourcePath;
 		this.destinationPath = destinationPath;
@@ -56,7 +56,7 @@ public class CopyDescription {
 	 * 		if the copy must be done recursively
 	 */
 	public CopyDescription(FileSystem sourceFS, Path sourcePath, Path destinationPath, boolean recursive) { 
-		this(sourceFS, sourcePath, destinationPath, CopyOption.CREATE, recursive);
+		this(sourceFS, sourcePath, destinationPath, CopyMode.CREATE, recursive);
 	}
 	
 	/**
@@ -72,7 +72,7 @@ public class CopyDescription {
 	 * 		the destination file to copy to 
 	 */
 	public CopyDescription(FileSystem sourceFS, Path sourcePath, Path destinationPath) { 
-		this(sourceFS, sourcePath, destinationPath, CopyOption.CREATE, false);
+		this(sourceFS, sourcePath, destinationPath, CopyMode.CREATE, false);
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class CopyDescription {
 	 * 		if the copy must be done recursively
 	 */
 	public CopyDescription(Path sourcePath, Path destinationPath, boolean recursive) { 
-		this(null, sourcePath, destinationPath,CopyOption.CREATE, true);
+		this(null, sourcePath, destinationPath,CopyMode.CREATE, true);
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class CopyDescription {
 	 * 		the destination file to copy to 
 	 */
 	public CopyDescription(Path sourcePath, Path destinationPath) { 
-		this(null, sourcePath, destinationPath,CopyOption.CREATE, false);
+		this(null, sourcePath, destinationPath,CopyMode.CREATE, false);
 	}
 	
 	public FileSystem getSourceFileSystem() {
@@ -120,7 +120,7 @@ public class CopyDescription {
 		return destinationPath;
 	}
 
-	public CopyOption getOption() {
+	public CopyMode getOption() {
 		return option;
 	}
 

@@ -1,7 +1,6 @@
 package nl.esciencecenter.xenon.adaptors.file.webdav;
 
 import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavFileAdaptor.ADAPTOR_NAME;
-import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavFileAdaptor.BUFFER_SIZE;
 import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavFileAdaptor.OK_CODE;
 import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavFileAdaptor.isFolderPath;
 import static nl.esciencecenter.xenon.adaptors.file.webdav.WebdavFileAdaptor.isOkish;
@@ -42,9 +41,6 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
-import nl.esciencecenter.xenon.files.CopyDescription;
-import nl.esciencecenter.xenon.files.CopyHandle;
-import nl.esciencecenter.xenon.files.CopyStatus;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
@@ -502,14 +498,14 @@ public class WebdavFileSystem extends FileSystem {
 		throw new XenonException(ADAPTOR_NAME, "Operation not supported");
 	}
 
-	private void streamCopy(InputStream in, OutputStream out) throws IOException {
-		byte[] buffer = new byte[BUFFER_SIZE];
-		int size = in.read(buffer);
-		while (size > 0) {
-			out.write(buffer, 0, size);
-			size = in.read(buffer);
-		}
-	}
+//	private void streamCopy(InputStream in, OutputStream out) throws IOException {
+//		byte[] buffer = new byte[BUFFER_SIZE];
+//		int size = in.read(buffer);
+//		while (size > 0) {
+//			out.write(buffer, 0, size);
+//			size = in.read(buffer);
+//		}
+//	}
 
 //	private void assertValidOptionsForCopy(CopyOption option) throws InvalidOptionsException {
 //		if (CopyOption.APPEND.equals(option)) {
@@ -526,8 +522,8 @@ public class WebdavFileSystem extends FileSystem {
 //		}
 //	}
 
-	@Override
-	public CopyHandle copy(CopyDescription description) throws XenonException {
+//	@Override
+//	public CopyHandle copy(CopyDescription description) throws XenonException {
 
 //		LOGGER.debug("copy description = {} ", description);
 //
@@ -583,26 +579,26 @@ public class WebdavFileSystem extends FileSystem {
 //		LOGGER.debug("copy OK result = {}", result);
 //		return result;
 //
-		return null;
-		
-	}
-
-	@Override
-	public CopyStatus getStatus(CopyHandle copy) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CopyStatus cancel(CopyHandle copy) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CopyStatus waitUntilDone(CopyHandle copy, long timeout) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//		return null;
+//		
+//	}
+//
+//	@Override
+//	public CopyStatus getStatus(CopyHandle copy) throws XenonException {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public CopyStatus cancel(CopyHandle copy) throws XenonException {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public CopyStatus waitUntilDone(CopyHandle copy, long timeout) throws XenonException {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 }

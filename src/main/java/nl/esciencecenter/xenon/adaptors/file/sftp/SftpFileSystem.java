@@ -442,28 +442,4 @@ public class SftpFileSystem extends FileSystem {
 
 		return new XenonException(ADAPTOR_NAME, message, e);
 	}
-
-	@Override
-	public CopyHandle copy(CopyDescription description) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CopyStatus getStatus(CopyHandle copy) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CopyStatus cancel(CopyHandle copy) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CopyStatus waitUntilDone(CopyHandle copy, long timeout) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
