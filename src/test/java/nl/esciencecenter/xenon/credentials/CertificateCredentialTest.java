@@ -26,13 +26,29 @@ import java.util.Arrays;
 public class CertificateCredentialTest {
 
     @org.junit.Test
-    public void test_getters_and_setters() throws Exception { 
+    public void test_username() throws Exception { 
         CertificateCredential cc = new CertificateCredential("username", "certfile", "password".toCharArray());
-
         assertEquals(cc.getUsername(), "username");
+    }
+
+
+    @org.junit.Test
+    public void test_certfile() throws Exception { 
+        CertificateCredential cc = new CertificateCredential("username", "certfile", "password".toCharArray());
         assertEquals(cc.getCertificateFile(), "certfile");
+    }
+    
+    @org.junit.Test
+    public void test_password() throws Exception { 
+        CertificateCredential cc = new CertificateCredential("username", "certfile", "password".toCharArray());
         assertTrue(Arrays.equals(cc.getPassword(), "password".toCharArray()));
-        assertTrue(cc.toString().equals(
-                "CertificateCredential [username=username, certfile=certfile]"));
+    }
+    
+    @org.junit.Test
+    public void test_toString() throws Exception { 
+        CertificateCredential cc = new CertificateCredential("username", "certfile", "password".toCharArray());
+        assertTrue(cc.toString().equals("CertificateCredential [username=username, certfile=certfile]"));
     }
 }
+
+

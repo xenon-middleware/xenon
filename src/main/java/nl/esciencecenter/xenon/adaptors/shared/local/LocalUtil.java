@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.shared.local;
 
-import static nl.esciencecenter.xenon.adaptors.file.file.LocalFileAdaptor.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor.ADAPTOR_NAME;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +25,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFileAttributeView;
 import java.security.AccessController;
@@ -37,18 +36,17 @@ import java.util.Locale;
 import java.util.Set;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.job.local.CommandRunner;
+import nl.esciencecenter.xenon.adaptors.schedulers.local.CommandRunner;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
-import nl.esciencecenter.xenon.files.DirectoryNotEmptyException;
-import nl.esciencecenter.xenon.files.FileAttributes;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.NoSuchPathException;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.files.PathAttributesPair;
-import nl.esciencecenter.xenon.files.PosixFilePermission;
-import nl.esciencecenter.xenon.jobs.InvalidCredentialException;
-import nl.esciencecenter.xenon.jobs.InvalidLocationException;
+import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
+import nl.esciencecenter.xenon.filesystems.PathAttributes;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
+import nl.esciencecenter.xenon.schedulers.InvalidCredentialException;
+import nl.esciencecenter.xenon.schedulers.InvalidLocationException;
 
 /**
  * LocalUtils contains various utilities for local file operations.
@@ -311,15 +309,15 @@ public class LocalUtil {
         return FileSystems.getDefault().getPath(root, relPath.getAbsolutePath());
     }
 
-    public static List<PathAttributesPair> listDirectory(FileSystem fs, Path dir) throws XenonException {
+    public static List<PathAttributes> listDirectory(FileSystem fs, Path dir) throws XenonException {
 
     	try { 
-    		ArrayList<PathAttributesPair> result = new ArrayList<>();
+    		ArrayList<PathAttributes> result = new ArrayList<>();
 
     		DirectoryStream<java.nio.file.Path> s = java.nio.file.Files.newDirectoryStream(LocalUtil.javaPath(fs, dir));
 
-    		for (java.nio.file.Path p : s) { 
-    			result.add(new PathAttributesPair(dir.resolve(p.getFileName().toString()), getLocalFileAttributes(p)));
+    		for (java.nio.file.Path p : s) {
+    			result.add(getLocalFileAttributes(dir.resolve(p.getFileName().toString()), p));
     		}
     		
     		return result;
@@ -328,14 +326,15 @@ public class LocalUtil {
 		}
     }
     
-    public static FileAttributes getLocalFileAttributes(FileSystem fs, Path path) throws XenonException {
-    	return getLocalFileAttributes(javaPath(fs, path));
+    public static PathAttributes getLocalFileAttributes(FileSystem fs, Path path) throws XenonException {
+    	return getLocalFileAttributes(path, javaPath(fs, path));
     }
 
-    public static FileAttributes getLocalFileAttributes(java.nio.file.Path path) throws XenonException {
+    public static PathAttributes getLocalFileAttributes(Path p, java.nio.file.Path path) throws XenonException {
     	try {
-            FileAttributes result = new FileAttributes();
+            PathAttributes result = new PathAttributes();
             
+            result.setPath(p);
             result.setExecutable(java.nio.file.Files.isExecutable(path));
             result.setReadable(java.nio.file.Files.isReadable(path));
             result.setReadable(java.nio.file.Files.isWritable(path));

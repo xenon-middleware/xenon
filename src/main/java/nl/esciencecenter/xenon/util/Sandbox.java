@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.UUID;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.files.CopyMode;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.InvalidOptionsException;
-import nl.esciencecenter.xenon.files.Path;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.InvalidOptionsException;
+import nl.esciencecenter.xenon.filesystems.Path;
 
 /**
  * Sandbox represents a (possibly remote and usually temporary) directory used for running jobs. 

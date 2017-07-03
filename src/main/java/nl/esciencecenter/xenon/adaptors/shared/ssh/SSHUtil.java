@@ -24,8 +24,8 @@ import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
-import nl.esciencecenter.xenon.jobs.InvalidCredentialException;
-import nl.esciencecenter.xenon.jobs.InvalidLocationException;
+import nl.esciencecenter.xenon.schedulers.InvalidCredentialException;
+import nl.esciencecenter.xenon.schedulers.InvalidLocationException;
 
 public class SSHUtil {
 	

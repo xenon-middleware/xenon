@@ -21,6 +21,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
+
 /**
  * @version 1.0
  * @since 1.0
