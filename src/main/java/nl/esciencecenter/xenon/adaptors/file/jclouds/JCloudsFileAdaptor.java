@@ -33,7 +33,7 @@ public class JCloudsFileAdaptor extends FileAdaptor {
     protected static final int DEFAULT_PORT = 21;
 
     /** A description of this adaptor */
-    private static final String ADAPTOR_DESCRIPTION = "The FTP adaptor implements file access on remote ftp servers.";
+    private static final String ADAPTOR_DESCRIPTION = "The JClouds adaptor uses Apache JClouds to talk to s3 and others";
 
     /** The locations supported by this adaptor */
     private static final String [] ADAPTOR_LOCATIONS = new String [] { "s3://host[:port]" };
