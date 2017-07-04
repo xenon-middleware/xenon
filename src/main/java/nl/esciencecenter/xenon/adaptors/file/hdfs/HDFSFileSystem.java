@@ -23,8 +23,8 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.files.FileSystem{
     final org.apache.hadoop.fs.FileSystem fs;
     boolean closed;
 
-    public HDFSFileSystem(String uniqueID, String adaptorName, String endPoint, org.apache.hadoop.fs.FileSystem fs, XenonProperties properties) {
-        super(uniqueID,adaptorName,endPoint,new Path(""),properties);
+    public HDFSFileSystem(String uniqueID, String endPoint, org.apache.hadoop.fs.FileSystem fs, XenonProperties properties) {
+        super(uniqueID,"hdfs",endPoint,new Path(""),properties);
         this.fs = fs;
         closed = false;
     }
@@ -42,7 +42,7 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.files.FileSystem{
 
     @Override
     public boolean isOpen() throws XenonException {
-        closed  = true;
+        return !closed;
     }
 
     @Override
@@ -107,7 +107,6 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.files.FileSystem{
         return null;
     }
 
-    @Override
     public Iterator<PathAttributesPair> list(Path dir, boolean recursive) throws XenonException {
         final RemoteIterator<LocatedFileStatus> it;
         try {

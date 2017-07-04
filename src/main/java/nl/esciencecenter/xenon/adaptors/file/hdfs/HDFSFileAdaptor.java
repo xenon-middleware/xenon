@@ -2,6 +2,7 @@ package nl.esciencecenter.xenon.adaptors.file.hdfs;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.file.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.file.ftp.FtpFileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -42,12 +43,14 @@ public class HDFSFileAdaptor extends FileAdaptor{
     @Override
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
         Configuration conf = new Configuration(false);
-        conf.set("fs.default.name", location);
+        conf.set("fs.defaultFS", location);
         // TODO: use authentication
+        XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
         try {
             org.apache.hadoop.fs.FileSystem fs = org.apache.hadoop.fs.FileSystem.get(conf);
+            return new HDFSFileSystem(getNewUniqueID(),location, fs,xp);
         } catch(IOException e){
-            e.printStackTrace();
+            throw new XenonException("hdfs", "Failed to create HDFS connection: " + e.getMessage());
         }
 
     }
