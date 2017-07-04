@@ -99,7 +99,7 @@ public class LocalFileSystem extends FileSystem {
     public OutputStream writeToFile(Path path, long size) throws XenonException {
         try {
             return java.nio.file.Files.newOutputStream(LocalUtil.javaPath(this, path), 
-            		StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+            		StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to create OutputStream.", e);
         }

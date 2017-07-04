@@ -805,4 +805,23 @@ public class PathTest {
         boolean v = p1.endsWith(p2);
         assert (!v);
     }
+    
+    
+    @Test
+    public void testGetFileName() {
+        Path p1 = new Path("/a/b/c");
+        Path p2 = p1.getFileName();
+
+        assertEquals(p2, new Path("c"));
+    }
+    
+    @Test
+    public void testGetFileNameNull() {
+        Path p1 = new Path("");
+        Path p2 = p1.getFileName();
+
+        assertNull(p2);
+    }
+    
+
 }
