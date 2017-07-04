@@ -1,9 +1,11 @@
 package nl.esciencecenter.xenon.adaptors.filesystems.hdfs;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.files.*;
 import nl.esciencecenter.xenon.filesystems.*;
+import nl.esciencecenter.xenon.filesystems.InvalidPathException;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.permission.FsAction;
@@ -30,6 +32,12 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
     }
 
 
+    void checkClosed() throws XenonException{
+        if(!isOpen()){
+            throw new NotConnectedException(getAdaptorName(), "Already closed file system!");
+        }
+    }
+
     @Override
     public void close() throws XenonException {
         try {
@@ -47,9 +55,50 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
 
 
     @Override
-    public boolean exists(Path path) throws XenonException {
+    public void move(Path source, Path target) throws XenonException {
+        checkClosed();
         try {
-            return fs.exists(toHDFSPath(path));
+            if (!exists(source)){
+                throw new NoSuchPathException(getAdaptorName(), source.getRelativePath());
+            }
+            if(exists(target)){
+                throw new PathAlreadyExistsException(getAdaptorName(), target.getRelativePath());
+            }
+            fs.rename(toHDFSPath(source), toHDFSPath(target));
+        } catch(IOException e ){
+            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+        }
+    }
+
+
+
+
+    @Override
+    public void createDirectory(Path dir) throws XenonException {
+        checkClosed();
+        try {
+            if(!exists(dir.getParent())){
+                throw new XenonException(getAdaptorName(), "createDirectory: parent does not exist: " + dir.getRelativePath());
+            }
+            if(exists(dir)){
+                throw new PathAlreadyExistsException(getAdaptorName(), "A directory or file already exists at: " + dir.getRelativePath());
+            }
+            fs.mkdirs(toHDFSPath(dir));
+        } catch(IOException e ){
+            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+        }
+
+    }
+
+
+    @Override
+    public void createFile(Path file) throws XenonException {
+        checkClosed();
+        try {
+            if(exists(file)){
+                throw new PathAlreadyExistsException(getAdaptorName(), "A directory or file already exists at: " + file.getRelativePath());
+            }
+            fs.createNewFile(toHDFSPath(file));
         } catch(IOException e ){
             throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
         }
@@ -57,6 +106,7 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
 
     @Override
     public void delete(Path path, boolean recursive) throws XenonException {
+        checkClosed();
         try {
             fs.delete(toHDFSPath(path), recursive);
         } catch(IOException e ){
@@ -64,9 +114,79 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
         }
     }
 
+
+
+    @Override
+    public boolean exists(Path path) throws XenonException {
+        checkClosed();
+        try {
+            return fs.exists(toHDFSPath(path));
+        } catch(IOException e ){
+            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+        }
+    }
+
+    public Iterable<PathAttributes> list(final Path dir,  boolean recursive) throws XenonException {
+        checkClosed();
+        try {
+            if (!fs.isDirectory(toHDFSPath(dir))) {
+                throw new InvalidPathException(getAdaptorName(), "Cannot list: " + dir.getRelativePath() + " is not a directory!");
+            }
+        } catch (IOException e){
+            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+        }
+        final Iterator<PathAttributes> it =  listIterator(dir,recursive);
+        return new Iterable<PathAttributes>() {
+            @Override
+            public Iterator<PathAttributes> iterator() {
+                return it;
+            }
+        };
+    }
+
+    private Iterator<PathAttributes> listIterator(Path dir, boolean recursive) throws XenonException {
+        checkClosed();
+        final RemoteIterator<LocatedFileStatus> it;
+        try {
+
+            it = fs.listFiles(toHDFSPath(dir), recursive);
+        } catch(IOException e ){
+            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+        }
+        return new Iterator<PathAttributes>() {
+            @Override
+            public boolean hasNext() {
+                try{
+                    return it.hasNext();
+                } catch(IOException e){
+                    throw new Error(e.getMessage());
+                }
+
+            }
+
+            @Override
+            public PathAttributes next() {
+                try{
+                    return toPathAttributes(it.next());
+                } catch(IOException e){
+                    throw new Error(e.getMessage());
+                }
+            }
+        };
+    }
+
+
     @Override
     public InputStream readFromFile(Path path) throws XenonException {
+        checkClosed();
         try {
+            org.apache.hadoop.fs.Path p = toHDFSPath(path);
+            if(!fs.exists(p)){
+                throw new NoSuchPathException(getAdaptorName(), "Cannot read from file " + path.getRelativePath() + ". File does not exist");
+            }
+            if(!fs.isFile(p)){
+                throw new InvalidPathException(getAdaptorName(), "Cannot read from file " + path.getRelativePath() + ". Not a regular file");
+            }
             return fs.open(toHDFSPath(path));
         } catch (IOException e){
             throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
@@ -80,6 +200,7 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
 
     @Override
     public OutputStream writeToFile(Path path) throws XenonException {
+        checkClosed();
         try {
             return fs.create(toHDFSPath(path));
         } catch (IOException e){
@@ -89,11 +210,32 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
 
     @Override
     public OutputStream appendToFile(Path path) throws XenonException {
+        checkClosed();
         try {
-            return fs.append(toHDFSPath(path));
+            org.apache.hadoop.fs.Path p = toHDFSPath(path);
+            if(!fs.exists(p)){
+                throw new NoSuchPathException(getAdaptorName(), "Cannot read from file " + path.getRelativePath() + ". File does not exist");
+            }
+            if(!fs.isFile(p)){
+                throw new InvalidPathException(getAdaptorName(), "Cannot read from file " + path.getRelativePath() + ". Not a regular file");
+            }
+            return fs.append(p);
         } catch (IOException e){
             throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public PathAttributes getAttributes(Path path) throws XenonException {
+        checkClosed();
+        Iterator<PathAttributes> p = list(path, false).iterator();
+        while(p.hasNext()){
+            PathAttributes at = p.next();
+            if(at.getPath().equals(path)){
+                return at;
+            }
+        }
+        throw new NoSuchPathException("hdfs", "No such file: " + path.getRelativePath());
     }
 
     @Override
@@ -114,52 +256,9 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
     }
 
 
-    @Override
-    public void move(Path source, Path target) throws XenonException {
-        try {
-            if (!exists(source)){
-                throw new NoSuchPathException(getAdaptorName(), source.getRelativePath());
-            }
-            if(exists(target)){
-                throw new PathAlreadyExistsException(getAdaptorName(), target.getRelativePath());
-            }
-            fs.rename(toHDFSPath(source), toHDFSPath(target));
-        } catch(IOException e ){
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
-        }
-    }
 
-    @Override
-    public void createDirectory(Path dir) throws XenonException {
-        try {
-            if(!exists(dir.getParent())){
-                throw new XenonException(getAdaptorName(), "createDirectory: parent does not exist: " + dir.getRelativePath());
-            }
-            fs.mkdirs(toHDFSPath(dir));
-        } catch(IOException e ){
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
-        }
 
-    }
 
-    @Override
-    public void createDirectories(Path dir) throws XenonException {
-        try {
-            fs.mkdirs(toHDFSPath(dir));
-        } catch(IOException e ){
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
-        }
-
-    }
-
-    @Override
-    public void createFile(Path file) throws XenonException {
-        try {
-            fs.createNewFile(toHDFSPath(file));
-        } catch(IOException e ){
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
-        }
-    }
 
 
     org.apache.hadoop.fs.Path toHDFSPath(Path p){
@@ -227,44 +326,6 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
         return p;
     }
 
-    public Iterable<PathAttributes> list(final Path dir,  boolean recursive) throws XenonException {
-        final Iterator<PathAttributes> it =  listIterator(dir,recursive);
-        return new Iterable<PathAttributes>() {
-            @Override
-            public Iterator<PathAttributes> iterator() {
-                return it;
-            }
-        };
-    }
-
-    private Iterator<PathAttributes> listIterator(Path dir, boolean recursive) throws XenonException {
-        final RemoteIterator<LocatedFileStatus> it;
-        try {
-            it = fs.listFiles(toHDFSPath(dir), recursive);
-        } catch(IOException e ){
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
-        }
-        return new Iterator<PathAttributes>() {
-                @Override
-                public boolean hasNext() {
-                    try{
-                        return it.hasNext();
-                    } catch(IOException e){
-                        throw new Error(e.getMessage());
-                    }
-
-                }
-
-                @Override
-                public PathAttributes next() {
-                    try{
-                        return toPathAttributes(it.next());
-                    } catch(IOException e){
-                        throw new Error(e.getMessage());
-                    }
-                }
-            };
-    }
 
 
 
@@ -272,21 +333,21 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
 
 
 
-    @Override
-    public PathAttributes getAttributes(Path path) throws XenonException {
-        Iterator<PathAttributes> p = list(path, false).iterator();
-        while(p.hasNext()){
-            PathAttributes at = p.next();
-            if(at.getPath().equals(path)){
-                return at;
-            }
-        }
-        throw new XenonException("hdfs", "No such file: " + path.getRelativePath());
-    }
+
+
 
     @Override
     public Path readSymbolicLink(Path link) throws XenonException {
+        checkClosed();
         try {
+            org.apache.hadoop.fs.Path p  = toHDFSPath(link);
+            if(!fs.exists(p)){
+                throw new NoSuchPathException(getAdaptorName(), "Cannot resolve link " + link.getRelativePath() + ": No such file or symlink");
+            }
+            PathAttributes pa = getAttributes(link);
+            if(!pa.isSymbolicLink()) {
+                throw new InvalidPathException(getAdaptorName(), "Cannot resolve link " + link.getRelativePath() + ": Not a symlink");
+            }
             return fromHDFSPath(fs.resolvePath(toHDFSPath(link)));
         } catch (IOException e){
             throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
@@ -296,6 +357,10 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
 
     @Override
     public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
+        checkClosed();
+        if(!exists(path)){
+            throw new NoSuchPathException(getAdaptorName(), "No such path :" + path.getRelativePath());
+        }
         FsAction user  = FsAction.NONE;
         FsAction group = FsAction.NONE;
         FsAction other = FsAction.NONE;
@@ -320,6 +385,8 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
         }
 
     }
+
+    // TODO: copyFile
 
 }
 

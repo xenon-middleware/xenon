@@ -1046,7 +1046,7 @@ public abstract class FileSystem {
 	 * @param file
 	 * 		the file to remove
 	 * @throws InvalidPathException 
-	 * 		if the provide path is not a file.
+	 * 		if the provided path is not a file.
 	 * @throws NoSuchPathException
 	 * 		if the provides file does not exist.
 	 * @throws XenonException.
