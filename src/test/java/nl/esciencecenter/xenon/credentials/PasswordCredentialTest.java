@@ -19,7 +19,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * 
@@ -27,10 +26,22 @@ import java.util.HashMap;
 public class PasswordCredentialTest {
 
     @org.junit.Test
-    public void test_getters_and_setters() throws Exception {
+    public void test_username() throws Exception {
         PasswordCredential pwc = new PasswordCredential("username", "password".toCharArray());
         assertEquals(pwc.getUsername(), "username");
+    }
+    
+    @org.junit.Test
+    public void test_password() throws Exception {
+        PasswordCredential pwc = new PasswordCredential("username", "password".toCharArray());
         assertTrue(Arrays.equals(pwc.getPassword(), "password".toCharArray()));
+    }
+
+    
+    @org.junit.Test
+    public void test_toString() throws Exception {
+        PasswordCredential pwc = new PasswordCredential("username", "password".toCharArray());
         assertTrue(pwc.toString().equals("PasswordCredential [username=username]"));
     }
+    
 }

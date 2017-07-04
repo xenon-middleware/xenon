@@ -17,41 +17,38 @@ package nl.esciencecenter.xenon.exceptions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import nl.esciencecenter.xenon.InvalidAdaptorException;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonRuntimeException;
-import nl.esciencecenter.xenon.ConnectionLostException;
-import nl.esciencecenter.xenon.IncompatibleVersionException;
-import nl.esciencecenter.xenon.InvalidCredentialException;
-import nl.esciencecenter.xenon.InvalidLocationException;
-import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.NoSuchXenonException;
-import nl.esciencecenter.xenon.NotConnectedException;
-import nl.esciencecenter.xenon.UnknownPropertyException;
-import nl.esciencecenter.xenon.adaptors.file.webdav.PathUninspectableException;
-import nl.esciencecenter.xenon.credentials.CertificateNotFoundException;
-import nl.esciencecenter.xenon.engine.PropertyTypeException;
-import nl.esciencecenter.xenon.engine.util.BadParameterException;
-import nl.esciencecenter.xenon.engine.util.CommandNotFoundException;
-import nl.esciencecenter.xenon.files.AttributeNotSupportedException;
-import nl.esciencecenter.xenon.files.DirectoryNotEmptyException;
-import nl.esciencecenter.xenon.files.EndOfFileException;
-import nl.esciencecenter.xenon.files.FileSystemClosedException;
-import nl.esciencecenter.xenon.files.InvalidOptionsException;
-import nl.esciencecenter.xenon.files.InvalidPathException;
-import nl.esciencecenter.xenon.files.InvalidResumeTargetException;
-import nl.esciencecenter.xenon.files.NoSuchCopyException;
-import nl.esciencecenter.xenon.files.NoSuchPathException;
-import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
-import nl.esciencecenter.xenon.files.PermissionDeniedException;
-import nl.esciencecenter.xenon.files.UnsupportedIOOperationException;
-import nl.esciencecenter.xenon.jobs.IncompleteJobDescriptionException;
-import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
-import nl.esciencecenter.xenon.jobs.JobCanceledException;
-import nl.esciencecenter.xenon.jobs.NoSuchJobException;
-import nl.esciencecenter.xenon.jobs.NoSuchQueueException;
-import nl.esciencecenter.xenon.jobs.NoSuchSchedulerException;
-import nl.esciencecenter.xenon.jobs.UnsupportedJobDescriptionException;
+import nl.esciencecenter.xenon.adaptors.NotConnectedException;
+import nl.esciencecenter.xenon.adaptors.PropertyTypeException;
+import nl.esciencecenter.xenon.adaptors.filesystems.ConnectionLostException;
+import nl.esciencecenter.xenon.adaptors.filesystems.EndOfFileException;
+import nl.esciencecenter.xenon.adaptors.filesystems.PermissionDeniedException;
+import nl.esciencecenter.xenon.adaptors.schedulers.BadParameterException;
+import nl.esciencecenter.xenon.adaptors.schedulers.IncompatibleVersionException;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.adaptors.schedulers.local.CommandNotFoundException;
+import nl.esciencecenter.xenon.adaptors.shared.ssh.CertificateNotFoundException;
+import nl.esciencecenter.xenon.filesystems.AttributeNotSupportedException;
+import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
+import nl.esciencecenter.xenon.filesystems.FileSystemClosedException;
+import nl.esciencecenter.xenon.filesystems.InvalidOptionsException;
+import nl.esciencecenter.xenon.filesystems.InvalidPathException;
+import nl.esciencecenter.xenon.filesystems.InvalidResumeTargetException;
+import nl.esciencecenter.xenon.filesystems.NoSuchCopyException;
+import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
+import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
+import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
+import nl.esciencecenter.xenon.schedulers.InvalidAdaptorException;
+import nl.esciencecenter.xenon.schedulers.InvalidCredentialException;
+import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
+import nl.esciencecenter.xenon.schedulers.InvalidLocationException;
+import nl.esciencecenter.xenon.schedulers.InvalidPropertyException;
+import nl.esciencecenter.xenon.schedulers.NoSuchJobException;
+import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
+import nl.esciencecenter.xenon.schedulers.UnknownPropertyException;
+import nl.esciencecenter.xenon.schedulers.UnsupportedJobDescriptionException;
 
 import org.junit.Test;
 
@@ -257,18 +254,6 @@ public class ExceptionsTest {
         Throwable t = new Throwable();
         testException(new CertificateNotFoundException("name", "message", t), t);
     }
-
-    @Test
-    public void testPathUninspectableException1() throws Exception {
-        testException(new PathUninspectableException("name", "message"));
-    }
-
-    @Test
-    public void testPathUninspectableException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new PathUninspectableException("name", "message", t), t);
-    }
-
     
     @Test
     public void testInvalidDataException1() throws Exception {
@@ -348,17 +333,6 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void testNoSuchXenonException1() throws Exception {
-        testException(new NoSuchXenonException("name", "message"));
-    }
-
-    @Test
-    public void testNoSuchXenonException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new NoSuchXenonException("name", "message", t), t);
-    }
-
-    @Test
     public void testNoSuchQueueException1() throws Exception {
         testException(new NoSuchQueueException("name", "message"));
     }
@@ -367,17 +341,6 @@ public class ExceptionsTest {
     public void testNoSuchQueueException2() throws Exception {
         Throwable t = new Throwable();
         testException(new NoSuchQueueException("name", "message", t), t);
-    }
-
-    @Test
-    public void testNoSuchSchedulerException1() throws Exception {
-        testException(new NoSuchSchedulerException("name", "message"));
-    }
-
-    @Test
-    public void testNoSuchSchedulerException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new NoSuchSchedulerException("name", "message", t), t);
     }
 
     @Test
@@ -411,17 +374,6 @@ public class ExceptionsTest {
     public void testUnknownPropertyException2() throws Exception {
         Throwable t = new Throwable();
         testException(new UnknownPropertyException("name", "message", t), t);
-    }
-
-    @Test
-    public void testUnsupportedIOOperationException1() throws Exception {
-        testException(new UnsupportedIOOperationException("name", "message"));
-    }
-
-    @Test
-    public void testUnsupportedIOOperationException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new UnsupportedIOOperationException("name", "message", t), t);
     }
 
     @Test

@@ -27,6 +27,8 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+
 /**
  * 
  */
@@ -37,6 +39,8 @@ public class JobDescriptionTest {
         new JobDescription();
     }
 
+    // TODO: split into seperate test
+    
     @Test
     public void test_setters_getters() throws Exception {
         JobDescription j = new JobDescription();

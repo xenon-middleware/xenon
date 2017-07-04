@@ -20,24 +20,24 @@ import java.util.List;
 import java.util.UUID;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.files.CopyOption;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.InvalidOptionsException;
-import nl.esciencecenter.xenon.files.Path;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.InvalidOptionsException;
+import nl.esciencecenter.xenon.filesystems.Path;
 
 /**
  * Sandbox represents a (possibly remote and usually temporary) directory used for running jobs. 
  * <p>
  * A Sandbox is created before the job is started. The input files (or directories) necessary to run the job are then
  * added to the Sandbox using {@link #addUploadFile(Path, String)}. Once all files have been added they can be uploaded to the 
- * Sandbox using {@link #upload(CopyOption...)}.
+ * Sandbox using {@link #upload(CopyMode...)}.
  * </p><p>
  * Similarly, the output files (or directories) produced by the job can be registered with the Sandbox using 
  * {@link #addDownloadFile(String, Path)}. These may be added before or after the job runs. 
  * </p><p>
  * Next the job is run using the sandbox as a working directory.
  * </p><p>
- * After the job has terminated, the output files can be downloaded using {@link #download(CopyOption...)}. 
+ * After the job has terminated, the output files can be downloaded using {@link #download(CopyMode...)}. 
  * </p><p>
  * Finally, the Sandbox can be deleted using {@link #delete()}. 
  * </p>       
@@ -189,7 +189,7 @@ public class Sandbox {
     }
 
     /**
-     * Returns the list of files that will be uploaded when calling {@link #upload(CopyOption []) upload}.
+     * Returns the list of files that will be uploaded when calling {@link #upload(CopyMode []) upload}.
      * 
      * @return list of files that will be uploaded.
      */
@@ -251,7 +251,7 @@ public class Sandbox {
     }
 
     /**
-     * Returns the list of files that will be downloaded when calling {@link #download(CopyOption []) download}.
+     * Returns the list of files that will be downloaded when calling {@link #download(CopyMode []) download}.
      * 
      * @return list of files that will be downloaded.
      */
@@ -284,9 +284,10 @@ public class Sandbox {
         downloadFiles.add(new Pair(targetFS, path.resolve(source), sourceFS, dest));
     }
 
-    private void copy(List<Pair> pairs, CopyOption option) throws XenonException {
+    private void copy(List<Pair> pairs, CopyMode option) throws XenonException {
         for (Pair pair : pairs) {
-            FileSystemUtil.recursiveCopy(pair.sourceFS, pair.source, pair.destinationFS, pair.destination, option);
+        	// TODO: reimplement!
+        	// FileSystemUtil.recursiveCopy(pair.sourceFS, pair.source, pair.destinationFS, pair.destination, option);
         }
     }
 
@@ -296,13 +297,13 @@ public class Sandbox {
      * Also creates sandbox directory if it does not exist yet.
      * 
      * @param options
-     *          the options to use while copying. See {@link CopyOption} for details.
+     *          the options to use while copying. See {@link CopyMode} for details.
      * @throws InvalidOptionsException
      *           if an invalid combination of options is used.
      * @throws XenonException
      *           if an I/O error occurs during the copying
      */
-    public void upload(CopyOption option) throws XenonException {
+    public void upload(CopyMode option) throws XenonException {
     	
         if (!targetFS.exists(path)) {
             targetFS.createDirectory(path);
@@ -315,13 +316,13 @@ public class Sandbox {
      * Download files from sandbox.
      * 
      * @param options
-     *          the options to use while copying. See {@link CopyOption} for details.
+     *          the options to use while copying. See {@link CopyMode} for details.
      * @throws InvalidOptionsException
      *           if an invalid combination of options is used.
      * @throws XenonException
      *           if an I/O error occurs during the copying
      */
-    public void download(CopyOption option) throws XenonException {
+    public void download(CopyMode option) throws XenonException {
         copy(downloadFiles, option);
     }
 
@@ -332,7 +333,8 @@ public class Sandbox {
      *         if an I/O error occurs during deletion 
      */
     public void delete() throws XenonException {
-        FileSystemUtil.recursiveDelete(targetFS, path);
+    	// TODO: reimplement
+    	// FileSystemUtil.recursiveDelete(targetFS, path);
     }
     
     @Override

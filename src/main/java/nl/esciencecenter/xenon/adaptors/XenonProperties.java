@@ -25,7 +25,8 @@ import java.util.Map.Entry;
 
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
-//import nl.esciencecenter.xenon.util.Utils;
+import nl.esciencecenter.xenon.schedulers.InvalidPropertyException;
+import nl.esciencecenter.xenon.schedulers.UnknownPropertyException;
 
 /**
  * Read-only properties implementation. Also contains some utility functions for getting typed properties.

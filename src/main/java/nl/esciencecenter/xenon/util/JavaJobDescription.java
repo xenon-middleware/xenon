@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import nl.esciencecenter.xenon.XenonRuntimeException;
-import nl.esciencecenter.xenon.jobs.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 /**
  * A JobDescription specialized in Java applications. 

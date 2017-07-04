@@ -15,35 +15,38 @@
  */
 package nl.esciencecenter.xenon.adaptors.shared.local;
 
-import static nl.esciencecenter.xenon.adaptors.file.file.LocalFileAdaptor.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor.ADAPTOR_NAME;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.LinkOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFileAttributeView;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.InvalidCredentialException;
-import nl.esciencecenter.xenon.adaptors.InvalidLocationException;
-import nl.esciencecenter.xenon.adaptors.job.local.CommandRunner;
+import nl.esciencecenter.xenon.adaptors.schedulers.local.CommandRunner;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
-import nl.esciencecenter.xenon.files.DirectoryNotEmptyException;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.NoSuchPathException;
-import nl.esciencecenter.xenon.files.OpenOption;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.files.PosixFilePermission;
+import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
+import nl.esciencecenter.xenon.filesystems.PathAttributes;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
+import nl.esciencecenter.xenon.schedulers.InvalidCredentialException;
+import nl.esciencecenter.xenon.schedulers.InvalidLocationException;
 
 /**
  * LocalUtils contains various utilities for local file operations.
@@ -306,6 +309,84 @@ public class LocalUtil {
         return FileSystems.getDefault().getPath(root, relPath.getAbsolutePath());
     }
 
+    public static List<PathAttributes> listDirectory(FileSystem fs, Path dir) throws XenonException {
+
+    	try { 
+    		ArrayList<PathAttributes> result = new ArrayList<>();
+
+    		DirectoryStream<java.nio.file.Path> s = java.nio.file.Files.newDirectoryStream(LocalUtil.javaPath(fs, dir));
+
+    		for (java.nio.file.Path p : s) {
+    			result.add(getLocalFileAttributes(dir.resolve(p.getFileName().toString()), p));
+    		}
+    		
+    		return result;
+    	} catch (IOException e) {
+    		throw new XenonException(ADAPTOR_NAME, "Failed to list directory: " + dir, e);
+		}
+    }
+    
+    public static PathAttributes getLocalFileAttributes(FileSystem fs, Path path) throws XenonException {
+    	return getLocalFileAttributes(path, javaPath(fs, path));
+    }
+
+    public static PathAttributes getLocalFileAttributes(Path p, java.nio.file.Path path) throws XenonException {
+    	try {
+            PathAttributes result = new PathAttributes();
+            
+            result.setPath(p);
+            result.setExecutable(java.nio.file.Files.isExecutable(path));
+            result.setReadable(java.nio.file.Files.isReadable(path));
+            result.setReadable(java.nio.file.Files.isWritable(path));
+            
+            boolean isWindows = LocalUtil.isWindows(); 
+
+            BasicFileAttributes basicAttributes;
+            
+            if (isWindows) {                
+                // TODO: Seems to fail in Windows ?
+                result.setHidden(false);
+                
+                // These should always work.
+                basicAttributes = java.nio.file.Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+                
+//               // These are windows only.
+//                AclFileAttributeView aclAttributes = Files.getFileAttributeView(javaPath, AclFileAttributeView.class, 
+//                        LinkOption.NOFOLLOW_LINKS);
+                
+            } else {
+            	result.setHidden(java.nio.file.Files.isHidden(path));
+                
+                // Note: when in a posix environment, basicAttributes point to posixAttributes.
+            	 java.nio.file.attribute.PosixFileAttributes posixAttributes = java.nio.file.Files.readAttributes(path,
+            			 java.nio.file.attribute.PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+                
+                basicAttributes = posixAttributes;
+    
+                result.setOwner(posixAttributes.owner().getName());
+                result.setGroup(posixAttributes.group().getName());
+                result.setPermissions(LocalUtil.xenonPermissions(posixAttributes.permissions()));
+            }
+            
+            result.setCreationTime(basicAttributes.creationTime().toMillis());
+            result.setLastAccessTime(basicAttributes.lastAccessTime().toMillis());
+            result.setLastModifiedTime(basicAttributes.lastModifiedTime().toMillis());
+            
+            result.setDirectory(basicAttributes.isDirectory());
+            result.setRegular(basicAttributes.isRegularFile());
+            result.setSymbolicLink(basicAttributes.isSymbolicLink());
+            result.setOther(basicAttributes.isOther());
+            
+            if (result.isRegular()) { 
+                result.setSize(basicAttributes.size());
+            } 
+            
+            return result;
+        } catch (IOException e) {
+            throw new XenonException(ADAPTOR_NAME, "Cannot read attributes.", e);
+        }
+    }
+    
     public static Set<java.nio.file.attribute.PosixFilePermission> javaPermissions(Set<PosixFilePermission> permissions) {
         if (permissions == null) {
             return new HashSet<>(0);
@@ -333,38 +414,38 @@ public class LocalUtil {
 
         return result;
     }
-
-    public static java.nio.file.OpenOption[] javaOpenOptions(OpenOption[] options) {
-        ArrayList<java.nio.file.OpenOption> result = new ArrayList<>(options.length);
-
-        for (OpenOption opt : options) {
-            switch (opt) {
-            case CREATE:
-                result.add(StandardOpenOption.CREATE_NEW);
-                break;
-            case OPEN:
-            case OPEN_OR_CREATE:
-                result.add(StandardOpenOption.CREATE);
-                break;
-            case APPEND:
-                result.add(StandardOpenOption.APPEND);
-                break;
-            case TRUNCATE:
-                result.add(StandardOpenOption.TRUNCATE_EXISTING);
-                break;
-            case WRITE:
-                result.add(StandardOpenOption.WRITE);
-                break;
-            case READ:
-                result.add(StandardOpenOption.READ);
-                break;
-            default:
-                // No other options left         
-            }
-        }
-
-        return result.toArray(new java.nio.file.OpenOption[result.size()]);
-    }
+//
+//    public static java.nio.file.OpenOption[] javaOpenOptions(OpenOption[] options) {
+//        ArrayList<java.nio.file.OpenOption> result = new ArrayList<>(options.length);
+//
+//        for (OpenOption opt : options) {
+//            switch (opt) {
+//            case CREATE:
+//                result.add(StandardOpenOption.CREATE_NEW);
+//                break;
+//            case OPEN:
+//            case OPEN_OR_CREATE:
+//                result.add(StandardOpenOption.CREATE);
+//                break;
+//            case APPEND:
+//                result.add(StandardOpenOption.APPEND);
+//                break;
+//            case TRUNCATE:
+//                result.add(StandardOpenOption.TRUNCATE_EXISTING);
+//                break;
+//            case WRITE:
+//                result.add(StandardOpenOption.WRITE);
+//                break;
+//            case READ:
+//                result.add(StandardOpenOption.READ);
+//                break;
+//            default:
+//                // No other options left         
+//            }
+//        }
+//
+//        return result.toArray(new java.nio.file.OpenOption[result.size()]);
+//    }
 
     /*
      * @param path
