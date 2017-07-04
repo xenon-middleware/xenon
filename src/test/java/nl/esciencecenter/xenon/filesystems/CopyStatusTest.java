@@ -1,4 +1,4 @@
-package nl.esciencecenter.xenon.files;
+package nl.esciencecenter.xenon.filesystems;
 
 import org.junit.Test;
 

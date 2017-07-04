@@ -22,11 +22,13 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
@@ -38,7 +40,6 @@ import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.Deadline;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
-import nl.esciencecenter.xenon.schedulers.InvalidAdaptorException;
 import nl.esciencecenter.xenon.schedulers.InvalidCredentialException;
 import nl.esciencecenter.xenon.schedulers.InvalidLocationException;
 import nl.esciencecenter.xenon.schedulers.InvalidPropertyException;
@@ -61,9 +62,7 @@ public abstract class FileSystem {
     /** The default buffer size */
     private static final int BUFFER_SIZE = 4 * 1024;
    
-	private static final HashMap<String, FileAdaptor> adaptors = new HashMap<>();
-
-	//	private static final CopyEngine copyEngine = new CopyEngine();
+	private static final HashMap<String, FileAdaptor> adaptors = new LinkedHashMap<>();
 
 	static { 
 		/** Load all supported file adaptors */
@@ -93,7 +92,14 @@ public abstract class FileSystem {
 	}
 
 	public static String [] getAdaptorNames() {
-		return null;
+		
+		ArrayList<String> tmp = new ArrayList<>();
+		
+		for (FileAdaptor a : adaptors.values()) { 
+			tmp.add(a.getName());
+		}
+		
+		return tmp.toArray(new String[tmp.size()]);
 	}
 
 	public static FileSystemAdaptorDescription getAdaptorDescription(String adaptorName) {
@@ -153,7 +159,12 @@ public abstract class FileSystem {
 		return create(type, null);
 	}
 
-	private class CopyOperation implements CopyHandle {
+	interface CopyCallback { 
+		boolean setBytesToCopy(long bytes);
+		boolean setBytesCopied(long bytes);
+	}
+	
+	class CopyOperation implements CopyHandle, CopyCallback {
 		
 		private final String uniqueID;
 
@@ -189,7 +200,7 @@ public abstract class FileSystem {
 		public FileSystem getSourceFileSystem() {
 			return sourceFS;
 		}
-
+		
 		@Override
 		public Path getSourcePath() {
 			return source;
@@ -231,12 +242,14 @@ public abstract class FileSystem {
 			return cancel;
 		}
 
-		private synchronized void setBytesToCopy(long bytesToCopy) {
+		public synchronized boolean setBytesToCopy(long bytesToCopy) {
 			this.bytesToCopy = bytesToCopy;
+			return !cancel;
 		}
 
-		private synchronized void setBytesCopied(long bytesCopied) {
+		public synchronized boolean setBytesCopied(long bytesCopied) {
 			this.bytesCopied = bytesCopied;
+			return !cancel;
 		}
 
 		private synchronized void setRunning() {
@@ -244,8 +257,9 @@ public abstract class FileSystem {
 		}
 		
 		private synchronized void setDone(Exception e) {
-			if (exception == null) { 
+			if (e == null) { 
 				this.state = "DONE";
+				this.exception = null;
 			} else { 
 				this.state = "FAILED";
 				this.exception = e;
@@ -699,11 +713,25 @@ public abstract class FileSystem {
 	public abstract void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException;
 
 	/**
-	 * Copy an existing source file or symbolic link to a target file.
+	 * Copy an existing source path to a target path on a different file system.
 	 * 
-	 * @param description
-	 *            a description of the copy to perform.
-
+	 * If the source path is a file, it will be copied to the destination file on the target file system.
+	 * 
+	 * If the source path is a directory, it will only be copied if <code>recursive</code> is set to <code>true</code>. 
+	 * Otherwise, an exception will be thrown. When copying recursively, the directory and its content (both files 
+	 * and subdirectories with content), will be copied to <code>destination</code>.
+	 * 
+	 * @param source
+	 *            the source path (on this filesystem) to copy from.
+	 * @param destinationFS
+	 *            the destination filesystem to copy to.
+	 * @param destination
+	 *            the destination path (on the destination filesystem) to copy to.
+	 * @param mode
+	 *            how to react if the destination already exists.
+	 * @param recursive
+	 *            if the copy should be recursive.
+	 *
 	 * @return a {@link CopyHandle} that can be used to inspect the status of the copy.
 	 * 
 	 * @throws NoSuchPathException
@@ -722,6 +750,18 @@ public abstract class FileSystem {
 	 */
 	public synchronized CopyHandle copy(Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive) throws XenonException { 
 
+		if (source == null) { 
+			throw new IllegalArgumentException("Source path is null");
+		}
+
+		if (destinationFS == null) { 
+			throw new IllegalArgumentException("Destination filesystem is null");
+		}
+		
+		if (destination == null) { 
+			throw new IllegalArgumentException("Destination path is null");
+		}
+		
 		String ID = getNextCopyID(getAdaptorName() + "_TO_" + destinationFS.getAdaptorName() + "_");
 
 		CopyOperation o = new CopyOperation(ID, this, source, destinationFS, destination, mode, recursive);
@@ -735,6 +775,8 @@ public abstract class FileSystem {
 
 	private void performCopy(CopyOperation cop) { 
 
+		System.out.println("PERFORM COPY");
+		
 		long bytesToCopy = 0;
 		long bytesCopied = 0;
 
@@ -750,13 +792,17 @@ public abstract class FileSystem {
 		FileSystem destinationFS = cop.getDestinatonFileSystem();
 		Path destination = cop.getDestinationPath();
 
+		System.out.println("  COPY " + source + " to " + destination);
+		
 		CopyMode mode = cop.getMode();
 
 		try { 
 			PathAttributes attributes = getAttributes(source);
 
-			if (attributes.isRegular() || attributes.isSymbolicLink()) { 
-				copyFile(source, destinationFS, destination, mode);
+			if (attributes.isRegular() || attributes.isSymbolicLink()) {
+				System.out.println("  COPY FILE");
+				copyFile(source, destinationFS, destination, mode, cop);
+				cop.setDone(null);
 				return;
 			}
 
@@ -770,8 +816,18 @@ public abstract class FileSystem {
 				return;
 			}
 
+			System.out.println("  COPY DIR RECURSIVE");
+			
+			if (!destinationFS.exists(destination)) {
+				destinationFS.createDirectory(destination);
+			}
+
+			System.out.println("  LIST");
+			
 			List<PathAttributes> listing = list(source, true);
 
+			System.out.println("  CREATE DIRS");
+			
 			for (PathAttributes p : listing) { 
 
 				if (cop.isCancelled()) { 
@@ -779,30 +835,45 @@ public abstract class FileSystem {
 					return;
 				}
 				
-				if (p.isDirectory() && !isDotDot(p.getPath())) { 
-					Path dst = destination.resolve(p.getPath());
+				if (p.isDirectory() && !isDotDot(p.getPath())) {
+					
+					Path rel = source.relativize(p.getPath());
+					Path dst = destination.resolve(rel);
+					
+					System.out.println("CREATE DIRECTORIES: " + dst);
+					
 					destinationFS.createDirectories(dst);
 				} else if (p.isRegular()) { 
 					bytesToCopy += p.getSize();
 				}
 			}
 
+			System.out.println("  COPY FILES");
+			
 			cop.setBytesToCopy(bytesToCopy);
 
 			for (PathAttributes p : listing) { 
-
+				
 				if (cop.isCancelled()) { 
 					cop.setDone(new XenonException(getAdaptorName(), "Copy cancelled by user"));
 					return;
 				}
 
 				if (p.isRegular()) { 
-					Path dst = destination.resolve(p.getPath());
-					copyFile(p.getPath(), destinationFS, dst, mode);;
+					
+					Path rel = source.relativize(p.getPath());
+					Path dst = destination.resolve(rel);
+					
+					System.out.println("COPY FILES: " + rel + "  *** " + dst);
+					
+					copyFile(p.getPath(), destinationFS, dst, mode, cop);;
 					bytesCopied += p.getSize();
 					cop.setBytesCopied(bytesCopied);
 				}
 			}
+			
+			cop.setDone(null);
+			
 		} catch (XenonException e) {
 			cop.setDone(e);
 		}
@@ -858,6 +929,10 @@ public abstract class FileSystem {
 	 */
 	public CopyStatus getStatus(CopyHandle copy) throws XenonException { 
 		
+		if (copy == null) {
+			throw new IllegalArgumentException("CopyHandle is null");
+		}
+		
 		if (!(copy instanceof CopyOperation)) {
 			throw new NoSuchCopyException(getAdaptorName(), "No such copy!");
 		}
@@ -891,6 +966,10 @@ public abstract class FileSystem {
 	 */
 	public synchronized CopyStatus cancel(CopyHandle copy) throws XenonException { 
 
+		if (copy == null) {
+			throw new IllegalArgumentException("CopyHandle is null");
+		}
+		
 		if (!(copy instanceof CopyOperation)) {
 			throw new NoSuchCopyException(getAdaptorName(), "No such copy!");
 		}
@@ -962,13 +1041,23 @@ public abstract class FileSystem {
 		return ((CopyOperation) copy).waitUntilDone(timeout);
 	}
 
-	protected void streamCopy(InputStream in, OutputStream out, int buffersize) throws IOException {
+	protected void streamCopy(InputStream in, OutputStream out, int buffersize, CopyCallback callback) throws IOException, XenonException {
+		
 		byte[] buffer = new byte[buffersize];
 
+		long total = 0;
+		
 		int size = in.read(buffer);
 
 		while (size > 0) {
 			out.write(buffer, 0, size);
+			
+			total += size;
+				
+			if (!callback.setBytesCopied(total)) { 
+				throw new XenonException(getAdaptorName(), "Copy cancelled by user");
+			}
+			
 			size = in.read(buffer);
 		}
 	}
@@ -1000,16 +1089,19 @@ public abstract class FileSystem {
 	 * @throws XenonException.
 	 *      If the file could not be copied.
 	 */    
-	protected void copyFile(Path source, FileSystem destinationFS, Path destination, CopyMode mode) throws XenonException {
+	protected void copyFile(Path source, FileSystem destinationFS, Path destination, CopyMode mode, CopyCallback callback) throws XenonException {
+
+		System.out.println("COPY FILE "+ source + " " + destinationFS + " " + destination);
 
 		PathAttributes attributes = getAttributes(source);
 
-		if (!attributes.isRegular()) { 
+		// TODO: is this correct for links ?
+		if (!attributes.isRegular() && !attributes.isSymbolicLink()) { 
 			throw new InvalidPathException(getAdaptorName(), "Source is not a regular file: " + source);
-		}
+		} 
 
 		destinationFS.assertParentDirectoryExists(destination);
-
+		
 		if (destinationFS.exists(destination)) { 
 			switch (mode) { 
 			case CREATE:
@@ -1022,12 +1114,23 @@ public abstract class FileSystem {
 			}
 		} 
 
+		System.out.println("COPY FILE START STREAM");
+		
+		boolean oke = callback.setBytesToCopy(attributes.getSize());
+		
+		if (!oke) { 
+			throw new XenonException(getAdaptorName(), "Copy cancelled by user");
+		}
+		
 		try (InputStream in = readFromFile(source); 
 				OutputStream out = destinationFS.writeToFile(destination, attributes.getSize())) { 
-			streamCopy(in, out, BUFFER_SIZE);
-		} catch (IOException e) {
+			streamCopy(in, out, BUFFER_SIZE, callback);
+		} catch (Exception e) {
+			System.out.println("COPY FAILED " + e);
 			throw new XenonException(getAdaptorName(), "Stream copy failed", e);	
 		}
+		
+		System.out.println("COPY DONE");
 	}
 
 
@@ -1102,12 +1205,13 @@ public abstract class FileSystem {
 	protected void list(Path dir, ArrayList<PathAttributes> list, boolean recursive) throws XenonException {
 
 		List<PathAttributes> tmp = listDirectory(dir);
+		
 		list.addAll(tmp);
 
 		if (recursive) { 
-			for (PathAttributes current : tmp) { 
+			for (PathAttributes current : tmp) {
 				// traverse subdirs provided they are not "." or "..". 
-				if (current.isDirectory() && !isDotDot(dir)) { 
+				if (current.isDirectory() && !isDotDot(current.getPath())) { 
 					list(dir.resolve(current.getPath().getFileNameAsString()), list, recursive);
 				}
 			}
@@ -1115,24 +1219,44 @@ public abstract class FileSystem {
 	}
 
 	protected void assertPathExists(Path path) throws XenonException {
+		
+		if (path == null) { 
+			throw new IllegalArgumentException("Path is null");
+		}
+		
 		if (!exists(path)) { 
 			throw new NoSuchPathException(getAdaptorName(), "Path does not exist: " + path);
 		}   	
 	}
 
 	protected void assertPathNotExists(Path path) throws XenonException {
+
+		if (path == null) { 
+			throw new IllegalArgumentException("Path is null");
+		}
+		
 		if (exists(path)) {
 			throw new PathAlreadyExistsException(getAdaptorName(), "File already exists: " + path);
 		}
 	}
 
 	protected void assertPathIsFile(Path path) throws XenonException {
+		
+		if (path == null) { 
+			throw new IllegalArgumentException("Path is null");
+		}
+		
 		if (!getAttributes(path).isRegular()) { 
 			throw new InvalidPathException(getAdaptorName(), "Path is not a file: " + path);
 		}
 	}
 
 	protected void assertPathIsDirectory(Path path) throws XenonException {
+
+		if (path == null) { 
+			throw new IllegalArgumentException("Path is null");
+		}
+
 		if (!getAttributes(path).isDirectory()) { 
 			throw new InvalidPathException(getAdaptorName(), "Path is not a directory: " + path);
 		}
@@ -1149,6 +1273,11 @@ public abstract class FileSystem {
 	}
 
 	protected void assertParentDirectoryExists(Path path) throws XenonException {
+		
+		if (path == null) { 
+			throw new IllegalArgumentException("Path is null");
+		}
+		
 		Path parent = path.getParent();
 
 		if (parent == null) { 
@@ -1159,12 +1288,26 @@ public abstract class FileSystem {
 	}
 
 	protected boolean areSamePaths(Path source, Path target) {
+		
+		if (source == null) { 
+			throw new IllegalArgumentException("Source is null");
+		}
+
+		if (target == null) { 
+			throw new IllegalArgumentException("Target is null");
+		}
+		
 		Path sourceName = source.normalize();
 		Path targetName = target.normalize();
 		return sourceName.equals(targetName);
 	}
 
 	protected boolean isDotDot(Path path) {
+		
+		if (path == null) { 
+			throw new IllegalArgumentException("Path is null");
+		}
+
 		String filename = path.getFileNameAsString();
 		return ".".equals(filename) || "..".equals(filename);
 	}

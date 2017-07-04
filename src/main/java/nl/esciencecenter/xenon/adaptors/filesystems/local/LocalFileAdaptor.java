@@ -80,6 +80,11 @@ public class LocalFileAdaptor extends FileAdaptor {
 	public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
 		
 		checkFileLocation(location);
+		
+		if (location == null){ 
+			location = "/";
+		}
+		
 		LocalUtil.checkCredential(ADAPTOR_NAME, credential);
 
 		XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);

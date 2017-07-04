@@ -34,6 +34,9 @@ public class CopyStatus {
 		this.bytesToCopy = bytesToCopy;
 		this.bytesCopied = bytesCopied;
 		this.exception = exception;
+		
+		System.out.println("STATUS " +state + " " +bytesToCopy + " " + bytesCopied + " " + exception);
+		
 	}
 
 	/**

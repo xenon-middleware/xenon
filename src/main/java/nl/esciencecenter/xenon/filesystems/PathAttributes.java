@@ -321,4 +321,8 @@ public class PathAttributes {
 	public void setPermissions(Set<PosixFilePermission> permissions) {
 		this.permissions = permissions;
 	}   
+	
+	public String toString() { 
+		return path.getAbsolutePath();
+	}
 }

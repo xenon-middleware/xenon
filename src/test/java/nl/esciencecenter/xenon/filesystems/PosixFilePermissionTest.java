@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.esciencecenter.xenon.files;
+package nl.esciencecenter.xenon.filesystems;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

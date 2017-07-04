@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.exceptions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
@@ -40,7 +41,6 @@ import nl.esciencecenter.xenon.filesystems.NoSuchCopyException;
 import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
-import nl.esciencecenter.xenon.schedulers.InvalidAdaptorException;
 import nl.esciencecenter.xenon.schedulers.InvalidCredentialException;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.InvalidLocationException;
