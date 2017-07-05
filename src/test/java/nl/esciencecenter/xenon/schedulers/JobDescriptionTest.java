@@ -250,6 +250,58 @@ public class JobDescriptionTest {
     }
 
     @Test
+    public void test_hashCode3() throws Exception {
+
+        JobDescription j = new JobDescription();
+        j.setInteractive(true);
+        j.setWorkingDirectory("aap");
+        j.setQueueName("noot");
+        j.setStdout("stdout");
+        j.setStdin("stdin");
+        j.setStderr("stderr");
+        j.setExecutable("exec");
+        j.setStartSingleProcess(true);
+
+        String[] args = new String[] { "a", "b", "c" };
+        j.setArguments(args);
+
+        Map<String, String> env = new HashMap<>(3);
+        env.put("ENV1", "ARG1");
+        env.put("ENV2", "ARG2");
+        j.setEnvironment(env);
+
+        Map<String, String> opt = new HashMap<>(3);
+        opt.put("OPT1", "ARG1");
+        opt.put("OPT2", "ARG2");
+        j.setJobOptions(opt);
+
+        int hash = j.hashCode();
+
+        final int prime = 31;
+        int result = 1;
+
+        result = prime * result + Arrays.asList(args).hashCode();
+        result = prime * result + env.hashCode();
+        result = prime * result + "exec".hashCode();
+        result = prime * result + opt.hashCode();
+        result = prime * result + 1231;
+        result = prime * result + 15;
+        result = prime * result + 1;
+        result = prime * result + 1;
+        result = prime * result + "noot".hashCode();
+        result = prime * result + 1231;
+        //noinspection PointlessArithmeticExpression
+        result = prime * result + "stderr".hashCode();
+        result = prime * result + "stdin".hashCode();
+        //noinspection PointlessArithmeticExpression
+        result = prime * result + "stdout".hashCode();
+        result = prime * result + "aap".hashCode();
+
+        assertEquals(result, hash);
+    }
+
+    
+    @Test
     public void test_equals() throws Exception {
 
         JobDescription j = new JobDescription();
@@ -263,9 +315,12 @@ public class JobDescriptionTest {
 
         other.setInteractive(true);
         assertFalse(j.equals(other));
+        assertFalse(other.equals(j));
+        
         other.setInteractive(false);
         assertTrue(j.equals(other));
-
+        assertTrue(other.equals(j));
+        
         other.setMaxTime(42);
         assertFalse(j.equals(other));
         other.setMaxTime(15);
@@ -281,6 +336,11 @@ public class JobDescriptionTest {
         other.setProcessesPerNode(1);
         assertTrue(j.equals(other));
 
+        other.setStartSingleProcess(true);
+        assertFalse(j.equals(other));
+        other.setStartSingleProcess(false);
+        assertTrue(j.equals(other));
+        
         other.setExecutable("aap");
         assertFalse(j.equals(other));
         other.setExecutable(null);

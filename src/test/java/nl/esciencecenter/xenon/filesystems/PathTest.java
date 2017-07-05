@@ -21,7 +21,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -29,6 +31,30 @@ import nl.esciencecenter.xenon.filesystems.Path;
 
 public class PathTest {
 
+	@Test
+	public void testStartsWithTrue() {
+		Path path = new Path("/aap/noot");
+		assertTrue(path.startsWith("/aap"));
+	}
+
+	@Test
+	public void testStartsWithFalse() {
+		Path path = new Path("/aap/noot");
+		assertFalse(path.startsWith("/noot"));
+	}
+	
+	@Test
+	public void testEndsWithTrue() {
+		Path path = new Path("/aap/noot");
+		assertTrue(path.endsWith("noot"));
+	}
+
+	@Test
+	public void testEndsWithFalse() {
+		Path path = new Path("/aap/noot");
+		assertFalse(path.endsWith("aap"));
+	}
+	
     @Test
     public void testRelativePath1a() {
         Path path = new Path();
@@ -356,6 +382,12 @@ public class PathTest {
         }
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void testSubpathFails() {
+        doSubPath(new String[] { "a", "b", "c" }, 1, 1, new String[] { "a" });
+    }
+
+    
     @Test
     public void testSubpath_First() {
         doSubPath(new String[] { "a", "b", "c" }, 0, 1, new String[] { "a" });
@@ -822,6 +854,64 @@ public class PathTest {
 
         assertNull(p2);
     }
+
+    @Test
+    public void test_create_eltNull() {
+
+    	List<String> elt = null;
+    	Path p = new Path('/', elt);
+    	assertTrue(p.isEmpty());
+    }
+
+    @Test
+    public void test_copyNull() {
+    	Path t = new Path((Path [])null);
+    	assertTrue(t.isEmpty());
+    }
+    
+    @Test
+    public void test_copyNullIndirect() {
+    	Path p = null;
+    	Path t = new Path(p);
+    	assertTrue(t.isEmpty());
+    }
+
+    @Test
+    public void test_copyEmptyArray() {
+    	Path [] p = new Path[0];
+    	Path t = new Path(p);
+    	assertTrue(t.isEmpty());
+    }
+    
+    @Test
+    public void test_copyArrayWithEmpty() {
+    	
+    	Path [] p = new Path[3];
+    	p[0] = new Path("aap");
+    	p[1] = null;
+    	p[2] = new Path("noot");
+    	
+    	Path t = new Path(p);
+    	assertEquals(new Path("/aap/noot"), t);
+    }
+
     
 
+    @Test
+    public void test_hashcode() {
+        Path p1 = new Path("/aap/noot");
+        
+        List<String> elements = new ArrayList<>();
+        elements.add("aap");
+        elements.add("noot");
+    
+        char separator = '/';
+        
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + elements.hashCode();
+        result = prime * result + separator;
+        
+        assertEquals(result, p1.hashCode());
+    }
 }
