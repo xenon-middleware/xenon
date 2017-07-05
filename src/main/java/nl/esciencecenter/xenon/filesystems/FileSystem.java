@@ -32,11 +32,11 @@ import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
-import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
+import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor;
+import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor;
-import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.Deadline;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
@@ -101,13 +101,21 @@ public abstract class FileSystem {
 		
 		return tmp.toArray(new String[tmp.size()]);
 	}
-
-	public static FileSystemAdaptorDescription getAdaptorDescription(String adaptorName) {
-		return null;
+	
+	public static FileSystemAdaptorDescription getAdaptorDescription(String adaptorName) throws XenonException {
+		return getAdaptorByName(adaptorName).getAdaptorDescription();
 	}
 
-	public static FileSystemAdaptorDescription [] getAdaptorDescriptions() {
-		return null;
+	public static FileSystemAdaptorDescription [] getAdaptorDescriptions() throws XenonException {
+		String [] names = getAdaptorNames();
+		
+		FileSystemAdaptorDescription[] result = new FileSystemAdaptorDescription[names.length];
+		
+		for (int i=0;i<names.length;i++) { 
+			result[i] = getAdaptorDescription(names[i]);
+		}
+		
+		return result;
 	}
 
 	/**

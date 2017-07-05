@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.jobs;
+package nl.esciencecenter.xenon.schedulers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -39,6 +39,15 @@ public class JobDescriptionTest {
         new JobDescription();
     }
 
+    @Test
+    public void test_copy() throws Exception {
+        JobDescription jd = new JobDescription();
+        jd.setExecutable("aap");
+
+        JobDescription jd2 = new JobDescription(jd);
+        assertEquals("aap", jd2.getExecutable());
+    }
+    
     // TODO: split into seperate test
     
     @Test

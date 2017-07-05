@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
@@ -284,11 +285,16 @@ public class TestFileSystem extends FileSystem {
 	}
 	
 	private DirEntry root;
-	
-	public TestFileSystem(String uniqueID, String name, String location, Path entryPath) throws XenonException { 
-		super(uniqueID, name, location, entryPath, null);
+
+	public TestFileSystem(String uniqueID, String name, String location, Path entryPath, XenonProperties p) throws XenonException { 
+		super(uniqueID, name, location, entryPath, p);
 		root = new DirEntry("", getDirAttributes(new Path("/")));
 		ensureDirectories(entryPath);		
+	}
+
+	
+	public TestFileSystem(String uniqueID, String name, String location, Path entryPath) throws XenonException {
+		this(uniqueID,name,location, entryPath, null);
 	}
 		
 	public PathAttributes getDirAttributes(Path path) { 

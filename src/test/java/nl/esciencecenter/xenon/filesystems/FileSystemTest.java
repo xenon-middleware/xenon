@@ -1,5 +1,6 @@
 package nl.esciencecenter.xenon.filesystems;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -7,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -14,6 +16,10 @@ import org.junit.Test;
 
 import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
+import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
 
 public class FileSystemTest {
 
@@ -61,11 +67,11 @@ public class FileSystemTest {
 			this.initial = initial;
 			this.maxBytes = maxBytes;
 		}
-		
+
 		Callback(long maxBytes){ 
 			this.maxBytes = maxBytes;
 		}
-		
+
 		@Override
 		public boolean setBytesToCopy(long bytes) {
 			this.bytesToCopy = bytes;
@@ -218,25 +224,65 @@ public class FileSystemTest {
 	}
 
 	// Testing against actual FileSystem
-	
+
 	@Test
 	public void test_names() throws XenonException {
 		String [] tmp = FileSystem.getAdaptorNames();
 		String [] expected = new String [] { "file", "ftp", "sftp", "webdav" };
 		assertTrue(Arrays.equals(expected, tmp));
 	}
-	
-	
+
+	@Test
+	public void test_adaptorDescription() throws XenonException {
+
+		FileSystemAdaptorDescription d = FileSystem.getAdaptorDescription("file");
+
+		LocalFileAdaptor l = new LocalFileAdaptor();
+
+		assertEquals("file", l.getName());
+		assertEquals(LocalFileAdaptor.ADAPTOR_DESCRIPTION, d.getDescription());
+		assertArrayEquals(LocalFileAdaptor.ADAPTOR_LOCATIONS, d.getSupportedLocations());
+		assertArrayEquals(LocalFileAdaptor.VALID_PROPERTIES, d.getSupportedProperties());
+	}
+
+	@Test(expected=InvalidAdaptorException.class)
+	public void test_adaptorDescriptionFailsNull() throws XenonException {
+		FileSystem.getAdaptorDescription(null);
+	}
+
+	@Test(expected=InvalidAdaptorException.class)
+	public void test_adaptorDescriptionFailsEmpty() throws XenonException {
+		FileSystem.getAdaptorDescription("");
+	}
+
+	@Test(expected=InvalidAdaptorException.class)
+	public void test_adaptorDescriptionFailsUnknown() throws XenonException {
+		FileSystem.getAdaptorDescription("aap");
+	}
+
+	@Test
+	public void test_adaptorDescriptions() throws XenonException {
+
+		String [] names = FileSystem.getAdaptorNames();
+		FileSystemAdaptorDescription [] desc = FileSystem.getAdaptorDescriptions();
+
+		assertEquals(names.length, desc.length);
+
+		for (int i=0;i<names.length;i++) { 
+			assertEquals(FileSystem.getAdaptorDescription(names[i]), desc[i]);
+		}
+	}
+
 	@Test
 	public void test_create() throws XenonException {
 		FileSystem f = FileSystem.create("file");
-		
+
 		System.err.println("GOT ADAPTOR " + f.getAdaptorName());
-		
+
 		assertEquals("file", f.getAdaptorName());
 		f.close();
 	}
-	
+
 	@Test(expected=InvalidAdaptorException.class)
 	public void test_createFailsNull() throws XenonException {
 		FileSystem.create(null);
@@ -251,9 +297,9 @@ public class FileSystemTest {
 	public void test_createFailsUnknown() throws XenonException {
 		FileSystem.create("aap");
 	}
-	
+
 	// Testing against Fake FileSystem
-	
+
 	@Test(expected=IllegalArgumentException.class)
 	public void test_constructorIdNull() throws XenonException {
 		new TestFileSystem(null, "TEST", "MEM", new Path("/test"));
@@ -862,7 +908,7 @@ public class FileSystemTest {
 
 		f0.createFile(f);
 		f0.addInputStream(f, new CountJunkInputStream(1024*1024));
-		
+
 		// should cancel after 1 block ?
 		f0.copyFile(f, f1, f, CopyMode.CREATE, new Callback(4*1024));
 	}
@@ -878,7 +924,7 @@ public class FileSystemTest {
 
 		f0.createFile(f);
 		f0.addInputStream(f, new CountJunkInputStream(1024*1024));
-		
+
 		// should cancel after 1 block ?
 		f0.copyFile(f, f1, f, CopyMode.CREATE, new Callback(false, 4*1024));
 	}
@@ -1278,5 +1324,43 @@ public class FileSystemTest {
 	}
 
 
+	@Test
+	public void test_properties() throws Exception {
+		HashMap<String,String> p = new HashMap<>(); 
+		p.put("aap", "noot");
+
+		XenonPropertyDescription d = new XenonPropertyDescription("aap", Type.STRING, "empty", "test");
+		XenonProperties prop = new XenonProperties(new XenonPropertyDescription [] { d }, p);
+
+		TestFileSystem f = new TestFileSystem("0", "TEST0", "MEM", new Path("/test"), prop);
+		assertEquals(p, f.getProperties());
+
+	}
+	
+	
+	  @Test
+	  public void test_equalsTrueSelf() throws Exception {
+		  TestFileSystem f = new TestFileSystem("0", "TEST0", "MEM", new Path("/test"));
+		  assertTrue(f.equals(f));
+	  }
+
+	  @Test
+	  public void test_equalsTrueSameID() throws Exception {
+		  TestFileSystem f0 = new TestFileSystem("0", "TEST0", "MEM", new Path("/test"));
+		  TestFileSystem f1 = new TestFileSystem("0", "TEST0", "MEM", new Path("/test"));
+		  assertTrue(f0.equals(f1));
+	  }
+
+	  @Test
+	  public void test_equalsFalseNull() throws Exception {
+		  TestFileSystem f = new TestFileSystem("0", "TEST0", "MEM", new Path("/test"));
+		  assertFalse(f.equals(null));
+	  }
+
+	  @Test
+	  public void test_equalsFalseWrongType() throws Exception {
+		  TestFileSystem f = new TestFileSystem("0", "TEST0", "MEM", new Path("/test"));
+		  assertFalse(f.equals("hello"));
+	  }
 
 }
