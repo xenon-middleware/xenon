@@ -709,7 +709,7 @@ public class PathTest {
     public void testToString() {
         Path path = new Path("mydir/myfile");
         String path_as_string = path.toString();
-        assertEquals(path_as_string, "RelativePath [element=[mydir, myfile], seperator=/]");
+        assertEquals(path_as_string, "Path [element=[mydir, myfile], seperator=/]");
     }
 
     @Test
