@@ -116,12 +116,24 @@ public class Path implements Iterable<Path> {
             separator = DEFAULT_SEPARATOR;
         } else {
             elements = new ArrayList<>(paths.length);
+            
+            Character sep = null;
+            
             for (Path path : paths) {
                 if (path != null) {
                     elements.addAll(path.elements);
+                    
+                    if (sep == null) { 
+                    	sep = new Character(paths[0].separator);
+                    }
                 }
             }
-            separator = paths[0].separator;
+            
+            if (sep == null) { 
+            	separator = DEFAULT_SEPARATOR;
+            } else { 
+            	separator = sep.charValue();
+            }
         }
     }
 
