@@ -257,6 +257,9 @@ public abstract class Scheduler {
      * Get the queue names supported by this Scheduler.
      * 
      * @return the queue names supported by this Scheduler.
+     * 
+     * @throws XenonException
+     * 		       If an I/O error occurred.
      */
     public abstract String[] getQueueNames() throws XenonException;
     
@@ -389,6 +392,8 @@ public abstract class Scheduler {
      * 
      * @return an array of the resulting JobStatusses.
      * 
+     * @throws XenonException
+     *             If an I/O error occurred
      */
     public abstract JobStatus[] getJobStatuses(JobHandle... jobs) throws XenonException;
 

@@ -40,6 +40,7 @@ public class SchedulerAdaptorDescription extends AdaptorDescription {
      * TODO: rename isOnline to something like separateServer, supportsDetach, etc.
      * 
      * @return
+     * 		if this scheduler is online
      */
     public boolean isOnline() { 
     	return isOnline;
@@ -49,7 +50,7 @@ public class SchedulerAdaptorDescription extends AdaptorDescription {
      * Does this scheduler support batch jobs ?
      * 
      * @return
-     * 		if this scheduler supports bach jobs
+     * 		if this scheduler supports batch jobs
      */
     public boolean supportsBatch() { 
     	return supportsBatch;

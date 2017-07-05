@@ -571,8 +571,10 @@ public abstract class FileSystem {
 	 * 
 	 * @param dir
 	 *            the target directory.
+	 * @param recursive
+	 *            should the list recursively traverse the subdirectories ?
 	 * 
-	 * @return a {@link List} of {@PathAttributePair}s that iterates over all entries in the directory <code>dir</code>.
+	 * @return a {@link List} of {@link PathAttributes} that iterates over all entries in the directory <code>dir</code>.
 	 * 
 	 * @throws NoSuchPathException
 	 *             If a directory does not exists.
@@ -1024,7 +1026,7 @@ public abstract class FileSystem {
 	 * the copy operation is done.  
 	 * </p>
 	 * <p>
-	 * A {@link Copystatus} is returned that can be used to determine why the call returned.
+	 * A {@link CopyStatus} is returned that can be used to determine why the call returned.
 	 * </p>
 	 * @param copy
 	 *            a handle for the copy operation 
@@ -1087,6 +1089,8 @@ public abstract class FileSystem {
 	 * 		the destination file on the destination file system.
 	 * @param mode
 	 * 		selects what should happen if the target file exists
+	 * @param callback
+	 * 		a {@link CopyCallback} used to update the status of the copy, or cancel it while in progress.
 	 * 
 	 * @throws InvalidPathException 
 	 * 		if the provide source is not a regular file.
@@ -1094,7 +1098,7 @@ public abstract class FileSystem {
 	 * 		if the source file does not exist or the destination parent directory does not exist.
 	 * @throws PathAlreadyExistsException
 	 * 		if the destination file already exists.
-	 * @throws XenonException.
+	 * @throws XenonException
 	 *      If the file could not be copied.
 	 */    
 	protected void copyFile(Path source, FileSystem destinationFS, Path destination, CopyMode mode, CopyCallback callback) throws XenonException {
@@ -1153,7 +1157,7 @@ public abstract class FileSystem {
 	 * 		if the provide path is not a file.
 	 * @throws NoSuchPathException
 	 * 		if the provides file does not exist.
-	 * @throws XenonException.
+	 * @throws XenonException
 	 *      If the file could not be removed.
 	 */    
 	protected abstract void deleteFile(Path file) throws XenonException;
@@ -1165,7 +1169,7 @@ public abstract class FileSystem {
 	 * 
 	 * This operation must be implemented by the various implementations of FileSystem.
 	 * 
-	 * @param dir
+	 * @param path
 	 * 		the directory to remove
 	 * @throws DirectoryNotEmptyException
 	 * 		if the directory was not empty.
@@ -1173,7 +1177,7 @@ public abstract class FileSystem {
 	 * 		if the provide path is not a directory.
 	 * @throws NoSuchPathException
 	 * 		if the provides path does not exist.
-	 * @throws XenonException.
+	 * @throws XenonException
 	 *      If the directory could not be removed.
 	 */    
 	protected abstract void deleteDirectory(Path path) throws XenonException;

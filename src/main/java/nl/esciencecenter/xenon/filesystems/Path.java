@@ -23,7 +23,7 @@ import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 /**
- * RelativePath contains a sequence of path elements separated by a separator.
+ * Path contains a sequence of path elements separated by a separator.
  *
  * It is designed to be immutable.
  *
@@ -44,7 +44,7 @@ public class Path implements Iterable<Path> {
     /** Estimate of path element String length. */
     private static final int PATH_ELEMENT_LENGTH = 25;
 
-    private class RelativePathIterator implements Iterator<Path> {
+    private class PathIterator implements Iterator<Path> {
         private int index = 1;
 
         @Override
@@ -68,16 +68,16 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Create a new empty RelativePath using the default separator.
+     * Create a new empty Path using the default separator.
      */
     public Path() {
         this(DEFAULT_SEPARATOR, new ArrayList<String>(0));
     }
 
     /**
-     * Create a new RelativePath using the path and the default separator.
+     * Create a new Path using the path and the default separator.
      * 
-     * If <code>path</code> is <code>null</code> or an empty String, the resulting RelativePath is empty.
+     * If <code>path</code> is <code>null</code> or an empty String, the resulting Path is empty.
      * If <code>path</code> contains the separator it will be split into multiple elements. 
      * 
      * @param path
@@ -88,9 +88,9 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Create a new RelativePath using the given path elements and the default separator.
+     * Create a new Path using the given path elements and the default separator.
      * 
-     * If <code>elements</code> is <code>null</code> or an empty String array, the resulting RelativePath is empty.
+     * If <code>elements</code> is <code>null</code> or an empty String array, the resulting Path is empty.
      * 
      * Any elements that are <code>null</code> or an empty String will be ignored.
      * Any elements that contain the separator will be split into multiple elements. 
@@ -103,9 +103,9 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Create a new RelativePath by appending the provided <code>paths</code>.
+     * Create a new Path by appending the provided <code>paths</code>.
      * 
-     * If the <code>paths</code> is <code>null</code> the resulting RelativePath is empty.
+     * If the <code>paths</code> is <code>null</code> the resulting Path is empty.
      * 
      * @param paths
      *            the path elements to use.
@@ -138,9 +138,9 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Create a new RelativePath using the given path elements and the separator.
+     * Create a new Path using the given path elements and the separator.
      * 
-     * If the <code>elements</code> is <code>null</code> or an empty String array, the resulting RelativePath is empty.
+     * If the <code>elements</code> is <code>null</code> or an empty String array, the resulting Path is empty.
      * 
      * Otherwise, each of the elements will be parsed individually, splitting them into elements wherever a separator is
      * encountered. Elements that are <code>null</code> or contain an empty String are ignored.
@@ -155,9 +155,9 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Create a new RelativePath using the given path elements and the separator.
+     * Create a new Path using the given path elements and the separator.
      *
-     * If the <code>elements</code> is <code>null</code> or an empty String array, the resulting RelativePath is empty.
+     * If the <code>elements</code> is <code>null</code> or an empty String array, the resulting Path is empty.
      *
      * Otherwise, each of the elements will be parsed individually, splitting them into elements wherever a separator is
      * encountered. Elements that are <code>null</code> or contain an empty String are ignored.
@@ -192,9 +192,9 @@ public class Path implements Iterable<Path> {
         }
     }
     /**
-     * Get the file name, or <code>null</code> if the RelativePath is empty.
+     * Get the file name, or <code>null</code> if the Path is empty.
      * 
-     * The file name is the last element of the RelativePath.
+     * The file name is the last element of the Path.
      * 
      * @return the resulting file name or <code>null</code>.
      */
@@ -207,9 +207,9 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Get the file name as a <code>String</code>, or <code>null</code> if the RelativePath is empty.
+     * Get the file name as a <code>String</code>, or <code>null</code> if the Path is empty.
      * 
-     * The file name is the last element of the RelativePath.
+     * The file name is the last element of the Path.
      * 
      * @return the resulting file name or <code>null</code>.
      */
@@ -231,9 +231,9 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Get the parent RelativePath, or <code>null</code> if this RelativePath does not have a parent.
+     * Get the parent Path, or <code>null</code> if this Path does not have a parent.
      * 
-     * @return a RelativePath representing this RelativePaths parent.
+     * @return a Path representing this Paths parent.
      */
     public Path getParent() {
         if (isEmpty()) {
@@ -244,16 +244,16 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Get the number of name elements in the RelativePath.
+     * Get the number of name elements in the Path.
      * 
-     * @return the number of elements in the RelativePath, or 0 if this is empty.
+     * @return the number of elements in the Path, or 0 if this is empty.
      */
     public int getNameCount() {
         return elements.size();
     }
 
     /**
-     * Get a name element of this RelativePath.
+     * Get a name element of this Path.
      * 
      * @param index
      *            the index of the element
@@ -268,14 +268,14 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Returns a RelativePath that is a subsequence of the name elements of this path.
+     * Returns a Path that is a subsequence of the name elements of this path.
      * 
      * @param beginIndex
      *            the index of the first element, inclusive
      * @param endIndex
      *            the index of the last element, exclusive
      * 
-     * @return a new RelativePath that is a subsequence of the name elements in this path.
+     * @return a new Path that is a subsequence of the name elements in this path.
      * 
      * @throws IllegalArgumentException
      *             If beginIndex is larger than or equal to the endIndex.
@@ -291,15 +291,15 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Tests if this RelativePath starts with the given RelativePath.
+     * Tests if this Path starts with the given Path.
      * 
-     * This method returns <code>true</code> if this RelativePath starts with the name elements in the given RelativePath. If the 
-     * given RelativePath has more name elements than this path then false is returned.
+     * This method returns <code>true</code> if this Path starts with the name elements in the given Path. If the 
+     * given Path has more name elements than this path then false is returned.
      * 
      * @param other
-     *            the RelativePath to compare to.
+     *            the Path to compare to.
      * 
-     * @return If this RelativePath start with the name elements in the other RelativePath.
+     * @return If this Path start with the name elements in the other Path.
      */
     public boolean startsWith(Path other) {
         return other.elements.size() <= elements.size()
@@ -307,15 +307,15 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Tests if this RelativePath ends with the given RelativePath.
+     * Tests if this Path ends with the given Path.
      * 
-     * This method returns <code>true</code> if this RelativePath end with the name elements in the given RelativePath. If the 
-     * given RelativePath has more name elements than this RelativePath then false is returned.
+     * This method returns <code>true</code> if this Path end with the name elements in the given Path. If the 
+     * given Path has more name elements than this Path then false is returned.
      * 
      * @param other
-     *            the RelativePath to compare to.
+     *            the Path to compare to.
      * 
-     * @return If this RelativePath ends with the name elements in the other RelativePath.
+     * @return If this Path ends with the name elements in the other Path.
      */
     public boolean endsWith(Path other) {
         int offset = elements.size() - other.elements.size();
@@ -325,44 +325,44 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Tests if this RelativePath starts with the given RelativePath.
+     * Tests if this Path starts with the given Path.
      *
-     * This method converts <code>other</code> into a <code>RelativePath</code> using {@link #RelativePath(String)} and then uses 
-     * {@link #startsWith(Path)} to compare the result to this RelativePath.
+     * This method converts <code>other</code> into a <code>Path</code> using {@link #Path(String)} and then uses 
+     * {@link #startsWith(Path)} to compare the result to this Path.
      * 
      * @param other
      *            the path to test.
      * 
-     * @return If this RelativePath start with the name elements in <code>other</code>.
+     * @return If this Path start with the name elements in <code>other</code>.
      */
     public boolean startsWith(String other) {
         return startsWith(new Path(other));
     }
 
     /**
-     * Tests if this RelativePath ends with the given RelativePath.
+     * Tests if this Path ends with the given Path.
      * 
-     * This method converts the <code>other</code> into a <code>RelativePath</code> using {@link #RelativePath(String)} and then uses 
+     * This method converts the <code>other</code> into a <code>Path</code> using {@link #Path(String)} and then uses 
      * {@link #endsWith(Path)} to compare the result to this path.
      * 
      * @param other
      *            the path to test.
      * 
-     * @return If this RelativePath ends with the elements in <code>other</code>.
+     * @return If this Path ends with the elements in <code>other</code>.
      */
     public boolean endsWith(String other) {
         return endsWith(new Path(other));
     }
 
     /**
-     * Resolve a RelativePath against this RelativePath.
+     * Resolve a Path against this Path.
      * 
-     * Concatenates the path elements of this RelativePath with the
-     * <code>other</code> RelativePath.
+     * Concatenates the path elements of this Path with the
+     * <code>other</code> Path.
      * 
      * @param other
-     *            the RelativePath to concatenate with.
-     * @return concatenation of this RelativePath with the other
+     *            the Path to concatenate with.
+     * @return concatenation of this Path with the other
      */
     public Path resolve(Path other) {
         if (other == null || other.isEmpty()) {
@@ -378,14 +378,14 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Resolve a String containing a RelativePath against this path.
+     * Resolve a String containing a Path against this path.
      * 
-     * Converts the <code>other</code> into a <code>RelativePath</code> using {@link #RelativePath(String)} and then uses 
+     * Converts the <code>other</code> into a <code>Path</code> using {@link #Path(String)} and then uses 
      * {@link #resolve(Path)} to resolve the result against this path.
      * 
      * @param other
      *            the String to concatenate with.
-     * @return concatenation of this RelativePath with the other
+     * @return concatenation of this Path with the other
      */
     public Path resolve(String other) {
         if (other == null || other.isEmpty()) {
@@ -396,32 +396,32 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Is this RelativePath empty ?
+     * Is this Path empty ?
      * 
-     * @return If this RelativePath is empty.
+     * @return If this Path is empty.
      */
     public boolean isEmpty() {
         return elements.isEmpty();
     }
 
     /**
-     * Resolves the given RelativePath to this paths parent RelativePath, thereby creating a sibling to this RelativePath.
+     * Resolves the given Path to this paths parent Path, thereby creating a sibling to this Path.
      * 
-     * If this RelativePath is empty, <code>other</code> will be returned, unless other is <code>null</code> in which case an 
-     * empty RelativePath is returned.
+     * If this Path is empty, <code>other</code> will be returned, unless other is <code>null</code> in which case an 
+     * empty Path is returned.
      * 
-     * If this RelativePath is not empty, but <code>other</code> is <code>null</code> or empty, the parent of this RelativePath 
+     * If this Path is not empty, but <code>other</code> is <code>null</code> or empty, the parent of this Path 
      * will be returned. 
      *    
-     * If neither this RelativePath and other are empty, <code>getParent.resolve(other)</code> will be returned.
+     * If neither this Path and other are empty, <code>getParent.resolve(other)</code> will be returned.
      * 
      * @param other
-     *            the RelativePath to resolve as sibling.
+     *            the Path to resolve as sibling.
      * 
-     * @return a RelativePath representing the sibling.
+     * @return a Path representing the sibling.
      * 
      * @throws IllegalArgumentException
-     *             If the RelativePath can not be resolved as a sibling to this RelativePath.
+     *             If the Path can not be resolved as a sibling to this Path.
      */
     public Path resolveSibling(Path other) {
         if (isEmpty()) {
@@ -436,15 +436,15 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Create a relative RelativePath between the given RelativePath and this RelativePath.
+     * Create a relative Path between the given Path and this Path.
      * 
-     * Relativation is the inverse of resolving. This method returns a RelativePath that, when resolved against this RelativePath,
-     * results in the given RelativePath <code>other</code>.   
+     * Relativation is the inverse of resolving. This method returns a Path that, when resolved against this Path,
+     * results in the given Path <code>other</code>.   
      * 
      * @param other
-     *            the RelativePath to relativize.
+     *            the Path to relativize.
      * 
-     * @return a RelativePath representing a relative path between the given path and this path.
+     * @return a Path representing a relative path between the given path and this path.
      * 
      * @throws IllegalArgumentException
      *             If the path can not be relativized to this path.
@@ -471,22 +471,22 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Create an {@link Iterator} that returns all possible sub RelativePaths of this RelativePath, in order of increasing length.
+     * Create an {@link Iterator} that returns all possible sub Paths of this Path, in order of increasing length.
      * 
-     * For example, for the RelativePath "/a/b/c/d" the iterator returns "/a", "/a/b", "/a/b/c", "/a/b/c/d".
+     * For example, for the Path "/a/b/c/d" the iterator returns "/a", "/a/b", "/a/b/c", "/a/b/c/d".
      * 
      * @return the iterator.
      */
     public Iterator<Path> iterator() {
-        return new RelativePathIterator();
+        return new PathIterator();
     }
 
     /**
-     * Return a <code>String</code> representation of this RelativePath interpreted as a relative path.
+     * Return a <code>String</code> representation of this Path interpreted as a relative path.
      * 
      * A relative path does not start with a separator. 
      * 
-     * @return a String representation of this RelativePath interpreted as a relative path.
+     * @return a String representation of this Path interpreted as a relative path.
      */
     public String getRelativePath() {
         StringBuilder tmp = new StringBuilder(elements.size() * PATH_ELEMENT_LENGTH);
@@ -503,7 +503,7 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Return a <code>String</code> representation of this RelativePath interpreted as an absolute path.
+     * Return a <code>String</code> representation of this Path interpreted as an absolute path.
      * 
      * An absolute path starts with a separator. 
      * 
@@ -514,7 +514,7 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Normalize this RelativePath by removing as many redundant path elements as possible.
+     * Normalize this Path by removing as many redundant path elements as possible.
      * 
      * Redundant path elements are <code>"."</code> (indicating the current directory) and <code>".."</code> (indicating the
      * parent directory).
@@ -584,6 +584,6 @@ public class Path implements Iterable<Path> {
 
     @Override
     public String toString() {
-        return "RelativePath [element=" + elements + ", seperator=" + separator + "]";
+        return "Path [element=" + elements + ", seperator=" + separator + "]";
     }
 }

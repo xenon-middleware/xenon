@@ -45,28 +45,28 @@ public class FileAttributesTest {
 	}
 
 	@Test
-	public void test_owner() {
+	public void test_owner() throws Exception {
 		PathAttributes a = new PathAttributes();
 		a.setOwner("aap");
 		assertEquals("aap", a.getOwner());
 	}
 
 	@Test
-	public void test_group() {
+	public void test_group() throws Exception {
 		PathAttributes a = new PathAttributes();
 		a.setGroup("noot");
 		assertEquals("noot", a.getGroup());
 	}
 
 	@Test
-	public void test_permissions1() {
+	public void test_permissions1() throws Exception {
 		PathAttributes a = new PathAttributes();
 		a.setPermissions(null);
 		assertNull(a.getPermissions());
 	}
 	
 	@Test
-	public void test_permissions2() {
+	public void test_permissions2() throws Exception {
 		PathAttributes a = new PathAttributes();
 		
 		Set<PosixFilePermission> p = new HashSet<>();
