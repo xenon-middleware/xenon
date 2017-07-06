@@ -29,6 +29,8 @@ To filter the tests using Gradle's filtering mechanism, use the `docker.tests` p
 ./gradlew dockerIntegrationTest -Pdocker.uid=$UID -Pdocker.tests='*ftp*'
 ```
 
+The `docker.tests` property uses the same syntax as `--tests` described at https://docs.gradle.org/3.3/userguide/java_plugin.html#test_filtering
+
 ## against live systems
 
 To run the Xenon integration tests a configuration file called `./xenon.test.properties` is required. 
@@ -45,3 +47,5 @@ echo '' > xenon.test.properties
 mkdir build\integrationTest & cd build\integrationTest & src\integrationTest\resources\scripts\create_symlinks.bat & cd ..\..
 ./gradlew.bat check integrationTest -x prepareIntegrationTest -x testPropertiesFileExists --tests=*adaptors.local*
 ```
+
+See https://docs.gradle.org/3.3/userguide/java_plugin.html#test_filtering how to filter tests with `--tests`.
