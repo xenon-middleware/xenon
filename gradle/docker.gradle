@@ -80,40 +80,8 @@ task dockerIntegrationTest(type: DockerCompose, dependsOn: 'dockerTestCache') {
     finalizedBy 'dockerCleanup'
 }
 
-//  DOCKER BUILD SETUP
+//  DOCKER PULL and RUN
 // ====================
-
-def dockerImageRequirementsSpec = copySpec {
-    from('src/integrationTest/resources/scripts') {
-        include 'create_symlinks'
-    }
-    from(dockerDir) {
-        include 'insecure-ssh-keys/*'
-    }
-}
-task dockerCopyAlpineRequirements(type: Copy) {
-    with dockerImageRequirementsSpec
-    into dockerDir + '/xenon-alpine-base'
-}
-task dockerCopyPhusionRequirements(type: Copy) {
-    with dockerImageRequirementsSpec
-    into dockerDir + '/xenon-phusion-base'
-}
-task dockerCopyTorqueRequirements(type: Copy) {
-    with dockerImageRequirementsSpec
-    into dockerDir + '/xenon-torque'
-}
-
-task dockerCopyRequirements(dependsOn: [
-        dockerCopyAlpineRequirements,
-        dockerCopyPhusionRequirements,
-        dockerCopyTorqueRequirements
-    ]) {
-    description "Copy required files for building the docker containers."
-}
-
-//  DOCKER BUILD
-// ==============
 
 ext.testCacheSet = file('.docker-test-cache-set')
 
@@ -169,29 +137,6 @@ task dockerTestCacheCleanup(type: Exec, dependsOn: checkDockerPresence) {
     }
     commandLine 'docker', 'rm', dockerCacheContainerName
 }
-
-task dockerBuild(dependsOn: [checkDockerPresence, resetDockerTestCache, dockerCopyRequirements]) << {
-    println "Building docker images for: " + dockerImages
-    dockerImages.each { image ->
-        exec {
-            workingDir dockerDir
-            commandLine 'docker', 'build', '-t', 'nlesc/xenon-' + image, dockerDirectories[image]
-        }
-    }
-}
-dockerBuild.description = "Build Docker images from Dockerfile"
-dockerBuild.group = 'Docker'
-
-task dockerPush(dependsOn: checkDockerPresence) << {
-    println "Pushing docker images of: " + dockerImages
-    dockerImages.each { image ->
-        exec {
-            commandLine 'docker', 'push', 'nlesc/xenon-' + image
-        }
-    }
-}
-dockerPush.description = "Push Docker images to Dockerhub (run docker login first)"
-dockerPush.group = 'Docker'
 
 task dockerPull(dependsOn: checkDockerPresence) << {
     println "Pulling docker images of: " + dockerImages
