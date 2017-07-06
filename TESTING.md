@@ -49,3 +49,32 @@ mkdir build\integrationTest & cd build\integrationTest & src\integrationTest\res
 ```
 
 See https://docs.gradle.org/3.3/userguide/java_plugin.html#test_filtering how to filter tests with `--tests`.
+
+# fixed client environment tests
+
+Run tests which expect the client environment (like credentials and ssh agent) to be in a fixed state.
+
+Task will startup multiple docker containers: the servers with filesystems/schedulers to test against and a container (xenon-test) which has the current code mounted and runs the tests.
+
+
+Use script to start a Docker container which will run `./gradlew fixedClientEnvironmentTest` inside of it and start any Docker containers to tests against.
+```bash
+./src/fixedClientEnvironmentTest/resources/run-fixed-client-environment-test.sh
+```
+
+# Live tests
+
+Run tests against a (remote) system like a cluster with Slurm or an sftp server. 
+
+It is the user's responsibility to manage the live system. For example, if you want to test whether certain files 
+exist, you need to create them yourself. If you want to run the tests against the live system, you can run the `src/liveTest/resources/scripts/create_symlinks` script.
+
+To run tests you need the pass the `Scheduler.create` or `FileSystem.create` method arguments as command line arguments.
+```bash
+./gradlew liveTest -Dscheduler=slurm -Dlocation=das5.vu.nl -Dcredential=default DpropertiesFile=slurm-das5.props
+```
+
+To ignore test
+```bash
+./gradlew liveTest
+```

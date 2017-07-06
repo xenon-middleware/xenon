@@ -12,8 +12,6 @@ plugins {
     // ide
     id 'idea'
     id 'eclipse'
-    // integration tests
-    id 'org.hidetake.ssh' version '1.1.3'
     // code coverage
     id 'jacoco'
     // quality
@@ -23,10 +21,12 @@ plugins {
     // id 'org.ajoberstar.github-pages' version '1.3.2'
     // license
     id 'com.github.hierynomus.license' version '0.12.1'
+    // test sets
+    id 'org.unbroken-dome.test-sets' version '1.4.1'
 }
 
 apply from: 'gradle/common.gradle'
-apply from: 'gradle/integrationTest.gradle'
+apply from: 'gradle/test.gradle'
 apply from: 'gradle/codestyle.gradle'
 apply from: 'gradle/release.gradle'
 apply from: 'gradle/license.gradle'

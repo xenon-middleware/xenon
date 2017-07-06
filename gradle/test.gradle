@@ -1,0 +1,34 @@
+// Depends on plugins:
+//    id 'jacoco'
+
+//    COVERAGE
+// ==============
+
+// TODO upgrade gradle to 4.0 to get jacocoTestCoverageVerification task
+//jacocoTestCoverageVerification.group = 'Code coverage reporting'
+
+jacocoTestReport {
+    description 'Generate coverage report of unit tests'
+    group 'Code coverage reporting'
+}
+
+task jacocoIntegrationTestReport(type: JacocoReport) {
+    description 'Generate coverage report of integration tests'
+    group 'Code coverage reporting'
+    executionData integrationTest
+    sourceSets sourceSets.main
+}
+
+task jacocoFixedClientEnvironmentTestReport(type: JacocoReport) {
+    description 'Generate coverage report of fixed client environment tests'
+    group 'Code coverage reporting'
+    executionData fixedClientEnvironmentTest
+    sourceSets sourceSets.main
+}
+
+task jacocoLiveTestReport(type: JacocoReport) {
+    description 'Generate coverage report of live integration tests'
+    group 'Code coverage reporting'
+    executionData liveTest
+    sourceSets sourceSets.main
+}
