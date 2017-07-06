@@ -38,6 +38,9 @@ apply from: 'gradle/license.gradle'
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        url 'https://dl.bintray.com/palantir/releases' // docker-compose-rule is published on bintray
+    }
 }
 
 ext.sshjVersion = '0.21.1'
@@ -70,6 +73,15 @@ dependencies {
     testCompile group: 'org.hamcrest', name: 'hamcrest-core', version: '1.3'
     testCompile group: 'org.hamcrest', name: 'hamcrest-library', version: '1.3'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+
+    integrationTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.31.1'
+    // allow isolated and live tests to import from integration test,
+    // so abstract test classes and docker compose files can be extended and reused
+    fixedClientEnvironmentTestCompile sourceSets.integrationTest.output
+    liveTestCompile sourceSets.integrationTest.output
+    // TODO isolatedTest should have same dependencies as integrationTest,
+    // do no copy deps but append integrationTest.deps to fixedClientEnvironmentTest.deps
+    fixedClientEnvironmentTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.31.1'
 }
 
 task downloadCompileDependencies(type: Copy) {

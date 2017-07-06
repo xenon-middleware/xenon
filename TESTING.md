@@ -71,7 +71,11 @@ exist, you need to create them yourself. If you want to run the tests against th
 
 To run tests you need the pass the `Scheduler.create` or `FileSystem.create` method arguments as command line arguments.
 ```bash
-./gradlew liveTest -Dscheduler=slurm -Dlocation=das5.vu.nl -Dcredential=default DpropertiesFile=slurm-das5.props
+./gradlew liveTest -Dxenon.scheduler=slurm -Dxenon.location=das5.vu.nl -Dxenon.adaptors.slurm.strictHostKeyChecking=false
+./gradlew liveTest -Dxenon.scheduler=slurm -Dxenon.location=das5.vu.nl -Dxenon.username=username -Dxenon.password=password
+./gradlew liveTest -Dxenon.scheduler=slurm -Dxenon.location=das5.vu.nl -Dxenon.username=username -Dxenon.certfile=pathtocertfile [ -Dxenon.passphrase=passphrase ] 
+
+/gradlew liveTest -Dxenon.filesystem=sftp -Dxenon.location=localhost:10022  -Dxenon.username=xenon -Dxenon.password=javagat -Dxenon.adaptors.file.sftp.strictHostKeyChecking=false -Dxenon.adaptors.file.sftp.loadKnownHosts=false
 ```
 
 To ignore test

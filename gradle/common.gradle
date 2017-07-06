@@ -66,6 +66,7 @@ tasks.withType(Test) {
 task wrapper(type: Wrapper) {
     description 'Generates gradle wrapper'
     group 'Build Setup'
+    // TODO upgrade to >=4.0
     gradleVersion = '2.9'
 }
 

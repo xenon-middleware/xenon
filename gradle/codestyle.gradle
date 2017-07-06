@@ -18,7 +18,7 @@ pmd {
     ruleSetFiles = files("config/pmd/ruleset.xml")
 }
 
-testRuleSetFiles = files("config/pmd/test_ruleset.xml")
+def testRuleSetFiles = files("config/pmd/test_ruleset.xml")
 pmdTest.ruleSetFiles = testRuleSetFiles
 pmdIntegrationTest.ruleSetFiles = testRuleSetFiles
 pmdFixedClientEnvironmentTest.ruleSetFiles = testRuleSetFiles
