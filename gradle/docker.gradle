@@ -1,13 +1,3 @@
-//  DOCKER COMPOSE
-// ================
-
-task checkDockerComposePresence(type: Exec) {
-    description "Whether docker compose is installed and accessible from gradle"
-    executable 'docker-compose'
-    args = ['-v']
-    standardOutput = new ByteArrayOutputStream()
-}
-
 
 // TODO instead of running shell script to run fixed client env tests us a gradle task
 // Use our own previous solution or https://github.com/palantir/gradle-docker-test-runner

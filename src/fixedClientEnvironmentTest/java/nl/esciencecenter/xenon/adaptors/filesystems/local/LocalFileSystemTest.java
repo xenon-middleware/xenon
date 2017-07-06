@@ -11,7 +11,7 @@ import nl.esciencecenter.xenon.filesystems.Path;
 
 public class LocalFileSystemTest extends FileSystemTestParent {
     @Override
-    protected LocationConfig setupLocationConfig() {
+    protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
         return new LocationConfig() {
             @Override
             public Path getExistingPath() {

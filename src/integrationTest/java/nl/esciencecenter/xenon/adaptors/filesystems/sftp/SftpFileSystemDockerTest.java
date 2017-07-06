@@ -24,7 +24,7 @@ public class SftpFileSystemDockerTest extends SftpFileSystemTestParent {
         .build();
 
     @Override
-    protected LocationConfig setupLocationConfig() {
+    protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
         return new SftpLocationConfig();
     }
 

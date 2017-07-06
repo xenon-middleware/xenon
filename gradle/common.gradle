@@ -50,8 +50,6 @@ liveTest.outputs.upToDateWhen {
 
 check.dependsOn integrationTest
 integrationTest.mustRunAfter test
-integrationTest.dependsOn checkDockerComposePresence
-fixedClientEnvironmentTest.dependsOn checkDockerComposePresence
 
 // See progress of tests
 tasks.withType(Test) {

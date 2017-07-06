@@ -14,8 +14,8 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
 
 public class FileSystemTest extends FileSystemTestParent {
     @Override
-    protected LocationConfig setupLocationConfig() {
-        return new LiveLocationConfig();
+    protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
+        return new LiveLocationConfig(fileSystem);
     }
 
     @Override

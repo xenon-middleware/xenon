@@ -24,10 +24,10 @@ public abstract class FileSystemTestParent {
     public void setup() throws XenonException {
         fileSystem = setupFileSystem();
         description = setupDescription();
-        locationConfig = setupLocationConfig();
+        locationConfig = setupLocationConfig(fileSystem);
     }
 
-    protected abstract LocationConfig setupLocationConfig();
+    protected abstract LocationConfig setupLocationConfig(FileSystem fileSystem);
 
     @After
     public void cleanup() throws XenonException {

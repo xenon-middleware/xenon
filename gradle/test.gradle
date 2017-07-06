@@ -10,6 +10,9 @@
 jacocoTestReport {
     description 'Generate coverage report of unit tests'
     group 'Code coverage reporting'
+    reports {
+        xml.enabled = true // codecov depends on xml format report
+    }
 }
 
 task jacocoIntegrationTestReport(type: JacocoReport) {
@@ -17,6 +20,9 @@ task jacocoIntegrationTestReport(type: JacocoReport) {
     group 'Code coverage reporting'
     executionData integrationTest
     sourceSets sourceSets.main
+    reports {
+        xml.enabled = true // codecov depends on xml format report
+    }
 }
 
 task jacocoFixedClientEnvironmentTestReport(type: JacocoReport) {
@@ -24,6 +30,9 @@ task jacocoFixedClientEnvironmentTestReport(type: JacocoReport) {
     group 'Code coverage reporting'
     executionData fixedClientEnvironmentTest
     sourceSets sourceSets.main
+    reports {
+        xml.enabled = true // codecov depends on xml format report
+    }
 }
 
 task jacocoLiveTestReport(type: JacocoReport) {
