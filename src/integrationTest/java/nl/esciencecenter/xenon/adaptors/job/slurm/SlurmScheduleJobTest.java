@@ -24,12 +24,12 @@ import java.util.Map;
 
 import nl.esciencecenter.xenon.JobException;
 import nl.esciencecenter.xenon.adaptors.GenericScheduleJobTestParent;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.jobs.Job;
-import nl.esciencecenter.xenon.jobs.JobDescription;
-import nl.esciencecenter.xenon.jobs.JobStatus;
-import nl.esciencecenter.xenon.jobs.Scheduler;
-import nl.esciencecenter.xenon.jobs.Streams;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobHandle;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
+import nl.esciencecenter.xenon.schedulers.Streams;
 import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.AfterClass;
@@ -207,7 +207,7 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
         Scheduler s = null;
         try {
             Map<String, String> properties = new HashMap<>(2);
-            properties.put(SlurmProperties.DISABLE_ACCOUNTING_USAGE, "true");
+            properties.put(SlurmSchedulerAdaptor.DISABLE_ACCOUNTING_USAGE, "true");
             s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
                 config.getDefaultCredential(), properties);
 
@@ -237,12 +237,12 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
         Path root = initJobDirectory(workingDir);
 
         Scheduler s = null;
-        Job[] j = new Job[5];
-        Job[] jCopy = new Job[5];
+        JobHandle[] j = new JobHandle[5];
+        JobHandle[] jCopy = new JobHandle[5];
         try {
             //custom scheduler with accounting disabled
             Map<String, String> properties = new HashMap<>(2);
-            properties.put(SlurmProperties.DISABLE_ACCOUNTING_USAGE, "true");
+            properties.put(SlurmSchedulerAdaptor.DISABLE_ACCOUNTING_USAGE, "true");
             s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(),
                     config.getDefaultCredential(), properties);
 
@@ -292,7 +292,7 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
                     }
                 }
             }
-            for (Job j1 : jCopy) {
+            for (JobHandle j1 : jCopy) {
                 checkJobOutput(j1, root);
             }
         } finally {

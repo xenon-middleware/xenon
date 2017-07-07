@@ -371,8 +371,7 @@ public class JobQueueScheduler extends Scheduler {
 
         LOGGER.debug("{}: JobDescription verified OK", adaptorName);
 
-        JobImplementation result = new JobImplementation(this, adaptorName + "-" + jobID.getAndIncrement(), copyOfDescription,
-                copyOfDescription.isInteractive(), true);
+        JobImplementation result = new JobImplementation(this, adaptorName + "-" + jobID.getAndIncrement(), copyOfDescription);
 
         LOGGER.debug("{}: Created Job {}", adaptorName, result.getIdentifier());
 

@@ -21,10 +21,10 @@ import static org.junit.Assume.assumeTrue;
 import java.io.OutputStream;
 
 import nl.esciencecenter.xenon.adaptors.GenericScheduleJobTestParent;
-import nl.esciencecenter.xenon.files.OpenOption;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.jobs.JobDescription;
-import nl.esciencecenter.xenon.jobs.JobStatus;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystemystems.OpenOption;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
 
 import org.junit.*;
 import org.junit.runners.MethodSorters;

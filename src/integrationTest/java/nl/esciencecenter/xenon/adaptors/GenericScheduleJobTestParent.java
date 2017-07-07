@@ -32,18 +32,17 @@ import nl.esciencecenter.xenon.JobException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonTestWatcher;
-import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.OpenOption;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
-import nl.esciencecenter.xenon.jobs.Job;
-import nl.esciencecenter.xenon.jobs.JobCanceledException;
-import nl.esciencecenter.xenon.jobs.JobDescription;
-import nl.esciencecenter.xenon.jobs.JobStatus;
-import nl.esciencecenter.xenon.jobs.Jobs;
-import nl.esciencecenter.xenon.jobs.Scheduler;
-import nl.esciencecenter.xenon.jobs.Streams;
-import nl.esciencecenter.xenon.jobs.UnsupportedJobDescriptionException;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystemystems.Files;
+import nl.esciencecenter.xenon.filesystemystems.OpenOption;
+import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobHandle;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
+import nl.esciencecenter.xenon.schedulers.Streams;
+import nl.esciencecenter.xenon.schedulers.UnsupportedJobDescriptionException;
 import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.After;
@@ -70,7 +69,7 @@ public abstract class GenericScheduleJobTestParent {
     protected Files files;
     protected Jobs jobs;
     protected Scheduler scheduler;
-    protected Job job;
+    protected JobHandle job;
 
     protected Path testDir;
 
@@ -147,14 +146,14 @@ public abstract class GenericScheduleJobTestParent {
         }
     }
     
-    protected void checkJobOutput(Job job, Path root) throws XenonException, IOException {
+    protected void checkJobOutput(JobHandle job, Path root) throws XenonException, IOException {
         checkJobOutput(job, root, null, null);
     }
-    protected void checkJobOutput(Job job, Path root, String expectedStdout) throws XenonException, IOException {
+    protected void checkJobOutput(JobHandle job, Path root, String expectedStdout) throws XenonException, IOException {
         checkJobOutput(job, root, expectedStdout, null);
     }
     
-    protected void checkJobOutput(Job job, Path root, String expectedStdout, String expectedWindowsStdout) throws XenonException, IOException {
+    protected void checkJobOutput(JobHandle job, Path root, String expectedStdout, String expectedWindowsStdout) throws XenonException, IOException {
         if (job.getJobDescription().getStdout() != null) {
             String tmpout = readFile(root, job.getJobDescription().getStdout());
 
@@ -245,7 +244,7 @@ public abstract class GenericScheduleJobTestParent {
      * @param otherPaths other paths to remove
      * @throws XenonException if resolving path or delete fails
      */
-    protected void cleanupJob(Job job, Path root, Path... otherPaths) throws XenonException {
+    protected void cleanupJob(JobHandle job, Path root, Path... otherPaths) throws XenonException {
         XenonException cleanupFailed = null;
         Path[] allPaths = Arrays.copyOf(otherPaths, otherPaths.length + 2);
         if (job != null) {
@@ -520,7 +519,7 @@ public abstract class GenericScheduleJobTestParent {
 
         String workingDir = getWorkingDir(testName);
         Path root = initJobDirectory(workingDir);
-        Job[] j = new Job[jobCount];
+        JobHandle[] j = new JobHandle[jobCount];
 
         try {
             for (int i = 0; i < j.length; i++) {
@@ -592,7 +591,7 @@ public abstract class GenericScheduleJobTestParent {
         String workingDir = getWorkingDir("test34");
         Path root = initJobDirectory(workingDir);
 
-        Job[] tmpJobs = new Job[4];
+        JobHandle[] tmpJobs = new JobHandle[4];
         try {
             // Start uninteresting jobs, to make sure there is something on the queue.
             for (int i = 0; i < tmpJobs.length; i++) {
@@ -619,7 +618,7 @@ public abstract class GenericScheduleJobTestParent {
             Exception e = status.getException();
             assertTrue("Did not expect " + e + ": " + e.getMessage(), e instanceof JobCanceledException);
         } finally {
-            for (Job tmpJob : tmpJobs) {
+            for (JobHandle tmpJob : tmpJobs) {
                 if (tmpJob != null) jobs.cancelJob(tmpJob);
             }
             cleanupJob(job, root);
@@ -804,7 +803,7 @@ public abstract class GenericScheduleJobTestParent {
             return;
         }
 
-        Job[] j = new Job[] {
+        JobHandle[] j = new JobHandle[] {
             jobs.submitJob(scheduler, timedJobDescription(null, 1)),
             jobs.submitJob(scheduler, timedJobDescription(null, 2)),
         };

@@ -70,6 +70,15 @@ public class LocalFileSystem extends FileSystem {
 	}
 	
 	@Override
+	public void createSymbolicLink(Path link, Path path) throws XenonException {
+
+		assertPathNotExists(link);
+		assertParentDirectoryExists(link);
+
+		LocalUtil.createSymbolicLink(this, link, path);
+	}
+	
+	@Override
 	protected void deleteFile(Path path) throws XenonException {
 		LocalUtil.delete(this, path);
 	}

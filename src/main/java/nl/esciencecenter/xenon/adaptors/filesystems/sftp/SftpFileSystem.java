@@ -125,7 +125,15 @@ public class SftpFileSystem extends FileSystem {
 
 		LOGGER.debug("createFile OK");
 	}
-	   
+	
+	@Override
+	public void createSymbolicLink(Path link, Path path) throws XenonException {
+		try {
+			client.symLink(link.getAbsolutePath(), path.getAbsolutePath());
+		} catch (IOException e) {
+			sftpExceptionToXenonException(e, "Cannot create link: " + link + " -> "+ path);
+		}
+	}
 	@Override
 	protected void deleteFile(Path file) throws XenonException { 
 		try { 

@@ -19,6 +19,8 @@ import static org.junit.Assert.assertTrue;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.adaptors.job.ssh.SSHJobTestConfig;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
+import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.Test;
@@ -52,7 +54,7 @@ public class ITInterSchemeCopyTest {
         Path localFile = Utils.resolveWithRoot(files, localDir, "test");
         files.createFile(localFile);
         Path sshFile = Utils.resolveWithRoot(files, sshDir, "test");
-        files.copy(localFile, sshFile, CopyOption.CREATE);
+        files.copy(localFile, sshFile, CopyMode.CREATE);
 
         assertTrue(files.exists(localFile));
         assertTrue(files.exists(sshFile));
@@ -61,7 +63,7 @@ public class ITInterSchemeCopyTest {
         Path localFile2 = Utils.resolveWithRoot(files, localDir, "test2");
         Path sshFile2 = Utils.resolveWithRoot(files, sshDir, "test2");
         files.createFile(sshFile2);
-        files.copy(sshFile2, localFile2, CopyOption.CREATE);
+        files.copy(sshFile2, localFile2, CopyMode.CREATE);
 
         assertTrue(files.exists(localFile2));
         assertTrue(files.exists(sshFile2));

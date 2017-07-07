@@ -1,53 +1,42 @@
 package nl.esciencecenter.xenon.filesystems;
 
-import org.junit.Test;
-
-import nl.esciencecenter.xenon.filesystems.CopyHandle;
-import nl.esciencecenter.xenon.filesystems.CopyStatus;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import static org.mockito.Mockito.mock;
+import org.junit.Test;
 
 public class CopyStatusTest {
 
 	class FakeCopyHandle implements CopyHandle {
 		@Override
 		public FileSystem getSourceFileSystem() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException("Not implemented");
 		}
 
 		@Override
 		public Path getSourcePath() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException("Not implemented");			
 		}
 
 		@Override
 		public FileSystem getDestinatonFileSystem() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException("Not implemented");			
 		}
 
 		@Override
 		public Path getDestinationPath() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException("Not implemented");
 		}
 
 		@Override
 		public CopyMode getMode() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new RuntimeException("Not implemented");			
 		}
 
 		@Override
 		public boolean isRecursive() {
-			// TODO Auto-generated method stub
-			return false;
+			throw new RuntimeException("Not implemented");
 		}
 		
 		public String toString() { 

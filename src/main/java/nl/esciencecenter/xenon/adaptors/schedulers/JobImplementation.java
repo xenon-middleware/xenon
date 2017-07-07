@@ -27,11 +27,7 @@ public class JobImplementation implements JobHandle {
 
     private final String identifier;
 
-    private final boolean interactive;
-
-    private final boolean online;
-
-    public JobImplementation(Scheduler scheduler, String identifier, boolean interactive, boolean online) {
+    public JobImplementation(Scheduler scheduler, String identifier) {
 
         if (scheduler == null) {
             throw new IllegalArgumentException("Scheduler may not be null!");
@@ -44,14 +40,11 @@ public class JobImplementation implements JobHandle {
         this.description = null;
         this.scheduler = scheduler;
         this.identifier = identifier;
-        this.interactive = interactive;
-        this.online = online;
     }
 
-    public JobImplementation(Scheduler scheduler, String identifier, JobDescription description, boolean interactive,
-            boolean online) {
+    public JobImplementation(Scheduler scheduler, String identifier, JobDescription description) {
 
-        this(scheduler, identifier, interactive, online);
+        this(scheduler, identifier);
 
         if (description == null) {
             throw new IllegalArgumentException("JobDescription may not be null!");
@@ -76,19 +69,8 @@ public class JobImplementation implements JobHandle {
     }
 
     @Override
-    public boolean isInteractive() {
-        return interactive;
-    }
-
-    @Override
-    public boolean isOnline() {
-        return online;
-    }
-
-    @Override
     public String toString() {
-        return "JobImplementation [identifier=" + identifier + ", scheduler=" + scheduler + ", description=" + description
-                + ", isInteractive=" + isInteractive() + ", isOnline=" + online + "]";
+        return "JobImplementation [identifier=" + identifier + ", scheduler=" + scheduler + ", description=" + description + "]";
     }
 
     @Override

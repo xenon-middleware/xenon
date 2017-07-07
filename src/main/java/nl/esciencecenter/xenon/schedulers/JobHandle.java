@@ -56,7 +56,7 @@ public interface JobHandle {
      * 
      * @return if this is an interactive job.
      */
-    boolean isInteractive();
+    // boolean isInteractive();
 
     /**
      * Returns if this is an online job.
@@ -68,5 +68,5 @@ public interface JobHandle {
      * 
      * @return if this is an online job.
      */
-    boolean isOnline();
+    // boolean isOnline();
 }

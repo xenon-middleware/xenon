@@ -23,8 +23,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import nl.esciencecenter.xenon.Xenon;
-import nl.esciencecenter.xenon.jobs.Jobs;
-import nl.esciencecenter.xenon.jobs.Scheduler;
+import nl.esciencecenter.xenon.schedulers.Jobs;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 /**
  * @version 1.0

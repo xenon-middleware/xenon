@@ -32,12 +32,11 @@ import org.junit.Test;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.job.ssh.SSHJobTestConfig;
-import nl.esciencecenter.xenon.files.CopyOption;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.OpenOption;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.files.RelativePath;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystemystems.Files;
+import nl.esciencecenter.xenon.filesystemystems.OpenOption;
 import nl.esciencecenter.xenon.util.Utils;
 
 /**
@@ -67,7 +66,7 @@ public class SftpSamePathCopyTest {
     }
     
     public Path resolve(Path root, String... path) throws XenonException {
-        return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(new RelativePath(path)));
+        return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(new Path(path)));
     }
     
     // Depends on: newOutputStream
@@ -105,8 +104,8 @@ public class SftpSamePathCopyTest {
         FileSystem fs2 = files.newFileSystem("ssh", config.getCorrectLocation(), config.getDefaultCredential(), null);
         
         // Create to paths to /tmp, one local, one remote.
-        Path p1 = files.newPath(fs1, new RelativePath("/tmp"));
-        Path p2 = files.newPath(fs2, new RelativePath("/tmp"));
+        Path p1 = files.newPath(fs1, new Path("/tmp"));
+        Path p2 = files.newPath(fs2, new Path("/tmp"));
         
         // Resolve the src and target file names, and check if they exist.
         Path src = resolve(p1, name);
@@ -121,7 +120,7 @@ public class SftpSamePathCopyTest {
         writeData(src, sourceData);
         
         // Copy to the target
-        files.copy(src, target, CopyOption.CREATE);
+        files.copy(src, target, CopyMode.CREATE);
         
         // Check if target exists and contains the expected data.
         assertTrue("TARGET test file does not exist! " + target, files.exists(target));

@@ -35,23 +35,22 @@ import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.esciencecenter.xenon.InvalidLocationException;
-import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonTestWatcher;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
-import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.jobs.Job;
-import nl.esciencecenter.xenon.jobs.JobStatus;
-import nl.esciencecenter.xenon.jobs.Jobs;
-import nl.esciencecenter.xenon.jobs.NoSuchQueueException;
-import nl.esciencecenter.xenon.jobs.NoSuchSchedulerException;
-import nl.esciencecenter.xenon.jobs.QueueStatus;
-import nl.esciencecenter.xenon.jobs.Scheduler;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystemystems.Files;
+import nl.esciencecenter.xenon.schedulers.InvalidLocationException;
+import nl.esciencecenter.xenon.schedulers.InvalidPropertyException;
+import nl.esciencecenter.xenon.schedulers.JobHandle;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
+import nl.esciencecenter.xenon.schedulers.NoSuchSchedulerException;
+import nl.esciencecenter.xenon.schedulers.QueueStatus;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
+import nl.esciencecenter.xenon.schedulers.UnknownPropertyException;
 import nl.esciencecenter.xenon.util.Utils;
 
 /**
@@ -504,7 +503,7 @@ public abstract class GenericJobAdaptorTestParent {
     @Test
     public void test25b_getJobStatuses() throws Exception {
 
-        JobStatus[] tmp = jobs.getJobStatuses((Job[]) null);
+        JobStatus[] tmp = jobs.getJobStatuses((JobHandle[]) null);
 
         assertNotNull(tmp);
         assertEquals(0, tmp.length);
@@ -513,7 +512,7 @@ public abstract class GenericJobAdaptorTestParent {
     @Test
     public void test25c_getJobStatuses() throws Exception {
 
-        JobStatus[] tmp = jobs.getJobStatuses(new Job[1]);
+        JobStatus[] tmp = jobs.getJobStatuses(new JobHandle[1]);
 
         assertNotNull(tmp);
         assertEquals(1, tmp.length);

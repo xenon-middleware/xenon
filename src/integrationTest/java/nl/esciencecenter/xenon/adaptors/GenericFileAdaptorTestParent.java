@@ -43,26 +43,25 @@ import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.esciencecenter.xenon.InvalidCredentialException;
-import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonTestWatcher;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.files.PathAttributesPairImplementation;
-import nl.esciencecenter.xenon.files.Copy;
-import nl.esciencecenter.xenon.files.CopyOption;
-import nl.esciencecenter.xenon.files.CopyStatus;
-import nl.esciencecenter.xenon.files.DirectoryStream;
-import nl.esciencecenter.xenon.files.FileAttributes;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.FileSystemClosedException;
-import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.OpenOption;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.files.PathAttributesPair;
-import nl.esciencecenter.xenon.files.PosixFilePermission;
-import nl.esciencecenter.xenon.files.RelativePath;
+import nl.esciencecenter.xenon.filesystems.CopyHandle;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
+import nl.esciencecenter.xenon.filesystems.CopyStatus;
+import nl.esciencecenter.xenon.filesystems.PathAttributes;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.FileSystemClosedException;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
+import nl.esciencecenter.xenon.filesystemystems.DirectoryStream;
+import nl.esciencecenter.xenon.filesystemystems.Files;
+import nl.esciencecenter.xenon.filesystemystems.OpenOption;
+import nl.esciencecenter.xenon.filesystemystems.PathAttributesPair;
+import nl.esciencecenter.xenon.schedulers.InvalidCredentialException;
+import nl.esciencecenter.xenon.schedulers.InvalidLocationException;
 import nl.esciencecenter.xenon.util.Utils;
 
 /**
@@ -128,7 +127,7 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     public Path resolve(Path root, String... path) throws XenonException {
-        return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(new RelativePath(path)));
+        return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(new Path(path)));
     }
 
     @Before
@@ -295,7 +294,7 @@ public abstract class GenericFileAdaptorTestParent {
     private void deleteTestFile(Path file) throws Exception {
         assertTrue("Cannot delete non-existing file: " + file, files.exists(file));
 
-        FileAttributes att = files.getAttributes(file);
+        PathAttributes att = files.getAttributes(file);
         assertFalse("Cannot delete directory: " + file, att.isDirectory());
 
         files.delete(file);
@@ -305,7 +304,7 @@ public abstract class GenericFileAdaptorTestParent {
     protected void deleteTestDir(Path dir) throws Exception {
         assertTrue("Cannot delete non-existing directory: " + dir, files.exists(dir));
 
-        FileAttributes att = files.getAttributes(dir);
+        PathAttributes att = files.getAttributes(dir);
         assertTrue("Cannot delete file: " + dir, att.isDirectory());
 
         files.delete(dir);
@@ -504,7 +503,7 @@ public abstract class GenericFileAdaptorTestParent {
     //
     // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), Path.getPath(), RelativePath, close
 
-    private void test03_newPath(FileSystem fs, RelativePath path, String expected, boolean mustFail) throws Exception {
+    private void test03_newPath(FileSystem fs, Path path, String expected, boolean mustFail) throws Exception {
         String result = null;
 
         try {
@@ -544,7 +543,7 @@ public abstract class GenericFileAdaptorTestParent {
         FileSystem fs = config.getTestFileSystem(files);
         try {
             String root = "/";
-            test03_newPath(fs, new RelativePath(), root, false);
+            test03_newPath(fs, new Path(), root, false);
         } finally {
             files.close(fs);
         }
@@ -555,7 +554,7 @@ public abstract class GenericFileAdaptorTestParent {
         FileSystem fs = config.getTestFileSystem(files);
         try {
             String root = "/";
-            test03_newPath(fs, new RelativePath("test"), root + "test", false);
+            test03_newPath(fs, new Path("test"), root + "test", false);
         } finally {
             files.close(fs);
         }
@@ -666,7 +665,7 @@ public abstract class GenericFileAdaptorTestParent {
 
             assertTrue(files.exists(path));
 
-            FileAttributes att = files.getAttributes(path);
+            PathAttributes att = files.getAttributes(path);
 
             assertTrue(att.isDirectory());
         } catch (Exception e) {
@@ -1402,7 +1401,7 @@ public abstract class GenericFileAdaptorTestParent {
     private void test13_getAttributes(Path path, boolean isDirectory, long size, long currentTime, boolean mustFail)
             throws Exception {
 
-        FileAttributes result = null;
+        PathAttributes result = null;
 
         try {
             result = files.getAttributes(path);
@@ -1556,7 +1555,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         // Check result
-        FileAttributes attributes = files.getAttributes(path);
+        PathAttributes attributes = files.getAttributes(path);
         Set<PosixFilePermission> tmp = attributes.permissions();
 
         if (!permissions.equals(tmp)) {
@@ -1595,7 +1594,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path existingFile = createTestFile(testDir, null);
 
         // Get original permissions so we can reset later.
-        FileAttributes attributes = files.getAttributes(existingFile);
+        PathAttributes attributes = files.getAttributes(existingFile);
         
         // Create new permissions
         Set<PosixFilePermission> emptyPermissions = EnumSet.noneOf(PosixFilePermission.class);
@@ -2676,7 +2675,7 @@ public abstract class GenericFileAdaptorTestParent {
     //
     // Depends on:
 
-    private void test23_copy(Path source, Path target, CopyOption[] options, byte[] expected, boolean mustFail) throws Exception {
+    private void test23_copy(Path source, Path target, CopyMode[] options, byte[] expected, boolean mustFail) throws Exception {
         try {
             files.copy(source, target, options);
         } catch (Exception e) {
@@ -2713,7 +2712,7 @@ public abstract class GenericFileAdaptorTestParent {
         prepareTestDir("test23_copy");
         Path file0 = createTestFile(testDir, data);
 
-        test23_copy(file0, null, new CopyOption[] { CopyOption.CREATE }, null, true);
+        test23_copy(file0, null, new CopyMode[] { CopyMode.CREATE }, null, true);
 
         // cleanup
         deleteTestFile(file0);
@@ -2725,7 +2724,7 @@ public abstract class GenericFileAdaptorTestParent {
         prepareTestDir("test23_copy");
         Path file0 = createTestFile(testDir, data);
 
-        test23_copy(null, file0, new CopyOption[] { CopyOption.CREATE }, null, true);
+        test23_copy(null, file0, new CopyMode[] { CopyMode.CREATE }, null, true);
 
         // cleanup
         deleteTestFile(file0);
@@ -2737,7 +2736,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path nonExistingSource = createNewTestFileName(testDir);
         Path target = createNewTestFileName(testDir);
 
-        test23_copy(nonExistingSource, target, new CopyOption[0], null, true);
+        test23_copy(nonExistingSource, target, new CopyMode[0], null, true);
     }
 
     @Test
@@ -2746,7 +2745,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path target = createNewTestFileName(testDir);
         Path dir0 = createTestDir(testDir);
 
-        test23_copy(dir0, target, new CopyOption[] { CopyOption.CREATE }, null, true);
+        test23_copy(dir0, target, new CopyMode[] { CopyMode.CREATE }, null, true);
 
         // cleanup
         deleteTestDir(dir0);
@@ -2759,7 +2758,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file0 = createTestFile(testDir, data);
         Path file1 = createNewTestFileName(testDir);
 
-        test23_copy(file0, file1, new CopyOption[] { CopyOption.IGNORE, CopyOption.CREATE }, null, true);
+        test23_copy(file0, file1, new CopyMode[] { CopyMode.IGNORE, CopyMode.CREATE }, null, true);
 
         // cleanup
         deleteTestFile(file0);
@@ -2772,7 +2771,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file0 = createTestFile(testDir, data);
         Path file1 = createNewTestFileName(testDir);
 
-        test23_copy(file0, file1, new CopyOption[] { CopyOption.CREATE, CopyOption.IGNORE }, null, true);
+        test23_copy(file0, file1, new CopyMode[] { CopyMode.CREATE, CopyMode.IGNORE }, null, true);
 
         // cleanup
         //  deleteTestFile(file0);
@@ -2785,7 +2784,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file0 = createTestFile(testDir, data);
         Path file1 = createNewTestFileName(testDir);
 
-        test23_copy(file0, file1, new CopyOption[] { CopyOption.CREATE, CopyOption.REPLACE }, null, true);
+        test23_copy(file0, file1, new CopyMode[] { CopyMode.CREATE, CopyMode.REPLACE }, null, true);
 
         // cleanup
         deleteTestFile(file0);
@@ -2798,7 +2797,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file0 = createTestFile(testDir, data);
         Path file1 = createNewTestFileName(testDir);
 
-        test23_copy(file0, file1, new CopyOption[] { CopyOption.CREATE, CopyOption.RESUME }, null, true);
+        test23_copy(file0, file1, new CopyMode[] { CopyMode.CREATE, CopyMode.RESUME }, null, true);
 
         // cleanup
         deleteTestFile(file0);
@@ -2811,7 +2810,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file0 = createTestFile(testDir, data);
         Path file1 = createNewTestFileName(testDir);
 
-        test23_copy(file0, file1, new CopyOption[] { CopyOption.CREATE, CopyOption.APPEND }, null, true);
+        test23_copy(file0, file1, new CopyMode[] { CopyMode.CREATE, CopyMode.APPEND }, null, true);
 
         // cleanup
         deleteTestFile(file0);
@@ -2824,7 +2823,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file0 = createTestFile(testDir, data);
         Path file1 = createNewTestFileName(testDir);
 
-        test23_copy(file0, file1, new CopyOption[] { CopyOption.CREATE }, data, false);
+        test23_copy(file0, file1, new CopyMode[] { CopyMode.CREATE }, data, false);
 
         // cleanup
         deleteTestFile(file0);
@@ -2837,7 +2836,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path source = createTestFile(testDir, data);
         Path target = createTestFile(testDir, data);
 
-        test23_copy(source, target, new CopyOption[0], null, true);
+        test23_copy(source, target, new CopyMode[0], null, true);
 
         // cleanup
         deleteTestFile(target);
@@ -2851,7 +2850,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path source = createTestFile(testDir, data);
         Path target = createTestFile(testDir, data);
 
-        test23_copy(source, target, new CopyOption[] { CopyOption.CREATE }, null, true);
+        test23_copy(source, target, new CopyMode[] { CopyMode.CREATE }, null, true);
 
         // cleanup
         deleteTestFile(source);
@@ -2866,7 +2865,7 @@ public abstract class GenericFileAdaptorTestParent {
         prepareTestDir("test23_copy");
         Path source = createTestFile(testDir, data);
 
-        test23_copy(source, source, new CopyOption[] { CopyOption.CREATE }, data, false);
+        test23_copy(source, source, new CopyMode[] { CopyMode.CREATE }, data, false);
 
         // cleanup
         deleteTestFile(source);
@@ -2879,7 +2878,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path source = createTestFile(testDir, data);
         Path target = createTestFile(testDir, data);
 
-        test23_copy(source, target, new CopyOption[] { CopyOption.IGNORE }, data, false);
+        test23_copy(source, target, new CopyMode[] { CopyMode.IGNORE }, data, false);
 
         // cleanup
         deleteTestFile(source);
@@ -2893,7 +2892,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path source = createTestFile(testDir, data);
         Path target = createTestFile(testDir, data);
 
-        test23_copy(source, target, new CopyOption[] { CopyOption.IGNORE, CopyOption.IGNORE }, data, false);
+        test23_copy(source, target, new CopyMode[] { CopyMode.IGNORE, CopyMode.IGNORE }, data, false);
 
         // cleanup
         deleteTestFile(source);
@@ -2908,7 +2907,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path nonExistingDirectory = createNewTestDirName(testDir);
         Path fileNameWithoutParentDirectory = createNewTestFileName(nonExistingDirectory);
 
-        test23_copy(source, fileNameWithoutParentDirectory, new CopyOption[] { CopyOption.CREATE }, null, true);
+        test23_copy(source, fileNameWithoutParentDirectory, new CopyMode[] { CopyMode.CREATE }, null, true);
 
         // cleanup
         deleteTestFile(source);
@@ -2922,7 +2921,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path fileWithData1 = createTestFile(testDir, data1);
         Path fileWithData2 = createTestFile(testDir, data2);
 
-        test23_copy(fileWithData2, fileWithData1, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+        test23_copy(fileWithData2, fileWithData1, new CopyMode[] { CopyMode.RESUME, CopyMode.VERIFY }, null, true);
 
         // cleanup
         deleteTestFile(fileWithData2);
@@ -2937,7 +2936,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path fileWithData1 = createTestFile(testDir, data1);
         Path fileWithData1And2 = createTestFile(testDir, data1And2);
 
-        test23_copy(fileWithData1, fileWithData1And2, new CopyOption[] { CopyOption.RESUME }, null, true);
+        test23_copy(fileWithData1, fileWithData1And2, new CopyMode[] { CopyMode.RESUME }, null, true);
 
         // cleanup
         deleteTestFile(fileWithData1And2);
@@ -2952,7 +2951,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path fileWithData1 = createTestFile(testDir, data1);
         Path fileWithData1And2 = createTestFile(testDir, data1And2);
 
-        test23_copy(fileWithData1And2, fileWithData1, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, data1And2,
+        test23_copy(fileWithData1And2, fileWithData1, new CopyMode[] { CopyMode.RESUME, CopyMode.VERIFY }, data1And2,
                 !config.supportsResuming());
 
         // cleanup
@@ -2968,7 +2967,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path fileWithData1 = createTestFile(testDir, data1);
         Path fileWithData1And2 = createTestFile(testDir, data1And2);
 
-        test23_copy(fileWithData1And2, fileWithData1, new CopyOption[] { CopyOption.RESUME }, data1And2,
+        test23_copy(fileWithData1And2, fileWithData1, new CopyMode[] { CopyMode.RESUME }, data1And2,
                 !config.supportsResuming());
 
         // cleanup
@@ -2984,7 +2983,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path fileWithData1 = createTestFile(testDir, data1);
         Path fileWithData1And2 = createTestFile(testDir, data1And2);
 
-        test23_copy(fileWithData1And2, fileWithData1, new CopyOption[] { CopyOption.RESUME, CopyOption.RESUME }, data1And2,
+        test23_copy(fileWithData1And2, fileWithData1, new CopyMode[] { CopyMode.RESUME, CopyMode.RESUME }, data1And2,
                 !config.supportsResuming());
 
         // cleanup
@@ -2999,7 +2998,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file1 = createTestFile(testDir, data);
         Path nonExisting = createNewTestFileName(testDir);
 
-        test23_copy(nonExisting, file1, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+        test23_copy(nonExisting, file1, new CopyMode[] { CopyMode.RESUME, CopyMode.VERIFY }, null, true);
 
         // cleanup
         deleteTestFile(file1);
@@ -3012,7 +3011,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file1 = createTestFile(testDir, data);
         Path nonExisting = createNewTestFileName(testDir);
 
-        test23_copy(file1, nonExisting, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+        test23_copy(file1, nonExisting, new CopyMode[] { CopyMode.RESUME, CopyMode.VERIFY }, null, true);
 
         // cleanup
         deleteTestFile(file1);
@@ -3025,7 +3024,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file1 = createTestFile(testDir, data);
         Path dir0 = createTestDir(testDir);
 
-        test23_copy(file1, dir0, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+        test23_copy(file1, dir0, new CopyMode[] { CopyMode.RESUME, CopyMode.VERIFY }, null, true);
 
         // cleanup
         deleteTestFile(file1);
@@ -3040,7 +3039,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file1 = createTestFile(testDir, data1);
         Path file2 = createTestFile(testDir, data2);
 
-        test23_copy(file1, file2, new CopyOption[] { CopyOption.REPLACE }, data1, false);
+        test23_copy(file1, file2, new CopyMode[] { CopyMode.REPLACE }, data1, false);
 
         // cleanup
         deleteTestFile(file2);
@@ -3055,7 +3054,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file1 = createTestFile(testDir, data1);
         Path file2 = createTestFile(testDir, data2);
 
-        test23_copy(file1, file2, new CopyOption[] { CopyOption.REPLACE, CopyOption.REPLACE }, data1, false);
+        test23_copy(file1, file2, new CopyMode[] { CopyMode.REPLACE, CopyMode.REPLACE }, data1, false);
 
         // cleanup
         deleteTestFile(file2);
@@ -3070,7 +3069,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file1 = createTestFile(testDir, data1);
         Path file2 = createTestFile(testDir, data2);
 
-        test23_copy(file1, file2, new CopyOption[] { CopyOption.REPLACE, CopyOption.VERIFY }, null, true);
+        test23_copy(file1, file2, new CopyMode[] { CopyMode.REPLACE, CopyMode.VERIFY }, null, true);
 
         // cleanup
         deleteTestFile(file2);
@@ -3085,7 +3084,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file0 = createTestFile(testDir, data);
         Path file1 = createTestFile(testDir, data);
 
-        test23_copy(file0, file1, new CopyOption[] { CopyOption.APPEND }, data4, config.supportsAppending() == false);
+        test23_copy(file0, file1, new CopyMode[] { CopyMode.APPEND }, data4, config.supportsAppending() == false);
 
         // cleanup
         //deleteTestFile(file1);
@@ -3101,7 +3100,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file0 = createTestFile(testDir, data);
         Path file1 = createTestFile(testDir, data4);
 
-        test23_copy(file0, file1, new CopyOption[] { CopyOption.APPEND, CopyOption.APPEND }, data5,
+        test23_copy(file0, file1, new CopyMode[] { CopyMode.APPEND, CopyMode.APPEND }, data5,
                 config.supportsAppending() == false);
 
         // cleanup
@@ -3116,7 +3115,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file1 = createTestFile(testDir, data);
         Path nonExisting = createNewTestFileName(testDir);
 
-        test23_copy(nonExisting, file1, new CopyOption[] { CopyOption.APPEND }, null, true);
+        test23_copy(nonExisting, file1, new CopyMode[] { CopyMode.APPEND }, null, true);
 
         // cleanup
         deleteTestFile(file1);
@@ -3129,7 +3128,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file0 = createTestFile(testDir, data);
         Path nonExisting = createNewTestFileName(testDir);
 
-        test23_copy(file0, nonExisting, new CopyOption[] { CopyOption.APPEND }, null, true);
+        test23_copy(file0, nonExisting, new CopyMode[] { CopyMode.APPEND }, null, true);
 
         // cleanup
         deleteTestFile(file0);
@@ -3142,7 +3141,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file0 = createTestFile(testDir, data);
         Path dir0 = createTestDir(testDir);
 
-        test23_copy(file0, dir0, new CopyOption[] { CopyOption.APPEND }, null, true);
+        test23_copy(file0, dir0, new CopyMode[] { CopyMode.APPEND }, null, true);
 
         // cleanup
         deleteTestDir(dir0);
@@ -3156,7 +3155,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file1 = createTestFile(testDir, data);
         Path dir0 = createTestDir(testDir);
 
-        test23_copy(dir0, file1, new CopyOption[] { CopyOption.APPEND }, null, true);
+        test23_copy(dir0, file1, new CopyMode[] { CopyMode.APPEND }, null, true);
 
         // cleanup
         deleteTestDir(dir0);
@@ -3169,7 +3168,7 @@ public abstract class GenericFileAdaptorTestParent {
         prepareTestDir("test23_copy");
         Path file0 = createTestFile(testDir, data);
 
-        test23_copy(file0, file0, new CopyOption[] { CopyOption.APPEND }, null, true);
+        test23_copy(file0, file0, new CopyMode[] { CopyMode.APPEND }, null, true);
 
         // cleanup
         deleteTestFile(file0);
@@ -3181,7 +3180,7 @@ public abstract class GenericFileAdaptorTestParent {
         prepareTestDir("test23_copy");
         Path file0 = createTestFile(testDir, data);
 
-        test23_copy(file0, file0, new CopyOption[] { null }, null, true);
+        test23_copy(file0, file0, new CopyMode[] { null }, null, true);
 
         // cleanup
         deleteTestFile(file0);
@@ -3212,7 +3211,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file1 = createNewTestFileName(testDir);
 
         // Test the async copy
-        Copy copy = files.copy(file0, file1, new CopyOption[] { CopyOption.CREATE, CopyOption.ASYNCHRONOUS });
+        CopyHandle copy = files.copy(file0, file1, new CopyMode[] { CopyMode.CREATE, CopyMode.ASYNCHRONOUS });
         CopyStatus status = files.getCopyStatus(copy);
 
         // Deadline for operation is 60 seconds 
@@ -3231,7 +3230,7 @@ public abstract class GenericFileAdaptorTestParent {
         assertTrue(status.isDone());
         
         // Test the cancel
-        copy = files.copy(file0, file1, new CopyOption[] { CopyOption.REPLACE, CopyOption.ASYNCHRONOUS });
+        copy = files.copy(file0, file1, new CopyMode[] { CopyMode.REPLACE, CopyMode.ASYNCHRONOUS });
         files.cancelCopy(copy);
 
         deleteTestFile(file1);
@@ -3294,8 +3293,8 @@ public abstract class GenericFileAdaptorTestParent {
             throwExpected("test27_move");
         }
 
-        RelativePath sourceName = source.getRelativePath().normalize();
-        RelativePath targetName = target.getRelativePath().normalize();
+        Path sourceName = source.getRelativePath().normalize();
+        Path targetName = target.getRelativePath().normalize();
 
         if (sourceName.equals(targetName)) {
             // source == target, so the move did nothing.

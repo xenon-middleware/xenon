@@ -1,5 +1,7 @@
 package nl.esciencecenter.xenon.filesystems;
 
+import static nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor.ADAPTOR_NAME;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
@@ -491,6 +494,11 @@ public class TestFileSystem extends FileSystem {
 	public synchronized void createFile(Path file) throws XenonException {
 		//System.err.println("Create file: " + file);
 		getDirEntry(file.getParent()).addFile(file.getFileNameAsString(), getFileAttributes(file));
+	}
+
+	@Override
+	public void createSymbolicLink(Path link, Path path) throws XenonException {
+		throw new XenonException("TEST", "Not implemented");
 	}
 
 	@Override

@@ -29,10 +29,13 @@ import org.junit.Test;
 import nl.esciencecenter.xenon.JobException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.files.RelativePath;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystemystems.Files;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobHandle;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.util.Sandbox;
 import nl.esciencecenter.xenon.util.Utils;
 
@@ -80,11 +83,11 @@ public class SandboxedLocalJobIT {
 
         // create workdir
         String workFn = tmpdir + "/AAP" + work_id;
-        Path workdir = files.newPath(localrootfs, new RelativePath(workFn));
+        Path workdir = files.newPath(localrootfs, new Path(workFn));
 
         // create sandbox
         String sandbox_id = "MIES" + UUID.randomUUID().toString();
-        Path sandboxPath = files.newPath(localrootfs, new RelativePath(tmpdir));
+        Path sandboxPath = files.newPath(localrootfs, new Path(tmpdir));
         Sandbox sandbox = new Sandbox(files, sandboxPath, sandbox_id);
 
         try {
@@ -92,14 +95,14 @@ public class SandboxedLocalJobIT {
 
             // fill workdir
             URL inputURL = SandboxedLocalJobIT.class.getResource("/fixtures/lorem_ipsum.txt");
-            files.copy(files.newPath(localrootfs, new RelativePath(inputURL.getPath())),
-                    files.newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")));
+            files.copy(files.newPath(localrootfs, new Path(inputURL.getPath())),
+                    files.newPath(localrootfs, new Path(workFn + "/lorem_ipsum.txt")));
 
-            sandbox.addUploadFile(files.newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")),
+            sandbox.addUploadFile(files.newPath(localrootfs, new Path(workFn + "/lorem_ipsum.txt")),
                     "lorem_ipsum.txt");
 
-            sandbox.addDownloadFile("stdout.txt", files.newPath(localrootfs, new RelativePath(workFn + "/stdout.txt")));
-            sandbox.addDownloadFile("stderr.txt", files.newPath(localrootfs, new RelativePath(workFn + "/stderr.txt")));
+            sandbox.addDownloadFile("stdout.txt", files.newPath(localrootfs, new Path(workFn + "/stdout.txt")));
+            sandbox.addDownloadFile("stderr.txt", files.newPath(localrootfs, new Path(workFn + "/stderr.txt")));
 
             // upload lorem_ipsum.txt to sandbox
             sandbox.upload();
@@ -112,7 +115,7 @@ public class SandboxedLocalJobIT {
             description.setStderr("stderr.txt");
             description.setWorkingDirectory(sandbox.getPath().getRelativePath().getAbsolutePath());
 
-            Job job = Xenon.jobs().submitJob(scheduler, description);
+            JobHandle job = Xenon.jobs().submitJob(scheduler, description);
             JobStatus status = Xenon.jobs().waitUntilDone(job, 1000);
 
             sandbox.download();

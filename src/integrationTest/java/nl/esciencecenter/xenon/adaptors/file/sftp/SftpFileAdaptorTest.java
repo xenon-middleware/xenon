@@ -16,7 +16,7 @@
 package nl.esciencecenter.xenon.adaptors.file.sftp;
 
 import nl.esciencecenter.xenon.adaptors.GenericFileAdaptorTestParent;
-import nl.esciencecenter.xenon.adaptors.file.sftp.SftpFileTestConfig;
+import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileTestConfig;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

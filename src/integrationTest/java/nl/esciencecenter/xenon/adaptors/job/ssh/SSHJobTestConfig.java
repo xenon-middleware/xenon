@@ -23,10 +23,10 @@ import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
-import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.jobs.Jobs;
-import nl.esciencecenter.xenon.jobs.Scheduler;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystemystems.Files;
+import nl.esciencecenter.xenon.schedulers.Jobs;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 /**
  * 

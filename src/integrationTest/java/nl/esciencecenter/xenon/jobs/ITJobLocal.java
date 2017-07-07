@@ -21,6 +21,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobHandle;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,7 +57,7 @@ public class ITJobLocal {
         description.setStderr("stderr.txt");
 
         Scheduler scheduler = Xenon.jobs().newScheduler("local", null, null, null);
-        Job job = Xenon.jobs().submitJob(scheduler, description);
+        JobHandle job = Xenon.jobs().submitJob(scheduler, description);
 
         Xenon.jobs().waitUntilDone(job, 5000);
 

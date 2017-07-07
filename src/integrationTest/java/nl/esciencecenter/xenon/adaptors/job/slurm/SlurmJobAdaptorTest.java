@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.adaptors.job.slurm;
 import static org.junit.Assert.assertEquals;
 
 import nl.esciencecenter.xenon.adaptors.GenericJobAdaptorTestParent;
-import nl.esciencecenter.xenon.jobs.Scheduler;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

@@ -196,7 +196,7 @@ public class SlurmScheduler extends ScriptingScheduler {
         String jobID = ScriptingParser.parseJobIDFromLine(output, ADAPTOR_NAME, "Submitted batch job",
                 "Granted job allocation");
 
-        return new JobImplementation(this, jobID, description, false, false);
+        return new JobImplementation(this, jobID, description);
     }
 
     private JobHandle findInteractiveJobInMap(Map<String, Map<String, String>> queueInfo, String tag, JobDescription description, 
@@ -211,7 +211,7 @@ public class SlurmScheduler extends ScriptingScheduler {
                 
                 LOGGER.debug("Found interactive job ID: %s", jobID);
 
-                JobHandle result = new JobImplementation(this, jobID, description, true, true);
+                JobHandle result = new JobImplementation(this, jobID, description);
                 
                 synchronized (this) {
                     //add to set of interactive jobs so we can find it
@@ -327,7 +327,7 @@ public class SlurmScheduler extends ScriptingScheduler {
         JobHandle[] result = new JobHandle[jobIdentifiers.length];
 
         for (int i = 0; i < result.length; i++) {
-            result[i] = new JobImplementation(this, jobIdentifiers[i], false, false);
+            result[i] = new JobImplementation(this, jobIdentifiers[i]);
         }
 
         return result;

@@ -20,8 +20,8 @@ import java.util.HashMap;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.adaptors.job.ssh.SSHJobTestConfig;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.Files;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystemsystems.Files;
 
 /**
  * 

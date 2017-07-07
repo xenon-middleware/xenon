@@ -13,26 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.job.local;
-
-import nl.esciencecenter.xenon.adaptors.GenericJobAdaptorTestParent;
-import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalJobTestConfig;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+package nl.esciencecenter.xenon;
 
 /**
+ * Signals that an invalid scheme was provided.  
  * 
+ * @version 1.0
+ * @since 1.0
  */
-public class LocalJobAdaptorTest extends GenericJobAdaptorTestParent {
+public class UnsupportedOperationException extends XenonException {
 
-    @BeforeClass
-    public static void prepareLocalJobAdaptorTest() throws Exception {
-        GenericJobAdaptorTestParent.prepareClass(new LocalJobTestConfig());
+    private static final long serialVersionUID = 1L;
+
+    public UnsupportedOperationException(String adaptorName, String message, Throwable t) {
+        super(adaptorName, message, t);
     }
 
-    @AfterClass
-    public static void cleanupAltLocalJobsTest() throws Exception {
-        GenericJobAdaptorTestParent.cleanupClass();
+    public UnsupportedOperationException(String adaptorName, String message) {
+        super(adaptorName, message);
     }
 }

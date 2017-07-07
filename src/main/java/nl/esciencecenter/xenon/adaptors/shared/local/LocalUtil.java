@@ -488,6 +488,21 @@ public class LocalUtil {
     }
 
     /*
+     * Create a symbolic link
+     * @param path
+     * @throws XenonException
+     * @throws NullPointerException if the path is not set
+     */
+	public static void createSymbolicLink(FileSystem fs, Path link, Path path) throws XenonException {
+
+		try {
+            Files.createSymbolicLink(LocalUtil.javaPath(fs, link), LocalUtil.javaPath(fs, path));
+        } catch (IOException e) {
+            throw new XenonException(ADAPTOR_NAME, "Failed to create link " + link + " to " + path, e);
+        }
+	}
+
+    /*
      * Delete a local file
      * @param path
      * @throws XenonException

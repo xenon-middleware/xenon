@@ -23,9 +23,13 @@ import java.util.HashMap;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.adaptors.job.ssh.SSHJobTestConfig;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.Path;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystemsystems.Files;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobHandle;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.util.Utils;
 
 /**
@@ -60,7 +64,7 @@ public class ITMultiJobTest {
         Path[] out = new Path[jobCount];
         Path[] err = new Path[jobCount];
 
-        Job[] j = new Job[jobCount];
+        JobHandle[] j = new JobHandle[jobCount];
 
         for (int i = 0; i < j.length; i++) {
             out[i] = Utils.resolveWithRoot(files, root, "stdout" + i + ".txt");

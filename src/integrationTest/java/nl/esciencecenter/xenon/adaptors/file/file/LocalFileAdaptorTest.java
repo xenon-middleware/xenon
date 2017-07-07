@@ -17,12 +17,12 @@ package nl.esciencecenter.xenon.adaptors.file.file;
 
 import static org.junit.Assert.assertEquals;
 
-import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.adaptors.GenericFileAdaptorTestParent;
-import nl.esciencecenter.xenon.adaptors.file.file.LocalFileTestConfig;
-import nl.esciencecenter.xenon.adaptors.file.file.LocalFiles;
+import nl.esciencecenter.xenon.adaptors.file.file.LocalFileAdaptor;
+import nl.esciencecenter.xenon.adaptors.filesystems.file.LocalFileTestConfig;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
-import nl.esciencecenter.xenon.files.FileSystem;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.schedulers.InvalidLocationException;
 import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.AfterClass;
@@ -46,46 +46,46 @@ public class LocalFileAdaptorTest extends GenericFileAdaptorTestParent {
     
     @Test
     public void test_checkLocation_null() throws Exception {
-        LocalFiles.checkFileLocation(null);
+        LocalFileAdaptor.checkFileLocation(null);
     }
 
     @Test
     public void test_checkLocation_empty() throws Exception {
-        LocalFiles.checkFileLocation("");
+        LocalFileAdaptor.checkFileLocation("");
     }
 
     @Test
     public void test_checkLocation_linuxRoot() throws Exception {
         if (Utils.isLinux() || Utils.isOSX()) { 
-            LocalFiles.checkFileLocation("/");
+            LocalFileAdaptor.checkFileLocation("/");
         }
     }
 
     @Test
     public void test_checkLocation_windowsRoot() throws Exception {
         if (Utils.isWindows()) { 
-            LocalFiles.checkFileLocation("C:");
+            LocalFileAdaptor.checkFileLocation("C:");
         }
     }
 
     @Test(expected = InvalidLocationException.class)
     public void test_checkLocation_wrong() throws Exception {
-        LocalFiles.checkFileLocation("ABC");
+        LocalFileAdaptor.checkFileLocation("ABC");
     }
 
     @Test(expected = InvalidLocationException.class)
     public void test_checkLocation_withPath() throws Exception {
-        LocalFiles.checkFileLocation("/aap");
+        LocalFileAdaptor.checkFileLocation("/aap");
     }
 
     @Test(expected = InvalidLocationException.class)
     public void test_checkLocation_withWindowsPath() throws Exception {
-        LocalFiles.checkFileLocation("C:/aap");
+        LocalFileAdaptor.checkFileLocation("C:/aap");
     }
     
     @Test(expected = InvalidLocationException.class)
     public void test_checkLocation_withWindowsPath2() throws Exception {
-        LocalFiles.checkFileLocation("C:\\aap");
+        LocalFileAdaptor.checkFileLocation("C:\\aap");
     }
 
     @Test

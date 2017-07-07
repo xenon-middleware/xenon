@@ -17,10 +17,10 @@ package nl.esciencecenter.xenon.adaptors.job.torque;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.GenericScheduleJobTestParent;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
-import nl.esciencecenter.xenon.jobs.JobDescription;
-import nl.esciencecenter.xenon.jobs.JobStatus;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

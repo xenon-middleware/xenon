@@ -18,6 +18,7 @@ import org.apache.commons.net.ftp.FTPFileFilters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -206,6 +207,11 @@ public class FtpFileSystem extends FileSystem {
 		LOGGER.debug("createFile OK");
 	}
 
+	@Override
+	public void createSymbolicLink(Path link, Path path) throws XenonException {
+		throw new UnsupportedOperationException(ADAPTOR_NAME, "Operation not supported");
+	}
+	
 	@Override
 	protected void deleteDirectory(Path path) throws XenonException {
 		FtpCommand ftpCommand = new FtpCommand() {

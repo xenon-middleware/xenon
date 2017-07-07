@@ -30,18 +30,6 @@ public class StreamsTest {
 			// TODO Auto-generated method stub
 			return null;
 		}
-
-		@Override
-		public boolean isInteractive() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public boolean isOnline() {
-			// TODO Auto-generated method stub
-			return false;
-		} 
 	}
 	
 	@Test

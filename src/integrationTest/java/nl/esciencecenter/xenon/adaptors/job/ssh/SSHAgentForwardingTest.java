@@ -28,11 +28,10 @@ import org.junit.Test;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.jobs.Job;
-import nl.esciencecenter.xenon.jobs.JobDescription;
-import nl.esciencecenter.xenon.jobs.JobStatus;
-import nl.esciencecenter.xenon.jobs.Jobs;
-import nl.esciencecenter.xenon.jobs.Scheduler;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobHandle;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 public class SSHAgentForwardingTest {
     public static SSHJobTestConfig config;
@@ -72,7 +71,7 @@ public class SSHAgentForwardingTest {
         description.setExecutable("/usr/bin/ssh");
         description.setArguments("-i", "/dev/null", config.getCorrectLocation(), "hostname");
 
-        Job job = jobs.submitJob(scheduler, description);
+        JobHandle job = jobs.submitJob(scheduler, description);
 
         JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(0));
 
