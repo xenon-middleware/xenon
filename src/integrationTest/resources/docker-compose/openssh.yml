@@ -1,0 +1,6 @@
+version: '3'
+services:
+  ssh:
+    image: nlesc/xenon-ssh
+    ports:
+    - 22
