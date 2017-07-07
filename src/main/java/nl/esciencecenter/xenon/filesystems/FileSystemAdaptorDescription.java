@@ -55,4 +55,8 @@ public class FileSystemAdaptorDescription extends AdaptorDescription {
         		", supportedProperties=" + Arrays.toString(getSupportedProperties()) +  
         		", supportsThirdPArtyCopy=" + supportsThirdPartyCopy + "]";
     }
+
+	public boolean supportsSymboliclinks() {
+    	return true;
+	}
 }
