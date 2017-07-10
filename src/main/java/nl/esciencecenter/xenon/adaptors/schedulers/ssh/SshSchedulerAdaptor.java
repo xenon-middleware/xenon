@@ -1,5 +1,6 @@
 package nl.esciencecenter.xenon.adaptors.schedulers.ssh;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.sshd.client.SshClient;
@@ -11,6 +12,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobQueueScheduler;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil;
@@ -137,8 +139,11 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
 	        
 		  ClientSession session = SSHUtil.connect(ADAPTOR_NAME, client, location, credential, timeout);
 	      
+		  // We must convert the relevant SSH properties to SFTP here.
+		  Map<String, String> sftpProperties = SSHUtil.sshToSftpProperties(properties);
+		  
 		  // Create a file system that point to the same location as the scheduler.
-		  FileSystem fs = FileSystem.create("sftp", location, credential, properties);
+		  FileSystem fs = FileSystem.create("sftp", location, credential, sftpProperties);
 
 		  long pollingDelay = xp.getLongProperty(POLLING_DELAY);
 		  int multiQThreads = xp.getIntegerProperty(MULTIQ_MAX_CONCURRENT);

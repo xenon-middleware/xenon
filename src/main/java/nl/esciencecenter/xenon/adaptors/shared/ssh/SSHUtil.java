@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyPair;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.sshd.agent.local.ProxyAgentFactory;
 import org.apache.sshd.client.SshClient;
@@ -22,6 +24,8 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
+import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
@@ -197,5 +201,30 @@ public class SSHUtil {
 		return session;
 	}
 	
+	public static Map<String,String> translateProperties(Map<String,String> properties, String orginalPrefix, String newPrefix) { 
+		
+		HashMap<String,String> result = new HashMap<>();
+		
+		int start = orginalPrefix.length();
+		
+		for (Map.Entry<String, String> e : properties.entrySet()) { 
+			
+			String key = e.getKey();
+			
+			if (key.startsWith(orginalPrefix)) { 
+				key = newPrefix + key.substring(start, key.length());
+				result.put(key, e.getValue());
+			}
+		}
+
+		return result;
+	}
 	
+	public static Map<String,String> sshToSftpProperties(Map<String,String> properties) {
+		return translateProperties(properties, SshSchedulerAdaptor.PREFIX, SftpFileAdaptor.PREFIX);
+	}
+	
+	public static Map<String,String> sftpToSshProperties(Map<String,String> properties) {
+		return translateProperties(properties, SftpFileAdaptor.PREFIX, SshSchedulerAdaptor.PREFIX);
+	}	
 }

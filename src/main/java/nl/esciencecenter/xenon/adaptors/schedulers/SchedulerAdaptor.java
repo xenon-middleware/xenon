@@ -10,7 +10,7 @@ import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
 
 public abstract class SchedulerAdaptor {
 
-	public static final String ADAPTORS_PREFIX = "xenon.adaptors.scheduler.";
+	public static final String ADAPTORS_PREFIX = "xenon.adaptors.schedulers.";
 	
 	private static int currentID = 1;
 	
