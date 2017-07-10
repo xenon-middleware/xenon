@@ -6,14 +6,13 @@ import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.filesystems.*;
 import org.apache.commons.io.input.NullInputStream;
 import org.jclouds.blobstore.BlobStoreContext;
-import org.jclouds.blobstore.domain.Blob;
-import org.jclouds.blobstore.domain.BlobMetadata;
-import org.jclouds.blobstore.domain.PageSet;
-import org.jclouds.blobstore.domain.StorageMetadata;
+import org.jclouds.blobstore.domain.*;
 import org.jclouds.blobstore.options.CopyOptions;
 import org.jclouds.blobstore.options.ListContainerOptions;
+import org.jclouds.http.functions.ParseURIFromListOrLocationHeaderIf20x;
 
 import java.io.*;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -163,7 +162,7 @@ public class JCloudsFileSytem extends FileSystem {
     }
 
 
-    PathAttributes toPathAttributes(final StorageMetadata m){
+    PathAttributes toPathAttributes(final StorageMetadata m, final BlobAccess access){
         Path p = new Path(m.getName());
 
         PathAttributes pa = new PathAttributes();
@@ -171,8 +170,18 @@ public class JCloudsFileSytem extends FileSystem {
         pa.setCreationTime(m.getCreationDate().getTime());
         pa.setLastModifiedTime(m.getLastModified().getTime());
         pa.setReadable(true);
+        boolean isDir = m.getName().endsWith("/");
+        pa.setExecutable(isDir);
         pa.setWritable(true);
         pa.setDirectory(m.getName().endsWith("/"));
+        Set<PosixFilePermission> permissions = new HashSet<>();
+        permissions.add(PosixFilePermission.OWNER_READ);
+        permissions.add(PosixFilePermission.OWNER_WRITE);
+        if(access == BlobAccess.PUBLIC_READ){
+            permissions.add(PosixFilePermission.OTHERS_READ);
+            if(isDir) { permissions.add(PosixFilePermission.OTHERS_EXECUTE); }
+        }
+        pa.setPermissions(permissions);
         return pa;
     }
 
@@ -207,12 +216,12 @@ public class JCloudsFileSytem extends FileSystem {
 
         @Override
         public PathAttributes next() {
-            PathAttributes res = toPathAttributes(nxt);
+            BlobAccess acess = context.getBlobStore().getBlobAccess(bucket,nxt.getName());
+            PathAttributes res = toPathAttributes(nxt,acess);
             getNext();
             return res;
         }
     }
-
 
 
     public Iterable<PathAttributes> list(Path dir, boolean recursive) throws XenonException{
@@ -302,7 +311,8 @@ public class JCloudsFileSytem extends FileSystem {
             throw new NoSuchPathException(adaptorName, "File does not exist: " + path.getRelativePath());
         }
         BlobMetadata md = context.getBlobStore().blobMetadata(bucket,path.getRelativePath());
-        return toPathAttributes(md);
+        BlobAccess access = context.getBlobStore().getBlobAccess(bucket, path.getRelativePath());
+        return toPathAttributes(md,access);
     }
 
     @Override
@@ -312,7 +322,24 @@ public class JCloudsFileSytem extends FileSystem {
 
     @Override
     public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
-        throw new AttributeNotSupportedException(adaptorName, "Posix file permissions not supported by " + adaptorName);
+        String s = path.getRelativePath();
+        boolean isDir = s.endsWith("/");
+        if(!isDir){
+            if(!context.getBlobStore().blobExists(bucket,s ) &&
+                    context.getBlobStore().blobExists(bucket,s +"/")){
+                isDir = true;
+                s += "/";
+            }
+        }
+        boolean publicAccess = false;
+        for(PosixFilePermission p : permissions){
+            switch(p){
+                case OTHERS_READ: publicAccess = true; break;
+                default : break;
+            }
+        }
+        BlobAccess ba = publicAccess ? BlobAccess.PUBLIC_READ : BlobAccess.PRIVATE;
+        context.getBlobStore().setBlobAccess(bucket,s,ba);
     }
 
 

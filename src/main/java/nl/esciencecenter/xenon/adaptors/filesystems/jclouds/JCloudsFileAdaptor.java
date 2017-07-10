@@ -34,10 +34,10 @@ public class JCloudsFileAdaptor extends FileAdaptor {
     private static final String ADAPTOR_DESCRIPTION = "The JClouds adaptor uses Apache JClouds to talk to s3 and others";
 
     /** The locations supported by this adaptor */
-    private static final String [] ADAPTOR_LOCATIONS = new String [] { "s3://host[:port]" };
+    private static final String [] ADAPTOR_LOCATIONS = new String [] { "jclouds://host[:port]" };
 
     /** All our own properties start with this prefix. */
-    public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + "s3.";
+    public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + "jclouds.";
 
     protected static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription[0];
 
@@ -50,7 +50,7 @@ public class JCloudsFileAdaptor extends FileAdaptor {
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
         int split = location.lastIndexOf("/");
         if(split < 0){
-            throw new InvalidLocationException("s3","No bucket found in url: " + location);
+            throw new InvalidLocationException("jclouds","No bucket found in url: " + location);
         }
 
         String server = location.substring(0,split);
