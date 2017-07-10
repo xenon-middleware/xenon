@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
-import nl.esciencecenter.xenon.files.*;
 import nl.esciencecenter.xenon.filesystems.*;
 
 

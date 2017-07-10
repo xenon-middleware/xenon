@@ -2,7 +2,6 @@ package nl.esciencecenter.xenon.adaptors.filesystems.jclouds;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
-import nl.esciencecenter.xenon.files.*;
 import nl.esciencecenter.xenon.filesystems.*;
 import org.jclouds.blobstore.BlobStoreContext;
 import org.jclouds.blobstore.domain.Blob;
