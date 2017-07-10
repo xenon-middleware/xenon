@@ -19,16 +19,16 @@ public abstract class SchedulerTestParent {
 
 	private Scheduler scheduler;
 	private SchedulerAdaptorDescription description;
-//	private LocationConfig locationConfig;
+	private SchedulerLocationConfig locationConfig;
 
 	@Before
 	public void setup() throws XenonException {
 		scheduler = setupScheduler();
 		description = setupDescription();
-//		locationConfig = setupLocationConfig(scheduler);
+		locationConfig = setupLocationConfig();
 	}
 
-//	protected abstract LocationConfig setupLocationConfig(Scheduler scheduler);
+	protected abstract SchedulerLocationConfig setupLocationConfig();
 
     @After
     public void cleanup() throws XenonException {
@@ -50,22 +50,19 @@ public abstract class SchedulerTestParent {
     	assertFalse(scheduler.isOpen());
     }
     	
+    @Test
+    public void test_getLocation() throws XenonException {
+    	assertEquals(locationConfig.getLocation(), scheduler.getLocation());
+    }
+    
+    @Test
+    public void test_unknownJobStatus() throws XenonException {
+   	
+    	
+
+    }
+
     
     
-//    
-//    @Test
-//    public void exists_fileDoesExist_fileExists() throws XenonException {
-//        Path path = locationConfig.getExistingPath();
-//        assertTrue(fileSystem.exists(path));
-//    }
-//
-//    @Test
-//    public void readSymbolicLink_linkToExistingFile_targetMatches() throws XenonException {
-//        assumeTrue(description.supportsSymboliclinks());
-//        Map.Entry<Path, Path> linkTarget = locationConfig.getSymbolicLinksToExistingFile();
-//        Path target = fileSystem.readSymbolicLink(linkTarget.getKey());
-//        Path expectedTarget = linkTarget.getValue();
-//        assertEquals(target, expectedTarget);
-//    }
 
 }

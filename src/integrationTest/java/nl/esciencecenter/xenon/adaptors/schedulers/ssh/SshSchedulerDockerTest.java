@@ -12,6 +12,7 @@ import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 
@@ -24,10 +25,10 @@ public class SshSchedulerDockerTest extends SshSchedulerTestParent {
 		.waitingForService("ssh", HealthChecks.toHaveAllPortsOpen())
 		.build();
 
-//	@Override
-//	protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
-//		return new SftpLocationConfig();
-//	}
+	@Override
+	protected SchedulerLocationConfig setupLocationConfig() {
+		return new SshLocationConfig(docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT"));
+	}
 
 	@Override
 	public Scheduler setupScheduler() throws XenonException {
@@ -38,4 +39,8 @@ public class SshSchedulerDockerTest extends SshSchedulerTestParent {
 		props.put(LOAD_STANDARD_KNOWN_HOSTS, "false");
 		return Scheduler.create("ssh", location, cred, props);
 	}
+	
+	
+	
+	
 }
