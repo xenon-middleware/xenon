@@ -155,7 +155,7 @@ public class TorqueScheduler extends ScriptingScheduler {
         updateJobsSeenMap(status.keySet());
 
         for (String jobID : status.keySet()) {
-            result.add(new JobImplementation(this, jobID, false, false));
+            result.add(new JobImplementation(this, jobID));
         }
     }
 
@@ -335,7 +335,7 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         //noinspection UnnecessaryLocalVariable
 
-        return new JobImplementation(this, identifier, description, false, false);
+        return new JobImplementation(this, identifier, description);
     }
 
     @Override

@@ -21,12 +21,8 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
-import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcess;
-import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcessFactory;
-import nl.esciencecenter.xenon.adaptors.schedulers.JobImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobQueueScheduler;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
-import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerClosedException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
@@ -80,7 +76,7 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
     public static final String SUBMITTED = JOBS + "submitted";
     
     /** The locations supported by the adaptor */
-    public static final String [] ADAPTOR_LOCATIONS = new String [] { "local://<schedulername>" };
+    public static final String [] ADAPTOR_LOCATIONS = new String [] { "local://" };
     
     /** The properties supported by this adaptor */
     public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {  
@@ -94,24 +90,32 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
     	super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, true, true, true);
     }
         
+    
+    /** 
+     * Check if a location string is valid for the local scheduler. 
+     * 
+     * The only valid options are null, "" or "local://". 
+     * 
+     * @param location
+     *          the location to check.
+     * @throws InvalidLocationException
+     *          if the location is invalid.                   
+     */
+    private static void checkLocation(String location) throws InvalidLocationException {
+        if (location == null || location.isEmpty() || location.equals("local://")) {
+            return;
+        }
+
+        throw new InvalidLocationException(ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
+    }
+	
     @Override
     public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
 
-    	// Location should be: local://<name> 
-    	
-        if (location == null || location.isEmpty() || !location.startsWith("local://") || location.equals("local://")) {
-            throw new InvalidLocationException(ADAPTOR_NAME, "Cannot create local scheduler with location: " 
-                    + location);
-        }
-     
-        // TODO: make sure id is unique!
-        String schedulerID = location.substring("local://".length()).trim();
-        
-        if (schedulerID.isEmpty()) { 
-        	throw new InvalidLocationException(ADAPTOR_NAME, "Cannot create local scheduler without a unique name"); 
-        }
-             
+    	// Location should be: null, empty, or local:// 
+    	checkLocation(location);
+         
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
         if (!(credential == null || credential instanceof DefaultCredential)) {
@@ -128,7 +132,7 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
         int multiQThreads = xp.getIntegerProperty(MULTIQ_MAX_CONCURRENT, processors);
         int pollingDelay = xp.getIntegerProperty(POLLING_DELAY);
         
-        return new JobQueueScheduler(schedulerID, ADAPTOR_NAME, location, new LocalInteractiveProcessFactory(), 
+        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, "local://", new LocalInteractiveProcessFactory(), 
         		filesystem, filesystem.getEntryPath(), multiQThreads, pollingDelay, xp);
     }
 }

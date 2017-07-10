@@ -153,7 +153,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
         updateJobsSeenMap(status.keySet());
 
         for (String jobID : status.keySet()) {
-            result.add(new JobImplementation(this, jobID, false, false));
+            result.add(new JobImplementation(this, jobID));
         }
 
     }
@@ -270,7 +270,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
         updateJobsSeenMap(Collections.singleton(identifier));
 
-        return new JobImplementation(this, identifier, description, false, false);
+        return new JobImplementation(this, identifier, description);
     }
 
     @Override

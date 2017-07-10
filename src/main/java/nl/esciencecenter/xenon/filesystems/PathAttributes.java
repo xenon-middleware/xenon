@@ -207,7 +207,7 @@ public class PathAttributes {
 	/**
      * Get the creation time for this file.
      * 
-     * If creationTime is not supported by the adaptor, the {@link #lastModifiedTime()} will be returned instead.
+     * If creationTime is not supported by the adaptor, {@link #getLastModifiedTime()} will be returned instead.
      * 
      * @return 
      *          the creation time for this file.
@@ -223,7 +223,7 @@ public class PathAttributes {
     /**
      * Get the last access time for this file.
      * 
-     * If lastAccessTime is not supported by the adaptor, the {@link #lastModifiedTime()} will be returned instead.
+     * If lastAccessTime is not supported by the adaptor, use {@link #getLastModifiedTime()} will be returned instead.
      *
      * @return 
      *          the last access time for this file.
@@ -279,7 +279,7 @@ public class PathAttributes {
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
-	public String getOwner() {
+	public String getOwner() throws AttributeNotSupportedException {
 		return owner;
 	}
 
@@ -296,7 +296,7 @@ public class PathAttributes {
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
-	public String getGroup() {
+	public String getGroup() throws AttributeNotSupportedException {
 		return group;
 	}
 
@@ -314,11 +314,15 @@ public class PathAttributes {
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
-	public Set<PosixFilePermission> getPermissions() {
+	public Set<PosixFilePermission> getPermissions() throws AttributeNotSupportedException {
 		return permissions;
 	}
 
 	public void setPermissions(Set<PosixFilePermission> permissions) {
 		this.permissions = permissions;
 	}   
+	
+	public String toString() { 
+		return path.getAbsolutePath();
+	}
 }

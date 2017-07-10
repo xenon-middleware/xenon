@@ -39,6 +39,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
@@ -363,6 +364,11 @@ public class WebdavFileSystem extends FileSystem {
 	@Override
 	public void createFile(Path file) throws XenonException {
 		createFile(file, 0, new ByteArrayInputStream(new byte[0]));
+	}
+
+	@Override
+	public void createSymbolicLink(Path link, Path path) throws XenonException {
+		throw new UnsupportedOperationException(ADAPTOR_NAME, "Operation not supported");
 	}
 
 //	public void createFile(Path file, byte [] data) throws XenonException {

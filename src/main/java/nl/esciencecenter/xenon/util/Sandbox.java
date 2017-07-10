@@ -30,14 +30,14 @@ import nl.esciencecenter.xenon.filesystems.Path;
  * <p>
  * A Sandbox is created before the job is started. The input files (or directories) necessary to run the job are then
  * added to the Sandbox using {@link #addUploadFile(Path, String)}. Once all files have been added they can be uploaded to the 
- * Sandbox using {@link #upload(CopyMode...)}.
+ * Sandbox using {@link #upload(CopyMode)}.
  * </p><p>
  * Similarly, the output files (or directories) produced by the job can be registered with the Sandbox using 
  * {@link #addDownloadFile(String, Path)}. These may be added before or after the job runs. 
  * </p><p>
  * Next the job is run using the sandbox as a working directory.
  * </p><p>
- * After the job has terminated, the output files can be downloaded using {@link #download(CopyMode...)}. 
+ * After the job has terminated, the output files can be downloaded using {@link #download(CopyMode)}. 
  * </p><p>
  * Finally, the Sandbox can be deleted using {@link #delete()}. 
  * </p>       
@@ -133,10 +133,14 @@ public class Sandbox {
      * 
      * Root and sandboxName will be concatenated to a path into which files can be uploaded/downloaded.
      * 
-     * @param files
-     *            A Files interface used to access the files.
-     * @param root
-     *            Directory in which sandbox will be created.
+     * @param sourceFS
+     *            the source filesystem used to access the files
+     * @param sourceRoot
+     *            the root directory on the source filesystem
+     * @param targetFS
+     *            the target filesystem used to where the snadbox will be created.
+     * @param targetRoot
+     *            the root directory on the target filesystem
      * @param sandboxName
      *            Name of the sandbox. If null a random name will be used.
      * @throws XenonException
@@ -189,7 +193,7 @@ public class Sandbox {
     }
 
     /**
-     * Returns the list of files that will be uploaded when calling {@link #upload(CopyMode []) upload}.
+     * Returns the list of files that will be uploaded when calling {@link #upload(CopyMode) upload}.
      * 
      * @return list of files that will be uploaded.
      */
@@ -251,7 +255,7 @@ public class Sandbox {
     }
 
     /**
-     * Returns the list of files that will be downloaded when calling {@link #download(CopyMode []) download}.
+     * Returns the list of files that will be downloaded when calling {@link #download(CopyMode) download}.
      * 
      * @return list of files that will be downloaded.
      */
@@ -296,7 +300,7 @@ public class Sandbox {
      * 
      * Also creates sandbox directory if it does not exist yet.
      * 
-     * @param options
+     * @param option
      *          the options to use while copying. See {@link CopyMode} for details.
      * @throws InvalidOptionsException
      *           if an invalid combination of options is used.
@@ -315,7 +319,7 @@ public class Sandbox {
     /**
      * Download files from sandbox.
      * 
-     * @param options
+     * @param option
      *          the options to use while copying. See {@link CopyMode} for details.
      * @throws InvalidOptionsException
      *           if an invalid combination of options is used.

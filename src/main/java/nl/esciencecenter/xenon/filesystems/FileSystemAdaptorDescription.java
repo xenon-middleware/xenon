@@ -16,6 +16,8 @@
 
 package nl.esciencecenter.xenon.filesystems;
 
+import java.util.Arrays;
+
 import nl.esciencecenter.xenon.AdaptorDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 
@@ -49,8 +51,12 @@ public class FileSystemAdaptorDescription extends AdaptorDescription {
     @Override
     public String toString() {
         return "FileAdaptorDescription [name=" + getName() + ", description=" + getDescription() + 
-        		", supportedLocations=" + getSupportedLocations() +
-        		", supportedProperties=" + getSupportedProperties() +  
+        		", supportedLocations=" + Arrays.toString(getSupportedLocations()) +
+        		", supportedProperties=" + Arrays.toString(getSupportedProperties()) +  
         		", supportsThirdPArtyCopy=" + supportsThirdPartyCopy + "]";
     }
+
+	public boolean supportsSymboliclinks() {
+    	return true;
+	}
 }

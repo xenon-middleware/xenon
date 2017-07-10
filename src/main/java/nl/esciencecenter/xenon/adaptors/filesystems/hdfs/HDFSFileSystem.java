@@ -4,6 +4,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.filesystems.*;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.fs.permission.FsAction;
@@ -16,9 +17,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-/**
- * Created by atze on 3-7-17.
- */
 public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSystem{
     final org.apache.hadoop.fs.FileSystem fs;
     boolean closed;
@@ -100,6 +98,20 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
         } catch(IOException e ){
             throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void createSymbolicLink(Path link, Path target) throws XenonException {
+        checkClosed();
+        try {
+            if(exists(link)){
+                throw new PathAlreadyExistsException(getAdaptorName(), "Cannot create symlink: A directory or file already exists at: " + link.getRelativePath());
+            }
+            fs.createSymlink(toHDFSPath(target), toHDFSPath(link), false);
+        } catch(IOException e ){
+            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+        }
+
     }
 
     @Override
@@ -253,12 +265,6 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
         return list(dir,false);
     }
 
-
-
-
-
-
-
     org.apache.hadoop.fs.Path toHDFSPath(Path p){
         return new org.apache.hadoop.fs.Path(p.getRelativePath());
     }
@@ -384,7 +390,8 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
 
     }
 
-    // TODO: copyFile
+    // CopyFile: Weirdly not supported in HDFS
+
 
 }
 

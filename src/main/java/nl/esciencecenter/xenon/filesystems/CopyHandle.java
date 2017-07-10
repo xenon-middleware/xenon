@@ -18,32 +18,59 @@ package nl.esciencecenter.xenon.filesystems;
 /**
  * Copy represents an asynchronous copy operation.
  * <p>
- * A <code>Copy</code> is returned as the result of the {@link Files#copy(Path, Path, CopyMode []) Files.copy} 
- * method, when the option {@link CopyMode#ASYNCHRONOUS CopyOption.ASYNCHRONOUS} is provided. This <code>Copy</code> can then 
- * be used to retrieve the status of the copy operation using {@link Files#getCopyStatus(Copy) Files.getCopyStatus} or cancel it 
- * using {@link Files#cancelCopy(Copy) Files.cancelCopy}.
+ * A <code>CopyHandle</code> is returned as the result of the {@link FileSystem#copy(Path, FileSystem, Path, CopyMode, boolean) FileSystem.copy} 
+ * This <code>CopyHandle</code> can then 
+ * be used to retrieve the status of the copy operation using {@link FileSystem#getStatus(CopyHandle) FileSystem.getStatus} or cancel it 
+ * using {@link FileSystem#cancel(CopyHandle) Files.cancel}.
  * </p>
- * 
- * @version 1.0
- * @since 1.0
- * @see Files
- * @see CopyMode
  */
 public interface CopyHandle {
 
-    public FileSystem getSourceFileSystem();
+	/**
+	 * Returns the {@link FileSystem} this copy is using as a source.
+	 * 
+	 * @return
+	 * 		the {@link FileSystem} this copy is using as a source.
+	 */
+	public FileSystem getSourceFileSystem();
 	
+	/**
+	 * Returns the {@link Path} this copy is using as a source.
+	 * 
+	 * @return
+	 * 		the {@link Path} this copy is using as a source.
+	 */
     public Path getSourcePath();
-	
+
+	/**
+	 * Returns the {@link FileSystem} this copy is using as a destination.
+	 * 
+	 * @return
+	 * 		the {@link FileSystem} this copy is using as a destination.
+	 */
     public FileSystem getDestinatonFileSystem();
-    
+
+	/**
+	 * Returns the {@link Path} this copy is using as a destination.
+	 * 
+	 * @return
+	 * 		the {@link Path} this copy is using as a destination.
+	 */
     public Path getDestinationPath();
 	
+	/**
+	 * Returns the {@link CopyMode} that determines what to do if the destination exists.
+	 * 
+	 * @return
+	 * 		the {@link CopyMode} that determines what to do if the destination exists.		
+	 */
 	public CopyMode getMode();
 	
+	/**
+	 * Returns if this this copy is recursive.
+	 * 	  
+	 * @return
+	 * 		if this copy is recursive.
+	 */
 	public boolean isRecursive();
-	
-	
-    
-    
 }

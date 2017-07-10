@@ -15,9 +15,12 @@
  */
 package nl.esciencecenter.xenon.schedulers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor;
@@ -40,7 +43,7 @@ public abstract class Scheduler {
 	/** The name of this component, for use in exceptions */
 	private static final String COMPONENT_NAME = "Scheduler";
 
-	private static final HashMap<String, SchedulerAdaptor> adaptors = new HashMap<>();
+	private static final HashMap<String, SchedulerAdaptor> adaptors = new LinkedHashMap<>();
 
 	static { 
 		/** Load all supported file adaptors */
@@ -71,15 +74,29 @@ public abstract class Scheduler {
 	}
 
 	public static String [] getAdaptorNames() {
-		return null;
+		ArrayList<String> tmp = new ArrayList<>();
+		
+		for (SchedulerAdaptor a : adaptors.values()) { 
+			tmp.add(a.getName());
+		}
+		
+		return tmp.toArray(new String[tmp.size()]);
 	}
 
-	public static SchedulerAdaptorDescription getAdaptorDescription(String adaptorName) {
-		return null;
+	public static SchedulerAdaptorDescription getAdaptorDescription(String adaptorName) throws XenonException {
+		return getAdaptorByName(adaptorName).getAdaptorDescription();
 	}
 
-	public static SchedulerAdaptorDescription [] getAdaptorDescriptions() {
-		return null;
+	public static SchedulerAdaptorDescription [] getAdaptorDescriptions() throws XenonException {
+		String [] names = getAdaptorNames();
+		
+		SchedulerAdaptorDescription[] result = new SchedulerAdaptorDescription[names.length];
+		
+		for (int i=0;i<names.length;i++) { 
+			result[i] = getAdaptorDescription(names[i]);
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -240,6 +257,9 @@ public abstract class Scheduler {
      * Get the queue names supported by this Scheduler.
      * 
      * @return the queue names supported by this Scheduler.
+     * 
+     * @throws XenonException
+     * 		       If an I/O error occurred.
      */
     public abstract String[] getQueueNames() throws XenonException;
     
@@ -372,6 +392,8 @@ public abstract class Scheduler {
      * 
      * @return an array of the resulting JobStatusses.
      * 
+     * @throws XenonException
+     *             If an I/O error occurred
      */
     public abstract JobStatus[] getJobStatuses(JobHandle... jobs) throws XenonException;
 

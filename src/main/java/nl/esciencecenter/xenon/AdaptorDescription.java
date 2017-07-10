@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon;
 
+import java.util.Arrays;
+
 /**
  * AdaptorStatus contains information on a specific adaptor.
  * 
@@ -76,8 +78,8 @@ public class AdaptorDescription {
     @Override
     public String toString() {
         return "AdaptorDescription [name=" + name + ", description=" + description + 
-        		", supportedLocations=" + supportedLocations +
-        		", supportedProperties=" + supportedProperties + "]";
+        		", supportedLocations=" + Arrays.toString(supportedLocations) +
+        		", supportedProperties=" + Arrays.toString(supportedProperties) + "]";
     }
     
     /**

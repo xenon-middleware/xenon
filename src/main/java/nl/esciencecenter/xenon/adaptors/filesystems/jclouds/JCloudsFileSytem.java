@@ -1,8 +1,10 @@
 package nl.esciencecenter.xenon.adaptors.filesystems.jclouds;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.filesystems.*;
+import org.apache.commons.io.input.NullInputStream;
 import org.jclouds.blobstore.BlobStoreContext;
 import org.jclouds.blobstore.domain.Blob;
 import org.jclouds.blobstore.domain.BlobMetadata;
@@ -16,11 +18,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Created by atze on 29-6-17.
- */
+// We emulate the presence of (empty) directories by a file ending in a /
+// this is the same behaviour as the official S3 console
 
-// TODO: Fix exceptions!
 public class JCloudsFileSytem extends FileSystem {
 
     final String bucket;
@@ -49,6 +49,13 @@ public class JCloudsFileSytem extends FileSystem {
         return open;
     }
 
+    void checkClosed() throws XenonException{
+        if(!isOpen()){
+            throw new NotConnectedException(getAdaptorName(), "Already closed file system!");
+        }
+    }
+
+/*
     @Override
     protected void copyFile(Path source, FileSystem destinationFS, Path destination, CopyMode mode) throws XenonException{
 
@@ -74,31 +81,68 @@ public class JCloudsFileSytem extends FileSystem {
         // revert to default copy
         super.copyFile(source,destinationFS,destination,mode);
     }
-
+*/
 
     @Override
     public void createDirectory(Path dir) throws XenonException {
-        // No true directories in a blobstore, so everything exists
+        checkClosed();
+        if(exists(dir)){
+            throw new PathAlreadyExistsException(adaptorName, "Cannot create directory, path already exists : " + dir.getRelativePath());
+        }
+        if(!exists(dir.getParent())){
+            throw new NoSuchPathException(adaptorName, "Cannot create file, " + dir.getRelativePath() + ", parent directory " + dir.getParent().getRelativePath() + "does not exists.");
+        }
 
+        String path = dir.getRelativePath();
+        if(!path.endsWith("/")){
+            path = path + "/";
+        }
+        InputStream emtpy = new org.apache.sshd.common.util.io.NullInputStream();
+        final Blob b = context.getBlobStore().blobBuilder(bucket).name(path).payload(new org.apache.sshd.common.util.io.NullInputStream()).contentLength(0).build();
+        context.getBlobStore().putBlob(bucket,b);
     }
 
     @Override
     public void createFile(Path file) throws XenonException {
-        // everything exists? do nothing?
+        checkClosed();
+        if(exists(file)){
+            throw new PathAlreadyExistsException(adaptorName, "Cannot create file, path already exists : " + file.getRelativePath());
+        }
+        if(!exists(file.getParent())){
+            throw new NoSuchPathException(adaptorName, "Cannot create file, " + file.getRelativePath() + ", parent directory " + file.getParent().getRelativePath() + "does not exists.");
+        }
+        String path = file.getRelativePath();
+        InputStream emtpy = new org.apache.sshd.common.util.io.NullInputStream();
+        final Blob b = context.getBlobStore().blobBuilder(bucket).name(path).payload(new org.apache.sshd.common.util.io.NullInputStream()).contentLength(0).build();
+        context.getBlobStore().putBlob(bucket,b);
     }
 
     @Override
-    public void deleteFile(Path path) throws XenonException{
-        String name = path.getRelativePath();
-        boolean exists = context.getBlobStore().blobExists(bucket,name);
+    public void createSymbolicLink(Path link, Path target) throws XenonException {
+        throw new AttributeNotSupportedException(adaptorName, "Symbolic link  not supported by " + adaptorName);
+    }
+
+    private void delete(String path){
+        boolean exists = context.getBlobStore().blobExists(bucket,path);
         if(exists){
-            context.getBlobStore().removeBlob(bucket,name);
+            context.getBlobStore().removeBlob(bucket,path);
         }
     }
 
     @Override
-    protected void deleteDirectory(Path path) throws XenonException {
-        // no directories
+    public void deleteFile(Path file) throws XenonException{
+        checkClosed();
+        delete(file.getRelativePath());
+    }
+
+    @Override
+    protected void deleteDirectory(Path dir) throws XenonException {
+        checkClosed();
+        String path = dir.getRelativePath();
+        if(!path.endsWith("/")){
+            path = path + "/";
+        }
+        delete(path);
     }
 
     @Override
@@ -109,20 +153,26 @@ public class JCloudsFileSytem extends FileSystem {
 
     @Override
     public boolean exists(Path path) throws XenonException {
-        // Everything exists, since there are no directories in a blobstore, and we want do not want to fail
-        // if we query for existence of a directory?
-        return true;
+        checkClosed();
+        String name = path.getRelativePath();
+        boolean exists = context.getBlobStore().blobExists(bucket,name);
+        if(!exists && !path.endsWith("/")){
+            return context.getBlobStore().blobExists(bucket,name +"/");
+        }
+        return exists;
     }
 
 
     PathAttributes toPathAttributes(final StorageMetadata m){
         Path p = new Path(m.getName());
+
         PathAttributes pa = new PathAttributes();
         pa.setPath(p);
         pa.setCreationTime(m.getCreationDate().getTime());
         pa.setLastModifiedTime(m.getLastModified().getTime());
         pa.setReadable(true);
         pa.setWritable(true);
+        pa.setDirectory(m.getName().endsWith("/"));
         return pa;
     }
 
@@ -165,7 +215,26 @@ public class JCloudsFileSytem extends FileSystem {
 
 
 
-    public Iterable<PathAttributes> list(Path dir, boolean recursive){
+    public Iterable<PathAttributes> list(Path dir, boolean recursive) throws XenonException{
+        checkClosed();
+        String name = dir.getRelativePath();
+        if(!name.endsWith("/")){
+            if(!context.getBlobStore().blobExists(bucket,name + "/")){
+                if(context.getBlobStore().blobExists(bucket,name )){
+                    throw new InvalidPathException(adaptorName, "Not a directory : " + dir.getRelativePath());
+                } else {
+                    throw new NoSuchPathException(adaptorName, " No such file or directory: " + dir.getRelativePath());
+                }
+            }
+        } else {
+            if(!context.getBlobStore().blobExists(bucket,name )){
+                throw new NoSuchPathException(adaptorName, " No such file or directory: " + dir.getRelativePath());
+            }
+        }
+
+        if(!exists(dir)){
+            throw new NoSuchPathException(adaptorName, "Cannot list " + dir.getRelativePath() + ": no such file or directory");
+        }
         ListContainerOptions options = new ListContainerOptions().prefix(dir.getRelativePath());
         if(recursive) { options = options.recursive(); }
         final ListContainerOptions optionsFinal = options;
@@ -229,6 +298,9 @@ public class JCloudsFileSytem extends FileSystem {
 
     @Override
     public PathAttributes getAttributes(Path path) throws XenonException {
+        if(exists(path)){
+            throw new NoSuchPathException(adaptorName, "File does not exist: " + path.getRelativePath());
+        }
         BlobMetadata md = context.getBlobStore().blobMetadata(bucket,path.getRelativePath());
         return toPathAttributes(md);
     }
