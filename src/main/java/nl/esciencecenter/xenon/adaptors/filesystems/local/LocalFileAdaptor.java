@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.adaptors.filesystems.local;
 import java.nio.file.Files;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
@@ -26,7 +27,6 @@ import nl.esciencecenter.xenon.adaptors.shared.local.LocalUtil;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
-import nl.esciencecenter.xenon.schedulers.InvalidLocationException;
 
 /**
  * LocalFiles implements an Xenon <code>Files</code> adaptor for local file operations.

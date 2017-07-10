@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.adaptors.filesystems;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import nl.esciencecenter.xenon.schedulers.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidLocationException;
 
 public abstract class Location {
     private final String user;

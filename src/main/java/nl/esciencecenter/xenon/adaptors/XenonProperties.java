@@ -23,10 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import nl.esciencecenter.xenon.PropertyTypeException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
-import nl.esciencecenter.xenon.schedulers.InvalidPropertyException;
-import nl.esciencecenter.xenon.schedulers.UnknownPropertyException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
+import nl.esciencecenter.xenon.UnknownPropertyException;
 
 /**
  * Read-only properties implementation. Also contains some utility functions for getting typed properties.

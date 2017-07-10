@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.schedulers;
-
-import nl.esciencecenter.xenon.XenonException;
+package nl.esciencecenter.xenon;
 
 /**
- * Signals that an invalid location was provided.  
+ * Signals that a property has a different type than the get method it was retrieved with.  
  * 
  * @version 1.0
  * @since 1.0
  */
-public class InvalidLocationException extends XenonException {
+public class UnknownPropertyException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 
-    public InvalidLocationException(String adaptorName, String message, Throwable t) {
+    public UnknownPropertyException(String adaptorName, String message, Throwable t) {
         super(adaptorName, message, t);
     }
 
-    public InvalidLocationException(String adaptorName, String message) {
+    public UnknownPropertyException(String adaptorName, String message) {
         super(adaptorName, message);
     }
 }

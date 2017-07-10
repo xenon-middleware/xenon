@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.schedulers;
-
-import nl.esciencecenter.xenon.XenonException;
+package nl.esciencecenter.xenon;
 
 /**
  * Signals that an invalid credential was used to access a resource.  

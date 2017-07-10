@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.schedulers;
-
-import nl.esciencecenter.xenon.XenonException;
+package nl.esciencecenter.xenon;
 
 /**
- * Signals that a property has an invalid value.  
+ * Signals that a property has a different type than the get method it was retrieved with.  
  * 
  * @version 1.0
  * @since 1.0
  */
-public class InvalidPropertyException extends XenonException {
+public class PropertyTypeException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 
-    public InvalidPropertyException(String adaptorName, String message, Throwable t) {
+    public PropertyTypeException(String adaptorName, String message, Throwable t) {
         super(adaptorName, message, t);
     }
 
-    public InvalidPropertyException(String adaptorName, String message) {
+    public PropertyTypeException(String adaptorName, String message) {
         super(adaptorName, message);
     }
 }

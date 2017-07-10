@@ -21,6 +21,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.InvalidAdaptorException;
+import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor;

@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors;
-
-import nl.esciencecenter.xenon.XenonException;
+package nl.esciencecenter.xenon;
 
 /**
  * Signals that a property has a different type than the get method it was retrieved with.  
@@ -23,15 +21,15 @@ import nl.esciencecenter.xenon.XenonException;
  * @version 1.0
  * @since 1.0
  */
-public class PropertyTypeException extends XenonException {
+public class InvalidPropertyException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 
-    public PropertyTypeException(String adaptorName, String message, Throwable t) {
+    public InvalidPropertyException(String adaptorName, String message, Throwable t) {
         super(adaptorName, message, t);
     }
 
-    public PropertyTypeException(String adaptorName, String message) {
+    public InvalidPropertyException(String adaptorName, String message) {
         super(adaptorName, message);
     }
 }

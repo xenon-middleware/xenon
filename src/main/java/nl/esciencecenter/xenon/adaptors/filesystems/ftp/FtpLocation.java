@@ -15,8 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.ftp;
 
+import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.adaptors.filesystems.Location;
-import nl.esciencecenter.xenon.schedulers.InvalidLocationException;
 
 public class FtpLocation extends Location {
 

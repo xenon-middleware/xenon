@@ -19,13 +19,13 @@ import org.apache.sshd.common.util.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
-import nl.esciencecenter.xenon.schedulers.InvalidCredentialException;
-import nl.esciencecenter.xenon.schedulers.InvalidLocationException;
 
 public class SSHUtil {
 	
