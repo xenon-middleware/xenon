@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 
-# TODO rename nlesc/xenon-test to nlesc/xenon-fixed-client, see https://github.com/NLeSC/xenon-docker-images/issues/7
-
 docker run \
--e MYUID=$UID \
+--env MYUID=$UID \
 --network host \
+--volume $HOME/.gradle:/home/xenon/.gradle \
+--volume $HOME/.m2:/home/xenon/.m2 \
+--volume /var/run/docker.sock:/var/run/docker.sock \
+--volume $PWD:/code \
+--tty --interactive --rm \
 --name=xenon-fixed-client \
--ti --rm \
--v $HOME/.gradle:/home/xenon/.gradle \
--v $PWD:/code \
--v /var/run/docker.sock:/var/run/docker.sock \
 nlesc/xenon-fixed-client \
 ./gradlew --no-daemon fixedClientEnvironmentTest "$@"
