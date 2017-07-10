@@ -5,10 +5,10 @@
 docker run \
 -e MYUID=$UID \
 --network host \
---name=xenon-client \
+--name=xenon-fixed-client \
 -ti --rm \
 -v $HOME/.gradle:/home/xenon/.gradle \
 -v $PWD:/code \
 -v /var/run/docker.sock:/var/run/docker.sock \
-nlesc/xenon-test \
+nlesc/xenon-fixed-client \
 ./gradlew --no-daemon fixedClientEnvironmentTest "$@"
