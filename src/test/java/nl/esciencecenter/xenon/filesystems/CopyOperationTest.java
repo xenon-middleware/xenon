@@ -25,7 +25,7 @@ import nl.esciencecenter.xenon.filesystems.FileSystem.CopyOperation;
 
 public class CopyOperationTest {
 
-	class FakeFileSystem extends TestFileSystem {
+	class FakeFileSystem extends MockFileSystem {
 
 		public FakeFileSystem(String uniqueID, String name, String location, Path entryPath) throws XenonException {
 			super(uniqueID, name, location, entryPath, null);

@@ -31,6 +31,7 @@ import nl.esciencecenter.xenon.adaptors.filesystems.PermissionDeniedException;
 import nl.esciencecenter.xenon.adaptors.schedulers.BadParameterException;
 import nl.esciencecenter.xenon.adaptors.schedulers.IncompatibleVersionException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerClosedException;
 import nl.esciencecenter.xenon.adaptors.schedulers.local.CommandNotFoundException;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.CertificateNotFoundException;
 import nl.esciencecenter.xenon.filesystems.AttributeNotSupportedException;
@@ -189,6 +190,17 @@ public class ExceptionsTest {
         testException(new EndOfFileException("name", "message", t), t);
     }
 
+    @Test
+    public void testSchedulerClosedException1() throws Exception {
+        testException(new SchedulerClosedException("name", "message"));
+    }
+
+    @Test
+    public void testSchedulerClosedException2() throws Exception {
+        Throwable t = new Throwable();
+        testException(new EndOfFileException("name", "message", t), t);
+    }
+    
     @Test
     public void testFileAlreadyExistsException1() throws Exception {
         testException(new PathAlreadyExistsException("name", "message"));

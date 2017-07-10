@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.xenon.filesystems;
 
-import static nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor.ADAPTOR_NAME;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,19 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
-import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
-import nl.esciencecenter.xenon.filesystems.FileSystem;
-import nl.esciencecenter.xenon.filesystems.InvalidPathException;
-import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
-import nl.esciencecenter.xenon.filesystems.Path;
-import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
-import nl.esciencecenter.xenon.filesystems.PathAttributes;
-import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 
-public class TestFileSystem extends FileSystem {
+public class MockFileSystem extends FileSystem {
 
 	private boolean close = false;
 	
@@ -304,14 +293,14 @@ public class TestFileSystem extends FileSystem {
 	
 	private DirEntry root;
 
-	public TestFileSystem(String uniqueID, String name, String location, Path entryPath, XenonProperties p) throws XenonException { 
+	public MockFileSystem(String uniqueID, String name, String location, Path entryPath, XenonProperties p) throws XenonException { 
 		super(uniqueID, name, location, entryPath, p);
 		root = new DirEntry("", getDirAttributes(new Path("/")));
 		ensureDirectories(entryPath);		
 	}
 
 	
-	public TestFileSystem(String uniqueID, String name, String location, Path entryPath) throws XenonException {
+	public MockFileSystem(String uniqueID, String name, String location, Path entryPath) throws XenonException {
 		this(uniqueID,name,location, entryPath, null);
 	}
 		

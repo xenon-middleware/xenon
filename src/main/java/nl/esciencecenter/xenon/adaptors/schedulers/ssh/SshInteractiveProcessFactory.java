@@ -30,6 +30,11 @@ public class SshInteractiveProcessFactory implements InteractiveProcessFactory {
 	private final ClientSession session;
 	
 	protected SshInteractiveProcessFactory(ClientSession session) { 
+		
+		if (session == null) { 
+			throw new IllegalArgumentException("Session may not be null");
+		}
+		
 		this.session = session;
 	}
 	

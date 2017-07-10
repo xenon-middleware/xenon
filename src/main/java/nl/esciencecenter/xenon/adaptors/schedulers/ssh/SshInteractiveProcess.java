@@ -53,8 +53,16 @@ class SshInteractiveProcess implements InteractiveProcess {
     private final long timeout = 10*1000;
     
     SshInteractiveProcess(ClientSession session, JobHandle job) throws XenonException {
-        this.session = session;
-      
+        
+    	if (session == null) { 
+    		throw new IllegalArgumentException("Session is null");
+    	}
+    	
+       	if (job == null) { 
+    		throw new IllegalArgumentException("Job handle is null");
+    	}
+    	
+    	this.session = session;
         JobDescription description = job.getJobDescription();
 
         try {
@@ -125,7 +133,7 @@ class SshInteractiveProcess implements InteractiveProcess {
             cleanup();
         }
 
-        return tmp;
+        return done;
     }
 
     @Override

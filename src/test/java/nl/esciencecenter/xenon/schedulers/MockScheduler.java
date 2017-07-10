@@ -18,9 +18,9 @@ package nl.esciencecenter.xenon.schedulers;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 
-public class TestScheduler extends Scheduler {
+public class MockScheduler extends Scheduler {
 
-	protected TestScheduler(String uniqueID, String adaptor, String location, boolean isOnline, boolean supportsBatch,
+	public MockScheduler(String uniqueID, String adaptor, String location, boolean isOnline, boolean supportsBatch,
 			boolean supportsInteractive, XenonProperties properties) {
 		super(uniqueID, adaptor, location, isOnline, supportsBatch, supportsInteractive, properties);
 	}
