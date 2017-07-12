@@ -28,7 +28,7 @@ services:
       timeout: 1s
       retries: 1
   slurm:
-    image: nlesc/xenon-slurm:15.08
+    image: nlesc/xenon-slurm-15
     depends_on:
     - mysql
     ports:
