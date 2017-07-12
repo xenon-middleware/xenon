@@ -19,8 +19,13 @@ import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineS
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.ADAPTOR_NAME;
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.IGNORE_VERSION_PROPERTY;
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.POLL_DELAY_PROPERTY;
-
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.*;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.VALID_PROPERTIES;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.JOB_OPTION_JOB_SCRIPT;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.QACCT_HEADER;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.generate;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.getJobStatusFromQacctInfo;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.getJobStatusFromQstatInfo;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.verifyJobDescription;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +41,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
@@ -76,10 +80,10 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
     private final GridEngineSetup setupInfo;
 
-    protected GridEngineScheduler(String uniqueID, String location, Credential credential, XenonProperties properties) 
+    protected GridEngineScheduler(String uniqueID, String location, Credential credential, Map<String,String> prop) 
             throws XenonException {
 
-        super(uniqueID, ADAPTOR_NAME, location, credential, true, false, properties, properties.getLongProperty(POLL_DELAY_PROPERTY));
+        super(uniqueID, ADAPTOR_NAME, location, credential, true, false, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
 
         boolean ignoreVersion = properties.getBooleanProperty(IGNORE_VERSION_PROPERTY);
         accountingGraceTime = properties.getLongProperty(ACCOUNTING_GRACE_TIME_PROPERTY);

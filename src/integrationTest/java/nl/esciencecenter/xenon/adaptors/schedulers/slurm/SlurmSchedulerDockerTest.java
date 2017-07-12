@@ -52,10 +52,7 @@ public class SlurmSchedulerDockerTest extends SlurmSchedulerTestParent {
 		Map<String, String> props = new HashMap<>();
 		props.put(STRICT_HOST_KEY_CHECKING, "false");
 		props.put(LOAD_STANDARD_KNOWN_HOSTS, "false");
-		return Scheduler.create("ssh", location, cred, props);
+		return Scheduler.create("slurm", location, cred, props);
 	}
-	
-	
-	
 	
 }

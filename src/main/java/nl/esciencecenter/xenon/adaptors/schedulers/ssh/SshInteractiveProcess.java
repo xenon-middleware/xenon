@@ -74,14 +74,24 @@ class SshInteractiveProcess implements InteractiveProcess {
 				channel.setEnv(entry.getKey(), entry.getValue());
 			}
 
-			// set the streams first, then connect the channel.
-            streams = new Streams(job, channel.getInvertedOut(), channel.getInvertedIn(), channel.getInvertedErr());           
+ 
+            
             
             // TODO: Add agent FW
             // channel.setAgentForwarding(session.useAgentForwarding());
             
             channel.open().verify(timeout);
-        } catch (IOException e) {
+
+			// set the streams first, then connect the channel.
+            streams = new Streams(job, channel.getInvertedOut(), channel.getInvertedIn(), channel.getInvertedErr());           
+
+            
+            System.out.println("CONNECTED!");
+            
+        } catch (Exception e) {
+        	
+        	System.out.println("FAILED: " + e);
+        	
         	throw new XenonException(ADAPTOR_NAME, "Failed to start command", e);
         }
     }
@@ -138,7 +148,14 @@ class SshInteractiveProcess implements InteractiveProcess {
 
     @Override
     public int getExitStatus() {
-        return channel.getExitStatus();
+    	
+    	Integer status = channel.getExitStatus();
+    	
+    	if (status == null) { 
+    		return -1;
+    	}
+    	
+        return status.intValue();
     }
 
     @Override

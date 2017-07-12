@@ -15,12 +15,14 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
+import nl.esciencecenter.xenon.XenonException;
+
 /**
  * 
  */
 public interface Process {
 
-    boolean isDone();
+    boolean isDone(); 
 
     int getExitStatus();
 

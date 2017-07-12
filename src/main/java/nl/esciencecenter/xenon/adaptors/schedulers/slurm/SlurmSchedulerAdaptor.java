@@ -81,6 +81,6 @@ public class SlurmSchedulerAdaptor extends SchedulerAdaptor {
     
 	@Override
 	public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) throws XenonException {
-		return new SlurmScheduler(getNewUniqueID(), location, credential, new XenonProperties(VALID_PROPERTIES, properties));
+		return new SlurmScheduler(getNewUniqueID(), location, credential, properties);
 	}
 }

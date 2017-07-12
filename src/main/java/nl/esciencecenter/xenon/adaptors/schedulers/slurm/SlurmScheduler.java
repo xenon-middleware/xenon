@@ -20,6 +20,7 @@ import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAd
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.POLL_DELAY_PROPERTY;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.SLURM_UPDATE_SLEEP;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.SLURM_UPDATE_TIMEOUT;
+import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.VALID_PROPERTIES;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmUtils.JOB_OPTION_JOB_SCRIPT;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmUtils.generate;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmUtils.generateInteractiveArguments;
@@ -68,16 +69,13 @@ public class SlurmScheduler extends ScriptingScheduler {
 
     private final String defaultQueueName;
 
-    private final Map<String, JobHandle> interactiveJobs;
+    private final Map<String, JobHandle> interactiveJobs = new HashMap<>();
 
     private final SlurmSetup setup;
     
-    protected SlurmScheduler(String uniqueID, String location, Credential credential, XenonProperties properties) throws XenonException {
+    protected SlurmScheduler(String uniqueID, String location, Credential credential, Map<String,String> prop) throws XenonException {
 
-        super(uniqueID, ADAPTOR_NAME, location, credential, true, true, properties, properties.getLongProperty(POLL_DELAY_PROPERTY));
-
-        //map containing references to interactive jobs (normally ssh jobs)
-        interactiveJobs = new HashMap<>();
+        super(uniqueID, ADAPTOR_NAME, location, credential, true, true, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
 
         boolean disableAccounting = properties.getBooleanProperty(DISABLE_ACCOUNTING_USAGE);
 

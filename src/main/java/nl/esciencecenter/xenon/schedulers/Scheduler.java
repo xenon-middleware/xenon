@@ -26,12 +26,12 @@ import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor;
+import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
@@ -153,7 +153,7 @@ public abstract class Scheduler {
 	private final String uniqueID;
 	private final String adaptor;
 	private final String location;
-	private final XenonProperties properties;
+	protected final XenonProperties properties;
 
 	private final boolean isOnline;
 	private final boolean supportsInteractive;
@@ -182,8 +182,7 @@ public abstract class Scheduler {
 		this.isOnline = isOnline;
 		this.supportsBatch = supportsBatch;
 		this.supportsInteractive = supportsInteractive;
-
-		this.properties = properties;		
+		this.properties = properties;
 	}
 
 	/**

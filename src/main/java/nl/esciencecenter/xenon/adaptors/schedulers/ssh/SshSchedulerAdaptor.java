@@ -106,7 +106,7 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
     public static final String SUBMITTED = JOBS + "submitted";
 
     /** List of properties supported by this SSH adaptor */
-    protected static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {
+    public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {
             new XenonPropertyDescription(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN,
             		"true", "Automatically add unknown host keys to known_hosts."),
             new XenonPropertyDescription(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, 

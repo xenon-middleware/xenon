@@ -603,12 +603,12 @@ public class XenonProperties {
     }
 
     /**
-     * Returns all properties that are set in a Map.
+     * Returns all properties that are set in a new Map.
      * 
-     * @return all properties that are set in a Map.
+     * @return all properties that are set in a new Map.
      */
     public Map<String, String> toMap() {
-        return Collections.unmodifiableMap(properties);
+        return new HashMap<>(properties);
     }
 
     /**

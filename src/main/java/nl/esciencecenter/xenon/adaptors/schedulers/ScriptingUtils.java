@@ -15,15 +15,40 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
+import java.util.Arrays;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.InvalidPropertyException;
+import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
+import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobHandle;
 
 public class ScriptingUtils {
+
+	public static boolean isLocal(String location) { 
+		return (location == null || location.length() == 0 || location.equals("/"));
+	}
+
+	public static XenonPropertyDescription [] mergeValidProperties(XenonPropertyDescription[] a, XenonPropertyDescription[] b) { 
+		XenonPropertyDescription [] result = Arrays.copyOf(a, a.length + b.length);
+		System.arraycopy(b, 0, result, a.length, b.length);
+		return result;
+	}
+
+	public static XenonProperties getProperties(XenonPropertyDescription[] validProperties, String location, Map<String,String> properties) throws UnknownPropertyException, InvalidPropertyException { 
+		if (isLocal(location)) {
+			return new XenonProperties(mergeValidProperties(validProperties, LocalSchedulerAdaptor.VALID_PROPERTIES), properties);
+		} else {
+			return new XenonProperties(mergeValidProperties(validProperties, SshSchedulerAdaptor.VALID_PROPERTIES), properties);
+		}
+	}
 
 	//  protected static boolean supportsScheme(String scheme, String[] supportedSchemes) {
 	//      for (String validScheme : supportedSchemes) {
@@ -131,6 +156,6 @@ public class ScriptingUtils {
 		}
 	}
 
-	
+
 
 }

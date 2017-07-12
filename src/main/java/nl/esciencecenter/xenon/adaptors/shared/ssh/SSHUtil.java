@@ -22,11 +22,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.sshd.agent.local.ProxyAgentFactory;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.config.hosts.DefaultConfigFileHostEntryResolver;
+import org.apache.sshd.client.keyverifier.AcceptAllServerKeyVerifier;
 import org.apache.sshd.client.keyverifier.DefaultKnownHostsServerKeyVerifier;
 import org.apache.sshd.client.keyverifier.RejectAllServerKeyVerifier;
 import org.apache.sshd.client.session.ClientSession;
@@ -39,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.CertificateCredential;
@@ -70,9 +74,11 @@ public class SSHUtil {
 
 		SshClient client = SshClient.setUpDefaultClient();
 		
-		if (loadKnownHosts) {
-			client.setServerKeyVerifier(new DefaultKnownHostsServerKeyVerifier(RejectAllServerKeyVerifier.INSTANCE));
-		}
+		client.setServerKeyVerifier(AcceptAllServerKeyVerifier.INSTANCE);
+		
+//		if (loadKnownHosts) {
+//			client.setServerKeyVerifier(new DefaultKnownHostsServerKeyVerifier(RejectAllServerKeyVerifier.INSTANCE));
+//		}
 
 		if (loadSSHConfig) {
 			client.setHostConfigEntryResolver(DefaultConfigFileHostEntryResolver.INSTANCE);
@@ -216,7 +222,8 @@ public class SSHUtil {
 		return session;
 	}
 	
-	public static Map<String,String> translateProperties(Map<String,String> properties, String orginalPrefix, String newPrefix) { 
+	public static Map<String,String> translateProperties(Map<String,String> properties, Set<String> valid, 
+			String orginalPrefix, String newPrefix) { 
 		
 		HashMap<String,String> result = new HashMap<>();
 		
@@ -226,20 +233,37 @@ public class SSHUtil {
 			
 			String key = e.getKey();
 			
-			if (key.startsWith(orginalPrefix)) { 
-				key = newPrefix + key.substring(start, key.length());
-				result.put(key, e.getValue());
+			if (key.startsWith(orginalPrefix)) {
+			
+				String newKey = newPrefix + key.substring(start, key.length());
+				
+				if (valid.contains(newKey)) { 
+					result.put(newKey, e.getValue());
+				}
 			}
 		}
 
 		return result;
 	}
 	
+	public static Set<String> validProperties(XenonPropertyDescription [] properties) { 
+		
+		HashSet<String> result = new HashSet<>();
+		
+		for (XenonPropertyDescription p : properties) { 
+			result.add(p.getName());
+		}
+		
+		return result;
+	}
+ 	
 	public static Map<String,String> sshToSftpProperties(Map<String,String> properties) {
-		return translateProperties(properties, SshSchedulerAdaptor.PREFIX, SftpFileAdaptor.PREFIX);
+		return translateProperties(properties, validProperties(SftpFileAdaptor.VALID_PROPERTIES), 
+				SshSchedulerAdaptor.PREFIX, SftpFileAdaptor.PREFIX);
 	}
 	
 	public static Map<String,String> sftpToSshProperties(Map<String,String> properties) {
-		return translateProperties(properties, SftpFileAdaptor.PREFIX, SshSchedulerAdaptor.PREFIX);
+		return translateProperties(properties, validProperties(SshSchedulerAdaptor.VALID_PROPERTIES), 
+				SftpFileAdaptor.PREFIX, SshSchedulerAdaptor.PREFIX);
 	}	
 }
