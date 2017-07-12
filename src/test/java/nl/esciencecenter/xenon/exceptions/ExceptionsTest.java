@@ -27,6 +27,7 @@ import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.filesystems.ConnectionLostException;
 import nl.esciencecenter.xenon.adaptors.filesystems.EndOfFileException;
+import nl.esciencecenter.xenon.adaptors.filesystems.NoSpaceException;
 import nl.esciencecenter.xenon.adaptors.filesystems.PermissionDeniedException;
 import nl.esciencecenter.xenon.adaptors.schedulers.BadParameterException;
 import nl.esciencecenter.xenon.adaptors.schedulers.IncompatibleVersionException;
@@ -45,8 +46,8 @@ import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
-import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.schedulers.NoSuchJobException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.schedulers.UnsupportedJobDescriptionException;
@@ -454,5 +455,29 @@ public class ExceptionsTest {
         testException(new FileSystemClosedException("name", "message", t), t);
     }
 
+    @Test
+    public void testUnsupportedOperationException1() throws Exception {
+        testException(new nl.esciencecenter.xenon.UnsupportedOperationException("name", "message"));
+    }
+
+    @Test
+    public void testUnsupportedOperationException2() throws Exception {
+        Throwable t = new Throwable();
+        testException(new nl.esciencecenter.xenon.UnsupportedOperationException("name", "message", t), t);
+    }
+
+
+    @Test
+    public void testNoSpaceException1() throws Exception {
+        testException(new NoSpaceException("name", "message"));
+    }
+
+    @Test
+    public void testNoSpaceException2() throws Exception {
+        Throwable t = new Throwable();
+        testException(new NoSpaceException("name", "message", t), t);
+    }
+
+    
     
 }

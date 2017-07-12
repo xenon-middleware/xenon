@@ -109,24 +109,47 @@ public abstract class SshInteractiveProcessITest {
 		assertEquals(0, p.getExitStatus());
 	}
 
+		
+	@Test
+	public void test_exitStatusBeforeFinish() throws Exception { 
+		SshClient client = SSHUtil.createSSHClient(false, false, false, false);
+		ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10*1000);
+		
+		JobDescription desc = new JobDescription();
+		desc.setExecutable("/bin/sleep");
+		desc.addArgument("5");
+		
+		JobHandle h = new MockJobHandle("TESTID", desc);
+		
+		SshInteractiveProcess p = new SshInteractiveProcess(session, h);
+		
+		// Not done yet, so exit returns -1
+		assertEquals(-1, p.getExitStatus());
+
+		Streams s = p.getStreams();
+
+		assertNotNull(s.getStdin());
+		assertNotNull(s.getStdout());
+		assertNotNull(s.getStderr());
+
+		s.getStdin().close();
+		
+		OutputReader stdout = new OutputReader(s.getStdout());
+		OutputReader stderr = new OutputReader(s.getStderr());
 	
-	
-//	@Test
-//	public void test_exitStatusBeforeFinish() throws Exception { 
-//		SshClient client = SSHUtil.createSSHClient(false, false, false, false);
-//		ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10*1000);
-//		
-//		JobDescription desc = new JobDescription();
-//		desc.setExecutable("/bin/hostname");
-//		
-//		JobHandle h = new MockJobHandle("TESTID", desc);
-//		
-//		SshInteractiveProcess p = new SshInteractiveProcess(session, h);
-//		
-//		assertEquals(-1, p.getExitStatus());
-//		
-//		p.destroy();		
-//	}
+		stderr.waitUntilFinished();
+		stdout.waitUntilFinished();
+		
+		String output = stdout.getResult();
+		String error = stderr.getResult();
+		
+		assertTrue(error.isEmpty());
+		assertTrue(output.isEmpty());
+
+
+		// Done yet, so exit returns 0
+		assertEquals(0, p.getExitStatus());
+	}
 //
 	
 }

@@ -16,6 +16,7 @@
 package nl.esciencecenter.xenon.adaptors.filesystems.webdav;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Map;
 
 import org.apache.commons.httpclient.Credentials;
@@ -32,6 +33,7 @@ import org.apache.jackrabbit.webdav.client.methods.OptionsMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
@@ -63,7 +65,9 @@ public class WebdavFileAdaptor extends FileAdaptor {
     protected static final int BUFFER_SIZE = 4 * 1024;
 
     public static final int OK_CODE = 200;
-
+	
+    private static final int DEFAULT_PORT = 80; 
+	
     public WebdavFileAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false);
     }
@@ -96,12 +100,25 @@ public class WebdavFileAdaptor extends FileAdaptor {
         LOGGER.debug("newFileSystem location = {} credential = {} properties = {}", location, credential,
                 properties);
 
-        WebdavLocation webdavLocation = new WebdavLocation(location);
-
-        HttpClient client = getClient(webdavLocation);
+        URI uri; 
+        
+    	try { 
+    		uri = new URI(location);
+    	} catch (Exception e) {
+    		throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
+		}
+        
+    	String host = uri.getHost();
+    	int port = uri.getPort();
+    	
+    	if (port == -1) { 
+    		port = DEFAULT_PORT;
+    	}
+    	
+    	HttpClient client = getClient(host, port);
         HttpMethod method;
         try {
-            method = new OptionsMethod(toFolderPath(webdavLocation.toString()));
+            method = new OptionsMethod(toFolderPath(uri.toString()));
             int response = client.executeMethod(method);
             String responseBodyAsString = method.getStatusLine().toString();
             method.releaseConnection();
@@ -112,7 +129,8 @@ public class WebdavFileAdaptor extends FileAdaptor {
             throw new XenonException(ADAPTOR_NAME, "Could not open connection to " + location, e);
         }
 
-        String cwd = webdavLocation.getPath();
+        String cwd = uri.getPath();
+        
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
        
         return new WebdavFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), client, xp);
@@ -127,9 +145,9 @@ public class WebdavFileAdaptor extends FileAdaptor {
 //        return fileSystem;
     }
 
-    private HttpClient getClient(WebdavLocation webdavLocation) {
+    private HttpClient getClient(String host, int port) {
         HostConfiguration hostConfig = new HostConfiguration();
-        hostConfig.setHost(webdavLocation.getHost(), webdavLocation.getPort());
+        hostConfig.setHost(host, port);
         HttpConnectionManager connectionManager = getConnectionManager(hostConfig);
         HttpClient client = new HttpClient(connectionManager);
         Credentials creds = new UsernamePasswordCredentials("xenon", "xenon1");

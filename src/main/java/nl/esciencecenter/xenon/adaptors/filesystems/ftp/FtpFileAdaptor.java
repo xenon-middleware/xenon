@@ -16,6 +16,7 @@
 package nl.esciencecenter.xenon.adaptors.filesystems.ftp;
 
 import java.io.IOException;
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
@@ -61,10 +63,27 @@ public class FtpFileAdaptor extends FileAdaptor {
     
     protected FTPClient connect(String location, Credential credential) throws XenonException { 
 
-    	FtpLocation ftpLocation = FtpLocation.parse(location);
+    	URI uri; 
+    	
+    	try { 
+    		uri = new URI(location);
+    	} catch (Exception e) {
+    		throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
+		}
+    	
+    	//FtpLocation ftpLocation = FtpLocation.parse(location);
+
     	FTPClient ftpClient = new FTPClient();
     	ftpClient.setListHiddenFiles(true);
-    	connectToServer(ftpLocation, ftpClient);
+    	
+    	String host = uri.getHost();
+    	int port = uri.getPort();
+    	
+    	if (port == -1) { 
+    		port = DEFAULT_PORT;
+    	}
+    	
+    	connectToServer(host, port, ftpClient);
     	login(credential, ftpClient);
     	
     	return ftpClient;
@@ -98,9 +117,9 @@ public class FtpFileAdaptor extends FileAdaptor {
         return wd;
     }
 
-    private void connectToServer(FtpLocation ftpLocation, FTPClient ftp) throws XenonException {
+    private void connectToServer(String host, int port, FTPClient ftp) throws XenonException {
         try {
-            ftp.connect(ftpLocation.getHost(), ftpLocation.getPort());
+            ftp.connect(host, port);
         } catch (IOException e) {
             throw new XenonException(getName(), "Failed to connect", e);
         }
