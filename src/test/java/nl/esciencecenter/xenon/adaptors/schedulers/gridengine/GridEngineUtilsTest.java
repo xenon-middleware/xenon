@@ -21,8 +21,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,10 +31,8 @@ import org.junit.runners.MethodSorters;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
-import nl.esciencecenter.xenon.adaptors.schedulers.MockScriptingJob;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.JobHandle;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -217,7 +213,6 @@ public class GridEngineUtilsTest {
         description.setProcessesPerNode(1);
         description.setMaxTime(1);
         //GridEngine specific info
-        description.setInteractive(false);
 
         GridEngineUtils.verifyJobDescription(description);
     }
@@ -233,8 +228,7 @@ public class GridEngineUtilsTest {
         description.setMaxTime(1);
         //GridEngine specific info
         description.addJobOption(GridEngineUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
-        description.setInteractive(false);
-
+        
         GridEngineUtils.verifyJobDescription(description);
     }
 
@@ -244,8 +238,7 @@ public class GridEngineUtilsTest {
 
         //set a job option
         description.addJobOption(GridEngineUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
-        description.setInteractive(false);
-
+        
         //All these settings are wrong. This should not lead to an error
         description.setExecutable(null);
         description.setNodeCount(0);
@@ -262,17 +255,7 @@ public class GridEngineUtilsTest {
 
         //set a job option
         description.addJobOption("wrong.setting", "wrong.value");
-        description.setInteractive(false);
-
-        GridEngineUtils.verifyJobDescription(description);
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test01e_verifyJobDescription_InteractiveJob_ExceptionThrown() throws Exception {
-        JobDescription description = new JobDescription();
-
-        description.setInteractive(true);
-
+        
         GridEngineUtils.verifyJobDescription(description);
     }
 
@@ -297,7 +280,6 @@ public class GridEngineUtilsTest {
         description.setProcessesPerNode(2);
         description.setMaxTime(1);
         //GridEngine specific info
-        description.setInteractive(false);
         description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
         description.setQueueName("some.queue");
 
@@ -314,7 +296,6 @@ public class GridEngineUtilsTest {
         description.setProcessesPerNode(2);
         description.setMaxTime(1);
         //GridEngine specific info
-        description.setInteractive(false);
         description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
         description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_SLOTS, "11");
 
@@ -331,7 +312,6 @@ public class GridEngineUtilsTest {
         description.setProcessesPerNode(2);
         description.setMaxTime(1);
         //GridEngine specific info
-        description.setInteractive(false);
         description.setQueueName("some.queue");
 
         GridEngineUtils.verifyJobDescription(description);
@@ -347,18 +327,7 @@ public class GridEngineUtilsTest {
         description.setProcessesPerNode(2);
         description.setMaxTime(1);
         //GridEngine specific info
-        description.setInteractive(false);
         description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
-
-        GridEngineUtils.verifyJobDescription(description);
-    }
-    
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test01k_verifyJobDescription_InteractiveJob_ExceptionThrown() throws Exception {
-        JobDescription description = new JobDescription();
-
-        description.setExecutable("/bin/nothing");
-        description.setInteractive(true);
 
         GridEngineUtils.verifyJobDescription(description);
     }
@@ -382,10 +351,9 @@ public class GridEngineUtilsTest {
         jobInfo.put("exit_status", "5");
         jobInfo.put("failed", "0");
 
-        JobHandle job = new MockScriptingJob(jobnumber);
-        JobStatus result = GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, job);
+        JobStatus result = GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, jobnumber);
 
-        assertEquals(job, result.getJob());
+        assertEquals(jobnumber, result.getJobIdentifier());
         assertEquals("done", result.getState());
         assertEquals(new Integer(5), result.getExitCode());
         assertFalse(result.hasException());
@@ -402,10 +370,10 @@ public class GridEngineUtilsTest {
         jobInfo.put("exit_status", "0");
         jobInfo.put("failed", "100: This job was canceled");
 
-        JobHandle job = new MockScriptingJob(jobnumber);
-        JobStatus result = GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, job);
+        
+        JobStatus result = GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, jobnumber);
 
-        assertEquals(job, result.getJob());
+        assertEquals(jobnumber, result.getJobIdentifier());
         assertEquals("done", result.getState());
         assertEquals(new Integer(0), result.getExitCode());
         assertTrue(result.hasException());
@@ -423,10 +391,10 @@ public class GridEngineUtilsTest {
         jobInfo.put("exit_status", "11");
         jobInfo.put("failed", "0");
 
-        JobHandle job = new MockScriptingJob(jobnumber);
-        JobStatus result = GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, job);
+        
+        JobStatus result = GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, jobnumber);
 
-        assertEquals(job, result.getJob());
+        assertEquals(jobnumber, result.getJobIdentifier());
         assertEquals("done", result.getState());
         assertEquals(new Integer(11), result.getExitCode());
         assertFalse(result.hasException());
@@ -443,10 +411,10 @@ public class GridEngineUtilsTest {
         jobInfo.put("exit_status", "4");
         jobInfo.put("failed", "666: SomethingWentWrongNoIdea");
 
-        JobHandle job = new MockScriptingJob(jobnumber);
-        JobStatus result = GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, job);
+        
+        JobStatus result = GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, jobnumber);
 
-        assertEquals(job, result.getJob());
+        assertEquals(jobnumber, result.getJobIdentifier());
         assertEquals("done", result.getState());
         assertEquals(new Integer(4), result.getExitCode());
         assertTrue(result.hasException());
@@ -460,8 +428,8 @@ public class GridEngineUtilsTest {
     @Test
     public void test03e_getJobStatusFromQacctInfo_NullInput_NullReturned() throws XenonException {
         String jobnumber = "555";
-        JobHandle job = new MockScriptingJob(jobnumber);
-        JobStatus result = GridEngineUtils.getJobStatusFromQacctInfo(null, job);
+        
+        JobStatus result = GridEngineUtils.getJobStatusFromQacctInfo(null, jobnumber);
 
         assertNull(result);
     }
@@ -472,9 +440,9 @@ public class GridEngineUtilsTest {
         //empty job info
         Map<String, String> jobInfo = new HashMap<>();
 
-        JobHandle job = new MockScriptingJob(jobnumber);
+        
 
-        GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, job);
+        GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, jobnumber);
     }
     
     @Test(expected = XenonException.class)
@@ -486,9 +454,9 @@ public class GridEngineUtilsTest {
         jobInfo.put("exit_status", "four");
         jobInfo.put("failed", "0");
         
-        JobHandle job = new MockScriptingJob(jobnumber);
+        
 
-        GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, job);
+        GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, jobnumber);
     }
     
     @Test
@@ -501,10 +469,10 @@ public class GridEngineUtilsTest {
 
         Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
-        JobHandle job = new MockScriptingJob(jobID);
-        JobStatus result = GridEngineUtils.getJobStatusFromQstatInfo(input, job);
+        
+        JobStatus result = GridEngineUtils.getJobStatusFromQstatInfo(input, jobID);
 
-        assertEquals(job, result.getJob());
+        assertEquals(jobID, result.getJobIdentifier());
         assertEquals("pending", result.getState());
         assertNull(result.getExitCode());
         assertFalse(result.hasException());
@@ -523,10 +491,10 @@ public class GridEngineUtilsTest {
 
         Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
-        JobHandle job = new MockScriptingJob(jobID);
-        JobStatus result = GridEngineUtils.getJobStatusFromQstatInfo(input, job);
+        
+        JobStatus result = GridEngineUtils.getJobStatusFromQstatInfo(input, jobID);
 
-        assertEquals(job, result.getJob());
+        assertEquals(jobID, result.getJobIdentifier());
         assertEquals("running", result.getState());
         assertNull(result.getExitCode());
         assertFalse(result.hasException());
@@ -545,10 +513,10 @@ public class GridEngineUtilsTest {
 
         Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
-        JobHandle job = new MockScriptingJob(jobID);
-        JobStatus result = GridEngineUtils.getJobStatusFromQstatInfo(input, job);
+      
+        JobStatus result = GridEngineUtils.getJobStatusFromQstatInfo(input, jobID);
 
-        assertEquals(job, result.getJob());
+        assertEquals(jobID, result.getJobIdentifier());
         assertEquals("error", result.getState());
         assertNull(result.getExitCode());
         assertTrue(result.hasException());
@@ -563,8 +531,7 @@ public class GridEngineUtilsTest {
     public void test04d_getJobStatusFromQstatInfo_JobNotInMap_NullReturned() throws XenonException {
         String jobID = "555";
         Map<String, Map<String, String>> input = new HashMap<>();
-        JobHandle job = new MockScriptingJob(jobID);
-        JobStatus result = GridEngineUtils.getJobStatusFromQstatInfo(input, job);
+        JobStatus result = GridEngineUtils.getJobStatusFromQstatInfo(input, jobID);
 
         assertNull(result);
     }
@@ -579,9 +546,7 @@ public class GridEngineUtilsTest {
         Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
 
-        JobHandle job = new MockScriptingJob(jobID);
-
-        GridEngineUtils.getJobStatusFromQstatInfo(input, job);
+        GridEngineUtils.getJobStatusFromQstatInfo(input, jobID);
     }
 
 }

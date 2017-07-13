@@ -22,8 +22,8 @@ import org.apache.sshd.client.session.ClientSession;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcess;
 import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcessFactory;
-import nl.esciencecenter.xenon.adaptors.schedulers.JobImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerClosedException;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 public class SshInteractiveProcessFactory implements InteractiveProcessFactory {
 	
@@ -39,13 +39,13 @@ public class SshInteractiveProcessFactory implements InteractiveProcessFactory {
 	}
 	
 	@Override
-    public InteractiveProcess createInteractiveProcess(JobImplementation job) throws XenonException {
+    public InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier) throws XenonException {
 		
 		if (session.isClosed()) { 
 			throw new SchedulerClosedException(ADAPTOR_NAME, "Scheduler is closed");
 		}
 		
-     	return new SshInteractiveProcess(session, job);
+     	return new SshInteractiveProcess(session, description, jobIdentifier);
     }
 
 	@Override

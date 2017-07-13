@@ -25,7 +25,6 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcess;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.JobHandle;
 import nl.esciencecenter.xenon.schedulers.Streams;
 
 import org.apache.sshd.client.channel.ChannelExec;
@@ -36,9 +35,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * LocalBatchProcess implements a {@link InteractiveProcess} for local batch processes.
- * 
- * @version 1.0
- * @since 1.0
  */
 class SshInteractiveProcess implements InteractiveProcess {
 
@@ -52,19 +48,22 @@ class SshInteractiveProcess implements InteractiveProcess {
     // FIXME: should be property or parameter!
     private final long timeout = 10*1000;
     
-    SshInteractiveProcess(ClientSession session, JobHandle job) throws XenonException {
+    SshInteractiveProcess(ClientSession session, JobDescription description, String jobIdentifier) throws XenonException {
         
     	if (session == null) { 
     		throw new IllegalArgumentException("Session is null");
     	}
     	
-       	if (job == null) { 
-    		throw new IllegalArgumentException("Job handle is null");
+       	if (description == null) { 
+    		throw new IllegalArgumentException("Job description is null");
     	}
-    	
-    	this.session = session;
-        JobDescription description = job.getJobDescription();
 
+       	if (jobIdentifier == null) { 
+    		throw new IllegalArgumentException("Job identifier is null");
+    	}
+       	
+    	this.session = session;
+        
         try {
 			this.channel = session.createExecChannel(buildCommand(description));
 	
@@ -73,9 +72,6 @@ class SshInteractiveProcess implements InteractiveProcess {
 			for (Entry<String, String> entry : environment.entrySet()) {
 				channel.setEnv(entry.getKey(), entry.getValue());
 			}
-
- 
-            
             
             // TODO: Add agent FW
             // channel.setAgentForwarding(session.useAgentForwarding());
@@ -83,8 +79,7 @@ class SshInteractiveProcess implements InteractiveProcess {
             channel.open().verify(timeout);
 
 			// set the streams first, then connect the channel.
-            streams = new Streams(job, channel.getInvertedOut(), channel.getInvertedIn(), channel.getInvertedErr());           
-
+            streams = new Streams(jobIdentifier, channel.getInvertedOut(), channel.getInvertedIn(), channel.getInvertedErr());           
             
             System.out.println("CONNECTED!");
             

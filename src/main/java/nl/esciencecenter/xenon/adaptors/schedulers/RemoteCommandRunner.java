@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.JobHandle;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.Streams;
@@ -62,14 +61,11 @@ public class RemoteCommandRunner {
         long start = System.currentTimeMillis();
 
         JobDescription description = new JobDescription();
-        description.setInteractive(true);
         description.setExecutable(executable);
         description.setArguments(arguments);
         description.setQueueName("unlimited");
             
-        JobHandle job = scheduler.submitJob(description);
-
-        Streams streams = scheduler.getStreams(job);
+        Streams streams = scheduler.submitInteractiveJob(description);
 
         InputWriter in = new InputWriter(stdin, streams.getStdin());
 
@@ -81,10 +77,10 @@ public class RemoteCommandRunner {
         out.waitUntilFinished();
         err.waitUntilFinished();
 
-        JobStatus status = scheduler.getJobStatus(job);
+        JobStatus status = scheduler.getJobStatus(streams.getJobIdentifier());
 
         if (!status.isDone()) {
-            status = scheduler.waitUntilDone(job, 0);
+            status = scheduler.waitUntilDone(streams.getJobIdentifier(), 0);
         }
 
         if (status.hasException()) {

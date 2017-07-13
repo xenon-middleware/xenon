@@ -25,18 +25,13 @@ import java.util.HashMap;
 import org.junit.Test;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.JobImplementation;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.Scheduler;
-import nl.esciencecenter.xenon.schedulers.MockScheduler;
 
 public class SshInteractiveProcessTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void test_createFailsSessionNull() throws XenonException {
 		
-		Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
-		
 		JobDescription desc = new JobDescription();
 		desc.setWorkingDirectory("workdir");
 		desc.setExecutable("exec");
@@ -47,20 +42,33 @@ public class SshInteractiveProcessTest {
 		desc.setEnvironment(env);
 		desc.setArguments(new String [] { "a", "b", "c" });
 		
-		JobImplementation j = new JobImplementation(s, "aap", desc);
-
-		new SshInteractiveProcess(null, j);
+		new SshInteractiveProcess(null, desc, "JOB-42");
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void test_createFailsJobNull() throws XenonException {
 		MockClientSession session = new MockClientSession(false);
-		new SshInteractiveProcess(session, null);
+		new SshInteractiveProcess(session, null, "JOB-42");
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void test_createFailsIDNull() throws XenonException {
+		
+		JobDescription desc = new JobDescription();
+		desc.setWorkingDirectory("workdir");
+		desc.setExecutable("exec");
+		
+		HashMap<String,String> env = new HashMap<>();
+		env.put("key1", "value1");
+		env.put("key2", "value2");
+		desc.setEnvironment(env);
+		desc.setArguments(new String [] { "a", "b", "c" });
+		
+		new SshInteractiveProcess(null, desc, null);
 	}
 	
 	@Test(expected=XenonException.class)
 	public void test_createFails() throws XenonException {
-		Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
 		
 		JobDescription desc = new JobDescription();
 		desc.setWorkingDirectory("workdir");
@@ -72,16 +80,12 @@ public class SshInteractiveProcessTest {
 		desc.setEnvironment(env);
 		desc.setArguments(new String [] { "a", "b", "c" });
 		
-		JobImplementation j = new JobImplementation(s, "aap", desc);
-		
 		MockClientSession session = new MockClientSession(false, true);
-		new SshInteractiveProcess(session, j);
+		new SshInteractiveProcess(session, desc, "JOB-42");
 	}
 	
 	@Test
 	public void test_create() throws XenonException {
-		Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
-		
 		JobDescription desc = new JobDescription();
 		desc.setWorkingDirectory("workdir");
 		desc.setExecutable("exec");
@@ -92,22 +96,19 @@ public class SshInteractiveProcessTest {
 		desc.setEnvironment(env);
 		desc.setArguments(new String [] { "a", "b", "c" });
 		
-		JobImplementation j = new JobImplementation(s, "aap", desc);
-		
 		MockClientSession session = new MockClientSession(false);
-		SshInteractiveProcess p = new SshInteractiveProcess(session, j);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
 		
 		MockChannelExec e = (MockChannelExec) session.exec;
 		
 		assertNotNull(e);
 		assertEquals("cd 'workdir' && exec 'a' 'b' 'c'", e.command);
 		assertEquals(env, e.env);
-		assertEquals(j, p.getStreams().getJob());
+		assertEquals("JOB-42", p.getStreams().getJobIdentifier());
 	}
 	
 	@Test
 	public void test_create2() throws XenonException {
-		Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
 		
 		JobDescription desc = new JobDescription();
 		desc.setExecutable("exec");
@@ -118,10 +119,8 @@ public class SshInteractiveProcessTest {
 		desc.setEnvironment(env);
 		desc.setArguments(new String [] { "a", "b", "c" });
 		
-		JobImplementation j = new JobImplementation(s, "aap", desc);
-		
 		MockClientSession session = new MockClientSession(false);
-		new SshInteractiveProcess(session, j);
+		new SshInteractiveProcess(session, desc, "JOB-42");
 		
 		MockChannelExec e = (MockChannelExec) session.exec;
 		
@@ -132,7 +131,6 @@ public class SshInteractiveProcessTest {
 
 	@Test
 	public void test_isDoneFalse() throws XenonException {
-		Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
 		
 		JobDescription desc = new JobDescription();
 		desc.setExecutable("exec");
@@ -143,10 +141,8 @@ public class SshInteractiveProcessTest {
 		desc.setEnvironment(env);
 		desc.setArguments(new String [] { "a", "b", "c" });
 		
-		JobImplementation j = new JobImplementation(s, "aap", desc);
-		
 		MockClientSession session = new MockClientSession(false);
-		SshInteractiveProcess p = new SshInteractiveProcess(session, j);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
 		
 		assertFalse(p.isDone());
 	}
@@ -154,8 +150,6 @@ public class SshInteractiveProcessTest {
 	
 	@Test
 	public void test_isDoneTrue() throws XenonException {
-		Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
-		
 		JobDescription desc = new JobDescription();
 		desc.setExecutable("exec");
 		
@@ -165,10 +159,8 @@ public class SshInteractiveProcessTest {
 		desc.setEnvironment(env);
 		desc.setArguments(new String [] { "a", "b", "c" });
 		
-		JobImplementation j = new JobImplementation(s, "aap", desc);
-		
 		MockClientSession session = new MockClientSession(false);
-		SshInteractiveProcess p = new SshInteractiveProcess(session, j);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
 		
 		MockChannelExec e = (MockChannelExec) session.exec;
 		e.closed = true;
@@ -178,8 +170,6 @@ public class SshInteractiveProcessTest {
 	
 	@Test
 	public void test_isDoubleDoneTrue() throws XenonException {
-		Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
-		
 		JobDescription desc = new JobDescription();
 		desc.setExecutable("exec");
 		
@@ -189,10 +179,8 @@ public class SshInteractiveProcessTest {
 		desc.setEnvironment(env);
 		desc.setArguments(new String [] { "a", "b", "c" });
 		
-		JobImplementation j = new JobImplementation(s, "aap", desc);
-		
 		MockClientSession session = new MockClientSession(false);
-		SshInteractiveProcess p = new SshInteractiveProcess(session, j);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
 		
 		assertNotNull(session.exec);
 		
@@ -206,8 +194,6 @@ public class SshInteractiveProcessTest {
 	
 	@Test
 	public void test_destroy() throws XenonException {
-		Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
-		
 		JobDescription desc = new JobDescription();
 		desc.setExecutable("exec");
 		
@@ -217,13 +203,10 @@ public class SshInteractiveProcessTest {
 		desc.setEnvironment(env);
 		desc.setArguments(new String [] { "a", "b", "c" });
 		
-		JobImplementation j = new JobImplementation(s, "aap", desc);
-		
 		MockClientSession session = new MockClientSession(false);
-		SshInteractiveProcess p = new SshInteractiveProcess(session, j);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
 		p.destroy();
 		
-
 		assertNotNull(session.exec);
 		MockChannelExec e = (MockChannelExec) session.exec;
 		assertTrue(e.gotClose);
@@ -231,8 +214,6 @@ public class SshInteractiveProcessTest {
 
 	@Test
 	public void test_destroyAfterDone() throws XenonException {
-		Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
-		
 		JobDescription desc = new JobDescription();
 		desc.setExecutable("exec");
 		
@@ -242,10 +223,8 @@ public class SshInteractiveProcessTest {
 		desc.setEnvironment(env);
 		desc.setArguments(new String [] { "a", "b", "c" });
 		
-		JobImplementation j = new JobImplementation(s, "aap", desc);
-		
 		MockClientSession session = new MockClientSession(false);
-		SshInteractiveProcess p = new SshInteractiveProcess(session, j);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
 		
 		assertNotNull(session.exec);
 		MockChannelExec e = (MockChannelExec) session.exec;
@@ -260,8 +239,6 @@ public class SshInteractiveProcessTest {
 
 	@Test
 	public void test_forCoverage() throws XenonException {
-		Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
-		
 		JobDescription desc = new JobDescription();
 		desc.setExecutable("exec");
 		
@@ -271,10 +248,8 @@ public class SshInteractiveProcessTest {
 		desc.setEnvironment(env);
 		desc.setArguments(new String [] { "a", "b", "c" });
 		
-		JobImplementation j = new JobImplementation(s, "aap", desc);
-		
 		MockClientSession session = new MockClientSession(false);
-		SshInteractiveProcess p = new SshInteractiveProcess(session, j);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
 		
 		assertNotNull(session.exec);
 		MockChannelExec e = (MockChannelExec) session.exec;
@@ -284,10 +259,5 @@ public class SshInteractiveProcessTest {
 		p.destroy();
 		p.getExitStatus();
 	}
-	
-
-	
-	
-	
 	
 }

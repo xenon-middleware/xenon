@@ -16,19 +16,15 @@
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assume.assumeTrue;
-
-import java.util.Map;
-
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.schedulers.Scheduler;
-import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
+import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
 
 public abstract class SchedulerTestParent {
 

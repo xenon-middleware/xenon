@@ -43,10 +43,8 @@ class BatchProcess implements Process {
     private StreamForwarder stdoutForwarder;
     private StreamForwarder stderrForwarder;
    
-    public BatchProcess(FileSystem filesystem, Path workingDirectory, JobImplementation job, InteractiveProcessFactory factory)
+    public BatchProcess(FileSystem filesystem, Path workingDirectory, JobDescription description, String jobIdentifier, InteractiveProcessFactory factory)
             throws XenonException, IOException {
-
-        JobDescription description = job.getJobDescription();
 
         // Retrieve the filesystem that goes with the scheduler.
         Path workdir = processPath(filesystem, workingDirectory, description.getWorkingDirectory());
@@ -69,7 +67,7 @@ class BatchProcess implements Process {
         OutputStream out = createOutputStream(filesystem, workdir, description.getStdout());
         OutputStream err = createOutputStream(filesystem, workdir, description.getStderr());
 
-        process = factory.createInteractiveProcess(job);
+        process = factory.createInteractiveProcess(description, jobIdentifier);
         Streams streams = process.getStreams();
 
         stdoutForwarder = new StreamForwarder(streams.getStdout(), out);

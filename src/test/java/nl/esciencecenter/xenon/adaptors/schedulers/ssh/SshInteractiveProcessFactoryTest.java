@@ -25,11 +25,8 @@ import java.util.HashMap;
 import org.junit.Test;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.JobImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerClosedException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.MockScheduler;
-import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 public class SshInteractiveProcessFactoryTest {
 
@@ -74,24 +71,35 @@ public class SshInteractiveProcessFactoryTest {
 		MockClientSession session = new MockClientSession(false);
 		SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
 		p.close();
+
+		JobDescription desc = new JobDescription();
+		desc.setWorkingDirectory("workdir");
+		desc.setExecutable("exec");
 		
-		Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
-		JobImplementation j = new JobImplementation(s, "aap");
-		p.createInteractiveProcess(j);
+		p.createInteractiveProcess(desc, "JOB-42");
 	}
 
 	@Test(expected=IllegalArgumentException.class)
-	public void test_createProcessFailsNull() throws XenonException { 
+	public void test_createProcessFailsNullDescription() throws XenonException { 
 		MockClientSession session = new MockClientSession(false);
 		SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
-		p.createInteractiveProcess(null);
+		p.createInteractiveProcess(null, null);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void test_createProcessFailsNullID() throws XenonException { 
+		MockClientSession session = new MockClientSession(false);
+		SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
+		JobDescription desc = new JobDescription();
+		desc.setWorkingDirectory("workdir");
+		desc.setExecutable("exec");
+		p.createInteractiveProcess(desc, null);
 	}
 	
 	@Test
 	public void test_createProcess() throws XenonException { 
 		MockClientSession session = new MockClientSession(false);
 		SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
-		Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
 		
 		JobDescription desc = new JobDescription();
 		desc.setWorkingDirectory("workdir");
@@ -102,10 +110,7 @@ public class SshInteractiveProcessFactoryTest {
 		env.put("key2", "value2");
 		desc.setEnvironment(env);
 		desc.setArguments(new String [] { "a", "b", "c" });
-		
-		JobImplementation j = new JobImplementation(s, "aap", desc);
-		
-		p.createInteractiveProcess(j);
+		p.createInteractiveProcess(desc, "JOB-42");
 		
 		MockChannelExec e = (MockChannelExec) session.exec;
 		

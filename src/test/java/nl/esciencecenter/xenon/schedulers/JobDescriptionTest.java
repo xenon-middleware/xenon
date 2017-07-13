@@ -53,11 +53,7 @@ public class JobDescriptionTest {
     @Test
     public void test_setters_getters() throws Exception {
         JobDescription j = new JobDescription();
-
-        j.setInteractive(true);
-        boolean b = j.isInteractive();
-        assertTrue(b);
-
+      
         j.setWorkingDirectory("aap");
         String tmp = j.getWorkingDirectory();
         assertTrue(tmp.equals("aap"));
@@ -179,7 +175,6 @@ public class JobDescriptionTest {
         result = prime * result + new HashMap<String, String>(0).hashCode();
         //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
-        result = prime * result + 1237;
         result = prime * result + 15;
         result = prime * result + 1;
         result = prime * result + 1;
@@ -202,7 +197,6 @@ public class JobDescriptionTest {
     public void test_hashCode2() throws Exception {
 
         JobDescription j = new JobDescription();
-        j.setInteractive(true);
         j.setWorkingDirectory("aap");
         j.setQueueName("noot");
         j.setStdout(null);
@@ -233,7 +227,6 @@ public class JobDescriptionTest {
         result = prime * result + env.hashCode();
         result = prime * result + "exec".hashCode();
         result = prime * result + opt.hashCode();
-        result = prime * result + 1231;
         result = prime * result + 15;
         result = prime * result + 1;
         result = prime * result + 1;
@@ -253,7 +246,6 @@ public class JobDescriptionTest {
     public void test_hashCode3() throws Exception {
 
         JobDescription j = new JobDescription();
-        j.setInteractive(true);
         j.setWorkingDirectory("aap");
         j.setQueueName("noot");
         j.setStdout("stdout");
@@ -284,7 +276,6 @@ public class JobDescriptionTest {
         result = prime * result + env.hashCode();
         result = prime * result + "exec".hashCode();
         result = prime * result + opt.hashCode();
-        result = prime * result + 1231;
         result = prime * result + 15;
         result = prime * result + 1;
         result = prime * result + 1;
@@ -312,15 +303,7 @@ public class JobDescriptionTest {
 
         JobDescription other = new JobDescription();
         assertTrue(j.equals(other));
-
-        other.setInteractive(true);
-        assertFalse(j.equals(other));
-        assertFalse(other.equals(j));
-        
-        other.setInteractive(false);
-        assertTrue(j.equals(other));
-        assertTrue(other.equals(j));
-        
+       
         other.setMaxTime(42);
         assertFalse(j.equals(other));
         other.setMaxTime(15);
@@ -405,10 +388,9 @@ public class JobDescriptionTest {
 
         String expected = "JobDescription [queueName=noot, executable=exec, arguments=[a, b, c], stdin=stdin.txt, stdout=stdout.txt,"
                 + " stderr=stderr.txt, workingDirectory=aap, environment={ENV1=ARG1}, jobOptions={OPT1=ARG1},"
-                + " nodeCount=1, processesPerNode=1, startSingleProcess=false, maxTime=15, interactive=true]";
+                + " nodeCount=1, processesPerNode=1, startSingleProcess=false, maxTime=15]";
 
         JobDescription j = new JobDescription();
-        j.setInteractive(true);
         j.setWorkingDirectory("aap");
         j.setQueueName("noot");
         j.setStdout("stdout.txt");

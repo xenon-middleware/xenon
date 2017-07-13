@@ -34,8 +34,3 @@ services:
     ports:
     - 22 # ssh
     - 6817 # slurm controller, when connectable slurm cluster is ready for use
-    healthcheck:
-      test: sinfo || exit 1
-      interval: 1s
-      timeout: 1s
-      retries: 1

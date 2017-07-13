@@ -28,7 +28,7 @@ import java.io.OutputStream;
  */
 public class Streams {
 
-	private final JobHandle job;
+	private final String jobIdentifier;
 	private final InputStream stdout;
 	private final InputStream stderr;
 	private final OutputStream stdin;
@@ -45,8 +45,8 @@ public class Streams {
 	 * @param stderr
 	 *            the standard error stream.
 	 */
-	public Streams(JobHandle job, InputStream stdout, OutputStream stdin, InputStream stderr) {
-		this.job = job;
+	public Streams(String jobIdentifier, InputStream stdout, OutputStream stdin, InputStream stderr) {
+		this.jobIdentifier = jobIdentifier;
 		this.stdout = stdout;
 		this.stdin = stdin;
 		this.stderr = stderr;
@@ -57,8 +57,8 @@ public class Streams {
 	 * 
 	 * @return the Job.
 	 */
-	public JobHandle getJob() {
-		return job;
+	public String getJobIdentifier() {
+		return jobIdentifier;
 	}
 
 	/**

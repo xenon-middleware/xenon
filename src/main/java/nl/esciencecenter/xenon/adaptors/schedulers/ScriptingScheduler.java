@@ -35,10 +35,10 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.JobHandle;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
+import nl.esciencecenter.xenon.schedulers.Streams;
 
 /**
  * Connection to a remote scheduler, implemented by calling command line commands over a ssh connection.
@@ -147,18 +147,17 @@ public abstract class ScriptingScheduler extends Scheduler {
      * @param arguments
      *          the arguments to pass to the executable
      * @return
-     *          the {@link JobHandle} that represents the interactive command 
+     *          the job identifier that represents the interactive command 
      * @throws XenonException
      *          if an error occurred
      */    
-    public JobHandle startInteractiveCommand(String executable, String... arguments) throws XenonException {
+    public Streams startInteractiveCommand(String executable, String... arguments) throws XenonException {
         JobDescription description = new JobDescription();
-        description.setInteractive(true);
         description.setQueueName("unlimited");        
         description.setExecutable(executable);
         description.setArguments(arguments);
 
-        return subScheduler.submitJob(description);
+        return subScheduler.submitInteractiveJob(description);
     }
 
     /**
@@ -189,7 +188,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      * 
      * A timeout of 0 will result in an infinite timeout, a negative timeout will result in an exception. 
      * 
-     * @param job
+     * @param jobIdentifier
      *          the Job to wait for
      * @param timeout
      *          the maximum number of milliseconds to wait, 0 to wait forever, or negative to return immediately.  
@@ -200,11 +199,11 @@ public abstract class ScriptingScheduler extends Scheduler {
      * @throws XenonException
      *          if an error occurs
      */
-    public JobStatus waitUntilDone(JobHandle job, long timeout) throws XenonException {
+    public JobStatus waitUntilDone(String jobIdentifier, long timeout) throws XenonException {
         
         long deadline = Deadline.getDeadline(timeout);
               
-        JobStatus status = getJobStatus(job);
+        JobStatus status = getJobStatus(jobIdentifier);
 
         // wait until we are done, or the timeout expires
         while (!status.isDone() && System.currentTimeMillis() < deadline) {
@@ -215,7 +214,7 @@ public abstract class ScriptingScheduler extends Scheduler {
                 return status;
             }
             
-            status = getJobStatus(job);
+            status = getJobStatus(jobIdentifier);
         }
 
         return status;
@@ -226,7 +225,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      * 
      * A timeout of 0 will result in an infinite timeout. A negative timeout will result in an exception.
      * 
-     * @param job
+     * @param jobIdentifier
      *          the Job to wait for
      * @param timeout
      *          the maximum number of milliseconds to wait, 0 to wait forever, or negative to return immediately.  
@@ -237,11 +236,11 @@ public abstract class ScriptingScheduler extends Scheduler {
      * @throws XenonException
      *          if an error occurs
      */
-    public JobStatus waitUntilRunning(JobHandle job, long timeout) throws XenonException {
+    public JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException {
 
         long deadline = Deadline.getDeadline(timeout);
         
-        JobStatus status = getJobStatus(job);
+        JobStatus status = getJobStatus(jobIdentifier);
 
         // wait until we are done, or the timeout expires
         while (!(status.isRunning() || status.isDone()) && System.currentTimeMillis() < deadline) {
@@ -252,7 +251,7 @@ public abstract class ScriptingScheduler extends Scheduler {
                 return status;
             }
             
-            status = getJobStatus(job);
+            status = getJobStatus(jobIdentifier);
         }
 
         return status;

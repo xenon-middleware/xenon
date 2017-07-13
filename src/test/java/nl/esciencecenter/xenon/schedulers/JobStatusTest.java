@@ -25,32 +25,11 @@ import org.junit.Test;
 
 public class JobStatusTest {
 	
-	class FakeJobHandle implements JobHandle {
-
-		@Override
-		public JobDescription getJobDescription() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public Scheduler getScheduler() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public String getIdentifier() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	}
-	
 	@Test
 	public void test_handle() throws Exception {
-		JobHandle h = new FakeJobHandle();
-		JobStatus s = new JobStatus(h, "STATE", 0, null, true, false, null);
-		assertEquals(h, s.getJob());
+		String id = "JOB-42";
+		JobStatus s = new JobStatus(id, "STATE", 0, null, true, false, null);
+		assertEquals(id, s.getJobIdentifier());
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -60,66 +39,66 @@ public class JobStatusTest {
 	
 	@Test
 	public void test_state() throws Exception {
-		JobHandle h = new FakeJobHandle();
-		JobStatus s = new JobStatus(h, "STATE", 0, null, true, false, null);
+		String id = "JOB-42";
+		JobStatus s = new JobStatus(id, "STATE", 0, null, true, false, null);
 		assertEquals("STATE", s.getState());
 	}
 
 	@Test
 	public void test_exit() throws Exception {
-		JobHandle h = new FakeJobHandle();
-		JobStatus s = new JobStatus(h, "STATE", 42, null, true, false, null);
+		String id = "JOB-42";
+		JobStatus s = new JobStatus(id, "STATE", 42, null, true, false, null);
 		assertEquals(new Integer(42), s.getExitCode());
 	}
 
 	@Test
 	public void test_exception() throws Exception {
-		JobHandle h = new FakeJobHandle();
+		String id = "JOB-42";
 		Exception e = new NullPointerException("EEP");
-		JobStatus s = new JobStatus(h, "STATE", 0, e, true, false, null);
+		JobStatus s = new JobStatus(id, "STATE", 0, e, true, false, null);
 		assertEquals(e, s.getException());
 	}
 	
 	@Test
 	public void test_hasExceptionTrue() throws Exception {
-		JobHandle h = new FakeJobHandle();
+		String id = "JOB-42";
 		Exception e = new NullPointerException("EEP");
-		JobStatus s = new JobStatus(h, "STATE", 0, e, true, false, null);
+		JobStatus s = new JobStatus(id, "STATE", 0, e, true, false, null);
 		assertTrue(s.hasException());
 	}
 
 	@Test
 	public void test_hasExceptionFalse() throws Exception {
-		JobHandle h = new FakeJobHandle();		
-		JobStatus s = new JobStatus(h, "STATE", 0, null, true, false, null);
+		String id = "JOB-42";		
+		JobStatus s = new JobStatus(id, "STATE", 0, null, true, false, null);
 		assertFalse(s.hasException());
 	}
 
 	@Test
 	public void test_runningTrue() throws Exception {
-		JobHandle h = new FakeJobHandle();
-		JobStatus s = new JobStatus(h, "STATE", 0, null, true, false, null);
+		String id = "JOB-42";
+		JobStatus s = new JobStatus(id, "STATE", 0, null, true, false, null);
 		assertTrue(s.isRunning());
 	}
 
 	@Test
 	public void test_runningFalse() throws Exception {
-		JobHandle h = new FakeJobHandle();
-		JobStatus s = new JobStatus(h, "STATE", 0, null, false, false, null);
+		String id = "JOB-42";
+		JobStatus s = new JobStatus(id, "STATE", 0, null, false, false, null);
 		assertFalse(s.isRunning());
 	}
 	
 	@Test
 	public void test_doneTrue() throws Exception {
-		JobHandle h = new FakeJobHandle();
-		JobStatus s = new JobStatus(h, "STATE", 0, null, false, true, null);
+		String id = "JOB-42";
+		JobStatus s = new JobStatus(id, "STATE", 0, null, false, true, null);
 		assertTrue(s.isDone());
 	}
 
 	@Test
 	public void test_doneFalse() throws Exception {
-		JobHandle h = new FakeJobHandle();
-		JobStatus s = new JobStatus(h, "STATE", 0, null, false, false, null);
+		String id = "JOB-42";
+		JobStatus s = new JobStatus(id, "STATE", 0, null, false, false, null);
 		assertFalse(s.isRunning());
 	}
 
@@ -128,8 +107,8 @@ public class JobStatusTest {
 		HashMap<String, String> tmp = new HashMap<>();
 		tmp.put("key", "value");
 
-		JobHandle h = new FakeJobHandle();
-		JobStatus s = new JobStatus(h, "STATE", 0, null, false, false, tmp);
+		String id = "JOB-42";
+		JobStatus s = new JobStatus(id, "STATE", 0, null, false, false, tmp);
 		assertEquals(tmp, s.getSchedulerSpecficInformation());
 	}
 
@@ -139,11 +118,11 @@ public class JobStatusTest {
 		HashMap<String, String> tmp = new HashMap<>();
 		tmp.put("key", "value");
 		
-		JobHandle h = new FakeJobHandle();
+		String id = "JOB-42";
 		Exception e = new NullPointerException("EEP");
-		JobStatus s = new JobStatus(h, "STATE", 0, e, false, false, tmp);
+		JobStatus s = new JobStatus(id, "STATE", 0, e, false, false, tmp);
 		
-		String expected = "JobStatus [job=" + h + ", state=" + "STATE" + ", exitCode=" + 0 + ", exception=" + e
+		String expected = "JobStatus [jobIdentifier=" + id + ", state=" + "STATE" + ", exitCode=" + 0 + ", exception=" + e
                 + ", running=" + false + ", done=" + false + ", schedulerSpecificInformation=" + tmp + "]";
 		
 		assertEquals(expected, s.toString());		

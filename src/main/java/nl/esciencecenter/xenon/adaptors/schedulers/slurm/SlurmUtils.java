@@ -18,34 +18,25 @@ package nl.esciencecenter.xenon.adaptors.schedulers.slurm;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.ADAPTOR_NAME;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.UnknownPropertyException;
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.adaptors.XenonProperties;
-import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
-import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
-import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
-import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
-import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
-import nl.esciencecenter.xenon.filesystems.Path;
-import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
-import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.JobHandle;
-import nl.esciencecenter.xenon.schedulers.JobStatus;
-import nl.esciencecenter.xenon.schedulers.QueueStatus;
-import nl.esciencecenter.xenon.schedulers.Scheduler;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.schedulers.QueueStatus;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 @SuppressFBWarnings(value = "VA_FORMAT_STRING_USES_NEWLINE", justification = "Script generated is a Unix script.")
 public final class SlurmUtils {
@@ -89,14 +80,14 @@ public final class SlurmUtils {
     /** In completed state, the job has terminated and all processes have returned exit code 0. */ 
     private static final String DONE_STATE = "COMPLETED";
     
- 	protected static String identifiersAsCSList(JobHandle[] jobs) {
+ 	protected static String identifiersAsCSList(String[] jobs) {
  		String result = null;
- 		for (JobHandle job : jobs) {
+ 		for (String job : jobs) {
  			if (job != null) {
  				if (result == null) {
- 					result = job.getIdentifier();
+ 					result = job;
  				} else {
- 					result = CommandLineUtils.concat(result, ",", job.getIdentifier());
+ 					result = CommandLineUtils.concat(result, ",", job);
  				}
  			}
  		}
@@ -120,16 +111,16 @@ public final class SlurmUtils {
 
     }
 
-    protected static JobStatus getJobStatusFromSacctInfo(Map<String, Map<String, String>> info, JobHandle job) throws XenonException {
-        Map<String, String> jobInfo = info.get(job.getIdentifier());
+    protected static JobStatus getJobStatusFromSacctInfo(Map<String, Map<String, String>> info, String jobIdentifier) throws XenonException {
+        Map<String, String> jobInfo = info.get(jobIdentifier);
 
         if (jobInfo == null) {
-            LOGGER.debug("job {} not found in sacct output", job.getIdentifier());
+            LOGGER.debug("job {} not found in sacct output", jobIdentifier);
             return null;
         }
 
         //also checks if the job id is correct
-        ScriptingUtils.verifyJobInfo(jobInfo, job, ADAPTOR_NAME, "JobID", "State", "ExitCode");
+        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JobID", "State", "ExitCode");
 
         String state = jobInfo.get("State");
 
@@ -145,7 +136,7 @@ public final class SlurmUtils {
             exception = new XenonException(ADAPTOR_NAME, "Job failed for unknown reason");
         }
 
-        JobStatus result = new JobStatus(job, state, exitcode, exception, isRunningState(state),
+        JobStatus result = new JobStatus(jobIdentifier, state, exitcode, exception, isRunningState(state),
                 isDoneOrFailedState(state), jobInfo);
 
         LOGGER.debug("Got job status from sacct output {}", result);
@@ -153,14 +144,14 @@ public final class SlurmUtils {
         return result;
     }
 
-    protected static JobStatus getJobStatusFromScontrolInfo(Map<String, String> jobInfo, JobHandle job) throws XenonException {
+    protected static JobStatus getJobStatusFromScontrolInfo(Map<String, String> jobInfo, String jobIdentifier) throws XenonException {
         if (jobInfo == null) {
-            LOGGER.debug("job {} not found in scontrol output", job.getIdentifier());
+            LOGGER.debug("job {} not found in scontrol output", jobIdentifier);
             return null;
         }
 
         //also checks if the job id is correct
-        ScriptingUtils.verifyJobInfo(jobInfo, job, ADAPTOR_NAME, "JobId", "JobState", "ExitCode", "Reason");
+        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JobId", "JobState", "ExitCode", "Reason");
 
         String state = jobInfo.get("JobState");
         Integer exitcode = exitcodeFromString(jobInfo.get("ExitCode"));
@@ -180,7 +171,7 @@ public final class SlurmUtils {
                     + "\" for unknown reason");
         }
 
-        JobStatus result = new JobStatus(job, state, exitcode, exception, isRunningState(state),
+        JobStatus result = new JobStatus(jobIdentifier, state, exitcode, exception, isRunningState(state),
                 isDoneOrFailedState(state), jobInfo);
 
         LOGGER.debug("Got job status from scontrol output {}", result);
@@ -188,21 +179,21 @@ public final class SlurmUtils {
         return result;
     }
 
-    protected static JobStatus getJobStatusFromSqueueInfo(Map<String, Map<String, String>> info, JobHandle job) throws XenonException {
+    protected static JobStatus getJobStatusFromSqueueInfo(Map<String, Map<String, String>> info, String jobIdentifier) throws XenonException {
 
-        Map<String, String> jobInfo = info.get(job.getIdentifier());
+        Map<String, String> jobInfo = info.get(jobIdentifier);
 
         if (jobInfo == null) {
-            LOGGER.debug("job {} not found in queue", job.getIdentifier());
+            LOGGER.debug("job {} not found in queue", jobIdentifier);
             return null;
         }
 
         //also checks if the job id is correct
-        ScriptingUtils.verifyJobInfo(jobInfo, job, ADAPTOR_NAME, "JOBID", "STATE");
+        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JOBID", "STATE");
 
         String state = jobInfo.get("STATE");
 
-        return new JobStatus(job, state, null, null, isRunningState(state), false, jobInfo);
+        return new JobStatus(jobIdentifier, state, null, null, isRunningState(state), false, jobInfo);
     }
 
     protected static QueueStatus getQueueStatusFromSInfo(Map<String, Map<String, String>> info, String queueName, Scheduler scheduler) {
@@ -282,10 +273,10 @@ public final class SlurmUtils {
     }
 
     @SuppressWarnings("PMD.NPathComplexity")
-    protected  static void verifyJobDescription(JobDescription description) throws XenonException {
+    protected  static void verifyJobDescription(JobDescription description, boolean interactive) throws XenonException {
         ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
 
-        if (description.isInteractive()) {
+        if (interactive) {
             if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
                 throw new InvalidJobDescriptionException(ADAPTOR_NAME,
                         "Custom job script not supported in interactive mode");

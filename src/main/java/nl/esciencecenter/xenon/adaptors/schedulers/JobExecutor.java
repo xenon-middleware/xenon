@@ -21,7 +21,6 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.JobHandle;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.Streams;
 
@@ -42,8 +41,10 @@ public class JobExecutor implements Runnable {
     /** Number of ms. per min. */
     private static final long MILLISECONDS_IN_MINUTE = 60L * 1000L;
 
-    private final JobImplementation job;
-
+    private final JobDescription description;
+    private final String jobIdentifier; 
+    private final boolean interactive;
+    
     private final InteractiveProcessFactory factory;
 
     private final long pollingDelay;
@@ -68,12 +69,14 @@ public class JobExecutor implements Runnable {
     private Exception error;
 
     public JobExecutor(String adaptorName, FileSystem filesystem, Path workingDirectory, InteractiveProcessFactory factory,
-            JobImplementation job, long pollingDelay) {
+            JobDescription description, String jobIdentifier, boolean interactive, long pollingDelay) {
 
         this.adaptorName = adaptorName;
         this.filesystem = filesystem;
         this.workingDirectory = workingDirectory;
-        this.job = job;
+        this.description = description;
+        this.jobIdentifier = jobIdentifier;
+        this.interactive = interactive;
         this.factory = factory;
         this.pollingDelay = pollingDelay;
     }
@@ -101,17 +104,21 @@ public class JobExecutor implements Runnable {
         return done;
     }
 
-    public JobHandle getJob() {
-        return job;
+    public String getJobIdentifier() {
+        return jobIdentifier;
     }
 
+    public JobDescription getJobDescription() {
+        return description;
+    }
+    
     public synchronized JobStatus getStatus() {
         if (!done && RUNNING_STATE.equals(state)) {
             triggerStatusUpdate();
             waitForStatusUpdate(pollingDelay);
         }
 
-        return new JobStatus(job, state, exitStatus, error, RUNNING_STATE.equals(state), done, null);
+        return new JobStatus(jobIdentifier, state, exitStatus, error, RUNNING_STATE.equals(state), done, null);
     }
 
     public synchronized String getState() {
@@ -146,16 +153,19 @@ public class JobExecutor implements Runnable {
     }
 
     private synchronized void setStreams(Streams streams) {
+    	
+    	System.out.println("STREAMS SET " + streams);
+    	
         this.streams = streams;
     }
 
     public synchronized Streams getStreams() throws XenonException {
 
-        if (job.getJobDescription().isInteractive()) {
-            return streams;
+        if (streams == null) {
+            throw new XenonException(adaptorName, "Streams not available");
         }
 
-        throw new XenonException(adaptorName, "Job is not interactive!");
+    	return streams;
     }
         
     public synchronized JobStatus waitUntilRunning(long timeout) {
@@ -290,8 +300,6 @@ public class JobExecutor implements Runnable {
     public void run() {
         Process process;
 
-        JobDescription description = job.getJobDescription();
-
         if (getKilled()) {
             updateState(KILLED_STATE, -1, new JobCanceledException(adaptorName, "Process cancelled by user."));
             return;
@@ -305,12 +313,12 @@ public class JobExecutor implements Runnable {
         }
 
         try {
-            if (description.isInteractive()) {
-                InteractiveProcess p = factory.createInteractiveProcess(job);
+            if (interactive) {
+                InteractiveProcess p = factory.createInteractiveProcess(description, jobIdentifier);
                 setStreams(p.getStreams());
                 process = p; 
             } else {
-                process = new BatchProcess(filesystem, workingDirectory, job, factory);
+                process = new BatchProcess(filesystem, workingDirectory, description, jobIdentifier, factory);
             }
         } catch (IOException | XenonException e) {
             updateState(ERROR_STATE, -1, e);

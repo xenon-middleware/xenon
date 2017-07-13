@@ -25,7 +25,7 @@ import java.util.Map;
  */
 public class JobStatus {
 
-    private final JobHandle job;
+    private final String jobIdentifier;
     private final String state;
     private final Integer exitCode;
     private final Exception exception;
@@ -51,14 +51,14 @@ public class JobStatus {
      * @param schedulerSpecificInformation
      * 		a map of scheduler implementation specific information on the job.
      */
-    public JobStatus(JobHandle job, String state, Integer exitCode, Exception exception, boolean running, boolean done,
+    public JobStatus(String jobIdentifier, String state, Integer exitCode, Exception exception, boolean running, boolean done,
             Map<String, String> schedulerSpecificInformation) {
 
-        if (job == null) {
+        if (jobIdentifier == null) {
             throw new IllegalArgumentException("Job may not be null!");
         }
 
-        this.job = job;
+        this.jobIdentifier = jobIdentifier;
         this.state = state;
         this.exitCode = exitCode;
         this.exception = exception;
@@ -68,12 +68,12 @@ public class JobStatus {
     }
 
     /**
-     * Get the job for which this JobStatus was created.
+     * Get the job identifier of the Job for which this JobStatus was created.
      * 
      * @return the Job.
      */
-    public JobHandle getJob() {
-        return job;
+    public String getJobIdentifier() {
+        return jobIdentifier;
     }
 
     /**
@@ -142,7 +142,7 @@ public class JobStatus {
     
     @Override
     public String toString() {
-        return "JobStatus [job=" + job + ", state=" + state + ", exitCode=" + exitCode + ", exception=" + exception
+        return "JobStatus [jobIdentifier=" + jobIdentifier + ", state=" + state + ", exitCode=" + exitCode + ", exception=" + exception
                 + ", running=" + running + ", done=" + done + ", schedulerSpecificInformation=" + schedulerSpecificInformation
                 + "]";
     }
