@@ -16,5 +16,5 @@
 /**
  * This package is contains several utility classes.
  */
-package nl.esciencecenter.xenon.util;
+package nl.esciencecenter.xenon.utils;
 

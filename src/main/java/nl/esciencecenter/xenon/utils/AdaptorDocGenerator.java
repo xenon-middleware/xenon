@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.util;
+package nl.esciencecenter.xenon.utils;
 
 import java.io.BufferedWriter;
 import java.io.File;

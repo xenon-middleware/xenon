@@ -38,74 +38,6 @@ import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
 
 public class FileSystemTest {
 
-
-	class FakeCopyHandle implements CopyHandle {
-
-		@Override
-		public FileSystem getSourceFileSystem() {
-			return null;
-		}
-
-		@Override
-		public Path getSourcePath() {
-			return null;
-		}
-
-		@Override
-		public FileSystem getDestinatonFileSystem() {
-			return null;
-		}
-
-		@Override
-		public Path getDestinationPath() {
-			return null;
-		}
-
-		@Override
-		public CopyMode getMode() {
-			return null;
-		}
-
-		@Override
-		public boolean isRecursive() {
-			return false;
-		}
-	}
-
-	class Callback implements FileSystem.CopyCallback {
-
-		boolean initial = true;
-		long bytesToCopy;
-		long bytes;
-		long maxBytes;
-
-		Callback(boolean initial, long maxBytes){
-			this.initial = initial;
-			this.maxBytes = maxBytes;
-		}
-
-		Callback(long maxBytes){ 
-			this.maxBytes = maxBytes;
-		}
-
-		@Override
-		public void setBytesToCopy(long bytes) {
-			this.bytesToCopy = bytes;
-		}
-
-		@Override
-		public void setBytesCopied(long bytes) {
-			this.bytes = bytes;  
-		}
-
-		@Override
-		public boolean isCancelled() {
-			return (bytes >= maxBytes);
-		} 
-		
-		
-	}
-
 	class CountIgnoreOutputStream extends OutputStream {
 
 		long bytes = 0;
@@ -839,7 +771,7 @@ public class FileSystemTest {
 		f0.addAttributes(f, a);
 
 		// should fail
-		f0.copyFile(f, f1, f, CopyMode.CREATE, new Callback(1024));
+		f0.copyFile(f, f1, f, CopyMode.CREATE, f0.createCallback(1024));
 	}
 
 	@Test(expected=InvalidPathException.class)
@@ -853,7 +785,7 @@ public class FileSystemTest {
 		f0.createDirectory(f);
 
 		// should fail
-		f0.copyFile(f, f1, f, CopyMode.CREATE, new Callback(1024));
+		f0.copyFile(f, f1, f, CopyMode.CREATE, f0.createCallback(1024));
 	}
 
 	@Test(expected=PathAlreadyExistsException.class)
@@ -868,7 +800,7 @@ public class FileSystemTest {
 		f1.createFile(f);
 
 		// should fail
-		f0.copyFile(f, f1, f, CopyMode.CREATE, new Callback(1024));
+		f0.copyFile(f, f1, f, CopyMode.CREATE, f0.createCallback(1024));
 	}
 
 	@Test
@@ -890,7 +822,7 @@ public class FileSystemTest {
 		f1.addData(f, data1);
 
 		// should replace
-		f0.copyFile(f, f1, f, CopyMode.REPLACE, new Callback(1024));
+		f0.copyFile(f, f1, f, CopyMode.REPLACE, f0.createCallback(1024));
 
 		assertTrue(Arrays.equals(data, f1.getData(f)));
 	}
@@ -914,7 +846,7 @@ public class FileSystemTest {
 		f1.addData(f, data1);
 
 		// should replace
-		f0.copyFile(f, f1, f, CopyMode.IGNORE, new Callback(1024));
+		f0.copyFile(f, f1, f, CopyMode.IGNORE, f0.createCallback(1024));
 
 		assertTrue(Arrays.equals(data1, f1.getData(f)));
 	}
@@ -932,7 +864,7 @@ public class FileSystemTest {
 		f0.addInputStream(f, new CountJunkInputStream(1024*1024));
 
 		// should cancel after 1 block ?
-		f0.copyFile(f, f1, f, CopyMode.CREATE, new Callback(4*1024));
+		f0.copyFile(f, f1, f, CopyMode.CREATE, f0.createCallback(4*1024));
 	}
 
 	@Test(expected = XenonException.class)
@@ -948,7 +880,7 @@ public class FileSystemTest {
 		f0.addInputStream(f, new CountJunkInputStream(1024*1024));
 
 		// should cancel after 1 block ?
-		f0.copyFile(f, f1, f, CopyMode.CREATE, new Callback(false, 4*1024));
+		f0.copyFile(f, f1, f, CopyMode.CREATE, f0.createCallback(false, 4*1024));
 	}
 
 	// copy
@@ -998,10 +930,9 @@ public class FileSystemTest {
 		f0.createFile(f);
 		f0.addData(f, data);
 
-		CopyHandle h = f0.copy(f, f1, f, CopyMode.CREATE, false);
-		f0.waitUntilDone(h, 5*1000);
+		String h = f0.copy(f, f1, f, CopyMode.CREATE, false);
+		CopyStatus s = f0.waitUntilDone(h, 5*1000);
 
-		CopyStatus s = f0.getStatus(h);
 		assertTrue(s.isDone());
 		assertFalse(s.hasException());
 		assertTrue(f1.exists(f));
@@ -1031,7 +962,7 @@ public class FileSystemTest {
 		f0.addAttributes(f, a);
 		f0.addData(f, data);
 
-		CopyHandle h = f0.copy(f, f1, f, CopyMode.CREATE, false);
+		String h = f0.copy(f, f1, f, CopyMode.CREATE, false);
 		f0.waitUntilDone(h, 5*1000);
 
 		CopyStatus s = f0.getStatus(h);
@@ -1060,10 +991,9 @@ public class FileSystemTest {
 
 		f1.createFile(f);
 
-		CopyHandle h = f0.copy(f, f1, f, CopyMode.CREATE, false);
-		f0.waitUntilDone(h, 60*1000);
+		String h = f0.copy(f, f1, f, CopyMode.CREATE, false);
+		CopyStatus s = f0.waitUntilDone(h, 60*1000);
 
-		CopyStatus s = f0.getStatus(h);
 		assertTrue(s.isDone());
 		assertTrue(s.hasException());
 		assertTrue(s.getException() instanceof PathAlreadyExistsException);
@@ -1087,10 +1017,9 @@ public class FileSystemTest {
 		f1.createFile(f);
 		f1.addData(f, data1);
 
-		CopyHandle h = f0.copy(f, f1, f, CopyMode.REPLACE, false);
-		f0.waitUntilDone(h, 60*1000);
+		String h = f0.copy(f, f1, f, CopyMode.REPLACE, false);
+		CopyStatus s = f0.waitUntilDone(h, 60*1000);
 
-		CopyStatus s = f0.getStatus(h);
 		assertTrue(s.isDone());
 		assertFalse(s.hasException());
 		assertTrue(Arrays.equals(data, f1.getData(f)));
@@ -1114,10 +1043,9 @@ public class FileSystemTest {
 		f1.createFile(f);
 		f1.addData(f, data1);
 
-		CopyHandle h = f0.copy(f, f1, f, CopyMode.IGNORE, false);
-		f0.waitUntilDone(h, 60*1000);
+		String h = f0.copy(f, f1, f, CopyMode.IGNORE, false);
+		CopyStatus s = f0.waitUntilDone(h, 60*1000);
 
-		CopyStatus s = f0.getStatus(h);
 		assertTrue(s.isDone());
 		assertFalse(s.hasException());
 		assertTrue(Arrays.equals(data1, f1.getData(f)));
@@ -1132,10 +1060,9 @@ public class FileSystemTest {
 		MockFileSystem f0 = new MockFileSystem("0", "TEST0", "MEM", entry);
 		MockFileSystem f1 = new MockFileSystem("1", "TEST1", "MEM", entry);
 
-		CopyHandle h = f0.copy(new Path("/test/aap"), f1, new Path("/test/aap"), CopyMode.CREATE, false);
-		f0.waitUntilDone(h, 60*1000);
+		String h = f0.copy(new Path("/test/aap"), f1, new Path("/test/aap"), CopyMode.CREATE, false);
+		CopyStatus s = f0.waitUntilDone(h, 60*1000);
 
-		CopyStatus s = f0.getStatus(h);
 		assertTrue(s.isDone());
 		assertTrue(s.hasException());
 		assertTrue(s.getException() instanceof NoSuchPathException);
@@ -1150,10 +1077,9 @@ public class FileSystemTest {
 
 		f0.createDirectory(new Path("/test/aap"));
 
-		CopyHandle h = f0.copy(new Path("/test/aap"), f1, new Path("/test/aap"), CopyMode.CREATE, false);
-		f0.waitUntilDone(h, 60*1000);
+		String h = f0.copy(new Path("/test/aap"), f1, new Path("/test/aap"), CopyMode.CREATE, false);
+		CopyStatus s = f0.waitUntilDone(h, 60*1000);
 
-		CopyStatus s = f0.getStatus(h);
 		assertTrue(s.isDone());
 		assertTrue(s.hasException());
 		assertTrue(s.getException() instanceof InvalidPathException);
@@ -1174,10 +1100,9 @@ public class FileSystemTest {
 		a.setOther(true);
 		f0.addAttributes(f, a);
 
-		CopyHandle h = f0.copy(new Path("/test/aap"), f1, new Path("/test/aap"), CopyMode.CREATE, false);
-		f0.waitUntilDone(h, 60*1000);
+		String h = f0.copy(new Path("/test/aap"), f1, new Path("/test/aap"), CopyMode.CREATE, false);
+		CopyStatus s = f0.waitUntilDone(h, 60*1000);
 
-		CopyStatus s = f0.getStatus(h);
 		assertTrue(s.isDone());
 		assertTrue(s.hasException());
 		assertTrue(s.getException() instanceof InvalidPathException);
@@ -1201,10 +1126,9 @@ public class FileSystemTest {
 		f0.addData(new Path("/test/aap/file0"), data0);
 		f0.addData(new Path("/test/aap/noot/file1"), data1);
 
-		CopyHandle h = f0.copy(new Path("/test/aap"), f1, new Path("/test/aap"), CopyMode.CREATE, true);
-		f0.waitUntilDone(h, 5*1000);
+		String h = f0.copy(new Path("/test/aap"), f1, new Path("/test/aap"), CopyMode.CREATE, true);
+		CopyStatus s = f0.waitUntilDone(h, 5*1000);
 
-		CopyStatus s = f0.getStatus(h);
 		assertTrue(s.isDone());
 		assertFalse(s.hasException());
 
@@ -1230,7 +1154,7 @@ public class FileSystemTest {
 	public void test_getStatusFailsWrongType() throws XenonException {
 		Path entry = new Path("/test");
 		FileSystem f = new MockFileSystem("0", "TEST0", "MEM", entry);
-		f.getStatus(new FakeCopyHandle());
+		f.getStatus("AAP");
 	}
 
 	// cancel
@@ -1246,7 +1170,7 @@ public class FileSystemTest {
 	public void test_cancelFailsWrongType() throws XenonException {
 		Path entry = new Path("/test");
 		FileSystem f = new MockFileSystem("0", "TEST0", "MEM", entry);
-		f.cancel(new FakeCopyHandle());
+		f.cancel("AAP");
 	}
 
 	@Test
@@ -1271,8 +1195,8 @@ public class FileSystemTest {
 		f1.addOutputStream(file1, new CountIgnoreOutputStream());
 		f1.addOutputStream(file2, new CountIgnoreOutputStream());
 
-		CopyHandle h1 = f0.copy(file1, f1, file1, CopyMode.REPLACE, false);
-		CopyHandle h2 = f0.copy(file2, f1, file2, CopyMode.REPLACE, false);
+		String h1 = f0.copy(file1, f1, file1, CopyMode.REPLACE, false);
+		String h2 = f0.copy(file2, f1, file2, CopyMode.REPLACE, false);
 
 		// cancel h2 immediately -- the coopy should not have a chance to start
 		CopyStatus s2 = f0.cancel(h2);
@@ -1310,7 +1234,7 @@ public class FileSystemTest {
 		f1.createFile(f);
 		f1.addOutputStream(f, new CountIgnoreOutputStream());
 
-		CopyHandle h = f0.copy(f, f1, f, CopyMode.REPLACE, false);
+		String h = f0.copy(f, f1, f, CopyMode.REPLACE, false);
 
 		sleep(1000);
 
@@ -1322,7 +1246,7 @@ public class FileSystemTest {
 		assertTrue(s.getException() instanceof XenonException);
 	}
 
-	@Test
+	@Test(expected=NoSuchCopyException.class)
 	public void test_cancelAfterDone() throws XenonException {
 		Path entry = new Path("/test");
 
@@ -1336,7 +1260,7 @@ public class FileSystemTest {
 		f0.createFile(f);
 		f0.addData(f, data);
 
-		CopyHandle h = f0.copy(f, f1, f, CopyMode.CREATE, false);
+		String h = f0.copy(f, f1, f, CopyMode.CREATE, false);
 
 		CopyStatus s = f0.waitUntilDone(h, 1000);
 
@@ -1345,11 +1269,8 @@ public class FileSystemTest {
 		assertTrue(s.isDone());
 		assertFalse(s.hasException());
 
-		// cancel -- the copy is already done 
+		// cancel -- the copy is already done -- show throw exception
 		CopyStatus s2 = f0.cancel(h);
-
-		assertTrue(s2.isDone());
-		assertFalse(s2.hasException());
 	}
 
 

@@ -19,14 +19,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Deque;
+
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.UnsupportedOperationException;
@@ -38,7 +44,6 @@ import nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor;
-import nl.esciencecenter.xenon.adaptors.schedulers.Deadline;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.InvalidCredentialException;
@@ -56,9 +61,6 @@ public abstract class FileSystem {
 
 	/** The name of this component, for use in exceptions */
 	private static final String COMPONENT_NAME = "FileSystem";
-
-	/** The polling delay */
-	private static final int POLLING_DELAY = 1000;
 
 	/** The default buffer size */
 	private static final int BUFFER_SIZE = 4 * 1024;
@@ -167,183 +169,62 @@ public abstract class FileSystem {
 	public static FileSystem create(String type) throws XenonException {
 		return create(type, null);
 	}
+	
+    class CopyCallback {
 
-	interface CopyCallback { 
-		void setBytesToCopy(long bytes);
-		void setBytesCopied(long bytes);
-		boolean isCancelled();
-	}
-
-	class CopyOperation implements CopyHandle, CopyCallback {
-
-		private final String uniqueID;
-
-		private final FileSystem sourceFS;
-		private final Path source;
-
-		private final FileSystem destinationFS;
-		private final Path destination;
-
-		private final CopyMode mode;
-
-		private final boolean recursive;
-
-		private Exception exception;
-
-		private String state = "PENDING";
-
-		private boolean cancel = false;
-		private long bytesToCopy = -1;
-		private long bytesCopied = 0;
-
-		public CopyOperation(String uniqueID, FileSystem sourceFS, Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive) {
-			this.uniqueID = uniqueID;
-			this.sourceFS = sourceFS;
-			this.source = source;
-			this.destinationFS = destinationFS;
-			this.destination = destination;
-			this.mode = mode;
-			this.recursive = recursive;
+		long bytesToCopy = 0;
+		long bytesCopied = 0;
+		
+		boolean started = false;
+		boolean cancel = false;
+		
+		synchronized void start(long bytesToCopy) {
+			if (!started) { 
+				started = true;
+				this.bytesToCopy = bytesToCopy;
+			}
 		}
-
-		@Override
-		public FileSystem getSourceFileSystem() {
-			return sourceFS;
+		
+		synchronized boolean isStarted() { 
+			return started;
 		}
-
-		@Override
-		public Path getSourcePath() {
-			return source;
+		
+		synchronized void addBytesCopied(long bytes) { 
+			this.bytesCopied += bytes;
 		}
-
-		@Override
-		public FileSystem getDestinatonFileSystem() {
-			return destinationFS;
+		
+		synchronized void cancel() { 
+			cancel = true;
 		}
-
-		@Override
-		public Path getDestinationPath() {
-			return destination;
-		}
-
-		@Override
-		public CopyMode getMode() {
-			return mode;
-		}
-
-		@Override
-		public boolean isRecursive() {
-			return recursive;
-		}
-
-		public String getUniqueID() {
-			return uniqueID;
-		}
-
-		private boolean hasID(String copyID) { 
-			return uniqueID.equals(copyID);
-		}
-
-		synchronized void cancel() {
-			this.cancel = true;
-		}
-
-		public synchronized boolean isCancelled() {
+		
+		synchronized boolean isCancelled() { 
 			return cancel;
 		}
-
-		public synchronized void setBytesToCopy(long bytesToCopy) {
-			this.bytesToCopy = bytesToCopy;
-		}
-
-		public synchronized void setBytesCopied(long bytesCopied) {
-			this.bytesCopied = bytesCopied;
-		}
-
-		private synchronized void setRunning() {
-			this.state = "RUNNING";
-		}
-
-		private synchronized void setDone(Exception e) {
-			if (e == null) { 
-				this.state = "DONE";
-				this.exception = null;
-			} else { 
-				this.state = "FAILED";
-				this.exception = e;
-			}
-
-			// Wakeup pending waitUntilDone if needed
-			notifyAll();
-		}
-
-		private synchronized boolean isDone() {
-			return "DONE".equals(state) || "FAILED".equals(state);
-		}
-
-		private synchronized CopyStatus getStatus() {
-			return new CopyStatus(this, state, bytesToCopy, bytesCopied, exception);
-		}
-
-		public synchronized CopyStatus waitUntilDone(long timeout) {
-
-			long deadline = Deadline.getDeadline(timeout);
-
-			long leftover = deadline - System.currentTimeMillis();
-
-			while (leftover > 0 && !isDone()) {
-				try {
-					wait(leftover);
-				} catch (InterruptedException e) {
-					// We were interrupted
-					Thread.currentThread().interrupt();
-					break;
-				}
-
-				leftover = deadline - System.currentTimeMillis();
-
-			}
-
-			return getStatus();
-		}
-
-		@Override
-		public String toString() {
-			return "CopyHandle [" + uniqueID + "]";
+	}
+	
+	private class PendingCopy { 
+	
+		Future<Void> future;
+		CopyCallback callback;
+		
+		public PendingCopy(Future<Void> future, CopyCallback callback) {
+			super();
+			this.future = future;
+			this.callback = callback;
 		}
 	}
-
+	
 	private final String uniqueID;
 	private final String adaptor;
 	private final String location;
 	private final Path entryPath;
 	private final XenonProperties properties;
-
-	/** Unique ID for copy operations */
+	private final ExecutorService pool;
+	
 	private long nextCopyID = 0;
-
-	/** Pending copies */
-	private final Deque<CopyOperation> pending = new LinkedList<>();
-
-	/** Running copy */
-	private CopyOperation running;
-
-	/** Should we terminate ? */
-	private boolean done = false;
-
-	/** Copy thread */   
-	private Thread copyThread = new Thread() {
-		@Override
-		public void run() {
-			CopyOperation ch = dequeue();
-
-			while (ch != null) {
-				performCopy(ch);
-				ch = dequeue();
-			}
-		}
-	};
-
+	
+	private final HashMap<String, PendingCopy> pendingCopies = new HashMap<>();
+	
 	protected FileSystem(String uniqueID, String adaptor, String location, Path entryPath, XenonProperties properties) {
 
 		if (uniqueID == null) {
@@ -366,18 +247,14 @@ public abstract class FileSystem {
 		this.adaptor = adaptor;
 		this.location = location;
 		this.entryPath = entryPath;
-
 		this.properties = properties;		
-
-		// Start the copy thread
-		copyThread.start();
-
+		this.pool = Executors.newFixedThreadPool(1);
 	}
 
-	private synchronized String getNextCopyID(String prefix) {
-		return prefix + nextCopyID++;
-	}
-
+	private synchronized String getNextCopyID() {
+		return "COPY-" + getAdaptorName() + "-" + nextCopyID++;
+	}	
+	
 	/**
 	 * Get the name of the adaptor that created this FileSystem.
 	 * 
@@ -750,332 +627,18 @@ public abstract class FileSystem {
 	 */
 	public abstract void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException;
 
-	/**
-	 * Copy an existing source path to a target path on a different file system.
-	 * 
-	 * If the source path is a file, it will be copied to the destination file on the target file system.
-	 * 
-	 * If the source path is a directory, it will only be copied if <code>recursive</code> is set to <code>true</code>. 
-	 * Otherwise, an exception will be thrown. When copying recursively, the directory and its content (both files 
-	 * and subdirectories with content), will be copied to <code>destination</code>.
-	 * 
-	 * @param source
-	 *            the source path (on this filesystem) to copy from.
-	 * @param destinationFS
-	 *            the destination filesystem to copy to.
-	 * @param destination
-	 *            the destination path (on the destination filesystem) to copy to.
-	 * @param mode
-	 *            how to react if the destination already exists.
-	 * @param recursive
-	 *            if the copy should be recursive.
-	 *
-	 * @return a {@link CopyHandle} that can be used to inspect the status of the copy.
-	 * 
-	 * @throws NoSuchPathException
-	 *             If the source file does not exist, the target parent directory does not exist, or the target file does not
-	 *             exist and the <code>APPEND</code> or <code>RESUME</code> option is provided.
-	 * @throws PathAlreadyExistsException
-	 *             If the target file already exists.
-	 * @throws InvalidPathException
-	 *             If the source or target path is not a file.
-	 * @throws InvalidOptionsException
-	 *             If a conflicting set of copy options is provided.
-	 * @throws InvalidResumeTargetException
-	 *             If the data in the target of a resume does not match the data in the source. 
-	 * @throws XenonException
-	 *             If an I/O error occurred.
-	 */
-	public synchronized CopyHandle copy(Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive) throws XenonException { 
-
-		if (source == null) { 
-			throw new IllegalArgumentException("Source path is null");
-		}
-
-		if (destinationFS == null) { 
-			throw new IllegalArgumentException("Destination filesystem is null");
-		}
-
-		if (destination == null) { 
-			throw new IllegalArgumentException("Destination path is null");
-		}
-
-		String ID = getNextCopyID(getAdaptorName() + "_TO_" + destinationFS.getAdaptorName() + "_");
-
-		CopyOperation o = new CopyOperation(ID, this, source, destinationFS, destination, mode, recursive);
-
-		pending.addLast(o);
-
-		notifyAll();
-
-		return o;
-	}
-
-	private void performCopy(CopyOperation cop) { 
-
-		long bytesToCopy = 0;
-		long bytesCopied = 0;
-
-		if (cop.isCancelled()) { 
-			cop.setDone(new XenonException(getAdaptorName(), "Copy cancelled by user"));
-			return;
-		}
-
-		cop.setRunning();
-
-		Path source = cop.getSourcePath();
-
-		FileSystem destinationFS = cop.getDestinatonFileSystem();
-		Path destination = cop.getDestinationPath();
-
-		CopyMode mode = cop.getMode();
-
-		try { 
-			PathAttributes attributes = getAttributes(source);
-
-			if (attributes.isRegular() || attributes.isSymbolicLink()) {
-				copyFile(source, destinationFS, destination, mode, cop);
-				cop.setDone(null);
-				return;
-			}
-
-			if (!attributes.isDirectory()) { 
-				cop.setDone(new InvalidPathException(getAdaptorName(), "Source path is not a file, link or directory: " + source));
-				return;
-			}
-
-			if (!cop.isRecursive()) { 
-				cop.setDone(new InvalidPathException(getAdaptorName(), "Source path is a directory: " + source));
-				return;
-			}
-
-			if (!destinationFS.exists(destination)) {
-				destinationFS.createDirectory(destination);
-			}
-
-			List<PathAttributes> listing = list(source, true);
-
-			for (PathAttributes p : listing) { 
-
-				if (cop.isCancelled()) { 
-					cop.setDone(new XenonException(getAdaptorName(), "Copy cancelled by user"));
-					return;
-				}
-
-				if (p.isDirectory() && !isDotDot(p.getPath())) {
-
-					Path rel = source.relativize(p.getPath());
-					Path dst = destination.resolve(rel);
-
-					destinationFS.createDirectories(dst);
-				} else if (p.isRegular()) { 
-					bytesToCopy += p.getSize();
-				}
-			}
-
-			cop.setBytesToCopy(bytesToCopy);
-
-			for (PathAttributes p : listing) { 
-
-				if (cop.isCancelled()) { 
-					cop.setDone(new XenonException(getAdaptorName(), "Copy cancelled by user"));
-					return;
-				}
-
-				if (p.isRegular()) { 
-
-					Path rel = source.relativize(p.getPath());
-					Path dst = destination.resolve(rel);
-
-					copyFile(p.getPath(), destinationFS, dst, mode, cop);;
-					bytesCopied += p.getSize();
-					cop.setBytesCopied(bytesCopied);
-				}
-			}
-
-			cop.setDone(null);
-
-		} catch (XenonException e) {
-			cop.setDone(e);
-		}
-	}
-
-	private synchronized CopyOperation dequeue() { 
-
-		if (running != null) {
-			running = null;
-			notifyAll();
-		}
-
-		while (!done && pending.isEmpty()) {
-			try {
-				wait(POLLING_DELAY);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				return null;
-			}
-		}
-
-		if (done) {
-			return null;
-		}
-
-		running = pending.removeFirst();
-		return running;
-	}
-
-
-
-	//	public abstract CopyHandle copy(Path sourcePath, Path destinationPath, CopyOption option, boolean recursive) throws XenonException;
-
-	//	public abstract CopyHandle copy(FileSystem sourceFS, Path sourcePath, Path destinationPath, CopyOption option, boolean recursive) throws XenonException;
-
-	//	public abstract CopyHandle copyRecursive(Path sourcePath, Path destinationPath, CopyOption option) throws XenonException;
-	//	
-	//	public abstract CopyHandle copyRecursive(FileSystem sourceFS, Path sourcePath, Path destinationPath, CopyOption option) throws XenonException;
-	//	
-
-	/**
-	 * Retrieve the status of an copy.
-	 * 
-	 * @param copy
-	 *            the copy for which to retrieve the status.
-	 * 
-	 * @return a {@link CopyStatus} containing the status of the asynchronous copy.
-	 * 
-	 * @throws NoSuchCopyException
-	 *             If the copy is not known.
-	 * @throws XenonException
-	 *             If an I/O error occurred.
-	 */
-	public CopyStatus getStatus(CopyHandle copy) throws XenonException { 
-
-		if (copy == null) {
-			throw new IllegalArgumentException("CopyHandle is null");
-		}
-
-		if (!(copy instanceof CopyOperation)) {
-			throw new NoSuchCopyException(getAdaptorName(), "No such copy!");
-		}
-
-		return ((CopyOperation) copy).getStatus();
-	}
-
-	private synchronized void waitUntilCancelled(String copyID) {
-
-		while (running != null && running.hasID(copyID)) {
-			try {
-				wait(POLLING_DELAY);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
-		}
-	}
-
-	/**
-	 * Cancel a copy operation.
-	 * 
-	 * @param copy
-	 *            the copy operation which to cancel.
-	 *            
-	 * @return a {@link CopyStatus} containing the status of the copy.
-	 * 
-	 * @throws NoSuchCopyException
-	 *             If the copy is not known.
-	 * @throws XenonException
-	 *             If an I/O error occurred.
-	 */
-	public synchronized CopyStatus cancel(CopyHandle copy) throws XenonException { 
-
-		if (copy == null) {
-			throw new IllegalArgumentException("CopyHandle is null");
-		}
-
-		if (!(copy instanceof CopyOperation)) {
-			throw new NoSuchCopyException(getAdaptorName(), "No such copy!");
-		}
-
-		CopyOperation cop = (CopyOperation) copy;
-
-		// If the copy has not yet finished we try to find it
-		if (!cop.isDone()) { 
-			// And try to figure out where it is.
-			String copyID = cop.getUniqueID();
-
-			// Maybe it is running ?
-			if (running != null && running.hasID(copyID)) {
-				// Cancel the copy and wait for it.
-				cop.cancel();
-				waitUntilCancelled(copyID);
-			} else { 
-				// Still pending, so remove it from the queue
-				Iterator<CopyOperation> it = pending.iterator();
-
-				while (it.hasNext()) {
-					CopyOperation c = it.next();
-					if (c.hasID(copyID)) {
-						it.remove();
-						c.setDone(new XenonException(getAdaptorName(), "Copy cancelled by user"));
-						break;
-					}
-				}
-			}
-		} 
-
-		// Finally return the status.
-		return cop.getStatus();
-	}
-
-	/**
-	 * Wait until a copy operation is done or until a timeout expires.
-	 * <p>
-	 * This method will wait until a copy operation is done (either gracefully or by producing an error), or until
-	 * the timeout expires, whichever comes first. If the timeout expires, the copy operation will continue to run.
-	 * </p>
-	 * <p>
-	 * The timeout is in milliseconds and must be &gt;= 0. When timeout is 0, it will be ignored and this method will wait until
-	 * the copy operation is done.  
-	 * </p>
-	 * <p>
-	 * A {@link CopyStatus} is returned that can be used to determine why the call returned.
-	 * </p>
-	 * @param copy
-	 *            a handle for the copy operation 
-	 * @param timeout
-	 *            the maximum time to wait for the copy operation in milliseconds.     
-	 *            
-	 * @return a {@link CopyStatus} containing the status of the copy.
-	 * 
-	 * @throws IllegalArgumentException 
-	 *             If the value of timeout is negative
-	 * @throws NoSuchCopyException
-	 *             If the copy handle is not known.
-	 * @throws XenonException
-	 *             If the status of the copy operation could not be retrieved.
-	 */    
-	public CopyStatus waitUntilDone(CopyHandle copy, long timeout) throws XenonException { 
-
-		if (!(copy instanceof CopyOperation)) {
-			throw new NoSuchCopyException(getAdaptorName(), "No such copy!");
-		}
-
-		return ((CopyOperation) copy).waitUntilDone(timeout);
-	}
+	
 
 	protected void streamCopy(InputStream in, OutputStream out, int buffersize, CopyCallback callback) throws IOException, XenonException {
 
 		byte[] buffer = new byte[buffersize];
-
-		long total = 0;
 
 		int size = in.read(buffer);
 
 		while (size > 0) {
 			out.write(buffer, 0, size);
 
-			total += size;
-
-			callback.setBytesCopied(total);
+			callback.addBytesCopied(size);
 			
 			if (callback.isCancelled()) { 
 				throw new XenonException(getAdaptorName(), "Copy cancelled by user");
@@ -1143,7 +706,7 @@ public abstract class FileSystem {
 		Path target = readSymbolicLink(source);
 		destinationFS.createSymbolicLink(destination, target);
 	}
-
+			
 	/**
 	 * Copy a single file to another file system. 
 	 * 
@@ -1195,8 +758,6 @@ public abstract class FileSystem {
 			}
 		} 
 		
-		callback.setBytesToCopy(attributes.getSize());
-	
 		if (callback.isCancelled()) { 
 			throw new XenonException(getAdaptorName(), "Copy cancelled by user");
 		}
@@ -1209,6 +770,82 @@ public abstract class FileSystem {
 		}
 	}
 
+	/**
+	 * 
+	 * @param source
+	 * @param destinationFS
+	 * @param destination
+	 * @param mode
+	 * @param recursive
+	 * @param callback
+	 * @throws XenonException
+	 */
+	protected void performCopy(Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive, CopyCallback callback) throws XenonException {
+		
+		long bytesToCopy = 0;
+		
+		PathAttributes attributes = getAttributes(source);
+
+		if (attributes.isRegular() || attributes.isSymbolicLink()) {
+			copyFile(source, destinationFS, destination, mode, callback);
+			return;
+		}
+
+		if (attributes.isSymbolicLink()) {
+			copySymbolicLink(source, destinationFS, destination, mode, callback);
+			return;
+		}
+
+		if (!attributes.isDirectory()) { 
+			throw new InvalidPathException(getAdaptorName(), "Source path is not a file, link or directory: " + source);
+		}
+
+		if (!recursive) { 
+			throw new InvalidPathException(getAdaptorName(), "Source path is a directory: " + source);
+		}
+
+		if (!destinationFS.exists(destination)) {
+			destinationFS.createDirectory(destination);
+		}
+
+		List<PathAttributes> listing = list(source, true);
+
+		for (PathAttributes p : listing) { 
+
+			if (callback.isCancelled()) { 
+				throw new XenonException(getAdaptorName(), "Copy cancelled by user");
+			}
+
+			if (p.isDirectory() && !isDotDot(p.getPath())) {
+
+				Path rel = source.relativize(p.getPath());
+				Path dst = destination.resolve(rel);
+
+				destinationFS.createDirectories(dst);
+			} else if (p.isRegular()) { 
+				bytesToCopy += p.getSize();
+			}
+		}
+
+		callback.start(bytesToCopy);
+
+		for (PathAttributes p : listing) { 
+
+			if (callback.isCancelled()) { 
+				throw new XenonException(getAdaptorName(), "Copy cancelled by user");
+			}
+
+			if (p.isRegular()) { 
+
+				Path rel = source.relativize(p.getPath());
+				Path dst = destination.resolve(rel);
+
+				copyFile(p.getPath(), destinationFS, dst, mode, callback);;
+				//bytesCopied += p.getSize();				
+				//callback.setBytesCopied(bytesCopied);
+			}
+		}
+	}
 
 	/**
 	 * Delete a file. If the file does not exist, an exception will be thrown.
@@ -1294,6 +931,221 @@ public abstract class FileSystem {
 		}
 	}
 
+	
+	/**
+	 * Copy an existing source path to a target path on a different file system.
+	 * 
+	 * If the source path is a file, it will be copied to the destination file on the target file system.
+	 * 
+	 * If the source path is a directory, it will only be copied if <code>recursive</code> is set to <code>true</code>. 
+	 * Otherwise, an exception will be thrown. When copying recursively, the directory and its content (both files 
+	 * and subdirectories with content), will be copied to <code>destination</code>.
+	 * 
+	 * @param source
+	 *            the source path (on this filesystem) to copy from.
+	 * @param destinationFS
+	 *            the destination filesystem to copy to.
+	 * @param destination
+	 *            the destination path (on the destination filesystem) to copy to.
+	 * @param mode
+	 *            how to react if the destination already exists.
+	 * @param recursive
+	 *            if the copy should be recursive.
+	 *
+	 * @return a {@link String} that identifies this copy and be used to inspect its progress.
+	 * 
+	 * @throws XenonException
+	 *             If an I/O error occurred.
+	 */
+	public synchronized String copy(Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive) throws XenonException { 
+	
+		if (source == null) { 
+			throw new IllegalArgumentException("Source path is null");
+		}
+
+		if (destinationFS == null) { 
+			throw new IllegalArgumentException("Destination filesystem is null");
+		}
+
+		if (destination == null) { 
+			throw new IllegalArgumentException("Destination path is null");
+		}
+		
+		String ID = getNextCopyID();
+		
+		CopyCallback callback = new CopyCallback();
+		
+		Future<Void> future = pool.submit(new Callable<Void>() {
+			@Override
+			public Void call() throws Exception {
+				
+				if (Thread.currentThread().isInterrupted()) { 
+					throw new XenonException(getAdaptorName(), "Copy cancelled by user");
+				}
+					
+				performCopy(source, destinationFS, destination, mode, recursive, callback);
+				return null;
+			}
+		}) ;
+		
+		pendingCopies.put(ID, new PendingCopy(future, callback));
+		return ID;
+	}
+	
+	/**
+	 * Cancel a copy operation.
+	 * 
+	 * @param copy
+	 *            the copy operation which to cancel.
+	 *            
+	 * @return a {@link CopyStatus} containing the status of the copy.
+	 * 
+	 * @throws NoSuchCopyException
+	 *             If the copy is not known.
+	 * @throws XenonException
+	 *             If an I/O error occurred.
+	 */
+	public synchronized CopyStatus cancel(String copyIdentifier) throws XenonException { 
+	
+		if (copyIdentifier == null) { 
+			throw new IllegalArgumentException("Copy identifier may not be null");
+		}
+		
+		PendingCopy copy = pendingCopies.remove(copyIdentifier);
+		
+		if (copy == null) { 
+			throw new NoSuchCopyException(getAdaptorName(), "Copy not found: " + copyIdentifier);
+		}
+		
+		copy.callback.cancel();
+		copy.future.cancel(true);
+		
+		Throwable ex = null;
+		String state = "DONE";
+		
+		try { 
+			copy.future.get();
+		} catch (ExecutionException ee) {
+			ex = ee.getCause();
+			state = "FAILED";
+		} catch (CancellationException | InterruptedException ec) {
+			ex = new XenonException(getAdaptorName(), "Copy cancelled by user");			
+			state = "FAILED";
+		}
+		
+		return new CopyStatus(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
+	}
+	
+	/**
+	 * Wait until a copy operation is done or until a timeout expires.
+	 * <p>
+	 * This method will wait until a copy operation is done (either gracefully or by producing an error), or until
+	 * the timeout expires, whichever comes first. If the timeout expires, the copy operation will continue to run.
+	 * </p>
+	 * <p>
+	 * The timeout is in milliseconds and must be &gt;= 0. When timeout is 0, it will be ignored and this method will wait until
+	 * the copy operation is done.  
+	 * </p>
+	 * <p>
+	 * A {@link CopyStatus} is returned that can be used to determine why the call returned.
+	 * </p>
+	 * @param copy
+	 *            a handle for the copy operation 
+	 * @param timeout
+	 *            the maximum time to wait for the copy operation in milliseconds.     
+	 *            
+	 * @return a {@link CopyStatus} containing the status of the copy.
+	 * 
+	 * @throws IllegalArgumentException 
+	 *             If the value of timeout is negative
+	 * @throws NoSuchCopyException
+	 *             If the copy handle is not known.
+	 * @throws XenonException
+	 *             If the status of the copy operation could not be retrieved.
+	 */    
+	public CopyStatus waitUntilDone(String copyIdentifier, long timeout) throws XenonException { 
+
+		if (copyIdentifier == null) { 
+			throw new IllegalArgumentException("Copy identifier may not be null");
+		}
+		
+		PendingCopy copy = pendingCopies.get(copyIdentifier);
+		
+		if (copy == null) { 
+			throw new NoSuchCopyException(getAdaptorName(), "Copy not found: " + copyIdentifier);
+		}
+		
+		Throwable ex = null;
+		String state = "DONE";
+		
+		try { 
+			copy.future.get(timeout, TimeUnit.MILLISECONDS);
+		} catch (TimeoutException e) {
+			state = "RUNNING";
+		} catch (ExecutionException ee) {
+			ex = ee.getCause();
+			state = "FAILED";
+		} catch (CancellationException | InterruptedException ec) {
+			ex = new XenonException(getAdaptorName(), "Copy cancelled by user");			
+			state = "FAILED";
+		}
+		
+		if (copy.future.isDone()) { 
+			pendingCopies.remove(copyIdentifier);
+		}
+		
+		return new CopyStatus(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
+	}
+	
+	/**
+	 * Retrieve the status of an copy.
+	 * 
+	 * @param copy
+	 *            the copy for which to retrieve the status.
+	 * 
+	 * @return a {@link CopyStatus} containing the status of the asynchronous copy.
+	 * 
+	 * @throws NoSuchCopyException
+	 *             If the copy is not known.
+	 * @throws XenonException
+	 *             If an I/O error occurred.
+	 */
+	public CopyStatus getStatus(String copyIdentifier) throws XenonException { 
+
+		if (copyIdentifier == null) { 
+			throw new IllegalArgumentException("Copy identifier may not be null");
+		}
+	
+		PendingCopy copy = pendingCopies.get(copyIdentifier);
+		
+		if (copy == null) { 
+			throw new NoSuchCopyException(getAdaptorName(), "Copy not found: " + copyIdentifier);
+		}
+		
+		Throwable ex = null;
+		String state = "PENDING";
+		
+		if (copy.future.isDone()) { 
+			pendingCopies.remove(copyIdentifier);
+			
+			// We have either finished, crashed, or cancelled
+			try { 
+				copy.future.get();
+				state = "DONE";
+			} catch (ExecutionException ee) {
+				ex = ee.getCause();
+				state = "FAILED";
+			} catch (CancellationException | InterruptedException ec) {
+				ex = new XenonException(getAdaptorName(), "Copy cancelled by user");			
+				state = "FAILED";
+			}
+		} else if (copy.callback.isStarted()) { 
+			state = "RUNNING";
+		}		
+			
+		return new CopyStatus(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
+	}
+	
 	protected void assertPathExists(Path path) throws XenonException {
 
 		if (path == null) { 
