@@ -66,8 +66,6 @@ public class SlurmScheduler extends ScriptingScheduler {
 
     private final String defaultQueueName;
 
-    private final Map<String, String> interactiveJobs = new HashMap<>();
-
     private final SlurmSetup setup;
     
     protected SlurmScheduler(String uniqueID, String location, Credential credential, Map<String,String> prop) throws XenonException {
@@ -148,8 +146,7 @@ public class SlurmScheduler extends ScriptingScheduler {
         return ScriptingParser.parseJobIDFromLine(output, ADAPTOR_NAME, "Submitted batch job", "Granted job allocation");
     }
 
-    private String findInteractiveJobInMap(Map<String, Map<String, String>> queueInfo, String tag, JobDescription description, 
-            String interactiveJobID) {
+    private String findInteractiveJobInMap(Map<String, Map<String, String>> queueInfo, String tag,  String interactiveJobID) {
 
         //find job with "tag" as a comment in the job info
         for (Map.Entry<String, Map<String, String>> entry : queueInfo.entrySet()) {
@@ -160,10 +157,10 @@ public class SlurmScheduler extends ScriptingScheduler {
                 
                 LOGGER.debug("Found interactive job ID: %s", jobID);
 
-                synchronized (this) {
-                    //add to set of interactive jobs so we can find it
-                    interactiveJobs.put(jobID, interactiveJobID);
-                }
+//                synchronized (this) {
+//                    //add to set of interactive jobs so we can find it
+//                    interactiveJobs.put(jobID, interactiveJobID);
+//                }
                 
                 return jobID;
             }
@@ -173,17 +170,17 @@ public class SlurmScheduler extends ScriptingScheduler {
     }
 
     
-    private String findInteractiveJob(String tag, JobDescription description, String interactiveJob) throws XenonException {
+    private String findInteractiveJob(String tag, String interactiveJob) throws XenonException {
 
         // See if the job can be found in the queue.
-        String result = findInteractiveJobInMap(getSqueueInfo(), tag, description, interactiveJob);
+        String result = findInteractiveJobInMap(getSqueueInfo(), tag, interactiveJob);
 
         if (result != null) { 
             return result;
         }
         
         // See if the job can be found in the accounting.                
-        return findInteractiveJobInMap(getSacctInfo(), tag, description, interactiveJob);
+        return findInteractiveJobInMap(getSacctInfo(), tag, interactiveJob);
     }
     
     @Override
@@ -205,7 +202,7 @@ public class SlurmScheduler extends ScriptingScheduler {
         
         // Next we try to find information on the remote slurm job. Note that this job may not be visible in the queue yet, or
         // if may already have finished. 
-        String result = findInteractiveJob(tag.toString(), description, interactiveJob.getJobIdentifier());
+        String result = findInteractiveJob(tag.toString(), interactiveJob.getJobIdentifier());
 
         long end = System.currentTimeMillis() + SLURM_UPDATE_TIMEOUT; 
         
@@ -218,7 +215,7 @@ public class SlurmScheduler extends ScriptingScheduler {
                 Thread.currentThread().interrupt();
             }
             
-            result = findInteractiveJob(tag.toString(), description, interactiveJob.getJobIdentifier());
+            result = findInteractiveJob(tag.toString(), interactiveJob.getJobIdentifier());
         }
         
         if (result != null) {
