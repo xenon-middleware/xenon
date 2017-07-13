@@ -20,7 +20,6 @@ import java.util.Map;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
-import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
@@ -76,6 +75,6 @@ public class TorqueSchedulerAdaptor extends SchedulerAdaptor {
 
 	@Override
 	public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) throws XenonException {
-		return new TorqueScheduler(getNewUniqueID(), location, credential, new XenonProperties(VALID_PROPERTIES, properties));
+		return new TorqueScheduler(getNewUniqueID(), location, credential, properties);
 	}
 }

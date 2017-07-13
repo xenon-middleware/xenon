@@ -1,14 +1,54 @@
+/**
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
+import java.util.Arrays;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.InvalidPropertyException;
+import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
+import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobHandle;
 
 public class ScriptingUtils {
+
+	public static boolean isLocal(String location) { 
+		return (location == null || location.length() == 0 || location.equals("/"));
+	}
+
+	public static XenonPropertyDescription [] mergeValidProperties(XenonPropertyDescription[] a, XenonPropertyDescription[] b) { 
+		XenonPropertyDescription [] result = Arrays.copyOf(a, a.length + b.length);
+		System.arraycopy(b, 0, result, a.length, b.length);
+		return result;
+	}
+
+	public static XenonProperties getProperties(XenonPropertyDescription[] validProperties, String location, Map<String,String> properties) throws UnknownPropertyException, InvalidPropertyException { 
+		if (isLocal(location)) {
+			return new XenonProperties(mergeValidProperties(validProperties, LocalSchedulerAdaptor.VALID_PROPERTIES), properties);
+		} else {
+			return new XenonProperties(mergeValidProperties(validProperties, SshSchedulerAdaptor.VALID_PROPERTIES), properties);
+		}
+	}
 
 	//  protected static boolean supportsScheme(String scheme, String[] supportedSchemes) {
 	//      for (String validScheme : supportedSchemes) {
@@ -116,6 +156,6 @@ public class ScriptingUtils {
 		}
 	}
 
-	
+
 
 }

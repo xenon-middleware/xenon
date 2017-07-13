@@ -24,6 +24,7 @@ import org.apache.sshd.client.subsystem.sftp.SftpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
@@ -33,7 +34,6 @@ import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
-import nl.esciencecenter.xenon.schedulers.InvalidCredentialException;
 
 public class SftpFileAdaptor extends FileAdaptor {
 
@@ -82,7 +82,7 @@ public class SftpFileAdaptor extends FileAdaptor {
 	public static final String CONNECTION_TIMEOUT = PREFIX + "connection.timeout";
 
 	/** List of properties supported by this SSH adaptor */
-	protected static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {
+	public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {
 			new XenonPropertyDescription(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, 
 					"true", "Automatically add unknown host keys to known_hosts."),
 			new XenonPropertyDescription(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN,  

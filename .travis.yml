@@ -25,7 +25,7 @@ matrix:
 
 # Install Docker compose
 before_install:
-  - if [ $INTEGRATION_TEST == "docker" ]; then
+  - if [ $INTEGRATION_TEST == "integration" ]; then
     export DEBIAN_FRONTEND=noninteractive;
     sudo apt-get -o Dpkg::Options::="--force-confnew" install -q -y docker-engine;
     docker version;
@@ -42,7 +42,7 @@ script:
   - ./gradlew $GRADLE_SCRIPT_TASKS
 
 after_script:
-  - if [ $INTEGRATION_TEST == "docker" ]; then
+  - if [ $INTEGRATION_TEST == "integration" ]; then
     ./src/fixedClientEnvironmentTest/resources/run-fixed-client-environment-test.sh
     ./gradlew jacocoIntegrationTestReport jacocoFixedClientEnvironmentTestReport;
     bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST,OS -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml;

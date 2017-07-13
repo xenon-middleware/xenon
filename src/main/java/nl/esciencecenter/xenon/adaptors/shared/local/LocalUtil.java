@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.local.CommandRunner;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -45,8 +47,6 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
-import nl.esciencecenter.xenon.schedulers.InvalidCredentialException;
-import nl.esciencecenter.xenon.schedulers.InvalidLocationException;
 
 /**
  * LocalUtils contains various utilities for local file operations.

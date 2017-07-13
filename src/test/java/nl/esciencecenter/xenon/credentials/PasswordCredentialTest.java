@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.credentials;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertArrayEquals;
 
 import java.util.Arrays;
 
@@ -43,5 +44,12 @@ public class PasswordCredentialTest {
         PasswordCredential pwc = new PasswordCredential("username", "password".toCharArray());
         assertTrue(pwc.toString().equals("PasswordCredential [username=username]"));
     }
+ 
+    @org.junit.Test
+    public void test_password_null() throws Exception {
+        PasswordCredential pwc = new PasswordCredential("username", null);
+        assertArrayEquals(new char[0], pwc.getPassword());
+    }
+ 
     
 }

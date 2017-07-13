@@ -53,8 +53,16 @@ class SshInteractiveProcess implements InteractiveProcess {
     private final long timeout = 10*1000;
     
     SshInteractiveProcess(ClientSession session, JobHandle job) throws XenonException {
-        this.session = session;
-      
+        
+    	if (session == null) { 
+    		throw new IllegalArgumentException("Session is null");
+    	}
+    	
+       	if (job == null) { 
+    		throw new IllegalArgumentException("Job handle is null");
+    	}
+    	
+    	this.session = session;
         JobDescription description = job.getJobDescription();
 
         try {
@@ -66,14 +74,24 @@ class SshInteractiveProcess implements InteractiveProcess {
 				channel.setEnv(entry.getKey(), entry.getValue());
 			}
 
-			// set the streams first, then connect the channel.
-            streams = new Streams(job, channel.getInvertedOut(), channel.getInvertedIn(), channel.getInvertedErr());           
+ 
+            
             
             // TODO: Add agent FW
             // channel.setAgentForwarding(session.useAgentForwarding());
             
             channel.open().verify(timeout);
-        } catch (IOException e) {
+
+			// set the streams first, then connect the channel.
+            streams = new Streams(job, channel.getInvertedOut(), channel.getInvertedIn(), channel.getInvertedErr());           
+
+            
+            System.out.println("CONNECTED!");
+            
+        } catch (Exception e) {
+        	
+        	System.out.println("FAILED: " + e);
+        	
         	throw new XenonException(ADAPTOR_NAME, "Failed to start command", e);
         }
     }
@@ -125,12 +143,19 @@ class SshInteractiveProcess implements InteractiveProcess {
             cleanup();
         }
 
-        return tmp;
+        return done;
     }
 
     @Override
     public int getExitStatus() {
-        return channel.getExitStatus();
+    	
+    	Integer status = channel.getExitStatus();
+    	
+    	if (status == null) { 
+    		return -1;
+    	}
+    	
+        return status.intValue();
     }
 
     @Override

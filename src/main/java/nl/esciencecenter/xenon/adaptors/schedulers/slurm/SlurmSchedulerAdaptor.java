@@ -44,7 +44,7 @@ public class SlurmSchedulerAdaptor extends SchedulerAdaptor {
             "(locations supported by ssh)" };
     
     /** Should the slurm version on the target machine be ignored ? */
-    public static final String IGNORE_VERSION_PROPERTY = PREFIX + "ignore.version";
+    // public static final String IGNORE_VERSION_PROPERTY = PREFIX + "ignore.version";
 
     /** Should the accounting usage be disabled? */
     public static final String DISABLE_ACCOUNTING_USAGE = PREFIX + "disable.accounting.usage";
@@ -58,9 +58,9 @@ public class SlurmSchedulerAdaptor extends SchedulerAdaptor {
 
     /** List of all properties supported by this adaptor */
     public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {
-        new XenonPropertyDescription(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, 
-                "false", "Skip version check is skipped when connecting to remote machines. "
-                 + "WARNING: it is not recommended to use this setting in production environments!"),
+//        new XenonPropertyDescription(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, 
+//                "false", "Skip version check is skipped when connecting to remote machines. "
+//                 + "WARNING: it is not recommended to use this setting in production environments!"),
         
         new XenonPropertyDescription(DISABLE_ACCOUNTING_USAGE, Type.BOOLEAN,
                 "false", "Do not use accounting info of slurm, even when available. Mostly for testing purposes"),
@@ -73,7 +73,7 @@ public class SlurmSchedulerAdaptor extends SchedulerAdaptor {
     
     public static final long SLURM_UPDATE_SLEEP = 1000L; // 1 second update sleep
     
-    protected static final String[] SUPPORTED_VERSIONS = { "2.3.", "2.5.", "2.6.", "14.03.0", "14.11.9-Bull.1.0", "15.08.6"};
+    public static final String[] SUPPORTED_VERSIONS = { "2.3.", "2.5.", "2.6.", "14.03.0", "14.11.9-Bull.1.0", "15.08.6"};
     
     public SlurmSchedulerAdaptor() {
 		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, true, true);
@@ -81,6 +81,6 @@ public class SlurmSchedulerAdaptor extends SchedulerAdaptor {
     
 	@Override
 	public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) throws XenonException {
-		return new SlurmScheduler(getNewUniqueID(), location, credential, new XenonProperties(VALID_PROPERTIES, properties));
+		return new SlurmScheduler(getNewUniqueID(), location, credential, properties);
 	}
 }

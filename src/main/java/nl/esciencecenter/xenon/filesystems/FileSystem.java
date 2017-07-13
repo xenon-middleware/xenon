@@ -41,10 +41,10 @@ import nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.Deadline;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
-import nl.esciencecenter.xenon.schedulers.InvalidCredentialException;
-import nl.esciencecenter.xenon.schedulers.InvalidLocationException;
-import nl.esciencecenter.xenon.schedulers.InvalidPropertyException;
-import nl.esciencecenter.xenon.schedulers.UnknownPropertyException;
+import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
+import nl.esciencecenter.xenon.UnknownPropertyException;
 
 /**
  * FileSystem represent a (possibly remote) file system that can be used to access data.
@@ -169,8 +169,9 @@ public abstract class FileSystem {
 	}
 
 	interface CopyCallback { 
-		boolean setBytesToCopy(long bytes);
-		boolean setBytesCopied(long bytes);
+		void setBytesToCopy(long bytes);
+		void setBytesCopied(long bytes);
+		boolean isCancelled();
 	}
 
 	class CopyOperation implements CopyHandle, CopyCallback {
@@ -243,22 +244,20 @@ public abstract class FileSystem {
 			return uniqueID.equals(copyID);
 		}
 
-		private synchronized void cancel() {
+		synchronized void cancel() {
 			this.cancel = true;
 		}
 
-		private synchronized boolean isCancelled() {
+		public synchronized boolean isCancelled() {
 			return cancel;
 		}
 
-		public synchronized boolean setBytesToCopy(long bytesToCopy) {
+		public synchronized void setBytesToCopy(long bytesToCopy) {
 			this.bytesToCopy = bytesToCopy;
-			return !cancel;
 		}
 
-		public synchronized boolean setBytesCopied(long bytesCopied) {
+		public synchronized void setBytesCopied(long bytesCopied) {
 			this.bytesCopied = bytesCopied;
-			return !cancel;
 		}
 
 		private synchronized void setRunning() {
@@ -822,8 +821,6 @@ public abstract class FileSystem {
 
 	private void performCopy(CopyOperation cop) { 
 
-		System.out.println("PERFORM COPY");
-
 		long bytesToCopy = 0;
 		long bytesCopied = 0;
 
@@ -839,15 +836,12 @@ public abstract class FileSystem {
 		FileSystem destinationFS = cop.getDestinatonFileSystem();
 		Path destination = cop.getDestinationPath();
 
-		System.out.println("  COPY " + source + " to " + destination);
-
 		CopyMode mode = cop.getMode();
 
 		try { 
 			PathAttributes attributes = getAttributes(source);
 
 			if (attributes.isRegular() || attributes.isSymbolicLink()) {
-				System.out.println("  COPY FILE");
 				copyFile(source, destinationFS, destination, mode, cop);
 				cop.setDone(null);
 				return;
@@ -861,6 +855,11 @@ public abstract class FileSystem {
 			if (!cop.isRecursive()) { 
 				cop.setDone(new InvalidPathException(getAdaptorName(), "Source path is a directory: " + source));
 				return;
+			}
+
+
+			if (!destinationFS.exists(destination)) {
+				destinationFS.createDirectory(destination);
 			}
 
 			Iterable<PathAttributes> listing = list(source, true);
@@ -878,15 +877,11 @@ public abstract class FileSystem {
 					Path rel = source.relativize(p.getPath());
 					Path dst = destination.resolve(rel);
 
-					System.out.println("CREATE DIRECTORIES: " + dst);
-
 					destinationFS.createDirectories(dst);
 				} else if (p.isRegular()) { 
 					bytesToCopy += p.getSize();
 				}
 			}
-
-			System.out.println("  COPY FILES");
 
 			cop.setBytesToCopy(bytesToCopy);
 
@@ -901,8 +896,6 @@ public abstract class FileSystem {
 
 					Path rel = source.relativize(p.getPath());
 					Path dst = destination.resolve(rel);
-
-					System.out.println("COPY FILES: " + rel + "  *** " + dst);
 
 					copyFile(p.getPath(), destinationFS, dst, mode, cop);;
 					bytesCopied += p.getSize();
@@ -1092,7 +1085,9 @@ public abstract class FileSystem {
 
 			total += size;
 
-			if (!callback.setBytesCopied(total)) { 
+			callback.setBytesCopied(total);
+			
+			if (callback.isCancelled()) { 
 				throw new XenonException(getAdaptorName(), "Copy cancelled by user");
 			}
 
@@ -1134,9 +1129,7 @@ public abstract class FileSystem {
 	 *      if the link could not be copied.
 	 */    
 	protected void copySymbolicLink(Path source, FileSystem destinationFS, Path destination, CopyMode mode, CopyCallback callback) throws XenonException {
-
-		System.out.println("COPY LINK "+ source + " " + destinationFS + " " + destination);
-
+		
 		PathAttributes attributes = getAttributes(source);
 
 		if (!attributes.isSymbolicLink()) { 
@@ -1192,8 +1185,6 @@ public abstract class FileSystem {
 	 */    
 	protected void copyFile(Path source, FileSystem destinationFS, Path destination, CopyMode mode, CopyCallback callback) throws XenonException {
 
-		System.out.println("COPY FILE "+ source + " " + destinationFS + " " + destination);
-
 		PathAttributes attributes = getAttributes(source);
 
 		if (!attributes.isRegular()) { 
@@ -1213,12 +1204,10 @@ public abstract class FileSystem {
 				break;
 			}
 		} 
-
-		System.out.println("COPY FILE START STREAM");
-
-		boolean oke = callback.setBytesToCopy(attributes.getSize());
-
-		if (!oke) { 
+		
+		callback.setBytesToCopy(attributes.getSize());
+	
+		if (callback.isCancelled()) { 
 			throw new XenonException(getAdaptorName(), "Copy cancelled by user");
 		}
 
@@ -1226,11 +1215,8 @@ public abstract class FileSystem {
 				OutputStream out = destinationFS.writeToFile(destination, attributes.getSize())) { 
 			streamCopy(in, out, BUFFER_SIZE, callback);
 		} catch (Exception e) {
-			System.out.println("COPY FAILED " + e);
 			throw new XenonException(getAdaptorName(), "Stream copy failed", e);	
 		}
-
-		System.out.println("COPY DONE");
 	}
 
 

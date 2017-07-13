@@ -132,7 +132,7 @@ class BatchProcess implements Process {
         }
     }
 
-    public boolean isDone() {
+    public boolean isDone()  {
 
         if (process.isDone()) {
             closeStreams();

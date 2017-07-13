@@ -13,25 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors;
+package nl.esciencecenter.xenon.adaptors.schedulers;
 
-import nl.esciencecenter.xenon.XenonException;
+public abstract class SchedulerLocationConfig {
 
-/**
- * Signals that a property has a different type than the get method it was retrieved with.  
- * 
- * @version 1.0
- * @since 1.0
- */
-public class PropertyTypeException extends XenonException {
+	public abstract String getLocation();
 
-    private static final long serialVersionUID = 1L;
-
-    public PropertyTypeException(String adaptorName, String message, Throwable t) {
-        super(adaptorName, message, t);
-    }
-
-    public PropertyTypeException(String adaptorName, String message) {
-        super(adaptorName, message);
-    }
+    //public abstract Map.Entry<Path,Path> getSymbolicLinksToExistingFile();
 }

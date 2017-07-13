@@ -1,5 +1,21 @@
+/**
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.xenon.adaptors.schedulers.ssh;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.sshd.client.SshClient;
@@ -11,6 +27,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobQueueScheduler;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil;
@@ -89,7 +106,7 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
     public static final String SUBMITTED = JOBS + "submitted";
 
     /** List of properties supported by this SSH adaptor */
-    protected static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {
+    public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {
             new XenonPropertyDescription(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN,
             		"true", "Automatically add unknown host keys to known_hosts."),
             new XenonPropertyDescription(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, 
@@ -137,8 +154,11 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
 	        
 		  ClientSession session = SSHUtil.connect(ADAPTOR_NAME, client, location, credential, timeout);
 	      
+		  // We must convert the relevant SSH properties to SFTP here.
+		  Map<String, String> sftpProperties = SSHUtil.sshToSftpProperties(properties);
+		  
 		  // Create a file system that point to the same location as the scheduler.
-		  FileSystem fs = FileSystem.create("sftp", location, credential, properties);
+		  FileSystem fs = FileSystem.create("sftp", location, credential, sftpProperties);
 
 		  long pollingDelay = xp.getLongProperty(POLLING_DELAY);
 		  int multiQThreads = xp.getIntegerProperty(MULTIQ_MAX_CONCURRENT);

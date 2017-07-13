@@ -13,25 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.schedulers;
+package nl.esciencecenter.xenon.adaptors.schedulers.ssh;
 
-import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
 
-/**
- * Signals that a property has an invalid value.  
- * 
- * @version 1.0
- * @since 1.0
- */
-public class InvalidPropertyException extends XenonException {
+public class SshLocationConfig extends SchedulerLocationConfig {
 
-    private static final long serialVersionUID = 1L;
-
-    public InvalidPropertyException(String adaptorName, String message, Throwable t) {
-        super(adaptorName, message, t);
-    }
-
-    public InvalidPropertyException(String adaptorName, String message) {
-        super(adaptorName, message);
-    }
+	private String location;
+	
+	public SshLocationConfig(String location) { 
+		this.location = location; 
+	}
+	
+	@Override
+	public String getLocation() {
+		return location;
+	}
 }

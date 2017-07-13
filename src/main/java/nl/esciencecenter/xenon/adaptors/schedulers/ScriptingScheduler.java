@@ -23,8 +23,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.xenon.InvalidPropertyException;
+import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
@@ -48,42 +52,45 @@ public abstract class ScriptingScheduler extends Scheduler {
     protected final FileSystem subFileSystem;
     
     protected final long pollDelay;
-
+    
     protected ScriptingScheduler(String uniqueID, String adaptor, String location, Credential credential,
-           boolean supportsBatch, boolean supportsInteractive, XenonProperties properties, long pollDelay) throws XenonException {
+           boolean supportsBatch, boolean supportsInteractive, Map<String,String> prop, 
+           XenonPropertyDescription[] validProperties, String pollDelayProperty) throws XenonException {
 
-    	super(uniqueID, adaptor, location, false, supportsBatch, supportsInteractive, properties);
+    	super(uniqueID, adaptor, location, false, supportsBatch, supportsInteractive, 
+    			ScriptingUtils.getProperties(validProperties, location, prop));
     	
-    	this.pollDelay = pollDelay;
+    	this.pollDelay = properties.getLongProperty(pollDelayProperty);
 
         String subJobScheme;
         String subFileScheme;
         String subLocation;
-
-        if (location == null || location.length() == 0 || location.equals("/")) {
+        Map<String, String> subSchedulerProperties;
+        
+        if (ScriptingUtils.isLocal(location)) {
             subJobScheme = "local";
             subFileScheme = "file";
             subLocation = "/";
+            subSchedulerProperties = properties.filter(LocalSchedulerAdaptor.PREFIX).toMap();
         } else {
             subJobScheme = "ssh";
             subFileScheme = "sftp";
             subLocation = location;
+            subSchedulerProperties = properties.filter(SshSchedulerAdaptor.PREFIX).toMap();
+
+            //since we expect commands to be done almost instantaneously, we poll quite frequently (local operation anyway)
+            subSchedulerProperties.put(SshSchedulerAdaptor.POLLING_DELAY, "100");
         }
 
         LOGGER.debug("creating sub scheduler for {} adaptor at {}://{}", adaptor, subJobScheme, subLocation);
-        Map<String, String> subSchedulerProperties = new HashMap<>(2);
-
-        //since we expect commands to be done almost instantaneously, we poll quite frequently (local operation anyway)
-        if (subJobScheme.equals("ssh")) {
-            subSchedulerProperties.put(SshSchedulerAdaptor.POLLING_DELAY, "100");
-        }
+        
         subScheduler = Scheduler.create(subJobScheme, subLocation, credential, subSchedulerProperties);
 
         LOGGER.debug("creating file system for {} adaptor at {}://{}", adaptor, subFileScheme, subLocation);
         subFileSystem = FileSystem.create(subFileScheme, subLocation, credential, null);
     }
     
-    protected Path getFsEntryPath() {
+	protected Path getFsEntryPath() {
         return subFileSystem.getEntryPath();
     }
 

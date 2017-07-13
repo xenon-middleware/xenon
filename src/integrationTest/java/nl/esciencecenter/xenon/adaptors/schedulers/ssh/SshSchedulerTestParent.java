@@ -13,25 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.schedulers;
+package nl.esciencecenter.xenon.adaptors.schedulers.ssh;
 
-import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerTestParent;
 
 /**
- * Signals that an unknown property was provided.  
- * 
- * @version 1.0
- * @since 1.0
+ * Extend this class for docker tests and live tests
+ *
+ * Can contain extra tests for ssh scheduler
  */
-public class UnknownPropertyException extends XenonException {
+public abstract class SshSchedulerTestParent extends SchedulerTestParent {
 
-    private static final long serialVersionUID = 1L;
-
-    public UnknownPropertyException(String adaptorName, String message, Throwable t) {
-        super(adaptorName, message, t);
-    }
-
-    public UnknownPropertyException(String adaptorName, String message) {
-        super(adaptorName, message);
-    }
 }

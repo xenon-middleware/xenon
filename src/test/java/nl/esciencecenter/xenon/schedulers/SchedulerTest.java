@@ -1,3 +1,18 @@
+/**
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.xenon.schedulers;
 
 import static org.junit.Assert.*;
@@ -90,83 +105,83 @@ public class SchedulerTest {
 	  
 	  @Test(expected=IllegalArgumentException.class)
 	  public void test_createSchedulerFailsIDNull() throws Exception {
-		  new TestScheduler(null, "TEST", "MEM", true, true, true, null);
+		  new MockScheduler(null, "TEST", "MEM", true, true, true, null);
 	  }
 
 	  @Test(expected=IllegalArgumentException.class)
 	  public void test_createSchedulerFailsNameNull() throws Exception {
-		  new TestScheduler("0", null, "MEM", true, true, true, null);
+		  new MockScheduler("0", null, "MEM", true, true, true, null);
 	  }
 
 	  @Test(expected=IllegalArgumentException.class)
 	  public void test_createSchedulerFailsLocationNull() throws Exception {
-		  new TestScheduler("0", "TEST", null, true, true, true, null);
+		  new MockScheduler("0", "TEST", null, true, true, true, null);
 	  }
 	  
 	  @Test
 	  public void test_getLocation() throws Exception {
-		  Scheduler s = new TestScheduler("0", "TEST", "MEM", true, true, true, null);
+		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, true, null);
 		  assertEquals("MEM",s.getLocation());
 	  }
 
 	  @Test
 	  public void test_isOnlineTrue() throws Exception {
-		  Scheduler s = new TestScheduler("0", "TEST", "MEM", true, true, true, null);
+		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, true, null);
 		  assertTrue(s.isOnline());
 	  }
 
 	  @Test
 	  public void test_isOnlineFalse() throws Exception {
-		  Scheduler s = new TestScheduler("0", "TEST", "MEM", false, true, true, null);
+		  Scheduler s = new MockScheduler("0", "TEST", "MEM", false, true, true, null);
 		  assertFalse(s.isOnline());
 	  }
 	  
 	  @Test
 	  public void test_supportsBathTrue() throws Exception {
-		  Scheduler s = new TestScheduler("0", "TEST", "MEM", true, true, true, null);
+		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, true, null);
 		  assertTrue(s.supportsBatch());
 	  }
 
 	  @Test
 	  public void test_supportsBathFalse() throws Exception {
-		  Scheduler s = new TestScheduler("0", "TEST", "MEM", true, false, true, null);
+		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, false, true, null);
 		  assertFalse(s.supportsBatch());
 	  }
 
 	  @Test
 	  public void test_supportsInteractiveTrue() throws Exception {
-		  Scheduler s = new TestScheduler("0", "TEST", "MEM", true, true, true, null);
+		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, true, null);
 		  assertTrue(s.supportsInteractive());
 	  }
 
 	  @Test
 	  public void test_supportsInteractiveFalse() throws Exception {
-		  Scheduler s = new TestScheduler("0", "TEST", "MEM", true, true, false, null);
+		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, false, null);
 		  assertFalse(s.supportsInteractive());
 	  }
 
 	  @Test
 	  public void test_equalsTrueSelf() throws Exception {
-		  Scheduler s = new TestScheduler("ID0", "TEST", "MEM", true, true, false, null);
+		  Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
 		  assertTrue(s.equals(s));
 	  }
 
 	  @Test
 	  public void test_equalsTrueSameID() throws Exception {
-		  Scheduler s = new TestScheduler("ID0", "TEST", "MEM", true, true, false, null);
-		  Scheduler s2 = new TestScheduler("ID0", "TEST", "MEM", true, true, false, null);
+		  Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
+		  Scheduler s2 = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
 		  assertTrue(s.equals(s2));
 	  }
 
 	  @Test
 	  public void test_equalsFalseNull() throws Exception {
-		  Scheduler s = new TestScheduler("ID0", "TEST", "MEM", true, true, false, null);
+		  Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
 		  assertFalse(s.equals(null));
 	  }
 
 	  @Test
 	  public void test_equalsFalseWrongType() throws Exception {
-		  Scheduler s = new TestScheduler("ID0", "TEST", "MEM", true, true, false, null);
+		  Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
 		  assertFalse(s.equals("hello"));
 	  }
 
@@ -178,13 +193,13 @@ public class SchedulerTest {
 		  XenonPropertyDescription d = new XenonPropertyDescription("aap", Type.STRING, "empty", "test");
 		  XenonProperties prop = new XenonProperties(new XenonPropertyDescription [] { d }, p);
 		  
-		  Scheduler s = new TestScheduler("ID0", "TEST", "MEM", true, true, true, prop);
+		  Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, true, prop);
 		  assertEquals(p, s.getProperties());
 	  }
 
 	  @Test
 	  public void test_hashcode() throws Exception {
-		  Scheduler s = new TestScheduler("ID0", "TEST", "MEM", true, true, false, null);
+		  Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
 		  assertEquals("ID0".hashCode(), s.hashCode());
 	  }
 	  

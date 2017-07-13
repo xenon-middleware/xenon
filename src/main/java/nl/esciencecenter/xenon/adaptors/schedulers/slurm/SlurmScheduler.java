@@ -17,11 +17,10 @@ package nl.esciencecenter.xenon.adaptors.schedulers.slurm;
 
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.ADAPTOR_NAME;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.DISABLE_ACCOUNTING_USAGE;
-import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.IGNORE_VERSION_PROPERTY;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.POLL_DELAY_PROPERTY;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.SLURM_UPDATE_SLEEP;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.SLURM_UPDATE_TIMEOUT;
-import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.SUPPORTED_VERSIONS;
+import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.VALID_PROPERTIES;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmUtils.JOB_OPTION_JOB_SCRIPT;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmUtils.generate;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmUtils.generateInteractiveArguments;
@@ -42,7 +41,6 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
-import nl.esciencecenter.xenon.adaptors.schedulers.IncompatibleVersionException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
@@ -71,20 +69,14 @@ public class SlurmScheduler extends ScriptingScheduler {
 
     private final String defaultQueueName;
 
-    private final Map<String, JobHandle> interactiveJobs;
+    private final Map<String, JobHandle> interactiveJobs = new HashMap<>();
 
-    private final boolean accountingAvailable;
-
-    private final String version;
+    private final SlurmSetup setup;
     
-    protected SlurmScheduler(String uniqueID, String location, Credential credential, XenonProperties properties) throws XenonException {
+    protected SlurmScheduler(String uniqueID, String location, Credential credential, Map<String,String> prop) throws XenonException {
 
-        super(uniqueID, ADAPTOR_NAME, location, credential, true, true, properties, properties.getLongProperty(POLL_DELAY_PROPERTY));
+        super(uniqueID, ADAPTOR_NAME, location, credential, true, true, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
 
-        //map containing references to interactive jobs (normally ssh jobs)
-        interactiveJobs = new HashMap<>();
-
-        boolean ignoreVersion = properties.getBooleanProperty(IGNORE_VERSION_PROPERTY);
         boolean disableAccounting = properties.getBooleanProperty(DISABLE_ACCOUNTING_USAGE);
 
         // Get some version information from slurm
@@ -94,22 +86,8 @@ public class SlurmScheduler extends ScriptingScheduler {
         Map<String, String> info = ScriptingParser.parseKeyValueLines(output, ScriptingParser.EQUALS_REGEX,
                 ADAPTOR_NAME, "Configuration data as of", "Slurmctld(primary/backup) at", "Account Gather");
 
-        version = info.get("SLURM_VERSION");
+        setup = new SlurmSetup(info, disableAccounting);
         
-        if (version == null) {
-            throw new XenonException(ADAPTOR_NAME, "Slurm config does not contain version info");
-        }
-        
-        checkVersion(ignoreVersion);
-
-        String accountingType = info.get("AccountingStorageType");
-
-        if (accountingType == null) {
-            throw new XenonException(ADAPTOR_NAME, "Slurm config does not contain expected accounting info");
-        }
-
-        accountingAvailable = !(accountingType.equals("accounting_storage/none") || disableAccounting);
-
         // Very wide partition format to compensate for bug in slurm 2.3.
         // If the size of the column is not specified the default partition does not get listed with a "*"
         output = runCheckedCommand(null, "sinfo", "--noheader", "--format=%120P");
@@ -128,23 +106,8 @@ public class SlurmScheduler extends ScriptingScheduler {
         this.queueNames = foundQueueNames;
         this.defaultQueueName = foundDefaultQueueName;
         
-        LOGGER.debug("Created new SlurmConfig. version = \"{}\", accounting available: {}", version, accountingAvailable);
-    }
-    
-    private void checkVersion(boolean ignoreVersion) throws IncompatibleVersionException {
-        for (String supportedVersion : SUPPORTED_VERSIONS) {
-            if (version.startsWith(supportedVersion)) {
-                return;
-            }
-        }
-        if (ignoreVersion) {
-            LOGGER.warn("Slurm version {} not supported by Slurm Adaptor. Ignoring as requested by {} property", version,
-                    IGNORE_VERSION_PROPERTY);
-        } else {
-            throw new IncompatibleVersionException(ADAPTOR_NAME, "Slurm version " + version
-                    + " not supported by Slurm Adaptor. Set " + IGNORE_VERSION_PROPERTY 
-                    + " in the properties passed to xenon.jobs().newScheduler() to ignore");
-        }
+        LOGGER.debug("Created new SlurmConfig. version = \"{}\", accounting available: {}", 
+        		setup.version(), setup.accountingAvailable());
     }
     
     @Override
@@ -369,7 +332,7 @@ public class SlurmScheduler extends ScriptingScheduler {
     }
 
     private Map<String, Map<String, String>> getSacctInfo(JobHandle... jobs) throws XenonException {
-        if (!accountingAvailable) {
+        if (!setup.accountingAvailable()) {
             return new HashMap<>();
         }
 

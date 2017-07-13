@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.xenon.filesystems;
 
-//import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -23,31 +22,6 @@ import org.junit.Test;
 import nl.esciencecenter.xenon.filesystems.CopyMode;
 
 public class CopyOptionTest {
-
-//    @Test
-//    public void testContains_empty_doesNotContainIt() {
-//        assertFalse(CopyOption.CREATE.occursIn());
-//    }
-//
-//    @Test
-//    public void testContains_filled_doesContainIt() {
-//        assertTrue(CopyOption.CREATE.occursIn(CopyOption.ASYNCHRONOUS, CopyOption.CREATE));
-//    }
-//
-//    @Test
-//    public void testContains_filled_doesNotContainIt() {
-//        assertFalse(CopyOption.CREATE.occursIn(CopyOption.REPLACE));
-//    }
-//
-//    @Test
-//    public void testContains_optionsNull_doesNotContainIt() {
-//        assertFalse(CopyOption.CREATE.occursIn((CopyOption[]) null));
-//    }
-//
-//    @Test
-//    public void testContains_optionsFilledNull_doesNotContainIt() {
-//        assertFalse(CopyOption.CREATE.occursIn(new CopyOption[] { null }));
-//    }
 
     @Test
     public void testContains_valueOf() {

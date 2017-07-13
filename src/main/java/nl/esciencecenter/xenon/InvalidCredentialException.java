@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.schedulers;
-
-import nl.esciencecenter.xenon.XenonException;
+package nl.esciencecenter.xenon;
 
 /**
- * Signals that an invalid location was provided.  
+ * Signals that an invalid credential was used to access a resource.  
  * 
  * @version 1.0
  * @since 1.0
  */
-public class InvalidLocationException extends XenonException {
+public class InvalidCredentialException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 
-    public InvalidLocationException(String adaptorName, String message, Throwable t) {
+    public InvalidCredentialException(String adaptorName, String message, Throwable t) {
         super(adaptorName, message, t);
     }
 
-    public InvalidLocationException(String adaptorName, String message) {
+    public InvalidCredentialException(String adaptorName, String message) {
         super(adaptorName, message);
     }
 }

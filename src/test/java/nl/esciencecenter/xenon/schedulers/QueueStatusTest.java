@@ -1,3 +1,18 @@
+/**
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.xenon.schedulers;
 
 import static org.junit.Assert.assertEquals;
@@ -12,7 +27,7 @@ public class QueueStatusTest {
 	
 	@Test
 	public void test_scheduler() throws Exception {
-		TestScheduler s = new TestScheduler("ID", "TEST", "MEM", true, true, true, null);
+		MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
 		QueueStatus stat = new QueueStatus(s, "Q", null, null);
 		assertEquals(s,  stat.getScheduler());
 	}
@@ -24,20 +39,20 @@ public class QueueStatusTest {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void test_queueNameFailsNull() throws Exception {
-		TestScheduler s = new TestScheduler("ID", "TEST", "MEM", true, true, true, null);
+		MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
 		new QueueStatus(s, null, null, null);
 	}
 	
 	@Test
 	public void test_queue() throws Exception {
-		TestScheduler s = new TestScheduler("ID", "TEST", "MEM", true, true, true, null);
+		MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
 		QueueStatus stat = new QueueStatus(s, "Q", null, null);
 		assertEquals("Q",  stat.getQueueName());
 	}
 	
 	@Test
 	public void test_exeption() throws Exception {
-		TestScheduler s = new TestScheduler("ID", "TEST", "MEM", true, true, true, null);
+		MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
 		Exception e = new NullPointerException("aap");
 		QueueStatus stat = new QueueStatus(s, "Q", e, null);
 		assertEquals(e,  stat.getException());
@@ -48,7 +63,7 @@ public class QueueStatusTest {
 		HashMap<String, String> tmp = new HashMap<>();
 		tmp.put("key", "value");
 		
-		TestScheduler s = new TestScheduler("ID", "TEST", "MEM", true, true, true, null);
+		MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
 		Exception e = new NullPointerException("aap");
 		QueueStatus stat = new QueueStatus(s, "Q", e, tmp);
 		assertEquals(tmp,  stat.getSchedulerSpecficInformation());
@@ -56,7 +71,7 @@ public class QueueStatusTest {
 	
 	@Test
 	public void test_hasExeptionTrue() throws Exception {
-		TestScheduler s = new TestScheduler("ID", "TEST", "MEM", true, true, true, null);
+		MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
 		Exception e = new NullPointerException("aap");
 		QueueStatus stat = new QueueStatus(s, "Q", e, null);
 		assertTrue(stat.hasException());
@@ -64,7 +79,7 @@ public class QueueStatusTest {
 	
 	@Test
 	public void test_hasExeptionFalse() throws Exception {
-		TestScheduler s = new TestScheduler("ID", "TEST", "MEM", true, true, true, null);
+		MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
 		QueueStatus stat = new QueueStatus(s, "Q", null, null);
 		assertFalse(stat.hasException());
 	}
@@ -73,7 +88,7 @@ public class QueueStatusTest {
 	public void test_toString() throws Exception {
 		HashMap<String, String> tmp = new HashMap<>();
 		tmp.put("key", "value");
-		TestScheduler s = new TestScheduler("ID", "TEST", "MEM", true, true, true, null);
+		MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
 		Exception e = new NullPointerException("aap");
 		QueueStatus stat = new QueueStatus(s, "Q", e, tmp);
 		
