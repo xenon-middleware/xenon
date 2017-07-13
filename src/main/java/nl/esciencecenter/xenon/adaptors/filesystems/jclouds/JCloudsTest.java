@@ -3,9 +3,7 @@ package nl.esciencecenter.xenon.adaptors.filesystems.jclouds;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.Path;
 
-/**
- * Created by atze on 30-6-17.
- */
+
 public class JCloudsTest {
 
     public static void main(String[] argv){
