@@ -409,7 +409,7 @@ public abstract class Scheduler {
      * <code>null</code>. If the retrieval of the <code>JobStatus</code> fails for a job, the exception will be stored in the
      * corresponding <code>JobsStatus</code> entry.
      * </p>
-     * @param jobIdentifier
+     * @param jobIdentifiers
      *            the job identifiers for which to retrieve the status.
      * 
      * @return an array of the resulting JobStatusses.
@@ -427,7 +427,7 @@ public abstract class Scheduler {
      * </p>
      * <p>
      * A {@link JobStatus} is returned that can be used to determine the state of the job after cancelJob returns. Note that it 
-     * may take some time before the job has actually terminated. The {@link #waitUntilDone(JobHandle, long) waitUntilDone} method can 
+     * may take some time before the job has actually terminated. The {@link #waitUntilDone(String, long) waitUntilDone} method can 
      * be used to wait until the job is terminated.
      * </p>
      * @param jobIdentifier

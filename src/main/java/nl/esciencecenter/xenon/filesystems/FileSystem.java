@@ -771,14 +771,22 @@ public abstract class FileSystem {
 	}
 
 	/**
-	 * 
+	 * Perform a (possibly) recursive copy from a path on this filesystem to a path on <code>destinationFS</code>.
+	 *  
 	 * @param source
+	 * 		the source path on this FileSystem.
 	 * @param destinationFS
+	 * 		the destination FileSystem.
 	 * @param destination
+	 * 		the destination path.
 	 * @param mode
+	 * 		the copy mode that determines how to react if the destination already exists.
 	 * @param recursive
+	 * 		should the copy be performed recursively ?
 	 * @param callback
+	 * 		a {@link CopyCallback} used to return status information on the copy. 
 	 * @throws XenonException
+	 * 		if an error occurred.
 	 */
 	protected void performCopy(Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive, CopyCallback callback) throws XenonException {
 		
@@ -995,8 +1003,8 @@ public abstract class FileSystem {
 	/**
 	 * Cancel a copy operation.
 	 * 
-	 * @param copy
-	 *            the copy operation which to cancel.
+	 * @param copyIdentifier
+	 *            the identifier of the copy operation which to cancel.
 	 *            
 	 * @return a {@link CopyStatus} containing the status of the copy.
 	 * 
@@ -1049,8 +1057,8 @@ public abstract class FileSystem {
 	 * <p>
 	 * A {@link CopyStatus} is returned that can be used to determine why the call returned.
 	 * </p>
-	 * @param copy
-	 *            a handle for the copy operation 
+	 * @param copyIdentifier
+	 *            the identifier of the copy operation to wait for. 
 	 * @param timeout
 	 *            the maximum time to wait for the copy operation in milliseconds.     
 	 *            
@@ -1100,8 +1108,8 @@ public abstract class FileSystem {
 	/**
 	 * Retrieve the status of an copy.
 	 * 
-	 * @param copy
-	 *            the copy for which to retrieve the status.
+	 * @param copyIdentifier
+	 *            the identifier of the copy for which to retrieve the status.
 	 * 
 	 * @return a {@link CopyStatus} containing the status of the asynchronous copy.
 	 * 
