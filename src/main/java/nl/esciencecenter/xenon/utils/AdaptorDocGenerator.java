@@ -165,6 +165,7 @@ public class AdaptorDocGenerator {
         out.println("<h4>Supported features</h4><ul>");
         out.println("<li>Batch: " + description.supportsBatch() + "</li>");
         out.println("<li>Interactive: " + description.supportsInteractive() + "</li>");
+        out.println("<li>Online: " + description.isOnline() + "</li>");
         out.println("</ul>");
     }
 }
