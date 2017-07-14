@@ -15,6 +15,8 @@ matrix:
       addons:
         sonarqube:
           organization: nlesc
+      before_install:
+        - docker-compose --version
       script:
         - ./gradlew check
         - ./src/fixedClientEnvironmentTest/resources/run-fixed-client-environment-test.sh;
@@ -40,8 +42,6 @@ matrix:
        - bash <(curl -s https://codecov.io/bash) -e JDK,OS -F livelocal -f build/reports/jacoco/jacocoLiveTestReport/jacocoLiveTestReport.xml
   fast_finish: true
 
-before_install:
-  - docker-compose --version
 
 install:
   - ./gradlew assemble

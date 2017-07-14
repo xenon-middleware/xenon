@@ -3,11 +3,11 @@ build_script:
   - cmd: ./gradlew.bat assemble
 test_script:
   - mkdir build\integrationTest & cd build\integrationTest & ..\..\src\liveTest\resources\scripts\create_symlinks.bat & cd ..\..
-  - cmd: ./gradlew.bat liveTest -Dxenon.scheduler=local -Dxenon.filesystem=file -Dxenon.location=%HomeDrive$ -Dxenon.username=%USERNAME% -Dxenon.basedir=%CD%\build\integrationTest
+  - cmd: gradlew.bat liveTest -Dxenon.scheduler=local -Dxenon.filesystem=file -Dxenon.location=%HomeDrive% -Dxenon.username=%USERNAME% -Dxenon.basedir=projects\xenon\build\integrationTest
 on_finish:
   - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
   - "SET JDK=oraclejdk8"
-  - ./gradlew.bat jacocoTestReport jacocoLiveTestReport
+  - .\gradlew.bat jacocoTestReport jacocoLiveTestReport
   - pip install codecov
   - codecov -e OS,JDK -F unit -f build/reports/jacoco/test/jacocoTestReport.xml
   - ps: |
