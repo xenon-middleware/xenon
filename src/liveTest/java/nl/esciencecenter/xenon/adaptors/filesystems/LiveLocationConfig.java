@@ -21,6 +21,9 @@ import java.util.Map;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 public class LiveLocationConfig extends LocationConfig {
     private final FileSystem fileSystem;
 
@@ -30,16 +33,24 @@ public class LiveLocationConfig extends LocationConfig {
     }
     // TODO the paths should be relative to the filesystem.getEntryPath()
 
+    private Path createPath(String path) {
+        String baseDir = System.getProperty("xenon.basedir");
+        if (baseDir == null) {
+            return fileSystem.getEntryPath().resolve(path);
+        }
+        return fileSystem.getEntryPath().resolve(new Path(baseDir, path));
+    }
+
     @Override
     public Path getExistingPath() {
-        return fileSystem.getEntryPath().resolve("filesystem-test-fixture/links/file0");
+        return createPath("filesystem-test-fixture/links/file0");
     }
 
     @Override
     public Map.Entry<Path, Path> getSymbolicLinksToExistingFile() {
         return new AbstractMap.SimpleEntry<>(
-            fileSystem.getEntryPath().resolve("filesystem-test-fixture/links/link0"),
-            fileSystem.getEntryPath().resolve("filesystem-test-fixture/links/file0")
+                createPath("filesystem-test-fixture/links/link0"),
+                createPath("filesystem-test-fixture/links/file0")
         );
     }
 }

@@ -25,6 +25,7 @@ import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobQueueScheduler;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
+import nl.esciencecenter.xenon.adaptors.shared.local.LocalUtil;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
@@ -125,8 +126,13 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
         if (properties != null && properties.size() > 0) {
             throw new UnknownPropertyException(ADAPTOR_NAME, "Cannot create local scheduler with additional properties!");
         }
+
+        String filesystemlocation = "/";
+        if (LocalUtil.isWindows()) {
+            filesystemlocation = "c:";
+        }
         
-        FileSystem filesystem = FileSystem.create("file", "/", credential, properties);
+        FileSystem filesystem = FileSystem.create("file", filesystemlocation, credential, properties);
         
         int processors = Runtime.getRuntime().availableProcessors();
         int multiQThreads = xp.getIntegerProperty(MULTIQ_MAX_CONCURRENT, processors);

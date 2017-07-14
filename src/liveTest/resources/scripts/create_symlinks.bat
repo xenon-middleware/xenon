@@ -1,13 +1,13 @@
-mkdir xenon_test\links
-echo "Hello World" > xenon_test\links\file0
-echo "" > xenon_test\links\file1
+mkdir filesystem-test-fixture\links
+echo "Hello World" > filesystem-test-fixture\links\file0
+echo "" > filesystem-test-fixture\links\file1
 
-mklink xenon_test\links\link0 xenon_test\links\file0
-mklink xenon_test\links\link1 xenon_test\links\file1
-mklink xenon_test\links\link2 xenon_test\links\file2
-mklink xenon_test\links\link3 xenon_test\links\link0
-mklink xenon_test\links\link4 xenon_test\links\link2
-mklink xenon_test\links\link5 xenon_test\links\link6
-mklink xenon_test\links\link6 xenon_test\links\link5
+mklink filesystem-test-fixture\links\link0 filesystem-test-fixture\links\file0
+mklink filesystem-test-fixture\links\link1 filesystem-test-fixture\links\file1
+mklink filesystem-test-fixture\links\link2 filesystem-test-fixture\links\file2
+mklink filesystem-test-fixture\links\link3 filesystem-test-fixture\links\link0
+mklink filesystem-test-fixture\links\link4 filesystem-test-fixture\links\link2
+mklink filesystem-test-fixture\links\link5 filesystem-test-fixture\links\link6
+mklink filesystem-test-fixture\links\link6 filesystem-test-fixture\links\link5
 
 

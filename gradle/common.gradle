@@ -30,42 +30,15 @@ testSets {
     }
     fixedClientEnvironmentTest
 }
-liveTest.description = 'Runs the integration tests against live systems'
-integrationTest.description = 'Run the integration tests against docker containers'
-fixedClientEnvironmentTest.description = 'Run the integration tests within and against docker containers'
 
 apply from: 'gradle/documentation.gradle'
 apply from: 'gradle/distribution.gradle'
 apply from: 'gradle/docker.gradle'
 
-//     TEST
-// ==============
-
-// Never up to date, can not verify same config/props/remote is used second time
-liveTest.outputs.upToDateWhen {
-    // TODO cache liveTest arguments for example `./gradlew liveTest -Dscheduler=slurm -Dlocation=das5.vu.nl -Dcredential=default DpropertiesFile=slurm-das5.props`
-    // then cache `-Dscheduler=slurm -Dlocation=das5.vu.nl -Dcredential=default DpropertiesFile=slurm-das5.props` when liveTest is run with same arguments return true.
-    false
-}
-
-check.dependsOn integrationTest
-integrationTest.mustRunAfter test
-
-// See progress of tests
-tasks.withType(Test) {
-    // TODO only verbose logging on when CI environment var is set, because on CI we can't look at html test reports
-    testLogging {
-        events 'started', 'passed', 'skipped', 'failed'
-        exceptionFormat 'full'
-        showStackTraces true
-    }
-}
-
 task wrapper(type: Wrapper) {
     description 'Generates gradle wrapper'
     group 'Build Setup'
-    // TODO upgrade to >=4.0
-    gradleVersion = '2.9'
+    gradleVersion = '4.0.1'
 }
 
 cleanIdeaWorkspace.group = 'IDE'

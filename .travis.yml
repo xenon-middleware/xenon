@@ -1,13 +1,10 @@
 language: java
 
 matrix:
-  # Only do docker integration tests with Oracle JDK 8: the docker
-  # tests are not affected by JDK on host system.
   include:
-    - jdk: oraclejdk8
+    - os: linux
+      jdk: oraclejdk8
       env:
-        - GRADLE_BUILD_TASKS="assemble"
-        - GRADLE_SCRIPT_TASKS="check"
         - INTEGRATION_TEST="integration"
         - JDK=oraclejdk8
         - OS=linux
@@ -18,41 +15,33 @@ matrix:
       addons:
         sonarqube:
           organization: nlesc
-      os: linux
-  # TODO add osx tests only run unit tests and local test of fixedClientEnvironmentTest
-  # Stop when one of the Java versions do not work
+      before_install:
+        - docker-compose --version
+      script:
+        - ./gradlew check
+        - ./src/fixedClientEnvironmentTest/resources/run-fixed-client-environment-test.sh;
+      after_script:
+        - ./gradlew jacocoIntegrationTestReport jacocoFixedClientEnvironmentTestReport;
+        - bash <(curl -s https://codecov.io/bash) -e JDK,OS -F unit -f build/reports/jacoco/test/jacocoTestReport.xml;
+        - bash <(curl -s https://codecov.io/bash) -e JDK,OS -F integration -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml;
+        - bash <(curl -s https://codecov.io/bash) -e JDK,OS -F fixedclientenvironment -f build/reports/jacoco/jacocoFixedClientEnvironmentTestReport/jacocoFixedClientEnvironmentTestReport.xml;
+        - sonar-scanner -Dsonar.login=$SONAR_TOKEN;
+
+    - os: osx
+      env:
+        - INTEGRATION_TEST="livelocal"
+        - JDK=oraclejdk8
+        - OS=osx
+      osx_image: xcode9
+      script:
+        - ./src/liveTest/resources/scripts/create_symlinks;
+        - ./gradlew test liveTest -Dxenon.scheduler=local -Dxenon.filesystem=file -Dxenon.location=/ -Dxenon.username=$USERNAME -Dxenon.basedir=$PWD
+      after_script:
+       -  ./gradlew jacocoTestReport jacocoLiveTestReport
+       - bash <(curl -s https://codecov.io/bash) -e JDK,OS -F unit -f build/reports/jacoco/test/jacocoTestReport.xml;
+       - bash <(curl -s https://codecov.io/bash) -e JDK,OS -F livelocal -f build/reports/jacoco/jacocoLiveTestReport/jacocoLiveTestReport.xml
   fast_finish: true
 
-# Install Docker compose
-before_install:
-  - if [ $INTEGRATION_TEST == "integration" ]; then
-    export DEBIAN_FRONTEND=noninteractive;
-    sudo apt-get -o Dpkg::Options::="--force-confnew" install -q -y docker-engine;
-    docker version;
-    mkdir -p "$HOME/bin";
-    export PATH="$PATH:$HOME/bin";
-    curl -L https://github.com/docker/compose/releases/download/1.11.2/docker-compose-`uname -s`-`uname -m` > "$HOME/bin/docker-compose";
-    chmod +x "$HOME/bin/docker-compose";
-    fi
 
 install:
-  - ./gradlew $GRADLE_BUILD_TASKS
-
-script:
-  - ./gradlew $GRADLE_SCRIPT_TASKS
-
-after_script:
-  - if [ $INTEGRATION_TEST == "integration" ]; then
-    ./src/fixedClientEnvironmentTest/resources/run-fixed-client-environment-test.sh
-    ./gradlew jacocoIntegrationTestReport jacocoFixedClientEnvironmentTestReport;
-    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST,OS -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml;
-    export INTEGRATION_TEST="FixedClientEnvironment"
-    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST,OS -f build/reports/jacoco/jacocoFixedClientEnvironmentTestReport/jacocoFixedClientEnvironmentTestReport.xml;
-    sonar-scanner -Dsonar.login=$SONAR_TOKEN;
-    elif [ $INTEGRATION_TEST == "local" ]; then
-    ./gradlew jacocoIntegrationTestReport;
-    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST,OS -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml;
-    else
-    ./gradlew jacocoTestReport;
-    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST,OS -f build/reports/jacoco/test/jacocoTestReport.xml;
-    fi
+  - ./gradlew assemble

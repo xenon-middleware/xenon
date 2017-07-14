@@ -1,6 +1,35 @@
 // Depends on plugins:
 //    id 'jacoco'
 
+//     TEST
+// ==============
+
+liveTest.description = 'Runs the integration tests against live systems'
+integrationTest.description = 'Run the integration tests against docker containers'
+fixedClientEnvironmentTest.description = 'Run the integration tests within and against docker containers, should be run within `nlesc/xenon-fixed-client` docker container'
+
+// Never up to date, can not verify same config/props/remote is used second time
+liveTest.outputs.upToDateWhen {
+    // TODO cache liveTest arguments for example `./gradlew liveTest -Dscheduler=slurm -Dlocation=das5.vu.nl -Dcredential=default DpropertiesFile=slurm-das5.props`
+    // then cache `-Dscheduler=slurm -Dlocation=das5.vu.nl -Dcredential=default DpropertiesFile=slurm-das5.props` when liveTest is run with same arguments return true.
+    false
+}
+
+check.dependsOn integrationTest
+integrationTest.mustRunAfter test
+
+// See progress of tests
+tasks.withType(Test) {
+    // only verbose logging on when CI environment var is set, because on CI we can't look at html test reports
+    if (System.getenv("CI")) {
+        testLogging {
+            events 'started', 'passed', 'skipped', 'failed'
+            exceptionFormat 'full'
+            showStackTraces true
+        }
+    }
+}
+
 //    COVERAGE
 // ==============
 
@@ -40,6 +69,9 @@ task jacocoLiveTestReport(type: JacocoReport) {
     group 'Code coverage reporting'
     executionData liveTest
     sourceSets sourceSets.main
+    reports {
+        xml.enabled = true // codecov depends on xml format report
+    }
 }
 
 task jacocoMergedTestReport(type: JacocoReport) {
