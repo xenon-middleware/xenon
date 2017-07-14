@@ -1,3 +1,10 @@
+The Xenon library has different test suites:
+
+* unit tests
+* integration tests - Run the integration tests against docker containers
+* fixed client environment tests - Run the integration tests within and against docker containers
+* live tests - Runs the integration tests against live systems
+
 # Run unit tests
 
 The unit tests can be run using:
@@ -5,64 +12,56 @@ The unit tests can be run using:
 ./gradlew test
 ```
 
-# Run integration tests
+# Run integration tests against Docker containers
 
-The integration tests of Xenon can be run against the docker images in this directory or live systems.
+Requirements:
+* [docker](https://docs.docker.com/engine/installation/), v1.13 or greater
+* [docker-compose](https://docs.docker.com/compose/), v1.10 or greater
+
+The integration tests of Xenon is run against the Docker images.
  
-## with Docker
+The schedulers and file systems supported by Xenon all have Docker images on [Docker Hub](https://hub.docker.com/r/nlesc/).
+See [https://github.com/NLeSC/xenon-docker-images](https://github.com/NLeSC/xenon-docker-images) for the source code of the images. The integration tests will start the Docker containers they need using [Docker compose junit rules](https://github.com/palantir/docker-compose-rule).
 
-There is a docker image for each major version the specific Xenon adaptor supports.
+The integration tests against Docker containers can be run with:
 
-The docker images are registered at the docker hub.
-
-Run the integration tests within and against the docker containers using docker compose. 
-Tests suite is run from a docker container so it can connect to linked containers and has ssh/globus keys. 
-The docker container is run with your own UID so test results are also owned by you.
-
-```bash
-./gradlew dockerIntegrationTest -Pdocker.uid=$UID
-```
-
-To filter the tests using Gradle's filtering mechanism, use the `docker.tests` property:
-
-```bash
-./gradlew dockerIntegrationTest -Pdocker.uid=$UID -Pdocker.tests='*ftp*'
-```
-
-The `docker.tests` property uses the same syntax as `--tests` described at https://docs.gradle.org/3.3/userguide/java_plugin.html#test_filtering
-
-## against live systems
-
-To run the Xenon integration tests a configuration file called `./xenon.test.properties` is required. 
-You can use `src/integrationTest/resources/xenon.test.properties.examples` as a template.
-
-The integration tests can be run with
 ```bash
 ./gradlew integrationTest
 ```
 
-To run only integration test of local adaptor under Windows, this will not require Docker or remote systems:
-```
-echo '' > xenon.test.properties
-mkdir build\integrationTest & cd build\integrationTest & src\integrationTest\resources\scripts\create_symlinks.bat & cd ..\..
-./gradlew.bat check integrationTest -x prepareIntegrationTest -x testPropertiesFileExists --tests=*adaptors.local*
+To filter the tests use [Gradle's filtering mechanism](https://docs.gradle.org/3.3/userguide/java_plugin.html#test_filtering).
+For example to only run the tests with `ftp` in their package name or class name use:
+
+```bash
+./gradlew integrationTest --tests '*ftp*'
 ```
 
-See https://docs.gradle.org/3.3/userguide/java_plugin.html#test_filtering how to filter tests with `--tests`.
+# Run fixed client environment tests
 
-# fixed client environment tests
+Requirements:
+* [docker](https://docs.docker.com/engine/installation/), v1.13 or greater
+* [docker-compose](https://docs.docker.com/compose/), v1.10 or greater
+* docker server running on localhost, which excludes MacOS and Windows as they run the Docker server in a VM.
 
 Run tests which expect the client environment (like credentials and ssh agent) to be in a fixed state.
 
-Task will startup multiple docker containers: the servers with filesystems/schedulers to test against and a container (xenon-test) which has the current code mounted and runs the tests.
+The [nlesc/xenon-fixed-client](https://hub.docker.com/r/nlesc/xenon-fixed-client/) Docker image is used as the fixed state client environment.
 
-
-Use script to start a Docker container which will run `./gradlew fixedClientEnvironmentTest` inside of it and start any Docker containers to tests against.
+The fixed client environment tests can be run with:
 ```bash
+# change to root directory of Xenon repository
 ./src/fixedClientEnvironmentTest/resources/run-fixed-client-environment-test.sh
 ```
 
-# Live tests
+The script will startup the [nlesc/xenon-fixed-client](https://hub.docker.com/r/nlesc/xenon-fixed-client/) Docker container which:
+* has the current code mounted
+* can communicate with Docker server, so tests can start filesystem/scheduler containers
+* can connect to host local ports, so tests can connect to filesystem/scheduler containers
+* has the gradle cache mounted, so it does not need to download all plugins and dependencies again
+* runs as the current user, so it writes test results and coverage in the Gradle build directory as the current user
+* runs the tests by running `./gradlew fixedClientEnvironmentTest` command
+
+# Run live tests
 
 Run tests against a (remote) system like a cluster with Slurm or an sftp server. 
 
@@ -76,9 +75,4 @@ To run tests you need the pass the `Scheduler.create` or `FileSystem.create` met
 ./gradlew liveTest -Dxenon.scheduler=slurm -Dxenon.location=das5.vu.nl -Dxenon.username=username -Dxenon.certfile=pathtocertfile [ -Dxenon.passphrase=passphrase ] 
 
 /gradlew liveTest -Dxenon.filesystem=sftp -Dxenon.location=localhost:10022  -Dxenon.username=xenon -Dxenon.password=javagat -Dxenon.adaptors.file.sftp.strictHostKeyChecking=false -Dxenon.adaptors.file.sftp.loadKnownHosts=false
-```
-
-To ignore test
-```bash
-./gradlew liveTest
 ```
