@@ -80,7 +80,7 @@ public class SftpFileSystem extends FileSystem {
 	}
 
 	@Override
-	public void move(Path source, Path target) throws XenonException {
+	public void rename(Path source, Path target) throws XenonException {
 		
 		LOGGER.debug("move source = {} target = {}", source, target);
 		

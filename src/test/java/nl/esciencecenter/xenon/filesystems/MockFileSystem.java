@@ -512,7 +512,7 @@ public class MockFileSystem extends FileSystem {
 	}
 
 	@Override
-	public void move(Path source, Path target) throws XenonException {
+	public void rename(Path source, Path target) throws XenonException {
 		throw new XenonException("TEST", "Not implememnted");
 	}
 

@@ -312,7 +312,7 @@ public abstract class FileSystem {
 	public abstract boolean isOpen() throws XenonException;
 
 	/**
-	 * Move or rename an existing source path to a non-existing target path.
+	 * Rename an existing source path to a non-existing target path (optional operation).
 	 * <p>
 	 * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
 	 * 
@@ -337,7 +337,7 @@ public abstract class FileSystem {
 	 * @throws XenonException
 	 *             If the move failed.
 	 */
-	public abstract void move(Path source, Path target) throws XenonException;
+	public abstract void rename(Path source, Path target) throws XenonException;
 
 	/**
 	 * Creates a new directory, failing if the directory already exists. All nonexistent parent directories are also created.

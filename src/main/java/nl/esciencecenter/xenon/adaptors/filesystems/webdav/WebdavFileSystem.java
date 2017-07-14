@@ -326,7 +326,7 @@ public class WebdavFileSystem extends FileSystem {
 	}
 
 	@Override
-	public void move(Path source, Path target) throws XenonException {
+	public void rename(Path source, Path target) throws XenonException {
 
 		LOGGER.debug("move source = {} to target = {}", source, target);
 
