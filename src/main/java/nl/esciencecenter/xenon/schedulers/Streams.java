@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Streams is a container for the standard input, output and error streams of a {@link JobHandle}.
+ * Streams is a container for the standard input, output and error streams of a job.
  * 
  * Note that these standard streams are only available for interactive jobs. 
  * 
@@ -36,8 +36,8 @@ public class Streams {
 	/**
 	 * Create a Streams containing the job and its standard streams.
 	 * 
-	 * @param job
-	 *            the job.
+	 * @param jobIdentifier
+	 *            the identifier of the job.
 	 * @param stdout
 	 *            the standard output stream.
 	 * @param stdin
@@ -53,9 +53,9 @@ public class Streams {
 	}
 
 	/**
-	 * Get the job for which this Streams was created.
+	 * Get the identifier of the job for which this Streams was created.
 	 * 
-	 * @return the Job.
+	 * @return the identifier of the ob.
 	 */
 	public String getJobIdentifier() {
 		return jobIdentifier;

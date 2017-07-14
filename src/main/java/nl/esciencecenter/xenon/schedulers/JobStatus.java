@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.schedulers;
 import java.util.Map;
 
 /**
- * JobStatus contains status information for a specific {@link JobHandle}.
+ * JobStatus contains status information for a specific job.
  * 
  * @version 1.0
  * @since 1.0
@@ -36,8 +36,8 @@ public class JobStatus {
     /**
      * Create a JobStatus. 
      * 
-     * @param job
-     * 		the <code>Job</code> for which this status was created.
+     * @param jobIdentifier
+     * 		the identifier of the job for which this status was created.
      * @param state
      * 		the state of the <code>Job</code> at the time this status was created.
      * @param exitCode

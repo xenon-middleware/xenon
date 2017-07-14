@@ -18,9 +18,11 @@ package nl.esciencecenter.xenon.adaptors.filesystems.ftp;
 import java.io.IOException;
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,7 +131,11 @@ public class FtpFileAdaptor extends FileAdaptor {
         try {
             loginWithCredentialOrDefault(ftp, credential);
             int replyCode = ftp.getReplyCode();
+            
+//            System.out.println("LOGIN REPLY: " + replyCode);
+            
             verifyLoginSuccess(replyCode);
+                        
         } catch (XenonException | IOException e) {
             throw new XenonException(getName(), "Failed to login", e);
         }
