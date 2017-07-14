@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -426,7 +427,11 @@ public class FileSystemTest {
 
 		f.createFile(new Path("/test/aap/noot/file0"));
 
-		List<PathAttributes> list = f.list(new Path("/test"), true);
+		List<PathAttributes> list = new ArrayList<>();
+		
+		for (PathAttributes p : f.list(new Path("/test"), true)) { 
+			list.add(p);
+		}
 
 		assertTrue(remove(list, "/test/aap/noot/file0"));
 		assertTrue(remove(list, "/test/aap/noot/.."));

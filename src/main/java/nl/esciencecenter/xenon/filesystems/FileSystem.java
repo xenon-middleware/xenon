@@ -484,7 +484,7 @@ public abstract class FileSystem {
 	 * @throws XenonException
 	 *             If an I/O error occurred.
 	 */
-	public List<PathAttributes> list(Path dir, boolean recursive) throws XenonException { 
+	public Iterable<PathAttributes> list(Path dir, boolean recursive) throws XenonException { 
 		ArrayList<PathAttributes> result = new ArrayList<>();
 		list(dir, result, recursive);
 		return result;
@@ -816,7 +816,7 @@ public abstract class FileSystem {
 			destinationFS.createDirectory(destination);
 		}
 
-		List<PathAttributes> listing = list(source, true);
+		Iterable<PathAttributes> listing = list(source, true);
 
 		for (PathAttributes p : listing) { 
 
@@ -902,17 +902,17 @@ public abstract class FileSystem {
 	 * @param dir
 	 * 		the directory to list
 	 * @return
-	 * 		a list of all entries in <code>dir</code>
+	 * 		a {@link Iterable} that iterates over all entries in <code>dir</code>
 	 * @throws XenonException
 	 *      If the list could not be retrieved.
 	 */    
-	protected abstract List<PathAttributes> listDirectory(Path dir) throws XenonException;
+	protected abstract Iterable<PathAttributes> listDirectory(Path dir) throws XenonException;
 
 	/**
 	 * Returns an (optionally recursive) listing of the entries in a directory <code>dir</code>. 
 	 * 
 	 * This is a generic implementation which relies on <code>listDirectory</code> to provide 
-	 * listings of individal directories.
+	 * listings of individual directories.
 	 * 
 	 * @param dir
 	 * 		the directory to list.
@@ -925,9 +925,11 @@ public abstract class FileSystem {
 	 */
 	protected void list(Path dir, ArrayList<PathAttributes> list, boolean recursive) throws XenonException {
 
-		List<PathAttributes> tmp = listDirectory(dir);
+		Iterable<PathAttributes> tmp = listDirectory(dir);
 
-		list.addAll(tmp);
+		for (PathAttributes p : tmp) { 
+			list.add(p);
+		}
 
 		if (recursive) { 
 			for (PathAttributes current : tmp) {
