@@ -32,7 +32,7 @@ testSets {
 }
 liveTest.description = 'Runs the integration tests against live systems'
 integrationTest.description = 'Run the integration tests against docker containers'
-fixedClientEnvironmentTest.description = 'Run the integration tests within and against docker containers'
+fixedClientEnvironmentTest.description = 'Run the integration tests within and against docker containers, should be run within `nlesc/xenon-fixed-client` docker container'
 
 apply from: 'gradle/documentation.gradle'
 apply from: 'gradle/distribution.gradle'
@@ -64,8 +64,7 @@ tasks.withType(Test) {
 task wrapper(type: Wrapper) {
     description 'Generates gradle wrapper'
     group 'Build Setup'
-    // TODO upgrade to >=4.0
-    gradleVersion = '2.9'
+    gradleVersion = '4.0.1'
 }
 
 cleanIdeaWorkspace.group = 'IDE'
