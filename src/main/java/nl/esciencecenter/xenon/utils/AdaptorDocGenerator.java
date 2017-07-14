@@ -16,15 +16,17 @@
 package nl.esciencecenter.xenon.utils;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Set;
 
-import nl.esciencecenter.xenon.AdaptorDescription;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
+import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
 
 /**
  * Generates html snippet with options of all adaptors.
@@ -40,59 +42,7 @@ public class AdaptorDocGenerator {
         generator.toFile(args[0]);
     }
 
-//    private void printPropertyDescription(PrintWriter out, XenonPropertyDescription d) {
-//
-//        out.println("<tr>");
-//        out.println("<td>" + "<pre>" + d.getName() + "</pre></td>");
-//        out.println("<td>" + d.getDescription() + "</td>");
-//        out.println("<td>" + d.getType() + "</td>");
-//        out.println("<td>" +  d.getDefaultValue() + "</td>");
-//        
-//        out.println("</tr>");
-//    }
-//
-//    private void printAdaptorDoc(PrintWriter out, AdaptorDescription a) {
-//
-//        out.println("<h2><a name=\"" + a.getName()  + "\">Adaptor: " + a.getName() + "</a></h2>");
-//
-//
-//        out.println("<p>");
-//        out.println(a.getDescription());
-//        out.println("</p");
-//
-//        out.println("<h4>Supported schemes:</h4><ul>");
-//
-////        String[] schemes = a.getSupportedSchemes();
-////
-////        for (int i = 0; i < schemes.length; i++) {
-////            out.print("<li>" + schemes[i] + "</li>");
-////        }
-////
-////        out.println("</ul>");
-//
-//        out.println("<h4> Supported locations:</h4><ul>");
-//
-//        String[] locations = a.getSupportedLocations();
-//
-//        for (int i = 0; i < locations.length; i++) {
-//            out.print("<li>" + locations[i] + "</li>");
-//        }
-//
-//        out.println("</ul>");
-//
-//        out.println("<h4> Supported properties: </h4>");
-//
-//        XenonPropertyDescription[] properties = a.getSupportedProperties();
-//
-//        out.println("<table border=1><tr><th>Name</th><th>Description</th><th>Expected type</th><th>Default</th><th>Valid for</th></tr>");
-//        for (XenonPropertyDescription d : properties) {
-//            printPropertyDescription(out, d);
-//        }
-//
-//        out.println("</table>");
-//    }
-//
-    public void toFile(String filename) {
+    private void toFile(String filename) {
         PrintWriter out = null;
         try {
             out = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
@@ -102,46 +52,119 @@ public class AdaptorDocGenerator {
             System.exit(1);
         }
 
-        generate(out);
+        try {
+            generate(out);
+        } catch (XenonException e) {
+            System.err.println("Failed to generate adaptor documentation: " + e.getMessage());
+            e.printStackTrace(System.err);
+            System.exit(1);
+        }
 
         out.flush();
         out.close();
     }
 
-    public void generate(PrintWriter out) {
-        try {
-    //        Xenon xenon = XenonFactory.newXenon(null);
-
-// FIXME: currently being changed!            
-//            AdaptorDescription[] adaptors = xenon.getAdaptorStatuses();
-
-            out.println("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Insert title here</title></head><body>");
-            out.println("A middleware abstraction library that provides a simple programming interface to various compute and storage resources.");
-            out.println("<h1>Adaptor Documentation</h1>");
-            out.println("<p>This section contains the adaptor documentation which is generated "
+    public void generate(PrintWriter out) throws XenonException {
+        out.println("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Xenon Javadoc overview</title></head><body>");
+        out.println("A middleware abstraction library that provides a simple programming interface to various compute and storage resources.");
+        out.println("<h1>Adaptor Documentation</h1>");
+        out.println("<p>This section contains the adaptor documentation which is generated "
                 + "from the information provided by the adaptors themselves.</p>");
 
-//            out.print("Xenon currently supports " + adaptors.length + " adaptors: <ul>");
+        generateTOC(out);
+        generateSchedulers(out);
+        generateFileSystems(out);
 
-//            for (AdaptorDescription a : adaptors) {
-//                out.println("<li><a href=\"#" + a.getName() + "\">" + a.getName() + "</a></li>");
-//            }
+        out.println("</body></html>");
+    }
 
-            out.println("</ul>");
-            out.println("");
-
-//            for (AdaptorDescription a : adaptors) {
-//                printAdaptorDoc(out, a);
-//            }
-
-       //     XenonFactory.endAll();
-
-            out.println("</body></html>");
-
-        } catch (Exception e) {
-            System.err.println("Failed to generate adaptor documentation: " + e.getMessage());
-            e.printStackTrace(System.err);
-            System.exit(1);
+    private void generateTOC(PrintWriter out) {
+        out.println("<ul>");
+        out.println("<li><a href=\"#schedulers\">Schedulers</a><ul>");
+        for (String name: Scheduler.getAdaptorNames()) {
+            out.println(String.format("<li><a href=\"#%s\">%s</a></li>", name, name));
         }
+        out.println("</ul></li>");
+        out.println("<li><a href=\"#filesystems\">File systems</a><ul>");
+        for (String name: FileSystem.getAdaptorNames()) {
+            out.println(String.format("<li><a href=\"#%s\">%s</a></li>", name, name));
+        }
+        out.println("</ul></li>");
+        out.println("</ul>");
+    }
+
+    private void generateFileSystems(PrintWriter out) throws XenonException {
+        out.println("<h2><a name=\"filesystems\">File systems<a/></h2>");
+        for (FileSystemAdaptorDescription description : FileSystem.getAdaptorDescriptions()) {
+            generateFileSystem(description, out);
+        }
+    }
+
+    private void generateFileSystem(FileSystemAdaptorDescription description, PrintWriter out) {
+        out.println(String.format("<h2><a name=\"%s\">%s</a></h2>", description.getName(), description.getName()));
+        out.println(String.format("<p>%s</p>", description.getDescription()));
+        out.println("<h4>Supported locations:</h4>");
+        out.println("Supported locations for <i>FileSystem.create(type, location, credential, properties)</i> method.<il>");
+        for (String supportedLocation : description.getSupportedLocations()) {
+            out.println(String.format("<li>%s</li>", supportedLocation));
+        }
+        out.println("</ul>");
+        out.println("<h4>Supported properties:</h4>");
+        if (description.getSupportedProperties().length > 0) {
+            out.println("Supported properties for <i>FileSystem.create(type, location, credential, properties)</i> method.");
+            out.println("<table border=1><tr><th>Name</th><th>Description</th><th>Expected type</th><th>Default</th></tr>");
+            for (XenonPropertyDescription prop : description.getSupportedProperties()) {
+                generateSupportedProperty(prop, out);
+            }
+            out.println("</table>");
+        } else {
+            out.println("No properties.");
+        }
+        out.println("<h4>Supported features</h4><ul>");
+        out.println("<li>Symbolic links: " + description.supportsSymboliclinks() + "</li>");
+        out.println("<li>Third party copy: " + description.supportsThirdPartyCopy() + "</li>");
+        out.println("</ul>");
+    }
+
+    private void generateSupportedProperty(XenonPropertyDescription prop, PrintWriter out) {
+        out.println("<tr>");
+        out.println(String.format("<td><pre>%s</pre></td>", prop.getName()));
+        out.println(String.format("<td>%s</td>", prop.getDescription()));
+        out.println(String.format("<td>%s</td>", prop.getType()));
+        out.println(String.format("<td>%s</td>", prop.getDefaultValue()));
+        out.println("</tr>");
+    }
+
+    private void generateSchedulers(PrintWriter out) throws XenonException {
+        out.println("<h2><a name=\"schedulers\">Schedulers</a></h2>");
+        for (SchedulerAdaptorDescription description : Scheduler.getAdaptorDescriptions()) {
+            generateScheduler(description, out);
+        }
+    }
+
+    private void generateScheduler(SchedulerAdaptorDescription description, PrintWriter out) {
+        out.println(String.format("<h2><a name=\"%s\">%s</a></h2>", description.getName(), description.getName()));
+        out.println(String.format("<p>%s</p>", description.getDescription()));
+        out.println("<h4>Supported locations:</h4>");
+        out.println("Supported locations for <i>Scheduler.create(type, location, credential, properties)</i> method.<ul>");
+        for (String supportedLocation : description.getSupportedLocations()) {
+            out.println(String.format("<li>%s</li>", supportedLocation));
+        }
+        out.println("</ul>");
+        out.println("<h4>Supported properties:</h4>");
+        if (description.getSupportedProperties().length > 0) {
+            out.println("Supported properties for <i>Scheduler.create(type, location, credential, properties)</i> method.");
+            out.println("<table border=1><tr><th>Name</th><th>Description</th><th>Expected type</th><th>Default</th></tr>");
+            for (XenonPropertyDescription prop : description.getSupportedProperties()) {
+                generateSupportedProperty(prop, out);
+            }
+            out.println("</table>");
+        } else {
+            out.println("No properties.");
+        }
+        out.println("<h4>Supported features</h4><ul>");
+        out.println("<li>Batch: " + description.supportsBatch() + "</li>");
+        out.println("<li>Interactive: " + description.supportsInteractive() + "</li>");
+        out.println("</ul>");
     }
 }

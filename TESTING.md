@@ -36,6 +36,12 @@ For example to only run the tests with `ftp` in their package name or class name
 ./gradlew integrationTest --tests '*ftp*'
 ```
 
+The tests can be slow, to see which test is running set the `CI` environment variable.
+```
+# To print test started/passed/etc. event to stdout
+CI=1 ./gradlew integrationTest
+```
+
 # Run fixed client environment tests
 
 Requirements:
