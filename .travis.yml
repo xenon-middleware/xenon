@@ -23,17 +23,8 @@ matrix:
   # Stop when one of the Java versions do not work
   fast_finish: true
 
-# Install Docker compose
 before_install:
-  - if [ $INTEGRATION_TEST == "integration" ]; then
-    export DEBIAN_FRONTEND=noninteractive;
-    sudo apt-get -o Dpkg::Options::="--force-confnew" install -q -y docker-engine;
-    docker version;
-    mkdir -p "$HOME/bin";
-    export PATH="$PATH:$HOME/bin";
-    curl -L https://github.com/docker/compose/releases/download/1.11.2/docker-compose-`uname -s`-`uname -m` > "$HOME/bin/docker-compose";
-    chmod +x "$HOME/bin/docker-compose";
-    fi
+  - docker-compose --version;
 
 install:
   - ./gradlew $GRADLE_BUILD_TASKS
