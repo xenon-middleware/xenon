@@ -38,6 +38,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.InvalidPathException;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
@@ -502,6 +503,27 @@ public class FtpFileSystem extends FileSystem {
 	}
 
 	private FTPFile getRegularFtpFile(Path pathToRegularFile) throws XenonException {
+		
+		try {
+			ftpClient.pasv();
+			
+			
+			
+			FTPFile [] result = ftpClient.listFiles(pathToRegularFile.getAbsolutePath());
+		
+			String replyString = ftpClient.getReplyString();
+	        int code = ftpClient.getReplyCode();
+			
+			System.out.println("FTP " + replyString + " " + code + " " + result + " " + result.length);
+	        
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+		
 		FtpQuery<FTPFile> ftpQuery = new FtpQuery<FTPFile>() {
 			@Override
 			public void doWork(FTPClient ftpClient, String path) throws IOException {
@@ -511,7 +533,7 @@ public class FtpFileSystem extends FileSystem {
 		ftpQuery.execute(ftpClient, pathToRegularFile, "Failed to retrieve attributes of path");
 		return ftpQuery.getResult();
 	}
-
+	
 	private FTPFile getDirectoryFtpFile(Path path) throws XenonException {
 		FtpQuery<FTPFile> ftpQuery = new FtpQuery<FTPFile>() {
 			@Override
@@ -541,8 +563,14 @@ public class FtpFileSystem extends FileSystem {
 
 	@Override
 	public Path readSymbolicLink(Path path) throws XenonException {
-		LOGGER.debug("readSymbolicLink path = {}", path);
-		throw new XenonException(ADAPTOR_NAME, "Ftp file system does not support symbolic links");
+		
+		FTPFile file = getFtpFile(path);
+		
+		if (file.getType() != FTPFile.SYMBOLIC_LINK_TYPE) {
+			throw new InvalidPathException(ADAPTOR_NAME, "Path is not a symbolic link: " + path);
+		}
+		
+		return new Path(file.getLink());
 	}
 
     @Override
