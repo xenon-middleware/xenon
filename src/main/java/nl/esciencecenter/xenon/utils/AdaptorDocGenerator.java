@@ -121,8 +121,8 @@ public class AdaptorDocGenerator {
             out.println("No properties.");
         }
         out.println("<h4>Supported features</h4><ul>");
-        out.println("<li>Symbolic links: " + description.supportsSymboliclinks() + "</li>");
-        out.println("<li>Third party copy: " + description.supportsThirdPartyCopy() + "</li>");
+        out.println(String.format("<li>Symbolic links: %s</li>", description.supportsSymboliclinks()));
+        out.println(String.format("<li>Third party copy: %s</li>", description.supportsThirdPartyCopy()));
         out.println("</ul>");
     }
 
@@ -163,9 +163,9 @@ public class AdaptorDocGenerator {
             out.println("No properties.");
         }
         out.println("<h4>Supported features</h4><ul>");
-        out.println("<li>Batch: " + description.supportsBatch() + "</li>");
-        out.println("<li>Interactive: " + description.supportsInteractive() + "</li>");
-        out.println("<li>Online: " + description.isOnline() + "</li>");
+        out.println(String.format("<li>Batch: %s</li>", description.supportsBatch()));
+        out.println(String.format("<li>Interactive: %s</li>", description.supportsInteractive()));
+        out.println(String.format("<li>Online: %s</li>", description.isOnline()));
         out.println("</ul>");
     }
 }
