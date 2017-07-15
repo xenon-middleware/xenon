@@ -1,8 +1,9 @@
 // javadoc and userguide generation
 
 javadoc {
-    exclude 'nl/esciencecenter/xenon/engine/**', 'nl/esciencecenter/xenon/adaptors/**'
+    exclude 'nl/esciencecenter/xenon/adaptors/**'
     options.overview = file("${buildDir}/overview.html")
+    options.showFromPublic()
     options.setNoTimestamp(true)
 }
 
@@ -15,8 +16,8 @@ task javadocDevel(type: Javadoc) {
     destinationDir = file("${project.docsDir}/javadoc-devel")
     options.showFromPrivate()
     options.overview = file("${buildDir}/overview.html")
+    options.setNoTimestamp(true)
 }
-
 
 task adaptorDocumentation(type: JavaExec) {
     description 'Generates html snippet with options of adaptors (used in the javadoc overview page)'

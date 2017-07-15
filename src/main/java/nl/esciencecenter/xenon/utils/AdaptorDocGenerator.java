@@ -67,6 +67,10 @@ public class AdaptorDocGenerator {
     public void generate(PrintWriter out) throws XenonException {
         out.println("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Xenon Javadoc overview</title></head><body>");
         out.println("A middleware abstraction library that provides a simple programming interface to various compute and storage resources.");
+        out.println("<p>The main entry points are<ul>");
+        out.println("<li><a href=\"nl/esciencecenter/xenon/schedulers/Scheduler.html\">nl.esciencecenter.xenon.schedulers.Scheduler</a></li>");
+        out.println("<li><a href=\"nl/esciencecenter/xenon/filesystems/FileSystem.html\">nl.esciencecenter.xenon.filesystems.FileSystem</a></li>");
+        out.println("</ul></p>");
         out.println("<h1>Adaptor Documentation</h1>");
         out.println("<p>This section contains the adaptor documentation which is generated "
                 + "from the information provided by the adaptors themselves.</p>");
