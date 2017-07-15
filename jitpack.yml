@@ -1,2 +1,2 @@
 install:
-- ./gradlew clean -Pgroup=$GROUP -P -Pversion=$VERSION -xtest -xintegrationTest build publishToMavenLocal
+- ./gradlew clean -Pgroup=$GROUP -Pversion=$VERSION -xtest -xintegrationTest build publishToMavenLocal
