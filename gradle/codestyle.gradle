@@ -18,14 +18,11 @@ pmd {
     ruleSetFiles = files("config/pmd/ruleset.xml")
 }
 
-pmdTest {
-    ruleSetFiles = files("config/pmd/test_ruleset.xml")
-}
+def testRuleSetFiles = files("config/pmd/test_ruleset.xml")
+pmdTest.ruleSetFiles = testRuleSetFiles
+pmdIntegrationTest.ruleSetFiles = testRuleSetFiles
+pmdFixedClientEnvironmentTest.ruleSetFiles = testRuleSetFiles
+pmdLiveTest.ruleSetFiles = testRuleSetFiles
 
-pmdIntegrationTest {
-    ruleSetFiles = files("config/pmd/test_ruleset.xml")
-}
-
-group = 'nlesc'
 
 

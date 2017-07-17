@@ -5,13 +5,13 @@ defaultTasks 'clean', 'assemble', 'test'
 
 //    METADATA
 // ==============
-version = '1.2.2'
+version = '2.0.0'
 description = 'Xenon: a middleware abstraction library that provides a simple programming interface to various compute and storage resources.'
 
 // will generate a warning with JDK 8, since the runtime jar (rt.jar) of
 // Java 7 is not available. Could configure gradle wrapper for this
-sourceCompatibility = '1.7'
-targetCompatibility = '1.7'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 // PROJECT DIRECTORIES
 // ==============
@@ -20,63 +20,25 @@ ext.runtimeLibDir = file('lib/runtime')
 ext.testLibDir = file('lib/test')
 ext.codestyleLibDir = file('lib/codestyle')
 
-sourceSets {
-    integrationTest {
-        java {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
+testSets {
+    integrationTest
+    liveTest {
+        options {
+            // Pass all -D arguments from gradlew to tests
+            systemProperties(System.getProperties())
         }
     }
-}
-
-configurations {
-    integrationTestCompile.extendsFrom testCompile
-    integrationTestRuntime.extendsFrom testRuntime
+    fixedClientEnvironmentTest
 }
 
 apply from: 'gradle/documentation.gradle'
 apply from: 'gradle/distribution.gradle'
 apply from: 'gradle/docker.gradle'
 
-//     TEST
-// ==============
-
-ext.xenonPropertiesFile = file('xenon.test.properties')
-if (project.hasProperty('xenon.test.properties')) {
-    ext.xenonPropertiesFile = file(project.get('xenon.test.properties'))
-}
-task testPropertiesFileExists << {
-    assert xenonPropertiesFile.exists() : "Xenon test properties file not set at " + xenonPropertiesFile + ".  Modify from src/test/resources/xenon.test.properties.example"
-}
-
-//Create the task that runs the integration tests found from the
-//configured source directory and uses the correct classpath.
-task integrationTest(type: Test, dependsOn: testPropertiesFileExists) {
-    testClassesDir = sourceSets.integrationTest.output.classesDir
-    classpath = sourceSets.integrationTest.runtimeClasspath
-    //Ensure that integration tests are run every time when you invoke this task
-    outputs.upToDateWhen { false }
-    systemProperty 'xenon.test.properties', xenonPropertiesFile.absolutePath
-    //Ensure that our unit tests are run before our integration tests
-    mustRunAfter test
-
-    testLogging {
-        events 'started', 'passed', 'skipped', 'failed'
-        exceptionFormat 'full'
-        showStackTraces true
-    }
-}
-
-//Ensure that the HTML reports of unit and integration tests are written to different directories.
-tasks.withType(Test) {
-    reports.html.destination = file("${reporting.baseDir}/${name}")
-    reports.junitXml.destination = file("${project.buildDir}/${name}-results")
-}
-
 task wrapper(type: Wrapper) {
     description 'Generates gradle wrapper'
     group 'Build Setup'
-    gradleVersion = '2.9'
+    gradleVersion = '4.0.1'
 }
 
 cleanIdeaWorkspace.group = 'IDE'

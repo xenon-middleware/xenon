@@ -6,18 +6,15 @@
 # intellij
 /.idea
 /*.iml
+/*.ipr
+/*.iws
 
 # gradle
 /build
 /.gradle
 
 # integration tests
-xenon.test.properties
-/xenon_test
-
-# docker cache
-.docker-test-cache-set
-/bin/
+/filesystem-test-fixture
 
 # Rendered Jekyll site
 /docs/_site

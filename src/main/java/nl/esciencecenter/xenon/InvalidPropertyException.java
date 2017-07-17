@@ -15,9 +15,8 @@
  */
 package nl.esciencecenter.xenon;
 
-
 /**
- * Signals that a property has an invalid value.  
+ * Signals that a property has a different type than the get method it was retrieved with.  
  * 
  * @version 1.0
  * @since 1.0

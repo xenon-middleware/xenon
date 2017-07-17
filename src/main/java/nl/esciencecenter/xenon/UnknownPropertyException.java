@@ -15,9 +15,8 @@
  */
 package nl.esciencecenter.xenon;
 
-
 /**
- * Signals that an unknown property was provided.  
+ * Signals that a property has a different type than the get method it was retrieved with.  
  * 
  * @version 1.0
  * @since 1.0

@@ -2,27 +2,23 @@ version: '{branch}-{build}'
 build_script:
   - cmd: ./gradlew.bat assemble
 test_script:
-  - echo '' > xenon.test.properties
-  - mkdir build\integrationTest & cd build\integrationTest & src\integrationTest\resources\scripts\create_symlinks.bat & cd ..\..
-  - cmd: ./gradlew.bat check integrationTest -x prepareIntegrationTest -x testPropertiesFileExists --tests=*adaptors.local* --continue
+  - mkdir build\integrationTest & cd build\integrationTest & ..\..\src\liveTest\resources\scripts\create_symlinks.bat & cd ..\..
+  - cmd: gradlew.bat liveTest -Dxenon.scheduler=local -Dxenon.filesystem=file -Dxenon.location=%HomeDrive% -Dxenon.username=%USERNAME% -Dxenon.basedir=projects\xenon\build\integrationTest
 on_finish:
   - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
-  - "SET JDK=oraclejdk7"
-  - "SET INTEGRATION_TEST=0"
-  - ./gradlew.bat jacocoTestReport
+  - "SET JDK=oraclejdk8"
+  - .\gradlew.bat jacocoTestReport jacocoLiveTestReport
   - pip install codecov
-  - codecov -e OS,JDK,INTEGRATION_TEST -f build/reports/jacoco/test/jacocoTestReport.xml
+  - codecov -e OS,JDK -F unit -f build/reports/jacoco/test/jacocoTestReport.xml
   - ps: |
       $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
-      Get-ChildItem "build/test-results/" -Filter *.xml | Foreach-Object{
+      Get-ChildItem "build/test-results/test/" -Filter *.xml | Foreach-Object{
         (New-Object 'System.Net.WebClient').UploadFile($url, $_.FullName)
       }
-  - "SET INTEGRATION_TEST=local"
-  - ./gradlew.bat jacocoIntegrationTestReport
-  - codecov -e OS,JDK,INTEGRATION_TEST -f build/reports/jacoco/test/jacocoTestReport.xml
+  - codecov -e OS,JDK,INTEGRATION_TEST -F livelocal -f build/reports/jacoco/jacocoLiveTestReport/jacocoLiveTestReport.xml
   - ps: |
       $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
-      Get-ChildItem "build/integrationTest-results/" -Filter *.xml | Foreach-Object{
+      Get-ChildItem "build/test-results/liveTest/" -Filter *.xml | Foreach-Object{
         (New-Object 'System.Net.WebClient').UploadFile($url, $_.FullName)
       }
 artifacts:

@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.xenon;
 
-
 /**
  * Signals that an invalid credential was used to access a resource.  
  * 
