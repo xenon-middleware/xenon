@@ -25,6 +25,7 @@ import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
+import nl.esciencecenter.xenon.utils.StreamForwarder;
 
 /**
  * BatchProcess wraps an {@link InteractiveProcess} to emulate a batch process.
