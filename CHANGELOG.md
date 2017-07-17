@@ -1,7 +1,14 @@
-Xenon 1.2.2
+Xenon 2.0
 -----------
 
-This is release 1.2.2 of Xenon. 
+This is release 2.0 of Xenon. 
+
+Notable changes compared to v1.2.2:
+-----------------------------------
+
+- complete overhaul of public API, which should increase ease-of-use significantly. 
+- complete overhaul of integration test framework, which should improve performance and make it easier to test against different versions of the same middleware.
+- complete overhaul of implementation, which should make implementing adaptors much more straightforward.
 
 Notable changes compared to v1.2.1:
 -----------------------------------
