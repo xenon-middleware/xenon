@@ -23,5 +23,7 @@ public abstract class LocationConfig {
     public abstract Path getExistingPath();
 
     // TODO return SymbolicLink object
-    public abstract Map.Entry<Path,Path> getSymbolicLinksToExistingFile();
+    public Map.Entry<Path,Path> getSymbolicLinksToExistingFile(){
+        return null;
+    }
 }
