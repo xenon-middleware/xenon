@@ -17,43 +17,40 @@ package nl.esciencecenter.xenon.exceptions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import nl.esciencecenter.xenon.InvalidSchemeException;
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonRuntimeException;
-import nl.esciencecenter.xenon.IncompatibleVersionException;
+
+import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.PropertyTypeException;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonRuntimeException;
+import nl.esciencecenter.xenon.adaptors.NotConnectedException;
+import nl.esciencecenter.xenon.adaptors.filesystems.ConnectionLostException;
+import nl.esciencecenter.xenon.adaptors.filesystems.EndOfFileException;
+import nl.esciencecenter.xenon.adaptors.filesystems.NoSpaceException;
+import nl.esciencecenter.xenon.adaptors.filesystems.PermissionDeniedException;
+import nl.esciencecenter.xenon.adaptors.schedulers.BadParameterException;
+import nl.esciencecenter.xenon.adaptors.schedulers.IncompatibleVersionException;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerClosedException;
+import nl.esciencecenter.xenon.adaptors.schedulers.local.CommandNotFoundException;
+import nl.esciencecenter.xenon.adaptors.shared.ssh.CertificateNotFoundException;
+import nl.esciencecenter.xenon.filesystems.AttributeNotSupportedException;
+import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
+import nl.esciencecenter.xenon.filesystems.FileSystemClosedException;
+import nl.esciencecenter.xenon.filesystems.InvalidOptionsException;
+import nl.esciencecenter.xenon.filesystems.InvalidPathException;
+import nl.esciencecenter.xenon.filesystems.InvalidResumeTargetException;
+import nl.esciencecenter.xenon.filesystems.NoSuchCopyException;
+import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
+import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
+import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
+import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
+import nl.esciencecenter.xenon.schedulers.NoSuchJobException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.NoSuchXenonException;
+import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
-import nl.esciencecenter.xenon.adaptors.ssh.ConnectionLostException;
-import nl.esciencecenter.xenon.adaptors.ssh.EndOfFileException;
-import nl.esciencecenter.xenon.adaptors.ssh.NotConnectedException;
-import nl.esciencecenter.xenon.adaptors.ssh.PermissionDeniedException;
-import nl.esciencecenter.xenon.adaptors.ssh.UnsupportedIOOperationException;
-import nl.esciencecenter.xenon.adaptors.webdav.PathUninspectableException;
-import nl.esciencecenter.xenon.credentials.CertificateNotFoundException;
-import nl.esciencecenter.xenon.engine.PropertyTypeException;
-import nl.esciencecenter.xenon.engine.util.BadParameterException;
-import nl.esciencecenter.xenon.engine.util.CommandNotFoundException;
-import nl.esciencecenter.xenon.files.AttributeNotSupportedException;
-import nl.esciencecenter.xenon.files.DirectoryNotEmptyException;
-import nl.esciencecenter.xenon.files.FileSystemClosedException;
-import nl.esciencecenter.xenon.files.IllegalSourcePathException;
-import nl.esciencecenter.xenon.files.IllegalTargetPathException;
-import nl.esciencecenter.xenon.files.InvalidCopyOptionsException;
-import nl.esciencecenter.xenon.files.InvalidOpenOptionsException;
-import nl.esciencecenter.xenon.files.InvalidResumeTargetException;
-import nl.esciencecenter.xenon.files.NoSuchCopyException;
-import nl.esciencecenter.xenon.files.NoSuchPathException;
-import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
-import nl.esciencecenter.xenon.jobs.IncompleteJobDescriptionException;
-import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
-import nl.esciencecenter.xenon.jobs.JobCanceledException;
-import nl.esciencecenter.xenon.jobs.NoSuchJobException;
-import nl.esciencecenter.xenon.jobs.NoSuchQueueException;
-import nl.esciencecenter.xenon.jobs.NoSuchSchedulerException;
-import nl.esciencecenter.xenon.jobs.UnsupportedJobDescriptionException;
+import nl.esciencecenter.xenon.schedulers.UnsupportedJobDescriptionException;
 
 import org.junit.Test;
 
@@ -173,17 +170,6 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void testDirectoryIteratorException1() throws Exception {
-        testException(new InvalidCopyOptionsException("name", "message"));
-    }
-
-    @Test
-    public void testDirectoryIteratorException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new InvalidCopyOptionsException("name", "message", t), t);
-    }
-
-    @Test
     public void testDirectoryNotEmptyException1() throws Exception {
         testException(new DirectoryNotEmptyException("name", "message"));
     }
@@ -206,6 +192,17 @@ public class ExceptionsTest {
     }
 
     @Test
+    public void testSchedulerClosedException1() throws Exception {
+        testException(new SchedulerClosedException("name", "message"));
+    }
+
+    @Test
+    public void testSchedulerClosedException2() throws Exception {
+        Throwable t = new Throwable();
+        testException(new EndOfFileException("name", "message", t), t);
+    }
+    
+    @Test
     public void testFileAlreadyExistsException1() throws Exception {
         testException(new PathAlreadyExistsException("name", "message"));
     }
@@ -218,24 +215,13 @@ public class ExceptionsTest {
 
     @Test
     public void testIllegalSourcePathException1() throws Exception {
-        testException(new IllegalSourcePathException("name", "message"));
+        testException(new InvalidPathException("name", "message"));
     }
 
     @Test
     public void testIllegalSourcePathException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new IllegalSourcePathException("name", "message", t), t);
-    }
-
-    @Test
-    public void testIllegalTargetPathException1() throws Exception {
-        testException(new IllegalTargetPathException("name", "message"));
-    }
-
-    @Test
-    public void testIllegalTargetPathException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new IllegalTargetPathException("name", "message", t), t);
+        testException(new InvalidPathException("name", "message", t), t);
     }
 
     @Test
@@ -281,18 +267,6 @@ public class ExceptionsTest {
         Throwable t = new Throwable();
         testException(new CertificateNotFoundException("name", "message", t), t);
     }
-
-    @Test
-    public void testPathUninspectableException1() throws Exception {
-        testException(new PathUninspectableException("name", "message"));
-    }
-
-    @Test
-    public void testPathUninspectableException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new PathUninspectableException("name", "message", t), t);
-    }
-
     
     @Test
     public void testInvalidDataException1() throws Exception {
@@ -325,17 +299,6 @@ public class ExceptionsTest {
     public void testInvalidLocationException2() throws Exception {
         Throwable t = new Throwable();
         testException(new InvalidLocationException("name", "message", t), t);
-    }
-
-    @Test
-    public void testInvalidOpenOptionsException1() throws Exception {
-        testException(new InvalidOpenOptionsException("name", "message"));
-    }
-
-    @Test
-    public void testInvalidOpenOptionsException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new InvalidOpenOptionsException("name", "message", t), t);
     }
 
     @Test
@@ -383,17 +346,6 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void testNoSuchXenonException1() throws Exception {
-        testException(new NoSuchXenonException("name", "message"));
-    }
-
-    @Test
-    public void testNoSuchXenonException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new NoSuchXenonException("name", "message", t), t);
-    }
-
-    @Test
     public void testNoSuchQueueException1() throws Exception {
         testException(new NoSuchQueueException("name", "message"));
     }
@@ -402,17 +354,6 @@ public class ExceptionsTest {
     public void testNoSuchQueueException2() throws Exception {
         Throwable t = new Throwable();
         testException(new NoSuchQueueException("name", "message", t), t);
-    }
-
-    @Test
-    public void testNoSuchSchedulerException1() throws Exception {
-        testException(new NoSuchSchedulerException("name", "message"));
-    }
-
-    @Test
-    public void testNoSuchSchedulerException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new NoSuchSchedulerException("name", "message", t), t);
     }
 
     @Test
@@ -449,17 +390,6 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void testUnsupportedIOOperationException1() throws Exception {
-        testException(new UnsupportedIOOperationException("name", "message"));
-    }
-
-    @Test
-    public void testUnsupportedIOOperationException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new UnsupportedIOOperationException("name", "message", t), t);
-    }
-
-    @Test
     public void testUnsupportedJobDescriptionException1() throws Exception {
         testException(new UnsupportedJobDescriptionException("name", "message"));
     }
@@ -471,14 +401,14 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void testUnsupportedOperationException1() throws Exception {
-        testException(new InvalidCopyOptionsException("name", "message"));
+    public void testInvalidOptionsException1() throws Exception {
+        testException(new InvalidOptionsException("name", "message"));
     }
 
     @Test
-    public void testUnsupportedOperationException2() throws Exception {
+    public void testInvalidOptionsException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new InvalidCopyOptionsException("name", "message", t), t);
+        testException(new InvalidOptionsException("name", "message", t), t);
     }
 
     @Test
@@ -505,13 +435,13 @@ public class ExceptionsTest {
 
     @Test
     public void testInvalidSchemeException1() throws Exception {
-        testException(new InvalidSchemeException("name", "message"));
+        testException(new InvalidAdaptorException("name", "message"));
     }
 
     @Test
     public void testInvalidSchemeException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new InvalidSchemeException("name", "message", t), t);
+        testException(new InvalidAdaptorException("name", "message", t), t);
     }
 
     @Test
@@ -525,5 +455,29 @@ public class ExceptionsTest {
         testException(new FileSystemClosedException("name", "message", t), t);
     }
 
+    @Test
+    public void testUnsupportedOperationException1() throws Exception {
+        testException(new nl.esciencecenter.xenon.UnsupportedOperationException("name", "message"));
+    }
+
+    @Test
+    public void testUnsupportedOperationException2() throws Exception {
+        Throwable t = new Throwable();
+        testException(new nl.esciencecenter.xenon.UnsupportedOperationException("name", "message", t), t);
+    }
+
+
+    @Test
+    public void testNoSpaceException1() throws Exception {
+        testException(new NoSpaceException("name", "message"));
+    }
+
+    @Test
+    public void testNoSpaceException2() throws Exception {
+        Throwable t = new Throwable();
+        testException(new NoSpaceException("name", "message", t), t);
+    }
+
+    
     
 }

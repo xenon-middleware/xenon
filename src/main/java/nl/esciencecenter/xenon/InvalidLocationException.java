@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.xenon;
 
-
 /**
  * Signals that an invalid location was provided.  
  * 
