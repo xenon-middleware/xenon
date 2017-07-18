@@ -2,6 +2,7 @@
 // Depends on plugins:
 //    id 'pmd'
 
+/*
 dependencies {
     pmd(
         'net.sourceforge.pmd:pmd-core:5.4.0',
@@ -23,6 +24,6 @@ pmdTest.ruleSetFiles = testRuleSetFiles
 pmdIntegrationTest.ruleSetFiles = testRuleSetFiles
 pmdFixedClientEnvironmentTest.ruleSetFiles = testRuleSetFiles
 pmdLiveTest.ruleSetFiles = testRuleSetFiles
-
+*/
 
 

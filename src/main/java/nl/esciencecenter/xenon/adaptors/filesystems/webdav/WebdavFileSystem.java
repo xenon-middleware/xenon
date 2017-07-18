@@ -297,10 +297,10 @@ public class WebdavFileSystem extends FileSystem {
 
 	private PathAttributes getFileOrDirAttributes(Path path, HttpClient client) throws XenonException {
 		try {
-			String folderPath = toFolderPath(path.toString());
+			String folderPath = toFolderPath(path.getRelativePath());
 			return getAttributes(path, getPathProperties(client, folderPath), true);
 		} catch (XenonException e) {
-			String filePath = toFilePath(path.toString());
+			String filePath = toFilePath(path.getRelativePath());
 			return getAttributes(path, getPathProperties(client, filePath), false);
 		}
 	}

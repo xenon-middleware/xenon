@@ -59,7 +59,7 @@ public abstract class FileSystemTestParent {
     @Test
     public void exists_fileDoesExist_fileExists() throws XenonException {
         Path path = locationConfig.getExistingPath();
-        assertTrue(path.toString(), fileSystem.exists(path));
+        assertTrue(path.getAbsolutePath(), fileSystem.exists(path));
     }
 
     @Test
