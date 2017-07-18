@@ -29,4 +29,14 @@ public class SlurmLocationConfig extends SchedulerLocationConfig {
 	public String getLocation() {
 		return location;
 	}
+
+	@Override
+	public String[] getQueueNames() {
+		return new String[] { "mypartition", "otherpartition" };
+	}
+
+	@Override
+	public String getDefaultQueueName() {
+		return "batch";
+	}
 }

@@ -17,6 +17,9 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Before;
@@ -66,11 +69,56 @@ public abstract class SchedulerTestParent {
     	assertEquals(locationConfig.getLocation(), scheduler.getLocation());
     }
     
-    @Test
-    public void test_unknownJobStatus() throws XenonException {
-   	
+    private boolean contains(String expected, String [] options) { 
+    
+    	if (options == null || options.length == 0) { 
+    		return false;
+    	}
     	
-
+		for (String s : options) { 
+			if (expected == null) { 
+				if (s == null) { 
+					return true;
+				}
+			} else { 
+				if (expected.equals(s)) { 
+					return true;
+				}
+			}
+		}
+    	
+		return false;
+    }
+    
+    private boolean unorderedEquals(String [] expected, String [] actual) { 
+    	
+    	if (expected.length != actual.length) { 
+    		return false;
+    	}
+    	
+    	for (String s : expected) {
+    		if (!contains(s, actual)) { 
+    			return false;
+    		}
+    	}
+    		
+    	for (String s : actual) {
+     		if (!contains(s, expected)) { 
+    			return false;
+    		}
+    	}
+    	
+    	return true;
+    }
+    
+    @Test
+    public void test_getQueueNames() throws XenonException {
+    	String [] queues = scheduler.getQueueNames();
+  
+     	System.out.println("Queue names: " + Arrays.toString(queues));
+        
+    	assertTrue(unorderedEquals(locationConfig.getQueueNames(), queues));
+    	
     }
 
     

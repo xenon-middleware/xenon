@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.schedulers.ssh;
+package nl.esciencecenter.xenon.adaptors.schedulers.torque;
 
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
 
-public class SshLocationConfig extends SchedulerLocationConfig {
+public class TorqueLocationConfig extends SchedulerLocationConfig {
 
 	private String location;
 	
-	public SshLocationConfig(String location) { 
+	public TorqueLocationConfig(String location) { 
 		this.location = location; 
 	}
 	
@@ -32,11 +32,11 @@ public class SshLocationConfig extends SchedulerLocationConfig {
 
 	@Override
 	public String[] getQueueNames() {
-		return new String [] { "single", "multi", "unlimited" } ;
+		return new String[] { "debug", "batch" };
 	}
 
 	@Override
 	public String getDefaultQueueName() {
-		return "single";
+		return "batch";
 	}
 }

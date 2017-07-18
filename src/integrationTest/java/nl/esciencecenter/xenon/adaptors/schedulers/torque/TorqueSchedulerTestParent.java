@@ -13,30 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.schedulers.ssh;
+package nl.esciencecenter.xenon.adaptors.schedulers.torque;
 
-import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
+import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerTestParent;
 
-public class SshLocationConfig extends SchedulerLocationConfig {
+/**
+ * Extend this class for docker tests and live tests
+ *
+ * Can contain extra tests for slurm scheduler
+ */
+public abstract class TorqueSchedulerTestParent extends SchedulerTestParent {
 
-	private String location;
-	
-	public SshLocationConfig(String location) { 
-		this.location = location; 
-	}
-	
-	@Override
-	public String getLocation() {
-		return location;
-	}
-
-	@Override
-	public String[] getQueueNames() {
-		return new String [] { "single", "multi", "unlimited" } ;
-	}
-
-	@Override
-	public String getDefaultQueueName() {
-		return "single";
-	}
 }
