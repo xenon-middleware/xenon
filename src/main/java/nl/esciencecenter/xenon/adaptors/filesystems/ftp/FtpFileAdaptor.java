@@ -104,6 +104,8 @@ public class FtpFileAdaptor extends FileAdaptor {
 
     	FTPClient ftpClient = connect(location, credential);
     	
+    	ftpClient.enterLocalPassiveMode();
+    	
     	String cwd = getCurrentWorkingDirectory(ftpClient);
 
     	return new FtpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), ftpClient, credential, this, xp);
