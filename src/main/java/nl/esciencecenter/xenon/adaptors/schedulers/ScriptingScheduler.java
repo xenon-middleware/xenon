@@ -16,18 +16,14 @@
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -131,7 +127,7 @@ public abstract class ScriptingScheduler extends Scheduler {
                 arguments);
 
         if (!runner.success()) {
-            throw new XenonException(getAdaptorName(), "could not run command \"" + executable + "\" with stdin \"" + stdin
+        	throw new XenonException(getAdaptorName(), "could not run command \"" + executable + "\" with stdin \"" + stdin
                     + "\" arguments \"" + Arrays.toString(arguments) + "\" at \"" + subScheduler + "\". Exit code = "
                     + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
         }
@@ -200,7 +196,9 @@ public abstract class ScriptingScheduler extends Scheduler {
      *          if an error occurs
      */
     public JobStatus waitUntilDone(String jobIdentifier, long timeout) throws XenonException {
-        
+
+    	checkJobIdentifier(jobIdentifier);
+    	
         long deadline = Deadline.getDeadline(timeout);
               
         JobStatus status = getJobStatus(jobIdentifier);
@@ -238,6 +236,8 @@ public abstract class ScriptingScheduler extends Scheduler {
      */
     public JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException {
 
+    	checkJobIdentifier(jobIdentifier);
+    	
         long deadline = Deadline.getDeadline(timeout);
         
         JobStatus status = getJobStatus(jobIdentifier);

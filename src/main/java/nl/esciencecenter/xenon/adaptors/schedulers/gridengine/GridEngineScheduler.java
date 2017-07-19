@@ -283,6 +283,9 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
     @Override
     public JobStatus cancelJob(String jobIdentifier) throws XenonException {
+    	
+    	checkJobIdentifier(jobIdentifier);
+    	
         String qdelOutput = runCheckedCommand(null, "qdel", jobIdentifier);
 
         String killedOutput = "has registered the job " + jobIdentifier + " for deletion";

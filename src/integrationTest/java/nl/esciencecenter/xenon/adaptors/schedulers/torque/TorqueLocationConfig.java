@@ -37,6 +37,6 @@ public class TorqueLocationConfig extends SchedulerLocationConfig {
 
 	@Override
 	public String getDefaultQueueName() {
-		return "batch";
+		return null;
 	}
 }

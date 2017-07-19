@@ -37,6 +37,6 @@ public class GridengineLocationConfig extends SchedulerLocationConfig {
 
 	@Override
 	public String getDefaultQueueName() {
-		return "default";
+		return null;
 	}
 }
