@@ -66,7 +66,10 @@ public abstract class SchedulerTestParent {
     	
     @Test
     public void test_getLocation() throws XenonException {
-    	assertEquals(locationConfig.getLocation(), scheduler.getLocation());
+    	
+    	String location = scheduler.getLocation();
+    	
+    	assertEquals(locationConfig.getLocation(), location);
     }
     
     private boolean contains(String expected, String [] options) { 
