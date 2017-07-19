@@ -33,7 +33,7 @@ public class FileSystemDescriptionTest {
 	@Test 
 	public void test_name() {
 		String [] loc = new String [] { "HERE", "THERE" };
-		FileSystemAdaptorDescription d = new FileSystemAdaptorDescription("NAME", "DESC", loc, null, true);
+		FileSystemAdaptorDescription d = new FileSystemAdaptorDescription("NAME", "DESC", loc, null, true, true, true);
 		assertEquals("NAME", d.getName());
 	}
 
@@ -41,7 +41,7 @@ public class FileSystemDescriptionTest {
 	@Test 
 	public void test_description() {
 		String [] loc = new String [] { "HERE", "THERE" };
-		FileSystemAdaptorDescription d = new FileSystemAdaptorDescription("NAME", "DESC", loc, null, true);
+		FileSystemAdaptorDescription d = new FileSystemAdaptorDescription("NAME", "DESC", loc, null, true, true, true);
 		assertEquals("DESC", d.getDescription());
 	}
 
@@ -49,21 +49,21 @@ public class FileSystemDescriptionTest {
 	@Test 
 	public void test_location() {
 		String [] loc = new String [] { "HERE", "THERE" };
-		FileSystemAdaptorDescription d = new FileSystemAdaptorDescription("NAME", "DESC", loc, null, true);
+		FileSystemAdaptorDescription d = new FileSystemAdaptorDescription("NAME", "DESC", loc, null, true, true, true);
 		assertArrayEquals(loc, d.getSupportedLocations());
 	}
 	
 	@Test 
 	public void test_3rdPartyTrue() {
 		String [] loc = new String [] { "HERE", "THERE" };
-		FileSystemAdaptorDescription d = new FileSystemAdaptorDescription("NAME", "DESC", loc, null, true);
+		FileSystemAdaptorDescription d = new FileSystemAdaptorDescription("NAME", "DESC", loc, null, true, true, true);
 		assertTrue(d.supportsThirdPartyCopy());
 	}
 	
 	@Test 
 	public void test_3rdPartyFalse() {
 		String [] loc = new String [] { "HERE", "THERE" };
-		FileSystemAdaptorDescription d = new FileSystemAdaptorDescription("NAME", "DESC", loc, null, false);
+		FileSystemAdaptorDescription d = new FileSystemAdaptorDescription("NAME", "DESC", loc, null, false, true, true);
 		assertFalse(d.supportsThirdPartyCopy());
 	}
 	
@@ -77,7 +77,7 @@ public class FileSystemDescriptionTest {
 		XenonPropertyDescription [] da = new XenonPropertyDescription[] { d };
 		
 		String [] loc = new String [] { "HERE", "THERE" };
-		FileSystemAdaptorDescription desc = new FileSystemAdaptorDescription("NAME", "DESC", loc, da, false);
+		FileSystemAdaptorDescription desc = new FileSystemAdaptorDescription("NAME", "DESC", loc, da, false, true, true);
 		
 		String expected = "FileAdaptorDescription [name=" + "NAME" + ", description=" + "DESC" + 
 				", supportedLocations=" + Arrays.toString(loc) +

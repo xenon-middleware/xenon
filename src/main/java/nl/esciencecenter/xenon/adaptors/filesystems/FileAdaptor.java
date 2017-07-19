@@ -32,8 +32,8 @@ public abstract class FileAdaptor {
 	private final FileSystemAdaptorDescription adaptorDescription;
 	
 	protected FileAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties, 
-			boolean supportsThirdPartyCopy) {
-		adaptorDescription = new FileSystemAdaptorDescription(name, description, locations, properties, supportsThirdPartyCopy);
+			boolean supportsThirdPartyCopy, boolean readSymbolicLinks, boolean createSymbolicLinks) {
+		adaptorDescription = new FileSystemAdaptorDescription(name, description, locations, properties, supportsThirdPartyCopy, readSymbolicLinks, createSymbolicLinks);
 	}
 	
     protected synchronized String getNewUniqueID() {

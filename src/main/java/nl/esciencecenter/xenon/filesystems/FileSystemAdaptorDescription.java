@@ -29,11 +29,15 @@ import nl.esciencecenter.xenon.XenonPropertyDescription;
 public class FileSystemAdaptorDescription extends AdaptorDescription {
 
 	private final boolean supportsThirdPartyCopy;
+	private final boolean readSymbolicLinks;
+	private final boolean createSymbolicLinks;
 	
     public FileSystemAdaptorDescription(String name, String description, String[] supportedLocations,
-			XenonPropertyDescription[] supportedProperties, boolean supportsThirdPartyCopy) {
+			XenonPropertyDescription[] supportedProperties, boolean supportsThirdPartyCopy, boolean readSymbolicLinks, boolean createSymbolicLinks) {
 		super(name, description, supportedLocations, supportedProperties);
 		this.supportsThirdPartyCopy = supportsThirdPartyCopy;
+		this.readSymbolicLinks = readSymbolicLinks;
+		this.createSymbolicLinks = createSymbolicLinks;
 	}
 
 	/**
@@ -48,6 +52,14 @@ public class FileSystemAdaptorDescription extends AdaptorDescription {
     	return supportsThirdPartyCopy;
     }
     
+    public boolean canReadSymboliclinks() {
+    	return readSymbolicLinks;
+	}
+    
+    public boolean canCreateSymboliclinks() {
+    	return createSymbolicLinks;
+	}
+    
     @Override
     public String toString() {
         return "FileAdaptorDescription [name=" + getName() + ", description=" + getDescription() + 
@@ -56,7 +68,5 @@ public class FileSystemAdaptorDescription extends AdaptorDescription {
         		", supportsThirdPArtyCopy=" + supportsThirdPartyCopy + "]";
     }
 
-	public boolean supportsSymboliclinks() {
-    	return true;
-	}
+	
 }

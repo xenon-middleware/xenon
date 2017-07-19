@@ -33,13 +33,10 @@ import nl.esciencecenter.xenon.schedulers.JobStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Generator for GridEngine job script.
  * 
  */
-@SuppressFBWarnings(value = "VA_FORMAT_STRING_USES_NEWLINE", justification = "Script generated is a Unix script.")
 final class TorqueUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TorqueUtils.class);

@@ -24,7 +24,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
@@ -37,7 +36,6 @@ import nl.esciencecenter.xenon.schedulers.JobStatus;
 /**
  * Generator for GridEngine job script.
  */
-@SuppressFBWarnings(value = "VA_FORMAT_STRING_USES_NEWLINE", justification = "Script generated is a Unix script.")
 final class GridEngineUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GridEngineUtils.class);
