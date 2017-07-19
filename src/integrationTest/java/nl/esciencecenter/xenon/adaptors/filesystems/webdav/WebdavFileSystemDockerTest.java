@@ -29,7 +29,7 @@ public class WebdavFileSystemDockerTest extends WebdavFileSystemTestParent {
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder()
         .file("src/integrationTest/resources/docker-compose/webdav.yml")
-        .waitingForService("webdav", HealthChecks.toHaveAllPortsOpen())
+        .waitingForService("webdav", HealthChecks.toHaveAllPortsOpen()).saveLogsTo("/tmp/webdav.txt")
         .build();
 
     @Override
@@ -42,5 +42,6 @@ public class WebdavFileSystemDockerTest extends WebdavFileSystemTestParent {
         String location = docker.containers().container("webdav").port(80).inFormat("http://$HOST:$EXTERNAL_PORT");
         PasswordCredential cred = new PasswordCredential("xenon", "javagat".toCharArray());
         return FileSystem.create("webdav", location, cred);
-    }
+    }        
+    
 }

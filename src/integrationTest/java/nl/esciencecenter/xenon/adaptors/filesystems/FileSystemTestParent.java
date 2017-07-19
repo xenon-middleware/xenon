@@ -64,8 +64,8 @@ public abstract class FileSystemTestParent {
 
     @Test
     public void readSymbolicLink_linkToExistingFile_targetMatches() throws XenonException {
-        assumeTrue(description.supportsSymboliclinks());
-        Map.Entry<Path, Path> linkTarget = locationConfig.getSymbolicLinksToExistingFile();
+    	assumeTrue("Does not support reading of symlinks", description.canReadSymboliclinks());
+    	Map.Entry<Path, Path> linkTarget = locationConfig.getSymbolicLinksToExistingFile();
         Path target = fileSystem.readSymbolicLink(linkTarget.getKey());
         Path expectedTarget = linkTarget.getValue();
         assertEquals(target, expectedTarget);

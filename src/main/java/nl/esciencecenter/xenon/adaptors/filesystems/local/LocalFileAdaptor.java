@@ -55,7 +55,7 @@ public class LocalFileAdaptor extends FileAdaptor {
     public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription[0];
     
     public LocalFileAdaptor() {
-    	super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false);
+    	super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, true, true);
     }
 
 	/** 

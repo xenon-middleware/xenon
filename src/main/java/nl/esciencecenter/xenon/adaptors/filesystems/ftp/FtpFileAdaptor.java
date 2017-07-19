@@ -60,7 +60,7 @@ public class FtpFileAdaptor extends FileAdaptor {
     protected static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription[0]; 
    
     public FtpFileAdaptor() {
-        super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false);
+        super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, true, false);
     }
     
     protected FTPClient connect(String location, Credential credential) throws XenonException { 

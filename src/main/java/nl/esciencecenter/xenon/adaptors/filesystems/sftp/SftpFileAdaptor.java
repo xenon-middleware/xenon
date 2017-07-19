@@ -102,7 +102,7 @@ public class SftpFileAdaptor extends FileAdaptor {
 	};
 
 	public SftpFileAdaptor() { 
-		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false);
+		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, true, true);
 	}
 
 	public FileSystem createFileSystem(String location, Credential credential, Map<String,String> properties) throws XenonException { 

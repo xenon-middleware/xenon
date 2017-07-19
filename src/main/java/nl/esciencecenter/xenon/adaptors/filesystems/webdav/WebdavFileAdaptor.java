@@ -33,12 +33,14 @@ import org.apache.jackrabbit.webdav.client.methods.OptionsMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 
@@ -69,7 +71,7 @@ public class WebdavFileAdaptor extends FileAdaptor {
     private static final int DEFAULT_PORT = 80; 
 	
     public WebdavFileAdaptor() {
-        super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false);
+        super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, false, false);
     }
 
     protected static boolean isOkish(int response) {
@@ -77,22 +79,9 @@ public class WebdavFileAdaptor extends FileAdaptor {
                 || response == HttpStatus.SC_NO_CONTENT;
     }
     
-    protected static String toFolderPath(String path) {
-        return path.endsWith("/") ? path : path + "/";
-    }
-    
-    protected static boolean isFolderPath(String path) {
-        return path.endsWith("/");
-    }
-	
-    protected static String toFilePath(String path) {
-		// Removes all, if any, trailing slashes
-		return path.replaceAll("/+$", "");
-	}
-    
-    protected boolean isFilePath(String path) {
-		return !isFolderPath(path);
-	}
+//    protected boolean isFilePath(String path) {
+//		return !isFolderPath(path);
+//	}
     
     @Override
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties)
@@ -100,6 +89,11 @@ public class WebdavFileAdaptor extends FileAdaptor {
         LOGGER.debug("newFileSystem location = {} credential = {} properties = {}", location, credential,
                 properties);
 
+        if (!(credential instanceof PasswordCredential)) { 
+        	throw new InvalidCredentialException(ADAPTOR_NAME, "Only password credentials supported");
+        }
+        
+        
         URI uri; 
         
     	try { 
@@ -115,10 +109,16 @@ public class WebdavFileAdaptor extends FileAdaptor {
     		port = DEFAULT_PORT;
     	}
     	
-    	HttpClient client = getClient(host, port);
+    	HttpClient client = getClient(host, port, (PasswordCredential) credential);
         HttpMethod method;
         try {
-            method = new OptionsMethod(toFolderPath(uri.toString()));
+        	String loc = uri.toString();
+        	
+        	if (!loc.endsWith("/")) { 
+        		loc = loc + "/";
+        	}
+        	
+            method = new OptionsMethod(loc);
             int response = client.executeMethod(method);
             String responseBodyAsString = method.getStatusLine().toString();
             method.releaseConnection();
@@ -134,23 +134,14 @@ public class WebdavFileAdaptor extends FileAdaptor {
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
        
         return new WebdavFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), client, xp);
-//        
-//        
-//        
-//        
-//        FileSystemImplementation fileSystem = new FileSystemImplementation(ADAPTOR_NAME, uniqueID, webdavLocation.getScheme(),
-//                webdavLocation.getHost(), entryPath, credential, xenonProperties);
-//        fileSystems.put(uniqueID, new FileSystemInfo(fileSystem, client, credential));
-//        LOGGER.debug("* newFileSystem OK remote cwd = {} entryPath = {} uniqueID = {}", cwd, entryPath, uniqueID);
-//        return fileSystem;
     }
 
-    private HttpClient getClient(String host, int port) {
+    private HttpClient getClient(String host, int port, PasswordCredential credential) {
         HostConfiguration hostConfig = new HostConfiguration();
         hostConfig.setHost(host, port);
         HttpConnectionManager connectionManager = getConnectionManager(hostConfig);
         HttpClient client = new HttpClient(connectionManager);
-        Credentials creds = new UsernamePasswordCredentials("xenon", "xenon1");
+        Credentials creds = new UsernamePasswordCredentials(credential.getUsername(), new String(credential.getPassword()));
         client.getState().setCredentials(AuthScope.ANY, creds);
         client.setHostConfiguration(hostConfig);
         return client;
@@ -165,32 +156,8 @@ public class WebdavFileAdaptor extends FileAdaptor {
         return connectionManager;
     }
 
-//    @Override
-//    public Path newPath(FileSystem filesystem, RelativePath location) throws XenonException {
-//        return new PathImplementation(filesystem, location);
-//    }
-//
-//    @Override
-//    public void close(FileSystem fileSystem) throws XenonException {
-//        // ignored!
-//    }
-//
-//    @Override
-//    public boolean isOpen(FileSystem fileSystem) throws XenonException {
-//        LOGGER.debug("isOpen fileSystem = {}", fileSystem);
-//        boolean result = true;
-//        LOGGER.debug("isOpen OK result = {}", result);
-//        return result;
-//    }
-
-    
-
-  
-
     public void end() {
         LOGGER.debug("end OK");
     }
-
-
 
 }
