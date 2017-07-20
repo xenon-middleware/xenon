@@ -95,14 +95,7 @@ public abstract class FileSystem {
 	}
 
 	public static String [] getAdaptorNames() {
-
-		ArrayList<String> tmp = new ArrayList<>();
-
-		for (FileAdaptor a : adaptors.values()) { 
-			tmp.add(a.getName());
-		}
-
-		return tmp.toArray(new String[tmp.size()]);
+		return adaptors.keySet().toArray(new String[0]);
 	}
 
 	public static FileSystemAdaptorDescription getAdaptorDescription(String adaptorName) throws XenonException {
@@ -110,6 +103,9 @@ public abstract class FileSystem {
 	}
 
 	public static FileSystemAdaptorDescription [] getAdaptorDescriptions() throws XenonException {
+
+		// TODO: see getNames
+		
 		String [] names = getAdaptorNames();
 
 		FileSystemAdaptorDescription[] result = new FileSystemAdaptorDescription[names.length];
@@ -439,8 +435,8 @@ public abstract class FileSystem {
 
 		if (getAttributes(path).isDirectory()) {
 
+			for (PathAttributes p : list(path, false)) { 
 			if (recursive) { 
-				for (PathAttributes p : list(path, false)) { 
 					delete(p.getPath(), true);
 				}
 			}
