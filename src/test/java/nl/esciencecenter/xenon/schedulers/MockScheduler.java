@@ -50,7 +50,7 @@ public class MockScheduler extends Scheduler {
 	}
 
 	@Override
-	public JobHandle[] getJobs(String... queueNames) throws XenonException {
+	public String[] getJobs(String... queueNames) throws XenonException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -68,43 +68,43 @@ public class MockScheduler extends Scheduler {
 	}
 
 	@Override
-	public JobHandle submitJob(JobDescription description) throws XenonException {
+	public String submitBatchJob(JobDescription description) throws XenonException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public JobStatus getJobStatus(JobHandle job) throws XenonException {
+	public Streams submitInteractiveJob(JobDescription description) throws XenonException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public JobStatus getJobStatus(String job) throws XenonException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public JobStatus[] getJobStatuses(JobHandle... jobs) throws XenonException {
+	public JobStatus[] getJobStatuses(String... jobs) throws XenonException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Streams getStreams(JobHandle job) throws XenonException {
+	public JobStatus cancelJob(String job) throws XenonException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public JobStatus cancelJob(JobHandle job) throws XenonException {
+	public JobStatus waitUntilDone(String job, long timeout) throws XenonException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public JobStatus waitUntilDone(JobHandle job, long timeout) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public JobStatus waitUntilRunning(JobHandle job, long timeout) throws XenonException {
+	public JobStatus waitUntilRunning(String job, long timeout) throws XenonException {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -20,16 +20,16 @@ package nl.esciencecenter.xenon.filesystems;
  */
 public class CopyStatus {
 
-	private final CopyHandle copy;
+	private final String copyIdentifier;
 	private final String state;
-	private final Exception exception;
+	private final Throwable exception;
 
 	private final long bytesToCopy;
 	private final long bytesCopied;
 
-	public CopyStatus(CopyHandle copy, String state, long bytesToCopy, long bytesCopied, Exception exception) {
+	public CopyStatus(String copyIdentifier, String state, long bytesToCopy, long bytesCopied, Throwable exception) {
 		super();
-		this.copy = copy;
+		this.copyIdentifier = copyIdentifier;
 		this.state = state;
 		this.bytesToCopy = bytesToCopy;
 		this.bytesCopied = bytesCopied;
@@ -40,12 +40,12 @@ public class CopyStatus {
 	}
 
 	/**
-	 * Get the Copy for which this CopyStatus was created.
+	 * Get the copy identifier for which this CopyStatus was created.
 	 * 
 	 * @return the Copy.
 	 */
-	public CopyHandle getCopy() {
-		return copy;
+	public String getCopyIdentifier() {
+		return copyIdentifier;
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class CopyStatus {
 	 * 
 	 * @return the exception.
 	 */
-	public Exception getException() {
+	public Throwable getException() {
 		return exception;
 	}
 
@@ -113,7 +113,7 @@ public class CopyStatus {
 
 	@Override
 	public String toString() {
-		return "CopyStatus [copy=" + copy + ", state=" + state + ", exception=" + exception + 
+		return "CopyStatus [copyIdentifier=" + copyIdentifier + ", state=" + state + ", exception=" + exception + 
 				", bytesToCopy=" + bytesToCopy + ", bytesCopied=" + bytesCopied + "]";
 	}
 }

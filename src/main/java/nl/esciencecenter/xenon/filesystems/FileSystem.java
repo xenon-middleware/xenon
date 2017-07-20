@@ -19,14 +19,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Deque;
+
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.UnsupportedOperationException;
@@ -35,11 +41,10 @@ import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor;
-import nl.esciencecenter.xenon.adaptors.filesystems.jclouds.JCloudsFileAdaptor;
+import nl.esciencecenter.xenon.adaptors.filesystems.s3.S3FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor;
-import nl.esciencecenter.xenon.adaptors.schedulers.Deadline;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.InvalidCredentialException;
@@ -49,7 +54,7 @@ import nl.esciencecenter.xenon.UnknownPropertyException;
 
 /**
  * FileSystem represent a (possibly remote) file system that can be used to access data.
- * 
+ *
  * @version 1.0
  * @since 1.0
  */
@@ -58,24 +63,22 @@ public abstract class FileSystem {
 	/** The name of this component, for use in exceptions */
 	private static final String COMPONENT_NAME = "FileSystem";
 
-	/** The polling delay */
-	private static final int POLLING_DELAY = 1000;
-
 	/** The default buffer size */
 	private static final int BUFFER_SIZE = 4 * 1024;
 
 	private static final HashMap<String, FileAdaptor> adaptors = new LinkedHashMap<>();
 
-	static { 
+	static {
 		/** Load all supported file adaptors */
 		addAdaptor(new LocalFileAdaptor());
 		addAdaptor(new FtpFileAdaptor());
 		addAdaptor(new SftpFileAdaptor());
-		addAdaptor(new JCloudsFileAdaptor());
 		addAdaptor(new WebdavFileAdaptor());
+		addAdaptor(new S3FileAdaptor());
+
 	}
 
-	private static void addAdaptor(FileAdaptor adaptor) { 
+	private static void addAdaptor(FileAdaptor adaptor) {
 		adaptors.put(adaptor.getName(), adaptor);
 	}
 
@@ -98,7 +101,7 @@ public abstract class FileSystem {
 
 		ArrayList<String> tmp = new ArrayList<>();
 
-		for (FileAdaptor a : adaptors.values()) { 
+		for (FileAdaptor a : adaptors.values()) {
 			tmp.add(a.getName());
 		}
 
@@ -114,7 +117,7 @@ public abstract class FileSystem {
 
 		FileSystemAdaptorDescription[] result = new FileSystemAdaptorDescription[names.length];
 
-		for (int i=0;i<names.length;i++) { 
+		for (int i=0;i<names.length;i++) {
 			result[i] = getAdaptorDescription(names[i]);
 		}
 
@@ -122,12 +125,12 @@ public abstract class FileSystem {
 	}
 
 	/**
-	 * Create a new FileSystem that represents a (possibly remote) data store 
-	 * at the <code>location</code> using the <code>credentials</code> to get 
-	 * access. Make sure to always close {@code FileSystem} instances by calling 
-	 * {@code close(FileSystem)} when you no longer need them, otherwise their 
+	 * Create a new FileSystem that represents a (possibly remote) data store
+	 * at the <code>location</code> using the <code>credentials</code> to get
+	 * access. Make sure to always close {@code FileSystem} instances by calling
+	 * {@code close(FileSystem)} when you no longer need them, otherwise their
 	 * associated resources remain allocated.
-	 * 
+	 *
 	 * @param type
 	 *            the type of file system to connect to (e.g. "sftp" or "webdav")
 	 * @param location
@@ -136,9 +139,9 @@ public abstract class FileSystem {
 	 *            the Credentials to use to get access to the FileSystem.
 	 * @param properties
 	 *            optional properties to use when creating the FileSystem.
-	 * 
+	 *
 	 * @return the new FileSystem.
-	 * 
+	 *
 	 * @throws UnknownPropertyException
 	 *             If a unknown property was provided.
 	 * @throws InvalidPropertyException
@@ -149,11 +152,11 @@ public abstract class FileSystem {
 	 *             If the location was invalid.
 	 * @throws InvalidCredentialException
 	 *             If the credential is invalid to access the location.
-	 * 
+	 *
 	 * @throws XenonException
 	 *             If the creation of the FileSystem failed.
 	 */
-	public static FileSystem create(String type, String location, Credential credential, Map<String, String> properties) 
+	public static FileSystem create(String type, String location, Credential credential, Map<String, String> properties)
 			throws XenonException {
 		return getAdaptorByName(type).createFileSystem(location, credential, properties);
 	}
@@ -170,148 +173,47 @@ public abstract class FileSystem {
 		return create(type, null);
 	}
 
-	interface CopyCallback { 
-		void setBytesToCopy(long bytes);
-		void setBytesCopied(long bytes);
-		boolean isCancelled();
-	}
+	class CopyCallback {
 
-	class CopyOperation implements CopyHandle, CopyCallback {
+		long bytesToCopy = 0;
+		long bytesCopied = 0;
 
-		private final String uniqueID;
+		boolean started = false;
+		boolean cancel = false;
 
-		private final FileSystem sourceFS;
-		private final Path source;
-
-		private final FileSystem destinationFS;
-		private final Path destination;
-
-		private final CopyMode mode;
-
-		private final boolean recursive;
-
-		private Exception exception;
-
-		private String state = "PENDING";
-
-		private boolean cancel = false;
-		private long bytesToCopy = -1;
-		private long bytesCopied = 0;
-
-		public CopyOperation(String uniqueID, FileSystem sourceFS, Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive) {
-			this.uniqueID = uniqueID;
-			this.sourceFS = sourceFS;
-			this.source = source;
-			this.destinationFS = destinationFS;
-			this.destination = destination;
-			this.mode = mode;
-			this.recursive = recursive;
+		synchronized void start(long bytesToCopy) {
+			if (!started) {
+				started = true;
+				this.bytesToCopy = bytesToCopy;
+			}
 		}
 
-		@Override
-		public FileSystem getSourceFileSystem() {
-			return sourceFS;
+		synchronized boolean isStarted() {
+			return started;
 		}
 
-		@Override
-		public Path getSourcePath() {
-			return source;
-		}
-
-		@Override
-		public FileSystem getDestinatonFileSystem() {
-			return destinationFS;
-		}
-
-		@Override
-		public Path getDestinationPath() {
-			return destination;
-		}
-
-		@Override
-		public CopyMode getMode() {
-			return mode;
-		}
-
-		@Override
-		public boolean isRecursive() {
-			return recursive;
-		}
-
-		public String getUniqueID() {
-			return uniqueID;
-		}
-
-		private boolean hasID(String copyID) { 
-			return uniqueID.equals(copyID);
+		synchronized void addBytesCopied(long bytes) {
+			this.bytesCopied += bytes;
 		}
 
 		synchronized void cancel() {
-			this.cancel = true;
+			cancel = true;
 		}
 
-		public synchronized boolean isCancelled() {
+		synchronized boolean isCancelled() {
 			return cancel;
 		}
+	}
 
-		public synchronized void setBytesToCopy(long bytesToCopy) {
-			this.bytesToCopy = bytesToCopy;
-		}
+	private class PendingCopy {
 
-		public synchronized void setBytesCopied(long bytesCopied) {
-			this.bytesCopied = bytesCopied;
-		}
+		Future<Void> future;
+		CopyCallback callback;
 
-		private synchronized void setRunning() {
-			this.state = "RUNNING";
-		}
-
-		private synchronized void setDone(Exception e) {
-			if (e == null) { 
-				this.state = "DONE";
-				this.exception = null;
-			} else { 
-				this.state = "FAILED";
-				this.exception = e;
-			}
-
-			// Wakeup pending waitUntilDone if needed
-			notifyAll();
-		}
-
-		private synchronized boolean isDone() {
-			return "DONE".equals(state) || "FAILED".equals(state);
-		}
-
-		private synchronized CopyStatus getStatus() {
-			return new CopyStatus(this, state, bytesToCopy, bytesCopied, exception);
-		}
-
-		public synchronized CopyStatus waitUntilDone(long timeout) {
-
-			long deadline = Deadline.getDeadline(timeout);
-
-			long leftover = deadline - System.currentTimeMillis();
-
-			while (leftover > 0 && !isDone()) {
-				try {
-					wait(leftover);
-				} catch (InterruptedException e) {
-					// We were interrupted
-					Thread.currentThread().interrupt();
-					break;
-				}
-
-				leftover = deadline - System.currentTimeMillis();
-
-			}
-
-			return getStatus();
-		}
-
-		@Override
-		public String toString() {
-			return "CopyHandle [" + uniqueID + "]";
+		public PendingCopy(Future<Void> future, CopyCallback callback) {
+			super();
+			this.future = future;
+			this.callback = callback;
 		}
 	}
 
@@ -320,31 +222,11 @@ public abstract class FileSystem {
 	private final String location;
 	private final Path entryPath;
 	private final XenonProperties properties;
+	private final ExecutorService pool;
 
-	/** Unique ID for copy operations */
 	private long nextCopyID = 0;
 
-	/** Pending copies */
-	private final Deque<CopyOperation> pending = new LinkedList<>();
-
-	/** Running copy */
-	private CopyOperation running;
-
-	/** Should we terminate ? */
-	private boolean done = false;
-
-	/** Copy thread */   
-	private Thread copyThread = new Thread() {
-		@Override
-		public void run() {
-			CopyOperation ch = dequeue();
-
-			while (ch != null) {
-				performCopy(ch);
-				ch = dequeue();
-			}
-		}
-	};
+	private final HashMap<String, PendingCopy> pendingCopies = new HashMap<>();
 
 	protected FileSystem(String uniqueID, String adaptor, String location, Path entryPath, XenonProperties properties) {
 
@@ -368,59 +250,55 @@ public abstract class FileSystem {
 		this.adaptor = adaptor;
 		this.location = location;
 		this.entryPath = entryPath;
-
-		this.properties = properties;		
-
-		// Start the copy thread
-		copyThread.start();
-
+		this.properties = properties;
+		this.pool = Executors.newFixedThreadPool(1);
 	}
 
-	private synchronized String getNextCopyID(String prefix) {
-		return prefix + nextCopyID++;
+	private synchronized String getNextCopyID() {
+		return "COPY-" + getAdaptorName() + "-" + nextCopyID++;
 	}
 
 	/**
 	 * Get the name of the adaptor that created this FileSystem.
-	 * 
+	 *
 	 * @return the name of the adaptor.
 	 */
-	public String getAdaptorName() { 
+	public String getAdaptorName() {
 		return adaptor;
 	}
 
 	/**
 	 * Get the location of the FileSystem.
-	 * 
+	 *
 	 * @return the location of the FileSystem.
 	 */
-	public String getLocation() { 
+	public String getLocation() {
 		return location;
 	}
 
 	/**
 	 * Get the properties used to create this FileSystem.
-	 * 
+	 *
 	 * @return the properties used to create this FileSystem.
 	 */
-	public Map<String, String> getProperties() { 
+	public Map<String, String> getProperties() {
 		return properties.toMap();
 	}
 
 	/**
 	 * Get the entry path of this file system.
-	 * 
+	 *
 	 * The entry path is the initial path when the FileSystem is first accessed, for example <code>"/home/username"</code>.
-	 * 
+	 *
 	 * @return the entry path of this file system.
 	 */
-	public Path getEntryPath() { 
+	public Path getEntryPath() {
 		return entryPath;
 	}
 
 	/**
 	 * Close this FileSystem.
-	 * 
+	 *
 	 * @throws XenonException
 	 *             If the FileSystem failed to close or if an I/O error occurred.
 	 */
@@ -428,23 +306,27 @@ public abstract class FileSystem {
 
 	/**
 	 * Return if the connection to the FileSystem is open.
-	 * 
+	 *
 	 * @throws XenonException
 	 *          if the test failed or an I/O error occurred.
 	 * @return
-	 *          if the connection to the FileSystem is open.                     
+	 *          if the connection to the FileSystem is open.
 	 */
 	public abstract boolean isOpen() throws XenonException;
 
 	/**
-	 * Move or rename an existing source path to a non-existing target path.
+	 * Rename an existing source path to a non-existing target path (optional operation).
 	 * <p>
+	 *
+	 * This method only implements a <em>rename</em> operation, not a <em>move</em> operation.
+	 * Hence, this method will not copy files and should return (almost) instantaneously.
+	 *
 	 * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
-	 * 
+	 *
 	 * If the target is equal to the source this method has no effect.
-	 * 
-	 * If the source is a link, the link itself will be moved, not the path to which it refers.
-	 * 
+	 *
+	 * If the source is a link, the link itself will be renamed, not the path to which it refers.
+	 *
 	 * If the source is a directory, it will be renamed to the target. This implies that a moving a directory between physical
 	 * locations may fail.
 	 * </p>
@@ -452,7 +334,8 @@ public abstract class FileSystem {
 	 *            the existing source path.
 	 * @param target
 	 *            the non existing target path.
-	 * 
+	 * @throws UnsupportedOperationException
+	 * 				If the adapter does not support renaming.
 	 * @throws NoSuchPathException
 	 *             If the source file does not exist or the target parent directory does not exist.
 	 * @throws PathAlreadyExistsException
@@ -462,29 +345,21 @@ public abstract class FileSystem {
 	 * @throws XenonException
 	 *             If the move failed.
 	 */
-	public void move(Path source, Path target) throws XenonException {
-		if (!exists(source)){
-			throw new NoSuchPathException(getAdaptorName(), source.getRelativePath());
-		}
-		CopyHandle handle = copy(source,this,target,CopyMode.CREATE,true);
-		waitUntilDone(handle,Long.MAX_VALUE);
-		delete(source,false);
-	}
-
+	public abstract void rename(Path source, Path target) throws XenonException;
 
 	/**
 	 * Creates a new directory, failing if the directory already exists. All nonexistent parent directories are also created.
-	 * 
+	 *
 	 * @param dir
 	 *            the directory to create.
-	 * 
+	 *
 	 * @throws PathAlreadyExistsException
 	 *             If the directory already exists or if a parent directory could not be created because a file with the same name
 	 *             already exists.
 	 * @throws XenonException
 	 *             If an I/O error occurred.
 	 */
-	public void createDirectories(Path dir) throws XenonException { 
+	public void createDirectories(Path dir) throws XenonException {
 
 		Path parent = dir.getParent();
 
@@ -500,9 +375,9 @@ public abstract class FileSystem {
 
 	/**
 	 * Creates a new directory, failing if the directory already exists.
-	 * 
+	 *
 	 * The parent directory of the file must already exists.
-	 * 
+	 *
 	 * @param dir
 	 *            the directory to create.
 	 *
@@ -517,12 +392,12 @@ public abstract class FileSystem {
 
 	/**
 	 * Creates a new empty file, failing if the file already exists.
-	 * 
+	 *
 	 * The parent directory of the file must already exists.
-	 * 
+	 *
 	 * @param file
 	 *            a path referring to the file to create.
-	 * 
+	 *
 	 * @throws PathAlreadyExistsException
 	 *             If the file already exists.
 	 * @throws NoSuchPathException
@@ -534,12 +409,12 @@ public abstract class FileSystem {
 
 	/**
 	 * Creates a new symbolic link, failing if the link already exists (optional operation).
-	 * 
+	 *
 	 * @param link
 	 *            the symbolic link to create.
 	 * @param target
 	 *            the target the symbolic link should refer to.
-	 * 
+	 *
 	 * @throws PathAlreadyExistsException
 	 *             If the link already exists.
 	 * @throws XenonException
@@ -550,13 +425,13 @@ public abstract class FileSystem {
 
 	/**
 	 * Deletes an existing path.
-	 * 
+	 *
 	 * If path is a symbolic link the symbolic link is removed and the symbolic link's target is not deleted.
-	 * 
-	 * If the path is a directory and <code>recursive</code> is set to true, the contents of the directory will 
-	 * also be deleted. If <code>recursive</code> is set to <code>false</code>, a directory will only be removed 
-	 * if it is empty. 
-	 * 
+	 *
+	 * If the path is a directory and <code>recursive</code> is set to true, the contents of the directory will
+	 * also be deleted. If <code>recursive</code> is set to <code>false</code>, a directory will only be removed
+	 * if it is empty.
+	 *
 	 * @param path
 	 *          the path to delete.
 	 * @param recursive
@@ -566,14 +441,14 @@ public abstract class FileSystem {
 	 */
 	public void delete(Path path, boolean recursive) throws XenonException {
 
-		if (isDotDot(path)) { 
+		if (isDotDot(path)) {
 			return;
 		}
 
 		if (getAttributes(path).isDirectory()) {
 
-			if (recursive) { 
-				for (PathAttributes p : list(path, false)) { 
+			if (recursive) {
+				for (PathAttributes p : list(path, false)) {
 					delete(p.getPath(), true);
 				}
 			}
@@ -582,34 +457,34 @@ public abstract class FileSystem {
 		} else {
 			deleteFile(path);
 		}
-	}   
+	}
 
 	/**
 	 * Tests if a path exists.
-	 * 
+	 *
 	 * @param path
 	 *            the path to test.
-	 * 
+	 *
 	 * @return If the path exists.
-	 * 
+	 *
 	 * @throws XenonException
 	 *             If an I/O error occurred.
 	 */
 	public abstract boolean exists(Path path) throws XenonException;
 
 	/**
-	 * List all entries in the directory <code>dir</code>. 
-	 * 
-	 * All entries in the directory are returned, but subdirectories will not be traversed by default. 
-	 * Set <code>recursive</code> to <code>true</code>, include the listing of all subdirectories.  
-	 * 
+	 * List all entries in the directory <code>dir</code>.
+	 *
+	 * All entries in the directory are returned, but subdirectories will not be traversed by default.
+	 * Set <code>recursive</code> to <code>true</code>, include the listing of all subdirectories.
+	 *
 	 * @param dir
 	 *            the target directory.
 	 * @param recursive
 	 *            should the list recursively traverse the subdirectories ?
-	 * 
+	 *
 	 * @return a {@link List} of {@link PathAttributes} that iterates over all entries in the directory <code>dir</code>.
-	 * 
+	 *
 	 * @throws NoSuchPathException
 	 *             If a directory does not exists.
 	 * @throws InvalidPathException
@@ -625,12 +500,12 @@ public abstract class FileSystem {
 
 	/**
 	 * Open an existing file and return an {@link InputStream} to read from this file.
-	 * 
+	 *
 	 * @param file
 	 *            the to read.
-	 * 
+	 *
 	 * @return the {@link InputStream} to read from the file.
-	 * 
+	 *
 	 * @throws NoSuchPathException
 	 *             If the file does not exists.
 	 * @throws InvalidPathException
@@ -643,23 +518,23 @@ public abstract class FileSystem {
 	/**
 	 * Open a file and return an {@link OutputStream} to write to this file.
 	 * <p>
-	 * If the file already exists it will be replaced and its data will be lost. 
-	 * 
-	 * The size of the file (once all data has been written) must be specified using 
-	 * the <code>size</code> parameter. This is required by some implementations 
+	 * If the file already exists it will be replaced and its data will be lost.
+	 *
+	 * The size of the file (once all data has been written) must be specified using
+	 * the <code>size</code> parameter. This is required by some implementations
 	 * (typically blob-stores).
-	 * 
+	 *
 	 * </p>
 	 * @param path
 	 *            the target file for the OutputStream.
 	 * @param size
 	 *            the size of the file once fully written.
-	 * 
+	 *
 	 * @return the {@link OutputStream} to write to the file.
-	 * 
+	 *
 	 * @throws InvalidPathException
 	 *             If the file could not be created.
-	 *             
+	 *
 	 * @throws XenonException
 	 *             If an I/O error occurred.
 	 */
@@ -669,16 +544,16 @@ public abstract class FileSystem {
 	 * Open a file and return an {@link OutputStream} to write to this file.
 	 * <p>
 	 * If the file already exists it will be replaced and its data will be lost.
-	 * 
-	 * The amount of data that will be written to the file is not specified in advance. 
-	 * This operation may not be supported by all implementations. 
-	 *  
+	 *
+	 * The amount of data that will be written to the file is not specified in advance.
+	 * This operation may not be supported by all implementations.
+	 *
 	 * </p>
 	 * @param file
 	 *            the target file for the OutputStream.
-	 * 
+	 *
 	 * @return the {@link OutputStream} to write to the file.
-	 * 
+	 *
 	 * @throws InvalidPathException
 	 *             If the file could not be created.
 	 * @throws XenonException
@@ -690,15 +565,15 @@ public abstract class FileSystem {
 	 * Open an existing file and return an {@link OutputStream} to append data to this file.
 	 * <p>
 	 * If the file does not exist, an exception will be thrown.
-	 * 
-	 * This operation may not be supported by all implementations. 
-	 *  
+	 *
+	 * This operation may not be supported by all implementations.
+	 *
 	 * </p>
 	 * @param file
 	 *            the target file for the OutputStream.
-	 * 
+	 *
 	 * @return the {@link OutputStream} to write to the file.
-	 * 
+	 *
 	 * @throws InvalidPathException
 	 *             If the file is not a regula file.
 	 * @throws NoSuchPathException
@@ -711,12 +586,12 @@ public abstract class FileSystem {
 
 	/**
 	 * Get the {@link PathAttributes} of an existing path.
-	 * 
+	 *
 	 * @param path
 	 *            the existing path.
-	 * 
+	 *
 	 * @return the FileAttributes of the path.
-	 * 
+	 *
 	 * @throws NoSuchPathException
 	 *             If a file does not exists.
 	 * @throws XenonException
@@ -726,18 +601,18 @@ public abstract class FileSystem {
 
 	/**
 	 * Reads the target of a symbolic link (optional operation).
-	 * 
+	 *
 	 * @param link
 	 *            the link to read.
-	 * 
+	 *
 	 * @return a Path representing the target of the link.
-	 * 
+	 *
 	 * @throws NoSuchPathException
 	 *             If the link does not exists.
 	 * @throws InvalidPathException
 	 *             If the source is not a link.
 	 * @throws UnsupportedOperationException
-	 * 		       If this FileSystem does not support symbolic links.            
+	 * 		       If this FileSystem does not support symbolic links.
 	 * @throws XenonException
 	 *             If an I/O error occurred.
 	 */
@@ -745,351 +620,35 @@ public abstract class FileSystem {
 
 	/**
 	 * Sets the POSIX permissions of a path (optional operation).
-	 * 
+	 *
 	 * @param path
 	 *            the target path.
 	 * @param permissions
 	 *            the permissions to set.
-	 * 
+	 *
 	 * @throws NoSuchPathException
 	 *             If the target path does not exists.
 	 * @throws UnsupportedOperationException
-	 * 		       If this FileSystem does not support symbolic links.            
+	 * 		       If this FileSystem does not support symbolic links.
 	 * @throws XenonException
 	 *             If an I/O error occurred.
 	 */
 	public abstract void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException;
 
-	/**
-	 * Copy an existing source path to a target path on a different file system.
-	 * 
-	 * If the source path is a file, it will be copied to the destination file on the target file system.
-	 * 
-	 * If the source path is a directory, it will only be copied if <code>recursive</code> is set to <code>true</code>. 
-	 * Otherwise, an exception will be thrown. When copying recursively, the directory and its content (both files 
-	 * and subdirectories with content), will be copied to <code>destination</code>.
-	 * 
-	 * @param source
-	 *            the source path (on this filesystem) to copy from.
-	 * @param destinationFS
-	 *            the destination filesystem to copy to.
-	 * @param destination
-	 *            the destination path (on the destination filesystem) to copy to.
-	 * @param mode
-	 *            how to react if the destination already exists.
-	 * @param recursive
-	 *            if the copy should be recursive.
-	 *
-	 * @return a {@link CopyHandle} that can be used to inspect the status of the copy.
-	 * 
-	 * @throws NoSuchPathException
-	 *             If the source file does not exist, the target parent directory does not exist, or the target file does not
-	 *             exist and the <code>APPEND</code> or <code>RESUME</code> option is provided.
-	 * @throws PathAlreadyExistsException
-	 *             If the target file already exists.
-	 * @throws InvalidPathException
-	 *             If the source or target path is not a file.
-	 * @throws InvalidOptionsException
-	 *             If a conflicting set of copy options is provided.
-	 * @throws InvalidResumeTargetException
-	 *             If the data in the target of a resume does not match the data in the source. 
-	 * @throws XenonException
-	 *             If an I/O error occurred.
-	 */
-	public synchronized CopyHandle copy(Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive) throws XenonException { 
 
-		if (source == null) { 
-			throw new IllegalArgumentException("Source path is null");
-		}
-
-		if (destinationFS == null) { 
-			throw new IllegalArgumentException("Destination filesystem is null");
-		}
-
-		if (destination == null) { 
-			throw new IllegalArgumentException("Destination path is null");
-		}
-
-		String ID = getNextCopyID(getAdaptorName() + "_TO_" + destinationFS.getAdaptorName() + "_");
-
-		CopyOperation o = new CopyOperation(ID, this, source, destinationFS, destination, mode, recursive);
-
-		pending.addLast(o);
-
-		notifyAll();
-
-		return o;
-	}
-
-	private void performCopy(CopyOperation cop) { 
-
-		long bytesToCopy = 0;
-		long bytesCopied = 0;
-
-		if (cop.isCancelled()) { 
-			cop.setDone(new XenonException(getAdaptorName(), "Copy cancelled by user"));
-			return;
-		}
-
-		cop.setRunning();
-
-		Path source = cop.getSourcePath();
-
-		FileSystem destinationFS = cop.getDestinatonFileSystem();
-		Path destination = cop.getDestinationPath();
-
-		CopyMode mode = cop.getMode();
-
-		try { 
-			PathAttributes attributes = getAttributes(source);
-
-			if (attributes.isRegular() || attributes.isSymbolicLink()) {
-				copyFile(source, destinationFS, destination, mode, cop);
-				cop.setDone(null);
-				return;
-			}
-
-			if (!attributes.isDirectory()) { 
-				cop.setDone(new InvalidPathException(getAdaptorName(), "Source path is not a file, link or directory: " + source));
-				return;
-			}
-
-			if (!cop.isRecursive()) { 
-				cop.setDone(new InvalidPathException(getAdaptorName(), "Source path is a directory: " + source));
-				return;
-			}
-
-
-			if (!destinationFS.exists(destination)) {
-				destinationFS.createDirectory(destination);
-			}
-
-			Iterable<PathAttributes> listing = list(source, true);
-
-
-			for (PathAttributes p : listing) { 
-
-				if (cop.isCancelled()) { 
-					cop.setDone(new XenonException(getAdaptorName(), "Copy cancelled by user"));
-					return;
-				}
-
-				if (p.isDirectory() && !isDotDot(p.getPath())) {
-
-					Path rel = source.relativize(p.getPath());
-					Path dst = destination.resolve(rel);
-
-					destinationFS.createDirectories(dst);
-				} else if (p.isRegular()) { 
-					bytesToCopy += p.getSize();
-				}
-			}
-
-			cop.setBytesToCopy(bytesToCopy);
-
-			for (PathAttributes p : listing) { 
-
-				if (cop.isCancelled()) { 
-					cop.setDone(new XenonException(getAdaptorName(), "Copy cancelled by user"));
-					return;
-				}
-
-				if (p.isRegular()) { 
-
-					Path rel = source.relativize(p.getPath());
-					Path dst = destination.resolve(rel);
-
-					copyFile(p.getPath(), destinationFS, dst, mode, cop);;
-					bytesCopied += p.getSize();
-					cop.setBytesCopied(bytesCopied);
-				}
-			}
-
-			cop.setDone(null);
-
-		} catch (XenonException e) {
-			cop.setDone(e);
-		}
-	}
-
-	private synchronized CopyOperation dequeue() { 
-
-		if (running != null) {
-			running = null;
-			notifyAll();
-		}
-
-		while (!done && pending.isEmpty()) {
-			try {
-				wait(POLLING_DELAY);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				return null;
-			}
-		}
-
-		if (done) {
-			return null;
-		}
-
-		running = pending.removeFirst();
-		return running;
-	}
-
-
-
-	//	public abstract CopyHandle copy(Path sourcePath, Path destinationPath, CopyOption option, boolean recursive) throws XenonException;
-
-	//	public abstract CopyHandle copy(FileSystem sourceFS, Path sourcePath, Path destinationPath, CopyOption option, boolean recursive) throws XenonException;
-
-	//	public abstract CopyHandle copyRecursive(Path sourcePath, Path destinationPath, CopyOption option) throws XenonException;
-	//	
-	//	public abstract CopyHandle copyRecursive(FileSystem sourceFS, Path sourcePath, Path destinationPath, CopyOption option) throws XenonException;
-	//	
-
-	/**
-	 * Retrieve the status of an copy.
-	 * 
-	 * @param copy
-	 *            the copy for which to retrieve the status.
-	 * 
-	 * @return a {@link CopyStatus} containing the status of the asynchronous copy.
-	 * 
-	 * @throws NoSuchCopyException
-	 *             If the copy is not known.
-	 * @throws XenonException
-	 *             If an I/O error occurred.
-	 */
-	public CopyStatus getStatus(CopyHandle copy) throws XenonException { 
-
-		if (copy == null) {
-			throw new IllegalArgumentException("CopyHandle is null");
-		}
-
-		if (!(copy instanceof CopyOperation)) {
-			throw new NoSuchCopyException(getAdaptorName(), "No such copy!");
-		}
-
-		return ((CopyOperation) copy).getStatus();
-	}
-
-	private synchronized void waitUntilCancelled(String copyID) {
-
-		while (running != null && running.hasID(copyID)) {
-			try {
-				wait(POLLING_DELAY);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
-		}
-	}
-
-	/**
-	 * Cancel a copy operation.
-	 * 
-	 * @param copy
-	 *            the copy operation which to cancel.
-	 *            
-	 * @return a {@link CopyStatus} containing the status of the copy.
-	 * 
-	 * @throws NoSuchCopyException
-	 *             If the copy is not known.
-	 * @throws XenonException
-	 *             If an I/O error occurred.
-	 */
-	public synchronized CopyStatus cancel(CopyHandle copy) throws XenonException { 
-
-		if (copy == null) {
-			throw new IllegalArgumentException("CopyHandle is null");
-		}
-
-		if (!(copy instanceof CopyOperation)) {
-			throw new NoSuchCopyException(getAdaptorName(), "No such copy!");
-		}
-
-		CopyOperation cop = (CopyOperation) copy;
-
-		// If the copy has not yet finished we try to find it
-		if (!cop.isDone()) { 
-			// And try to figure out where it is.
-			String copyID = cop.getUniqueID();
-
-			// Maybe it is running ?
-			if (running != null && running.hasID(copyID)) {
-				// Cancel the copy and wait for it.
-				cop.cancel();
-				waitUntilCancelled(copyID);
-			} else { 
-				// Still pending, so remove it from the queue
-				Iterator<CopyOperation> it = pending.iterator();
-
-				while (it.hasNext()) {
-					CopyOperation c = it.next();
-					if (c.hasID(copyID)) {
-						it.remove();
-						c.setDone(new XenonException(getAdaptorName(), "Copy cancelled by user"));
-						break;
-					}
-				}
-			}
-		} 
-
-		// Finally return the status.
-		return cop.getStatus();
-	}
-
-	/**
-	 * Wait until a copy operation is done or until a timeout expires.
-	 * <p>
-	 * This method will wait until a copy operation is done (either gracefully or by producing an error), or until
-	 * the timeout expires, whichever comes first. If the timeout expires, the copy operation will continue to run.
-	 * </p>
-	 * <p>
-	 * The timeout is in milliseconds and must be &gt;= 0. When timeout is 0, it will be ignored and this method will wait until
-	 * the copy operation is done.  
-	 * </p>
-	 * <p>
-	 * A {@link CopyStatus} is returned that can be used to determine why the call returned.
-	 * </p>
-	 * @param copy
-	 *            a handle for the copy operation 
-	 * @param timeout
-	 *            the maximum time to wait for the copy operation in milliseconds.     
-	 *            
-	 * @return a {@link CopyStatus} containing the status of the copy.
-	 * 
-	 * @throws IllegalArgumentException 
-	 *             If the value of timeout is negative
-	 * @throws NoSuchCopyException
-	 *             If the copy handle is not known.
-	 * @throws XenonException
-	 *             If the status of the copy operation could not be retrieved.
-	 */    
-	public CopyStatus waitUntilDone(CopyHandle copy, long timeout) throws XenonException { 
-
-		if (!(copy instanceof CopyOperation)) {
-			throw new NoSuchCopyException(getAdaptorName(), "No such copy!");
-		}
-
-		return ((CopyOperation) copy).waitUntilDone(timeout);
-	}
 
 	protected void streamCopy(InputStream in, OutputStream out, int buffersize, CopyCallback callback) throws IOException, XenonException {
 
 		byte[] buffer = new byte[buffersize];
-
-		long total = 0;
 
 		int size = in.read(buffer);
 
 		while (size > 0) {
 			out.write(buffer, 0, size);
 
-			total += size;
+			callback.addBytesCopied(size);
 
-			callback.setBytesCopied(total);
-			
-			if (callback.isCancelled()) { 
+			if (callback.isCancelled()) {
 				throw new XenonException(getAdaptorName(), "Copy cancelled by user");
 			}
 
@@ -1099,15 +658,15 @@ public abstract class FileSystem {
 
 	/**
 	 * Copy a symbolic link to another file system (optional operation).
-	 * 
-	 * This is a blocking copy operation. It only returns once the link has been copied 
-	 * or the copy has failed. 
-	 * 
-	 * This operation may be re-implemented by the various implementations of FileSystem. 
-	 * 
+	 *
+	 * This is a blocking copy operation. It only returns once the link has been copied
+	 * or the copy has failed.
+	 *
+	 * This operation may be re-implemented by the various implementations of FileSystem.
+	 *
 	 * This default implementation is based on a creating a new link on the destination filesystem.
-	 * Note that the file the link is referring to is not copied. Only the link itself is copied. 
-	 * 
+	 * Note that the file the link is referring to is not copied. Only the link itself is copied.
+	 *
 	 * @param source
 	 * 		the link to copy.
 	 * @param destinationFS
@@ -1118,53 +677,53 @@ public abstract class FileSystem {
 	 * 		selects what should happen if the destination link already exists
 	 * @param callback
 	 * 		a {@link CopyCallback} used to update the status of the copy, or cancel it while in progress.
-	 * 
-	 * @throws InvalidPathException 
+	 *
+	 * @throws InvalidPathException
 	 * 		if the provide source is not a link.
 	 * @throws NoSuchPathException
 	 * 		if the source link does not exist or the destination parent directory does not exist.
 	 * @throws PathAlreadyExistsException
 	 * 		if the destination link already exists.
 	 * @throws UnsupportedOperationException
-	 * 		if the destination FileSystem does not support symbolic links.            
+	 * 		if the destination FileSystem does not support symbolic links.
 	 * @throws XenonException
 	 *      if the link could not be copied.
-	 */    
+	 */
 	protected void copySymbolicLink(Path source, FileSystem destinationFS, Path destination, CopyMode mode, CopyCallback callback) throws XenonException {
-		
+
 		PathAttributes attributes = getAttributes(source);
 
-		if (!attributes.isSymbolicLink()) { 
+		if (!attributes.isSymbolicLink()) {
 			throw new InvalidPathException(getAdaptorName(), "Source is not a regular file: " + source);
-		} 
+		}
 
 		destinationFS.assertParentDirectoryExists(destination);
 
-		if (destinationFS.exists(destination)) { 
-			switch (mode) { 
-			case CREATE:
-				throw new PathAlreadyExistsException(getAdaptorName(), "Destination path already exists: " + destination);
-			case IGNORE:
-				return;
-			case REPLACE:
-				// continue 
-				break;
+		if (destinationFS.exists(destination)) {
+			switch (mode) {
+				case CREATE:
+					throw new PathAlreadyExistsException(getAdaptorName(), "Destination path already exists: " + destination);
+				case IGNORE:
+					return;
+				case REPLACE:
+					// continue
+					break;
 			}
-		} 
+		}
 
 		Path target = readSymbolicLink(source);
 		destinationFS.createSymbolicLink(destination, target);
 	}
 
 	/**
-	 * Copy a single file to another file system. 
-	 * 
-	 * This is a blocking copy operation. It only returns once the file has been copied 
-	 * or the copy has failed. 
-	 * 
-	 * This operation may be re-implemented by the various implementations of FileSystem. 
+	 * Copy a single file to another file system.
+	 *
+	 * This is a blocking copy operation. It only returns once the file has been copied
+	 * or the copy has failed.
+	 *
+	 * This operation may be re-implemented by the various implementations of FileSystem.
 	 * This default implementation is based on a simple stream based copy.
-	 * 
+	 *
 	 * @param source
 	 * 		the file to copy.
 	 * @param destinationFS
@@ -1175,8 +734,8 @@ public abstract class FileSystem {
 	 * 		selects what should happen if the destination file already exists
 	 * @param callback
 	 * 		a {@link CopyCallback} used to update the status of the copy, or cancel it while in progress.
-	 * 
-	 * @throws InvalidPathException 
+	 *
+	 * @throws InvalidPathException
 	 * 		if the provide source is not a regular file.
 	 * @throws NoSuchPathException
 	 * 		if the source file does not exist or the destination parent directory does not exist.
@@ -1184,103 +743,185 @@ public abstract class FileSystem {
 	 * 		if the destination file already exists.
 	 * @throws XenonException
 	 *      If the file could not be copied.
-	 */    
+	 */
 	protected void copyFile(Path source, FileSystem destinationFS, Path destination, CopyMode mode, CopyCallback callback) throws XenonException {
 
 		PathAttributes attributes = getAttributes(source);
 
-		if (!attributes.isRegular()) { 
+		if (!attributes.isRegular()) {
 			throw new InvalidPathException(getAdaptorName(), "Source is not a regular file: " + source);
-		} 
+		}
 
 		destinationFS.assertParentDirectoryExists(destination);
 
-		if (destinationFS.exists(destination)) { 
-			switch (mode) { 
-			case CREATE:
-				throw new PathAlreadyExistsException(getAdaptorName(), "Destination path already exists: " + destination);
-			case IGNORE:
-				return;
-			case REPLACE:
-				// continue 
-				break;
+		if (destinationFS.exists(destination)) {
+			switch (mode) {
+				case CREATE:
+					throw new PathAlreadyExistsException(getAdaptorName(), "Destination path already exists: " + destination);
+				case IGNORE:
+					return;
+				case REPLACE:
+					// continue
+					break;
 			}
-		} 
-		
-		callback.setBytesToCopy(attributes.getSize());
-	
-		if (callback.isCancelled()) { 
+		}
+
+		if (callback.isCancelled()) {
 			throw new XenonException(getAdaptorName(), "Copy cancelled by user");
 		}
 
-		try (InputStream in = readFromFile(source); 
-				OutputStream out = destinationFS.writeToFile(destination, attributes.getSize())) { 
+		try (InputStream in = readFromFile(source);
+			 OutputStream out = destinationFS.writeToFile(destination, attributes.getSize())) {
 			streamCopy(in, out, BUFFER_SIZE, callback);
 		} catch (Exception e) {
-			throw new XenonException(getAdaptorName(), "Stream copy failed", e);	
+			throw new XenonException(getAdaptorName(), "Stream copy failed", e);
 		}
 	}
 
+	/**
+	 * Perform a (possibly) recursive copy from a path on this filesystem to a path on <code>destinationFS</code>.
+	 *
+	 * @param source
+	 * 		the source path on this FileSystem.
+	 * @param destinationFS
+	 * 		the destination FileSystem.
+	 * @param destination
+	 * 		the destination path.
+	 * @param mode
+	 * 		the copy mode that determines how to react if the destination already exists.
+	 * @param recursive
+	 * 		should the copy be performed recursively ?
+	 * @param callback
+	 * 		a {@link CopyCallback} used to return status information on the copy.
+	 * @throws XenonException
+	 * 		if an error occurred.
+	 */
+	protected void performCopy(Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive, CopyCallback callback) throws XenonException {
+
+		long bytesToCopy = 0;
+
+		PathAttributes attributes = getAttributes(source);
+
+		if (attributes.isRegular() || attributes.isSymbolicLink()) {
+			copyFile(source, destinationFS, destination, mode, callback);
+			return;
+		}
+
+		if (attributes.isSymbolicLink()) {
+			copySymbolicLink(source, destinationFS, destination, mode, callback);
+			return;
+		}
+
+		if (!attributes.isDirectory()) {
+			throw new InvalidPathException(getAdaptorName(), "Source path is not a file, link or directory: " + source);
+		}
+
+		if (!recursive) {
+			throw new InvalidPathException(getAdaptorName(), "Source path is a directory: " + source);
+		}
+
+		if (!destinationFS.exists(destination)) {
+			destinationFS.createDirectory(destination);
+		}
+
+		Iterable<PathAttributes> listing = list(source, true);
+
+		for (PathAttributes p : listing) {
+
+			if (callback.isCancelled()) {
+				throw new XenonException(getAdaptorName(), "Copy cancelled by user");
+			}
+
+			if (p.isDirectory() && !isDotDot(p.getPath())) {
+
+				Path rel = source.relativize(p.getPath());
+				Path dst = destination.resolve(rel);
+
+				destinationFS.createDirectories(dst);
+			} else if (p.isRegular()) {
+				bytesToCopy += p.getSize();
+			}
+		}
+
+		callback.start(bytesToCopy);
+
+		for (PathAttributes p : listing) {
+
+			if (callback.isCancelled()) {
+				throw new XenonException(getAdaptorName(), "Copy cancelled by user");
+			}
+
+			if (p.isRegular()) {
+
+				Path rel = source.relativize(p.getPath());
+				Path dst = destination.resolve(rel);
+
+				copyFile(p.getPath(), destinationFS, dst, mode, callback);;
+				//bytesCopied += p.getSize();
+				//callback.setBytesCopied(bytesCopied);
+			}
+		}
+	}
 
 	/**
 	 * Delete a file. If the file does not exist, an exception will be thrown.
-	 * 
+	 *
 	 * This operation must be implemented by the various implementations of FileSystem.
-	 * 
+	 *
 	 * @param file
 	 * 		the file to remove
-	 * @throws InvalidPathException 
-	 * 		if the provided path is not a file.
+	 * @throws InvalidPathException
+	 * 		if the provide path is not a file.
 	 * @throws NoSuchPathException
 	 * 		if the provides file does not exist.
 	 * @throws XenonException
 	 *      If the file could not be removed.
-	 */    
+	 */
 	protected abstract void deleteFile(Path file) throws XenonException;
 
 	/**
 	 * Delete an empty directory. If the directory is not empty, an exception will be thrown.
-	 * 
-	 * This operation can only delete empty directories (analogous to <code>rmdir</code> in Linux). 
-	 * 
+	 *
+	 * This operation can only delete empty directories (analogous to <code>rmdir</code> in Linux).
+	 *
 	 * This operation must be implemented by the various implementations of FileSystem.
-	 * 
+	 *
 	 * @param path
 	 * 		the directory to remove
 	 * @throws DirectoryNotEmptyException
 	 * 		if the directory was not empty.
-	 * @throws InvalidPathException 
+	 * @throws InvalidPathException
 	 * 		if the provide path is not a directory.
 	 * @throws NoSuchPathException
 	 * 		if the provides path does not exist.
 	 * @throws XenonException
 	 *      If the directory could not be removed.
-	 */    
+	 */
 	protected abstract void deleteDirectory(Path path) throws XenonException;
 
 	/**
-	 * Return the list of entries in a directory. 
-	 * 
+	 * Return the list of entries in a directory.
+	 *
 	 * This operation is non-recursive; any subdirectories in <code>dir</code> will be returned as
-	 * part of the list, but they will not be listed themselves.   
-	 * 
+	 * part of the list, but they will not be listed themselves.
+	 *
 	 * This operation must be implemented by the various implementations of FileSystem.
-	 * 
+	 *
 	 * @param dir
 	 * 		the directory to list
 	 * @return
-	 * 		a list of all entries in <code>dir</code>
+	 * 		a {@link Iterable} that iterates over all entries in <code>dir</code>
 	 * @throws XenonException
 	 *      If the list could not be retrieved.
-	 */    
+	 */
 	protected abstract Iterable<PathAttributes> listDirectory(Path dir) throws XenonException;
 
 	/**
-	 * Returns an (optionally recursive) listing of the entries in a directory <code>dir</code>. 
-	 * 
-	 * This is a generic implementation which relies on <code>listDirectory</code> to provide 
-	 * listings of individal directories.
-	 * 
+	 * Returns an (optionally recursive) listing of the entries in a directory <code>dir</code>.
+	 *
+	 * This is a generic implementation which relies on <code>listDirectory</code> to provide
+	 * listings of individual directories.
+	 *
 	 * @param dir
 	 * 		the directory to list.
 	 * @param list
@@ -1293,32 +934,250 @@ public abstract class FileSystem {
 	protected void list(Path dir, ArrayList<PathAttributes> list, boolean recursive) throws XenonException {
 
 		Iterable<PathAttributes> tmp = listDirectory(dir);
-		//list.addAll(tmp);
 
-		if (recursive) { 
+		for (PathAttributes p : tmp) {
+			list.add(p);
+		}
+
+		if (recursive) {
 			for (PathAttributes current : tmp) {
-				// traverse subdirs provided they are not "." or "..". 
-				if (current.isDirectory() && !isDotDot(current.getPath())) { 
+				// traverse subdirs provided they are not "." or "..".
+				if (current.isDirectory() && !isDotDot(current.getPath())) {
 					list(dir.resolve(current.getPath().getFileNameAsString()), list, recursive);
 				}
 			}
 		}
 	}
 
+
+	/**
+	 * Copy an existing source path to a target path on a different file system.
+	 *
+	 * If the source path is a file, it will be copied to the destination file on the target file system.
+	 *
+	 * If the source path is a directory, it will only be copied if <code>recursive</code> is set to <code>true</code>.
+	 * Otherwise, an exception will be thrown. When copying recursively, the directory and its content (both files
+	 * and subdirectories with content), will be copied to <code>destination</code>.
+	 *
+	 * @param source
+	 *            the source path (on this filesystem) to copy from.
+	 * @param destinationFS
+	 *            the destination filesystem to copy to.
+	 * @param destination
+	 *            the destination path (on the destination filesystem) to copy to.
+	 * @param mode
+	 *            how to react if the destination already exists.
+	 * @param recursive
+	 *            if the copy should be recursive.
+	 *
+	 * @return a {@link String} that identifies this copy and be used to inspect its progress.
+	 *
+	 * @throws XenonException
+	 *             If an I/O error occurred.
+	 */
+	public synchronized String copy(Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive) throws XenonException {
+
+		if (source == null) {
+			throw new IllegalArgumentException("Source path is null");
+		}
+
+		if (destinationFS == null) {
+			throw new IllegalArgumentException("Destination filesystem is null");
+		}
+
+		if (destination == null) {
+			throw new IllegalArgumentException("Destination path is null");
+		}
+
+		String ID = getNextCopyID();
+
+		CopyCallback callback = new CopyCallback();
+
+		Future<Void> future = pool.submit(new Callable<Void>() {
+			@Override
+			public Void call() throws Exception {
+
+				if (Thread.currentThread().isInterrupted()) {
+					throw new XenonException(getAdaptorName(), "Copy cancelled by user");
+				}
+
+				performCopy(source, destinationFS, destination, mode, recursive, callback);
+				return null;
+			}
+		}) ;
+
+		pendingCopies.put(ID, new PendingCopy(future, callback));
+		return ID;
+	}
+
+	/**
+	 * Cancel a copy operation.
+	 *
+	 * @param copyIdentifier
+	 *            the identifier of the copy operation which to cancel.
+	 *
+	 * @return a {@link CopyStatus} containing the status of the copy.
+	 *
+	 * @throws NoSuchCopyException
+	 *             If the copy is not known.
+	 * @throws XenonException
+	 *             If an I/O error occurred.
+	 */
+	public synchronized CopyStatus cancel(String copyIdentifier) throws XenonException {
+
+		if (copyIdentifier == null) {
+			throw new IllegalArgumentException("Copy identifier may not be null");
+		}
+
+		PendingCopy copy = pendingCopies.remove(copyIdentifier);
+
+		if (copy == null) {
+			throw new NoSuchCopyException(getAdaptorName(), "Copy not found: " + copyIdentifier);
+		}
+
+		copy.callback.cancel();
+		copy.future.cancel(true);
+
+		Throwable ex = null;
+		String state = "DONE";
+
+		try {
+			copy.future.get();
+		} catch (ExecutionException ee) {
+			ex = ee.getCause();
+			state = "FAILED";
+		} catch (CancellationException | InterruptedException ec) {
+			ex = new XenonException(getAdaptorName(), "Copy cancelled by user");
+			state = "FAILED";
+		}
+
+		return new CopyStatus(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
+	}
+
+	/**
+	 * Wait until a copy operation is done or until a timeout expires.
+	 * <p>
+	 * This method will wait until a copy operation is done (either gracefully or by producing an error), or until
+	 * the timeout expires, whichever comes first. If the timeout expires, the copy operation will continue to run.
+	 * </p>
+	 * <p>
+	 * The timeout is in milliseconds and must be &gt;= 0. When timeout is 0, it will be ignored and this method will wait until
+	 * the copy operation is done.
+	 * </p>
+	 * <p>
+	 * A {@link CopyStatus} is returned that can be used to determine why the call returned.
+	 * </p>
+	 * @param copyIdentifier
+	 *            the identifier of the copy operation to wait for.
+	 * @param timeout
+	 *            the maximum time to wait for the copy operation in milliseconds.
+	 *
+	 * @return a {@link CopyStatus} containing the status of the copy.
+	 *
+	 * @throws IllegalArgumentException
+	 *             If the value of timeout is negative
+	 * @throws NoSuchCopyException
+	 *             If the copy handle is not known.
+	 * @throws XenonException
+	 *             If the status of the copy operation could not be retrieved.
+	 */
+	public CopyStatus waitUntilDone(String copyIdentifier, long timeout) throws XenonException {
+
+		if (copyIdentifier == null) {
+			throw new IllegalArgumentException("Copy identifier may not be null");
+		}
+
+		PendingCopy copy = pendingCopies.get(copyIdentifier);
+
+		if (copy == null) {
+			throw new NoSuchCopyException(getAdaptorName(), "Copy not found: " + copyIdentifier);
+		}
+
+		Throwable ex = null;
+		String state = "DONE";
+
+		try {
+			copy.future.get(timeout, TimeUnit.MILLISECONDS);
+		} catch (TimeoutException e) {
+			state = "RUNNING";
+		} catch (ExecutionException ee) {
+			ex = ee.getCause();
+			state = "FAILED";
+		} catch (CancellationException | InterruptedException ec) {
+			ex = new XenonException(getAdaptorName(), "Copy cancelled by user");
+			state = "FAILED";
+		}
+
+		if (copy.future.isDone()) {
+			pendingCopies.remove(copyIdentifier);
+		}
+
+		return new CopyStatus(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
+	}
+
+	/**
+	 * Retrieve the status of an copy.
+	 *
+	 * @param copyIdentifier
+	 *            the identifier of the copy for which to retrieve the status.
+	 *
+	 * @return a {@link CopyStatus} containing the status of the asynchronous copy.
+	 *
+	 * @throws NoSuchCopyException
+	 *             If the copy is not known.
+	 * @throws XenonException
+	 *             If an I/O error occurred.
+	 */
+	public CopyStatus getStatus(String copyIdentifier) throws XenonException {
+
+		if (copyIdentifier == null) {
+			throw new IllegalArgumentException("Copy identifier may not be null");
+		}
+
+		PendingCopy copy = pendingCopies.get(copyIdentifier);
+
+		if (copy == null) {
+			throw new NoSuchCopyException(getAdaptorName(), "Copy not found: " + copyIdentifier);
+		}
+
+		Throwable ex = null;
+		String state = "PENDING";
+
+		if (copy.future.isDone()) {
+			pendingCopies.remove(copyIdentifier);
+
+			// We have either finished, crashed, or cancelled
+			try {
+				copy.future.get();
+				state = "DONE";
+			} catch (ExecutionException ee) {
+				ex = ee.getCause();
+				state = "FAILED";
+			} catch (CancellationException | InterruptedException ec) {
+				ex = new XenonException(getAdaptorName(), "Copy cancelled by user");
+				state = "FAILED";
+			}
+		} else if (copy.callback.isStarted()) {
+			state = "RUNNING";
+		}
+
+		return new CopyStatus(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
+	}
+
 	protected void assertPathExists(Path path) throws XenonException {
 
-		if (path == null) { 
+		if (path == null) {
 			throw new IllegalArgumentException("Path is null");
 		}
 
-		if (!exists(path)) { 
+		if (!exists(path)) {
 			throw new NoSuchPathException(getAdaptorName(), "Path does not exist: " + path);
-		}   	
+		}
 	}
 
 	protected void assertPathNotExists(Path path) throws XenonException {
 
-		if (path == null) { 
+		if (path == null) {
 			throw new IllegalArgumentException("Path is null");
 		}
 
@@ -1329,45 +1188,45 @@ public abstract class FileSystem {
 
 	protected void assertPathIsFile(Path path) throws XenonException {
 
-		if (path == null) { 
+		if (path == null) {
 			throw new IllegalArgumentException("Path is null");
 		}
 
-		if (!getAttributes(path).isRegular()) { 
+		if (!getAttributes(path).isRegular()) {
 			throw new InvalidPathException(getAdaptorName(), "Path is not a file: " + path);
 		}
 	}
 
 	protected void assertPathIsDirectory(Path path) throws XenonException {
 
-		if (path == null) { 
+		if (path == null) {
 			throw new IllegalArgumentException("Path is null");
 		}
 
-		if (!getAttributes(path).isDirectory()) { 
+		if (!getAttributes(path).isDirectory()) {
 			throw new InvalidPathException(getAdaptorName(), "Path is not a directory: " + path);
 		}
 	}
 
-	protected void assertFileExists(Path file) throws XenonException { 
+	protected void assertFileExists(Path file) throws XenonException {
 		assertPathExists(file);
 		assertPathIsFile(file);
 	}
 
-	protected void assertDirectoryExists(Path dir) throws XenonException { 
+	protected void assertDirectoryExists(Path dir) throws XenonException {
 		assertPathExists(dir);
 		assertPathIsDirectory(dir);
 	}
 
 	protected void assertParentDirectoryExists(Path path) throws XenonException {
 
-		if (path == null) { 
+		if (path == null) {
 			throw new IllegalArgumentException("Path is null");
 		}
 
 		Path parent = path.getParent();
 
-		if (parent == null) { 
+		if (parent == null) {
 			throw new InvalidPathException(getAdaptorName(), "Parent directory does not exist: " + path);
 		}
 
@@ -1376,11 +1235,11 @@ public abstract class FileSystem {
 
 	protected boolean areSamePaths(Path source, Path target) {
 
-		if (source == null) { 
+		if (source == null) {
 			throw new IllegalArgumentException("Source is null");
 		}
 
-		if (target == null) { 
+		if (target == null) {
 			throw new IllegalArgumentException("Target is null");
 		}
 
@@ -1391,7 +1250,7 @@ public abstract class FileSystem {
 
 	protected boolean isDotDot(Path path) {
 
-		if (path == null) { 
+		if (path == null) {
 			throw new IllegalArgumentException("Path is null");
 		}
 
@@ -1414,5 +1273,5 @@ public abstract class FileSystem {
 			return false;
 
 		return uniqueID.equals(((FileSystem)obj).uniqueID);
-	}    
+	}
 }

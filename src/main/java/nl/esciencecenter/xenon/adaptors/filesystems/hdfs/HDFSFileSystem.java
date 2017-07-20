@@ -36,6 +36,7 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
 
     @Override
     public void close() throws XenonException {
+        checkClosed();
         try {
             fs.close();
             closed = false;
@@ -49,9 +50,8 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
         return !closed;
     }
 
-
     @Override
-    public void move(Path source, Path target) throws XenonException {
+    public void rename(Path source, Path target) throws XenonException {
         checkClosed();
         try {
             if (!exists(source)){
@@ -65,6 +65,7 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
             throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
         }
     }
+
 
 
 

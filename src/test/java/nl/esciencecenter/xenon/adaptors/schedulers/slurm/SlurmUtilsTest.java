@@ -33,11 +33,9 @@ import org.junit.runners.MethodSorters;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
-import nl.esciencecenter.xenon.adaptors.schedulers.MockScriptingJob;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.JobHandle;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.MockScheduler;
 import nl.esciencecenter.xenon.schedulers.QueueStatus;
@@ -101,10 +99,9 @@ public class SlurmUtilsTest {
 
 		Map<String, Map<String, String>> input = new HashMap<>();
 		input.put(jobID, jobInfo);
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, job);
+		JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, jobID);
 
-		assertEquals(job, result.getJob());
+		assertEquals(jobID, result.getJobIdentifier());
 		assertEquals("COMPLETED", result.getState());
 		assertEquals(new Integer(5), result.getExitCode());
 		assertFalse(result.hasException());
@@ -123,10 +120,9 @@ public class SlurmUtilsTest {
 
 		Map<String, Map<String, String>> input = new HashMap<>();
 		input.put(jobID, jobInfo);
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, job);
+		JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, jobID);
 
-		assertEquals(job, result.getJob());
+		assertEquals(jobID, result.getJobIdentifier());
 		assertEquals("RUNNING", result.getState());
 		assertEquals(new Integer(0), result.getExitCode());
 		assertFalse(result.hasException());
@@ -145,10 +141,9 @@ public class SlurmUtilsTest {
 
 		Map<String, Map<String, String>> input = new HashMap<>();
 		input.put(jobID, jobInfo);
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, job);
+		JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, jobID);
 
-		assertEquals(job, result.getJob());
+		assertEquals(jobID, result.getJobIdentifier());
 		assertEquals("CANCELLED", result.getState());
 		assertEquals(new Integer(0), result.getExitCode());
 		assertTrue(result.hasException());
@@ -168,10 +163,9 @@ public class SlurmUtilsTest {
 
 		Map<String, Map<String, String>> input = new HashMap<>();
 		input.put(jobID, jobInfo);
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, job);
+		JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, jobID);
 
-		assertEquals(job, result.getJob());
+		assertEquals(jobID, result.getJobIdentifier());
 		assertEquals("FAILED", result.getState());
 		assertEquals(new Integer(11), result.getExitCode());
 		assertFalse(result.hasException());
@@ -190,10 +184,9 @@ public class SlurmUtilsTest {
 
 		Map<String, Map<String, String>> input = new HashMap<>();
 		input.put(jobID, jobInfo);
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, job);
+		JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, jobID);
 
-		assertEquals(job, result.getJob());
+		assertEquals(jobID, result.getJobIdentifier());
 		assertEquals("FAILED", result.getState());
 		assertEquals(new Integer(0), result.getExitCode());
 		assertTrue(result.hasException());
@@ -208,8 +201,7 @@ public class SlurmUtilsTest {
 	public void test02f_getJobStatusFromSacctInfo_JobNotInMap_NullReturned() throws XenonException {
 		String jobID = "555";
 		Map<String, Map<String, String>> input = new HashMap<>();
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, job);
+		JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, jobID);
 
 		assertNull(result);
 	}
@@ -223,9 +215,7 @@ public class SlurmUtilsTest {
 		Map<String, Map<String, String>> input = new HashMap<>();
 		input.put(jobID, jobInfo);
 
-		JobHandle job = new MockScriptingJob(jobID);
-
-		SlurmUtils.getJobStatusFromSacctInfo(input, job);
+		SlurmUtils.getJobStatusFromSacctInfo(input, jobID);
 	}
 
 	@Test
@@ -237,10 +227,9 @@ public class SlurmUtilsTest {
 		jobInfo.put("ExitCode", "5:0");
 		jobInfo.put("Reason", "None");
 
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, job);
+		JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
 
-		assertEquals(job, result.getJob());
+		assertEquals(jobID, result.getJobIdentifier());
 		assertEquals("COMPLETED", result.getState());
 		assertEquals(new Integer(5), result.getExitCode());
 		assertFalse(result.hasException());
@@ -258,10 +247,9 @@ public class SlurmUtilsTest {
 		jobInfo.put("ExitCode", "0:0");
 		jobInfo.put("Reason", "None");
 
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, job);
+		JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
 
-		assertEquals(job, result.getJob());
+		assertEquals(jobID, result.getJobIdentifier());
 		assertEquals("RUNNING", result.getState());
 		assertEquals(new Integer(0), result.getExitCode());
 		assertFalse(result.hasException());
@@ -279,10 +267,9 @@ public class SlurmUtilsTest {
 		jobInfo.put("ExitCode", "0:0");
 		jobInfo.put("Reason", "None");
 
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, job);
+		JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
 
-		assertEquals(job, result.getJob());
+		assertEquals(jobID, result.getJobIdentifier());
 		assertEquals("CANCELLED", result.getState());
 		assertEquals(new Integer(0), result.getExitCode());
 		assertTrue(result.hasException());
@@ -301,10 +288,9 @@ public class SlurmUtilsTest {
 		jobInfo.put("ExitCode", "11:0");
 		jobInfo.put("Reason", "NonZeroExitCode");
 
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, job);
+		JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
 
-		assertEquals(job, result.getJob());
+		assertEquals(jobID, result.getJobIdentifier());
 		assertEquals("FAILED", result.getState());
 		assertEquals(new Integer(11), result.getExitCode());
 		assertFalse(result.hasException());
@@ -322,10 +308,9 @@ public class SlurmUtilsTest {
 		jobInfo.put("ExitCode", "4:0");
 		jobInfo.put("Reason", "SomethingWentWrongNoIdea");
 
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, job);
+		JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
 
-		assertEquals(job, result.getJob());
+		assertEquals(jobID, result.getJobIdentifier());
 		assertEquals("FAILED", result.getState());
 		assertEquals(new Integer(4), result.getExitCode());
 		assertTrue(result.hasException());
@@ -345,10 +330,9 @@ public class SlurmUtilsTest {
 		jobInfo.put("ExitCode", "4:0");
 		jobInfo.put("Reason", "None");
 
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, job);
+		JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
 
-		assertEquals(job, result.getJob());
+		assertEquals(jobID, result.getJobIdentifier());
 		assertEquals("FAILED", result.getState());
 		assertEquals(new Integer(4), result.getExitCode());
 		assertTrue(result.hasException());
@@ -362,8 +346,8 @@ public class SlurmUtilsTest {
 	@Test
 	public void test03g_getJobStatusFromScontrolInfo_NullInput_NullReturned() throws XenonException {
 		String jobID = "555";
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(null, job);
+		
+		JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(null, jobID);
 
 		assertNull(result);
 	}
@@ -374,9 +358,7 @@ public class SlurmUtilsTest {
 		//empty job info
 		Map<String, String> jobInfo = new HashMap<>();
 
-		JobHandle job = new MockScriptingJob(jobID);
-
-		SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, job);
+		SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
 	}
 
 	@Test
@@ -388,10 +370,9 @@ public class SlurmUtilsTest {
 
 		Map<String, Map<String, String>> input = new HashMap<>();
 		input.put(jobID, jobInfo);
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromSqueueInfo(input, job);
+		JobStatus result = SlurmUtils.getJobStatusFromSqueueInfo(input, jobID);
 
-		assertEquals(job, result.getJob());
+		assertEquals(jobID, result.getJobIdentifier());
 		assertEquals("PENDING", result.getState());
 		assertNull(result.getExitCode());
 		assertFalse(result.hasException());
@@ -409,10 +390,9 @@ public class SlurmUtilsTest {
 
 		Map<String, Map<String, String>> input = new HashMap<>();
 		input.put(jobID, jobInfo);
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromSqueueInfo(input, job);
+		JobStatus result = SlurmUtils.getJobStatusFromSqueueInfo(input, jobID);
 
-		assertEquals(job, result.getJob());
+		assertEquals(jobID, result.getJobIdentifier());
 		assertEquals("RUNNING", result.getState());
 		assertNull(result.getExitCode());
 		assertFalse(result.hasException());
@@ -425,8 +405,7 @@ public class SlurmUtilsTest {
 	public void test04c_getJobStatusFromSqueueInfo_JobNotInMap_NullReturned() throws XenonException {
 		String jobID = "555";
 		Map<String, Map<String, String>> input = new HashMap<>();
-		JobHandle job = new MockScriptingJob(jobID);
-		JobStatus result = SlurmUtils.getJobStatusFromSqueueInfo(input, job);
+		JobStatus result = SlurmUtils.getJobStatusFromSqueueInfo(input, jobID);
 
 		assertNull(result);
 	}
@@ -441,9 +420,7 @@ public class SlurmUtilsTest {
 		Map<String, Map<String, String>> input = new HashMap<>();
 		input.put(jobID, jobInfo);
 
-		JobHandle job = new MockScriptingJob(jobID);
-
-		SlurmUtils.getJobStatusFromSqueueInfo(input, job);
+		SlurmUtils.getJobStatusFromSqueueInfo(input, jobID);
 	}
 
 	@Test
@@ -514,9 +491,7 @@ public class SlurmUtilsTest {
 		description.setProcessesPerNode(1);
 		description.setMaxTime(1);
 		//slurm specific info
-		description.setInteractive(false);
-
-		SlurmUtils.verifyJobDescription(description);
+		SlurmUtils.verifyJobDescription(description, false);
 	}
 
 	@Test
@@ -530,9 +505,8 @@ public class SlurmUtilsTest {
 		description.setMaxTime(1);
 		//slurm specific info
 		description.addJobOption(SlurmUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
-		description.setInteractive(false);
-
-		SlurmUtils.verifyJobDescription(description);
+		
+		SlurmUtils.verifyJobDescription(description, false);
 	}
 
 	@Test
@@ -541,15 +515,14 @@ public class SlurmUtilsTest {
 
 		//set a job option
 		description.addJobOption(SlurmUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
-		description.setInteractive(false);
-
+		
 		//All these settings are wrong. This should not lead to an error
 		description.setExecutable(null);
 		description.setNodeCount(0);
 		description.setProcessesPerNode(0);
 		description.setMaxTime(0);
 
-		SlurmUtils.verifyJobDescription(description);
+		SlurmUtils.verifyJobDescription(description, false);
 	}
 
 	@Test(expected = InvalidJobDescriptionException.class)
@@ -558,9 +531,8 @@ public class SlurmUtilsTest {
 
 		//set a job option
 		description.addJobOption("wrong.setting", "wrong.value");
-		description.setInteractive(false);
 
-		SlurmUtils.verifyJobDescription(description);
+		SlurmUtils.verifyJobDescription(description, false);
 	}
 
 	//    @Test(expected = InvalidJobDescriptionException.class)
@@ -580,7 +552,7 @@ public class SlurmUtilsTest {
 		description.setExecutable("bin/bla");
 		description.setMaxTime(0);
 
-		SlurmUtils.verifyJobDescription(description);
+		SlurmUtils.verifyJobDescription(description, false);
 	}
 
 	@Test(expected = InvalidJobDescriptionException.class)
@@ -594,9 +566,8 @@ public class SlurmUtilsTest {
 		description.setMaxTime(1);
 		//slurm specific info
 		description.addJobOption(SlurmUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
-		description.setInteractive(true);
-
-		SlurmUtils.verifyJobDescription(description);
+	
+		SlurmUtils.verifyJobDescription(description, true);
 	}
 
 	@Test(expected = InvalidJobDescriptionException.class)
@@ -609,10 +580,9 @@ public class SlurmUtilsTest {
 		description.setProcessesPerNode(1);
 		description.setMaxTime(1);
 		//slurm specific info
-		description.setInteractive(true);
 		description.setStartSingleProcess(true);
 
-		SlurmUtils.verifyJobDescription(description);
+		SlurmUtils.verifyJobDescription(description, true);
 	}
 
 	@Test(expected = InvalidJobDescriptionException.class)
@@ -625,10 +595,9 @@ public class SlurmUtilsTest {
 		description.setProcessesPerNode(1);
 		description.setMaxTime(1);
 		//slurm specific info
-		description.setInteractive(true);
 		description.setStdin("stdin.txt");
 
-		SlurmUtils.verifyJobDescription(description);
+		SlurmUtils.verifyJobDescription(description, true);
 	}
 
 	@Test
@@ -641,10 +610,9 @@ public class SlurmUtilsTest {
 		description.setProcessesPerNode(1);
 		description.setMaxTime(1);
 		//slurm specific info
-		description.setInteractive(true);
 		description.setStdout("stdout.txt");
 
-		SlurmUtils.verifyJobDescription(description);
+		SlurmUtils.verifyJobDescription(description, true);
 	}
 
 	@Test
@@ -657,10 +625,9 @@ public class SlurmUtilsTest {
 		description.setProcessesPerNode(1);
 		description.setMaxTime(1);
 		//slurm specific info
-		description.setInteractive(true);
 		description.setStderr("stderr.txt");
 
-		SlurmUtils.verifyJobDescription(description);
+		SlurmUtils.verifyJobDescription(description, true);
 	}
 
 	@Test(expected = InvalidJobDescriptionException.class)
@@ -673,10 +640,9 @@ public class SlurmUtilsTest {
 		description.setProcessesPerNode(1);
 		description.setMaxTime(1);
 		//slurm specific info
-		description.setInteractive(true);
 		description.setStdout("foobar.txt");
 
-		SlurmUtils.verifyJobDescription(description);
+		SlurmUtils.verifyJobDescription(description, true);
 	}
 
 	@Test(expected = InvalidJobDescriptionException.class)
@@ -689,10 +655,9 @@ public class SlurmUtilsTest {
 		description.setProcessesPerNode(1);
 		description.setMaxTime(1);
 		//slurm specific info
-		description.setInteractive(true);
 		description.setStderr("foobar.txt");
 
-		SlurmUtils.verifyJobDescription(description);
+		SlurmUtils.verifyJobDescription(description, true);
 	}
 
 	@Test(expected = InvalidJobDescriptionException.class)
@@ -705,14 +670,13 @@ public class SlurmUtilsTest {
 		description.setProcessesPerNode(1);
 		description.setMaxTime(1);
 		//slurm specific info
-		description.setInteractive(true);
 
 		HashMap<String, String> env = new HashMap<>();
 		env.put("key", "value");
 
 		description.setEnvironment(env);
 
-		SlurmUtils.verifyJobDescription(description);
+		SlurmUtils.verifyJobDescription(description, true);
 	}
 
 	@Test
@@ -877,7 +841,7 @@ public class SlurmUtilsTest {
 	@Test
 	public void test_identifiersAsCSList() {
 		
-		MockScriptingJob [] array = new MockScriptingJob [] { new MockScriptingJob("AAP"), new MockScriptingJob("NOOT") }; 
+		String [] array = new String [] { "AAP", "NOOT" }; 
 		
 		String result = SlurmUtils.identifiersAsCSList(array);
 		
@@ -887,7 +851,8 @@ public class SlurmUtilsTest {
 	@Test
 	public void test_identifiersAsCSListWithNull() {
 		
-		MockScriptingJob [] array = new MockScriptingJob [] { new MockScriptingJob("AAP"), null, new MockScriptingJob("NOOT") }; 
+
+		String [] array = new String [] { "AAP", "NOOT" }; 
 		
 		String result = SlurmUtils.identifiersAsCSList(array);
 		

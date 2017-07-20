@@ -81,8 +81,12 @@ public class LocalFileAdaptor extends FileAdaptor {
 		
 		checkFileLocation(location);
 		
-		if (location == null){ 
-			location = "/";
+		if (location == null){
+		    if (LocalUtil.isWindows()) {
+		        location = "c:";
+            } else {
+                location = "/";
+            }
 		}
 		
 		LocalUtil.checkCredential(ADAPTOR_NAME, credential);

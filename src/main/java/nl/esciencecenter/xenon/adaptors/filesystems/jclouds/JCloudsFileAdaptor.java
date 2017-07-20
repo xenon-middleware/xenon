@@ -1,24 +1,24 @@
 package nl.esciencecenter.xenon.adaptors.filesystems.jclouds;
 
-import nl.esciencecenter.xenon.InvalidCredentialException;
-import nl.esciencecenter.xenon.InvalidLocationException;
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonPropertyDescription;
+        import nl.esciencecenter.xenon.InvalidCredentialException;
+        import nl.esciencecenter.xenon.InvalidLocationException;
+        import nl.esciencecenter.xenon.XenonException;
+        import nl.esciencecenter.xenon.XenonPropertyDescription;
 
-import nl.esciencecenter.xenon.adaptors.XenonProperties;
+        import nl.esciencecenter.xenon.adaptors.XenonProperties;
 
-import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
-import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.credentials.PasswordCredential;
-import nl.esciencecenter.xenon.filesystems.FileSystem;
-import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
-import org.jclouds.ContextBuilder;
-import org.jclouds.blobstore.BlobStoreContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+        import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
+        import nl.esciencecenter.xenon.credentials.Credential;
+        import nl.esciencecenter.xenon.credentials.PasswordCredential;
+        import nl.esciencecenter.xenon.filesystems.FileSystem;
+        import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
+        import org.jclouds.ContextBuilder;
+        import org.jclouds.blobstore.BlobStoreContext;
+        import org.slf4j.Logger;
+        import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+        import java.util.HashMap;
+        import java.util.Map;
 
 /**
  * Created by atze on 29-6-17.

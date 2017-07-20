@@ -1,18 +1,18 @@
 #!/bin/bash
 
-if [ -d xenon_test ]
+if [ -d filesystem-test-fixture ]
 then
 	exit 0
 fi
 
-mkdir -p $PWD/xenon_test/links
-echo "Hello World" > $PWD/xenon_test/links/file0
-touch $PWD/xenon_test/links/file1
+mkdir -p $PWD/filesystem-test-fixture/links
+echo "Hello World" > $PWD/filesystem-test-fixture/links/file0
+touch $PWD/filesystem-test-fixture/links/file1
 
-ln -s $PWD/xenon_test/links/file0 $PWD/xenon_test/links/link0
-ln -s $PWD/xenon_test/links/file1 $PWD/xenon_test/links/link1
-ln -s $PWD/xenon_test/links/file2 $PWD/xenon_test/links/link2
-ln -s $PWD/xenon_test/links/link0 $PWD/xenon_test/links/link3
-ln -s $PWD/xenon_test/links/link2 $PWD/xenon_test/links/link4
-ln -s $PWD/xenon_test/links/link6 $PWD/xenon_test/links/link5
-ln -s $PWD/xenon_test/links/link5 $PWD/xenon_test/links/link6
+ln -s $PWD/filesystem-test-fixture/links/file0 $PWD/filesystem-test-fixture/links/link0
+ln -s $PWD/filesystem-test-fixture/links/file1 $PWD/filesystem-test-fixture/links/link1
+ln -s $PWD/filesystem-test-fixture/links/file2 $PWD/filesystem-test-fixture/links/link2
+ln -s $PWD/filesystem-test-fixture/links/link0 $PWD/filesystem-test-fixture/links/link3
+ln -s $PWD/filesystem-test-fixture/links/link2 $PWD/filesystem-test-fixture/links/link4
+ln -s $PWD/filesystem-test-fixture/links/link6 $PWD/filesystem-test-fixture/links/link5
+ln -s $PWD/filesystem-test-fixture/links/link5 $PWD/filesystem-test-fixture/links/link6

@@ -28,9 +28,15 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
 
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
+import nl.esciencecenter.xenon.filesystems.Path;
 import org.junit.ClassRule;
 
 public class SftpFileSystemDockerTest extends SftpFileSystemTestParent {
+
+    @Override
+    protected Path getTestRoot() {
+        return new Path("");
+    }
 
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder()

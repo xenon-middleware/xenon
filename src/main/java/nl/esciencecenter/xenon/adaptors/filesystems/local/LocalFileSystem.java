@@ -49,7 +49,7 @@ public class LocalFileSystem extends FileSystem {
 	}
 
 	@Override
-	public void move(Path source, Path target) throws XenonException {
+	public void rename(Path source, Path target) throws XenonException {
 		
 		if (areSamePaths(source, target)) {
 			return;

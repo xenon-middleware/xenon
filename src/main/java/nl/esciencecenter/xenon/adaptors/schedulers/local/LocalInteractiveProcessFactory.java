@@ -20,19 +20,19 @@ import static nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAd
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcess;
 import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcessFactory;
-import nl.esciencecenter.xenon.adaptors.schedulers.JobImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerClosedException;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 public class LocalInteractiveProcessFactory implements InteractiveProcessFactory {
 
 	private boolean open = true;
 
 	@Override
-	public synchronized InteractiveProcess createInteractiveProcess(JobImplementation job) throws XenonException {
+	public synchronized InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier) throws XenonException {
 		if (!open) { 
 			throw new SchedulerClosedException(ADAPTOR_NAME, "Scheduler is closed");
 		}
-		return new LocalInteractiveProcess(job);
+		return new LocalInteractiveProcess(description, jobIdentifier);
 	}
 
 	@Override

@@ -38,16 +38,15 @@ import java.util.regex.Matcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
-import nl.esciencecenter.xenon.adaptors.schedulers.JobImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingScheduler;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.JobHandle;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.NoSuchJobException;
 import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
@@ -61,7 +60,6 @@ import nl.esciencecenter.xenon.schedulers.Streams;
 public class TorqueScheduler extends ScriptingScheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TorqueScheduler.class);
-
    
     private final long accountingGraceTime;
 
@@ -138,30 +136,26 @@ public class TorqueScheduler extends ScriptingScheduler {
         return (lastSeenMap.get(identifier) + accountingGraceTime) > System.currentTimeMillis();
     }
 
-    private synchronized void addDeletedJob(JobHandle job) {
-        deletedJobs.add(job.getIdentifier());
+    private synchronized void addDeletedJob(String jobIdentifier) {
+        deletedJobs.add(jobIdentifier);
     }
 
     /*
      * Note: Works exactly once per job.
      */
-    private synchronized boolean jobWasDeleted(JobHandle job) {
-        return deletedJobs.remove(job.getIdentifier());
+    private synchronized boolean jobWasDeleted(String jobIdentifier) {
+        return deletedJobs.remove(jobIdentifier);
     }
 
-    private void jobsFromStatus(String statusOutput, List<JobHandle> result) throws XenonException {
+    private void jobsFromStatus(String statusOutput, List<String> result) throws XenonException {
         Map<String, Map<String, String>> status = parser.parseJobInfos(statusOutput);
-
         updateJobsSeenMap(status.keySet());
-
-        for (String jobID : status.keySet()) {
-            result.add(new JobImplementation(this, jobID));
-        }
+        result.addAll(status.keySet());
     }
 
     @Override
-    public JobHandle[] getJobs(String... queueNames) throws XenonException {
-        List<JobHandle> result = new ArrayList<>(1500);
+    public String[] getJobs(String... queueNames) throws XenonException {
+        List<String> result = new ArrayList<>(1500);
 
         if (queueNames == null || queueNames.length == 0) {
             String statusOutput = runCheckedCommand(null, "qstat", "-x").trim();
@@ -185,7 +179,7 @@ public class TorqueScheduler extends ScriptingScheduler {
             }
         }
 
-        return result.toArray(new JobHandle[result.size()]);
+        return result.toArray(new String[result.size()]);
     }
 
     @Override
@@ -292,9 +286,11 @@ public class TorqueScheduler extends ScriptingScheduler {
     }
     
     @Override
-    public JobHandle submitJob(JobDescription description) throws XenonException {
-        String output;
-        Path fsEntryPath = getFsEntryPath();
+    public String submitBatchJob(JobDescription description) throws XenonException {
+    
+    	String output;
+        
+    	Path fsEntryPath = getFsEntryPath();
         
         verifyJobDescription(description);
 
@@ -333,19 +329,21 @@ public class TorqueScheduler extends ScriptingScheduler {
             }
         }
 
-        //noinspection UnnecessaryLocalVariable
-
-        return new JobImplementation(this, identifier, description);
+        return identifier;
     }
 
     @Override
+    public Streams submitInteractiveJob(JobDescription description) throws XenonException {
+    	throw new UnsupportedOperationException(ADAPTOR_NAME, "Interactive jobs not supported");
+    }
+    
+    @Override
     @SuppressWarnings("PMD.EmptyIfStmt")
-    public JobStatus cancelJob(JobHandle job) throws XenonException {
-        String identifier = job.getIdentifier();
+    public JobStatus cancelJob(String identifier) throws XenonException {
         RemoteCommandRunner runner = runCommand(null, "qdel", identifier);
         if (runner.success()) {
             // deleted or already finished
-            addDeletedJob(job);
+            addDeletedJob(identifier);
         } else if (runner.getExitCode() == 170) {
             // job was already finished.
         } else {
@@ -353,7 +351,7 @@ public class TorqueScheduler extends ScriptingScheduler {
                     + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
         }
 
-        return getJobStatus(job);
+        return getJobStatus(identifier);
     }
 
     private Map<String, Map<String, String>> getQstatInfo() throws XenonException {
@@ -385,7 +383,7 @@ public class TorqueScheduler extends ScriptingScheduler {
      * @throws XenonException
      *             in case an additional command fails to run.
      */
-    private JobStatus getJobStatus(Map<String, Map<String, String>> qstatInfo, JobHandle job) throws XenonException {
+    private JobStatus getJobStatus(Map<String, Map<String, String>> qstatInfo, String job) throws XenonException {
         if (job == null) {
             return null;
         }
@@ -398,15 +396,13 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         if (status == null) {
             if (jobWasDeleted(job)) {
-                Exception exception = new JobCanceledException(ADAPTOR_NAME, "Job " + job.getIdentifier()
-                    + " deleted by user");
+                Exception exception = new JobCanceledException(ADAPTOR_NAME, "Job " + job + " deleted by user");
                 status = new JobStatus(job, "killed", null, exception, false, true, null);
-            } else if (haveRecentlySeen(job.getIdentifier())) {
+            } else if (haveRecentlySeen(job)) {
                 status = new JobStatus(job, "unknown", null, null, false, true, new HashMap<String, String>(0));
             }
         } else if (status.isDone() && jobWasDeleted(job)) {
-            Exception exception = new JobCanceledException(ADAPTOR_NAME, "Job " + job.getIdentifier()
-                    + " deleted by user");
+            Exception exception = new JobCanceledException(ADAPTOR_NAME, "Job " + job + " deleted by user");
             status = new JobStatus(job, "killed", status.getExitCode(), exception, false, true, status.getSchedulerSpecficInformation());
         }
 
@@ -414,7 +410,7 @@ public class TorqueScheduler extends ScriptingScheduler {
     }
 
     @Override
-    public JobStatus getJobStatus(JobHandle job) throws XenonException {
+    public JobStatus getJobStatus(String job) throws XenonException {
         
         if (job == null) { 
             throw new NoSuchJobException(ADAPTOR_NAME, "Job <null> not found on server");
@@ -426,14 +422,14 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         //this job really does not exist. throw an exception
         if (result == null) {
-            throw new NoSuchJobException(ADAPTOR_NAME, "Job " + job.getIdentifier() + " not found on server");
+            throw new NoSuchJobException(ADAPTOR_NAME, "Job " + job + " not found on server");
         }
 
         return result;
     }
 
     @Override
-    public JobStatus[] getJobStatuses(JobHandle... jobs) throws XenonException {
+    public JobStatus[] getJobStatuses(String... jobs) throws XenonException {
         Map<String, Map<String, String>> info = getQstatInfo();
 
         JobStatus[] result = new JobStatus[jobs.length];
@@ -446,8 +442,7 @@ public class TorqueScheduler extends ScriptingScheduler {
 
                 //this job really does not exist. set it to an error state.
                 if (result[i] == null) {
-                    Exception exception = new NoSuchJobException(ADAPTOR_NAME, "Job " + jobs[i].getIdentifier()
-                            + " not found on server");
+                    Exception exception = new NoSuchJobException(ADAPTOR_NAME, "Job " + jobs[i] + " not found on server");
                     result[i] = new JobStatus(jobs[i], null, null, exception, false, false, null);
                 }
             }
@@ -455,10 +450,10 @@ public class TorqueScheduler extends ScriptingScheduler {
         return result;
     }
 
-    @Override
-    public Streams getStreams(JobHandle job) throws XenonException {
-        throw new XenonException(ADAPTOR_NAME, "does not support interactive jobs");
-    }
+//    @Override
+//    public Streams getStreams(JobHandle job) throws XenonException {
+//        throw new XenonException(ADAPTOR_NAME, "does not support interactive jobs");
+//    }
 
 	@Override
 	public boolean isOpen() throws XenonException {

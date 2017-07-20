@@ -19,6 +19,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Test;
+
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -30,13 +32,13 @@ import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
  */
 public class PosixFileUtilsTest {
 
-    @org.junit.Test
+    @Test
     public void testConstructor() throws Exception {
         // Dummy test for coverage
         new PosixFileUtils();
     }
 
-    @org.junit.Test
+    @Test
     public void testAllBits() throws Exception {
 
         Set<PosixFilePermission> tmp = EnumSet.allOf(PosixFilePermission.class);
@@ -52,7 +54,7 @@ public class PosixFileUtilsTest {
         assertTrue(PosixFileUtils.isWritable(bits));
     }
 
-    @org.junit.Test
+    @Test
     public void testNoBits() throws Exception {
 
         Set<PosixFilePermission> tmp = EnumSet.noneOf(PosixFilePermission.class);

@@ -40,16 +40,15 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
-import nl.esciencecenter.xenon.adaptors.schedulers.JobImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingScheduler;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.JobHandle;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.NoSuchJobException;
 import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
@@ -136,35 +135,35 @@ public class GridEngineScheduler extends ScriptingScheduler {
         return (lastSeenMap.get(identifier) + accountingGraceTime) > System.currentTimeMillis();
     }
 
-    private synchronized void addDeletedJob(JobHandle job) {
-        deletedJobs.add(Long.parseLong(job.getIdentifier()));
+    private synchronized void addDeletedJob(String jobIdentifier) {
+        deletedJobs.add(Long.parseLong(jobIdentifier));
     }
 
     /*
      * Note: Works exactly once per job.
      */
-    private synchronized boolean jobWasDeleted(JobHandle job) {
+    private synchronized boolean jobWasDeleted(String jobIdentifier) {
         //optimization of common case
         if (deletedJobs.isEmpty()) {
             return false;
         }
-        return deletedJobs.remove(Long.parseLong(job.getIdentifier()));
+        return deletedJobs.remove(Long.parseLong(jobIdentifier));
     }
 
-    private void jobsFromStatus(String statusOutput, List<JobHandle> result) throws XenonException {
+    private void jobsFromStatus(String statusOutput, List<String> result) throws XenonException {
         Map<String, Map<String, String>> status = parser.parseJobInfos(statusOutput);
 
         updateJobsSeenMap(status.keySet());
 
         for (String jobID : status.keySet()) {
-            result.add(new JobImplementation(this, jobID));
+            result.add(jobID);
         }
 
     }
 
     @Override
-    public JobHandle[] getJobs(String... queueNames) throws XenonException {
-        ArrayList<JobHandle> result = new ArrayList<>();
+    public String[] getJobs(String... queueNames) throws XenonException {
+        ArrayList<String> result = new ArrayList<>();
 
         if (queueNames == null || queueNames.length == 0) {
             String statusOutput = runCheckedCommand(null, "qstat", "-xml");
@@ -188,7 +187,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
             }
         }
 
-        return result.toArray(new JobHandle[result.size()]);
+        return result.toArray(new String[result.size()]);
     }
 
     @Override
@@ -245,8 +244,13 @@ public class GridEngineScheduler extends ScriptingScheduler {
     }
 
     @Override
-    public JobHandle submitJob(JobDescription description) throws XenonException {
-        String output;
+    public Streams submitInteractiveJob(JobDescription description) throws XenonException {
+    	throw new UnsupportedOperationException(ADAPTOR_NAME, "Interactive jobs not supported");
+    }
+
+    @Override
+    public String submitBatchJob(JobDescription description) throws XenonException {
+    	String output;
         Path fsEntryPath = getFsEntryPath();
         
         verifyJobDescription(description);
@@ -274,28 +278,27 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
         updateJobsSeenMap(Collections.singleton(identifier));
 
-        return new JobImplementation(this, identifier, description);
+        return identifier;
     }
 
     @Override
-    public JobStatus cancelJob(JobHandle job) throws XenonException {
-        String identifier = job.getIdentifier();
-        String qdelOutput = runCheckedCommand(null, "qdel", identifier);
+    public JobStatus cancelJob(String jobIdentifier) throws XenonException {
+        String qdelOutput = runCheckedCommand(null, "qdel", jobIdentifier);
 
-        String killedOutput = "has registered the job " + identifier + " for deletion";
-        String deletedOutput = "has deleted job " + identifier;
+        String killedOutput = "has registered the job " + jobIdentifier + " for deletion";
+        String deletedOutput = "has deleted job " + jobIdentifier;
 
         int matched = ScriptingParser.checkIfContains(qdelOutput, ADAPTOR_NAME, killedOutput, deletedOutput);
 
         //keep track of the deleted jobs.
         if (matched == 1) {
-            addDeletedJob(job);
+            addDeletedJob(jobIdentifier);
         } else {
             //it will take a while to get this job to the accounting. Remember it existed for now
-            updateJobsSeenMap(Collections.singleton(identifier));
+            updateJobsSeenMap(Collections.singleton(jobIdentifier));
         }
 
-        return getJobStatus(job);
+        return getJobStatus(jobIdentifier);
     }
 
     private Map<String, Map<String, String>> getQstatInfo() throws XenonException {
@@ -314,8 +317,8 @@ public class GridEngineScheduler extends ScriptingScheduler {
         return result;
     }
 
-    private Map<String, String> getQacctInfo(JobHandle job) throws XenonException {
-        RemoteCommandRunner runner = runCommand(null, "qacct", "-j", job.getIdentifier());
+    private Map<String, String> getQacctInfo(String jobIdentifier) throws XenonException {
+        RemoteCommandRunner runner = runCommand(null, "qacct", "-j", jobIdentifier);
 
         if (!runner.success()) {
             LOGGER.debug("failed to get job status {}", runner);
@@ -331,7 +334,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
      * 
      * @param qstatInfo
      *            the info to get the job status from.
-     * @param job
+     * @param jobIdentifier
      *            the job to get the status for.
      * @return the JobStatus of the job.
      * @throws XenonException
@@ -339,61 +342,61 @@ public class GridEngineScheduler extends ScriptingScheduler {
      * @throws XenonException
      *             in case an additional command fails to run.
      */
-    private JobStatus getJobStatus(Map<String, Map<String, String>> qstatInfo, JobHandle job) throws XenonException {
+    private JobStatus getJobStatus(Map<String, Map<String, String>> qstatInfo, String jobIdentifier) throws XenonException {
 
-        if (job == null) {
+        if (jobIdentifier == null) {
             return null;
         }
 
-        JobStatus status = getJobStatusFromQstatInfo(qstatInfo, job);
+        JobStatus status = getJobStatusFromQstatInfo(qstatInfo, jobIdentifier);
 
         if (status != null && status.hasException()) {
-            cancelJob(job);
+            cancelJob(jobIdentifier);
             status = null;
         }
 
         if (status == null) {
-            Map<String, String> qacctInfo = getQacctInfo(job);
-            status = getJobStatusFromQacctInfo(qacctInfo, job);
+            Map<String, String> qacctInfo = getQacctInfo(jobIdentifier);
+            status = getJobStatusFromQacctInfo(qacctInfo, jobIdentifier);
         }
 
         //perhaps the job was killed while it was not running yet ("deleted", in sge speak). This will make it disappear from
         //qstat/qacct output completely
-        if (status == null && jobWasDeleted(job)) {
-            Exception exception = new JobCanceledException(ADAPTOR_NAME, "Job " + job.getIdentifier()
+        if (status == null && jobWasDeleted(jobIdentifier)) {
+            Exception exception = new JobCanceledException(ADAPTOR_NAME, "Job " + jobIdentifier
                     + " deleted by user while still pending");
-            status = new JobStatus(job, "killed", null, exception, false, true, null);
+            status = new JobStatus(jobIdentifier, "killed", null, exception, false, true, null);
         }
 
         //this job is neither in qstat nor qacct output. we assume it is "in between" for a certain grace time.
-        if (status == null && haveRecentlySeen(job.getIdentifier())) {
-            status = new JobStatus(job, "unknown", null, null, false, false, new HashMap<String, String>());
+        if (status == null && haveRecentlySeen(jobIdentifier)) {
+            status = new JobStatus(jobIdentifier, "unknown", null, null, false, false, new HashMap<String, String>());
         }
 
         return status;
     }
 
     @Override
-    public JobStatus getJobStatus(JobHandle job) throws XenonException {
+    public JobStatus getJobStatus(String jobIdentifier) throws XenonException {
         
-        if (job == null) { 
+        if (jobIdentifier == null) { 
             throw new NoSuchJobException(ADAPTOR_NAME, "Job <null> not found on server");
         }
         
         Map<String, Map<String, String>> info = getQstatInfo();
 
-        JobStatus result = getJobStatus(info, job);
+        JobStatus result = getJobStatus(info, jobIdentifier);
 
         //this job really does not exist. throw an exception
         if (result == null) {
-            throw new NoSuchJobException(ADAPTOR_NAME, "Job " + job.getIdentifier() + " not found on server");
+            throw new NoSuchJobException(ADAPTOR_NAME, "Job " + jobIdentifier + " not found on server");
         }
 
         return result;
     }
 
     @Override
-    public JobStatus[] getJobStatuses(JobHandle... jobs) throws XenonException {
+    public JobStatus[] getJobStatuses(String... jobs) throws XenonException {
         Map<String, Map<String, String>> info = getQstatInfo();
 
         JobStatus[] result = new JobStatus[jobs.length];
@@ -406,8 +409,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
                 //this job really does not exist. set it to an error state.
                 if (result[i] == null) {
-                    Exception exception = new NoSuchJobException(ADAPTOR_NAME, "Job " + jobs[i].getIdentifier()
-                            + " not found on server");
+                    Exception exception = new NoSuchJobException(ADAPTOR_NAME, "Job " + jobs[i] + " not found on server");
                     result[i] = new JobStatus(jobs[i], null, null, exception, false, false, null);
                 }
             }
@@ -415,10 +417,10 @@ public class GridEngineScheduler extends ScriptingScheduler {
         return result;
     }
 
-    @Override
-    public Streams getStreams(JobHandle job) throws XenonException {
-        throw new XenonException(ADAPTOR_NAME, "does not support interactive jobs");
-    }
+//    @Override
+//    public Streams getStreams(JobHandle job) throws XenonException {
+//        throw new XenonException(ADAPTOR_NAME, "does not support interactive jobs");
+//    }
 
 	@Override
 	public boolean isOpen() throws XenonException {

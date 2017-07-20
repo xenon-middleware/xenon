@@ -3,23 +3,43 @@ package nl.esciencecenter.xenon.adaptors.filesystems.jclouds;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.Path;
 
+import nl.esciencecenter.xenon.adaptors.filesystems.s3.S3FileAdaptor;
+
+import java.io.*;
 
 public class JCloudsTest {
 
     public static void main(String[] argv){
         try {
             System.setProperty("jclouds.relax-hostname","true");
-            JCloudsFileSytem fs = (JCloudsFileSytem)new JCloudsFileAdaptor().createFileSystem("http://localhost:9000/aapjeemmer",
-                    new PasswordCredential("X0XAO695ATIYL94AO8R7", "Dcajx9mm/RUQZnHepBEcVv42urKxy0s+y1nKvBJb".toCharArray()), null);
+            JCloudsFileSytem fs = (JCloudsFileSytem)new JCloudsFileAdaptor().createFileSystem("http://localhost:9000/filesystem-test-fixture",
+                    new PasswordCredential("xenon", "javagat01".toCharArray()), null);
+           // fs.createDirectory(new Path("bla"));
+            //Path testDir = new Path("test04_createDirectory");
+//            fs.createDirectory(new Path("links"));
+
+            InputStream s = new FileInputStream(new File("jip.jpg"));
+            OutputStream read = fs.writeToFile(new Path("links/file0"),s.available());
+
+            byte[] bytes = new byte[1024];
+            int bs = 0;
+            while ((bs = s.read(bytes)) != -1) {
+                read.write(bytes, 0, bs);
+            }
+            read.close();
+
+            //fs.createDirectory(testDir);
+            System.out.print(fs.exists(new Path("links")));
+            System.out.print(fs.exists(new Path("links/f")));
+            System.out.print(fs.exists(new Path("jada")));
+
 
             //byte[] msg = "test bla".getBytes();
             //OutputStream os = fs.newOutputStream(new Path("test3"),msg.length*2);
             //os.write(msg);
             //os.write(msg);
             //os.close();
-            for(int i = 0 ; i < 10000 ; i++){
-                fs.delete(new Path("NogEenAapje" + i), false);
-            }
+
             //fs.copySync(new CopyDescription(fs,new Path("jip.jpg"), fs, new Path("jip2.jpg"), CopyOption.CREATE));
 
             /*
@@ -53,3 +73,4 @@ public class JCloudsTest {
         }
     }
 }
+

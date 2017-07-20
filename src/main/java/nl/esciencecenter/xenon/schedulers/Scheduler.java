@@ -296,23 +296,23 @@ public abstract class Scheduler {
     public abstract String getDefaultQueueName() throws XenonException;
 
     /**
-     * Get all jobs currently in (one ore more) queues. 
+     * Get all job identifier of jobs currently in (one ore more) queues. 
      * 
-     * If no queue names are specified, the jobs for all queues are returned.
+     * If no queue names are specified, the job identifiers for all queues are returned.
      * 
-     * Note that jobs submitted by other users or other schedulers may also be returned.
+     * Note that job identifiers of jobs submitted by other users or other schedulers may also be returned.
      * 
      * @param queueNames
      *            the names of the queues.
      * 
-     * @return an array containing the resulting Jobs.
+     * @return an array containing the resulting job identifiers .
      * 
      * @throws NoSuchQueueException
      *             If the queue does not exist in the scheduler.
      * @throws XenonException
      *             If the Scheduler failed to get jobs.
      */
-    public abstract JobHandle[] getJobs(String... queueNames) throws XenonException;
+    public abstract String[] getJobs(String... queueNames) throws XenonException;
 
     /**
      * Get the status of the <code>queue</code>.
@@ -348,12 +348,12 @@ public abstract class Scheduler {
     public abstract QueueStatus[] getQueueStatuses(String... queueNames) throws XenonException;
 
     /**
-     * Submit a job.
+     * Submit a batch job.
      * 
      * @param description
-     *            the description of the job to submit.
+     *            the description of the batch job to submit.
      * 
-     * @return Job representing the running job.
+     * @return the job identifier representing the running job.
      * 
      * @throws IncompleteJobDescriptionException
      *             If the description did not contain the required information.
@@ -364,13 +364,32 @@ public abstract class Scheduler {
      * @throws XenonException
      *             If the Scheduler failed to get submit the job.
      */
-    public abstract JobHandle submitJob(JobDescription description) throws XenonException;
+    public abstract String submitBatchJob(JobDescription description) throws XenonException;
+
+    /**
+     * Submit an interactive job (optional operation).
+     * 
+     * @param description
+     *            the description of the interactive job to submit.
+     * 
+     * @return a <code>Streams</code> object containing the job identifier and the standard streams of a job.
+     * 
+     * @throws IncompleteJobDescriptionException
+     *             If the description did not contain the required information.
+     * @throws InvalidJobDescriptionException
+     *             If the description contains illegal or conflicting values.
+     * @throws UnsupportedJobDescriptionException
+     *             If the description is not legal for this scheduler.
+     * @throws XenonException
+     *             If the Scheduler failed to get submit the job.
+     */
+    public abstract Streams submitInteractiveJob(JobDescription description) throws XenonException;
 
     /**
      * Get the status of a Job.
      * 
-     * @param job
-     *            the job.
+     * @param jobIdentifier
+     *            the job identifier of the job to get the status for.
      * 
      * @return the status of the Job.
      * 
@@ -379,7 +398,7 @@ public abstract class Scheduler {
      * @throws XenonException
      *             If the status of the job could not be retrieved.
      */
-    public abstract JobStatus getJobStatus(JobHandle job) throws XenonException;
+    public abstract JobStatus getJobStatus(String jobIdentifier) throws XenonException;
 
     /**
      * Get the status of all specified <code>jobs</code>.
@@ -390,32 +409,16 @@ public abstract class Scheduler {
      * <code>null</code>. If the retrieval of the <code>JobStatus</code> fails for a job, the exception will be stored in the
      * corresponding <code>JobsStatus</code> entry.
      * </p>
-     * @param jobs
-     *            the jobs for which to retrieve the status.
+     * @param jobIdentifiers
+     *            the job identifiers for which to retrieve the status.
      * 
      * @return an array of the resulting JobStatusses.
      * 
      * @throws XenonException
      *             If an I/O error occurred
      */
-    public abstract JobStatus[] getJobStatuses(JobHandle... jobs) throws XenonException;
-
-    /**
-     * Returns the standard streams of a job.
-     * 
-     * The standard streams can only be retrieved if it is an interactive job.
-     * 
-     * @param job
-     *            the interactive job for which to retrieve the streams.
-     * @return the streams of the job.
-  	 *
-     * @throws NoSuchJobException
-     *             If the job is not known on this Scheduler.
-     * @throws XenonException
-     *             if the job is not interactive.
-     */
-    public abstract Streams getStreams(JobHandle job) throws XenonException;
-
+    public abstract JobStatus[] getJobStatuses(String... jobIdentifiers) throws XenonException;
+    
     /**
      * Cancel a job.
      * <p>
@@ -424,11 +427,11 @@ public abstract class Scheduler {
      * </p>
      * <p>
      * A {@link JobStatus} is returned that can be used to determine the state of the job after cancelJob returns. Note that it 
-     * may take some time before the job has actually terminated. The {@link #waitUntilDone(JobHandle, long) waitUntilDone} method can 
+     * may take some time before the job has actually terminated. The {@link #waitUntilDone(String, long) waitUntilDone} method can 
      * be used to wait until the job is terminated.
      * </p>
-     * @param job
-     *            the job to kill.
+     * @param jobIdentifier
+     *            the identifier of job to kill.
      * @return the status of the Job.
      * 
      * @throws NoSuchJobException
@@ -436,7 +439,7 @@ public abstract class Scheduler {
      * @throws XenonException
      *             If the status of the job could not be retrieved.
      */
-    public abstract JobStatus cancelJob(JobHandle job) throws XenonException;
+    public abstract JobStatus cancelJob(String jobIdentifier) throws XenonException;
 
     /**
      * Wait until a job is done or until a timeout expires.
@@ -451,8 +454,8 @@ public abstract class Scheduler {
      * <p>
      * A JobStatus is returned that can be used to determine why the call returned.
      * </p>
-     * @param job
-     *            the job.
+     * @param jobIdentifier
+     *            the identifier of the to wait for.
      * @param timeout
      *            the maximum time to wait for the job in milliseconds.
      * @return the status of the Job.
@@ -464,13 +467,13 @@ public abstract class Scheduler {
      * @throws XenonException
      *             If the status of the job could not be retrieved.
      */
-    public abstract JobStatus waitUntilDone(JobHandle job, long timeout) throws XenonException;
+    public abstract JobStatus waitUntilDone(String jobIdentifier, long timeout) throws XenonException;
 
     /**
-     * Wait while a job is waiting in a queue, or until a timeout expires.
+     * Wait until a job starts running, or until a timeout expires.
      * <p>
      * This method will return as soon as the job is no longer waiting in the queue, or when the timeout expires, whichever comes
-     * first. If the job is no longer waiting in the queue, it may be running, but it may also be killed, finished or produced 
+     * first. If the job is no longer waiting in the queue, it may be running, but it may also be killed, finished or have produced 
      * an error. If the timeout expires, the job will continue to be queued normally.
      * </p>
      * <p>
@@ -480,8 +483,8 @@ public abstract class Scheduler {
      * <p>
      * A JobStatus is returned that can be used to determine why the call returned.
      * </p>
-     * @param job
-     *            the job.
+     * @param jobIdentifier
+     *            the identifier of the to wait for.
      * @param timeout
      *            the maximum time to wait in milliseconds.
      * @return the status of the Job.
@@ -493,7 +496,7 @@ public abstract class Scheduler {
      * @throws XenonException
      *             If the status of the job could not be retrieved.
      */
-    public abstract JobStatus waitUntilRunning(JobHandle job, long timeout) throws XenonException;
+    public abstract JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException;
 
     
 	@Override

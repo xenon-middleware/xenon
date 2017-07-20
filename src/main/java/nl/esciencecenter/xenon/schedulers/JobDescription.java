@@ -68,9 +68,6 @@ public class JobDescription {
     /** The maximum run time in minutes. */
     private int maxTime = DEFAULT_MAX_RUN_TIME;
 
-    /** Is this an interactive job ? */
-    private boolean interactive = false;
-
     /**
      * Create a JobDescription.
      */
@@ -96,7 +93,6 @@ public class JobDescription {
         processesPerNode = original.getProcessesPerNode();
         startSingleProcess = original.isStartSingleProcess();
         maxTime = original.getMaxTime();
-        interactive = original.isInteractive();
     }
 
     /**
@@ -439,25 +435,6 @@ public class JobDescription {
         return workingDirectory;
     }
 
-    /**
-     * Is this an interactive job ?
-     * 
-     * @return if this an interactive job.
-     */
-    public boolean isInteractive() {
-        return interactive;
-    }
-
-    /**
-     * Set if this is an interactive job.
-     * 
-     * @param interactive
-     *            if this is an interactive job.
-     */
-    public void setInteractive(boolean interactive) {
-        this.interactive = interactive;
-    }
-
     /* Generated */
     @Override
     public String toString() {
@@ -465,7 +442,7 @@ public class JobDescription {
                 + stdin + ", stdout=" + stdout + ", stderr=" + stderr + ", workingDirectory=" + workingDirectory
                 + ", environment=" + environment + ", jobOptions=" + jobOptions + ", nodeCount=" + nodeCount
                 + ", processesPerNode=" + processesPerNode + ", startSingleProcess=" + startSingleProcess + ", maxTime="
-                + maxTime + ", interactive=" + interactive + "]";
+                + maxTime + "]";
     }
 
     /* Generated */
@@ -478,7 +455,6 @@ public class JobDescription {
         result = prime * result + environment.hashCode();
         result = prime * result + ((executable == null) ? 0 : executable.hashCode());
         result = prime * result + jobOptions.hashCode();
-        result = prime * result + (interactive ? 1231 : 1237);
         result = prime * result + maxTime;
         result = prime * result + nodeCount;
         result = prime * result + processesPerNode;
@@ -503,8 +479,7 @@ public class JobDescription {
 
         JobDescription other = (JobDescription) obj;
 
-        return interactive == other.interactive
-                && maxTime == other.maxTime
+        return maxTime == other.maxTime
                 && nodeCount == other.nodeCount
                 && startSingleProcess == other.startSingleProcess
                 && processesPerNode == other.processesPerNode

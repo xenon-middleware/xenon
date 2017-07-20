@@ -15,9 +15,10 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers.ssh;
 
-import static org.junit.Assert.*;
-
-import java.io.OutputStream;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.session.ClientSession;
@@ -28,7 +29,6 @@ import nl.esciencecenter.xenon.adaptors.schedulers.OutputReader;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.JobHandle;
 import nl.esciencecenter.xenon.schedulers.Streams;
 
 public abstract class SshInteractiveProcessITest {
@@ -45,9 +45,9 @@ public abstract class SshInteractiveProcessITest {
 		JobDescription desc = new JobDescription();
 		desc.setExecutable("/bin/hostname");
 		
-		JobHandle h = new MockJobHandle("TESTID", desc);
+		String id = "TESTID";
 		
-		SshInteractiveProcess p = new SshInteractiveProcess(session, h);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, id);
 		
 		Streams s = p.getStreams();
 
@@ -81,9 +81,9 @@ public abstract class SshInteractiveProcessITest {
 		JobDescription desc = new JobDescription();
 		desc.setExecutable("/bin/cat");
 		
-		JobHandle h = new MockJobHandle("TESTID", desc);
+		String id = "TESTID";
 		
-		SshInteractiveProcess p = new SshInteractiveProcess(session, h);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, id);
 		
 		Streams s = p.getStreams();
 
@@ -119,9 +119,9 @@ public abstract class SshInteractiveProcessITest {
 		desc.setExecutable("/bin/sleep");
 		desc.addArgument("5");
 		
-		JobHandle h = new MockJobHandle("TESTID", desc);
+		String id = "TESTID";
 		
-		SshInteractiveProcess p = new SshInteractiveProcess(session, h);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, id);
 		
 		// Not done yet, so exit returns -1
 		assertEquals(-1, p.getExitStatus());

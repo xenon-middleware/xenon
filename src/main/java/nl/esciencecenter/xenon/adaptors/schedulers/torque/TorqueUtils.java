@@ -28,7 +28,6 @@ import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.JobHandle;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 
 import org.slf4j.Logger;
@@ -58,10 +57,6 @@ final class TorqueUtils {
     public static void verifyJobDescription(JobDescription description) throws XenonException {
         ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
 
-        if (description.isInteractive()) {
-            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Adaptor does not support interactive jobs");
-        }
-
         if (description.getStdout() != null) {
             throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Torque adaptor cannot set STDOUT: a custom STDOUT is set internally");
         }
@@ -86,15 +81,15 @@ final class TorqueUtils {
         ScriptingUtils.verifyJobDescription(description, ADAPTOR_NAME);
     }
 
-    protected static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, JobHandle job) throws XenonException {
+    protected static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, String jobIdentifier) throws XenonException {
         boolean done = false;
-        Map<String, String> jobInfo = info.get(job.getIdentifier());
+        Map<String, String> jobInfo = info.get(jobIdentifier);
 
         if (jobInfo == null) {
             return null;
         }
 
-        ScriptingUtils.verifyJobInfo(jobInfo, job, ADAPTOR_NAME, "Job_Id", "job_state");
+        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "Job_Id", "job_state");
 
         String stateCode = jobInfo.get("job_state");
 
@@ -112,7 +107,7 @@ final class TorqueUtils {
             exitStatus = Integer.valueOf(exitStatusStr);
         }
 
-        return new JobStatus(job, stateCode, exitStatus, exception, stateCode.equals("R"), done, jobInfo);
+        return new JobStatus(jobIdentifier, stateCode, exitStatus, exception, stateCode.equals("R"), done, jobInfo);
     }
 
     public static void generateScriptContent(JobDescription description, Formatter script) {

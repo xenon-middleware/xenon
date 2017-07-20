@@ -28,7 +28,6 @@ import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.JobHandle;
 
 public class ScriptingUtils {
 
@@ -131,11 +130,11 @@ public class ScriptingUtils {
 	 * @throws XenonException
 	 *             if any fields are missing or incorrect
 	 */
-	public static void verifyJobInfo(Map<String, String> jobInfo, JobHandle job, String adaptorName, String jobIDField,
+	public static void verifyJobInfo(Map<String, String> jobInfo, String jobIdentifier, String adaptorName, String jobIDField,
 			String... additionalFields) throws XenonException {
 		if (jobInfo == null) {
 			//redundant check, calling functions usually already check for this and return null.
-			throw new XenonException(adaptorName, "Job " + job.getIdentifier() + " not found in job info");
+			throw new XenonException(adaptorName, "Job " + jobIdentifier + " not found in job info");
 		}
 
 		String jobID = jobInfo.get(jobIDField);
@@ -144,9 +143,8 @@ public class ScriptingUtils {
 			throw new XenonException(adaptorName, "Invalid job info. Info does not contain job id");
 		}
 
-		if (!jobID.equals(job.getIdentifier())) {
-			throw new XenonException(adaptorName, "Invalid job info. Found job id \"" + jobID + "\" does not match "
-					+ job.getIdentifier());
+		if (!jobID.equals(jobIdentifier)) {
+			throw new XenonException(adaptorName, "Invalid job info. Found job id \"" + jobID + "\" does not match " + jobIdentifier);
 		}
 
 		for (String field : additionalFields) {

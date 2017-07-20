@@ -32,7 +32,6 @@ import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.JobHandle;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 
 /**
@@ -191,10 +190,6 @@ final class GridEngineUtils {
     
     protected static void verifyJobDescription(JobDescription description) throws XenonException {
         ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
-
-        if (description.isInteractive()) {
-            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Adaptor does not support interactive jobs");
-        }
         
         if (description.isStartSingleProcess()) {
             throw new InvalidJobDescriptionException(ADAPTOR_NAME, "StartSingleProcess option not supported");
@@ -223,7 +218,7 @@ final class GridEngineUtils {
     }
 
     @SuppressWarnings("PMD.EmptyIfStmt")
-    protected static JobStatus getJobStatusFromQacctInfo(Map<String, String> info, JobHandle job) throws XenonException {
+    protected static JobStatus getJobStatusFromQacctInfo(Map<String, String> info, String jobIdentifier) throws XenonException {
         Integer exitcode;
         Exception exception = null;
         String state = "done";
@@ -232,7 +227,7 @@ final class GridEngineUtils {
             return null;
         }
 
-        ScriptingUtils.verifyJobInfo(info, job, ADAPTOR_NAME, "jobnumber", "exit_status", "failed");
+        ScriptingUtils.verifyJobInfo(info, jobIdentifier, ADAPTOR_NAME, "jobnumber", "exit_status", "failed");
 
         String exitcodeString = info.get("exit_status");
         String failedString = info.get("failed");
@@ -240,8 +235,7 @@ final class GridEngineUtils {
         try {
             exitcode = Integer.parseInt(info.get("exit_status"));
         } catch (NumberFormatException e) {
-            throw new XenonException(ADAPTOR_NAME, "cannot parse exit code of job " + job.getIdentifier()
-                    + " from string " + exitcodeString, e);
+            throw new XenonException(ADAPTOR_NAME, "cannot parse exit code of job " + jobIdentifier + " from string " + exitcodeString, e);
         }
 
         if (failedString.equals("0")) {
@@ -254,18 +248,18 @@ final class GridEngineUtils {
             exception = new XenonException(ADAPTOR_NAME, "Job reports error: " + failedString);
         }
 
-        return new JobStatus(job, state, exitcode, exception, false, true, info);
+        return new JobStatus(jobIdentifier, state, exitcode, exception, false, true, info);
     }
 
-    protected static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, JobHandle job) throws XenonException {
+    protected static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, String jobIdentifier) throws XenonException {
         boolean done = false;
-        Map<String, String> jobInfo = info.get(job.getIdentifier());
+        Map<String, String> jobInfo = info.get(jobIdentifier);
 
         if (jobInfo == null) {
             return null;
         }
 
-        ScriptingUtils.verifyJobInfo(jobInfo, job, ADAPTOR_NAME, "JB_job_number", "state", "long_state");
+        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JB_job_number", "state", "long_state");
 
         String longState = jobInfo.get("long_state");
         String stateCode = jobInfo.get("state");
@@ -276,6 +270,6 @@ final class GridEngineUtils {
             done = true;
         }
 
-        return new JobStatus(job, longState, null, exception, "running".equals(longState), done, jobInfo);
+        return new JobStatus(jobIdentifier, longState, null, exception, "running".equals(longState), done, jobInfo);
     }
 }

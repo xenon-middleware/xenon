@@ -25,7 +25,6 @@ import java.security.PrivilegedAction;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcess;
-import nl.esciencecenter.xenon.adaptors.schedulers.JobImplementation;
 import nl.esciencecenter.xenon.adaptors.shared.local.LocalUtil;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
@@ -45,9 +44,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
 
     private final Streams streams;
 
-    LocalInteractiveProcess(JobImplementation job) throws XenonException {
-        JobDescription description = job.getJobDescription();
-
+    LocalInteractiveProcess(JobDescription description, String jobIdentifier) throws XenonException {
         ProcessBuilder builder = new ProcessBuilder();
 
         builder.command().add(description.getExecutable());
@@ -55,6 +52,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
         builder.environment().putAll(description.getEnvironment());
 
         String workingDirectory = description.getWorkingDirectory();
+        
         if (workingDirectory == null) {
             workingDirectory = System.getProperty("user.dir");
         }
@@ -66,7 +64,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
         } catch (IOException e) { 
             throw new XenonException(ADAPTOR_NAME, "Failed to start local process!", e);
         }
-        streams = new Streams(job, process.getInputStream(), process.getOutputStream(), process.getErrorStream());
+        streams = new Streams(jobIdentifier, process.getInputStream(), process.getOutputStream(), process.getErrorStream());
     }
 
     public Streams getStreams() {

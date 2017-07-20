@@ -61,4 +61,12 @@ public class FileSystemAdaptorDescription extends AdaptorDescription {
 	public boolean supportsSymboliclinks() {
     	return supportsSymbolicLinks;
 	}
+
+	public boolean supportsNullFileSystemLocation() {
+    	return false;
+	}
+
+	public boolean isConnectionless() {
+    	return false;
+	}
 }
