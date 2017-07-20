@@ -4,6 +4,10 @@ import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.Path;
 
 import nl.esciencecenter.xenon.adaptors.filesystems.s3.S3FileAdaptor;
+import org.jclouds.blobstore.domain.PageSet;
+import org.jclouds.blobstore.domain.StorageMetadata;
+import org.jclouds.blobstore.domain.StorageType;
+import org.jclouds.blobstore.options.ListContainerOptions;
 
 import java.io.*;
 
@@ -17,7 +21,7 @@ public class JCloudsTest {
            // fs.createDirectory(new Path("bla"));
             //Path testDir = new Path("test04_createDirectory");
 //            fs.createDirectory(new Path("links"));
-
+/*
             InputStream s = new FileInputStream(new File("jip.jpg"));
             OutputStream read = fs.writeToFile(new Path("links/file0"),s.available());
 
@@ -27,11 +31,22 @@ public class JCloudsTest {
                 read.write(bytes, 0, bs);
             }
             read.close();
+            */
+            fs.delete(new Path("links"),true);
 
             //fs.createDirectory(testDir);
-            System.out.print(fs.exists(new Path("links")));
-            System.out.print(fs.exists(new Path("links/f")));
-            System.out.print(fs.exists(new Path("jada")));
+            System.out.println(fs.getAttributes(new Path("links/file0")).getSize());
+            System.out.println(fs.exists(new Path("links")));
+            System.out.println(fs.exists(new Path("links/file0")));
+            System.out.println(fs.exists(new Path("jada")));
+            System.out.println("\n\n\n");
+            PageSet<? extends StorageMetadata> ps =
+                    fs.context.getBlobStore().list("filesystem-test-fixture", new ListContainerOptions().prefix("li").delimiter("/"));
+            for(StorageMetadata m : ps) {
+                System.out.println(m.getName());
+                System.out.println(m.getType() );
+            }
+            //fs.delete(new Path("links"), true);
 
 
             //byte[] msg = "test bla".getBytes();

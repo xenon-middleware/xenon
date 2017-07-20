@@ -141,11 +141,6 @@ public class JCloudsFileSytem extends FileSystem {
     @Override
     protected void deleteDirectory(Path dir) throws XenonException {
         checkClosed();
-        String path = dir.getRelativePath();
-        if(path.endsWith("/")){
-            path = path.substring(0,path.length()-1);
-        }
-        delete(path);
     }
 
     @Override
@@ -155,30 +150,17 @@ public class JCloudsFileSytem extends FileSystem {
 
 
 
+
     @Override
     public boolean exists(Path path) throws XenonException {
         checkClosed();
         String name = path.getRelativePath();
-
-        boolean exists;
-        try {
-            exists = context.getBlobStore().blobExists(bucket, name);
-        } catch (Exception e) {
-            // Horrible workaround, Minio for some reason throws authorization exception when asking
-            // for existence of directory
-            exists = false;
-        }
-        if(!exists) {
-            for (PathAttributes p : listPrefix(name, false)) {
-                System.out.println(p.getPath().getRelativePath());
-                if (p.getPath().getParent().equals(path) || p.getPath().equals(path)) {
-                    return true;
-                }
+        for (PathAttributes p : listPrefix(name, false)) {
+            if (p.getPath().getParent().equals(path) || p.getPath().equals(path)) {
+                return true;
             }
         }
-
-
-        return exists;
+        return false;
     }
 
 
@@ -187,6 +169,9 @@ public class JCloudsFileSytem extends FileSystem {
 
         PathAttributes pa = new PathAttributes();
         pa.setPath(p);
+        if(m.getSize() != null) {
+            pa.setSize(m.getSize());
+        }
         Date d = m.getCreationDate();
         if(d != null){
             pa.setCreationTime(d.getTime());
@@ -197,6 +182,11 @@ public class JCloudsFileSytem extends FileSystem {
         }
         pa.setReadable(true);
         pa.setWritable(true);
+        switch(m.getType()){
+            case RELATIVE_PATH:
+                pa.setDirectory(true); break;
+            default: pa.setDirectory(false); break;
+        }
         /*
         Set<PosixFilePermission> permissions = new HashSet<>();
         permissions.add(PosixFilePermission.OWNER_READ);
@@ -244,6 +234,7 @@ public class JCloudsFileSytem extends FileSystem {
         public PathAttributes next() {
 
             BlobAccess access = BlobAccess.PUBLIC_READ; // context.getBlobStore().getBlobAccess(bucket,nxt.getName());
+
             PathAttributes res = toPathAttributes(nxt,access);
 
             getNext();
@@ -328,12 +319,16 @@ public class JCloudsFileSytem extends FileSystem {
 
     @Override
     public PathAttributes getAttributes(Path path) throws XenonException {
-        if(!context.getBlobStore().blobExists(bucket,path.getRelativePath())){
-            throw new NoSuchPathException(adaptorName, "File does not exist: " + path.getRelativePath());
+
+        String name = path.getRelativePath();
+        for (PathAttributes p : listPrefix(name, false)) {
+            if ( p.getPath().equals(path)) {
+               return p;
+            }
         }
-        BlobMetadata md = context.getBlobStore().blobMetadata(bucket,path.getRelativePath());
-        BlobAccess access = BlobAccess.PUBLIC_READ; // context.getBlobStore().getBlobAccess(bucket, path.getRelativePath());
-        return toPathAttributes(md,access);
+
+        throw new NoSuchPathException(adaptorName, "File does not exist: " + path.getRelativePath());
+
     }
 
     @Override

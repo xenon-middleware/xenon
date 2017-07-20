@@ -18,6 +18,7 @@ import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
+import nl.esciencecenter.xenon.adaptors.filesystems.jclouds.JCloudsFileSytem;
 import nl.esciencecenter.xenon.adaptors.filesystems.s3.S3FileSystem;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
@@ -60,6 +61,7 @@ public class S3FileAdaptor extends FileAdaptor {
 
     @Override
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
+
         int split = location.lastIndexOf("/");
         if(split < 0){
             throw new InvalidLocationException("s3","No bucket found in url: " + location);
@@ -75,19 +77,10 @@ public class S3FileAdaptor extends FileAdaptor {
         }
         PasswordCredential pwUser = (PasswordCredential) credential;
         if(properties == null) { properties = new HashMap<>(); }
-        AWSCredentials credentials = new BasicAWSCredentials("xenon", "javagat01");
-        ClientConfiguration clientConfig = new ClientConfiguration();
-        clientConfig.setProtocol(Protocol.HTTP);
-        AwsClientBuilder.EndpointConfiguration endpointConfiguration = new AwsClientBuilder.EndpointConfiguration(
-                "http://localhost:9000","");
-        AmazonS3 client = AmazonS3ClientBuilder.standard()
-                .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                .withClientConfiguration(clientConfig)
-                .withEndpointConfiguration(endpointConfiguration)
-                .withRegion("").enablePathStyleAccess()
-                .build();
-
-        return new S3FileSystem(getNewUniqueID(),"s3", server, client,  bucket,xp);
+        System.err.println("server : " + server);
+        BlobStoreContext context = ContextBuilder.newBuilder("s3").endpoint(server).
+                credentials(pwUser.getUsername(), new String(pwUser.getPassword())).buildView(BlobStoreContext.class);
+        return new JCloudsFileSytem(getNewUniqueID(),"s3", server, context,  bucket,xp);
     }
 
 }
