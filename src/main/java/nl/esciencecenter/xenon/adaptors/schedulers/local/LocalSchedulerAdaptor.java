@@ -88,10 +88,22 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
     };
 	
     public LocalSchedulerAdaptor() {
-    	super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, true, true, true);
+    	super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
     }
         
-    
+    @Override
+	public boolean isEmbedded() {
+		// The local scheduler is embedded
+		return true;
+	}
+
+	@Override
+	public boolean supportsInteractive() { 
+		// The local scheduler supports interactive jobs
+		return true;
+	}
+	
+	
     /** 
      * Check if a location string is valid for the local scheduler. 
      * 

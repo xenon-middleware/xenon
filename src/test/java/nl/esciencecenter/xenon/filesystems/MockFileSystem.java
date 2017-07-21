@@ -28,6 +28,7 @@ import java.util.Set;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
 
 public class MockFileSystem extends FileSystem {
 
@@ -333,14 +334,14 @@ public class MockFileSystem extends FileSystem {
 	}
 		
 	public PathAttributes getDirAttributes(Path path) { 
-		PathAttributes a = new PathAttributes();
+		PathAttributesImplementation a = new PathAttributesImplementation();
 		a.setPath(path);
 		a.setDirectory(true);
 		return a;
 	}
 
 	public PathAttributes getFileAttributes(Path path) { 
-		PathAttributes a = new PathAttributes();
+		PathAttributesImplementation a = new PathAttributesImplementation();
 		a.setPath(path);
 		a.setRegular(true);
 		return a;

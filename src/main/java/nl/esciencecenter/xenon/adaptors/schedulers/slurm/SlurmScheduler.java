@@ -40,9 +40,12 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
+import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingScheduler;
+import nl.esciencecenter.xenon.adaptors.schedulers.StreamsImplementation;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
@@ -70,7 +73,7 @@ public class SlurmScheduler extends ScriptingScheduler {
     
     protected SlurmScheduler(String uniqueID, String location, Credential credential, Map<String,String> prop) throws XenonException {
 
-        super(uniqueID, ADAPTOR_NAME, location, credential, true, true, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
+        super(uniqueID, ADAPTOR_NAME, location, credential, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
 
         boolean disableAccounting = properties.getBooleanProperty(DISABLE_ACCOUNTING_USAGE);
 
@@ -104,6 +107,12 @@ public class SlurmScheduler extends ScriptingScheduler {
         LOGGER.debug("Created new SlurmConfig. version = \"{}\", accounting available: {}", 
         		setup.version(), setup.accountingAvailable());
     }
+    
+	@Override
+	public boolean supportsInteractive() { 
+		// this scheduler supports interactive jobs. 
+		return true;
+	}
     
     @Override
     public String[] getQueueNames() {
@@ -219,7 +228,7 @@ public class SlurmScheduler extends ScriptingScheduler {
         }
         
         if (result != null) {
-        	return new Streams(result, interactiveJob.getStdout(), interactiveJob.getStdin(), interactiveJob.getStderr());
+        	return new StreamsImplementation(result, interactiveJob.getStdout(), interactiveJob.getStdin(), interactiveJob.getStderr());
         }
         
         // Failed to find job within timeout. Fetch status of interactive job to return as an error.
@@ -402,7 +411,7 @@ public class SlurmScheduler extends ScriptingScheduler {
                 //job really does not seem to exist (anymore)
                 if (result[i] == null) {
                     NoSuchJobException exception = new NoSuchJobException(ADAPTOR_NAME, "Unknown Job: " + jobs[i]);
-                    result[i] = new JobStatus(jobs[i], null, null, exception, false, false, null);
+                    result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);
                 }
             }
         }
@@ -448,7 +457,7 @@ public class SlurmScheduler extends ScriptingScheduler {
                 if (result[i] == null) {
                     Exception exception = new NoSuchQueueException(ADAPTOR_NAME, "Cannot get status of queue \""
                             + targetQueueNames[i] + "\" from server");
-                    result[i] = new QueueStatus(this, targetQueueNames[i], exception, null);
+                    result[i] = new QueueStatusImplementation(this, targetQueueNames[i], exception, null);
                 }
             }
         }

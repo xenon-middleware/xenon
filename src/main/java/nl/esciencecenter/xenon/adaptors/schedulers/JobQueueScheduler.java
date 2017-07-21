@@ -101,7 +101,7 @@ public class JobQueueScheduler extends Scheduler {
 	public JobQueueScheduler(String uniqueID, String adaptorName, String location, InteractiveProcessFactory factory, 
 			FileSystem filesystem, Path workingDirectory, int multiQThreads, long pollingDelay, XenonProperties properties) throws BadParameterException {
 
-		super(uniqueID, adaptorName, location, true, true, true, properties);
+		super(uniqueID, adaptorName, location, properties);
 
 		LOGGER.debug("Creating JobQueueScheduler for Adaptor {} with multiQThreads: {} and pollingDelay: {}", adaptorName, multiQThreads,
 				pollingDelay);
@@ -132,20 +132,21 @@ public class JobQueueScheduler extends Scheduler {
 		multiExecutor = Executors.newFixedThreadPool(multiQThreads, threadFactory);
 	}
 
+	@Override
+	public boolean supportsInteractive() { 
+		// this scheduler supports interactive jobs. 
+		return true;
+	}
+
+	@Override
+	public boolean isEmbedded() { 
+		// this scheduler is embedded. 
+		return true;
+    }
+	
 	public long getCurrentJobID() {
 		return jobID.get();
 	}
-
-	//    private void checkScheduler(Scheduler sched) throws XenonException {
-	//
-	//        if (sched == null) {
-	//            throw new IllegalArgumentException("Adaptor " + adaptorName + ": Scheduler is null!");
-	//        }
-	//
-	//        if (!equals(sched)) {
-	//            throw new XenonException(adaptorName, "Scheduler mismatch! " + this + " != " + sched);
-	//        }
-	//    }
 
 	private void getJobs(List<JobExecutor> list, List<String> out) {
 		for (JobExecutor e : list) {
@@ -285,7 +286,7 @@ public class JobQueueScheduler extends Scheduler {
 					result[i] = null;
 				}
 			} catch (XenonException e) {
-				result[i] = new JobStatus(jobs[i], null, null, e, false, false, null);
+				result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, false, null);
 			}
 		}
 
@@ -469,11 +470,11 @@ public class JobQueueScheduler extends Scheduler {
 		}
 
 		if (SINGLE_QUEUE_NAME.equals(queueName)) {
-			return new QueueStatus(this, SINGLE_QUEUE_NAME, null, null);
+			return new QueueStatusImplementation(this, SINGLE_QUEUE_NAME, null, null);
 		} else if (MULTI_QUEUE_NAME.equals(queueName)) {
-			return new QueueStatus(this, MULTI_QUEUE_NAME, null, null);
+			return new QueueStatusImplementation(this, MULTI_QUEUE_NAME, null, null);
 		} else if (UNLIMITED_QUEUE_NAME.equals(queueName)) {
-			return new QueueStatus(this, UNLIMITED_QUEUE_NAME, null, null);
+			return new QueueStatusImplementation(this, UNLIMITED_QUEUE_NAME, null, null);
 		} else {
 			throw new NoSuchQueueException(adaptorName, "No such queue: " + queueName);
 		}
@@ -501,7 +502,7 @@ public class JobQueueScheduler extends Scheduler {
 			try {
 				result[i] = getQueueStatus(names[i]);
 			} catch (XenonException e) {
-				result[i] = new QueueStatus(this, names[i], e, null);
+				result[i] = new QueueStatusImplementation(this, names[i], e, null);
 			}
 		}
 

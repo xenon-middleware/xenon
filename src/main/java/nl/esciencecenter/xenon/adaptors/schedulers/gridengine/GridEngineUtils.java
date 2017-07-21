@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
@@ -246,7 +247,7 @@ final class GridEngineUtils {
             exception = new XenonException(ADAPTOR_NAME, "Job reports error: " + failedString);
         }
 
-        return new JobStatus(jobIdentifier, state, exitcode, exception, false, true, info);
+        return new JobStatusImplementation(jobIdentifier, state, exitcode, exception, false, true, info);
     }
 
     protected static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, String jobIdentifier) throws XenonException {
@@ -268,6 +269,6 @@ final class GridEngineUtils {
             done = true;
         }
 
-        return new JobStatus(jobIdentifier, longState, null, exception, "running".equals(longState), done, jobInfo);
+        return new JobStatusImplementation(jobIdentifier, longState, null, exception, "running".equals(longState), done, jobInfo);
     }
 }

@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.xenon.schedulers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -23,16 +22,16 @@ import java.util.Map;
 import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
-import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
+import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor;
-import nl.esciencecenter.xenon.adaptors.XenonProperties;
-import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 
@@ -78,29 +77,15 @@ public abstract class Scheduler {
 	}
 
 	public static String [] getAdaptorNames() {
-		ArrayList<String> tmp = new ArrayList<>();
-		
-		for (SchedulerAdaptor a : adaptors.values()) { 
-			tmp.add(a.getName());
-		}
-		
-		return tmp.toArray(new String[tmp.size()]);
+		return adaptors.keySet().toArray(new String[adaptors.size()]);
 	}
 
 	public static SchedulerAdaptorDescription getAdaptorDescription(String adaptorName) throws XenonException {
-		return getAdaptorByName(adaptorName).getAdaptorDescription();
+		return getAdaptorByName(adaptorName);
 	}
 
 	public static SchedulerAdaptorDescription [] getAdaptorDescriptions() throws XenonException {
-		String [] names = getAdaptorNames();
-		
-		SchedulerAdaptorDescription[] result = new SchedulerAdaptorDescription[names.length];
-		
-		for (int i=0;i<names.length;i++) { 
-			result[i] = getAdaptorDescription(names[i]);
-		}
-		
-		return result;
+		return adaptors.values().toArray(new SchedulerAdaptorDescription[adaptors.size()]);
 	}
 	
 	/**
@@ -155,13 +140,7 @@ public abstract class Scheduler {
 	private final String location;
 	protected final XenonProperties properties;
 
-	private final boolean isOnline;
-	private final boolean supportsInteractive;
-	private final boolean supportsBatch;
-	
-	protected Scheduler(String uniqueID, String adaptor, String location, 
-			boolean isOnline, boolean supportsBatch, boolean supportsInteractive, 
-			XenonProperties properties) {
+	protected Scheduler(String uniqueID, String adaptor, String location, XenonProperties properties) {
 
 		if (uniqueID == null) {
 			throw new IllegalArgumentException("Identifier may not be null!");
@@ -178,10 +157,6 @@ public abstract class Scheduler {
 		this.uniqueID = uniqueID;
 		this.adaptor = adaptor;
 		this.location = location;
-
-		this.isOnline = isOnline;
-		this.supportsBatch = supportsBatch;
-		this.supportsInteractive = supportsInteractive;
 		this.properties = properties;
 	}
 
@@ -212,7 +187,8 @@ public abstract class Scheduler {
      * @return if this scheduler supports the submission of interactive jobs ?
      */
 	public boolean supportsInteractive() { 
-		return supportsInteractive;
+		// By default, schedulers do not support interactive jobs. 
+		return false;
 	}
 
     /**
@@ -223,28 +199,24 @@ public abstract class Scheduler {
      * @return if this scheduler supports the submission of batch jobs ?
      */
     public boolean supportsBatch() { 
-    	return supportsBatch;
+    	// By default, schedulers support batch jobs. 
+    	return true;
     }
 
     /**
-     * Is this an online scheduler ?
+     * Is this an embedded scheduler ?
      * 
-     * Online schedulers need to remain active for their jobs to run. Ending an online scheduler will kill all jobs that were
-     * submitted to it.
+     * Embedded schedulers are implemented inside the Xenon process itself. Therefore this process needs to remain active for its jobs 
+     * to run. Ending an online scheduler will kill all jobs that were submitted to it.
      * 
-     * Offline schedulers do not need to remains active for their jobs to run. A submitted job will typically be handed over to
+     * Non-embedded schedulers do not need to remain active for their jobs to run. A submitted job will typically be handed over to
      * some external server that will manage the job for the rest of its lifetime.
      * 
-     * Online schedulers typically support both interactive jobs (where the user controls the standard streams) and batch jobs
-     * (where the standard streams are redirected to/from files).
-     * 
-     * Since it is impossible to continue an interactive jobs when a scheduler ends, interactive jobs will always be killed,
-     * even in an offline scheduler.
-     * 
-     * @return if this scheduler is online.
+     * @return if this scheduler is embedded.
      */
-    public boolean isOnline() { 
-    	return isOnline;
+    public boolean isEmbedded() { 
+    	// By default, schedulers are not embedded. 
+    	return false;
     }
 
 	/**

@@ -130,9 +130,21 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
     };
 	
 	public SshSchedulerAdaptor() {
-		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, true, true, true);
+		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
+	}
+	
+	@Override
+	public boolean isEmbedded() {
+		// The SSH scheduler is embedded
+		return true;
 	}
 
+	@Override
+	public boolean supportsInteractive() { 
+		// The SSH scheduler supports interactive jobs
+		return true;
+	}
+	
 	@Override
 	public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties)
 			throws XenonException {

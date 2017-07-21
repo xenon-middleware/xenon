@@ -35,6 +35,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
 import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
 
 public class FileSystemTest {
@@ -770,7 +771,7 @@ public class FileSystemTest {
 		Path f = new Path("/test/aap");
 		f0.createFile(f);
 
-		PathAttributes a = new PathAttributes();
+		PathAttributesImplementation a = new PathAttributesImplementation();
 		a.setPath(f);
 		a.setOther(true);
 		f0.addAttributes(f, a);
@@ -1100,7 +1101,7 @@ public class FileSystemTest {
 		Path f = new Path("/test/aap");
 		f0.createFile(f);
 
-		PathAttributes a = new PathAttributes();
+		PathAttributesImplementation a = new PathAttributesImplementation();
 		a.setPath(f);
 		a.setOther(true);
 		f0.addAttributes(f, a);

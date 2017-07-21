@@ -19,38 +19,37 @@ import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.adaptors.Adaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
 
-public abstract class FileAdaptor {
+public abstract class FileAdaptor extends Adaptor implements FileSystemAdaptorDescription {
 	
 	public static final String ADAPTORS_PREFIX = "xenon.adaptors.file.";
 	
-	private static int currentID = 1;
-	
-	private final FileSystemAdaptorDescription adaptorDescription;
-	
-	protected FileAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties, 
-			boolean supportsThirdPartyCopy, boolean readSymbolicLinks, boolean createSymbolicLinks) {
-		adaptorDescription = new FileSystemAdaptorDescription(name, description, locations, properties, supportsThirdPartyCopy, readSymbolicLinks, createSymbolicLinks);
+	protected FileAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) { 
+		super(name, description, locations, properties);
 	}
-	
-    protected synchronized String getNewUniqueID() {
-        String res = adaptorDescription.getName() + "." + currentID;
-        currentID++;
-        return res;
-    }
 
-	public String getName() { 
-		return adaptorDescription.getName();
+	@Override
+	public boolean supportsThirdPartyCopy() { 
+		// By default, adaptors do not support third party copy.
+		return false;
 	}
-	
-	public FileSystemAdaptorDescription getAdaptorDescription() { 
-		// TODO: should include a map of properties ? 
-		return adaptorDescription;
+
+	@Override
+	public boolean canReadSymboliclinks() {
+		// By default, adaptors can read symbolic links.
+		return true;
 	}
-	   
+
+	@Override
+	public boolean canCreateSymboliclinks() { 
+		// By default, adaptors cannot create symbolic links.
+		return false;
+	}
+			
 	public abstract FileSystem createFileSystem(String location, Credential credential, Map<String,String> properties) throws XenonException;
 	
 }

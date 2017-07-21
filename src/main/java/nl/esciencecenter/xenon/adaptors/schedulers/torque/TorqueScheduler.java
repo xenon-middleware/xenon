@@ -41,6 +41,8 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
+import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingScheduler;
@@ -79,7 +81,7 @@ public class TorqueScheduler extends ScriptingScheduler {
 
     TorqueScheduler(String uniqueID, String location, Credential credential, Map<String,String> prop) throws XenonException {
 
-        super(uniqueID, ADAPTOR_NAME, location, credential, true, false, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
+        super(uniqueID, ADAPTOR_NAME, location, credential, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
 
         accountingGraceTime = properties.getLongProperty(ACCOUNTING_GRACE_TIME_PROPERTY);
 
@@ -193,7 +195,7 @@ public class TorqueScheduler extends ScriptingScheduler {
                     + "\" from server, perhaps it does not exist?");
         }
 
-        return new QueueStatus(this, queueName, null, map);
+        return new QueueStatusImplementation(this, queueName, null, map);
     }
 
     @Override
@@ -220,9 +222,9 @@ public class TorqueScheduler extends ScriptingScheduler {
                 if (map == null) {
 					Exception exception = new NoSuchQueueException(ADAPTOR_NAME,
 							"Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
-					result[i] = new QueueStatus(this, queueNames[i], exception, null);
+					result[i] = new QueueStatusImplementation(this, queueNames[i], exception, null);
 				} else {
-					result[i] = new QueueStatus(this, queueNames[i], null, map);
+					result[i] = new QueueStatusImplementation(this, queueNames[i], null, map);
 				}
 			}
 		}
@@ -400,13 +402,13 @@ public class TorqueScheduler extends ScriptingScheduler {
         if (status == null) {
             if (jobWasDeleted(job)) {
                 Exception exception = new JobCanceledException(ADAPTOR_NAME, "Job " + job + " deleted by user");
-                status = new JobStatus(job, "killed", null, exception, false, true, null);
+                status = new JobStatusImplementation(job, "killed", null, exception, false, true, null);
             } else if (haveRecentlySeen(job)) {
-                status = new JobStatus(job, "unknown", null, null, false, true, new HashMap<String, String>(0));
+                status = new JobStatusImplementation(job, "unknown", null, null, false, true, new HashMap<String, String>(0));
             }
         } else if (status.isDone() && jobWasDeleted(job)) {
             Exception exception = new JobCanceledException(ADAPTOR_NAME, "Job " + job + " deleted by user");
-            status = new JobStatus(job, "killed", status.getExitCode(), exception, false, true, status.getSchedulerSpecficInformation());
+            status = new JobStatusImplementation(job, "killed", status.getExitCode(), exception, false, true, status.getSchedulerSpecficInformation());
         }
 
         return status;
@@ -446,7 +448,7 @@ public class TorqueScheduler extends ScriptingScheduler {
                 //this job really does not exist. set it to an error state.
                 if (result[i] == null) {
                     Exception exception = new NoSuchJobException(ADAPTOR_NAME, "Job " + jobs[i] + " not found on server");
-                    result[i] = new JobStatus(jobs[i], null, null, exception, false, false, null);
+                    result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);
                 }
             }
         }

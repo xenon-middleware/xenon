@@ -70,7 +70,7 @@ public class TorqueSchedulerAdaptor extends SchedulerAdaptor {
     };
 
     public TorqueSchedulerAdaptor() {
-		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, true, false);
+		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
 	}
 
 	@Override
