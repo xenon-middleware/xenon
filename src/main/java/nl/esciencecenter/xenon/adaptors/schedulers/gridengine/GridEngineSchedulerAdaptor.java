@@ -54,9 +54,9 @@ public class GridEngineSchedulerAdaptor extends SchedulerAdaptor {
         new XenonPropertyDescription(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, 
                 "false", "Skip version check is skipped when connecting to remote machines. "
                         + "WARNING: it is not recommended to use this setting in production environments!"),
-        new XenonPropertyDescription(ACCOUNTING_GRACE_TIME_PROPERTY, Type.NATURAL, 
+        new XenonPropertyDescription(ACCOUNTING_GRACE_TIME_PROPERTY, Type.LONG, 
                 "60000", "Number of milliseconds a job is allowed to take going from the queue to the qacct output."),
-        new XenonPropertyDescription(POLL_DELAY_PROPERTY, Type.NATURAL, 
+        new XenonPropertyDescription(POLL_DELAY_PROPERTY, Type.LONG, 
         		"1000", "Number of milliseconds between polling the status of a job.")
     };
 	

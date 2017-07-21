@@ -13,30 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.schedulers.slurm;
+package nl.esciencecenter.xenon.adaptors.filesystems.ftp;
 
-import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
+import nl.esciencecenter.xenon.adaptors.filesystems.FileSystemTestParent;
 
-public class SlurmLocationConfig extends SchedulerLocationConfig {
-
-	private String location;
-	
-	public SlurmLocationConfig(String location) { 
-		this.location = location; 
-	}
-	
-	@Override
-	public String getLocation() {
-		return location;
-	}
-
-	@Override
-	public String[] getQueueNames() {
-		return new String[] { "mypartition", "otherpartition" };
-	}
-
-	@Override
-	public String getDefaultQueueName() {
-		return "mypartition";
-	}
+/**
+ * Extend this class for docker tests and live tests
+ *
+ * Can contain extra tests for sftp filesystem
+ */
+public abstract class FtpFileSystemTestParent extends FileSystemTestParent {
 }

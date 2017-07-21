@@ -55,7 +55,7 @@ public class S3FileAdaptor extends FileAdaptor {
 
     public S3FileAdaptor() {
 
-        super("s3", ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, false);
+        super("s3", ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, false, false);
     }
 
 

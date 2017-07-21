@@ -29,4 +29,14 @@ public class SshLocationConfig extends SchedulerLocationConfig {
 	public String getLocation() {
 		return location;
 	}
+
+	@Override
+	public String[] getQueueNames() {
+		return new String [] { "single", "multi", "unlimited" } ;
+	}
+
+	@Override
+	public String getDefaultQueueName() {
+		return "single";
+	}
 }

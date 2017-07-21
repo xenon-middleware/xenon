@@ -24,24 +24,18 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
 
 public abstract class FileAdaptor {
-
-    public static final String ADAPTORS_PREFIX = "xenon.adaptors.file.";
-
-    private static int currentID = 1;
-
-    private final FileSystemAdaptorDescription adaptorDescription;
-
-    protected FileAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties,
-                          boolean supportsThirdPartyCopy, boolean supportsSymbolicLinks) {
-        adaptorDescription = new FileSystemAdaptorDescription(name, description, locations, properties, supportsThirdPartyCopy, supportsSymbolicLinks);
-    }
-
-
-    protected FileAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties,
-                          boolean supportsThirdPartyCopy) {
-        adaptorDescription = new FileSystemAdaptorDescription(name, description, locations, properties, supportsThirdPartyCopy, true);
-    }
-
+	
+	public static final String ADAPTORS_PREFIX = "xenon.adaptors.file.";
+	
+	private static int currentID = 1;
+	
+	private final FileSystemAdaptorDescription adaptorDescription;
+	
+	protected FileAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties, 
+			boolean supportsThirdPartyCopy, boolean readSymbolicLinks, boolean createSymbolicLinks) {
+		adaptorDescription = new FileSystemAdaptorDescription(name, description, locations, properties, supportsThirdPartyCopy, readSymbolicLinks, createSymbolicLinks);
+	}
+	
     protected synchronized String getNewUniqueID() {
         String res = adaptorDescription.getName() + "." + currentID;
         currentID++;

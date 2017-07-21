@@ -2,6 +2,7 @@ package nl.esciencecenter.xenon.adaptors.filesystems.jclouds;
 
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PathAttributes;
 
 import nl.esciencecenter.xenon.adaptors.filesystems.s3.S3FileAdaptor;
 import org.jclouds.blobstore.domain.PageSet;
@@ -32,20 +33,26 @@ public class JCloudsTest {
             }
             read.close();
             */
-            fs.delete(new Path("links"),true);
+            //fs.delete(new Path("links"),true);
 
             //fs.createDirectory(testDir);
+            Iterable<PathAttributes> p = fs.list(new Path(""), true);
+            for(PathAttributes pa : p){
+            	System.out.println("bla" + pa.getPath());
+            }
+            /*
             System.out.println(fs.getAttributes(new Path("links/file0")).getSize());
             System.out.println(fs.exists(new Path("links")));
             System.out.println(fs.exists(new Path("links/file0")));
             System.out.println(fs.exists(new Path("jada")));
             System.out.println("\n\n\n");
             PageSet<? extends StorageMetadata> ps =
-                    fs.context.getBlobStore().list("filesystem-test-fixture", new ListContainerOptions().prefix("li").delimiter("/"));
+                    fs.context.getBlobStore().list("filesystem-test-fixture", new ListContainerOptions().prefix("bla").delimiter("/"));
             for(StorageMetadata m : ps) {
                 System.out.println(m.getName());
                 System.out.println(m.getType() );
             }
+            */
             //fs.delete(new Path("links"), true);
 
 

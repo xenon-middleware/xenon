@@ -45,7 +45,7 @@ public class JCloudsFileAdaptor extends FileAdaptor {
 
 
 
-        super("s3", ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, false);
+        super("s3", ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, false,false);
     }
 
 

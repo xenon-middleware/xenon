@@ -21,10 +21,6 @@ import static nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor.
 public class MinioTest extends TestParent {
 
 
-    @Override
-    protected Path getTestRoot() {
-        return new Path("");
-    }
 
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder()

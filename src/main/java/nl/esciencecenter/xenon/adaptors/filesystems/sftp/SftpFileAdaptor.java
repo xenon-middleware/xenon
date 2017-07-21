@@ -33,6 +33,7 @@ import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
 import nl.esciencecenter.xenon.filesystems.Path;
 
 public class SftpFileAdaptor extends FileAdaptor {
@@ -49,7 +50,7 @@ public class SftpFileAdaptor extends FileAdaptor {
 	public static final String ADAPTOR_DESCRIPTION = "The SFTP adaptor implements all file access functionality to remote SFTP servers";
 
 	/** The locations supported by this adaptor */
-	public static final String [] ADAPTOR_LOCATIONS = new String [] { "sftp://[user@]host[:port]" };
+	public static final String [] ADAPTOR_LOCATIONS = new String [] { "host[:port]" };
 
 	/** All our own properties start with this prefix. */
 	public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
@@ -102,9 +103,9 @@ public class SftpFileAdaptor extends FileAdaptor {
 	};
 
 	public SftpFileAdaptor() { 
-		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false);
+		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, true, true);
 	}
-
+	
 	public FileSystem createFileSystem(String location, Credential credential, Map<String,String> properties) throws XenonException { 
 
 		LOGGER.debug("newFileSystem scheme = SFTP location = {} credential = {} properties = {}", location, credential, properties);

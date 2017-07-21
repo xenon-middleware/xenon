@@ -13,30 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.schedulers.slurm;
+package nl.esciencecenter.xenon.adaptors.schedulers.torque;
 
-import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
+import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerTestParent;
 
-public class SlurmLocationConfig extends SchedulerLocationConfig {
+/**
+ * Extend this class for docker tests and live tests
+ *
+ * Can contain extra tests for slurm scheduler
+ */
+public abstract class TorqueSchedulerTestParent extends SchedulerTestParent {
 
-	private String location;
-	
-	public SlurmLocationConfig(String location) { 
-		this.location = location; 
-	}
-	
-	@Override
-	public String getLocation() {
-		return location;
-	}
-
-	@Override
-	public String[] getQueueNames() {
-		return new String[] { "mypartition", "otherpartition" };
-	}
-
-	@Override
-	public String getDefaultQueueName() {
-		return "mypartition";
-	}
 }

@@ -29,7 +29,89 @@ public class PathAttributes {
 	 /** Is this a directory ? */
     private boolean isDirectory;
 
-    /** Is this a regular file ? */
+    @Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (creationTime ^ (creationTime >>> 32));
+		result = prime * result + (executable ? 1231 : 1237);
+		result = prime * result + ((group == null) ? 0 : group.hashCode());
+		result = prime * result + (hidden ? 1231 : 1237);
+		result = prime * result + (isDirectory ? 1231 : 1237);
+		result = prime * result + (isOther ? 1231 : 1237);
+		result = prime * result + (isRegular ? 1231 : 1237);
+		result = prime * result + (isSymbolicLink ? 1231 : 1237);
+		result = prime * result
+				+ (int) (lastAccessTime ^ (lastAccessTime >>> 32));
+		result = prime * result
+				+ (int) (lastModifiedTime ^ (lastModifiedTime >>> 32));
+		result = prime * result + ((owner == null) ? 0 : owner.hashCode());
+		result = prime * result + ((path == null) ? 0 : path.hashCode());
+		result = prime * result
+				+ ((permissions == null) ? 0 : permissions.hashCode());
+		result = prime * result + (readable ? 1231 : 1237);
+		result = prime * result + (int) (size ^ (size >>> 32));
+		result = prime * result + (writable ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PathAttributes other = (PathAttributes) obj;
+		if (creationTime != other.creationTime)
+			return false;
+		if (executable != other.executable)
+			return false;
+		if (group == null) {
+			if (other.group != null)
+				return false;
+		} else if (!group.equals(other.group))
+			return false;
+		if (hidden != other.hidden)
+			return false;
+		if (isDirectory != other.isDirectory)
+			return false;
+		if (isOther != other.isOther)
+			return false;
+		if (isRegular != other.isRegular)
+			return false;
+		if (isSymbolicLink != other.isSymbolicLink)
+			return false;
+		if (lastAccessTime != other.lastAccessTime)
+			return false;
+		if (lastModifiedTime != other.lastModifiedTime)
+			return false;
+		if (owner == null) {
+			if (other.owner != null)
+				return false;
+		} else if (!owner.equals(other.owner))
+			return false;
+		if (path == null) {
+			if (other.path != null)
+				return false;
+		} else if (!path.equals(other.path))
+			return false;
+		if (permissions == null) {
+			if (other.permissions != null)
+				return false;
+		} else if (!permissions.equals(other.permissions))
+			return false;
+		if (readable != other.readable)
+			return false;
+		if (size != other.size)
+			return false;
+		if (writable != other.writable)
+			return false;
+		return true;
+	}
+
+	/** Is this a regular file ? */
     private boolean isRegular;
 
     /** Is this a symbolic link ? */

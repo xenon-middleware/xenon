@@ -20,7 +20,8 @@ import java.util.*;
 
 public class JCloudsFileSytem extends FileSystem {
 
-    final String bucket;
+    private static final String NOT_EMPTY = "___not__empty___";
+	final String bucket;
     final BlobStoreContext context;
     final String adaptorName;
     final String endPoint;
@@ -100,7 +101,7 @@ public class JCloudsFileSytem extends FileSystem {
         if(path.endsWith("/")){
             path = path.substring(0,path.length()-1);
         }
-        path = path + "/__not_empty__";
+        path = path + "/" + NOT_EMPTY;
         final Blob b = context.getBlobStore().blobBuilder(bucket).name(path).payload(new NullInputStream(0)).contentLength(0).build();
         context.getBlobStore().putBlob(bucket,b);
     }
@@ -141,6 +142,13 @@ public class JCloudsFileSytem extends FileSystem {
     @Override
     protected void deleteDirectory(Path dir) throws XenonException {
         checkClosed();
+        if(list(dir, false).iterator().hasNext()){
+        	throw new XenonException(adaptorName, "Cannot delete directory: " + dir.getRelativePath() + " not empty!");
+        }
+        String notEmpty = dir.getRelativePath() + "/" + NOT_EMPTY;
+        if(context.getBlobStore().blobExists(bucket, notEmpty)){
+        	context.getBlobStore().removeBlob(bucket, notEmpty);
+        }
     }
 
     @Override
@@ -149,13 +157,24 @@ public class JCloudsFileSytem extends FileSystem {
     }
 
 
-
+    private boolean directoryExists(Path path) throws XenonException{
+    	String name = path.getRelativePath();
+        for (PathAttributes p : listPrefix(name,false, false)) {
+            if (p.getPath().getParent().equals(path) || p.getPath().equals(path)) {
+            	if(p.isDirectory()){
+            		return true;
+            	}
+            }
+        }
+        return false;
+    }
+    
 
     @Override
     public boolean exists(Path path) throws XenonException {
         checkClosed();
         String name = path.getRelativePath();
-        for (PathAttributes p : listPrefix(name, false)) {
+        for (PathAttributes p : listPrefix(name, false, false)) {
             if (p.getPath().getParent().equals(path) || p.getPath().equals(path)) {
                 return true;
             }
@@ -166,7 +185,7 @@ public class JCloudsFileSytem extends FileSystem {
 
     PathAttributes toPathAttributes(final StorageMetadata m, final BlobAccess access){
         Path p = new Path(m.getName());
-
+      	System.out.println(m);
         PathAttributes pa = new PathAttributes();
         pa.setPath(p);
         if(m.getSize() != null) {
@@ -207,14 +226,16 @@ public class JCloudsFileSytem extends FileSystem {
         PageSet<? extends StorageMetadata> curPageSet;
         StorageMetadata nxt;
 
-        ListingIterator(ListContainerOptions options, PageSet<? extends StorageMetadata> pageSet){
+        ListingIterator(ListContainerOptions options,  PageSet<? extends StorageMetadata> pageSet){
             this.options = options;
             this.curPageSet = pageSet;
             this.curIterator = curPageSet.iterator();
             getNext();
+            
         }
 
         void getNext(){
+        	if(options.isDetailed()) System.out.println("hullo!");
             if (!curIterator.hasNext() && curPageSet.getNextMarker() != null){
                 curPageSet = context.getBlobStore().list(bucket,options.afterMarker(curPageSet.getNextMarker()));
                 curIterator = curPageSet.iterator();
@@ -224,6 +245,11 @@ public class JCloudsFileSytem extends FileSystem {
             } else {
                 nxt = null;
             }
+            if(nxt != null && nxt.getName().endsWith(NOT_EMPTY)){
+            	 
+            	getNext();
+            }
+       	 if(options.isDetailed()) System.out.println("hullo3!");
 
         }
 
@@ -234,30 +260,38 @@ public class JCloudsFileSytem extends FileSystem {
         public PathAttributes next() {
 
             BlobAccess access = BlobAccess.PUBLIC_READ; // context.getBlobStore().getBlobAccess(bucket,nxt.getName());
-
+          	System.out.println("bla?");
             PathAttributes res = toPathAttributes(nxt,access);
 
             getNext();
+            
+
+
             return res;
         }
     }
 
 
     public Iterable<PathAttributes> list(Path dir, boolean recursive) throws XenonException{
+    	// TODO: Fixme: this is extremely inefficient
         checkClosed();
-        String name = dir.getRelativePath();
-        Iterable<PathAttributes> pa = listPrefix(dir.getRelativePath() + "/",recursive);
-        if(!pa.iterator().hasNext()){
-            throw new NoSuchPathException(adaptorName, "No such directory: "  + dir.getRelativePath());
+        if(!exists(dir)){
+        	throw new NoSuchPathException(adaptorName, "No such directory: "  + dir.getRelativePath());
         }
+        if(!directoryExists(dir)){
+        	throw new InvalidPathException(getAdaptorName(), "Not a directory: " + dir.getRelativePath());
+        }
+
+        Iterable<PathAttributes> pa = listPrefix(dir.getRelativePath() + "/" ,true, recursive);
 
         return pa;
 
     }
 
-    private Iterable<PathAttributes> listPrefix(String prefix,boolean recursive){
+    private Iterable<PathAttributes> listPrefix(String prefix,boolean details, boolean recursive){
         ListContainerOptions options = new ListContainerOptions().prefix(prefix);
 
+       // if(details) { options = options.withDetails(); }
         if(recursive) { options = options.recursive(); }
         final ListContainerOptions optionsFinal = options;
 
@@ -265,7 +299,7 @@ public class JCloudsFileSytem extends FileSystem {
         return new Iterable<PathAttributes>() {
             @Override
             public Iterator<PathAttributes> iterator() {
-                return new ListingIterator(optionsFinal,context.getBlobStore().list(bucket,optionsFinal));
+                return new ListingIterator(optionsFinal, context.getBlobStore().list(bucket,optionsFinal));
             }
         };}
 
@@ -321,7 +355,7 @@ public class JCloudsFileSytem extends FileSystem {
     public PathAttributes getAttributes(Path path) throws XenonException {
 
         String name = path.getRelativePath();
-        for (PathAttributes p : listPrefix(name, false)) {
+        for (PathAttributes p : listPrefix(name, true, false)) {
             if ( p.getPath().equals(path)) {
                return p;
             }

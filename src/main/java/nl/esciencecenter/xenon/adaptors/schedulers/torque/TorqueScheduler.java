@@ -339,19 +339,22 @@ public class TorqueScheduler extends ScriptingScheduler {
     
     @Override
     @SuppressWarnings("PMD.EmptyIfStmt")
-    public JobStatus cancelJob(String identifier) throws XenonException {
-        RemoteCommandRunner runner = runCommand(null, "qdel", identifier);
+    public JobStatus cancelJob(String jobIdentifier) throws XenonException {
+    	
+    	checkJobIdentifier(jobIdentifier);
+    	
+        RemoteCommandRunner runner = runCommand(null, "qdel", jobIdentifier);
         if (runner.success()) {
             // deleted or already finished
-            addDeletedJob(identifier);
+            addDeletedJob(jobIdentifier);
         } else if (runner.getExitCode() == 170) {
             // job was already finished.
         } else {
-            throw new XenonException(ADAPTOR_NAME, "could not run command qdel for job \"" + identifier + "\". Exit code = "
+            throw new XenonException(ADAPTOR_NAME, "could not run command qdel for job \"" + jobIdentifier + "\". Exit code = "
                     + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
         }
 
-        return getJobStatus(identifier);
+        return getJobStatus(jobIdentifier);
     }
 
     private Map<String, Map<String, String>> getQstatInfo() throws XenonException {

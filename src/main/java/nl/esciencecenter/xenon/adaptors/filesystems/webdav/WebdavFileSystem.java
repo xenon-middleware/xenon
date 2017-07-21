@@ -17,10 +17,7 @@ package nl.esciencecenter.xenon.adaptors.filesystems.webdav;
 
 import static nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor.ADAPTOR_NAME;
 import static nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor.OK_CODE;
-import static nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor.isFolderPath;
 import static nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor.isOkish;
-import static nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor.toFilePath;
-import static nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor.toFolderPath;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -51,15 +48,16 @@ import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
-import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 
 public class WebdavFileSystem extends FileSystem {
@@ -79,70 +77,18 @@ public class WebdavFileSystem extends FileSystem {
 		super(uniqueID, name, location, entryPath, properties);
 		this.client = client;
 	}
+    
+	private String toFolderPath(Path path) {
+		return getLocation() + path.getAbsolutePath() + "/";
+    }
 
-	//	private void assertRegularFileExists(Path path) throws XenonException {
-	//        assertExists(path);
-	//        if (getAttributes(path).isDirectory()) {
-	//            String message = "Specified path should be a file but is a directory: " + path.toString();
-	//            throw new XenonException(ADAPTOR_NAME, message);
-	//        }
-	//    }
-
-	//    private void assertExists(Path path) throws XenonException {
-	//        if (!exists(path)) {
-	//            throw new NoSuchPathException(ADAPTOR_NAME, "Path does not exist " + path.toString());
-	//        }
-	//    }
-
-	//    private void assertNotExists(Path path) throws XenonException {
-	//        if (exists(path)) {
-	//            throw new PathAlreadyExistsException(ADAPTOR_NAME, "Path already exists " + path.toString());
-	//        }
-	//    }
-
-	//    private void assertIsEmpty(Path path) throws XenonException {
-	//        DirectoryStream<Path> newDirectoryStream = newDirectoryStream(path);
-	//        boolean hasNext = newDirectoryStream.iterator().hasNext();
-	//        try {
-	//            newDirectoryStream.close();
-	//        } catch (IOException e) {
-	//            LOGGER.warn("Could not close stream at {} because of IOException with message \"{}\"", path.toString(),
-	//                    e.getMessage());
-	//        }
-	//        if (hasNext) {
-	//            throw new XenonException(ADAPTOR_NAME, "Path is not empty: " + path.toString());
-	//        }
-	//    }
-	//    
-	//    
-	//    private void assertValidArgumentsForNewOutputStream(Path path, OpenOptions processedOptions) throws XenonException {
-	//        if (processedOptions.getReadMode() != null) {
-	//            throw new InvalidOptionsException(ADAPTOR_NAME, "Disallowed open option: READ");
-	//        }
-	//
-	//        if (processedOptions.getAppendMode() == null) {
-	//            throw new InvalidOptionsException(ADAPTOR_NAME, "No append mode provided!");
-	//        }
-	//
-	//        if (processedOptions.getAppendMode() == OpenOption.APPEND) {
-	//            throw new InvalidOptionsException(ADAPTOR_NAME,
-	//                    "Webdav adaptor does not support appending when writing files.");
-	//        }
-	//
-	//        if (processedOptions.getWriteMode() == null) {
-	//            processedOptions.setWriteMode(OpenOption.WRITE);
-	//        }
-	//
-	//        if (processedOptions.getOpenMode() == OpenOption.CREATE) {
-	//            assertNotExists(path);
-	//        } else if (processedOptions.getOpenMode() == OpenOption.OPEN) {
-	//            assertRegularFileExists(path);
-	//        }
-	//    }
-	//
-
-
-	
+	private String toFilePath(Path path) {
+		return getLocation() + path.getAbsolutePath();
+	}
+    
+    private boolean isFolderPath(String path) {
+        return path.endsWith("/");
+    }
 	
 	private MultiStatusResponse[] getResponsesFromPropFindMethod(String folderPath, PropFindMethod method) throws XenonException {
 		MultiStatus multiStatus = null;
@@ -153,9 +99,6 @@ public class WebdavFileSystem extends FileSystem {
 		}
 		return multiStatus.getResponses();
 	}
-	//
-	//    private void throwDirectoryListingException(String folderPath, Exception e) throws XenonException {
-	//    }
 
 	private Object getProperty(DavPropertySet properties, String name) {
 		DavPropertyName propertyName = DavPropertyName.create(name);
@@ -169,8 +112,16 @@ public class WebdavFileSystem extends FileSystem {
 		if (property == null) {
 			return defaultValue;
 		}
-		DateTime dateTime = DateTime.parse((String) property);
-		return dateTime.getMillis();
+		
+		// "Tue, 18 Jul 2017 15:23:01 GMT"
+		try { 
+			DateTime dateTime = DateTime.parse((String) property);
+			return dateTime.getMillis();
+		} catch (Exception e) {
+			String format = "E, d MMMM yyyy H:m:s z";
+			DateTime dateTime = DateTime.parse((String) property, DateTimeFormat.forPattern(format));
+			return dateTime.getMillis();
+		}
 	}
 
 	private long getLongProperty(DavPropertySet properties, String name, long defaultValue) {
@@ -220,7 +171,7 @@ public class WebdavFileSystem extends FileSystem {
 	@Override
 	protected List<PathAttributes> listDirectory(Path path)  throws XenonException {
 
-		String folderPath = toFolderPath(path.toString());
+		String folderPath = toFolderPath(path);
 		PropFindMethod method = null;
 		try {
 			method = new PropFindMethod(folderPath, DavConstants.PROPFIND_ALL_PROP, DavConstants.DEPTH_1);
@@ -234,7 +185,6 @@ public class WebdavFileSystem extends FileSystem {
 		ArrayList<PathAttributes> result = new ArrayList<>(responses.length);
 		
 		for (MultiStatusResponse r : responses) { 
-			
 			String filename = getFileNameFromEntry(r, path);
 			DavPropertySet p = r.getProperties(WebdavFileAdaptor.OK_CODE);
 			result.add(getAttributes(path.resolve(filename), p, isFolderPath(filename)));
@@ -243,27 +193,19 @@ public class WebdavFileSystem extends FileSystem {
 		return result;
 	}
 
-//
-//
-//	private List<MultiStatusResponse> listDirectory(Path path) throws XenonException {
-//		assertPathExists(path);
-//
-//		String folderPath = toFolderPath(path.toString());
-//		PropFindMethod method = null;
-//		try {
-//			method = new PropFindMethod(folderPath, DavConstants.PROPFIND_ALL_PROP, DavConstants.DEPTH_1);
-//			client.executeMethod(method);
-//		} catch (IOException e) {
-//			throw new XenonException(ADAPTOR_NAME, "Could not create directory listing of " + folderPath, e);
-//		}
-//		MultiStatusResponse[] responses = getResponsesFromPropFindMethod(folderPath, method);
-//		return new LinkedList<>(Arrays.asList(responses));
-//	}
 
 	private void executeMethod(HttpClient client, HttpMethod method) throws IOException {
+		
+		System.out.println("Client: " + client + " " + method);
+		
 		int response = client.executeMethod(method);
+		
+		
 		String responseBodyAsString = method.getStatusLine().toString();
 		method.releaseConnection();
+		
+		System.out.println("Got response: " + responseBodyAsString);
+		
 		if (!isOkish(response)) {
 			throw new IOException(responseBodyAsString);
 		}
@@ -296,11 +238,20 @@ public class WebdavFileSystem extends FileSystem {
 	}
 
 	private PathAttributes getFileOrDirAttributes(Path path, HttpClient client) throws XenonException {
+		
+		LOGGER.debug("Retrieving attributes for path {}", path);
+		
 		try {
-			String folderPath = toFolderPath(path.toString());
+			String folderPath = toFolderPath(path);
+			
+			LOGGER.debug("Trying folderpath {}", folderPath);
+				
 			return getAttributes(path, getPathProperties(client, folderPath), true);
 		} catch (XenonException e) {
-			String filePath = toFilePath(path.toString());
+			String filePath = toFilePath(path);
+			
+			LOGGER.debug("Trying filepath {}", filePath);
+			
 			return getAttributes(path, getPathProperties(client, filePath), false);
 		}
 	}
@@ -343,11 +294,11 @@ public class WebdavFileSystem extends FileSystem {
 		String targetPath;
 
 		if (getAttributes(source).isDirectory()) {
-			sourcePath = toFolderPath(source.toString());
-			targetPath = toFolderPath(target.toString());
+			sourcePath = toFolderPath(source);
+			targetPath = toFolderPath(target);
 		} else {
-			sourcePath = toFilePath(source.toString());
-			targetPath = toFilePath(target.toString());
+			sourcePath = toFilePath(source);
+			targetPath = toFilePath(target);
 		}
 
 		MoveMethod method = new MoveMethod(sourcePath, targetPath, false);
@@ -366,7 +317,7 @@ public class WebdavFileSystem extends FileSystem {
 
 		assertPathNotExists(dir);
 
-		String folderPath = toFolderPath(dir.toString());
+		String folderPath = toFolderPath(dir);
 		DavMethod method = new MkColMethod(folderPath);
 		try {
 			executeMethod(client, method);
@@ -386,28 +337,10 @@ public class WebdavFileSystem extends FileSystem {
 		throw new UnsupportedOperationException(ADAPTOR_NAME, "Operation not supported");
 	}
 
-//	public void createFile(Path file, byte [] data) throws XenonException {
-//		createFile(file, new ByteArrayInputStream(data));
-//	}
-//
-//	public void createFile(Path file, InputStream data) throws XenonException {
-//		LOGGER.debug("createFile path = {}", file);
-//		assertPathNotExists(file);
-//		String filePath = toFilePath(file.toString());
-//		PutMethod method = new PutMethod(filePath);
-//		method.setRequestEntity(new InputStreamRequestEntity(data));
-//		try {
-//			executeMethod(client, method);
-//		} catch (IOException e) {
-//			throw new XenonException(ADAPTOR_NAME, "Could not create file " + filePath, e);
-//		}
-//		LOGGER.debug("createFile OK");
-//	}
-
 	private void createFile(Path file, long size, InputStream data) throws XenonException {
 		LOGGER.debug("createFile path = {}", file);
 		assertPathNotExists(file);
-		String filePath = toFilePath(file.toString());
+		String filePath = toFilePath(file);
 		PutMethod method = new PutMethod(filePath);
 		method.setRequestEntity(new InputStreamRequestEntity(data, size));
 		try {
@@ -421,53 +354,35 @@ public class WebdavFileSystem extends FileSystem {
 	
 	@Override
 	protected void deleteFile(Path path) throws XenonException {
-		executeDeleteMethod(toFilePath(path.toString()), client);
+		executeDeleteMethod(toFilePath(path), client);
 	}
 
 	@Override
 	protected void deleteDirectory(Path path) throws XenonException {
-		executeDeleteMethod(toFolderPath(path.toString()), client);
+		executeDeleteMethod(toFolderPath(path), client);
 	}
 
 	@Override
 	public boolean exists(Path path) throws XenonException {
-		LOGGER.debug("exists path = {}", path);
+		System.out.println("exists path =" +path);
 		try {
-			getAttributes(path);
+			PathAttributes a = getAttributes(path);
+			
+			System.out.println("exists path =" + a);
+			
 			return true;
 		} catch (XenonException e) {
 			// getAttributes did not find evidence that the specified path exists
+			
+			System.out.println("exists path failed");
+			e.printStackTrace();
 			return false;
 		}
 	}
 
-	//	@Override
-	//	public DirectoryStream<Path> newDirectoryStream(Path dir, Filter filter) throws XenonException {
-	//		LOGGER.debug("newDirectoryStream path = {} filter = <?>", dir);
-	//		
-	//		if (filter == null) {
-	//			throw new XenonException(ADAPTOR_NAME, "Filter cannot be null.");
-	//		}
-	//
-	//		return new WebdavDirectoryStream(dir, filter, listDirectory(dir));
-	//	}
-	//
-	//	@Override
-	//	public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir, Filter filter)
-	//			throws XenonException {
-	//		LOGGER.debug("newAttributesDirectoryStream path = {} filter = <?>", dir);
-	//		if (dir == null) {
-	//			throw new XenonException(ADAPTOR_NAME, "Cannot open attribute directory stream of null path");
-	//		}
-	//		if (filter == null) {
-	//			throw new XenonException(ADAPTOR_NAME, "Filter cannot be null.");
-	//		}
-	//		return new WebdavDirectoryAttributeStream(dir, filter, listDirectory(dir));
-	//	}
-
 	@Override
 	public InputStream readFromFile(Path path) throws XenonException {
-		String filePath = toFilePath(path.toString());
+		String filePath = toFilePath(path);
 		assertFileExists(path);
 		GetMethod method = new GetMethod(filePath);
 		try {
@@ -517,108 +432,4 @@ public class WebdavFileSystem extends FileSystem {
 	public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
 		throw new XenonException(ADAPTOR_NAME, "Operation not supported");
 	}
-
-//	private void streamCopy(InputStream in, OutputStream out) throws IOException {
-//		byte[] buffer = new byte[BUFFER_SIZE];
-//		int size = in.read(buffer);
-//		while (size > 0) {
-//			out.write(buffer, 0, size);
-//			size = in.read(buffer);
-//		}
-//	}
-
-//	private void assertValidOptionsForCopy(CopyOption option) throws InvalidOptionsException {
-//		if (CopyOption.APPEND.equals(option)) {
-//			throw new InvalidOptionsException(ADAPTOR_NAME,
-//					"Webdav adaptor does not support appending when copying files.");
-//		}
-//		if (CopyOption.RESUME.equals(option)) {
-//			throw new InvalidOptionsException(ADAPTOR_NAME,
-//					"Webdav adaptor does not support resuming when copying files.");
-//		}
-//		if (CopyOption.VERIFY_AND_RESUME.equals(option)) {
-//			throw new InvalidOptionsException(ADAPTOR_NAME,
-//					"Webdav adaptor does not support resuming when copying files.");
-//		}
-//	}
-
-//	@Override
-//	public CopyHandle copy(CopyDescription description) throws XenonException {
-
-//		LOGGER.debug("copy description = {} ", description);
-//
-//		Path source = description.getSourcePath();
-//		Path target = description.getDestinationPath();
-//
-//		CopyOption option = description.getOption();
-//
-//		assertValidOptionsForCopy(option);
-//
-//		// Extra check just to match behavior of other files adaptors and tests.
-//		if (areSamePaths(description.getSourcePath(), target) && CopyOption.CREATE.equals(option)) {
-//			return null;
-//		}
-//
-//		if (exists(target)) { 
-//			if (CopyOption.CREATE.equals(option)) { 
-//				throw new PathAlreadyExistsException(ADAPTOR_NAME, "Destination path already exists: " + target);
-//			}
-//
-//			if (CopyOption.IGNORE.equals(option)) { 
-//				return null;
-//			}
-//		}
-
-		/* TODO: Test if this works -- and move into separate thread 
-
-        String filePath = toFilePath(target.toString());
-        PutMethod method = new PutMethod(filePath);
-        method.setRequestEntity(new PathRequestEntity(this, source));
-
-        try {
-            executeMethod(client, method);
-        } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME, "Could not create file " + filePath, e);
-        }
-		 */
-
-//		InputStream inputStream = newInputStream(source);
-//
-//		OutputStream outputStream = newOutputStream(target, OpenOption.OPEN_OR_CREATE, OpenOption.TRUNCATE, OpenOption.WRITE);
-//
-//		try {
-//			streamCopy(inputStream, outputStream);
-//			inputStream.close();
-//			// NB. Webdav output stream buffers all and writes it all at once upon close.
-//			outputStream.close();
-//		} catch (IOException e) {
-//			throw new XenonException(ADAPTOR_NAME, "Copy failed!", e);
-//		}
-//
-//		CopyHandle result = null;
-//		LOGGER.debug("copy OK result = {}", result);
-//		return result;
-//
-//		return null;
-//		
-//	}
-//
-//	@Override
-//	public CopyStatus getStatus(CopyHandle copy) throws XenonException {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//	@Override
-//	public CopyStatus cancel(CopyHandle copy) throws XenonException {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//	@Override
-//	public CopyStatus waitUntilDone(CopyHandle copy, long timeout) throws XenonException {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-
 }

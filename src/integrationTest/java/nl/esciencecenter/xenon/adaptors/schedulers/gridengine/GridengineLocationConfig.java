@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.schedulers.slurm;
+package nl.esciencecenter.xenon.adaptors.schedulers.gridengine;
 
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
 
-public class SlurmLocationConfig extends SchedulerLocationConfig {
+public class GridengineLocationConfig extends SchedulerLocationConfig {
 
 	private String location;
 	
-	public SlurmLocationConfig(String location) { 
+	public GridengineLocationConfig(String location) { 
 		this.location = location; 
 	}
 	
@@ -32,11 +32,11 @@ public class SlurmLocationConfig extends SchedulerLocationConfig {
 
 	@Override
 	public String[] getQueueNames() {
-		return new String[] { "mypartition", "otherpartition" };
+		return new String[] { "default", "slow" };
 	}
 
 	@Override
 	public String getDefaultQueueName() {
-		return "mypartition";
+		return null;
 	}
 }

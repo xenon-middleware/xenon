@@ -13,30 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.schedulers.slurm;
+package nl.esciencecenter.xenon.adaptors.filesystems.webdav;
 
-import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
+import java.util.Map;
 
-public class SlurmLocationConfig extends SchedulerLocationConfig {
+import nl.esciencecenter.xenon.adaptors.filesystems.LocationConfig;
+import nl.esciencecenter.xenon.filesystems.Path;
 
-	private String location;
-	
-	public SlurmLocationConfig(String location) { 
-		this.location = location; 
-	}
-	
-	@Override
-	public String getLocation() {
-		return location;
-	}
+public class WebdavLocationConfig extends LocationConfig {
+    @Override
+    public Path getExistingPath() {
+        return new Path("~xenon/filesystem-test-fixture/links/file0");
+    }
 
-	@Override
-	public String[] getQueueNames() {
-		return new String[] { "mypartition", "otherpartition" };
-	}
-
-	@Override
-	public String getDefaultQueueName() {
-		return "mypartition";
-	}
+    @Override
+    public Map.Entry<Path, Path> getSymbolicLinksToExistingFile() {
+        // Not supported
+    	return null;
+    }
 }

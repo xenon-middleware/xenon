@@ -13,13 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.filesystems.sftp;
-
-import static nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor.LOAD_STANDARD_KNOWN_HOSTS;
-import static nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor.STRICT_HOST_KEY_CHECKING;
-
-import java.util.HashMap;
-import java.util.Map;
+package nl.esciencecenter.xenon.adaptors.filesystems.webdav;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.LocationConfig;
@@ -28,31 +22,26 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
 
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
-import nl.esciencecenter.xenon.filesystems.Path;
 import org.junit.ClassRule;
 
-public class SftpFileSystemDockerTest extends SftpFileSystemTestParent {
-
-
+public class WebdavFileSystemDockerTest extends WebdavFileSystemTestParent {
 
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder()
-        .file("src/integrationTest/resources/docker-compose/openssh.yml")
-        .waitingForService("ssh", HealthChecks.toHaveAllPortsOpen())
+        .file("src/integrationTest/resources/docker-compose/webdav.yml")
+        .waitingForService("webdav", HealthChecks.toHaveAllPortsOpen()).saveLogsTo("/tmp/webdav.txt")
         .build();
 
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
-        return new SftpLocationConfig();
+        return new WebdavLocationConfig();
     }
 
     @Override
     public FileSystem setupFileSystem() throws XenonException {
-        String location = docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT");
+        String location = docker.containers().container("webdav").port(80).inFormat("http://$HOST:$EXTERNAL_PORT");
         PasswordCredential cred = new PasswordCredential("xenon", "javagat".toCharArray());
-        Map<String, String> props = new HashMap<>();
-        props.put(STRICT_HOST_KEY_CHECKING, "false");
-        props.put(LOAD_STANDARD_KNOWN_HOSTS, "false");
-        return FileSystem.create("sftp", location, cred, props);
-    }
+        return FileSystem.create("webdav", location, cred);
+    }        
+    
 }

@@ -497,7 +497,18 @@ public abstract class Scheduler {
      *             If the status of the job could not be retrieved.
      */
     public abstract JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException;
-
+    
+    protected void checkJobIdentifier(String jobIdentifier) {
+		if (jobIdentifier == null || jobIdentifier.isEmpty()) { 
+    		throw new IllegalArgumentException("No job identifier specified");
+    	}
+    }
+    
+    protected void checkTimeout(long timeout) {
+    	if (timeout < 0) { 
+            throw new IllegalArgumentException("Illegal timeout " + timeout);
+		}
+	}
     
 	@Override
 	public int hashCode() {

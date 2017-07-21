@@ -245,6 +245,9 @@ public class SlurmScheduler extends ScriptingScheduler {
 
     @Override
     public JobStatus cancelJob(String jobIdentifier) throws XenonException {
+    	
+    	checkJobIdentifier(jobIdentifier);
+    	
         String output = runCheckedCommand(null, "scancel", jobIdentifier);
 
         if (!output.isEmpty()) {

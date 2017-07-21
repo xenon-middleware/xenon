@@ -36,7 +36,7 @@ public class HDFSFileAdaptor extends FileAdaptor{
     protected static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[0];
 
     public HDFSFileAdaptor() {
-        super("hdfs", ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false);
+        super("hdfs", ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, false ,false);
     }
 
 

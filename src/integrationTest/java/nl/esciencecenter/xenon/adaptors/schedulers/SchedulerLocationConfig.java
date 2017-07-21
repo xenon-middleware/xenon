@@ -19,5 +19,12 @@ public abstract class SchedulerLocationConfig {
 
 	public abstract String getLocation();
 
+	public abstract String [] getQueueNames();
+	
+	public abstract String getDefaultQueueName();
+	
+	
+	
+	
     //public abstract Map.Entry<Path,Path> getSymbolicLinksToExistingFile();
 }

@@ -295,8 +295,9 @@ public class JobQueueScheduler extends Scheduler {
 	public JobStatus waitUntilDone(String jobIdentifier, long timeout) throws XenonException {
 		LOGGER.debug("{}: Waiting for job {} for {} ms.", adaptorName, jobIdentifier, timeout);
 
-		//checkScheduler(job.getScheduler());
-
+		checkJobIdentifier(jobIdentifier);
+		checkTimeout(timeout);
+		
 		JobStatus status = findJob(jobIdentifier).waitUntilDone(timeout);
 
 		if (status.isDone()) {
@@ -313,8 +314,9 @@ public class JobQueueScheduler extends Scheduler {
 
 		LOGGER.debug("{}: Waiting for job {} to start for {} ms.", adaptorName, jobIdentifier, timeout);
 
-		///checkScheduler(job.getScheduler());
-
+		checkJobIdentifier(jobIdentifier);
+		checkTimeout(timeout);
+		
 		JobStatus status = findJob(jobIdentifier).waitUntilRunning(timeout);
 
 		if (status.isDone()) {
@@ -437,8 +439,8 @@ public class JobQueueScheduler extends Scheduler {
 	public JobStatus cancelJob(String jobIdentifier) throws XenonException {
 		LOGGER.debug("{}: Cancel job {}", adaptorName, jobIdentifier);
 
-		// checkScheduler(job.getScheduler());
-
+		checkJobIdentifier(jobIdentifier);
+		
 		JobExecutor e = findJob(jobIdentifier);
 
 		boolean killed = e.kill();

@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers.ssh;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.sshd.client.SshClient;
@@ -27,7 +26,6 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
-import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobQueueScheduler;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil;

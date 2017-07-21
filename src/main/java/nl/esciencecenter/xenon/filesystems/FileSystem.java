@@ -98,14 +98,7 @@ public abstract class FileSystem {
 	}
 
 	public static String [] getAdaptorNames() {
-
-		ArrayList<String> tmp = new ArrayList<>();
-
-		for (FileAdaptor a : adaptors.values()) {
-			tmp.add(a.getName());
-		}
-
-		return tmp.toArray(new String[tmp.size()]);
+		return adaptors.keySet().toArray(new String[0]);
 	}
 
 	public static FileSystemAdaptorDescription getAdaptorDescription(String adaptorName) throws XenonException {
@@ -113,6 +106,9 @@ public abstract class FileSystem {
 	}
 
 	public static FileSystemAdaptorDescription [] getAdaptorDescriptions() throws XenonException {
+
+		// TODO: see getNames
+		
 		String [] names = getAdaptorNames();
 
 		FileSystemAdaptorDescription[] result = new FileSystemAdaptorDescription[names.length];
@@ -447,8 +443,8 @@ public abstract class FileSystem {
 
 		if (getAttributes(path).isDirectory()) {
 
-			if (recursive) {
-				for (PathAttributes p : list(path, false)) {
+			for (PathAttributes p : list(path, false)) { 
+			if (recursive) { 
 					delete(p.getPath(), true);
 				}
 			}
@@ -975,7 +971,7 @@ public abstract class FileSystem {
 	 * @throws XenonException
 	 *             If an I/O error occurred.
 	 */
-	public synchronized String copy(Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive) throws XenonException {
+	public synchronized String copy(final Path source, final FileSystem destinationFS, final Path destination, final CopyMode mode, final boolean recursive) throws XenonException {
 
 		if (source == null) {
 			throw new IllegalArgumentException("Source path is null");
@@ -991,7 +987,7 @@ public abstract class FileSystem {
 
 		String ID = getNextCopyID();
 
-		CopyCallback callback = new CopyCallback();
+		final CopyCallback callback = new CopyCallback();
 
 		Future<Void> future = pool.submit(new Callable<Void>() {
 			@Override

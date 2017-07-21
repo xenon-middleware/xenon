@@ -125,7 +125,8 @@ public class AdaptorDocGenerator {
             out.println("No properties.");
         }
         out.println("<h4>Supported features</h4><ul>");
-        out.println(String.format("<li>Symbolic links: %s</li>", description.supportsSymboliclinks()));
+        out.println(String.format("<li>Read symbolic links: %s</li>", description.canReadSymboliclinks()));
+        out.println(String.format("<li>Create symbolic links: %s</li>", description.canCreateSymboliclinks()));
         out.println(String.format("<li>Third party copy: %s</li>", description.supportsThirdPartyCopy()));
         out.println("</ul>");
     }

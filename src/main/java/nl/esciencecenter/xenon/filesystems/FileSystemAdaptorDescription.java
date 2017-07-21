@@ -29,13 +29,15 @@ import nl.esciencecenter.xenon.XenonPropertyDescription;
 public class FileSystemAdaptorDescription extends AdaptorDescription {
 
 	private final boolean supportsThirdPartyCopy;
-	private final boolean supportsSymbolicLinks;
+	private final boolean readSymbolicLinks;
+	private final boolean createSymbolicLinks;
 	
     public FileSystemAdaptorDescription(String name, String description, String[] supportedLocations,
-			XenonPropertyDescription[] supportedProperties, boolean supportsThirdPartyCopy, boolean supportsSymbolicLinks) {
+			XenonPropertyDescription[] supportedProperties, boolean supportsThirdPartyCopy, boolean readSymbolicLinks, boolean createSymbolicLinks) {
 		super(name, description, supportedLocations, supportedProperties);
 		this.supportsThirdPartyCopy = supportsThirdPartyCopy;
-		this.supportsSymbolicLinks = supportsSymbolicLinks;
+		this.readSymbolicLinks = readSymbolicLinks;
+		this.createSymbolicLinks = createSymbolicLinks;
 	}
 
 	/**
@@ -50,6 +52,14 @@ public class FileSystemAdaptorDescription extends AdaptorDescription {
     	return supportsThirdPartyCopy;
     }
     
+    public boolean canReadSymboliclinks() {
+    	return readSymbolicLinks;
+	}
+    
+    public boolean canCreateSymboliclinks() {
+    	return createSymbolicLinks;
+	}
+    
     @Override
     public String toString() {
         return "FileAdaptorDescription [name=" + getName() + ", description=" + getDescription() + 
@@ -58,15 +68,7 @@ public class FileSystemAdaptorDescription extends AdaptorDescription {
         		", supportsThirdPartyCopy=" + supportsThirdPartyCopy + "]";
     }
 
-	public boolean supportsSymboliclinks() {
-    	return supportsSymbolicLinks;
-	}
+    // TODO: Fix me! Bad default, no way to set!
+    public boolean isConnectionless() { return true; }
 
-	public boolean supportsNullFileSystemLocation() {
-    	return false;
-	}
-
-	public boolean isConnectionless() {
-    	return false;
-	}
 }
