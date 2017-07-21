@@ -17,134 +17,50 @@ package nl.esciencecenter.xenon.filesystems;
 
 import java.util.Set;
 
-
 /**
  * FileAttributes represents a set of attributes of a path.
  */
-public class PathAttributes {
+public interface PathAttributes {
 	
-	/** The path these attributes belong to */
-	private Path path;
-	
-	 /** Is this a directory ? */
-    private boolean isDirectory;
-
-    /** Is this a regular file ? */
-    private boolean isRegular;
-
-    /** Is this a symbolic link ? */
-    private boolean isSymbolicLink;
-    
-    /** Is this an other type of file ? */
-    private boolean isOther;
-    
-    /** Is the file executable ? */
-    private boolean executable;
-
-    /** Is the file readable ? */
-    private boolean readable;
-
-    /** Is the file writable ? */
-    private boolean writable;
-
-    /** Is the file hidden ? */
-    private boolean hidden;
-
-    /** The creation time of this file */
-    private long creationTime;
-    
-    /** The last access time of this file */
-    private long lastAccessTime;
-    
-    /** The last modified time of this file */
-    private long lastModifiedTime;
-
-    /** The size of this file */
-    private long size;
-    
-    /** The owner of this file */
-    private String owner;
-    
-    /** The group of this file */
-    private String group;
-    
-    /** The permissions of this file (POSIX only) */
-    private Set<PosixFilePermission> permissions;
-    
-    public PathAttributes() { 
-    	// EMPTY
-    }
-
     /**
      * Get the path these attributes belong to.
      * 
      * @return
      *   	the path these attributes belong to.
      */
-    public Path getPath() {  
-		return path;
-	}
-
-	public void setPath(Path path) {
-		this.path = path;
-	}
-
+    Path getPath();
+    
     /**
      * Does the path refer to a directory ?
      * 
      * @return
      *          if the path refers to a directory.
      */
-    public boolean isDirectory() {
-		return isDirectory;
-	}
-
-	public void setDirectory(boolean isDirectory) {
-		this.isDirectory = isDirectory;
-	}
-
+    boolean isDirectory();
+    
 	/**
      * Does the path refer to a regular file ?
      * 
      * @return 
      *          if the path refers to a regular file.
      */
-	public boolean isRegular() {
-		return isRegular;
-	}
-
-	public void setRegular(boolean isRegular) {
-		this.isRegular = isRegular;
-	}
-
-
+	boolean isRegular();
+	
     /**
      * Does the path refer to a symbolic link ?
      * 
      * @return 
      *          if the path refers to a symbolic link.
      */
-	public boolean isSymbolicLink() {
-		return isSymbolicLink;
-	}
-
-	public void setSymbolicLink(boolean isSymbolicLink) {
-		this.isSymbolicLink = isSymbolicLink;
-	}
-
+	boolean isSymbolicLink();
+	
     /**
      * Is the path not a file, link or directory ?
      * 
      * @return 
      *          if the path does not refer to a file, link or directory.
      */
-	public boolean isOther() {
-		return isOther;
-	}
-
-	public void setOther(boolean isOther) {
-		this.isOther = isOther;
-	}
+	boolean isOther();
 	
     /**
      * Does the path refer to an executable file ?
@@ -152,57 +68,31 @@ public class PathAttributes {
      * @return 
      *          if the path refers an executable file ?
      */
-	public boolean isExecutable() {
-		return executable;
-	}
-
-	public void setExecutable(boolean executable) {
-		this.executable = executable;
-	}
-
+	boolean isExecutable();
 	
-	   /**
+	/**
      * Does the path refer to an readable file ?
      * 
      * @return 
      *          if the path refers an readable file ?
      */
-	public boolean isReadable() {
-		return readable;
-	}
-
-	public void setReadable(boolean readable) {
-		this.readable = readable;
-	}
-
+	public boolean isReadable();
+	
     /**
      * Does the path refer to a writable file ?
      * 
      * @return 
      *          if the path refers a writable file ?
      */
-	public boolean isWritable() {
-		return writable;
-	}
-
-	public void setWritable(boolean writable) {
-		this.writable = writable;
-	}
-
+	boolean isWritable();
+	
     /**
      * Does the path refer to an hidden file ?
      * 
      * @return 
      *          if the path refers an hidden file ?
      */
-	public boolean isHidden() {
-		return hidden;
-	}
-
-	public void setHidden(boolean hidden) {
-		this.hidden = hidden;
-	}
-
+	boolean isHidden();
 	
 	/**
      * Get the creation time for this file.
@@ -212,14 +102,8 @@ public class PathAttributes {
      * @return 
      *          the creation time for this file.
      */
-	public long getCreationTime() {
-		return creationTime;
-	}
-
-	public void setCreationTime(long creationTime) {
-		this.creationTime = creationTime;
-	}
-
+	long getCreationTime();
+	
     /**
      * Get the last access time for this file.
      * 
@@ -228,14 +112,8 @@ public class PathAttributes {
      * @return 
      *          the last access time for this file.
      */
-	public long getLastAccessTime() {
-		return lastAccessTime;
-	}
-
-	public void setLastAccessTime(long lastAccessTime) {
-		this.lastAccessTime = lastAccessTime;
-	}
-
+	long getLastAccessTime();
+	
     /**
      * Get the last modified time for this file.
      * 
@@ -244,14 +122,7 @@ public class PathAttributes {
      * @return 
      *          the last modified time for this file.
      */
-	public long getLastModifiedTime() {
-		return lastModifiedTime;
-	}
-
-	public void setLastModifiedTime(long lastModifiedTime) {
-		this.lastModifiedTime = lastModifiedTime;
-	}
-
+	long getLastModifiedTime();
 	
     /**
      * Get the size of this file in bytes.
@@ -261,17 +132,10 @@ public class PathAttributes {
      * @return 
      *          the size of this file.
      */
-	public long getSize() {
-		return size;
-	}
-
-	public void setSize(long size) {
-		this.size = size;
-	}
-
+	long getSize();
 	
     /**
-     * Get the owner of this file.
+     * Get the owner of this file (optional operation).
      * 
      * @return 
      *          the owner of this file.
@@ -279,16 +143,10 @@ public class PathAttributes {
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
-	public String getOwner() throws AttributeNotSupportedException {
-		return owner;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
-
+	String getOwner() throws AttributeNotSupportedException;
+	
 	 /**
-     * Get the group of this file.
+     * Get the group of this file (optional operation).
      * 
      * @return 
      *          the group of this file.
@@ -296,17 +154,10 @@ public class PathAttributes {
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
-	public String getGroup() throws AttributeNotSupportedException {
-		return group;
-	}
-
-	public void setGroup(String group) {
-		this.group = group;
-	}
-
+	String getGroup() throws AttributeNotSupportedException;
 
     /**
-     * Get the permissions of this file.
+     * Get the permissions of this file (optional operation).
      * 
      * @return 
      *          the permissions of this file.
@@ -314,15 +165,5 @@ public class PathAttributes {
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
-	public Set<PosixFilePermission> getPermissions() throws AttributeNotSupportedException {
-		return permissions;
-	}
-
-	public void setPermissions(Set<PosixFilePermission> permissions) {
-		this.permissions = permissions;
-	}   
-	
-	public String toString() { 
-		return path.getAbsolutePath();
-	}
+	Set<PosixFilePermission> getPermissions() throws AttributeNotSupportedException;
 }

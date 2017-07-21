@@ -95,28 +95,85 @@ public abstract class FileSystem {
 	}
 
 	public static String [] getAdaptorNames() {
-		return adaptors.keySet().toArray(new String[0]);
+		return adaptors.keySet().toArray(new String[adaptors.size()]);
 	}
 
 	public static FileSystemAdaptorDescription getAdaptorDescription(String adaptorName) throws XenonException {
-		return getAdaptorByName(adaptorName).getAdaptorDescription();
+		return getAdaptorByName(adaptorName);
 	}
 
 	public static FileSystemAdaptorDescription [] getAdaptorDescriptions() throws XenonException {
+		return adaptors.values().toArray(new FileSystemAdaptorDescription[adaptors.size()]);
+	}
+	
+	/**
+	 * CopyStatus contains status information for a specific copy operation.
+	 */
+	public static class CopyStatusImplementation implements CopyStatus {
 
-		// TODO: see getNames
-		
-		String [] names = getAdaptorNames();
+		private final String copyIdentifier;
+		private final String state;
+		private final Throwable exception;
 
-		FileSystemAdaptorDescription[] result = new FileSystemAdaptorDescription[names.length];
+		private final long bytesToCopy;
+		private final long bytesCopied;
 
-		for (int i=0;i<names.length;i++) { 
-			result[i] = getAdaptorDescription(names[i]);
+		public CopyStatusImplementation(String copyIdentifier, String state, long bytesToCopy, long bytesCopied, Throwable exception) {
+			super();
+			this.copyIdentifier = copyIdentifier;
+			this.state = state;
+			this.bytesToCopy = bytesToCopy;
+			this.bytesCopied = bytesCopied;
+			this.exception = exception;
 		}
 
-		return result;
-	}
+		@Override
+		public String getCopyIdentifier() {
+			return copyIdentifier;
+		}
 
+		@Override
+		public String getState() {
+			return state;
+		}
+
+		@Override
+		public Throwable getException() {
+			return exception;
+		}
+
+		@Override
+		public boolean isRunning() {
+			return "RUNNING".equals(state);
+		}
+
+		@Override
+		public boolean isDone() {
+			return "DONE".equals(state) || "FAILED".equals(state);
+		}
+
+		@Override
+		public boolean hasException() {
+			return exception != null;
+		}
+
+		@Override
+		public long bytesToCopy() {
+			return bytesToCopy;
+		}
+
+		@Override
+		public long bytesCopied() {
+			return bytesCopied;
+		}
+
+		@Override
+		public String toString() {
+			return "CopyStatus [copyIdentifier=" + copyIdentifier + ", state=" + state + ", exception=" + exception + 
+					", bytesToCopy=" + bytesToCopy + ", bytesCopied=" + bytesCopied + "]";
+		}
+	}
+	
 	/**
 	 * Create a new FileSystem that represents a (possibly remote) data store 
 	 * at the <code>location</code> using the <code>credentials</code> to get 
@@ -1039,7 +1096,7 @@ public abstract class FileSystem {
 			state = "FAILED";
 		}
 		
-		return new CopyStatus(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
+		return new CopyStatusImplementation(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
 	}
 	
 	/**
@@ -1100,7 +1157,7 @@ public abstract class FileSystem {
 			pendingCopies.remove(copyIdentifier);
 		}
 		
-		return new CopyStatus(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
+		return new CopyStatusImplementation(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
 	}
 	
 	/**
@@ -1149,7 +1206,7 @@ public abstract class FileSystem {
 			state = "RUNNING";
 		}		
 			
-		return new CopyStatus(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
+		return new CopyStatusImplementation(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
 	}
 	
 	protected void assertPathExists(Path path) throws XenonException {

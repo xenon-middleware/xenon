@@ -67,7 +67,7 @@ public class SchedulerTest {
 		  LocalSchedulerAdaptor l = new LocalSchedulerAdaptor();
 		  
 		  assertEquals("local", l.getName());
-		  assertTrue(d.isOnline());
+		  assertTrue(d.isEmbedded());
 		  assertTrue(d.supportsBatch());
 		  assertTrue(d.supportsInteractive());
 		  assertEquals(LocalSchedulerAdaptor.ADAPTOR_DESCRIPTION, d.getDescription());
@@ -125,15 +125,21 @@ public class SchedulerTest {
 	  }
 
 	  @Test
-	  public void test_isOnlineTrue() throws Exception {
+	  public void test_isEmbeddedTrue() throws Exception {
 		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, true, null);
-		  assertTrue(s.isOnline());
+		  assertTrue(s.isEmbedded());
 	  }
 
 	  @Test
-	  public void test_isOnlineFalse() throws Exception {
+	  public void test_isEmbeddedFalse() throws Exception {
 		  Scheduler s = new MockScheduler("0", "TEST", "MEM", false, true, true, null);
-		  assertFalse(s.isOnline());
+		  assertFalse(s.isEmbedded());
+	  }
+
+	  @Test
+	  public void test_isEmbeddedDefaultFalse() throws Exception {
+		  Scheduler s = new MockDefaultScheduler("0", "TEST", "MEM", null);
+		  assertFalse(s.isEmbedded());
 	  }
 	  
 	  @Test
@@ -155,11 +161,23 @@ public class SchedulerTest {
 	  }
 
 	  @Test
+	  public void test_supportsBathDefaultTrue() throws Exception {
+		  Scheduler s = new MockDefaultScheduler("0", "TEST", "MEM", null);
+		  assertTrue(s.supportsBatch());
+	  }
+	  
+	  @Test
 	  public void test_supportsInteractiveFalse() throws Exception {
 		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, false, null);
 		  assertFalse(s.supportsInteractive());
 	  }
 
+	  @Test
+	  public void test_supportsInteractiveDefaultFalse() throws Exception {
+		  Scheduler s = new MockDefaultScheduler("0", "TEST", "MEM", null);
+		  assertFalse(s.supportsInteractive());
+	  }
+	  
 	  @Test
 	  public void test_equalsTrueSelf() throws Exception {
 		  Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
@@ -196,7 +214,7 @@ public class SchedulerTest {
 		  Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, true, prop);
 		  assertEquals(p, s.getProperties());
 	  }
-
+	  
 	  @Test
 	  public void test_hashcode() throws Exception {
 		  Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);

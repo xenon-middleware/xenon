@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
+import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
@@ -134,7 +136,7 @@ public final class SlurmUtils {
             exception = new XenonException(ADAPTOR_NAME, "Job failed for unknown reason");
         }
 
-        JobStatus result = new JobStatus(jobIdentifier, state, exitcode, exception, isRunningState(state),
+        JobStatus result = new JobStatusImplementation(jobIdentifier, state, exitcode, exception, isRunningState(state),
                 isDoneOrFailedState(state), jobInfo);
 
         LOGGER.debug("Got job status from sacct output {}", result);
@@ -169,7 +171,7 @@ public final class SlurmUtils {
                     + "\" for unknown reason");
         }
 
-        JobStatus result = new JobStatus(jobIdentifier, state, exitcode, exception, isRunningState(state),
+        JobStatus result = new JobStatusImplementation(jobIdentifier, state, exitcode, exception, isRunningState(state),
                 isDoneOrFailedState(state), jobInfo);
 
         LOGGER.debug("Got job status from scontrol output {}", result);
@@ -191,7 +193,7 @@ public final class SlurmUtils {
 
         String state = jobInfo.get("STATE");
 
-        return new JobStatus(jobIdentifier, state, null, null, isRunningState(state), false, jobInfo);
+        return new JobStatusImplementation(jobIdentifier, state, null, null, isRunningState(state), false, jobInfo);
     }
 
     protected static QueueStatus getQueueStatusFromSInfo(Map<String, Map<String, String>> info, String queueName, Scheduler scheduler) {
@@ -202,7 +204,7 @@ public final class SlurmUtils {
             return null;
         }
 
-        return new QueueStatus(scheduler, queueName, null, queueInfo);
+        return new QueueStatusImplementation(scheduler, queueName, null, queueInfo);
     }
     
     /**

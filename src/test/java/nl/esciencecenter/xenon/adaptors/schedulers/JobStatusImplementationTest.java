@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.schedulers;
+package nl.esciencecenter.xenon.adaptors.schedulers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -23,31 +23,33 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
-public class JobStatusTest {
+import nl.esciencecenter.xenon.schedulers.JobStatus;
+
+public class JobStatusImplementationTest {
 	
 	@Test
 	public void test_handle() throws Exception {
 		String id = "JOB-42";
-		JobStatus s = new JobStatus(id, "STATE", 0, null, true, false, null);
+		JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, true, false, null);
 		assertEquals(id, s.getJobIdentifier());
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void test_handleFailsNull() throws Exception {
-		new JobStatus(null, "STATE", 0, null, true, false, null);
+		new JobStatusImplementation(null, "STATE", 0, null, true, false, null);
 	}
 	
 	@Test
 	public void test_state() throws Exception {
 		String id = "JOB-42";
-		JobStatus s = new JobStatus(id, "STATE", 0, null, true, false, null);
+		JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, true, false, null);
 		assertEquals("STATE", s.getState());
 	}
 
 	@Test
 	public void test_exit() throws Exception {
 		String id = "JOB-42";
-		JobStatus s = new JobStatus(id, "STATE", 42, null, true, false, null);
+		JobStatus s = new JobStatusImplementation(id, "STATE", 42, null, true, false, null);
 		assertEquals(new Integer(42), s.getExitCode());
 	}
 
@@ -55,7 +57,7 @@ public class JobStatusTest {
 	public void test_exception() throws Exception {
 		String id = "JOB-42";
 		Exception e = new NullPointerException("EEP");
-		JobStatus s = new JobStatus(id, "STATE", 0, e, true, false, null);
+		JobStatus s = new JobStatusImplementation(id, "STATE", 0, e, true, false, null);
 		assertEquals(e, s.getException());
 	}
 	
@@ -63,42 +65,42 @@ public class JobStatusTest {
 	public void test_hasExceptionTrue() throws Exception {
 		String id = "JOB-42";
 		Exception e = new NullPointerException("EEP");
-		JobStatus s = new JobStatus(id, "STATE", 0, e, true, false, null);
+		JobStatus s = new JobStatusImplementation(id, "STATE", 0, e, true, false, null);
 		assertTrue(s.hasException());
 	}
 
 	@Test
 	public void test_hasExceptionFalse() throws Exception {
 		String id = "JOB-42";		
-		JobStatus s = new JobStatus(id, "STATE", 0, null, true, false, null);
+		JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, true, false, null);
 		assertFalse(s.hasException());
 	}
 
 	@Test
 	public void test_runningTrue() throws Exception {
 		String id = "JOB-42";
-		JobStatus s = new JobStatus(id, "STATE", 0, null, true, false, null);
+		JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, true, false, null);
 		assertTrue(s.isRunning());
 	}
 
 	@Test
 	public void test_runningFalse() throws Exception {
 		String id = "JOB-42";
-		JobStatus s = new JobStatus(id, "STATE", 0, null, false, false, null);
+		JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, false, false, null);
 		assertFalse(s.isRunning());
 	}
 	
 	@Test
 	public void test_doneTrue() throws Exception {
 		String id = "JOB-42";
-		JobStatus s = new JobStatus(id, "STATE", 0, null, false, true, null);
+		JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, false, true, null);
 		assertTrue(s.isDone());
 	}
 
 	@Test
 	public void test_doneFalse() throws Exception {
 		String id = "JOB-42";
-		JobStatus s = new JobStatus(id, "STATE", 0, null, false, false, null);
+		JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, false, false, null);
 		assertFalse(s.isRunning());
 	}
 
@@ -108,7 +110,7 @@ public class JobStatusTest {
 		tmp.put("key", "value");
 
 		String id = "JOB-42";
-		JobStatus s = new JobStatus(id, "STATE", 0, null, false, false, tmp);
+		JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, false, false, tmp);
 		assertEquals(tmp, s.getSchedulerSpecficInformation());
 	}
 
@@ -120,7 +122,7 @@ public class JobStatusTest {
 		
 		String id = "JOB-42";
 		Exception e = new NullPointerException("EEP");
-		JobStatus s = new JobStatus(id, "STATE", 0, e, false, false, tmp);
+		JobStatus s = new JobStatusImplementation(id, "STATE", 0, e, false, false, tmp);
 		
 		String expected = "JobStatus [jobIdentifier=" + id + ", state=" + "STATE" + ", exitCode=" + 0 + ", exception=" + e
                 + ", running=" + false + ", done=" + false + ", schedulerSpecificInformation=" + tmp + "]";

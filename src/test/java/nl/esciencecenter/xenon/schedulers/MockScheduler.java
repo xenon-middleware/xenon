@@ -15,98 +15,35 @@
  */
 package nl.esciencecenter.xenon.schedulers;
 
-import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 
-public class MockScheduler extends Scheduler {
+public class MockScheduler extends MockDefaultScheduler {
 
-	public MockScheduler(String uniqueID, String adaptor, String location, boolean isOnline, boolean supportsBatch,
-			boolean supportsInteractive, XenonProperties properties) {
-		super(uniqueID, adaptor, location, isOnline, supportsBatch, supportsInteractive, properties);
-	}
-
-	@Override
-	public String[] getQueueNames() throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void close() throws XenonException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean isOpen() throws XenonException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public String getDefaultQueueName() throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String[] getJobs(String... queueNames) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public QueueStatus getQueueStatus(String queueName) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public QueueStatus[] getQueueStatuses(String... queueNames) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String submitBatchJob(JobDescription description) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Streams submitInteractiveJob(JobDescription description) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	private boolean isEmbedded; 
+	private boolean supportsBatch; 
+	private boolean supportsInteractive; 
 	
-	@Override
-	public JobStatus getJobStatus(String job) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
+	public MockScheduler(String uniqueID, String adaptor, String location, boolean isEmbedded, boolean supportsBatch,
+			boolean supportsInteractive, XenonProperties properties) {
+		super(uniqueID, adaptor, location, properties);
+	
+		this.isEmbedded = isEmbedded;
+		this.supportsBatch = supportsBatch;
+		this.supportsInteractive = supportsInteractive;
 	}
 
 	@Override
-	public JobStatus[] getJobStatuses(String... jobs) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean supportsInteractive() { 
+		return supportsInteractive;
 	}
 
 	@Override
-	public JobStatus cancelJob(String job) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public boolean supportsBatch() { 
+    	return supportsBatch;
+    }
 
 	@Override
-	public JobStatus waitUntilDone(String job, long timeout) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public JobStatus waitUntilRunning(String job, long timeout) throws XenonException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	public boolean isEmbedded() { 
+		return isEmbedded;
+    }
 }

@@ -17,34 +17,20 @@
 package nl.esciencecenter.xenon.schedulers;
 
 import nl.esciencecenter.xenon.AdaptorDescription;
-import nl.esciencecenter.xenon.XenonPropertyDescription;
 
 /**
- *
+ * 
  */
-public class SchedulerAdaptorDescription extends AdaptorDescription {
-
-	private final boolean isOnline;
-	private final boolean supportsBatch;
-	private final boolean supportsInteractive;
-	
-    public SchedulerAdaptorDescription(String name, String description, String[] supportedLocations,
-			XenonPropertyDescription[] supportedProperties, boolean isOnline, boolean supportsBatch, boolean supportsInteractive) {
-		super(name, description, supportedLocations, supportedProperties);
-		this.isOnline = isOnline;
-		this.supportsBatch = supportsBatch;
-		this.supportsInteractive = supportsInteractive;
-    }
+public interface SchedulerAdaptorDescription extends AdaptorDescription {
 
 	/**
-     * TODO: rename isOnline to something like separateServer, supportsDetach, etc.
+     * Is this scheduler embedded in Xenon ? 
      * 
      * @return
-     * 		if this scheduler is online
+     * 		if this scheduler is embedded in Xenon ?
      */
-    public boolean isOnline() { 
-    	return isOnline;
-    }
+    boolean isEmbedded();
+    
     
     /**
      * Does this scheduler support batch jobs ?
@@ -52,9 +38,7 @@ public class SchedulerAdaptorDescription extends AdaptorDescription {
      * @return
      * 		if this scheduler supports batch jobs
      */
-    public boolean supportsBatch() { 
-    	return supportsBatch;
-    }
+    boolean supportsBatch();
     
     /**
      * Does this scheduler support interactive jobs ?
@@ -62,8 +46,5 @@ public class SchedulerAdaptorDescription extends AdaptorDescription {
      * @return
      * 		if this scheduler supports interactive jobs
      */
-    public boolean supportsInteractive() { 
-    	return supportsInteractive;
-    }
-    
+    boolean supportsInteractive();    
 }

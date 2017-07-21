@@ -20,8 +20,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
-import java.util.Arrays;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +27,6 @@ import org.junit.Test;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
-import nl.esciencecenter.xenon.schedulers.NoSuchJobException;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
 
@@ -76,7 +73,7 @@ public abstract class SchedulerTestParent {
     	assertEquals(locationConfig.getLocation(), location);
     }
     
-    private boolean contains(String expected, String [] options) { 
+    private boolean contains(String [] options, String expected) { 
     
     	if (options == null || options.length == 0) { 
     		return false;
@@ -104,13 +101,13 @@ public abstract class SchedulerTestParent {
     	}
     	
     	for (String s : expected) {
-    		if (!contains(s, actual)) { 
+    		if (!contains(actual, s)) { 
     			return false;
     		}
     	}
     		
     	for (String s : actual) {
-     		if (!contains(s, expected)) { 
+     		if (!contains(expected, s)) { 
     			return false;
     		}
     	}
@@ -160,14 +157,149 @@ public abstract class SchedulerTestParent {
      	status = scheduler.cancelJob(jobID);
 
      	if (!status.isDone()) {
-     		// Wait up to 5 seconds until the job is completely done
-     		status = scheduler.waitUntilDone(jobID, 5*1000);
+     		// Wait up to 60 seconds until the job is completely done
+     		status = scheduler.waitUntilDone(jobID, 60*1000);
      	}
      	
     	System.out.println(status);
      	
     	assertTrue(status.isDone());
     }
+    
+    @Test
+    public void test_getJobsQueueNameEmpty() throws XenonException {
+    
+    	// Get the available queues
+    	String [] queueNames = locationConfig.getQueueNames();
+    	
+    	assumeTrue(queueNames != null);
+    	assumeTrue(queueNames.length > 0);
+    	
+    	// Create a job
+    	JobDescription job = new JobDescription();
+    	job.setExecutable("/bin/sleep");
+    	job.setArguments("5");
+    	job.setQueueName(queueNames[0]);
+    	
+    	// Submit it
+     	String jobID = scheduler.submitBatchJob(job);
+
+     	// Retrieve all jobs
+     	String [] jobs = scheduler.getJobs();
+     	
+     	// Our job should be part of this
+     	assertTrue(contains(jobs, jobID));
+     
+     	// Clean up the mess...
+     	JobStatus status = scheduler.cancelJob(jobID);
+
+     	if (!status.isDone()) {
+     		// Wait up to 5 seconds until the job is completely done
+     		status = scheduler.waitUntilDone(jobID, 5*1000);
+     	}
+    }
+    
+    @Test
+    public void test_getJobsQueueNameNull() throws XenonException {
+    
+    	// Get the available queues
+    	String [] queueNames = locationConfig.getQueueNames();
+    	
+    	assumeTrue(queueNames != null);
+    	assumeTrue(queueNames.length > 0);
+    	
+    	// Create a job
+    	JobDescription job = new JobDescription();
+    	job.setExecutable("/bin/sleep");
+    	job.setArguments("5");
+    	job.setQueueName(queueNames[0]);
+    	
+    	// Submit it
+     	String jobID = scheduler.submitBatchJob(job);
+
+     	// Retrieve all jobs 
+     	String [] jobs = scheduler.getJobs(new String[0]);
+     	
+     	// Our job should be part of this
+     	assertTrue(contains(jobs, jobID));
+     
+     	// Clean up the mess...
+     	JobStatus status = scheduler.cancelJob(jobID);
+
+     	if (!status.isDone()) {
+     		// Wait up to 5 seconds until the job is completely done
+     		status = scheduler.waitUntilDone(jobID, 5*1000);
+     	}
+    }
+
+    
+    @Test
+    public void test_getJobsQueueNameCorrect() throws XenonException {
+    
+    	// Get the available queues
+    	String [] queueNames = locationConfig.getQueueNames();
+    	
+    	assumeTrue(queueNames != null);
+    	assumeTrue(queueNames.length > 0);
+    	
+    	// Create a job
+    	JobDescription job = new JobDescription();
+    	job.setExecutable("/bin/sleep");
+    	job.setArguments("5");
+    	job.setQueueName(queueNames[0]);
+    	
+    	// Submit it
+     	String jobID = scheduler.submitBatchJob(job);
+
+     	// Retrieve all jobs
+     	String [] jobs = scheduler.getJobs(queueNames[0]);
+     	
+     	// Our job should be part of this
+     	assertTrue(contains(jobs, jobID));
+     
+     	// Clean up the mess...
+     	JobStatus status = scheduler.cancelJob(jobID);
+
+     	if (!status.isDone()) {
+     		// Wait up to 5 seconds until the job is completely done
+     		status = scheduler.waitUntilDone(jobID, 5*1000);
+     	}
+    }
+/*
+    @Test
+    public void test_getJobsQueueNameOtherQueue() throws XenonException {
+    
+    	// Get the available queues
+    	String [] queueNames = locationConfig.getQueueNames();
+    	
+    	assumeTrue(queueNames != null);
+    	assumeTrue(queueNames.length > 1);
+    	
+    	// Create a job
+    	JobDescription job = new JobDescription();
+    	job.setExecutable("/bin/sleep");
+    	job.setArguments("5");
+    	job.setQueueName(queueNames[0]);
+    	
+    	// Submit it to one queue 
+     	String jobID = scheduler.submitBatchJob(job);
+
+     	// Retrieve all jobs for other queue 
+     	String [] jobs = scheduler.getJobs(queueNames[1]);
+     	
+     	// Our job should NOT be part of this
+     	assertFalse(contains(jobs, jobID));
+     
+     	// Clean up the mess...
+     	JobStatus status = scheduler.cancelJob(jobID);
+
+     	if (!status.isDone()) {
+     		// Wait up to 5 seconds until the job is completely done
+     		status = scheduler.waitUntilDone(jobID, 5*1000);
+     	}
+    }
+*/
+    
     
     /*
     @Test(expected=XenonException.class)

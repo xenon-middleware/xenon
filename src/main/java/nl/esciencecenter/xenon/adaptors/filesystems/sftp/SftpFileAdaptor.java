@@ -33,7 +33,6 @@ import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
-import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
 import nl.esciencecenter.xenon.filesystems.Path;
 
 public class SftpFileAdaptor extends FileAdaptor {
@@ -103,7 +102,13 @@ public class SftpFileAdaptor extends FileAdaptor {
 	};
 
 	public SftpFileAdaptor() { 
-		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, true, true);
+		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
+	}
+	
+	@Override
+	public boolean canCreateSymboliclinks() { 
+		// SFTP can create symbolic links.
+		return true;
 	}
 	
 	public FileSystem createFileSystem(String location, Credential credential, Map<String,String> properties) throws XenonException { 

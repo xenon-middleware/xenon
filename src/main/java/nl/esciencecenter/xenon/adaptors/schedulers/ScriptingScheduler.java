@@ -50,11 +50,9 @@ public abstract class ScriptingScheduler extends Scheduler {
     protected final long pollDelay;
     
     protected ScriptingScheduler(String uniqueID, String adaptor, String location, Credential credential,
-           boolean supportsBatch, boolean supportsInteractive, Map<String,String> prop, 
-           XenonPropertyDescription[] validProperties, String pollDelayProperty) throws XenonException {
+           Map<String,String> prop, XenonPropertyDescription[] validProperties, String pollDelayProperty) throws XenonException {
 
-    	super(uniqueID, adaptor, location, false, supportsBatch, supportsInteractive, 
-    			ScriptingUtils.getProperties(validProperties, location, prop));
+    	super(uniqueID, adaptor, location, ScriptingUtils.getProperties(validProperties, location, prop));
     	
     	this.pollDelay = properties.getLongProperty(pollDelayProperty);
 
@@ -85,7 +83,7 @@ public abstract class ScriptingScheduler extends Scheduler {
         LOGGER.debug("creating file system for {} adaptor at {}://{}", adaptor, subFileScheme, subLocation);
         subFileSystem = FileSystem.create(subFileScheme, subLocation, credential, null);
     }
-    
+      
 	protected Path getFsEntryPath() {
         return subFileSystem.getEntryPath();
     }
