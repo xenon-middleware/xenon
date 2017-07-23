@@ -26,6 +26,7 @@ import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
@@ -389,7 +390,24 @@ public abstract class Scheduler {
      * @throws XenonException
      *             If an I/O error occurred
      */
-    public abstract JobStatus[] getJobStatuses(String... jobIdentifiers) throws XenonException;
+    public JobStatus[] getJobStatuses(String... jobIdentifiers) throws XenonException { 
+
+    	JobStatus[] result = new JobStatus[jobIdentifiers.length];
+
+    	for (int i = 0; i < jobIdentifiers.length; i++) {
+    		try {
+    			if (jobIdentifiers[i] != null) {
+    				result[i] = getJobStatus(jobIdentifiers[i]);
+    			} else {
+    				result[i] = null;
+    			}
+    		} catch (XenonException e) {
+    			result[i] = new JobStatusImplementation(jobIdentifiers[i], null, null, e, false, true, null);
+    		}
+    	}
+
+    	return result;
+    }
     
     /**
      * Cancel a job.
@@ -470,15 +488,15 @@ public abstract class Scheduler {
      */
     public abstract JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException;
     
-    protected void checkJobIdentifier(String jobIdentifier) {
-		if (jobIdentifier == null || jobIdentifier.isEmpty()) { 
-    		throw new IllegalArgumentException("No job identifier specified");
+	protected void assertNonNullOrEmpty(String s, String message) {
+		if (s == null || s.isEmpty()) { 
+    		throw new IllegalArgumentException(message);
     	}
     }
-    
-    protected void checkTimeout(long timeout) {
-    	if (timeout < 0) { 
-            throw new IllegalArgumentException("Illegal timeout " + timeout);
+	
+    protected void assertPositive(long value, String message) {
+    	if (value < 0) { 
+            throw new IllegalArgumentException(message + value);
 		}
 	}
     

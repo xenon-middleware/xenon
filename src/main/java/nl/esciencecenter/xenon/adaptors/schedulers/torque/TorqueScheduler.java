@@ -186,6 +186,9 @@ public class TorqueScheduler extends ScriptingScheduler {
 
     @Override
     public QueueStatus getQueueStatus(String queueName) throws XenonException {
+    	
+    	assertNonNullOrEmpty(queueName, "Queue name may not be null or empty");
+    	
         Map<String, Map<String,String>> allMap = queryQueues(queueName);
 
         Map<String, String> map = allMap.get(queueName);
@@ -200,10 +203,11 @@ public class TorqueScheduler extends ScriptingScheduler {
 
     @Override
     public QueueStatus[] getQueueStatuses(String... queueNames) throws XenonException {
-        if (queueNames == null) {
-            throw new IllegalArgumentException("Queue names cannot be null");
+        
+    	if (queueNames == null) {
+            throw new IllegalArgumentException("Queue names may not be null");
         }
-
+    	
         Map<String, Map<String, String>> allMap = queryQueues(queueNames);
 
         if (queueNames.length == 0) {
@@ -242,10 +246,20 @@ public class TorqueScheduler extends ScriptingScheduler {
         if (queueNames.length == 0) {
             output = runCheckedCommand(null, "qstat", "-Qf");
         } else {
-            String[] args = new String[1 + queueNames.length];
-            args[0] = "-Qf";
-            System.arraycopy(queueNames, 0, args, 1, queueNames.length);
-            RemoteCommandRunner runner = runCommand(null, "qstat", args);
+        	
+        	ArrayList<String> args = new ArrayList<>();
+        	args.add("-Qf");
+        	
+        	for (String name : queueNames) { 
+        		if (name != null) { 
+        			args.add(name);
+        		}
+        	}
+//            String[] args = new String[1 + queueNames.length];
+//            args[0] = "-Qf";
+//            System.arraycopy(queueNames, 0, args, 1, queueNames.length);
+
+        	RemoteCommandRunner runner = runCommand(null, "qstat", args.toArray(new String[args.size()]));
 
             if (runner.success()) {
                 output = runner.getStdout();
@@ -343,7 +357,7 @@ public class TorqueScheduler extends ScriptingScheduler {
     @SuppressWarnings("PMD.EmptyIfStmt")
     public JobStatus cancelJob(String jobIdentifier) throws XenonException {
     	
-    	checkJobIdentifier(jobIdentifier);
+    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
     	
         RemoteCommandRunner runner = runCommand(null, "qdel", jobIdentifier);
         if (runner.success()) {
@@ -415,19 +429,17 @@ public class TorqueScheduler extends ScriptingScheduler {
     }
 
     @Override
-    public JobStatus getJobStatus(String job) throws XenonException {
+    public JobStatus getJobStatus(String jobIdentifier) throws XenonException {
         
-        if (job == null) { 
-            throw new NoSuchJobException(ADAPTOR_NAME, "Job <null> not found on server");
-        }
-        
+    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
+    	
         Map<String, Map<String, String>> info = getQstatInfo();
 
-        JobStatus result = getJobStatus(info, job);
+        JobStatus result = getJobStatus(info, jobIdentifier);
 
         //this job really does not exist. throw an exception
         if (result == null) {
-            throw new NoSuchJobException(ADAPTOR_NAME, "Job " + job + " not found on server");
+            throw new NoSuchJobException(ADAPTOR_NAME, "Job " + jobIdentifier + " not found on server");
         }
 
         return result;
