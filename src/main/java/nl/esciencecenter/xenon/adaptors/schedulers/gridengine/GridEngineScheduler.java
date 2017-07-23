@@ -194,6 +194,9 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
     @Override
     public QueueStatus getQueueStatus(String queueName) throws XenonException {
+    	
+    	assertNonNullOrEmpty(queueName, "Queue name cannot be null or empty!");
+    	
         String qstatOutput = runCheckedCommand(null, "qstat", "-xml", "-g", "c");
 
         Map<String, Map<String, String>> allMap = parser.parseQueueInfos(qstatOutput);
@@ -286,7 +289,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
     @Override
     public JobStatus cancelJob(String jobIdentifier) throws XenonException {
     	
-    	checkJobIdentifier(jobIdentifier);
+    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
     	
         String qdelOutput = runCheckedCommand(null, "qdel", jobIdentifier);
 
@@ -384,9 +387,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
     @Override
     public JobStatus getJobStatus(String jobIdentifier) throws XenonException {
         
-        if (jobIdentifier == null) { 
-            throw new NoSuchJobException(ADAPTOR_NAME, "Job <null> not found on server");
-        }
+    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
         
         Map<String, Map<String, String>> info = getQstatInfo();
 

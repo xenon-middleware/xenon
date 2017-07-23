@@ -217,6 +217,8 @@ public class JobQueueScheduler extends Scheduler {
 
 		LOGGER.debug("{}: findJob for job {}", adaptorName, jobIdentifier);
 
+		assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
+		
 		JobExecutor e = null;
 
 		for (List<JobExecutor> queue : queues) { 
@@ -260,9 +262,7 @@ public class JobQueueScheduler extends Scheduler {
 
 	public JobStatus getJobStatus(String jobIdentifier) throws XenonException {
 		LOGGER.debug("{}: getJobStatus for job {}", adaptorName, jobIdentifier);
-
-		// checkScheduler(job.getScheduler());
-
+		
 		JobStatus status = findJob(jobIdentifier).getStatus();
 
 		if (status.isDone()) {
@@ -272,34 +272,35 @@ public class JobQueueScheduler extends Scheduler {
 		return status;
 	}
 
-	public JobStatus[] getJobStatuses(String... jobs) {
-
-		LOGGER.debug("{}: getJobStatuses for jobs {}", adaptorName, jobs);
-
-		JobStatus[] result = new JobStatus[jobs.length];
-
-		for (int i = 0; i < jobs.length; i++) {
-			try {
-				if (jobs[i] != null) {
-					result[i] = getJobStatus(jobs[i]);
-				} else {
-					result[i] = null;
-				}
-			} catch (XenonException e) {
-				result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, false, null);
-			}
-		}
-
-		return result;
-	}
+//	public JobStatus[] getJobStatuses(String... jobs) {
+//
+//		LOGGER.debug("{}: getJobStatuses for jobs {}", adaptorName, jobs);
+//
+//		JobStatus[] result = new JobStatus[jobs.length];
+//
+//		for (int i = 0; i < jobs.length; i++) {
+//			try {
+//				if (jobs[i] != null) {
+//					result[i] = getJobStatus(jobs[i]);
+//				} else {
+//					result[i] = null;
+//				}
+//			} catch (XenonException e) {
+//				result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, false, null);
+//			}
+//		}
+//
+//		return result;
+//	}
 
 	public JobStatus waitUntilDone(String jobIdentifier, long timeout) throws XenonException {
 		LOGGER.debug("{}: Waiting for job {} for {} ms.", adaptorName, jobIdentifier, timeout);
 
-		checkJobIdentifier(jobIdentifier);
-		checkTimeout(timeout);
+		JobExecutor ex = findJob(jobIdentifier);
 		
-		JobStatus status = findJob(jobIdentifier).waitUntilDone(timeout);
+		assertPositive(timeout, "Illegal timeout ");
+		
+		JobStatus status = ex.waitUntilDone(timeout);
 
 		if (status.isDone()) {
 			LOGGER.debug("{}: Job {} is done after {} ms.", adaptorName, jobIdentifier, timeout);
@@ -315,10 +316,11 @@ public class JobQueueScheduler extends Scheduler {
 
 		LOGGER.debug("{}: Waiting for job {} to start for {} ms.", adaptorName, jobIdentifier, timeout);
 
-		checkJobIdentifier(jobIdentifier);
-		checkTimeout(timeout);
+		JobExecutor ex = findJob(jobIdentifier);
 		
-		JobStatus status = findJob(jobIdentifier).waitUntilRunning(timeout);
+		assertPositive(timeout, "Illegal timeout ");
+		
+		JobStatus status = ex.waitUntilRunning(timeout);
 
 		if (status.isDone()) {
 			LOGGER.debug("{}: Job {} is done within {} ms.", adaptorName, jobIdentifier, timeout);
@@ -440,8 +442,6 @@ public class JobQueueScheduler extends Scheduler {
 	public JobStatus cancelJob(String jobIdentifier) throws XenonException {
 		LOGGER.debug("{}: Cancel job {}", adaptorName, jobIdentifier);
 
-		checkJobIdentifier(jobIdentifier);
-		
 		JobExecutor e = findJob(jobIdentifier);
 
 		boolean killed = e.kill();
@@ -499,10 +499,14 @@ public class JobQueueScheduler extends Scheduler {
 		QueueStatus[] result = new QueueStatus[names.length];
 
 		for (int i = 0; i < names.length; i++) {
-			try {
-				result[i] = getQueueStatus(names[i]);
-			} catch (XenonException e) {
-				result[i] = new QueueStatusImplementation(this, names[i], e, null);
+			if (names[i] == null) { 
+				result[i] = null;
+			} else { 
+				try {
+					result[i] = getQueueStatus(names[i]);
+				} catch (XenonException e) {
+					result[i] = new QueueStatusImplementation(this, names[i], e, null);
+				}
 			}
 		}
 

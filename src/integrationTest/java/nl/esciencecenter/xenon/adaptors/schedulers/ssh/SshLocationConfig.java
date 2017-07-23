@@ -39,4 +39,14 @@ public class SshLocationConfig extends SchedulerLocationConfig {
 	public String getDefaultQueueName() {
 		return "single";
 	}
+	
+	@Override
+	public boolean supportsInteractive() {
+		return true;
+	}
+	
+	@Override
+	public boolean isEmbedded() {
+		return true;
+	}
 }

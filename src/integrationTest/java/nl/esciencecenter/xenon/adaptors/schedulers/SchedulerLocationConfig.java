@@ -22,9 +22,18 @@ public abstract class SchedulerLocationConfig {
 	public abstract String [] getQueueNames();
 	
 	public abstract String getDefaultQueueName();
+
+	public boolean supportsBatch() {
+		return true;
+	}
+
+	public boolean supportsInteractive() {
+		return false;
+	}
 	
-	
-	
+	public boolean isEmbedded() {
+		return false;
+	}
 	
     //public abstract Map.Entry<Path,Path> getSymbolicLinksToExistingFile();
 }

@@ -106,6 +106,14 @@ public abstract class ScriptingScheduler extends Scheduler {
         return new RemoteCommandRunner(subScheduler, getAdaptorName(), stdin, executable, arguments);
     }
 
+    // Subclasses can override this method to produce more specified exceptions
+    protected void translateError(RemoteCommandRunner runner, String stdin, String executable, String... arguments) throws XenonException { 
+    	throw new XenonException(getAdaptorName(), "could not run command \"" + executable + "\" with stdin \"" + stdin
+                + "\" arguments \"" + Arrays.toString(arguments) + "\" at \"" + subScheduler + "\". Exit code = "
+                + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());	
+    }
+    
+    
     /**
      * Run a command until completion. Throw an exception if the command returns a non-zero exit code, or prints to stderr.
       * 
@@ -125,9 +133,7 @@ public abstract class ScriptingScheduler extends Scheduler {
                 arguments);
 
         if (!runner.success()) {
-        	throw new XenonException(getAdaptorName(), "could not run command \"" + executable + "\" with stdin \"" + stdin
-                    + "\" arguments \"" + Arrays.toString(arguments) + "\" at \"" + subScheduler + "\". Exit code = "
-                    + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
+        	translateError(runner, stdin, executable, arguments);
         }
 
         return runner.getStdout();
@@ -154,6 +160,7 @@ public abstract class ScriptingScheduler extends Scheduler {
         return subScheduler.submitInteractiveJob(description);
     }
 
+    
     /**
      * Checks if the queue names given are valid, and throw an exception otherwise. Checks against the list of queues when the
      * scheduler was created.
@@ -164,7 +171,8 @@ public abstract class ScriptingScheduler extends Scheduler {
      *          if one or more of the queue names is not known in the scheduler
      */
     protected void checkQueueNames(String[] givenQueueNames) throws XenonException {
-        //create a hash set with all given queues
+        
+    	//create a hash set with all given queues
         HashSet<String> invalidQueues = new HashSet<>(Arrays.asList(givenQueueNames));
 
         //remove all valid queues from the set
@@ -195,7 +203,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      */
     public JobStatus waitUntilDone(String jobIdentifier, long timeout) throws XenonException {
 
-    	checkJobIdentifier(jobIdentifier);
+    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
     	
         long deadline = Deadline.getDeadline(timeout);
               
@@ -234,7 +242,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      */
     public JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException {
 
-    	checkJobIdentifier(jobIdentifier);
+    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
     	
         long deadline = Deadline.getDeadline(timeout);
         
