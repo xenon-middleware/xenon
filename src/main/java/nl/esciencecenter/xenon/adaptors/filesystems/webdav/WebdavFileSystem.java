@@ -19,7 +19,6 @@ import static nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdap
 import static nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor.OK_CODE;
 import static nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor.isOkish;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,6 +30,7 @@ import java.util.Set;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.jackrabbit.webdav.DavConstants;
@@ -72,19 +72,21 @@ public class WebdavFileSystem extends FileSystem {
 	private static final String CONTENT_LENGTH = "getcontentlength";
 
 	private final HttpClient client;
+	private final String server;
 
-	protected WebdavFileSystem(String uniqueID, String name, String location, Path entryPath,
+	protected WebdavFileSystem(String uniqueID, String name, String location, String server, Path entryPath,
 			HttpClient client, XenonProperties properties) {
 		super(uniqueID, name, location, entryPath, properties);
 		this.client = client;
+		this.server = server;
 	}
     
 	private String toFolderPath(Path path) {
-		return getLocation() + path.getAbsolutePath() + "/";
+		return server + path.getAbsolutePath() + "/";
     }
 
 	private String toFilePath(Path path) {
-		return getLocation() + path.getAbsolutePath();
+		return server + path.getAbsolutePath();
 	}
     
     private boolean isFolderPath(String path) {
@@ -173,6 +175,9 @@ public class WebdavFileSystem extends FileSystem {
 	protected List<PathAttributes> listDirectory(Path path)  throws XenonException {
 
 		String folderPath = toFolderPath(path);
+		
+		System.out.println("listDir " + path);
+		
 		PropFindMethod method = null;
 		try {
 			method = new PropFindMethod(folderPath, DavConstants.PROPFIND_ALL_PROP, DavConstants.DEPTH_1);
@@ -315,9 +320,10 @@ public class WebdavFileSystem extends FileSystem {
 	@Override
 	public void createDirectory(Path dir) throws XenonException {
 		LOGGER.debug("createDirectory dir = {}", dir);
-
+	
 		assertPathNotExists(dir);
-
+ 		assertParentDirectoryExists(dir);
+		
 		String folderPath = toFolderPath(dir);
 		DavMethod method = new MkColMethod(folderPath);
 		try {
@@ -330,20 +336,14 @@ public class WebdavFileSystem extends FileSystem {
 
 	@Override
 	public void createFile(Path file) throws XenonException {
-		createFile(file, 0, new ByteArrayInputStream(new byte[0]));
-	}
-
-	@Override
-	public void createSymbolicLink(Path link, Path path) throws XenonException {
-		throw new UnsupportedOperationException(ADAPTOR_NAME, "Operation not supported");
-	}
-
-	private void createFile(Path file, long size, InputStream data) throws XenonException {
 		LOGGER.debug("createFile path = {}", file);
+		
 		assertPathNotExists(file);
+		assertParentDirectoryExists(file);
+		
 		String filePath = toFilePath(file);
 		PutMethod method = new PutMethod(filePath);
-		method.setRequestEntity(new InputStreamRequestEntity(data, size));
+		method.setRequestEntity(new ByteArrayRequestEntity(new byte[0]));
 		try {
 			executeMethod(client, method);
 		} catch (IOException e) {
@@ -352,6 +352,10 @@ public class WebdavFileSystem extends FileSystem {
 		LOGGER.debug("createFile OK");
 	}
 
+	@Override
+	public void createSymbolicLink(Path link, Path path) throws XenonException {
+		throw new UnsupportedOperationException(ADAPTOR_NAME, "Operation not supported");
+	}
 	
 	@Override
 	protected void deleteFile(Path path) throws XenonException {
@@ -365,17 +369,12 @@ public class WebdavFileSystem extends FileSystem {
 
 	@Override
 	public boolean exists(Path path) throws XenonException {
-		System.out.println("exists path =" +path);
+		
 		try {
 			PathAttributes a = getAttributes(path);
-			
-			System.out.println("exists path =" + a);
-			
 			return true;
 		} catch (XenonException e) {
 			// getAttributes did not find evidence that the specified path exists
-			
-			System.out.println("exists path failed");
 			e.printStackTrace();
 			return false;
 		}
@@ -394,6 +393,23 @@ public class WebdavFileSystem extends FileSystem {
 		}
 	}
 
+	private void createFile(Path file, long size, InputStream data) throws XenonException {
+		LOGGER.debug("createFile path = {}", file);
+		
+		assertPathNotExists(file);
+		assertParentDirectoryExists(file);
+		
+		String filePath = toFilePath(file);
+		PutMethod method = new PutMethod(filePath);
+		method.setRequestEntity(new InputStreamRequestEntity(data, size));
+		try {
+			executeMethod(client, method);
+		} catch (IOException e) {
+			throw new XenonException(ADAPTOR_NAME, "Could not create file " + filePath, e);
+		}
+		LOGGER.debug("createFile OK");
+	}
+	
 	@Override
 	public OutputStream writeToFile(Path file, long size) throws XenonException {
 	

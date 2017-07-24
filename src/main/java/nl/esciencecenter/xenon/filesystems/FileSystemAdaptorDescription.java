@@ -19,23 +19,10 @@ package nl.esciencecenter.xenon.filesystems;
 import nl.esciencecenter.xenon.AdaptorDescription;
 
 /**
- * @version 1.0
- * @since 1.0
  *
  */
 public interface FileSystemAdaptorDescription extends AdaptorDescription {
 
-//	private final boolean supportsThirdPartyCopy;
-//	private final boolean readSymbolicLinks;
-//	private final boolean createSymbolicLinks;
-//	
-//    public FileSystemAdaptorDescription(String name, String description, String[] supportedLocations,
-//			XenonPropertyDescription[] supportedProperties, boolean supportsThirdPartyCopy, boolean readSymbolicLinks, boolean createSymbolicLinks) {
-//		super(name, description, supportedLocations, supportedProperties);
-//		this.supportsThirdPartyCopy = supportsThirdPartyCopy;
-//		this.readSymbolicLinks = readSymbolicLinks;
-//		this.createSymbolicLinks = createSymbolicLinks;
-//	}
 
 	/**
      * Does this adaptor support third party copy ?
@@ -54,7 +41,7 @@ public interface FileSystemAdaptorDescription extends AdaptorDescription {
      *          if this adaptor can read symbolic links.
      */
     boolean canReadSymboliclinks();
-
+    
 	/**
      * Can this adaptor create symbolic links ?
      * 
@@ -64,4 +51,6 @@ public interface FileSystemAdaptorDescription extends AdaptorDescription {
      *          if this adaptor can create symbolic links.
      */
     boolean canCreateSymboliclinks();
+    
+    boolean isConnectionless();    
 }

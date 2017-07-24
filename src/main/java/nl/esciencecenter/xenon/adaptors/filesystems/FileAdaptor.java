@@ -49,7 +49,13 @@ public abstract class FileAdaptor extends Adaptor implements FileSystemAdaptorDe
 		// By default, adaptors cannot create symbolic links.
 		return false;
 	}
-			
+
+	@Override
+	public boolean isConnectionless() { 
+		// By default, adaptors require a connection.
+		return false;
+	}
+	
 	public abstract FileSystem createFileSystem(String location, Credential credential, Map<String,String> properties) throws XenonException;
 	
 }

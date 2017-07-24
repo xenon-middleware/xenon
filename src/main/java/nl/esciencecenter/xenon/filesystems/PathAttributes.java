@@ -21,7 +21,7 @@ import java.util.Set;
  * FileAttributes represents a set of attributes of a path.
  */
 public interface PathAttributes {
-	
+
     /**
      * Get the path these attributes belong to.
      * 

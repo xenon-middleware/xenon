@@ -19,6 +19,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.LocationConfig;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
 
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
@@ -26,22 +27,33 @@ import org.junit.ClassRule;
 
 public class WebdavFileSystemDockerTest extends WebdavFileSystemTestParent {
 
-    @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder()
-        .file("src/integrationTest/resources/docker-compose/webdav.yml")
-        .waitingForService("webdav", HealthChecks.toHaveAllPortsOpen()).saveLogsTo("/tmp/webdav.txt")
-        .build();
+	@ClassRule
+	public static DockerComposeRule docker = DockerComposeRule.builder()
+	.file("src/integrationTest/resources/docker-compose/webdav.yml")
+	.waitingForService("webdav", HealthChecks.toHaveAllPortsOpen()).saveLogsTo("/tmp/webdav.txt")
+	.build();
 
-    @Override
-    protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
-        return new WebdavLocationConfig();
-    }
+	@Override
+	protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
+		return new LocationConfig() {
 
-    @Override
-    public FileSystem setupFileSystem() throws XenonException {
-        String location = docker.containers().container("webdav").port(80).inFormat("http://$HOST:$EXTERNAL_PORT");
-        PasswordCredential cred = new PasswordCredential("xenon", "javagat".toCharArray());
-        return FileSystem.create("webdav", location, cred);
-    }        
-    
+			@Override
+			public Path getExistingPath() {
+				return new Path("~xenon/filesystem-test-fixture/links/file0");
+			}
+
+			@Override
+			public Path getWritableTestDir() {
+				return fileSystem.getEntryPath().resolve("uploads");
+			}
+		};
+	}
+
+	@Override
+	public FileSystem setupFileSystem() throws XenonException {
+		String location = docker.containers().container("webdav").port(80).inFormat("http://$HOST:$EXTERNAL_PORT/~xenon");
+		PasswordCredential cred = new PasswordCredential("xenon", "javagat".toCharArray());
+		return FileSystem.create("webdav", location, cred);
+	}        
+
 }

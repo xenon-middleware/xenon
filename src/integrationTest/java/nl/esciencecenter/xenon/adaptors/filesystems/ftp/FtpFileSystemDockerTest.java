@@ -19,9 +19,14 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.LocationConfig;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
 
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
+
+import java.util.AbstractMap;
+import java.util.Map;
+
 import org.junit.ClassRule;
 
 public class FtpFileSystemDockerTest extends FtpFileSystemTestParent {
@@ -34,7 +39,26 @@ public class FtpFileSystemDockerTest extends FtpFileSystemTestParent {
 
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
-        return new FtpLocationConfig();
+    	
+    	return new LocationConfig() {
+    		@Override
+    		public Path getExistingPath() {
+    			return new Path("/home/xenon/filesystem-test-fixture/links/file0");
+    		}
+
+    		@Override
+    		public Map.Entry<Path, Path> getSymbolicLinksToExistingFile() {
+    			return new AbstractMap.SimpleEntry<>(
+    					new Path("/home/xenon/filesystem-test-fixture/links/link0"),
+    					new Path("/home/xenon/filesystem-test-fixture/links/file0")
+    					);
+    		}
+
+    		@Override
+    		public Path getWritableTestDir() {
+    			return fileSystem.getEntryPath();
+    		}
+		};
     }
 
     @Override
