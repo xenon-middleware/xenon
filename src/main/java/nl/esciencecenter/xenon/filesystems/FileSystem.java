@@ -80,7 +80,7 @@ public abstract class FileSystem {
 		adaptors.put(adaptor.getName(), adaptor);
 	}
 
-	private static FileAdaptor getAdaptorByName(String adaptorName) throws XenonException {
+	private static FileAdaptor getAdaptorByName(String adaptorName) throws UnknownAdaptorException {
 
 		if (adaptorName == null || adaptorName.trim().isEmpty()) {
 			throw new IllegalArgumentException("Adaptor name may not be null or empty");
@@ -99,11 +99,11 @@ public abstract class FileSystem {
 		return adaptors.keySet().toArray(new String[adaptors.size()]);
 	}
 
-	public static FileSystemAdaptorDescription getAdaptorDescription(String adaptorName) throws XenonException {
+	public static FileSystemAdaptorDescription getAdaptorDescription(String adaptorName) throws UnknownAdaptorException {
 		return getAdaptorByName(adaptorName);
 	}
 
-	public static FileSystemAdaptorDescription [] getAdaptorDescriptions() throws XenonException {
+	public static FileSystemAdaptorDescription [] getAdaptorDescriptions() {
 		return adaptors.values().toArray(new FileSystemAdaptorDescription[adaptors.size()]);
 	}
 	
