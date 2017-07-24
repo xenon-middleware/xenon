@@ -412,15 +412,25 @@ public abstract class SchedulerTestParent {
      	JobStatus status1 = scheduler.cancelJob(jobID1);
      	JobStatus status2 = scheduler.cancelJob(jobID2);
 
-     	if (!status1.isDone()) {
-     		// Wait up to 60 seconds until the job is completely done
-     		status1 = scheduler.waitUntilDone(jobID2, 60*1000);
-     	}
+     	try { 
+     		if (!status1.isDone()) {
+     			// Wait up to 60 seconds until the job is completely done
+     			status1 = scheduler.waitUntilDone(jobID1, 60*1000);
+     		}
+     	} catch (Exception e) {
+			System.err.println("WARN: Failed to wait for job: " + e);
+			e.printStackTrace(System.err);
+		}
     
-     	if (!status2.isDone()) {
-     		// Wait up to 60 seconds until the job is completely done
-     		status2 = scheduler.waitUntilDone(jobID2, 60*1000);
-     	}
+     	try { 
+     		if (!status2.isDone()) {
+     			// Wait up to 60 seconds until the job is completely done
+     			status2 = scheduler.waitUntilDone(jobID2, 60*1000);
+     		}
+     	} catch (Exception e) {
+			System.err.println("WARN: Failed to wait for job: " + e);
+			e.printStackTrace(System.err);
+		}
     }
    
     @Test(expected=IllegalArgumentException.class)

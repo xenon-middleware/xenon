@@ -20,6 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.OutputStream;
@@ -248,24 +249,6 @@ public abstract class FileSystemTestParent {
         fileSystem.delete(dir,true);
     }
 
-//    private void test04_createDirectory(Path path, boolean mustFail) throws XenonException {
-//        try {
-//            fileSystem.createDirectory(path);
-//        } catch (Exception e) {
-//            if (mustFail) {
-//                // expected
-//                return;
-//            }
-//
-//            throwUnexpected("test04_createDirectory", e);
-//        }
-//
-//        if (mustFail) {
-//            throwExpected("test04_createDirectory");
-//        }
-//    }
-//
-
     private void generateTestDir() throws XenonException { 
     	testDir = resolve(generateTestDirName());    	
     }
@@ -275,6 +258,7 @@ public abstract class FileSystemTestParent {
     	fileSystem.createDirectories(testDir);    	
     }
     
+    // Tests to create directories
     
     @Test(expected=IllegalArgumentException.class)
     public void createDirectory_null_throw() throws Exception {
@@ -313,12 +297,14 @@ public abstract class FileSystemTestParent {
     	fileSystem.createDirectory(testDir.resolve(new Path("aap", "noot")));
     }
     
-    @Test(expected=XenonException.class)
-    public void createDirectory_closedFileSystemIfSupported_throw() throws Exception {
-        assumeTrue(!description.isConnectionless());
-        fileSystem.close();
-        generateAndCreateTestDir();
-    }
+//    @Test(expected=XenonException.class)
+//    public void createDirectory_closedFileSystemIfSupported_throw() throws Exception {
+//        assumeFalse(description.isConnectionless());
+//        fileSystem.close();
+//        generateAndCreateTestDir();
+//    }
+    
+    
     
 /*
     // ---------------------------------------------------------------------------------------------------------------------------
