@@ -1,75 +1,73 @@
 package nl.esciencecenter.xenon.adaptors.filesystems.jclouds;
 
-        import nl.esciencecenter.xenon.InvalidCredentialException;
-        import nl.esciencecenter.xenon.InvalidLocationException;
-        import nl.esciencecenter.xenon.XenonException;
-        import nl.esciencecenter.xenon.XenonPropertyDescription;
+import java.util.HashMap;
+import java.util.Map;
 
-        import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import org.jclouds.ContextBuilder;
+import org.jclouds.blobstore.BlobStoreContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-        import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
-        import nl.esciencecenter.xenon.credentials.Credential;
-        import nl.esciencecenter.xenon.credentials.PasswordCredential;
-        import nl.esciencecenter.xenon.filesystems.FileSystem;
-        import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
-        import org.jclouds.ContextBuilder;
-        import org.jclouds.blobstore.BlobStoreContext;
-        import org.slf4j.Logger;
-        import org.slf4j.LoggerFactory;
-
-        import java.util.HashMap;
-        import java.util.Map;
+import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
 
 /**
  * Created by atze on 29-6-17.
  */
-public class JCloudsFileAdaptor extends FileAdaptor {
+ public class JCloudsFileAdaptor extends FileAdaptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JCloudsFileAdaptor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(JCloudsFileAdaptor.class);
 
-    /** The default SSH port */
-    protected static final int DEFAULT_PORT = 21;
+	/** The default SSH port */
+	protected static final int DEFAULT_PORT = 21;
 
-    /** A description of this adaptor */
-    private static final String ADAPTOR_DESCRIPTION = "The JClouds adaptor uses Apache JClouds to talk to s3 and others";
+	/** A description of this adaptor */
+	private static final String ADAPTOR_DESCRIPTION = "The JClouds adaptor uses Apache JClouds to talk to s3 and others";
 
-    /** The locations supported by this adaptor */
-    private static final String [] ADAPTOR_LOCATIONS = new String [] { "jclouds://host[:port]" };
+	/** The locations supported by this adaptor */
+	private static final String [] ADAPTOR_LOCATIONS = new String [] { "jclouds://host[:port]" };
 
-    /** All our own properties start with this prefix. */
-    public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + "s3.";
+	/** All our own properties start with this prefix. */
+	public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + "s3.";
 
-    protected static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription[0];
+	protected static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription[0];
 
-    public JCloudsFileAdaptor() {
-
-
-
-        super("s3", ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, false,false);
-    }
+	public JCloudsFileAdaptor() {
 
 
-    @Override
-    public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
-        int split = location.lastIndexOf("/");
-        if(split < 0){
-            throw new InvalidLocationException("s3","No bucket found in url: " + location);
-        }
 
-        String server = location.substring(0,split);
-        String bucket = location.substring(split + 1);
+		super("s3", ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, false,false);
+	}
 
-        XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
-        if (!(credential instanceof PasswordCredential)){
-            throw new InvalidCredentialException("s3", "No secret key given for s3 connection.");
-        }
-        PasswordCredential pwUser = (PasswordCredential) credential;
-        if(properties == null) { properties = new HashMap<>(); }
-        System.err.println("server : " + server);
-        BlobStoreContext context = ContextBuilder.newBuilder("s3").endpoint(server).
-                credentials(pwUser.getUsername(), new String(pwUser.getPassword())).buildView(BlobStoreContext.class);
-        return new JCloudsFileSytem(getNewUniqueID(),"s3", server, context,  bucket,xp);
-    }
+	@Override
+	public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
+		int split = location.lastIndexOf("/");
+		if(split < 0){
+			throw new InvalidLocationException("s3","No bucket found in url: " + location);
+		}
 
-}
+		String server = location.substring(0,split);
+		String bucket = location.substring(split + 1);
+
+		XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
+
+		if (!(credential instanceof PasswordCredential)){
+			throw new InvalidCredentialException("s3", "No secret key given for s3 connection.");
+		}
+		PasswordCredential pwUser = (PasswordCredential) credential;
+		if(properties == null) { properties = new HashMap<>(); }
+		System.err.println("server : " + server);
+		BlobStoreContext context = ContextBuilder.newBuilder("s3").endpoint(server).
+				credentials(pwUser.getUsername(), new String(pwUser.getPassword())).buildView(BlobStoreContext.class);
+		return new JCloudsFileSytem(getNewUniqueID(),"s3", server, context,  bucket,xp);
+	}
+
+ }

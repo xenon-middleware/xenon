@@ -20,10 +20,14 @@ import java.util.Map;
 import nl.esciencecenter.xenon.filesystems.Path;
 
 public abstract class LocationConfig {
-    public abstract Path getExistingPath();
+
+	public abstract Path getExistingPath();
 
     // TODO return SymbolicLink object
     public Map.Entry<Path,Path> getSymbolicLinksToExistingFile(){
         return null;
     }
+    
+    public abstract Path getWritableTestDir(); 
+    
 }

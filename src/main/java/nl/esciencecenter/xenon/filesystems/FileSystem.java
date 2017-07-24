@@ -34,7 +34,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
@@ -47,6 +46,7 @@ import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
@@ -85,7 +85,7 @@ public abstract class FileSystem {
 	private static FileAdaptor getAdaptorByName(String adaptorName) throws XenonException {
 
 		if (adaptorName == null || adaptorName.trim().isEmpty()) {
-			throw new InvalidAdaptorException(COMPONENT_NAME, "Adaptor name may not be null or empty");
+			throw new IllegalArgumentException("Adaptor name may not be null or empty");
 		}
 
 		FileAdaptor adaptor = adaptors.get(adaptorName);
@@ -357,15 +357,28 @@ public abstract class FileSystem {
 	 */
 	public void createDirectories(Path dir) throws XenonException {
 
+		System.out.println("CREATEDIRS=" + dir);
+		
+		assertNotNull(dir);
+				
 		Path parent = dir.getParent();
 
+		System.out.println("PARENT=" + parent);
+		
 		if (parent != null) {
 
 			if (!exists(parent)) {
+				System.out.println("!EXISTS=" + parent);
 				// Recursive call
 				createDirectories(parent);
+			} else { 
+				System.out.println("EXISTS=" + parent);
+				
 			}
 		}
+		
+		System.out.println("CREATE=" + dir);
+		
 		createDirectory(dir);
 	}
 
@@ -1160,11 +1173,15 @@ public abstract class FileSystem {
 		return new CopyStatus(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
 	}
 
-	protected void assertPathExists(Path path) throws XenonException {
-
+	protected void assertNotNull(Path path) {
 		if (path == null) {
 			throw new IllegalArgumentException("Path is null");
 		}
+	}
+	
+	protected void assertPathExists(Path path) throws XenonException {
+		
+		assertNotNull(path);
 
 		if (!exists(path)) {
 			throw new NoSuchPathException(getAdaptorName(), "Path does not exist: " + path);
@@ -1173,20 +1190,16 @@ public abstract class FileSystem {
 
 	protected void assertPathNotExists(Path path) throws XenonException {
 
-		if (path == null) {
-			throw new IllegalArgumentException("Path is null");
-		}
+		assertNotNull(path);
 
 		if (exists(path)) {
-			throw new PathAlreadyExistsException(getAdaptorName(), "File already exists: " + path);
+			throw new PathAlreadyExistsException(getAdaptorName(), "Path already exists: " + path);
 		}
 	}
 
 	protected void assertPathIsFile(Path path) throws XenonException {
 
-		if (path == null) {
-			throw new IllegalArgumentException("Path is null");
-		}
+		assertNotNull(path);
 
 		if (!getAttributes(path).isRegular()) {
 			throw new InvalidPathException(getAdaptorName(), "Path is not a file: " + path);
@@ -1195,11 +1208,15 @@ public abstract class FileSystem {
 
 	protected void assertPathIsDirectory(Path path) throws XenonException {
 
-		if (path == null) {
-			throw new IllegalArgumentException("Path is null");
-		}
+		assertNotNull(path);
 
-		if (!getAttributes(path).isDirectory()) {
+		PathAttributes a = getAttributes(path);
+		
+		if (a == null) { 
+			throw new InvalidPathException(getAdaptorName(), "Path failed to produce attributes: " + path);
+		}
+		
+		if (!a.isDirectory()) {
 			throw new InvalidPathException(getAdaptorName(), "Path is not a directory: " + path);
 		}
 	}
@@ -1216,9 +1233,7 @@ public abstract class FileSystem {
 
 	protected void assertParentDirectoryExists(Path path) throws XenonException {
 
-		if (path == null) {
-			throw new IllegalArgumentException("Path is null");
-		}
+		assertNotNull(path);
 
 		Path parent = path.getParent();
 
@@ -1246,9 +1261,7 @@ public abstract class FileSystem {
 
 	protected boolean isDotDot(Path path) {
 
-		if (path == null) {
-			throw new IllegalArgumentException("Path is null");
-		}
+		assertNotNull(path);
 
 		String filename = path.getFileNameAsString();
 		return ".".equals(filename) || "..".equals(filename);

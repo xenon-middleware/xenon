@@ -109,6 +109,11 @@ public class WebdavFileAdaptor extends FileAdaptor {
     		port = DEFAULT_PORT;
     	}
     	
+    	String hostPort = uri.getScheme() + "://" + host + ":" + port;
+    	
+    	System.out.println("HOSTPORT=" + hostPort);
+    	System.out.println("ENTRYPATH=" + uri.getPath());
+    	
     	HttpClient client = getClient(host, port, (PasswordCredential) credential);
         HttpMethod method;
         try {
@@ -133,7 +138,7 @@ public class WebdavFileAdaptor extends FileAdaptor {
         
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
        
-        return new WebdavFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), client, xp);
+        return new WebdavFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, hostPort, new Path(cwd), client, xp);
     }
 
     private HttpClient getClient(String host, int port, PasswordCredential credential) {

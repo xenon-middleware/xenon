@@ -53,4 +53,9 @@ public class LiveLocationConfig extends LocationConfig {
                 createPath("filesystem-test-fixture/links/file0")
         );
     }
+
+	@Override
+	public Path getWritableTestDir() {
+		return fileSystem.getEntryPath();
+	}
 }

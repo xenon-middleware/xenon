@@ -12,15 +12,7 @@ import org.junit.ClassRule;
 import java.util.HashMap;
 import java.util.Map;
 
-import static nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor.LOAD_STANDARD_KNOWN_HOSTS;
-import static nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor.STRICT_HOST_KEY_CHECKING;
-
-/**
- * Created by atze on 13-7-17.
- */
-public class MinioTest extends TestParent {
-
-
+public class S3MinioFileSystemDockerTest extends S3FileSystemTestParent {
 
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder()
@@ -31,15 +23,16 @@ public class MinioTest extends TestParent {
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
         return new LocationConfig() {
-            @Override
+            
+        	@Override
             public Path getExistingPath() {
-                return new Path("links/file0");
+                return new Path("filesystem-test-fixture/links/file0");
             }
 
             @Override
-            public Map.Entry<Path, Path> getSymbolicLinksToExistingFile() {
-                return null;
-            }
+        	public Path getWritableTestDir() {
+        		return fileSystem.getEntryPath();
+        	}
         };
     }
 

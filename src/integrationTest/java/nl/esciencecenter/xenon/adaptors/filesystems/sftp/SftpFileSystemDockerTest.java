@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.adaptors.filesystems.sftp;
 import static nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor.LOAD_STANDARD_KNOWN_HOSTS;
 import static nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor.STRICT_HOST_KEY_CHECKING;
 
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +44,26 @@ public class SftpFileSystemDockerTest extends SftpFileSystemTestParent {
 
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
-        return new SftpLocationConfig();
+    	
+    	return new LocationConfig() {
+    		@Override
+    		public Path getExistingPath() {
+    			return new Path("/home/xenon/filesystem-test-fixture/links/file0");
+    		}
+
+    		@Override
+    		public Map.Entry<Path, Path> getSymbolicLinksToExistingFile() {
+    			return new AbstractMap.SimpleEntry<>(
+    					new Path("/home/xenon/filesystem-test-fixture/links/link0"),
+    					new Path("/home/xenon/filesystem-test-fixture/links/file0")
+    					);
+    		}
+
+    		@Override
+    		public Path getWritableTestDir() {
+    			return fileSystem.getEntryPath();
+    		}			
+		};
     }
 
     @Override

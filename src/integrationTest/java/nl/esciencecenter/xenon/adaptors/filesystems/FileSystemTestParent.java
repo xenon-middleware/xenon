@@ -16,8 +16,11 @@
 package nl.esciencecenter.xenon.adaptors.filesystems;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.OutputStream;
 import java.util.Collection;
@@ -25,42 +28,41 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import net.schmizz.sshj.sftp.FileAttributes;
-import nl.esciencecenter.xenon.InvalidLocationException;
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.filesystems.FileSystem;
-import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
-import nl.esciencecenter.xenon.filesystems.FileSystemClosedException;
-import nl.esciencecenter.xenon.filesystems.Path;
-
-import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
+import nl.esciencecenter.xenon.filesystems.FileSystemClosedException;
+import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
+import nl.esciencecenter.xenon.filesystems.PathAttributes;
+
 public abstract class FileSystemTestParent {
-    private static final Logger logger = LoggerFactory.getLogger(FileSystemTestParent.class);
-
+	
+	public static final String TEST_DIR = "xenon_test";
+    
     private Path testRoot;
-    public static final String TEST_DIR = "xenon_test";
-
+    
     private FileSystem fileSystem;
     private FileSystemAdaptorDescription description;
     private LocationConfig locationConfig;
-    private long counter = 0;
     private Path testDir;
 
+    private static long counter = 0;
+    
+    private static long getNextCounter() { 
+    	return counter++;
+    }
 
-
+    
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
@@ -69,7 +71,19 @@ public abstract class FileSystemTestParent {
         fileSystem = setupFileSystem();
         description = setupDescription();
         locationConfig = setupLocationConfig(fileSystem);
-        testRoot = fileSystem.getEntryPath().resolve(TEST_DIR);
+        
+        Path root = locationConfig.getWritableTestDir();
+        
+        System.out.println("ROOT=" + root);
+        
+        assertNotNull(root);
+        
+        testRoot = root.resolve(TEST_DIR);
+        
+        System.out.println("TEST_ROOT=" + testRoot);
+        
+        fileSystem.createDirectories(testRoot);
+        
         testDir = null;
     }
 
@@ -78,8 +92,8 @@ public abstract class FileSystemTestParent {
     @After
     public void cleanup() throws XenonException {
         try {
-            if (testDir != null && fileSystem.exists(testDir)) {
-                fileSystem.delete(testDir,true);
+            if (testRoot != null && fileSystem.exists(testRoot)) {
+                fileSystem.delete(testRoot, true);
             }
         } finally {
             try {
@@ -138,13 +152,18 @@ public abstract class FileSystemTestParent {
         fail(name + " produced unexpected element: " + element);
     }
 
+    private String generateTestDirName() throws XenonException {
+    	return "dir" + getNextCounter();
+    }
 
+    private String generateTestFileName() throws XenonException {
+    	return "file" + getNextCounter();
+    }
 
     // Depends on: Path.resolve, RelativePath, exists
     private Path createNewTestDirName(Path root) throws XenonException {
-        Path dir = root.resolve(new Path( "dir" + counter));
-        counter++;
-
+        Path dir = resolve("dir" + getNextCounter());
+        
         assertFalse("Generated test dir already exists! " + dir, fileSystem.exists(dir));
 
         return dir;
@@ -170,9 +189,8 @@ public abstract class FileSystemTestParent {
 
     // Depends on: Path.resolve, RelativePath, exists
     private Path createNewTestFileName(Path root) throws Exception {
-        Path file = root.resolve(resolve( "file" + counter));
-        counter++;
-
+        Path file = resolve( "file" + getNextCounter());
+        
         assertFalse("Generated NEW test file already exists! " + file, fileSystem.exists(file));
 
         return file;
@@ -230,142 +248,79 @@ public abstract class FileSystemTestParent {
         fileSystem.delete(dir,true);
     }
 
-    // ---------------------------------------------------------------------------------------------------------------------------
-    // TEST isOpen
-    //
-    // Possible parameters:
-    //
-    // FileSystem - null / open FS / closed FS
-    //
-    // Total combinations : 3
-    //
-    // Depends on: close, isOpen
+//    private void test04_createDirectory(Path path, boolean mustFail) throws XenonException {
+//        try {
+//            fileSystem.createDirectory(path);
+//        } catch (Exception e) {
+//            if (mustFail) {
+//                // expected
+//                return;
+//            }
+//
+//            throwUnexpected("test04_createDirectory", e);
+//        }
+//
+//        if (mustFail) {
+//            throwExpected("test04_createDirectory");
+//        }
+//    }
+//
+
+    private void generateTestDir() throws XenonException { 
+    	testDir = resolve(generateTestDirName());    	
+    }
+    
+    private void generateAndCreateTestDir() throws XenonException { 
+    	generateTestDir();
+    	fileSystem.createDirectories(testDir);    	
+    }
+    
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void createDirectory_null_throw() throws Exception {
+    	fileSystem.createDirectory(null);
+    }
+    
+    @Test
+    public void createDirectory_nonExisting_noThrow() throws Exception {
+    	generateAndCreateTestDir();
+    	assertTrue(fileSystem.exists(testDir));
+    	
+    }
+
+    @Test(expected=PathAlreadyExistsException.class)
+    public void createDirectory_existing_throw() throws Exception {
+    	generateAndCreateTestDir();
+        fileSystem.createDirectory(testDir);
+    }
+
+    @Test(expected=PathAlreadyExistsException.class)
+    public void createDirectory_existingFile_throw() throws Exception {
+    	generateAndCreateTestDir();
+
+    	String file = generateTestFileName();
+        
+        Path tmp = testDir.resolve(file);
+        fileSystem.createFile(tmp);
+        
+        // Should fail!
+        fileSystem.createDirectory(tmp);
+    }
+
+    @Test(expected=NoSuchPathException.class)
+    public void createDirectory_nonExistingParent_throw() throws Exception {
+    	generateAndCreateTestDir();
+    	fileSystem.createDirectory(testDir.resolve(new Path("aap", "noot")));
+    }
+    
+    @Test(expected=XenonException.class)
+    public void createDirectory_closedFileSystemIfSupported_throw() throws Exception {
+        assumeTrue(!description.isConnectionless());
+        fileSystem.close();
+        generateAndCreateTestDir();
+    }
+    
 /*
-    private void test01_isOpen(boolean expected, boolean mustFail) throws Exception {
-        boolean result = false;
-
-        try {
-            result = fileSystem.isOpen();
-        } catch (Exception e) {
-            if (mustFail) {
-                // expected
-                return;
-            }
-
-            throwUnexpected("test01_isOpen", e);
-        }
-
-        if (mustFail) {
-            throwExpected("test01_isOpen");
-        }
-
-        if (result != expected) {
-            throwWrong("test01_isOpen", expected, result);
-        }
-    }
-
-
-    @Test
-    public void test01_isOpen_openFs_true() throws Exception {
-        test01_isOpen(true, false);
-    }
-
-    @Test
-    public void test01_isOpen_closedFsIfSupported_false() throws Exception {
-        assumeTrue(!description.isConnectionless());
-        fileSystem.close();
-        test01_isOpen(false, false);
-    }
-
-    @Test(expected = XenonException.class)
-    public void test02_close_closedFileSystemIfSupported_throw() throws Exception {
-        assumeTrue(!description.isConnectionless());
-        fileSystem.close();
-        fileSystem.close();
-    }
-
-*/
-
-    // ---------------------------------------------------------------------------------------------------------------------------
-    // TEST: createDirectory
-    //
-    // Possible parameters:
-    //
-    // Path null / non-existing dir / existing dir / existing file / non-exising parent / closed filesystem
-    //
-    // Total combinations : 5
-    //
-    // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], [createTestFile],
-    //             createDirectory, [deleteTestDir], [deleteTestFile], [closeTestFileSystem]
-
-    private void test04_createDirectory(Path path, boolean mustFail) throws XenonException {
-        try {
-            fileSystem.createDirectory(path);
-        } catch (Exception e) {
-            if (mustFail) {
-                // expected
-                return;
-            }
-
-            throwUnexpected("test04_createDirectory", e);
-        }
-
-        if (mustFail) {
-            throwExpected("test04_createDirectory");
-        }
-    }
-
-    @Test
-    public void test04_createDirectory_null_throw() throws Exception {
-        test04_createDirectory(null, true);
-    }
-
-    @Test
-    public void test04_createDirectory_nonExisting_noThrow() throws Exception {
-        testDir = resolve( "test04_createDirectory");
-
-        test04_createDirectory(testDir, false);
-    }
-
-    @Test
-    public void test04_createDirectory_existing_throw() throws Exception {
-        testDir = resolve( "test04_createDirectory");
-        fileSystem.createDirectory(testDir);
-
-        test04_createDirectory(testDir, true);
-    }
-
-    @Test
-    public void test04_createDirectory_existingFile_throw() throws Exception {
-        testDir = resolve("test04_createDirectory");
-        fileSystem.createDirectory(testDir);
-
-        Path file = createTestFile(testDir, null);
-        test04_createDirectory(file, true);
-        deleteTestFile(file);
-    }
-
-    @Test
-    public void test04_createDirectory_nonExistingParent_throw() throws Exception {
-        testDir = resolve( "test04_createDirectory");
-        Path parent = createNewTestDirName(testDir);
-        Path dir0 = createNewTestDirName(parent);
-        fileSystem.createDirectory(testDir);
-
-        test04_createDirectory(dir0, true);
-    }
-
-    
-    @Test
-    public void test04_createDirectory_closedFileSystemIfSupported_throw() throws Exception {
-        assumeTrue(!description.isConnectionless());
-
-        Path testDir = resolve( "test04_createDirectory");
-        fileSystem.close();
-        test04_createDirectory(testDir, true);
-    }
-    
-
     // ---------------------------------------------------------------------------------------------------------------------------
     // TEST: createDirectories
     //
@@ -459,25 +414,22 @@ public abstract class FileSystemTestParent {
 
         deleteTestFile(file);
     }
-/*
- * 
- *  TODO: I do not understand this test
-    @Test
-    public void test05_createDirectories_fileSystemClosed_throwIfSupported() throws Exception {
-        assumeTrue(!description.isConnectionless());
-        // Use root instead of testDir to prevent cleanup
-        testDir = resolve("test05_createDirectories");
-        files.close(testDir.getFileSystem());
 
-        try {
-            test05_createDirectories(testDir, true);
-        } finally {
-            // set up for cleaning again
-            cwd = config.getWorkingDir(files, credentials);
-            testDir = resolve(cwd, TEST_ROOT, "test05_createDirectories");
-        }
-    }
-    */
+//    @Test
+//    public void test05_createDirectories_fileSystemClosed_throwIfSupported() throws Exception {
+//        assumeTrue(!description.isConnectionless());
+//        // Use root instead of testDir to prevent cleanup
+//        testDir = resolve("test05_createDirectories");
+//        files.close(testDir.getFileSystem());
+//
+//        try {
+//            test05_createDirectories(testDir, true);
+//        } finally {
+//            // set up for cleaning again
+//            cwd = config.getWorkingDir(files, credentials);
+//            testDir = resolve(cwd, TEST_ROOT, "test05_createDirectories");
+//        }
+//    }
     
     // ---------------------------------------------------------------------------------------------------------------------------
     // TEST: createFile
@@ -955,7 +907,8 @@ public abstract class FileSystemTestParent {
         }
 
     }
-
+*/
+    
     /**
      * Tests whether two times (in milliseconds) are within a mild margin of one another. The margin is large enough to be able to
      * cope with servers in other timezones and similar, expected, sources of discrepancy between times.
@@ -970,7 +923,7 @@ public abstract class FileSystemTestParent {
         final long margin = 30 * secondsPerHour * millisecondsPerSecond;
         return Math.abs(time1 - time2) < margin;
     }
-
+/*
     @Test
     public void test13_getAttributes_nullPath_throw() throws Exception {
         long currentTime = System.currentTimeMillis();
@@ -1030,5 +983,5 @@ public abstract class FileSystemTestParent {
             testDir = resolve( "test13_getAttributes");
         }
     }
-
+*/
 }

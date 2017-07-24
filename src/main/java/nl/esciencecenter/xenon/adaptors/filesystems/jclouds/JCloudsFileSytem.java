@@ -172,6 +172,9 @@ public class JCloudsFileSytem extends FileSystem {
 
     @Override
     public boolean exists(Path path) throws XenonException {
+    	
+    	assertNotNull(path);
+    	
         checkClosed();
         String name = path.getRelativePath();
         for (PathAttributes p : listPrefix(name, false, false)) {

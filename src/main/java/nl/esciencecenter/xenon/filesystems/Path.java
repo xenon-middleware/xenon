@@ -236,7 +236,7 @@ public class Path implements Iterable<Path> {
      * @return a Path representing this Paths parent.
      */
     public Path getParent() {
-        if (isEmpty()) {
+        if (isEmpty() || elements.size() == 1) {
             return null;
         }
 
@@ -584,6 +584,6 @@ public class Path implements Iterable<Path> {
 
     @Override
     public String toString() {
-        return "Path [element=" + elements + ", seperator=" + separator + "]";
+        return getAbsolutePath();
     }
 }

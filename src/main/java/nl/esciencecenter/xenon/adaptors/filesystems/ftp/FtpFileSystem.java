@@ -40,6 +40,7 @@ import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
 import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 
@@ -198,6 +199,9 @@ public class FtpFileSystem extends FileSystem {
 	public void createDirectory(Path path) throws XenonException {
 		LOGGER.debug("createDirectory dir = {}", path);
 
+		assertPathNotExists(path);
+		assertParentDirectoryExists(path);
+		
 		FtpCommand ftpCommand = new FtpCommand() {
 			@Override
 			public void doWork(FTPClient ftpClient, String absolutePath) throws IOException {
@@ -211,7 +215,10 @@ public class FtpFileSystem extends FileSystem {
 	@Override
 	public void createFile(Path path) throws XenonException {
 		LOGGER.debug("createFile path = {}", path);
+		
 		assertPathNotExists(path);
+		assertParentDirectoryExists(path);
+		
 		FtpCommand ftpCommand = new FtpCommand() {
 			@Override
 			public void doWork(FTPClient ftpClient, String absolutePath) throws IOException {
@@ -253,6 +260,7 @@ public class FtpFileSystem extends FileSystem {
 	}
 
 	private boolean fileExists(Path path) throws XenonException {
+		
 		FtpQuery<Boolean> ftpQuery = new FtpQuery<Boolean>() {
 			@Override
 			public void doWork(FTPClient ftpClient, String path) throws IOException {
