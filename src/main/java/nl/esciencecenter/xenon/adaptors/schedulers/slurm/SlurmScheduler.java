@@ -108,12 +108,6 @@ public class SlurmScheduler extends ScriptingScheduler {
         		setup.version(), setup.accountingAvailable());
     }
     
-	@Override
-	public boolean supportsInteractive() { 
-		// this scheduler supports interactive jobs. 
-		return true;
-	}
-    
     @Override
     public String[] getQueueNames() {
         return queueNames.clone();

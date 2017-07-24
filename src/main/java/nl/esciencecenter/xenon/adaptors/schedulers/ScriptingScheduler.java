@@ -56,19 +56,19 @@ public abstract class ScriptingScheduler extends Scheduler {
     	
     	this.pollDelay = properties.getLongProperty(pollDelayProperty);
 
-        String subJobScheme;
-        String subFileScheme;
+        String subSchedulerAdaptor;
+        String subFileSystemAdaptor;
         String subLocation;
         Map<String, String> subSchedulerProperties;
         
         if (ScriptingUtils.isLocal(location)) {
-            subJobScheme = "local";
-            subFileScheme = "file";
+            subSchedulerAdaptor = "local";
+            subFileSystemAdaptor = "file";
             subLocation = "/";
             subSchedulerProperties = properties.filter(LocalSchedulerAdaptor.PREFIX).toMap();
         } else {
-            subJobScheme = "ssh";
-            subFileScheme = "sftp";
+            subSchedulerAdaptor = "ssh";
+            subFileSystemAdaptor = "sftp";
             subLocation = location;
             subSchedulerProperties = properties.filter(SshSchedulerAdaptor.PREFIX).toMap();
 
@@ -76,12 +76,12 @@ public abstract class ScriptingScheduler extends Scheduler {
             subSchedulerProperties.put(SshSchedulerAdaptor.POLLING_DELAY, "100");
         }
 
-        LOGGER.debug("creating sub scheduler for {} adaptor at {}://{}", adaptor, subJobScheme, subLocation);
+        LOGGER.debug("creating sub scheduler for {} adaptor at {}://{}", adaptor, subSchedulerAdaptor, subLocation);
         
-        subScheduler = Scheduler.create(subJobScheme, subLocation, credential, subSchedulerProperties);
+        subScheduler = Scheduler.create(subSchedulerAdaptor, subLocation, credential, subSchedulerProperties);
 
-        LOGGER.debug("creating file system for {} adaptor at {}://{}", adaptor, subFileScheme, subLocation);
-        subFileSystem = FileSystem.create(subFileScheme, subLocation, credential, null);
+        LOGGER.debug("creating file system for {} adaptor at {}://{}", adaptor, subFileSystemAdaptor, subLocation);
+        subFileSystem = FileSystem.create(subFileSystemAdaptor, subLocation, credential, null);
     }
       
 	protected Path getFsEntryPath() {

@@ -16,10 +16,7 @@
 package nl.esciencecenter.xenon;
 
 /**
- * Signals that an invalid scheme was provided.  
- * 
- * @version 1.0
- * @since 1.0
+ * Throw when an unsupported optional operation is called.   
  */
 public class UnsupportedOperationException extends XenonException {
 

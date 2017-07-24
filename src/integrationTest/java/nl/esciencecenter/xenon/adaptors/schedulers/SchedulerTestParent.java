@@ -80,17 +80,17 @@ public abstract class SchedulerTestParent {
    
     @Test
     public void test_isEmbedded() throws XenonException {
-    	assertEquals(locationConfig.isEmbedded(), scheduler.isEmbedded());
+    	assertEquals(locationConfig.isEmbedded(), description.isEmbedded());
     }
     
     @Test
     public void test_supportsBatch() throws XenonException {
-    	assertEquals(locationConfig.supportsBatch(), scheduler.supportsBatch());
+    	assertEquals(locationConfig.supportsBatch(), description.supportsBatch());
     }
    
     @Test
     public void test_supportsInteractive() throws XenonException {
-    	assertEquals(locationConfig.supportsInteractive(), scheduler.supportsInteractive());
+    	assertEquals(locationConfig.supportsInteractive(), description.supportsInteractive());
     }
     
     private boolean contains(String [] options, String expected) { 
