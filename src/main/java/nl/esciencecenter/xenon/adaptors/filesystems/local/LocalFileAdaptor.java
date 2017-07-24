@@ -49,7 +49,7 @@ public class LocalFileAdaptor extends FileAdaptor {
             + " file functionality for local access.";
     
     /** The locations supported by the adaptor */
-    public static final String [] ADAPTOR_LOCATIONS = new String [] { "(null)", "(empty string)", "/" };
+    public static final String [] ADAPTOR_LOCATIONS = new String [] { "(null)", "(empty string)", "/", "c:", "<drive letter>:" };
     
     /** The properties supported by this adaptor */
     public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription[0];
