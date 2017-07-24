@@ -51,22 +51,13 @@ ext.apacheCommonsNetVersion = '3.3'
 dependencies {
     // Xenon dependencies.
     // xenon/lib/**/*.jar to ./lib/
-//    compile group: 'com.hierynomus', name: 'sshj', version: sshjVersion
-//    compile group: 'com.jcraft', name: 'jsch', version: jschVersion
-//    compile group: 'com.jcraft', name: 'jsch.agentproxy.jsch', version: jschAgentproxyVersion
-//    compile group: 'com.jcraft', name: 'jsch.agentproxy.connector-factory', version: jschAgentproxyVersion
+//    compile group: 'org.apache.hadoop', name: 'hadoop-common', version: '2.8.0'
+//    compile group: 'org.apache.hadoop', name: 'hadoop-hdfs', version: '2.8.0'
+//    compile group: 'org.apache.jclouds', name: 'jclouds-all', version: '2.0.1'
+//    compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.154'
 
-
-		compile group: 'org.apache.hadoop', name: 'hadoop-common', version: '2.8.0'
-
-		compile group: 'org.apache.hadoop', name: 'hadoop-hdfs', version: '2.8.0'
-
-		compile group: 'org.apache.jclouds', name: 'jclouds-all', version: '2.0.1'
-    compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.154'
     compile group: 'org.apache.sshd', name: 'sshd-core', version: '1.4.0'
-
     compile group: 'commons-net', name: 'commons-net', version: apacheCommonsNetVersion
-//    compile group: 'com.google.code.findbugs', name: 'findbugs', version: '2.0.2'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.5'
     compile group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
     compile group: 'org.apache.jackrabbit', name: 'jackrabbit-webdav', version: '2.14.2'
