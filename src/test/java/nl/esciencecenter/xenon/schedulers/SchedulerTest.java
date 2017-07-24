@@ -15,19 +15,21 @@
  */
 package nl.esciencecenter.xenon.schedulers;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.junit.Test;
-
 import nl.esciencecenter.xenon.UnknownAdaptorException;
-import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
+
+import org.junit.Test;
 
 public class SchedulerTest {
 
@@ -53,14 +55,14 @@ public class SchedulerTest {
 	  }
 
 	  @Test
-	  public void test_names() throws XenonException {
+	  public void test_names() {
 		  String [] tmp = Scheduler.getAdaptorNames();
 		  String [] expected = new String [] { "local", "ssh", "gridengine", "slurm", "torque" };
 		  assertTrue(Arrays.equals(expected, tmp));
 	  }
 
 	  @Test
-	  public void test_adaptorDescription() throws XenonException {
+	  public void test_adaptorDescription() throws UnknownAdaptorException {
 		  
 		  SchedulerAdaptorDescription d = Scheduler.getAdaptorDescription("local");
 		  
@@ -76,22 +78,22 @@ public class SchedulerTest {
 	  }
 
 	  @Test(expected=UnknownAdaptorException.class)
-	  public void test_adaptorDescriptionFailsNull() throws XenonException {
+	  public void test_adaptorDescriptionFailsNull() throws UnknownAdaptorException {
 		  Scheduler.getAdaptorDescription(null);
 	  }
 
 	  @Test(expected=UnknownAdaptorException.class)
-	  public void test_adaptorDescriptionFailsEmpty() throws XenonException {
+	  public void test_adaptorDescriptionFailsEmpty() throws UnknownAdaptorException {
 		  Scheduler.getAdaptorDescription("");
 	  }
 
 	  @Test(expected=UnknownAdaptorException.class)
-	  public void test_adaptorDescriptionFailsUnknown() throws XenonException {
+	  public void test_adaptorDescriptionFailsUnknown() throws UnknownAdaptorException {
 		  Scheduler.getAdaptorDescription("aap");
 	  }
 	  
 	  @Test
-	  public void test_adaptorDescriptions() throws XenonException {
+	  public void test_adaptorDescriptions() throws UnknownAdaptorException {
 		  
 		  String [] names =  Scheduler.getAdaptorNames();
 		  SchedulerAdaptorDescription [] desc = Scheduler.getAdaptorDescriptions();

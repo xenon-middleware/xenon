@@ -21,9 +21,6 @@ import java.util.Map;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
 public class LiveLocationConfig extends LocationConfig {
     private final FileSystem fileSystem;
 
@@ -38,7 +35,7 @@ public class LiveLocationConfig extends LocationConfig {
         if (baseDir == null) {
             return fileSystem.getEntryPath().resolve(path);
         }
-        return fileSystem.getEntryPath().resolve(new Path(baseDir, path));
+        return fileSystem.getEntryPath().resolve(new Path(baseDir).resolve(new Path(path)));
     }
 
     @Override

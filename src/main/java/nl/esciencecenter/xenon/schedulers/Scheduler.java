@@ -62,7 +62,7 @@ public abstract class Scheduler {
 		adaptors.put(adaptor.getName(), adaptor);
 	}
 
-	private static SchedulerAdaptor getAdaptorByName(String adaptorName) throws XenonException {
+	private static SchedulerAdaptor getAdaptorByName(String adaptorName) throws UnknownAdaptorException {
 
 		if (adaptorName == null || adaptorName.trim().isEmpty()) {
 			throw new UnknownAdaptorException(COMPONENT_NAME, "Adaptor name may not be null or empty");
@@ -81,11 +81,11 @@ public abstract class Scheduler {
 		return adaptors.keySet().toArray(new String[adaptors.size()]);
 	}
 
-	public static SchedulerAdaptorDescription getAdaptorDescription(String adaptorName) throws XenonException {
+	public static SchedulerAdaptorDescription getAdaptorDescription(String adaptorName) throws UnknownAdaptorException {
 		return getAdaptorByName(adaptorName);
 	}
 
-	public static SchedulerAdaptorDescription [] getAdaptorDescriptions() throws XenonException {
+	public static SchedulerAdaptorDescription [] getAdaptorDescriptions() {
 		return adaptors.values().toArray(new SchedulerAdaptorDescription[adaptors.size()]);
 	}
 	
