@@ -330,7 +330,7 @@ public class PathTest {
     public void testGetParent_SingleElement_EmptyPath() {
         Path path = new Path("mydir");
         Path parent = path.getParent();
-        assertEquals(parent, new Path());
+        assertNull(parent);
     }
 
     @Test
@@ -707,9 +707,9 @@ public class PathTest {
 
     @Test
     public void testToString() {
-        Path path = new Path("mydir/myfile");
+        Path path = new Path("/mydir/myfile");
         String path_as_string = path.toString();
-        assertEquals(path_as_string, "Path [element=[mydir, myfile], seperator=/]");
+        assertEquals(path_as_string, "/mydir/myfile");
     }
 
     @Test

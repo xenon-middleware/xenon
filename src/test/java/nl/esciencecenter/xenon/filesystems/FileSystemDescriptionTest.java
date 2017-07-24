@@ -82,7 +82,7 @@ public class FileSystemDescriptionTest {
 		String expected = "FileAdaptorDescription [name=" + "NAME" + ", description=" + "DESC" + 
 				", supportedLocations=" + Arrays.toString(loc) +
 				", supportedProperties=" + Arrays.toString(da) +  
-				", supportsThirdPArtyCopy=" + false + "]";
+				", supportsThirdPartyCopy=" + false + "]";
 
 		assertEquals(expected, desc.toString());
 	}

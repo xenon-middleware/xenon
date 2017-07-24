@@ -200,12 +200,12 @@ public class FileSystemTest {
 		assertArrayEquals(LocalFileAdaptor.VALID_PROPERTIES, d.getSupportedProperties());
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=IllegalArgumentException.class)
 	public void test_adaptorDescriptionFailsNull() throws XenonException {
 		FileSystem.getAdaptorDescription(null);
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=IllegalArgumentException.class)
 	public void test_adaptorDescriptionFailsEmpty() throws XenonException {
 		FileSystem.getAdaptorDescription("");
 	}
@@ -238,12 +238,12 @@ public class FileSystemTest {
 		f.close();
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=IllegalArgumentException.class)
 	public void test_createFailsNull() throws XenonException {
 		FileSystem.create(null);
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=IllegalArgumentException.class)
 	public void test_createFailsEmpty() throws XenonException {
 		FileSystem.create("");
 	}

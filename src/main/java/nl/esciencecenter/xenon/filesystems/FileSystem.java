@@ -40,7 +40,6 @@ import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor;
-import nl.esciencecenter.xenon.adaptors.filesystems.s3.S3FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor;
@@ -74,8 +73,7 @@ public abstract class FileSystem {
 		addAdaptor(new FtpFileAdaptor());
 		addAdaptor(new SftpFileAdaptor());
 		addAdaptor(new WebdavFileAdaptor());
-		addAdaptor(new S3FileAdaptor());
-
+	//	addAdaptor(new S3FileAdaptor());
 	}
 
 	private static void addAdaptor(FileAdaptor adaptor) {
