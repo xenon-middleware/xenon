@@ -32,18 +32,5 @@ public class MockScheduler extends MockDefaultScheduler {
 		this.supportsInteractive = supportsInteractive;
 	}
 
-	@Override
-	public boolean supportsInteractive() { 
-		return supportsInteractive;
-	}
-
-	@Override
-	public boolean supportsBatch() { 
-    	return supportsBatch;
-    }
-
-	@Override
-	public boolean isEmbedded() { 
-		return isEmbedded;
-    }
+	
 }

@@ -16,20 +16,17 @@
 package nl.esciencecenter.xenon;
 
 /**
- * Signals that an invalid scheme was provided.  
- * 
- * @version 1.0
- * @since 1.0
+ * Thrown when an unknown adaptor name is provided.  
  */
-public class InvalidAdaptorException extends XenonException {
+public class UnknownAdaptorException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 
-    public InvalidAdaptorException(String adaptorName, String message, Throwable t) {
+    public UnknownAdaptorException(String adaptorName, String message, Throwable t) {
         super(adaptorName, message, t);
     }
 
-    public InvalidAdaptorException(String adaptorName, String message) {
+    public UnknownAdaptorException(String adaptorName, String message) {
         super(adaptorName, message);
     }
 }

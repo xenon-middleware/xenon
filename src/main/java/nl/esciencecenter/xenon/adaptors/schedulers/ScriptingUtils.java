@@ -49,16 +49,6 @@ public class ScriptingUtils {
 		}
 	}
 
-	//  protected static boolean supportsScheme(String scheme, String[] supportedSchemes) {
-	//      for (String validScheme : supportedSchemes) {
-	//          if (validScheme.equalsIgnoreCase(scheme)) {
-	//              return true;
-	//          }
-	//      }
-	//
-	//      return false;
-	//  }
-	//
 	/**
 	 * Do some checks on a job description.
 	 * 

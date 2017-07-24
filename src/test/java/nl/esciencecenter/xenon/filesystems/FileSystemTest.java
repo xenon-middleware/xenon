@@ -30,7 +30,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import nl.esciencecenter.xenon.InvalidAdaptorException;
+import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
@@ -201,17 +201,17 @@ public class FileSystemTest {
 		assertArrayEquals(LocalFileAdaptor.VALID_PROPERTIES, d.getSupportedProperties());
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=UnknownAdaptorException.class)
 	public void test_adaptorDescriptionFailsNull() throws XenonException {
 		FileSystem.getAdaptorDescription(null);
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=UnknownAdaptorException.class)
 	public void test_adaptorDescriptionFailsEmpty() throws XenonException {
 		FileSystem.getAdaptorDescription("");
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=UnknownAdaptorException.class)
 	public void test_adaptorDescriptionFailsUnknown() throws XenonException {
 		FileSystem.getAdaptorDescription("aap");
 	}
@@ -239,17 +239,17 @@ public class FileSystemTest {
 		f.close();
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=UnknownAdaptorException.class)
 	public void test_createFailsNull() throws XenonException {
 		FileSystem.create(null);
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=UnknownAdaptorException.class)
 	public void test_createFailsEmpty() throws XenonException {
 		FileSystem.create("");
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=UnknownAdaptorException.class)
 	public void test_createFailsUnknown() throws XenonException {
 		FileSystem.create("aap");
 	}

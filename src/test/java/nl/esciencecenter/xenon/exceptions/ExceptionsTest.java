@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.exceptions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import nl.esciencecenter.xenon.InvalidAdaptorException;
+import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.PropertyTypeException;
@@ -434,14 +434,14 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void testInvalidSchemeException1() throws Exception {
-        testException(new InvalidAdaptorException("name", "message"));
+    public void testUnknownAdaptorException1() throws Exception {
+        testException(new UnknownAdaptorException("name", "message"));
     }
 
     @Test
-    public void testInvalidSchemeException2() throws Exception {
+    public void testUnknownAdaptorException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new InvalidAdaptorException("name", "message", t), t);
+        testException(new UnknownAdaptorException("name", "message", t), t);
     }
 
     @Test

@@ -354,7 +354,6 @@ public class TorqueScheduler extends ScriptingScheduler {
     }
     
     @Override
-    @SuppressWarnings("PMD.EmptyIfStmt")
     public JobStatus cancelJob(String jobIdentifier) throws XenonException {
     	
     	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");

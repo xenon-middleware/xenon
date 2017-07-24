@@ -34,7 +34,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import nl.esciencecenter.xenon.InvalidAdaptorException;
+import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
@@ -82,13 +82,13 @@ public abstract class FileSystem {
 	private static FileAdaptor getAdaptorByName(String adaptorName) throws XenonException {
 
 		if (adaptorName == null || adaptorName.trim().isEmpty()) {
-			throw new InvalidAdaptorException(COMPONENT_NAME, "Adaptor name may not be null or empty");
+			throw new UnknownAdaptorException(COMPONENT_NAME, "Adaptor name may not be null or empty");
 		}
 
 		FileAdaptor adaptor = adaptors.get(adaptorName);
 
 		if (adaptor == null) {
-			throw new InvalidAdaptorException(COMPONENT_NAME, "File adaptor not found " + adaptor);
+			throw new UnknownAdaptorException(COMPONENT_NAME, "File adaptor not found " + adaptor);
 		}
 
 		return adaptor;
@@ -109,7 +109,7 @@ public abstract class FileSystem {
 	/**
 	 * CopyStatus contains status information for a specific copy operation.
 	 */
-	public static class CopyStatusImplementation implements CopyStatus {
+	static class CopyStatusImplementation implements CopyStatus {
 
 		private final String copyIdentifier;
 		private final String state;
@@ -175,13 +175,15 @@ public abstract class FileSystem {
 	}
 	
 	/**
-	 * Create a new FileSystem that represents a (possibly remote) data store 
-	 * at the <code>location</code> using the <code>credentials</code> to get 
-	 * access. Make sure to always close {@code FileSystem} instances by calling 
+	 * Create a new FileSystem using the <code>adaptor</code> that connects to a data store 
+	 * at <code>location</code> using the <code>credentials</code> to get access. Use 
+	 * <code>properties</code> to (optionally) configure the FileSystem when it is created.  
+	 * 
+	 * Make sure to always close {@code FileSystem} instances by calling 
 	 * {@code close(FileSystem)} when you no longer need them, otherwise their 
 	 * associated resources remain allocated.
 	 * 
-	 * @param type
+	 * @param adaptor
 	 *            the type of file system to connect to (e.g. "sftp" or "webdav")
 	 * @param location
 	 *            the location of the FileSystem.
@@ -196,7 +198,7 @@ public abstract class FileSystem {
 	 *             If a unknown property was provided.
 	 * @throws InvalidPropertyException
 	 *             If a known property was provided with an invalid value.
-	 * @throws InvalidAdaptorException
+	 * @throws UnknownAdaptorException
 	 *             If the adaptor was invalid.
 	 * @throws InvalidLocationException
 	 *             If the location was invalid.
@@ -206,21 +208,111 @@ public abstract class FileSystem {
 	 * @throws XenonException
 	 *             If the creation of the FileSystem failed.
 	 */
-	public static FileSystem create(String type, String location, Credential credential, Map<String, String> properties) 
+	public static FileSystem create(String adaptor, String location, Credential credential, Map<String, String> properties) 
 			throws XenonException {
-		return getAdaptorByName(type).createFileSystem(location, credential, properties);
+		return getAdaptorByName(adaptor).createFileSystem(location, credential, properties);
 	}
 
-	public static FileSystem create(String type, String location, Credential credential) throws XenonException {
-		return create(type, location, credential, new HashMap<String, String>(0));
+	/**
+	 * Create a new FileSystem using the <code>adaptor</code> that connects to a data store 
+	 * at <code>location</code> using the <code>credentials</code> to get access.   
+	 * 
+	 * Make sure to always close {@code FileSystem} instances by calling 
+	 * {@code close(FileSystem)} when you no longer need them, otherwise their 
+	 * associated resources remain allocated.
+	 * 
+	 * @param adaptor
+	 *            the type of file system to connect to (e.g. "sftp" or "webdav")
+	 * @param location
+	 *            the location of the FileSystem.
+	 * @param credential
+	 *            the Credentials to use to get access to the FileSystem.
+	 * 
+	 * @return the new FileSystem.
+	 * 
+	 * @throws UnknownPropertyException
+	 *             If a unknown property was provided.
+	 * @throws InvalidPropertyException
+	 *             If a known property was provided with an invalid value.
+	 * @throws UnknownAdaptorException
+	 *             If the adaptor was invalid.
+	 * @throws InvalidLocationException
+	 *             If the location was invalid.
+	 * @throws InvalidCredentialException
+	 *             If the credential is invalid to access the location.
+	 * 
+	 * @throws XenonException
+	 *             If the creation of the FileSystem failed.
+	 */
+	public static FileSystem create(String adaptor, String location, Credential credential) throws XenonException {
+		return create(adaptor, location, credential, new HashMap<String, String>(0));
 	}
 
-	public static FileSystem create(String type, String location) throws XenonException {
-		return create(type, location, new DefaultCredential());
+	/**
+	 * Create a new FileSystem using the <code>adaptor</code> that connects to a data store 
+	 * at <code>location</code> using the default credentials to get access.   
+	 * 
+	 * Make sure to always close {@code FileSystem} instances by calling 
+	 * {@code close(FileSystem)} when you no longer need them, otherwise their 
+	 * associated resources remain allocated.
+	 * 
+	 * @param adaptor
+	 *            the type of file system to connect to (e.g. "sftp" or "webdav")
+	 * @param location
+	 *            the location of the FileSystem.
+	 * 
+	 * @return the new FileSystem.
+	 * 
+	 * @throws UnknownPropertyException
+	 *             If a unknown property was provided.
+	 * @throws InvalidPropertyException
+	 *             If a known property was provided with an invalid value.
+	 * @throws UnknownAdaptorException
+	 *             If the adaptor was invalid.
+	 * @throws InvalidLocationException
+	 *             If the location was invalid.
+	 * @throws InvalidCredentialException
+	 *             If the credential is invalid to access the location.
+	 * 
+	 * @throws XenonException
+	 *             If the creation of the FileSystem failed.
+	 */
+	public static FileSystem create(String adaptor, String location) throws XenonException {
+		return create(adaptor, location, new DefaultCredential());
 	}
-
-	public static FileSystem create(String type) throws XenonException {
-		return create(type, null);
+	
+	/**
+	 * Create a new FileSystem using the <code>adaptor</code> that connects to a data store 
+	 * at the default location using the default credentials to get access.   
+	 * 
+	 * Note that there are very few filesystem adaptors that support a default location. The 
+	 * local filesystem adaptor is the prime example.  
+	 * 
+	 * Make sure to always close {@code FileSystem} instances by calling 
+	 * {@code close(FileSystem)} when you no longer need them, otherwise their 
+	 * associated resources remain allocated.
+	 * 
+	 * @param adaptor
+	 *            the type of file system to connect to (e.g. "sftp" or "webdav")
+	 * 
+	 * @return the new FileSystem.
+	 * 
+	 * @throws UnknownPropertyException
+	 *             If a unknown property was provided.
+	 * @throws InvalidPropertyException
+	 *             If a known property was provided with an invalid value.
+	 * @throws UnknownAdaptorException
+	 *             If the adaptor was invalid.
+	 * @throws InvalidLocationException
+	 *             If the location was invalid.
+	 * @throws InvalidCredentialException
+	 *             If the credential is invalid to access the location.
+	 * 
+	 * @throws XenonException
+	 *             If the creation of the FileSystem failed.
+	 */
+	public static FileSystem create(String adaptor) throws XenonException {
+		return create(adaptor, null);
 	}
 	
     class CopyCallback {

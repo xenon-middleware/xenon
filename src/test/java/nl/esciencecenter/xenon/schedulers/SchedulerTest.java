@@ -22,7 +22,7 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
-import nl.esciencecenter.xenon.InvalidAdaptorException;
+import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
@@ -37,17 +37,17 @@ public class SchedulerTest {
 		  assertEquals("local", s.getAdaptorName());
 	  }
 	  
-	  @Test(expected=InvalidAdaptorException.class)
+	  @Test(expected=UnknownAdaptorException.class)
 	  public void test_createFailsNull() throws Exception {
 		  Scheduler.create(null);
 	  }
 
-	  @Test(expected=InvalidAdaptorException.class)
+	  @Test(expected=UnknownAdaptorException.class)
 	  public void test_createFailsEmpty() throws Exception {
 		  Scheduler.create("");
 	  }
 
-	  @Test(expected=InvalidAdaptorException.class)
+	  @Test(expected=UnknownAdaptorException.class)
 	  public void test_createFailsUnknown() throws Exception {
 		  Scheduler.create("aap");
 	  }
@@ -75,17 +75,17 @@ public class SchedulerTest {
 		  assertArrayEquals(LocalSchedulerAdaptor.VALID_PROPERTIES, d.getSupportedProperties());
 	  }
 
-	  @Test(expected=InvalidAdaptorException.class)
+	  @Test(expected=UnknownAdaptorException.class)
 	  public void test_adaptorDescriptionFailsNull() throws XenonException {
 		  Scheduler.getAdaptorDescription(null);
 	  }
 
-	  @Test(expected=InvalidAdaptorException.class)
+	  @Test(expected=UnknownAdaptorException.class)
 	  public void test_adaptorDescriptionFailsEmpty() throws XenonException {
 		  Scheduler.getAdaptorDescription("");
 	  }
 
-	  @Test(expected=InvalidAdaptorException.class)
+	  @Test(expected=UnknownAdaptorException.class)
 	  public void test_adaptorDescriptionFailsUnknown() throws XenonException {
 		  Scheduler.getAdaptorDescription("aap");
 	  }
@@ -124,59 +124,59 @@ public class SchedulerTest {
 		  assertEquals("MEM",s.getLocation());
 	  }
 
-	  @Test
-	  public void test_isEmbeddedTrue() throws Exception {
-		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, true, null);
-		  assertTrue(s.isEmbedded());
-	  }
-
-	  @Test
-	  public void test_isEmbeddedFalse() throws Exception {
-		  Scheduler s = new MockScheduler("0", "TEST", "MEM", false, true, true, null);
-		  assertFalse(s.isEmbedded());
-	  }
-
-	  @Test
-	  public void test_isEmbeddedDefaultFalse() throws Exception {
-		  Scheduler s = new MockDefaultScheduler("0", "TEST", "MEM", null);
-		  assertFalse(s.isEmbedded());
-	  }
-	  
-	  @Test
-	  public void test_supportsBathTrue() throws Exception {
-		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, true, null);
-		  assertTrue(s.supportsBatch());
-	  }
-
-	  @Test
-	  public void test_supportsBathFalse() throws Exception {
-		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, false, true, null);
-		  assertFalse(s.supportsBatch());
-	  }
-
-	  @Test
-	  public void test_supportsInteractiveTrue() throws Exception {
-		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, true, null);
-		  assertTrue(s.supportsInteractive());
-	  }
-
-	  @Test
-	  public void test_supportsBathDefaultTrue() throws Exception {
-		  Scheduler s = new MockDefaultScheduler("0", "TEST", "MEM", null);
-		  assertTrue(s.supportsBatch());
-	  }
-	  
-	  @Test
-	  public void test_supportsInteractiveFalse() throws Exception {
-		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, false, null);
-		  assertFalse(s.supportsInteractive());
-	  }
-
-	  @Test
-	  public void test_supportsInteractiveDefaultFalse() throws Exception {
-		  Scheduler s = new MockDefaultScheduler("0", "TEST", "MEM", null);
-		  assertFalse(s.supportsInteractive());
-	  }
+//	  @Test
+//	  public void test_isEmbeddedTrue() throws Exception {
+//		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, true, null);
+//		  assertTrue(s.isEmbedded());
+//	  }
+//
+//	  @Test
+//	  public void test_isEmbeddedFalse() throws Exception {
+//		  Scheduler s = new MockScheduler("0", "TEST", "MEM", false, true, true, null);
+//		  assertFalse(s.isEmbedded());
+//	  }
+//
+//	  @Test
+//	  public void test_isEmbeddedDefaultFalse() throws Exception {
+//		  Scheduler s = new MockDefaultScheduler("0", "TEST", "MEM", null);
+//		  assertFalse(s.isEmbedded());
+//	  }
+//	  
+//	  @Test
+//	  public void test_supportsBathTrue() throws Exception {
+//		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, true, null);
+//		  assertTrue(s.supportsBatch());
+//	  }
+//
+//	  @Test
+//	  public void test_supportsBathFalse() throws Exception {
+//		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, false, true, null);
+//		  assertFalse(s.supportsBatch());
+//	  }
+//
+//	  @Test
+//	  public void test_supportsInteractiveTrue() throws Exception {
+//		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, true, null);
+//		  assertTrue(s.supportsInteractive());
+//	  }
+//
+//	  @Test
+//	  public void test_supportsBathDefaultTrue() throws Exception {
+//		  Scheduler s = new MockDefaultScheduler("0", "TEST", "MEM", null);
+//		  assertTrue(s.supportsBatch());
+//	  }
+//	  
+//	  @Test
+//	  public void test_supportsInteractiveFalse() throws Exception {
+//		  Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, false, null);
+//		  assertFalse(s.supportsInteractive());
+//	  }
+//
+//	  @Test
+//	  public void test_supportsInteractiveDefaultFalse() throws Exception {
+//		  Scheduler s = new MockDefaultScheduler("0", "TEST", "MEM", null);
+//		  assertFalse(s.supportsInteractive());
+//	  }
 	  
 	  @Test
 	  public void test_equalsTrueSelf() throws Exception {

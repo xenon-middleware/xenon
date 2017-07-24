@@ -113,7 +113,7 @@ public class SftpFileAdaptor extends FileAdaptor {
 	
 	public FileSystem createFileSystem(String location, Credential credential, Map<String,String> properties) throws XenonException { 
 
-		LOGGER.debug("newFileSystem scheme = SFTP location = {} credential = {} properties = {}", location, credential, properties);
+		LOGGER.debug("new SftpFileSystem location = {} credential = {} properties = {}", location, credential, properties);
 
 		if (credential == null) { 
 			throw new InvalidCredentialException(ADAPTOR_NAME, "Credential may not be null");
