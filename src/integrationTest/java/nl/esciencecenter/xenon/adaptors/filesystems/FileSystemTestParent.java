@@ -50,6 +50,9 @@ import static org.junit.Assert.fail;
 public abstract class FileSystemTestParent {
     private static final Logger logger = LoggerFactory.getLogger(FileSystemTestParent.class);
 
+    private Path testRoot;
+    public static final String TEST_DIR = "xenon_test";
+
     private FileSystem fileSystem;
     private FileSystemAdaptorDescription description;
     private LocationConfig locationConfig;
@@ -66,6 +69,7 @@ public abstract class FileSystemTestParent {
         fileSystem = setupFileSystem();
         description = setupDescription();
         locationConfig = setupLocationConfig(fileSystem);
+        testRoot = fileSystem.getEntryPath().resolve(TEST_DIR);
         testDir = null;
     }
 
@@ -110,7 +114,7 @@ public abstract class FileSystemTestParent {
 
 
     public Path resolve(String... path) throws XenonException {
-        return new Path(path);
+        return testRoot.resolve(new Path(path));
     }
 
 
