@@ -124,6 +124,8 @@ public class SftpFileSystem extends FileSystem {
 	@Override
 	public void createFile(Path file) throws XenonException {
 		
+		assertPathNotExists(file);
+		
 		LOGGER.debug("createFile path = {}", file);
 
 		OutputStream out = null;
@@ -274,6 +276,10 @@ public class SftpFileSystem extends FileSystem {
 
 	@Override
 	public OutputStream writeToFile(Path path, long size) throws XenonException {
+		
+		assertNotNull(path);
+		assertParentDirectoryExists(path);
+		
 		try {
 			return client.write(path.getAbsolutePath(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Create, SftpClient.OpenMode.Truncate);      	
 		} catch (IOException e) {
@@ -288,6 +294,10 @@ public class SftpFileSystem extends FileSystem {
 
 	@Override
 	public OutputStream appendToFile(Path path) throws XenonException {
+
+		assertNotNull(path);
+		assertFileExists(path);
+		
 		try {
 			return client.write(path.getAbsolutePath(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Append);      	
 		} catch (IOException e) {
