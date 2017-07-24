@@ -17,53 +17,42 @@
 package nl.esciencecenter.xenon.schedulers;
 
 import nl.esciencecenter.xenon.AdaptorDescription;
-import nl.esciencecenter.xenon.XenonPropertyDescription;
 
 /**
- *
+ * 
  */
-public class SchedulerAdaptorDescription extends AdaptorDescription {
+public interface SchedulerAdaptorDescription extends AdaptorDescription {
 
-	private final boolean isOnline;
-	private final boolean supportsBatch;
-	private final boolean supportsInteractive;
-	
-    public SchedulerAdaptorDescription(String name, String description, String[] supportedLocations,
-			XenonPropertyDescription[] supportedProperties, boolean isOnline, boolean supportsBatch, boolean supportsInteractive) {
-		super(name, description, supportedLocations, supportedProperties);
-		this.isOnline = isOnline;
-		this.supportsBatch = supportsBatch;
-		this.supportsInteractive = supportsInteractive;
-    }
-
-	/**
-     * TODO: rename isOnline to something like separateServer, supportsDetach, etc.
+	 /**
+     * Is this an embedded scheduler ?
      * 
-     * @return
-     * 		if this scheduler is online
+     * Embedded schedulers are implemented inside the Xenon process itself. Therefore this process needs to remain active for its jobs 
+     * to run. Ending an online scheduler will typically orphan or kill all jobs that were submitted to it.
+     * 
+     * Non-embedded schedulers do not need to remain active for their jobs to run. A submitted job will typically be handed over to
+     * some external server that will manage the job for the rest of its lifetime.
+     * 
+     * @return if this scheduler is embedded.
      */
-    public boolean isOnline() { 
-    	return isOnline;
-    }
+	boolean isEmbedded();
+    
     
     /**
-     * Does this scheduler support batch jobs ?
+     * Does this Scheduler support the submission of batch jobs ?
      * 
-     * @return
-     * 		if this scheduler supports batch jobs
+     * For batch jobs the standard streams of the jobs are redirected from and to files.
+     * 
+     * @return if this scheduler supports the submission of batch jobs ?
      */
-    public boolean supportsBatch() { 
-    	return supportsBatch;
-    }
+    boolean supportsBatch();
     
     /**
-     * Does this scheduler support interactive jobs ?
+     * Does this Scheduler supports the submission of interactive jobs ?
      * 
-     * @return
-     * 		if this scheduler supports interactive jobs
+     * For interactive jobs the standard streams of the job must be handled by the submitting process. Failing to do so may cause
+     * the job to hang indefinitely.
+     * 
+     * @return if this scheduler supports the submission of interactive jobs ?
      */
-    public boolean supportsInteractive() { 
-    	return supportsInteractive;
-    }
-    
+    boolean supportsInteractive();    
 }

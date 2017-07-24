@@ -118,7 +118,7 @@ public class JobExecutor implements Runnable {
             waitForStatusUpdate(pollingDelay);
         }
 
-        return new JobStatus(jobIdentifier, state, exitStatus, error, RUNNING_STATE.equals(state), done, null);
+        return new JobStatusImplementation(jobIdentifier, state, exitStatus, error, RUNNING_STATE.equals(state), done, null);
     }
 
     public synchronized String getState() {

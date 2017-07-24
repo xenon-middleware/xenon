@@ -37,6 +37,7 @@ import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.EndOfFileException;
 import nl.esciencecenter.xenon.adaptors.filesystems.NoSpaceException;
+import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
 import nl.esciencecenter.xenon.adaptors.filesystems.PermissionDeniedException;
 import nl.esciencecenter.xenon.adaptors.filesystems.PosixFileUtils;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
@@ -351,7 +352,7 @@ public class SftpFileSystem extends FileSystem {
 	
 	private static PathAttributes convertAttributes(Path path, SftpClient.Attributes attributes) { 
 		
-		PathAttributes result = new PathAttributes();
+		PathAttributesImplementation result = new PathAttributesImplementation();
 		
 		result.setPath(path);
 		result.setDirectory(attributes.isDirectory());

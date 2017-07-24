@@ -18,102 +18,61 @@ package nl.esciencecenter.xenon.filesystems;
 /**
  * CopyStatus contains status information for a specific copy operation.
  */
-public class CopyStatus {
-
-	private final String copyIdentifier;
-	private final String state;
-	private final Throwable exception;
-
-	private final long bytesToCopy;
-	private final long bytesCopied;
-
-	public CopyStatus(String copyIdentifier, String state, long bytesToCopy, long bytesCopied, Throwable exception) {
-		super();
-		this.copyIdentifier = copyIdentifier;
-		this.state = state;
-		this.bytesToCopy = bytesToCopy;
-		this.bytesCopied = bytesCopied;
-		this.exception = exception;
-		
-		System.out.println("STATUS " +state + " " +bytesToCopy + " " + bytesCopied + " " + exception);
-		
-	}
+public interface CopyStatus {
 
 	/**
 	 * Get the copy identifier for which this CopyStatus was created.
 	 * 
 	 * @return the Copy.
 	 */
-	public String getCopyIdentifier() {
-		return copyIdentifier;
-	}
+	String getCopyIdentifier();
 
 	/**
 	 * Get the state of the Copy operation.
 	 * 
 	 * @return the state of the Copy operation.
 	 */
-	public String getState() {
-		return state;
-	}
+	String getState();
 
 	/**
 	 * Get the exception produced by the Copy or while retrieving the status.
 	 * 
 	 * @return the exception.
 	 */
-	public Throwable getException() {
-		return exception;
-	}
+	Throwable getException();
 
 	/**
 	 * Is the Copy still running?
 	 * 
 	 * @return if the Copy is running.
 	 */
-	public boolean isRunning() {
-		return "RUNNING".equals(state);
-	}
+	boolean isRunning();
 
 	/**
 	 * Is the Copy done?
 	 * 
 	 * @return if the Copy is done.
 	 */
-	public boolean isDone() {
-		return "DONE".equals(state) || "FAILED".equals(state);
-	}
+	boolean isDone();
 
 	/**
 	 * Has the Copy or status retrieval produced a exception ?
 	 * 
 	 * @return if the Copy or status retrieval produced a exception.
 	 */
-	public boolean hasException() {
-		return exception != null;
-	}
+	boolean hasException();
 
 	/**
 	 * Get the number of bytes that need to be copied for the entire copy operation.
 	 * 
 	 * @return the number of bytes that need to be copied.
 	 */
-	public long bytesToCopy() {
-		return bytesToCopy;
-	}
+	long bytesToCopy();
 
 	/**
 	 * Get the number of bytes that have been copied.
 	 * 
 	 * @return the number of bytes that have been copied.
 	 */
-	public long bytesCopied() {
-		return bytesCopied;
-	}
-
-	@Override
-	public String toString() {
-		return "CopyStatus [copyIdentifier=" + copyIdentifier + ", state=" + state + ", exception=" + exception + 
-				", bytesToCopy=" + bytesToCopy + ", bytesCopied=" + bytesCopied + "]";
-	}
+	long bytesCopied();
 }

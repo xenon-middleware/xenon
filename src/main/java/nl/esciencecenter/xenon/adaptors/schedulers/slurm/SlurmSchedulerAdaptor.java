@@ -20,7 +20,6 @@ import java.util.Map;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
-import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
@@ -36,16 +35,10 @@ public class SlurmSchedulerAdaptor extends SchedulerAdaptor {
     /** The prefix used by all properties related to this adaptor */
     public static final String PREFIX = SchedulerAdaptor.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
 
-    /** The schemes supported by this adaptor */
-    // public static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<>("slurm");
-    
     /** The locations supported by this adaptor */
     public static final String [] ADAPTOR_LOCATIONS = new String [] { "(locations supported by local)",
             "(locations supported by ssh)" };
     
-    /** Should the slurm version on the target machine be ignored ? */
-    // public static final String IGNORE_VERSION_PROPERTY = PREFIX + "ignore.version";
-
     /** Should the accounting usage be disabled? */
     public static final String DISABLE_ACCOUNTING_USAGE = PREFIX + "disable.accounting.usage";
 
@@ -57,11 +50,7 @@ public class SlurmSchedulerAdaptor extends SchedulerAdaptor {
             + "or the ssh adaptor to gain access to the scheduler machine.";
 
     /** List of all properties supported by this adaptor */
-    public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {
-//        new XenonPropertyDescription(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, 
-//                "false", "Skip version check is skipped when connecting to remote machines. "
-//                 + "WARNING: it is not recommended to use this setting in production environments!"),
-        
+    public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {       
         new XenonPropertyDescription(DISABLE_ACCOUNTING_USAGE, Type.BOOLEAN,
                 "false", "Do not use accounting info of slurm, even when available. Mostly for testing purposes"),
                 
@@ -76,7 +65,13 @@ public class SlurmSchedulerAdaptor extends SchedulerAdaptor {
     public static final String[] SUPPORTED_VERSIONS = { "2.3.", "2.5.", "2.6.", "14.03.0", "14.11.9-Bull.1.0", "15.08.6"};
     
     public SlurmSchedulerAdaptor() {
-		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, true, true);
+		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
+	}
+    
+	@Override
+	public boolean supportsInteractive() { 
+		// The slurm scheduler supports interactive jobs
+		return true;
 	}
     
 	@Override

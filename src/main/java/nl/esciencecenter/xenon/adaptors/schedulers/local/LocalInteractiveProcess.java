@@ -25,6 +25,7 @@ import java.security.PrivilegedAction;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcess;
+import nl.esciencecenter.xenon.adaptors.schedulers.StreamsImplementation;
 import nl.esciencecenter.xenon.adaptors.shared.local.LocalUtil;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
@@ -64,7 +65,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
         } catch (IOException e) { 
             throw new XenonException(ADAPTOR_NAME, "Failed to start local process!", e);
         }
-        streams = new Streams(jobIdentifier, process.getInputStream(), process.getOutputStream(), process.getErrorStream());
+        streams = new StreamsImplementation(jobIdentifier, process.getInputStream(), process.getOutputStream(), process.getErrorStream());
     }
 
     public Streams getStreams() {

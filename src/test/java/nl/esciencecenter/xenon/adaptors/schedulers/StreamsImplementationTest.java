@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.schedulers;
+package nl.esciencecenter.xenon.adaptors.schedulers;
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,7 +24,9 @@ import java.io.OutputStream;
 
 import org.junit.Test;
 
-public class StreamsTest {
+import nl.esciencecenter.xenon.schedulers.Streams;
+
+public class StreamsImplementationTest {
 	
 	@Test
 	public void test_handle() throws Exception {
@@ -33,7 +35,7 @@ public class StreamsTest {
 		OutputStream stdin = new ByteArrayOutputStream();
 		InputStream stderr = new ByteArrayInputStream(new byte[0]);
 		
-		Streams s = new Streams(id, stdout, stdin, stderr);
+		Streams s = new StreamsImplementation(id, stdout, stdin, stderr);
 		assertEquals(id, s.getJobIdentifier());
 	}
 	
@@ -44,7 +46,7 @@ public class StreamsTest {
 		OutputStream stdin = new ByteArrayOutputStream();
 		InputStream stderr = new ByteArrayInputStream(new byte[0]);
 		
-		Streams s = new Streams(id, stdout, stdin, stderr);
+		Streams s = new StreamsImplementation(id, stdout, stdin, stderr);
 		assertEquals(stdout, s.getStdout());
 	}
 	
@@ -55,7 +57,7 @@ public class StreamsTest {
 		OutputStream stdin = new ByteArrayOutputStream();
 		InputStream stderr = new ByteArrayInputStream(new byte[0]);
 		
-		Streams s = new Streams(id, stdout, stdin, stderr);
+		Streams s = new StreamsImplementation(id, stdout, stdin, stderr);
 		assertEquals(stderr, s.getStderr());
 	}
 
@@ -66,7 +68,7 @@ public class StreamsTest {
 		OutputStream stdin = new ByteArrayOutputStream();
 		InputStream stderr = new ByteArrayInputStream(new byte[0]);
 		
-		Streams s = new Streams(id, stdout, stdin, stderr);
+		Streams s = new StreamsImplementation(id, stdout, stdin, stderr);
 		assertEquals(stdin, s.getStdin());
 	}
 }

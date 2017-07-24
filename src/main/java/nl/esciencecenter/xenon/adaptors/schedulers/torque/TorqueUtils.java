@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
@@ -104,7 +105,7 @@ final class TorqueUtils {
             exitStatus = Integer.valueOf(exitStatusStr);
         }
 
-        return new JobStatus(jobIdentifier, stateCode, exitStatus, exception, stateCode.equals("R"), done, jobInfo);
+        return new JobStatusImplementation(jobIdentifier, stateCode, exitStatus, exception, stateCode.equals("R"), done, jobInfo);
     }
 
     public static void generateScriptContent(JobDescription description, Formatter script) {

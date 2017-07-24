@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.schedulers;
+package nl.esciencecenter.xenon.adaptors.schedulers;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import nl.esciencecenter.xenon.schedulers.Streams;
 
 /**
  * Streams is a container for the standard input, output and error streams of a job.
@@ -26,33 +28,65 @@ import java.io.OutputStream;
  * @version 1.0
  * @since 1.0
  */
-public interface Streams {
+public class StreamsImplementation implements Streams {
+
+	private final String jobIdentifier;
+	private final InputStream stdout;
+	private final InputStream stderr;
+	private final OutputStream stdin;
+
+	/**
+	 * Create a Streams containing the job and its standard streams.
+	 * 
+	 * @param jobIdentifier
+	 *            the identifier of the job.
+	 * @param stdout
+	 *            the standard output stream.
+	 * @param stdin
+	 *            the standard input stream.
+	 * @param stderr
+	 *            the standard error stream.
+	 */
+	public StreamsImplementation(String jobIdentifier, InputStream stdout, OutputStream stdin, InputStream stderr) {
+		this.jobIdentifier = jobIdentifier;
+		this.stdout = stdout;
+		this.stdin = stdin;
+		this.stderr = stderr;
+	}
 
 	/**
 	 * Get the identifier of the job for which this Streams was created.
 	 * 
 	 * @return the identifier of the ob.
 	 */
-	String getJobIdentifier();
+	public String getJobIdentifier() {
+		return jobIdentifier;
+	}
 
 	/**
 	 * Returns the standard output stream of job.
 	 * 
 	 * @return the standard output stream of job.
 	 */
-	InputStream getStdout();
+	public InputStream getStdout() {
+		return stdout;
+	}
 
 	/**
 	 * Returns the standard error stream of job.
 	 * 
 	 * @return the standard error stream of job.
 	 */
-	InputStream getStderr();
+	public InputStream getStderr() {
+		return stderr;
+	}
 
 	/**
 	 * Returns the standard input stream of job.
 	 * 
 	 * @return the standard input stream of this job.
 	 */
-	OutputStream getStdin();
+	public OutputStream getStdin() {
+		return stdin;
+	}
 }

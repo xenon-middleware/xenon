@@ -31,6 +31,7 @@ import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmUtils.getQu
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmUtils.identifiersAsCSList;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmUtils.verifyJobDescription;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -40,9 +41,11 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
+import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingScheduler;
+import nl.esciencecenter.xenon.adaptors.schedulers.StreamsImplementation;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
@@ -70,7 +73,7 @@ public class SlurmScheduler extends ScriptingScheduler {
     
     protected SlurmScheduler(String uniqueID, String location, Credential credential, Map<String,String> prop) throws XenonException {
 
-        super(uniqueID, ADAPTOR_NAME, location, credential, true, true, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
+        super(uniqueID, ADAPTOR_NAME, location, credential, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
 
         boolean disableAccounting = properties.getBooleanProperty(DISABLE_ACCOUNTING_USAGE);
 
@@ -115,6 +118,20 @@ public class SlurmScheduler extends ScriptingScheduler {
         return defaultQueueName;
     }
 
+    @Override
+    protected void translateError(RemoteCommandRunner runner, String stdin, String executable, String... arguments) throws XenonException { 
+    
+    	String error = runner.getStderr();
+    	
+    	if (error.contains("Invalid job id")) { 
+    		throw new NoSuchJobException(ADAPTOR_NAME, "Invalid job ID");
+    	}
+    	
+    	throw new XenonException(ADAPTOR_NAME, "Could not run command \"" + executable + "\" with stdin \"" + stdin
+                + "\" arguments \"" + Arrays.toString(arguments) + "\" at \"" + subScheduler + "\". Exit code = "
+                + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());	
+    }
+    
     @Override
     public String submitBatchJob(JobDescription description) throws XenonException {
      
@@ -219,7 +236,7 @@ public class SlurmScheduler extends ScriptingScheduler {
         }
         
         if (result != null) {
-        	return new Streams(result, interactiveJob.getStdout(), interactiveJob.getStdin(), interactiveJob.getStderr());
+        	return new StreamsImplementation(result, interactiveJob.getStdout(), interactiveJob.getStdin(), interactiveJob.getStderr());
         }
         
         // Failed to find job within timeout. Fetch status of interactive job to return as an error.
@@ -246,7 +263,7 @@ public class SlurmScheduler extends ScriptingScheduler {
     @Override
     public JobStatus cancelJob(String jobIdentifier) throws XenonException {
     	
-    	checkJobIdentifier(jobIdentifier);
+    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
     	
         String output = runCheckedCommand(null, "scancel", jobIdentifier);
 
@@ -268,7 +285,7 @@ public class SlurmScheduler extends ScriptingScheduler {
 
             //add a list of all requested queues
             output = runCheckedCommand(null, "squeue", "--noheader", "--format=%i",
-                    "--partitions=" + CommandLineUtils.asCSList(getQueueNames()));
+                    "--partitions=" + CommandLineUtils.asCSList(queueNames));
         }
 
         //Job id's are on separate lines, on their own.
@@ -289,13 +306,13 @@ public class SlurmScheduler extends ScriptingScheduler {
 
     private Map<String, Map<String, String>> getSqueueInfo(String... jobs) throws XenonException {
         
-        String squeueOutput;
+        String squeueOutput = "";
         
         if (jobs == null || jobs.length == 0)  {
-            squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R %k");
+        	squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R %k");
         } else { 
-            squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R %k", "--jobs="
-                + identifiersAsCSList(jobs));
+        	squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R %k", "--jobs="
+        			+ identifiersAsCSList(jobs));
         }
 
         return ScriptingParser.parseTable(squeueOutput, "JOBID", ScriptingParser.WHITESPACE_REGEX, ADAPTOR_NAME,
@@ -343,74 +360,79 @@ public class SlurmScheduler extends ScriptingScheduler {
     }
 
     @Override
-    public JobStatus getJobStatus(String job) throws XenonException {
+    public JobStatus getJobStatus(String jobIdentifier) throws XenonException {
 
+    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
+    	
         //try the queue first
-        Map<String, Map<String, String>> sQueueInfo = getSqueueInfo(job);
-        JobStatus result = getJobStatusFromSqueueInfo(sQueueInfo, job);
+        Map<String, Map<String, String>> sQueueInfo = getSqueueInfo(jobIdentifier);
+        JobStatus result = getJobStatusFromSqueueInfo(sQueueInfo, jobIdentifier);
 
         //try the accounting (if available)
         if (result == null) {
-            Map<String, Map<String, String>> sacctInfo = getSacctInfo(job);
-            result = getJobStatusFromSacctInfo(sacctInfo, job);
+            Map<String, Map<String, String>> sacctInfo = getSacctInfo(jobIdentifier);
+            result = getJobStatusFromSacctInfo(sacctInfo, jobIdentifier);
         }
 
         //check scontrol.
         if (result == null) {
-            Map<String, String> scontrolInfo = getSControlInfo(job);
-            result = getJobStatusFromScontrolInfo(scontrolInfo, job);
+            Map<String, String> scontrolInfo = getSControlInfo(jobIdentifier);
+            result = getJobStatusFromScontrolInfo(scontrolInfo, jobIdentifier);
         }
 
         //job not found anywhere, give up
         if (result == null) {
-            throw new NoSuchJobException(ADAPTOR_NAME, "Unknown Job: " + job);
+            throw new NoSuchJobException(ADAPTOR_NAME, "Unknown Job: " + jobIdentifier);
         }
 
         return result;
     }
 
-    @Override
-    public JobStatus[] getJobStatuses(String... jobs) throws XenonException {
-        JobStatus[] result = new JobStatus[jobs.length];
-
-        //fetch queue info for all jobs in one go
-        Map<String, Map<String, String>> squeueInfo = getSqueueInfo(jobs);
-
-        //fetch accounting info for all jobs in one go
-        Map<String, Map<String, String>> sacctInfo = getSacctInfo(jobs);
-
-        //loop over all jobs looking for status in info maps
-        for (int i = 0; i < jobs.length; i++) {
-            //job not requested at all
-            if (jobs[i] == null) {
-                result[i] = null;
-            } else {
-                //Check the squeue info.
-                result[i] = getJobStatusFromSqueueInfo(squeueInfo, jobs[i]);
-
-                //Check sacct info. (if available)
-                if (result[i] == null) {
-                    result[i] = getJobStatusFromSacctInfo(sacctInfo, jobs[i]);
-                }
-
-                //Check scontrol. Will run an additional command.
-                if (result[i] == null) {
-                    Map<String, String> scontrolInfo = getSControlInfo(jobs[i]);
-                    result[i] = getJobStatusFromScontrolInfo(scontrolInfo, jobs[i]);
-                }
-
-                //job really does not seem to exist (anymore)
-                if (result[i] == null) {
-                    NoSuchJobException exception = new NoSuchJobException(ADAPTOR_NAME, "Unknown Job: " + jobs[i]);
-                    result[i] = new JobStatus(jobs[i], null, null, exception, false, false, null);
-                }
-            }
-        }
-        return result;
-    }
+//    @Override
+//    public JobStatus[] getJobStatuses(String... jobs) throws XenonException {
+//        JobStatus[] result = new JobStatus[jobs.length];
+//        
+//        //fetch queue info for all jobs in one go
+//        Map<String, Map<String, String>> squeueInfo = getSqueueInfo(jobs);
+//
+//        //fetch accounting info for all jobs in one go
+//        Map<String, Map<String, String>> sacctInfo = getSacctInfo(jobs);
+//
+//        //loop over all jobs looking for status in info maps
+//        for (int i = 0; i < jobs.length; i++) {
+//            //job not requested at all
+//            if (jobs[i] == null) {
+//                result[i] = null;
+//            } else {
+//                //Check the squeue info.
+//                result[i] = getJobStatusFromSqueueInfo(squeueInfo, jobs[i]);
+//
+//                //Check sacct info. (if available)
+//                if (result[i] == null) {
+//                    result[i] = getJobStatusFromSacctInfo(sacctInfo, jobs[i]);
+//                }
+//
+//                //Check scontrol. Will run an additional command.
+//                if (result[i] == null) {
+//                    Map<String, String> scontrolInfo = getSControlInfo(jobs[i]);
+//                    result[i] = getJobStatusFromScontrolInfo(scontrolInfo, jobs[i]);
+//                }
+//
+//                //job really does not seem to exist (anymore)
+//                if (result[i] == null) {
+//                    NoSuchJobException exception = new NoSuchJobException(ADAPTOR_NAME, "Unknown Job: " + jobs[i]);
+//                    result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);
+//                }
+//            }
+//        }
+//        return result;
+//    }
 
     @Override
     public QueueStatus getQueueStatus(String queueName) throws XenonException {
+
+    	assertNonNullOrEmpty(queueName, "Queue name cannot be null or empty");
+    	
         Map<String, Map<String, String>> info = getSinfoInfo(queueName);
 
         QueueStatus result = getQueueStatusFromSInfo(info, queueName, this);
@@ -448,7 +470,7 @@ public class SlurmScheduler extends ScriptingScheduler {
                 if (result[i] == null) {
                     Exception exception = new NoSuchQueueException(ADAPTOR_NAME, "Cannot get status of queue \""
                             + targetQueueNames[i] + "\" from server");
-                    result[i] = new QueueStatus(this, targetQueueNames[i], exception, null);
+                    result[i] = new QueueStatusImplementation(this, targetQueueNames[i], exception, null);
                 }
             }
         }

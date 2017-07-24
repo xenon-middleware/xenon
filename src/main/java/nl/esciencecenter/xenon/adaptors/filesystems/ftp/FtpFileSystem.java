@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
@@ -138,7 +139,7 @@ public class FtpFileSystem extends FileSystem {
 
 	private PathAttributes convertAttributes(Path path, FTPFile attributes)  { 
 		
-		PathAttributes result = new PathAttributes();
+		PathAttributesImplementation result = new PathAttributesImplementation();
 		
 		result.setPath(path);
 		result.setDirectory(attributes.isDirectory());

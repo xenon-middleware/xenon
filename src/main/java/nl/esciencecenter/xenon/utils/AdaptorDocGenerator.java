@@ -170,7 +170,7 @@ public class AdaptorDocGenerator {
         out.println("<h4>Supported features</h4><ul>");
         out.println(String.format("<li>Batch: %s</li>", description.supportsBatch()));
         out.println(String.format("<li>Interactive: %s</li>", description.supportsInteractive()));
-        out.println(String.format("<li>Online: %s</li>", description.isOnline()));
+        out.println(String.format("<li>Embedded: %s</li>", description.isEmbedded()));
         out.println("</ul>");
     }
 }

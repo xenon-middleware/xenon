@@ -16,59 +16,41 @@
 
 package nl.esciencecenter.xenon.filesystems;
 
-import java.util.Arrays;
-
 import nl.esciencecenter.xenon.AdaptorDescription;
-import nl.esciencecenter.xenon.XenonPropertyDescription;
 
 /**
- * @version 1.0
- * @since 1.0
  *
  */
-public class FileSystemAdaptorDescription extends AdaptorDescription {
+public interface FileSystemAdaptorDescription extends AdaptorDescription {
 
-	private final boolean supportsThirdPartyCopy;
-	private final boolean readSymbolicLinks;
-	private final boolean createSymbolicLinks;
-	
-    public FileSystemAdaptorDescription(String name, String description, String[] supportedLocations,
-			XenonPropertyDescription[] supportedProperties, boolean supportsThirdPartyCopy, boolean readSymbolicLinks, boolean createSymbolicLinks) {
-		super(name, description, supportedLocations, supportedProperties);
-		this.supportsThirdPartyCopy = supportsThirdPartyCopy;
-		this.readSymbolicLinks = readSymbolicLinks;
-		this.createSymbolicLinks = createSymbolicLinks;
-	}
 
 	/**
-     * Does this scheme support third party copy ?
+     * Does this adaptor support third party copy ?
      * 
      * In third party copy, a file is copied between two remote locations, without passing through the local machine first.  
      * 
      * @return
-     *          if this scheme supports third party copy.
+     *          if this adaptor supports third party copy.
      */
-    public boolean supportsThirdPartyCopy() { 
-    	return supportsThirdPartyCopy;
-    }
-    
-    public boolean canReadSymboliclinks() {
-    	return readSymbolicLinks;
-	}
-    
-    public boolean canCreateSymboliclinks() {
-    	return createSymbolicLinks;
-	}
-    
-    @Override
-    public String toString() {
-        return "FileAdaptorDescription [name=" + getName() + ", description=" + getDescription() + 
-        		", supportedLocations=" + Arrays.toString(getSupportedLocations()) +
-        		", supportedProperties=" + Arrays.toString(getSupportedProperties()) +  
-        		", supportsThirdPartyCopy=" + supportsThirdPartyCopy + "]";
-    }
+    boolean supportsThirdPartyCopy();
 
-    // TODO: Fix me! Bad default, no way to set!
-    public boolean isConnectionless() { return true; }
-
+	/**
+     * Can this adaptor read symbolic links ?
+     * 
+     * @return
+     *          if this adaptor can read symbolic links.
+     */
+    boolean canReadSymboliclinks();
+    
+	/**
+     * Can this adaptor create symbolic links ?
+     * 
+     * In third party copy, a file is copied between two remote locations, without passing through the local machine first.  
+     * 
+     * @return
+     *          if this adaptor can create symbolic links.
+     */
+    boolean canCreateSymboliclinks();
+    
+    boolean isConnectionless();    
 }

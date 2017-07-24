@@ -55,6 +55,7 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
@@ -151,9 +152,7 @@ public class WebdavFileSystem extends FileSystem {
 
 	private PathAttributes getAttributes(Path path, DavPropertySet p, boolean isDirectory) { 
 
-		System.out.println("GetAttributes " + path + " " + isDirectory);
-		
-		PathAttributes attributes = new PathAttributes();
+		PathAttributesImplementation attributes = new PathAttributesImplementation();
 		
 		attributes.setPath(path);
 		attributes.setDirectory(isDirectory);

@@ -30,11 +30,12 @@ import java.util.List;
 
 import org.junit.Test;
 
-import nl.esciencecenter.xenon.InvalidAdaptorException;
+import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
 import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
 
 public class FileSystemTest {
@@ -210,7 +211,7 @@ public class FileSystemTest {
 		FileSystem.getAdaptorDescription("");
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=UnknownAdaptorException.class)
 	public void test_adaptorDescriptionFailsUnknown() throws XenonException {
 		FileSystem.getAdaptorDescription("aap");
 	}
@@ -248,7 +249,7 @@ public class FileSystemTest {
 		FileSystem.create("");
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=UnknownAdaptorException.class)
 	public void test_createFailsUnknown() throws XenonException {
 		FileSystem.create("aap");
 	}
@@ -770,7 +771,7 @@ public class FileSystemTest {
 		Path f = new Path("/test/aap");
 		f0.createFile(f);
 
-		PathAttributes a = new PathAttributes();
+		PathAttributesImplementation a = new PathAttributesImplementation();
 		a.setPath(f);
 		a.setOther(true);
 		f0.addAttributes(f, a);
@@ -1100,7 +1101,7 @@ public class FileSystemTest {
 		Path f = new Path("/test/aap");
 		f0.createFile(f);
 
-		PathAttributes a = new PathAttributes();
+		PathAttributesImplementation a = new PathAttributesImplementation();
 		a.setPath(f);
 		a.setOther(true);
 		f0.addAttributes(f, a);

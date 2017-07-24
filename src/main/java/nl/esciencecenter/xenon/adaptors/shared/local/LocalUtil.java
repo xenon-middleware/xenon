@@ -38,6 +38,7 @@ import java.util.Set;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.local.CommandRunner;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
@@ -332,7 +333,7 @@ public class LocalUtil {
 
     public static PathAttributes getLocalFileAttributes(Path p, java.nio.file.Path path) throws XenonException {
     	try {
-            PathAttributes result = new PathAttributes();
+            PathAttributesImplementation result = new PathAttributesImplementation();
             
             result.setPath(p);
             result.setExecutable(java.nio.file.Files.isExecutable(path));

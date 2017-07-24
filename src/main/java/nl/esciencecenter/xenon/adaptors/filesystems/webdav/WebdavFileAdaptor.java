@@ -71,9 +71,15 @@ public class WebdavFileAdaptor extends FileAdaptor {
     private static final int DEFAULT_PORT = 80; 
 	
     public WebdavFileAdaptor() {
-        super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, false, false);
+        super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
     }
 
+	@Override
+	public boolean canReadSymboliclinks() {
+		// Webdav cannot read symbolic links.
+		return false;
+	}
+    
     protected static boolean isOkish(int response) {
         return response == HttpStatus.SC_OK || response == HttpStatus.SC_CREATED || response == HttpStatus.SC_MULTI_STATUS
                 || response == HttpStatus.SC_NO_CONTENT;

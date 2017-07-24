@@ -38,9 +38,6 @@ public class TorqueSchedulerAdaptor extends SchedulerAdaptor {
     /** The prefix used by all properties related to this adaptor */
     public static final String PREFIX = SchedulerAdaptor.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
 
-    /** The schemes supported by this adaptor */
-    //public static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<>("torque");
-    
     /** The locations supported by this adaptor */
     public static final String [] ADAPTOR_LOCATIONS = new String [] { "(locations supported by local)", 
             "(locations supported by ssh)" };
@@ -70,7 +67,7 @@ public class TorqueSchedulerAdaptor extends SchedulerAdaptor {
     };
 
     public TorqueSchedulerAdaptor() {
-		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, true, false);
+		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
 	}
 
 	@Override

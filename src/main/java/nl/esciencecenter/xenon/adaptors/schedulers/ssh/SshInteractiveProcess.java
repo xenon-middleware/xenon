@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcess;
+import nl.esciencecenter.xenon.adaptors.schedulers.StreamsImplementation;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
 
@@ -79,7 +80,7 @@ class SshInteractiveProcess implements InteractiveProcess {
             channel.open().verify(timeout);
 
 			// set the streams first, then connect the channel.
-            streams = new Streams(jobIdentifier, channel.getInvertedOut(), channel.getInvertedIn(), channel.getInvertedErr());           
+            streams = new StreamsImplementation(jobIdentifier, channel.getInvertedOut(), channel.getInvertedIn(), channel.getInvertedErr());           
             
             System.out.println("CONNECTED!");
             

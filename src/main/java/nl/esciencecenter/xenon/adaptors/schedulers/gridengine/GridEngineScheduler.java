@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
+import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingScheduler;
@@ -82,7 +84,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
     protected GridEngineScheduler(String uniqueID, String location, Credential credential, Map<String,String> prop) 
             throws XenonException {
 
-        super(uniqueID, ADAPTOR_NAME, location, credential, true, false, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
+        super(uniqueID, ADAPTOR_NAME, location, credential, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
 
         boolean ignoreVersion = properties.getBooleanProperty(IGNORE_VERSION_PROPERTY);
         accountingGraceTime = properties.getLongProperty(ACCOUNTING_GRACE_TIME_PROPERTY);
@@ -95,7 +97,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
         // Run a few commands to fetch info about the queue
         this.setupInfo = new GridEngineSetup(this);
     }
-        
+        	    
     @Override
     public String[] getQueueNames() {
         return setupInfo.getQueueNames();
@@ -192,6 +194,9 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
     @Override
     public QueueStatus getQueueStatus(String queueName) throws XenonException {
+    	
+    	assertNonNullOrEmpty(queueName, "Queue name cannot be null or empty!");
+    	
         String qstatOutput = runCheckedCommand(null, "qstat", "-xml", "-g", "c");
 
         Map<String, Map<String, String>> allMap = parser.parseQueueInfos(qstatOutput);
@@ -203,7 +208,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
                     + "\" from server, perhaps it does not exist?");
         }
 
-        return new QueueStatus(this, queueName, null, map);
+        return new QueueStatusImplementation(this, queueName, null, map);
     }
 
     @Override
@@ -232,9 +237,9 @@ public class GridEngineScheduler extends ScriptingScheduler {
                 if (map == null || map.isEmpty()) {
                     Exception exception = new NoSuchQueueException(ADAPTOR_NAME,
                             "Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
-                    result[i] = new QueueStatus(this, queueNames[i], exception, null);
+                    result[i] = new QueueStatusImplementation(this, queueNames[i], exception, null);
                 } else {
-                    result[i] = new QueueStatus(this, queueNames[i], null, map);
+                    result[i] = new QueueStatusImplementation(this, queueNames[i], null, map);
                 }
             }
         }
@@ -284,7 +289,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
     @Override
     public JobStatus cancelJob(String jobIdentifier) throws XenonException {
     	
-    	checkJobIdentifier(jobIdentifier);
+    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
     	
         String qdelOutput = runCheckedCommand(null, "qdel", jobIdentifier);
 
@@ -368,12 +373,12 @@ public class GridEngineScheduler extends ScriptingScheduler {
         if (status == null && jobWasDeleted(jobIdentifier)) {
             Exception exception = new JobCanceledException(ADAPTOR_NAME, "Job " + jobIdentifier
                     + " deleted by user while still pending");
-            status = new JobStatus(jobIdentifier, "killed", null, exception, false, true, null);
+            status = new JobStatusImplementation(jobIdentifier, "killed", null, exception, false, true, null);
         }
 
         //this job is neither in qstat nor qacct output. we assume it is "in between" for a certain grace time.
         if (status == null && haveRecentlySeen(jobIdentifier)) {
-            status = new JobStatus(jobIdentifier, "unknown", null, null, false, false, new HashMap<String, String>());
+            status = new JobStatusImplementation(jobIdentifier, "unknown", null, null, false, false, new HashMap<String, String>());
         }
 
         return status;
@@ -382,9 +387,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
     @Override
     public JobStatus getJobStatus(String jobIdentifier) throws XenonException {
         
-        if (jobIdentifier == null) { 
-            throw new NoSuchJobException(ADAPTOR_NAME, "Job <null> not found on server");
-        }
+    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
         
         Map<String, Map<String, String>> info = getQstatInfo();
 
@@ -413,7 +416,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
                 //this job really does not exist. set it to an error state.
                 if (result[i] == null) {
                     Exception exception = new NoSuchJobException(ADAPTOR_NAME, "Job " + jobs[i] + " not found on server");
-                    result[i] = new JobStatus(jobs[i], null, null, exception, false, false, null);
+                    result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);
                 }
             }
         }

@@ -50,27 +50,25 @@ public abstract class ScriptingScheduler extends Scheduler {
     protected final long pollDelay;
     
     protected ScriptingScheduler(String uniqueID, String adaptor, String location, Credential credential,
-           boolean supportsBatch, boolean supportsInteractive, Map<String,String> prop, 
-           XenonPropertyDescription[] validProperties, String pollDelayProperty) throws XenonException {
+           Map<String,String> prop, XenonPropertyDescription[] validProperties, String pollDelayProperty) throws XenonException {
 
-    	super(uniqueID, adaptor, location, false, supportsBatch, supportsInteractive, 
-    			ScriptingUtils.getProperties(validProperties, location, prop));
+    	super(uniqueID, adaptor, location, ScriptingUtils.getProperties(validProperties, location, prop));
     	
     	this.pollDelay = properties.getLongProperty(pollDelayProperty);
 
-        String subJobScheme;
-        String subFileScheme;
+        String subSchedulerAdaptor;
+        String subFileSystemAdaptor;
         String subLocation;
         Map<String, String> subSchedulerProperties;
         
         if (ScriptingUtils.isLocal(location)) {
-            subJobScheme = "local";
-            subFileScheme = "file";
+            subSchedulerAdaptor = "local";
+            subFileSystemAdaptor = "file";
             subLocation = "/";
             subSchedulerProperties = properties.filter(LocalSchedulerAdaptor.PREFIX).toMap();
         } else {
-            subJobScheme = "ssh";
-            subFileScheme = "sftp";
+            subSchedulerAdaptor = "ssh";
+            subFileSystemAdaptor = "sftp";
             subLocation = location;
             subSchedulerProperties = properties.filter(SshSchedulerAdaptor.PREFIX).toMap();
 
@@ -78,14 +76,14 @@ public abstract class ScriptingScheduler extends Scheduler {
             subSchedulerProperties.put(SshSchedulerAdaptor.POLLING_DELAY, "100");
         }
 
-        LOGGER.debug("creating sub scheduler for {} adaptor at {}://{}", adaptor, subJobScheme, subLocation);
+        LOGGER.debug("creating sub scheduler for {} adaptor at {}://{}", adaptor, subSchedulerAdaptor, subLocation);
         
-        subScheduler = Scheduler.create(subJobScheme, subLocation, credential, subSchedulerProperties);
+        subScheduler = Scheduler.create(subSchedulerAdaptor, subLocation, credential, subSchedulerProperties);
 
-        LOGGER.debug("creating file system for {} adaptor at {}://{}", adaptor, subFileScheme, subLocation);
-        subFileSystem = FileSystem.create(subFileScheme, subLocation, credential, null);
+        LOGGER.debug("creating file system for {} adaptor at {}://{}", adaptor, subFileSystemAdaptor, subLocation);
+        subFileSystem = FileSystem.create(subFileSystemAdaptor, subLocation, credential, null);
     }
-    
+      
 	protected Path getFsEntryPath() {
         return subFileSystem.getEntryPath();
     }
@@ -108,6 +106,14 @@ public abstract class ScriptingScheduler extends Scheduler {
         return new RemoteCommandRunner(subScheduler, getAdaptorName(), stdin, executable, arguments);
     }
 
+    // Subclasses can override this method to produce more specified exceptions
+    protected void translateError(RemoteCommandRunner runner, String stdin, String executable, String... arguments) throws XenonException { 
+    	throw new XenonException(getAdaptorName(), "could not run command \"" + executable + "\" with stdin \"" + stdin
+                + "\" arguments \"" + Arrays.toString(arguments) + "\" at \"" + subScheduler + "\". Exit code = "
+                + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());	
+    }
+    
+    
     /**
      * Run a command until completion. Throw an exception if the command returns a non-zero exit code, or prints to stderr.
       * 
@@ -127,9 +133,7 @@ public abstract class ScriptingScheduler extends Scheduler {
                 arguments);
 
         if (!runner.success()) {
-        	throw new XenonException(getAdaptorName(), "could not run command \"" + executable + "\" with stdin \"" + stdin
-                    + "\" arguments \"" + Arrays.toString(arguments) + "\" at \"" + subScheduler + "\". Exit code = "
-                    + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
+        	translateError(runner, stdin, executable, arguments);
         }
 
         return runner.getStdout();
@@ -156,6 +160,7 @@ public abstract class ScriptingScheduler extends Scheduler {
         return subScheduler.submitInteractiveJob(description);
     }
 
+    
     /**
      * Checks if the queue names given are valid, and throw an exception otherwise. Checks against the list of queues when the
      * scheduler was created.
@@ -166,7 +171,8 @@ public abstract class ScriptingScheduler extends Scheduler {
      *          if one or more of the queue names is not known in the scheduler
      */
     protected void checkQueueNames(String[] givenQueueNames) throws XenonException {
-        //create a hash set with all given queues
+        
+    	//create a hash set with all given queues
         HashSet<String> invalidQueues = new HashSet<>(Arrays.asList(givenQueueNames));
 
         //remove all valid queues from the set
@@ -197,7 +203,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      */
     public JobStatus waitUntilDone(String jobIdentifier, long timeout) throws XenonException {
 
-    	checkJobIdentifier(jobIdentifier);
+    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
     	
         long deadline = Deadline.getDeadline(timeout);
               
@@ -236,7 +242,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      */
     public JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException {
 
-    	checkJobIdentifier(jobIdentifier);
+    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
     	
         long deadline = Deadline.getDeadline(timeout);
         

@@ -39,4 +39,9 @@ public class SlurmLocationConfig extends SchedulerLocationConfig {
 	public String getDefaultQueueName() {
 		return "mypartition";
 	}
+	
+	@Override
+	public boolean supportsInteractive() {
+		return true;
+	}
 }

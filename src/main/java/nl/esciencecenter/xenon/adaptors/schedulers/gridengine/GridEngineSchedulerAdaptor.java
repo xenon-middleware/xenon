@@ -61,7 +61,7 @@ public class GridEngineSchedulerAdaptor extends SchedulerAdaptor {
     };
 	
 	public GridEngineSchedulerAdaptor() {
-		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, true, false);
+		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
 	}
 
 	@Override

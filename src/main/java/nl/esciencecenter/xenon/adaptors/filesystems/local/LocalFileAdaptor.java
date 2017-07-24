@@ -55,9 +55,15 @@ public class LocalFileAdaptor extends FileAdaptor {
     public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription[0];
     
     public LocalFileAdaptor() {
-    	super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES, false, true, true);
+    	super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
     }
-
+    
+	@Override
+	public boolean canCreateSymboliclinks() { 
+		// Local can create symbolic links.
+		return true;
+	}
+	
 	/** 
      * Check if a location string is valid for the local filesystem. 
      * 
