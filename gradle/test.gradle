@@ -77,6 +77,6 @@ task jacocoLiveTestReport(type: JacocoReport) {
 task jacocoMergedTestReport(type: JacocoReport) {
     description 'Generate combined coverage report of unit and integration tests'
     group 'Code coverage reporting'
-    executionData(test, integrationTest, fixedClientEnvironmentTest)
+    executionData( files { file('build/jacoco').listFiles() } )
     sourceSets sourceSets.main
 }
