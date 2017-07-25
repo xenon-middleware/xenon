@@ -53,6 +53,6 @@ public class LiveLocationConfig extends LocationConfig {
 
 	@Override
 	public Path getWritableTestDir() {
-		return fileSystem.getEntryPath();
+		return new Path("/tmp");
 	}
 }
