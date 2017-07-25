@@ -17,7 +17,7 @@
 --- 
 services: 
   slurm: 
-    image: xenon-slurm:15
+    image: nlesc/xenon-slurm:15
     ports: 
       - 22
       - 6817
