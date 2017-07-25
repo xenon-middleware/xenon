@@ -162,20 +162,20 @@ public abstract class SchedulerTestParent {
     @Test
     public void test_sleep() throws XenonException {
     	String jobID = scheduler.submitBatchJob(getSleepJob(null, 1));
-    	JobStatus status = scheduler.waitUntilDone(jobID, 5*1000);
-    	assertTrue(status.isDone());
+    	JobStatus status = scheduler.waitUntilDone(jobID, 60*1000);
+    	assertTrue("Job is not done yet", status.isDone());
     }
     
     @Test
     public void test_cancel() throws XenonException {
     	
-    	String jobID = scheduler.submitBatchJob(getSleepJob(null,  120));
+    	String jobID = scheduler.submitBatchJob(getSleepJob(null, 120));
 
     	// Wait up to 5 seconds until the job is running
-    	JobStatus status = scheduler.waitUntilRunning(jobID, 5*1000);
+    	JobStatus status = scheduler.waitUntilRunning(jobID, 60*1000);
     	
-     	assertTrue(status.isRunning());
-     	assertFalse(status.isDone());
+     	assertTrue("Job is not running yet", status.isRunning());
+     	assertFalse("Job is already done", status.isDone());
          	
      	status = scheduler.cancelJob(jobID);
 
@@ -183,8 +183,6 @@ public abstract class SchedulerTestParent {
      		// Wait up to 60 seconds until the job is completely done
      		status = scheduler.waitUntilDone(jobID, 60*1000);
      	}
-     	
-    	System.out.println(status);
      	
     	assertTrue(status.isDone());
     }
