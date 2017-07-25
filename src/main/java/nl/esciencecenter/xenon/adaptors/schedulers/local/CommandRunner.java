@@ -70,15 +70,16 @@ public class CommandRunner {
     }
 
     public CommandRunner(String stdin, File workingDir, String... command) throws CommandNotFoundException {
-        if (command.length == 0) {
-            throw new ArrayIndexOutOfBoundsException("runCommand: command array has length 0");
+        
+    	if (command.length == 0) {
+            throw new IllegalArgumentException("runCommand: command array has length 0");
         }
 
         // expand command using path
         command[0] = getExeFile(command[0]);
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("CommandRunner running {}", Arrays.toString(command));
-        }
+        
+        LOGGER.debug("CommandRunner running {}", Arrays.toString(command));
+        
         ProcessBuilder builder = new ProcessBuilder(command);
         if (workingDir != null) {
             builder.directory(workingDir);
@@ -106,10 +107,8 @@ public class CommandRunner {
             out.waitUntilFinished();
             err.waitUntilFinished();
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("CommandRunner out: {}\nCommandRunner err: {}\n", out.getResult(), err.getResult());
-            }
-
+            LOGGER.debug("CommandRunner out: {}\nCommandRunner err: {}\n", out.getResult(), err.getResult());
+         
         } catch (InterruptedException e) {
             LOGGER.warn("CommandRunner was interrupted before termination!");
             Thread.currentThread().interrupt();
