@@ -260,6 +260,16 @@ public abstract class FileSystemTestParent {
     
     // Tests to create directories
     
+    @Test
+    public void exists_ok() throws Exception {
+    	assertTrue(fileSystem.exists(locationConfig.getExistingPath()));
+    }
+  
+    @Test
+    public void exists_notExistsDir() throws Exception {
+    	assertFalse(fileSystem.exists(new Path("/foobar")));
+    }
+      
     @Test(expected=IllegalArgumentException.class)
     public void createDirectory_null_throw() throws Exception {
     	fileSystem.createDirectory(null);
@@ -341,6 +351,18 @@ public abstract class FileSystemTestParent {
     	fileSystem.createFile(file);
     	fileSystem.createFile(file);
     }
+    
+    @Test(expected=NoSuchPathException.class)
+    public void createFile_nonExistingParent_throwsException() throws Exception {
+    	generateAndCreateTestDir();
+    	Path dir = testDir.resolve(generateTestDirName());
+    	Path file = dir.resolve(generateTestFileName());    	
+    	fileSystem.createFile(file);
+    }
+   
+    
+    
+    
     
     /*
 
