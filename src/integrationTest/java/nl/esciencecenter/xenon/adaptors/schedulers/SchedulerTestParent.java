@@ -80,17 +80,17 @@ public abstract class SchedulerTestParent {
    
     @Test
     public void test_isEmbedded() throws XenonException {
-    	assertEquals(locationConfig.isEmbedded(), scheduler.isEmbedded());
+    	assertEquals(locationConfig.isEmbedded(), description.isEmbedded());
     }
     
     @Test
     public void test_supportsBatch() throws XenonException {
-    	assertEquals(locationConfig.supportsBatch(), scheduler.supportsBatch());
+    	assertEquals(locationConfig.supportsBatch(), description.supportsBatch());
     }
    
     @Test
     public void test_supportsInteractive() throws XenonException {
-    	assertEquals(locationConfig.supportsInteractive(), scheduler.supportsInteractive());
+    	assertEquals(locationConfig.supportsInteractive(), description.supportsInteractive());
     }
     
     private boolean contains(String [] options, String expected) { 
@@ -162,20 +162,20 @@ public abstract class SchedulerTestParent {
     @Test
     public void test_sleep() throws XenonException {
     	String jobID = scheduler.submitBatchJob(getSleepJob(null, 1));
-    	JobStatus status = scheduler.waitUntilDone(jobID, 5*1000);
-    	assertTrue(status.isDone());
+    	JobStatus status = scheduler.waitUntilDone(jobID, 60*1000);
+    	assertTrue("Job is not done yet", status.isDone());
     }
     
     @Test
     public void test_cancel() throws XenonException {
     	
-    	String jobID = scheduler.submitBatchJob(getSleepJob(null,  120));
+    	String jobID = scheduler.submitBatchJob(getSleepJob(null, 120));
 
     	// Wait up to 5 seconds until the job is running
-    	JobStatus status = scheduler.waitUntilRunning(jobID, 5*1000);
+    	JobStatus status = scheduler.waitUntilRunning(jobID, 60*1000);
     	
-     	assertTrue(status.isRunning());
-     	assertFalse(status.isDone());
+     	assertTrue("Job is not running yet", status.isRunning());
+     	assertFalse("Job is already done", status.isDone());
          	
      	status = scheduler.cancelJob(jobID);
 
@@ -183,8 +183,6 @@ public abstract class SchedulerTestParent {
      		// Wait up to 60 seconds until the job is completely done
      		status = scheduler.waitUntilDone(jobID, 60*1000);
      	}
-     	
-    	System.out.println(status);
      	
     	assertTrue(status.isDone());
     }
@@ -412,15 +410,25 @@ public abstract class SchedulerTestParent {
      	JobStatus status1 = scheduler.cancelJob(jobID1);
      	JobStatus status2 = scheduler.cancelJob(jobID2);
 
-     	if (!status1.isDone()) {
-     		// Wait up to 60 seconds until the job is completely done
-     		status1 = scheduler.waitUntilDone(jobID2, 60*1000);
-     	}
+     	try { 
+     		if (!status1.isDone()) {
+     			// Wait up to 60 seconds until the job is completely done
+     			status1 = scheduler.waitUntilDone(jobID1, 60*1000);
+     		}
+     	} catch (Exception e) {
+			System.err.println("WARN: Failed to wait for job: " + e);
+			e.printStackTrace(System.err);
+		}
     
-     	if (!status2.isDone()) {
-     		// Wait up to 60 seconds until the job is completely done
-     		status2 = scheduler.waitUntilDone(jobID2, 60*1000);
-     	}
+     	try { 
+     		if (!status2.isDone()) {
+     			// Wait up to 60 seconds until the job is completely done
+     			status2 = scheduler.waitUntilDone(jobID2, 60*1000);
+     		}
+     	} catch (Exception e) {
+			System.err.println("WARN: Failed to wait for job: " + e);
+			e.printStackTrace(System.err);
+		}
     }
    
     @Test(expected=IllegalArgumentException.class)

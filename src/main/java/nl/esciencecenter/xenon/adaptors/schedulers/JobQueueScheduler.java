@@ -131,18 +131,6 @@ public class JobQueueScheduler extends Scheduler {
 		singleExecutor = Executors.newSingleThreadExecutor(threadFactory);
 		multiExecutor = Executors.newFixedThreadPool(multiQThreads, threadFactory);
 	}
-
-	@Override
-	public boolean supportsInteractive() { 
-		// this scheduler supports interactive jobs. 
-		return true;
-	}
-
-	@Override
-	public boolean isEmbedded() { 
-		// this scheduler is embedded. 
-		return true;
-    }
 	
 	public long getCurrentJobID() {
 		return jobID.get();

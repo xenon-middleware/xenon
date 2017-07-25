@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.InvalidAdaptorException;
+import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
@@ -62,16 +62,16 @@ public abstract class Scheduler {
 		adaptors.put(adaptor.getName(), adaptor);
 	}
 
-	private static SchedulerAdaptor getAdaptorByName(String adaptorName) throws XenonException {
+	private static SchedulerAdaptor getAdaptorByName(String adaptorName) throws UnknownAdaptorException {
 
 		if (adaptorName == null || adaptorName.trim().isEmpty()) {
-			throw new InvalidAdaptorException(COMPONENT_NAME, "Adaptor name may not be null or empty");
+			throw new UnknownAdaptorException(COMPONENT_NAME, "Adaptor name may not be null or empty");
 		}
 
 		SchedulerAdaptor adaptor = adaptors.get(adaptorName);
 
 		if (adaptor == null) {
-			throw new InvalidAdaptorException(COMPONENT_NAME, "File adaptor not found " + adaptor);
+			throw new UnknownAdaptorException(COMPONENT_NAME, "File adaptor not found " + adaptor);
 		}
 
 		return adaptor;
@@ -81,18 +81,20 @@ public abstract class Scheduler {
 		return adaptors.keySet().toArray(new String[adaptors.size()]);
 	}
 
-	public static SchedulerAdaptorDescription getAdaptorDescription(String adaptorName) throws XenonException {
+	public static SchedulerAdaptorDescription getAdaptorDescription(String adaptorName) throws UnknownAdaptorException {
 		return getAdaptorByName(adaptorName);
 	}
 
-	public static SchedulerAdaptorDescription [] getAdaptorDescriptions() throws XenonException {
+	public static SchedulerAdaptorDescription [] getAdaptorDescriptions() {
 		return adaptors.values().toArray(new SchedulerAdaptorDescription[adaptors.size()]);
 	}
 	
 	/**
-     * Create a new Scheduler that represents a (possibly remote) job 
-     * scheduler at the <code>location</code> using <code>credentials</code> 
-     * to get access. Make sure to always close {@code Scheduler} instances 
+     * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code> 
+     * using <code>credentials</code> to get access. Use <code>properties</code> to (optionally) 
+     * configure the scheduler when it is created.  
+     * 
+     * Make sure to always close {@code Scheduler} instances 
      * by calling {@code Scheduler.close()} when you no longer need them, 
      * otherwise their associated resources may remain allocated.
      * 
@@ -124,14 +126,98 @@ public abstract class Scheduler {
 		return getAdaptorByName(adaptor).createScheduler(location, credential, properties);
 	}
 	
+	/**
+     * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code> 
+     * using <code>credentials</code> to get access.  
+     * 
+     * Make sure to always close {@code Scheduler} instances 
+     * by calling {@code Scheduler.close()} when you no longer need them, 
+     * otherwise their associated resources may remain allocated.
+     * 
+     * @param adaptor
+     *            the adaptor used to access the Scheduler.
+     * @param location
+     *            the location of the Scheduler.
+     * @param credential
+     *            the Credentials to use to get access to the Scheduler.
+     * 
+     * @return the new Scheduler.
+     * 
+     * @throws UnknownPropertyException
+     *             If a unknown property was provided.
+     * @throws InvalidPropertyException
+     *             If a known property was provided with an invalid value.
+     * @throws InvalidLocationException
+     *             If the location was invalid.
+     * @throws InvalidCredentialException
+     *             If the credential is invalid to access the location.
+     * 
+     * @throws XenonException
+     *             If the creation of the Scheduler failed.
+     */
 	public static Scheduler create(String adaptor, String location, Credential credential) throws XenonException {
 		return create(adaptor, location, credential, new HashMap<String, String>(0));
 	}
 	
+	/**
+     * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code> 
+     * using the default credentials to get access.  
+     * 
+     * Make sure to always close {@code Scheduler} instances 
+     * by calling {@code Scheduler.close()} when you no longer need them, 
+     * otherwise their associated resources may remain allocated.
+     * 
+     * @param adaptor
+     *            the adaptor used to access the Scheduler.
+     * @param location
+     *            the location of the Scheduler.
+     * 
+     * @return the new Scheduler.
+     * 
+     * @throws UnknownPropertyException
+     *             If a unknown property was provided.
+     * @throws InvalidPropertyException
+     *             If a known property was provided with an invalid value.
+     * @throws InvalidLocationException
+     *             If the location was invalid.
+     * @throws InvalidCredentialException
+     *             If the credential is invalid to access the location.
+     * 
+     * @throws XenonException
+     *             If the creation of the Scheduler failed.
+     */
 	public static Scheduler create(String adaptor, String location) throws XenonException {
 		return create(adaptor, location, new DefaultCredential());
 	}
 	
+	/**
+     * Create a new Scheduler using the <code>adaptor</code> connecting to the default location 
+     * and using the default credentials to get access.  
+     * 
+	 * Note that there are very few adaptors that support a default scheduler location. The local 
+	 * scheduler adaptor is the prime example.  
+     * 
+     * Make sure to always close {@code Scheduler} instances 
+     * by calling {@code Scheduler.close()} when you no longer need them, 
+     * otherwise their associated resources may remain allocated.
+     * 
+     * @param adaptor
+     *            the adaptor used to access the Scheduler.
+     * 
+     * @return the new Scheduler.
+     * 
+     * @throws UnknownPropertyException
+     *             If a unknown property was provided.
+     * @throws InvalidPropertyException
+     *             If a known property was provided with an invalid value.
+     * @throws InvalidLocationException
+     *             If the location was invalid.
+     * @throws InvalidCredentialException
+     *             If the credential is invalid to access the location.
+     * 
+     * @throws XenonException
+     *             If the creation of the Scheduler failed.
+     */
 	public static Scheduler create(String adaptor) throws XenonException {
 		return create(adaptor, null);
 	}
@@ -178,47 +264,6 @@ public abstract class Scheduler {
 	public String getLocation() { 
 		return location;
 	}
-
-	/**
-     * Does this Scheduler supports the submission of interactive jobs ?
-     * 
-     * For interactive jobs the standard streams of the job must be handled by the submitting process. Failing to do so may cause
-     * the job to hang indefinitely.
-     * 
-     * @return if this scheduler supports the submission of interactive jobs ?
-     */
-	public boolean supportsInteractive() { 
-		// By default, schedulers do not support interactive jobs. 
-		return false;
-	}
-
-    /**
-     * Does this Scheduler support the submission of batch jobs ?
-     * 
-     * For batch jobs the standard streams of the jobs are redirected from / to files.
-     * 
-     * @return if this scheduler supports the submission of batch jobs ?
-     */
-    public boolean supportsBatch() { 
-    	// By default, schedulers support batch jobs. 
-    	return true;
-    }
-
-    /**
-     * Is this an embedded scheduler ?
-     * 
-     * Embedded schedulers are implemented inside the Xenon process itself. Therefore this process needs to remain active for its jobs 
-     * to run. Ending an online scheduler will kill all jobs that were submitted to it.
-     * 
-     * Non-embedded schedulers do not need to remain active for their jobs to run. A submitted job will typically be handed over to
-     * some external server that will manage the job for the rest of its lifetime.
-     * 
-     * @return if this scheduler is embedded.
-     */
-    public boolean isEmbedded() { 
-    	// By default, schedulers are not embedded. 
-    	return false;
-    }
 
 	/**
 	 * Get the properties used to create this Scheduler.

@@ -13,22 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.filesystems.webdav;
+package nl.esciencecenter.xenon;
 
-import java.util.Map;
+/**
+ * Thrown when an unknown adaptor name is provided.  
+ */
+public class UnknownAdaptorException extends XenonException {
 
-import nl.esciencecenter.xenon.adaptors.filesystems.LocationConfig;
-import nl.esciencecenter.xenon.filesystems.Path;
+    private static final long serialVersionUID = 1L;
 
-public class WebdavLocationConfig extends LocationConfig {
-    @Override
-    public Path getExistingPath() {
-        return new Path("~xenon/filesystem-test-fixture/links/file0");
+    public UnknownAdaptorException(String adaptorName, String message, Throwable t) {
+        super(adaptorName, message, t);
     }
 
-    @Override
-    public Map.Entry<Path, Path> getSymbolicLinksToExistingFile() {
-        // Not supported
-    	return null;
+    public UnknownAdaptorException(String adaptorName, String message) {
+        super(adaptorName, message);
     }
 }

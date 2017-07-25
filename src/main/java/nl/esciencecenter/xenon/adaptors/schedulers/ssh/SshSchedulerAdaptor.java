@@ -149,7 +149,7 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
 	public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties)
 			throws XenonException {
 		
-		  LOGGER.debug("newFileSystem scheme = SFTP location = {} credential = {} properties = {}", location, credential, properties);
+		  LOGGER.debug("new SSH scheduler location = {} credential = {} properties = {}", location, credential, properties);
 	        
 		  XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 	        

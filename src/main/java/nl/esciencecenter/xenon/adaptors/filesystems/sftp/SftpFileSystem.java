@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -107,7 +108,7 @@ public class SftpFileSystem extends FileSystem {
 	public void createDirectory(Path dir) throws XenonException {
 
 		LOGGER.debug("createDirectory dir = {}", dir);
-
+		
 		assertPathNotExists(dir);
 		assertParentDirectoryExists(dir);
 		
@@ -122,6 +123,8 @@ public class SftpFileSystem extends FileSystem {
 
 	@Override
 	public void createFile(Path file) throws XenonException {
+		
+		assertPathNotExists(file);
 		
 		LOGGER.debug("createFile path = {}", file);
 
@@ -273,8 +276,12 @@ public class SftpFileSystem extends FileSystem {
 
 	@Override
 	public OutputStream writeToFile(Path path, long size) throws XenonException {
+		
+		assertNotNull(path);
+		assertParentDirectoryExists(path);
+		
 		try {
-			return client.write(path.getAbsolutePath(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Truncate);      	
+			return client.write(path.getAbsolutePath(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Create, SftpClient.OpenMode.Truncate);      	
 		} catch (IOException e) {
 			throw new XenonException(ADAPTOR_NAME, "Failed open stream to write to: " + path, e);
 		}
@@ -287,6 +294,10 @@ public class SftpFileSystem extends FileSystem {
 
 	@Override
 	public OutputStream appendToFile(Path path) throws XenonException {
+
+		assertNotNull(path);
+		assertFileExists(path);
+		
 		try {
 			return client.write(path.getAbsolutePath(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Append);      	
 		} catch (IOException e) {
@@ -340,6 +351,15 @@ public class SftpFileSystem extends FileSystem {
 		LOGGER.debug("setPosixFilePermissions OK");
 	}
 	
+	private static long convertTime(FileTime time) { 
+		
+		if (time == null) { 
+			return 0;
+		}
+		
+		return time.toMillis();
+	}
+	
 	private static PathAttributes convertAttributes(Path path, SftpClient.Attributes attributes) { 
 		
 		PathAttributesImplementation result = new PathAttributesImplementation();
@@ -350,9 +370,9 @@ public class SftpFileSystem extends FileSystem {
 		result.setOther(attributes.isOther());
 		result.setSymbolicLink(attributes.isSymbolicLink());
 		
-		result.setLastModifiedTime(attributes.getModifyTime().toMillis());
-		result.setCreationTime(attributes.getCreateTime().toMillis());
-		result.setLastAccessTime(attributes.getAccessTime().toMillis());
+		result.setLastModifiedTime(convertTime(attributes.getModifyTime()));
+		result.setCreationTime(convertTime(attributes.getCreateTime()));
+		result.setLastAccessTime(convertTime(attributes.getAccessTime()));
 		
 		result.setSize(attributes.getSize());
 		

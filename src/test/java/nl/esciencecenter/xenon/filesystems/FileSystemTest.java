@@ -28,15 +28,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.junit.Test;
-
-import nl.esciencecenter.xenon.InvalidAdaptorException;
+import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
 import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
+
+import org.junit.Test;
 
 public class FileSystemTest {
 
@@ -182,14 +182,14 @@ public class FileSystemTest {
 	// Testing against actual FileSystem
 
 	@Test
-	public void test_names() throws XenonException {
+	public void test_names() {
 		String [] tmp = FileSystem.getAdaptorNames();
 		String [] expected = new String [] { "file", "ftp", "sftp", "webdav" };
 		assertTrue(Arrays.equals(expected, tmp));
 	}
 
 	@Test
-	public void test_adaptorDescription() throws XenonException {
+	public void test_adaptorDescription() throws UnknownAdaptorException {
 
 		FileSystemAdaptorDescription d = FileSystem.getAdaptorDescription("file");
 
@@ -201,23 +201,23 @@ public class FileSystemTest {
 		assertArrayEquals(LocalFileAdaptor.VALID_PROPERTIES, d.getSupportedProperties());
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=IllegalArgumentException.class)
 	public void test_adaptorDescriptionFailsNull() throws XenonException {
 		FileSystem.getAdaptorDescription(null);
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=IllegalArgumentException.class)
 	public void test_adaptorDescriptionFailsEmpty() throws XenonException {
 		FileSystem.getAdaptorDescription("");
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
-	public void test_adaptorDescriptionFailsUnknown() throws XenonException {
+	@Test(expected=UnknownAdaptorException.class)
+	public void test_adaptorDescriptionFailsUnknown() throws UnknownAdaptorException {
 		FileSystem.getAdaptorDescription("aap");
 	}
 
 	@Test
-	public void test_adaptorDescriptions() throws XenonException {
+	public void test_adaptorDescriptions() throws UnknownAdaptorException {
 
 		String [] names = FileSystem.getAdaptorNames();
 		FileSystemAdaptorDescription [] desc = FileSystem.getAdaptorDescriptions();
@@ -239,17 +239,17 @@ public class FileSystemTest {
 		f.close();
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=IllegalArgumentException.class)
 	public void test_createFailsNull() throws XenonException {
 		FileSystem.create(null);
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=IllegalArgumentException.class)
 	public void test_createFailsEmpty() throws XenonException {
 		FileSystem.create("");
 	}
 
-	@Test(expected=InvalidAdaptorException.class)
+	@Test(expected=UnknownAdaptorException.class)
 	public void test_createFailsUnknown() throws XenonException {
 		FileSystem.create("aap");
 	}

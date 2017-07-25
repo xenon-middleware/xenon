@@ -40,6 +40,11 @@ public class LocalFileSystemTest extends FileSystemTestParent {
                     new Path("/home/xenon/filesystem-test-fixture/links/file0")
                 );
             }
+
+			@Override
+			public Path getWritableTestDir() {
+				return new Path("/tmp");
+			}
         };
     }
 
