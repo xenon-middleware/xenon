@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.OutputReader;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
 import nl.esciencecenter.xenon.filesystems.FileSystemClosedException;
@@ -359,8 +360,18 @@ public abstract class FileSystemTestParent {
     	Path file = dir.resolve(generateTestFileName());    	
     	fileSystem.createFile(file);
     }
-   
     
+    @Test
+    public void test_readFromFile() throws Exception {
+    
+    	Path file = locationConfig.getExistingPath();
+    	
+    	OutputReader reader = new OutputReader(fileSystem.readFromFile(file));
+
+    	reader.waitUntilFinished();
+    	assertEquals("Hello World\n", reader.getResultAsString());
+    }
+   
     
     
     
