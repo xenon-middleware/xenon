@@ -44,9 +44,13 @@ public final class InputWriter extends Thread {
      * @param destination the destination to write to.
      */
     public InputWriter(String content, OutputStream destination) {
-        this.destination = destination;
 
-        this.content = content;
+    	if (destination == null) { 
+    		throw new IllegalArgumentException("Destination may not be null");
+    	}
+
+    	this.content = content;
+    	this.destination = destination;
 
         setDaemon(true);
         setName("Input Writer");

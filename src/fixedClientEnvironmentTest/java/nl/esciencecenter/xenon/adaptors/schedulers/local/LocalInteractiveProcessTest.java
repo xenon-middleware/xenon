@@ -65,7 +65,7 @@ public class LocalInteractiveProcessTest {
 		assertTrue(p.isDone());
 		assertTrue(p.isDone());
 		assertEquals(0, p.getExitStatus());
-		assertEquals("Hello World\nGoodbye World\n", out.getResult());
+		assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
 	}
 
 	@Test(expected=XenonException.class)
@@ -106,7 +106,7 @@ public class LocalInteractiveProcessTest {
 		out.waitUntilFinished();
 		err.waitUntilFinished();
 
-		assertEquals("Hello World\nGoodbye World\n", out.getResult());
+		assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
 
 		while (!p.isDone()) { 
 			Thread.sleep(500);

@@ -107,7 +107,7 @@ public class CommandRunner {
             out.waitUntilFinished();
             err.waitUntilFinished();
 
-            LOGGER.debug("CommandRunner out: {}\nCommandRunner err: {}\n", out.getResult(), err.getResult());
+            LOGGER.debug("CommandRunner out: {}\nCommandRunner err: {}\n", out.getResultAsString(), err.getResultAsString());
          
         } catch (InterruptedException e) {
             LOGGER.warn("CommandRunner was interrupted before termination!");
@@ -119,11 +119,11 @@ public class CommandRunner {
     }
 
     public String getStdout() {
-        return out.getResult();
+        return out.getResultAsString();
     }
 
     public String getStderr() {
-        return err.getResult();
+        return err.getResultAsString();
     }
 
     public int getExitCode() {

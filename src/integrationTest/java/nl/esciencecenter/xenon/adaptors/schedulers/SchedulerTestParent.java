@@ -583,7 +583,7 @@ public abstract class SchedulerTestParent {
     	out.waitUntilFinished();
     	err.waitUntilFinished();
     	
-    	assertEquals("Hello World\nGoodbye World\n", out.getResult());
+    	assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
     	
        	cleanupJob(streams.getJobIdentifier());
     }
