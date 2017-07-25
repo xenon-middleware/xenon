@@ -29,13 +29,13 @@ public class LiveLocationConfig extends LocationConfig {
         this.fileSystem = fileSystem;
     }
     // TODO the paths should be relative to the filesystem.getEntryPath()
-
     private Path createPath(String path) {
         String baseDir = System.getProperty("xenon.basedir");
         if (baseDir == null) {
             return fileSystem.getEntryPath().resolve(path);
         }
-        return fileSystem.getEntryPath().resolve(new Path(baseDir).resolve(new Path(path)));
+        return new Path(baseDir).resolve(new Path(path));
+       // return fileSystem.getEntryPath().resolve(new Path(baseDir).resolve(new Path(path)));
     }
 
     @Override
@@ -53,6 +53,10 @@ public class LiveLocationConfig extends LocationConfig {
 
 	@Override
 	public Path getWritableTestDir() {
-		return new Path("/tmp");
-	}
+		String baseDir = System.getProperty("xenon.basedir");
+        if (baseDir == null) {
+            return fileSystem.getEntryPath();
+        }
+        return new Path(baseDir);
+    }
 }
