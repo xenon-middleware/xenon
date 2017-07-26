@@ -64,8 +64,8 @@ public abstract class SshInteractiveProcessITest {
 		stderr.waitUntilFinished();
 		stdout.waitUntilFinished();
 		
-		String output = stdout.getResult();
-		String error = stderr.getResult();
+		String output = stdout.getResultAsString();
+		String error = stderr.getResultAsString();
 		
 		assertTrue(error.isEmpty());
 		assertFalse(output.isEmpty());
@@ -101,8 +101,8 @@ public abstract class SshInteractiveProcessITest {
 		stderr.waitUntilFinished();
 		stdout.waitUntilFinished();
 		
-		String output = stdout.getResult();
-		String error = stderr.getResult();
+		String output = stdout.getResultAsString();
+		String error = stderr.getResultAsString();
 		
 		assertTrue(error.isEmpty());
 		assertEquals(message, output);
@@ -140,8 +140,8 @@ public abstract class SshInteractiveProcessITest {
 		stderr.waitUntilFinished();
 		stdout.waitUntilFinished();
 		
-		String output = stdout.getResult();
-		String error = stderr.getResult();
+		String output = stdout.getResultAsString();
+		String error = stderr.getResultAsString();
 		
 		assertTrue(error.isEmpty());
 		assertTrue(output.isEmpty());

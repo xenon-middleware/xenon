@@ -43,7 +43,7 @@ public class LocalFileSystemTest extends FileSystemTestParent {
 
 			@Override
 			public Path getWritableTestDir() {
-				return fileSystem.getEntryPath();
+				return new Path("/tmp");
 			}
         };
     }

@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.OutputReader;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
 import nl.esciencecenter.xenon.filesystems.FileSystemClosedException;
@@ -188,7 +189,7 @@ public abstract class FileSystemTestParent {
         fileSystem.createDirectories(testDir);
     }
 
-    // Depends on: Path.resolve, RelativePath, exists
+    // Depends on: Path.resolve, exists
     private Path createNewTestFileName(Path root) throws Exception {
         Path file = resolve( "file" + getNextCounter());
         
@@ -260,6 +261,16 @@ public abstract class FileSystemTestParent {
     
     // Tests to create directories
     
+    @Test
+    public void exists_ok() throws Exception {
+    	assertTrue(fileSystem.exists(locationConfig.getExistingPath()));
+    }
+  
+    @Test
+    public void exists_notExistsDir() throws Exception {
+    	assertFalse(fileSystem.exists(new Path("/foobar")));
+    }
+      
     @Test(expected=IllegalArgumentException.class)
     public void createDirectory_null_throw() throws Exception {
     	fileSystem.createDirectory(null);
@@ -304,130 +315,6 @@ public abstract class FileSystemTestParent {
 //        generateAndCreateTestDir();
 //    }
     
-    
-    
-/*
-    // ---------------------------------------------------------------------------------------------------------------------------
-    // TEST: createDirectories
-    //
-    // Possible parameters:
-    //
-    // Path null / non-existing dir / existing dir / dir with existing parents / dir with non existing parents /
-    //               dir where last parent is file / closed filesystem
-    //
-    // Total combinations : 7
-    //
-    // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories,
-    //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
-
-    private void test05_createDirectories(Path path, boolean mustFail) throws Exception {
-        try {
-            fileSystem.createDirectories(path);
-
-            assertTrue(fileSystem.exists(path));
-
-            PathAttributes att = fileSystem.getAttributes(path);
-
-            assertTrue(att.isDirectory());
-        } catch (Exception e) {
-            if (mustFail) {
-                // expected
-                return;
-            }
-            throwUnexpected("test05_createDirectories", e);
-        }
-
-        if (mustFail) {
-            throwExpected("createDirectory");
-        }
-    }
-
-    @Test
-    public void test05_createDirectories_null_throw() throws Exception {
-        test05_createDirectories(null, true);
-    }
-
-    @Test
-    public void test05_createDirectories_nonExisting_noThrow() throws Exception {
-        testDir = resolve("test05_createDirectories");
-
-        test05_createDirectories(testDir, false);
-    }
-
-    @Test
-    public void test05_createDirectories_existingPath_throw() throws Exception {
-        testDir = resolve( "test05_createDirectories");
-        fileSystem.createDirectories(testDir);
-
-        test05_createDirectories(testDir, true);
-    }
-
-    @Test
-    public void test05_createDirectories_existingParent_noThrow() throws Exception {
-        testDir = resolve("test05_createDirectories");
-        Path dir0 = createNewTestDirName(testDir);
-
-        fileSystem.createDirectories(testDir);
-
-        test05_createDirectories(dir0, false);
-        deleteTestDir(dir0);
-    }
-
-    @Test
-    public void test05_createDirectories_nonExistingParents_noThrow() throws Exception {
-        testDir = resolve( "test05_createDirectories");
-        Path nonExistingDir = createNewTestDirName(testDir);
-
-        // Directory with non-existing parents
-        Path pathWithoutParent = createNewTestDirName(nonExistingDir);
-
-        fileSystem.createDirectories(testDir);
-        test05_createDirectories(pathWithoutParent, false);
-        deleteTestDir(pathWithoutParent);
-        deleteTestDir(nonExistingDir);
-    }
-
-    @Test
-    public void test05_createDirectories_parentIsFile_throw() throws Exception {
-        testDir = resolve("test05_createDirectories");
-        fileSystem.createDirectories(testDir);
-
-        // Directory where last parent is file
-        Path file = createTestFile(testDir, null);
-
-        Path pathWithFileParent = createNewTestDirName(file);
-        test05_createDirectories(pathWithFileParent, true);
-
-        deleteTestFile(file);
-    }
-
-//    @Test
-//    public void test05_createDirectories_fileSystemClosed_throwIfSupported() throws Exception {
-//        assumeTrue(!description.isConnectionless());
-//        // Use root instead of testDir to prevent cleanup
-//        testDir = resolve("test05_createDirectories");
-//        files.close(testDir.getFileSystem());
-//
-//        try {
-//            test05_createDirectories(testDir, true);
-//        } finally {
-//            // set up for cleaning again
-//            cwd = config.getWorkingDir(files, credentials);
-//            testDir = resolve(cwd, TEST_ROOT, "test05_createDirectories");
-//        }
-//    }
-    
-    // ---------------------------------------------------------------------------------------------------------------------------
-    // TEST: createFile
-    //
-    // Possible parameters:
-    //
-    // Path null / non-existing file / existing file / existing dir / non-existing parent / closed filesystem
-    //
-    // Total combinations : 6
-    //
-    // Depends on: [getTestFileSystem], [createTestDir], [createNewTestFileName], createFile, delete, [deleteTestDir]
-    //             [closeTestFileSystem]
 
     private void test07_createFile(Path path, boolean mustFail) throws Exception {
         try {
@@ -446,32 +333,49 @@ public abstract class FileSystemTestParent {
         }
     }
 
-    @Test
-    public void test07_createFile_nullFile_throw() throws Exception {
-        prepareTestDir("test07_createFile");
-
-        test07_createFile(null, true);
+    @Test(expected=IllegalArgumentException.class)
+    public void createFile_null_throwsException() throws Exception {
+    	fileSystem.createFile(null);
     }
 
     @Test
-    public void test07_createFile_nonExistingFile_noThrow() throws Exception {
-        prepareTestDir("test07_createFile");
-        Path file0 = createNewTestFileName(testDir);
-
-        test07_createFile(file0, false);
-        deleteTestFile(file0);
+    public void createFile_nonExistingFile() throws Exception {
+    	generateAndCreateTestDir();
+    	Path file = testDir.resolve(generateTestFileName());    	
+    	fileSystem.createFile(file);
     }
 
+    @Test(expected=PathAlreadyExistsException.class)
+    public void createFile_existingFile_throwsException() throws Exception {
+    	generateAndCreateTestDir();
+    	Path file = testDir.resolve(generateTestFileName());    	
+    	fileSystem.createFile(file);
+    	fileSystem.createFile(file);
+    }
+    
+    @Test(expected=NoSuchPathException.class)
+    public void createFile_nonExistingParent_throwsException() throws Exception {
+    	generateAndCreateTestDir();
+    	Path dir = testDir.resolve(generateTestDirName());
+    	Path file = dir.resolve(generateTestFileName());    	
+    	fileSystem.createFile(file);
+    }
+    
     @Test
-    public void test07_createFile_existingFile_throw() throws Exception {
-        prepareTestDir("test07_createFile");
-        Path existingFile = createNewTestFileName(testDir);
+    public void test_readFromFile() throws Exception {
+    
+    	Path file = locationConfig.getExistingPath();
+    	
+    	OutputReader reader = new OutputReader(fileSystem.readFromFile(file));
 
-        fileSystem.createFile(existingFile);
-        test07_createFile(existingFile, true);
-
-        deleteTestFile(existingFile);
+    	reader.waitUntilFinished();
+    	assertEquals("Hello World\n", reader.getResultAsString());
     }
+   
+    
+    
+    
+    /*
 
     @Test
     public void test07_createFile_existingDir_throw() throws Exception {

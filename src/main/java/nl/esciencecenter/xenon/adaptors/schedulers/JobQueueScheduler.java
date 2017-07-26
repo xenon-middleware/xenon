@@ -431,7 +431,7 @@ public class JobQueueScheduler extends Scheduler {
 		LOGGER.debug("{}: Cancel job {}", adaptorName, jobIdentifier);
 
 		JobExecutor e = findJob(jobIdentifier);
-
+		
 		boolean killed = e.kill();
 
 		JobStatus status;
