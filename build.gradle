@@ -83,11 +83,11 @@ dependencies {
     fixedClientEnvironmentTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.32.0'
 }
 
-//tasks.withType(Test) {
-//    testLogging {
-//        events "standardOut", "started", "passed", "skipped", "failed"
-//    }
-//}
+tasks.withType(Test) {
+    testLogging {
+        events "standardOut", "started", "passed", "skipped", "failed"
+    }
+}
 
 task downloadCompileDependencies(type: Copy) {
     from configurations.compile.files

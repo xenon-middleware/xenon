@@ -213,6 +213,8 @@ public abstract class SchedulerTestParent {
     		status = scheduler.cancelJob(jobID);
     	} catch (Exception e) {
     		LOGGER.warn("Failed to cancel job: " + jobID, e);
+    		System.out.println("Failed to cancel job: " + jobID + " " + e);
+    		e.printStackTrace();
     		return;
     	}
 
@@ -229,11 +231,15 @@ public abstract class SchedulerTestParent {
     		
     		if (status.isDone()) {
     			LOGGER.warn("Job " + jobID + " done after " + delta + " ms.");		
+    			System.out.println("Job " + jobID + " done after " + delta + " ms.");		
     		} else {
-    			LOGGER.warn("Job " + jobID + " NOT done after " + delta + " ms.");		
+    			LOGGER.warn("Job " + jobID + " NOT done after " + delta + " ms.");
+    			System.out.println("Job " + jobID + " NOT done after " + delta + " ms.");
     		}
     	} catch (Exception e) {
     		LOGGER.warn("Failed to cancel job: " + jobID, e);
+    		System.out.println("Failed to cancel job: " + jobID + " " + e);
+    		e.printStackTrace();
     		return;
     	}
     }
@@ -357,7 +363,7 @@ public abstract class SchedulerTestParent {
     	assumeTrue(queueNames.length >= 1);
 
     	// Submit job to one queue 
-     	String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 5));
+     	String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 1));
     	
      	JobStatus status = scheduler.getJobStatus(jobID);
         
