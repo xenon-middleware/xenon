@@ -88,8 +88,8 @@ public class RemoteCommandRunner {
         }
 
         this.exitCode = status.getExitCode();
-        this.output = out.getResult();
-        this.error = err.getResult();
+        this.output = out.getResultAsString();
+        this.error = err.getResultAsString();
 
         long runtime = System.currentTimeMillis() - start;
 
