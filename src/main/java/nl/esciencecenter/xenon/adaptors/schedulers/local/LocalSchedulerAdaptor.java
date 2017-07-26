@@ -77,7 +77,7 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
     public static final String SUBMITTED = JOBS + "submitted";
     
     /** The locations supported by the adaptor */
-    public static final String [] ADAPTOR_LOCATIONS = new String [] { "local://" };
+    public static final String [] ADAPTOR_LOCATIONS = new String [] { "(null)", "(empty string)", "local://" };
     
     /** The properties supported by this adaptor */
     public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {  
