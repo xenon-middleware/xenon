@@ -21,10 +21,11 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingSchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 
-public class GridEngineSchedulerAdaptor extends SchedulerAdaptor {
+public class GridEngineSchedulerAdaptor extends ScriptingSchedulerAdaptor {
 	
 	  /** The name of this adaptor */
     public static final String ADAPTOR_NAME = "gridengine";

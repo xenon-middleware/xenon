@@ -21,6 +21,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingSchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 
@@ -30,7 +31,7 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
  * @version 1.0
  * @since 1.0
  */
-public class TorqueSchedulerAdaptor extends SchedulerAdaptor {
+public class TorqueSchedulerAdaptor extends ScriptingSchedulerAdaptor {
 
 	/** The name of this adaptor */
     public static final String ADAPTOR_NAME = "torque";
