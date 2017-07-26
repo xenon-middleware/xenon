@@ -18,11 +18,9 @@ package nl.esciencecenter.xenon.adaptors.filesystems.ftp;
 import java.io.IOException;
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +85,12 @@ public class FtpFileAdaptor extends FileAdaptor {
     	
     	connectToServer(host, port, ftpClient);
     	login(credential, ftpClient);
+    	
+    	try { 
+    		ftpClient.enterLocalPassiveMode();
+    	} catch (Exception e) {
+			throw new XenonException(ADAPTOR_NAME, "Failed to switch to PASSIVE mode");
+		}
     	
     	return ftpClient;
     }

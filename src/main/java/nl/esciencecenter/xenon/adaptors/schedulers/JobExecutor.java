@@ -153,9 +153,6 @@ public class JobExecutor implements Runnable {
     }
 
     private synchronized void setStreams(Streams streams) {
-    	
-    	System.out.println("STREAMS SET " + streams);
-    	
         this.streams = streams;
     }
 

@@ -118,20 +118,21 @@ public final class OutputReader extends Thread {
 
                 if (readCount < 0) {
                     // end-of-stream, we're done
-                    setFinished();
                     return;
                 }
 
                 addToBuffer(bytes, readCount);
             }
         } catch (Exception e) {
-            setFinished();
+            //setFinished();
         } finally {
             try {
                 source.close();
             } catch (IOException e) {
                 // ignore
             }
+            
+            setFinished();
         }
     }
 

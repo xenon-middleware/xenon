@@ -99,21 +99,6 @@ public class PosixFileUtils {
 
         return result;
     }
-
-//    public static int permissionsToBits(Set<PosixFilePermission> permissions, int otherbits) {
-//    	
-//    	System.out.println("OLD BITS: " + otherbits + " " + bitsToPermissions(otherbits));
-//    	
-//    	System.out.println("OLD BITS AFTER MASK: " + (otherbits&MASK) + " " + bitsToPermissions(otherbits&MASK));
-//    	
-//    	System.out.println("NEW BITS: " + permissionsToBits(permissions) + " " + permissions);
-//    	
-//    	System.out.println("NEW BITS AFTER MASK: " + ((otherbits & MASK) | permissionsToBits(permissions)) + " " + bitsToPermissions((otherbits & MASK) | permissionsToBits(permissions)));
-//    	
-//    	
-//    	return (otherbits & MASK) | permissionsToBits(permissions); 
-//    }
-
     
     public static int permissionsToBits(Set<PosixFilePermission> permissions) {
 

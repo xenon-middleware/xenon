@@ -82,12 +82,7 @@ class SshInteractiveProcess implements InteractiveProcess {
 			// set the streams first, then connect the channel.
             streams = new StreamsImplementation(jobIdentifier, channel.getInvertedOut(), channel.getInvertedIn(), channel.getInvertedErr());           
             
-            System.out.println("CONNECTED!");
-            
         } catch (Exception e) {
-        	
-        	System.out.println("FAILED: " + e);
-        	
         	throw new XenonException(ADAPTOR_NAME, "Failed to start command", e);
         }
     }

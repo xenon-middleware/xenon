@@ -504,27 +504,17 @@ public abstract class FileSystem {
 	 */
 	public void createDirectories(Path dir) throws XenonException {
 
-		System.out.println("CREATEDIRS=" + dir);
-		
 		assertNotNull(dir);
 				
 		Path parent = dir.getParent();
 
-		System.out.println("PARENT=" + parent);
-		
 		if (parent != null) {
 
 			if (!exists(parent)) {
-				System.out.println("!EXISTS=" + parent);
 				// Recursive call
 				createDirectories(parent);
-			} else { 
-				System.out.println("EXISTS=" + parent);
-				
-			}
+			} 
 		}
-		
-		System.out.println("CREATE=" + dir);
 		
 		createDirectory(dir);
 	}
