@@ -38,15 +38,6 @@ import org.junit.runners.MethodSorters;
 public class ScriptingParserTest {
 
     @Test
-    public void test00_constructorIsPrivate() throws Throwable {
-        Constructor<ScriptingParser> constructor = ScriptingParser.class.getDeclaredConstructor();
-        assertTrue(Modifier.isPrivate(constructor.getModifiers()));
-        constructor.setAccessible(true);
-        constructor.newInstance();
-        constructor.setAccessible(false);
-    }
-
-    @Test
     public void test01a_parseKeyValuePairs_CorrectInput_ResultMap() throws Exception {
         Map<String, String> expected = new HashMap<>();
         expected.put("key1", "value1");
