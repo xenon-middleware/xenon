@@ -78,6 +78,8 @@ public class FtpFileSystem extends FileSystem {
 			throw new XenonException(ADAPTOR_NAME, "Exception while disconnecting ftp file system.", e);
 		}
 
+		super.close();
+		
 		LOGGER.debug("close OK");
 	}
 

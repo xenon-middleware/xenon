@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -394,7 +395,19 @@ public abstract class FileSystem {
 		this.location = location;
 		this.entryPath = entryPath;
 		this.properties = properties;
-		this.pool = Executors.newFixedThreadPool(1);
+//		this.pool = Executors.newFixedThreadPool(1);
+		
+		ThreadFactory f = new ThreadFactory() {
+			
+			@Override
+			public Thread newThread(Runnable r) {
+				Thread t = new Thread(r, adaptor + "-" + uniqueID + "-copythread");
+				//t.setDaemon(true);
+				return t;
+			}
+		};
+		
+		this.pool = Executors.newFixedThreadPool(1, f); 
 	}
 
 	private synchronized String getNextCopyID() {
