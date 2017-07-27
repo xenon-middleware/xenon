@@ -23,10 +23,18 @@ public abstract class SchedulerLocationConfig {
 	
 	public abstract String getDefaultQueueName();
 
+	public long getMaxWaitUntilRunning() { 
+		return 10*1000;
+	}
+
+	public long getMaxWaintUntilDone() { 
+		return 60*1000;
+	}
+	
 	public boolean supportsBatch() {
 		return true;
 	}
-
+	
 	public boolean supportsInteractive() {
 		return false;
 	}

@@ -17,14 +17,10 @@ package nl.esciencecenter.xenon.adaptors.schedulers.local;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.Assume.assumeFalse;
 
 import java.io.OutputStream;
-
-import static org.junit.Assume.assumeFalse;
 
 import org.junit.Test;
 
@@ -61,10 +57,17 @@ public class LocalInteractiveProcessTest {
 
 		out.waitUntilFinished();
 		err.waitUntilFinished();
+		
+		// Wait up to 10 x 100 ms. until process is done.
+		int count = 0;
+		
+		while (!p.isDone() && count < 10) { 
+			Thread.sleep(100);
+			count++;
+		}
 
-		assertTrue(p.isDone());
-		assertTrue(p.isDone());
-		assertEquals(0, p.getExitStatus());
+		assertTrue("Process not done", p.isDone());
+		assertEquals("Exitcode not 0", 0, p.getExitStatus());
 		assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
 	}
 

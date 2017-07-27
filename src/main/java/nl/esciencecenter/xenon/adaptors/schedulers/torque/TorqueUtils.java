@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.adaptors.schedulers.torque;
 
 import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor.ADAPTOR_NAME;
 
+import java.util.Collection;
 import java.util.Formatter;
 import java.util.Locale;
 import java.util.Map;
@@ -87,6 +88,11 @@ final class TorqueUtils {
             return null;
         }
 
+        System.out.println("TORQUE STATUS: ");
+        System.out.println("--------------------------------");
+        System.out.println(info.toString());
+        System.out.println("--------------------------------");
+        
         ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "Job_Id", "job_state");
 
         String stateCode = jobInfo.get("job_state");
