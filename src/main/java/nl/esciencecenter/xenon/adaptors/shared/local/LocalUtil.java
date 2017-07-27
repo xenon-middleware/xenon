@@ -57,11 +57,7 @@ import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
  */
 public class LocalUtil {
 
-    private LocalUtil() {
-        // DO NOT USE
-    }
-
-    /**
+	/**
      * Returns if we are currently running on Windows.
      *
      * @return if we are currently running on Window.

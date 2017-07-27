@@ -27,6 +27,8 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
+import nl.esciencecenter.xenon.utils.OutputReader;
+
 public class OutputReaderTest {
 
 	@Test(expected=IllegalArgumentException.class)

@@ -23,6 +23,8 @@ import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.Streams;
+import nl.esciencecenter.xenon.utils.InputWriter;
+import nl.esciencecenter.xenon.utils.OutputReader;
 
 /**
  * Runs a command. Constructor waits for command to finish.
@@ -56,8 +58,7 @@ public class RemoteCommandRunner {
      * @throws XenonException
      *             if the job could not be run successfully.
      */
-    public RemoteCommandRunner(Scheduler scheduler, String adaptorName, String stdin, String executable,
-            String... arguments) throws XenonException {
+    public RemoteCommandRunner(Scheduler scheduler, String stdin, String executable, String... arguments) throws XenonException {
         long start = System.currentTimeMillis();
 
         JobDescription description = new JobDescription();
@@ -84,7 +85,7 @@ public class RemoteCommandRunner {
         }
 
         if (status.hasException()) {
-            throw new XenonException(adaptorName, "Could not run command remotely", status.getException());
+            throw new XenonException(scheduler.getAdaptorName(), "Could not run command remotely", status.getException());
         }
 
         this.exitCode = status.getExitCode();

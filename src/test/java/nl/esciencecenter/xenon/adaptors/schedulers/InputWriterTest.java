@@ -30,6 +30,8 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
+import nl.esciencecenter.xenon.utils.InputWriter;
+
 public class InputWriterTest {
 
 	@Test

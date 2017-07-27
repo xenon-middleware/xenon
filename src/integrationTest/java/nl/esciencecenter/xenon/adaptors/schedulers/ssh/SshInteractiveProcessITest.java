@@ -24,12 +24,12 @@ import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.session.ClientSession;
 import org.junit.Test;
 
-import nl.esciencecenter.xenon.adaptors.schedulers.InputWriter;
-import nl.esciencecenter.xenon.adaptors.schedulers.OutputReader;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
+import nl.esciencecenter.xenon.utils.InputWriter;
+import nl.esciencecenter.xenon.utils.OutputReader;
 
 public abstract class SshInteractiveProcessITest {
 

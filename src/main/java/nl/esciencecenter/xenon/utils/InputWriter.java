@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.schedulers;
+package nl.esciencecenter.xenon.utils;
 
 import java.io.IOException;
 import java.io.OutputStream;

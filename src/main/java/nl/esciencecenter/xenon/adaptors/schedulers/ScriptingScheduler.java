@@ -103,7 +103,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      *          if an error occurs
      */
     public RemoteCommandRunner runCommand(String stdin, String executable, String... arguments) throws XenonException {
-        return new RemoteCommandRunner(subScheduler, getAdaptorName(), stdin, executable, arguments);
+        return new RemoteCommandRunner(subScheduler, stdin, executable, arguments);
     }
 
     // Subclasses can override this method to produce more specified exceptions
@@ -129,7 +129,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      *          if an error occurred
      */
     public String runCheckedCommand(String stdin, String executable, String... arguments) throws XenonException {
-        RemoteCommandRunner runner = new RemoteCommandRunner(subScheduler, getAdaptorName(), stdin, executable,
+        RemoteCommandRunner runner = new RemoteCommandRunner(subScheduler, stdin, executable,
                 arguments);
 
         if (!runner.success()) {

@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
-import nl.esciencecenter.xenon.XenonException;
-
 /**
  * 
  */
