@@ -301,6 +301,7 @@ public class FtpFileSystem extends FileSystem {
 	
 	@Override
 	public boolean exists(Path path) throws XenonException {
+		assertNotNull(path);
 		return fileExists(path) || directoryExists(path);
 	}
 	

@@ -193,7 +193,7 @@ public class SftpFileSystem extends FileSystem {
 	public boolean exists(Path path) throws XenonException {
 
 		LOGGER.debug("exists path = {}", path);
-
+		assertNotNull(path);
 		try {
 			stat(path);
 			return true;

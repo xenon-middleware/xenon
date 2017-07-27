@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import nl.esciencecenter.xenon.filesystems.*;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
@@ -56,10 +57,6 @@ import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
-import nl.esciencecenter.xenon.filesystems.FileSystem;
-import nl.esciencecenter.xenon.filesystems.Path;
-import nl.esciencecenter.xenon.filesystems.PathAttributes;
-import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 
 public class WebdavFileSystem extends FileSystem {
 
@@ -357,13 +354,14 @@ public class WebdavFileSystem extends FileSystem {
 
 	@Override
 	public boolean exists(Path path) throws XenonException {
-		
+		assertNotNull(path);
+		// TODO: This seems like a very brittle way to test for existence..
 		try {
 			PathAttributes a = getAttributes(path);
 			return true;
 		} catch (XenonException e) {
 			// getAttributes did not find evidence that the specified path exists
-			e.printStackTrace();
+			//e.printStackTrace();
 			return false;
 		}
 	}

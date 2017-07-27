@@ -18,13 +18,8 @@ package nl.esciencecenter.xenon.filesystems;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.util.*;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -585,6 +580,16 @@ public abstract class FileSystem {
 	 */
 	public abstract void createSymbolicLink(Path link, Path target) throws XenonException;
 
+	// assumes directory exists
+	boolean isDirectoryEmpty(Path dir) throws XenonException{
+	    for(PathAttributes p  : list(dir,false)){
+	        if(!isDotDot(p.getPath())){
+	            return false;
+            }
+        }
+        return true;
+		//return !list(dir,false).iterator().hasNext();
+	}
 
 	/**
 	 * Deletes an existing path.
@@ -609,13 +614,15 @@ public abstract class FileSystem {
 		}
 
 		if (getAttributes(path).isDirectory()) {
-
-			for (PathAttributes p : list(path, false)) { 
-			if (recursive) { 
+			if (recursive) {
+				for (PathAttributes p : list(path, false)) {
 					delete(p.getPath(), true);
 				}
+			} else {
+				if(!isDirectoryEmpty(path)) {
+					throw new DirectoryNotEmptyException(getAdaptorName(), "Directory not empty: " + path.getRelativePath());
+				}
 			}
-
 			deleteDirectory(path);
 		} else {
 			deleteFile(path);
@@ -1027,7 +1034,7 @@ public abstract class FileSystem {
 	}
 
 	/**
-	 * Delete a file. If the file does not exist, an exception will be thrown.
+	 * Delete a file. Is only called on existing files
 	 *
 	 * This operation must be implemented by the various implementations of FileSystem.
 	 *
@@ -1043,7 +1050,7 @@ public abstract class FileSystem {
 	protected abstract void deleteFile(Path file) throws XenonException;
 
 	/**
-	 * Delete an empty directory. If the directory is not empty, an exception will be thrown.
+	 * Delete an empty directory. Is only called on empty directories
 	 *
 	 * This operation can only delete empty directories (analogous to <code>rmdir</code> in Linux).
 	 *
@@ -1051,8 +1058,6 @@ public abstract class FileSystem {
 	 *
 	 * @param path
 	 * 		the directory to remove
-	 * @throws DirectoryNotEmptyException
-	 * 		if the directory was not empty.
 	 * @throws InvalidPathException
 	 * 		if the provide path is not a directory.
 	 * @throws NoSuchPathException
@@ -1099,7 +1104,9 @@ public abstract class FileSystem {
 		Iterable<PathAttributes> tmp = listDirectory(dir);
 
 		for (PathAttributes p : tmp) {
-			list.add(p);
+			//if(!isDotDot(p.getPath())) {
+				list.add(p);
+			//}
 		}
 
 		if (recursive) {

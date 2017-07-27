@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.filesystems.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,12 +34,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.filesystems.FileSystem;
-import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
-import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
-import nl.esciencecenter.xenon.filesystems.Path;
-import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
-import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.utils.OutputReader;
 
 public abstract class FileSystemTestParent {
@@ -312,24 +307,7 @@ public abstract class FileSystemTestParent {
 //        fileSystem.close();
 //        generateAndCreateTestDir();
 //    }
-    
 
-    private void test07_createFile(Path path, boolean mustFail) throws Exception {
-        try {
-            fileSystem.createFile(path);
-        } catch (Exception e) {
-            if (mustFail) {
-                // expected
-                return;
-            }
-
-            throwUnexpected("test07_createFile", e);
-        }
-
-        if (mustFail) {
-            throwExpected("test07_createFile");
-        }
-    }
 
     @Test(expected=IllegalArgumentException.class)
     public void test_createFile_null_throwsException() throws Exception {
@@ -350,7 +328,15 @@ public abstract class FileSystemTestParent {
     	fileSystem.createFile(file);
     	fileSystem.createFile(file);
     }
-    
+
+    @Test(expected=PathAlreadyExistsException.class)
+    public void test07_createFile_existingDir_throwsException() throws Exception {
+        generateAndCreateTestDir();
+        fileSystem.createFile(testDir);
+    }
+
+
+
     @Test(expected=NoSuchPathException.class)
     public void test_createFile_nonExistingParent_throwsException() throws Exception {
     	generateAndCreateTestDir();
@@ -358,6 +344,17 @@ public abstract class FileSystemTestParent {
     	Path file = dir.resolve(generateTestFileName());    	
     	fileSystem.createFile(file);
     }
+
+    /* TODO: Fixme!
+    @Test(expected=XenonException.class)
+    public void test_createFile_closedFileSystem_throwsException() throws Exception {
+        assumeTrue(!description.isConnectionless());
+        generateAndCreateTestDir();
+        Path file0 = createNewTestFileName(testDir);
+        fileSystem.close();
+        fileSystem.createFile(file0);
+    }
+    */
     
     @Test
     public void test_readFromFile() throws Exception {
@@ -372,107 +369,82 @@ public abstract class FileSystemTestParent {
     	
     	assertEquals("Hello World\n", reader.getResultAsString());    	
     }
-   
-    
-    
-    
-    /*
 
-    @Test
-    public void test07_createFile_existingDir_throw() throws Exception {
-        prepareTestDir("test07_createFile");
 
-        test07_createFile(testDir, true);
+
+    @Test(expected=IllegalArgumentException.class)
+    public void test_exists_null_throwsException() throws Exception {
+        fileSystem.exists(null);
     }
 
     @Test
-    public void test07_createFile_nonExistentParent_throw() throws Exception {
-        prepareTestDir("test07_createFile");
-        Path nonExistingDir = createNewTestDirName(testDir);
-        Path pathWithoutParent = createNewTestFileName(nonExistingDir);
-
-        test07_createFile(pathWithoutParent, true);
-    }
-
-    @Test
-    public void test07_createFile_closedFileSystem_throwIfSupported() throws Exception {
-    	assumeTrue(!description.isConnectionless());
-
-        prepareTestDir("test07_createFile");
-        Path file0 = createNewTestFileName(testDir);
-        fileSystem.close();
-
-        try {
-            test07_createFile(file0, true);
-        } finally {
-            // prepare for removal in cleanup
-            testDir = resolve("test07_createFile");
-        }
-    }
-    
-
-    // ---------------------------------------------------------------------------------------------------------------------------
-    // TEST: exists
-    //
-    // Possible parameters:
-    //
-    // Path null / non-existing file / existing file
-    //
-    // Total combinations : 3
-    //
-    // Depends on: [getTestFileSystem], [createTestDir], [createNewTestFileName], [createTestFile], [deleteTestFile],
-    //             [closeTestFileSystem], exists
-
-    private void test08_exists(Path path, boolean expected, boolean mustFail) throws Exception {
-        boolean result = false;
-
-        try {
-            result = fileSystem.exists(path);
-        } catch (Exception e) {
-            if (mustFail) {
-                // expected
-                return;
-            }
-
-            throwUnexpected("test08_exists", e);
-        }
-
-        if (mustFail) {
-            throwExpected("test08_exists");
-        }
-
-        if (result != expected) {
-            throwWrong("test08_exists", expected, result);
-        }
-    }
-
-    @Test
-    public void test08_exists_nullFile_throw() throws Exception {
-        prepareTestDir("test08_exists");
-
-        // test with null
-        test08_exists(null, false, true);
-    }
-
-    @Test
-    public void test08_exists_nonExistent_returnFalse() throws Exception {
-        prepareTestDir("test08_exists");
+    public void test_exists_nonExistent_returnFalse() throws Exception {
+        generateAndCreateTestDir();
 
         // test with non-existing file
         Path file0 = createNewTestFileName(testDir);
-        test08_exists(file0, false, false);
+        assertFalse(fileSystem.exists(file0));
     }
 
     @Test
-    public void test08_exists_existingFile_returnTrue() throws Exception {
-        prepareTestDir("test08_exists");
+    public void test_exists_existingFile_returnTrue() throws Exception {
+        generateAndCreateTestDir();
 
-        // test with existing file
-        Path file1 = createTestFile(testDir, null);
-        test08_exists(file1, true, false);
-        deleteTestFile(file1);
+        // test with non-existing file
+        Path file0 = createNewTestFileName(testDir);
+        fileSystem.createFile(file0);
+        assertTrue(fileSystem.exists(file0));
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void test_delete_nonRec_null_throwsException() throws Exception {
+        fileSystem.delete(null,false);
+    }
+
+
+    @Test(expected=IllegalArgumentException.class)
+    public void test_delete_rec_null_throwsException() throws Exception {
+        fileSystem.delete(null,true);
+    }
+
+    @Test(expected=NoSuchPathException.class)
+    public void test_delete_nonExistentFile_throwsException() throws Exception {
+        generateAndCreateTestDir();
+        Path nonExistent = createNewTestFileName(testDir);
+        fileSystem.delete(nonExistent, false);
+    }
+
+    @Test
+    public void test_delete_existingFile() throws Exception {
+        generateAndCreateTestDir();
+        Path file = createNewTestFileName(testDir);
+        fileSystem.createFile(file);
+        fileSystem.delete(file,false);
+        assertFalse(fileSystem.exists(file));
+    }
+
+    @Test
+    public void test_delete_existingEmptyDir() throws Exception {
+        generateAndCreateTestDir();
+        fileSystem.delete(testDir,false);
+        assertFalse(fileSystem.exists(testDir));
+    }
+
+    @Test(expected=DirectoryNotEmptyException.class)
+    public void test_delete_existingNonEmptyDir_throwsException() throws Exception {
+        generateAndCreateTestDir();
+        Path file = createNewTestFileName(testDir);
+        Path file2 = createNewTestFileName(testDir);
+        fileSystem.createFile(file);
+        fileSystem.createFile(file2);
+        fileSystem.delete(testDir,false);
+    }
+
+
+    /*
+
+
+    
 
     // TODO: Test recursive delete!
     
