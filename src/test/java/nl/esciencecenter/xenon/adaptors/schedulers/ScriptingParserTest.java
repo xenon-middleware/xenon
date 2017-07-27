@@ -25,7 +25,6 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 import nl.esciencecenter.xenon.XenonException;
 
 import org.junit.FixMethodOrder;
@@ -736,7 +735,11 @@ public class ScriptingParserTest {
         ScriptingParser.parseKeyValueRecords(input, "key0", ScriptingParser.EQUALS_REGEX, "fake");
     }
 
-
+    @Test
+    public void test_parseList_emptystring_emptylist() {
+        String[] out = ScriptingParser.parseList("");
+        assertArrayEquals(new String[0], out);
+    }
     
     
     
