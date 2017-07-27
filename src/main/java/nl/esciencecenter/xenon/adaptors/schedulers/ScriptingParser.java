@@ -355,7 +355,11 @@ public final class ScriptingParser {
      * @return an array of strings with no whitespace
      */
     public static String[] parseList(String input) {
-        return WHITESPACE_REGEX.split(input);
+        String[] out = WHITESPACE_REGEX.split(input);
+        if (out.length == 1 && "".equals(out[0])) {
+            return new String[0];
+        }
+        return out;
     }
 
     /**
