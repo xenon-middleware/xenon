@@ -127,25 +127,25 @@ public abstract class FileSystemTestParent {
     }
 
 
-    private void throwMissingElements(String name, Collection elements) {
-        fail(name + " did NOT produce elements: " + elements);
-    }
-
-    private void throwUnexpected(String name, Throwable e) {
-        throw new AssertionError(name + " throws unexpected Exception!", e);
-    }
-
-    private void throwExpected(String name) {
-        fail(name + " did NOT throw Exception which was expected!");
-    }
-
-    private void throwWrong(String name, Object expected, Object result) {
-        fail(name + " produced wrong result! Expected: " + expected + " but got: " + result);
-    }
-
-    private void throwUnexpectedElement(String name, Object element) {
-        fail(name + " produced unexpected element: " + element);
-    }
+//    private void throwMissingElements(String name, Collection elements) {
+//        fail(name + " did NOT produce elements: " + elements);
+//    }
+//
+//    private void throwUnexpected(String name, Throwable e) {
+//        throw new AssertionError(name + " throws unexpected Exception!", e);
+//    }
+//
+//    private void throwExpected(String name) {
+//        fail(name + " did NOT throw Exception which was expected!");
+//    }
+//
+//    private void throwWrong(String name, Object expected, Object result) {
+//        fail(name + " produced wrong result! Expected: " + expected + " but got: " + result);
+//    }
+//
+//    private void throwUnexpectedElement(String name, Object element) {
+//        fail(name + " produced unexpected element: " + element);
+//    }
 
     private String generateTestDirName() throws XenonException {
     	return "dir" + getNextCounter();
@@ -156,23 +156,23 @@ public abstract class FileSystemTestParent {
     }
 
     // Depends on: Path.resolve, RelativePath, exists
-    private Path createNewTestDirName(Path root) throws XenonException {
-        Path dir = resolve("dir" + getNextCounter());
-        
-        assertFalse("Generated test dir already exists! " + dir, fileSystem.exists(dir));
-
-        return dir;
-    }
+//    private Path createNewTestDirName(Path root) throws XenonException {
+//        Path dir = resolve("dir" + getNextCounter());
+//        
+//        assertFalse("Generated test dir already exists! " + dir, fileSystem.exists(dir));
+//
+//        return dir;
+//    }
 
     // Depends on: [createNewTestDirName], createDirectory, exists
-    private Path createTestDir(Path root) throws Exception {
-        Path dir = createNewTestDirName(root);
-        fileSystem.createDirectory(dir);
-
-        assertTrue("Failed to generate test dir! " + dir, fileSystem.exists(dir));
-
-        return dir;
-    }
+//    private Path createTestDir(Path root) throws Exception {
+//        Path dir = createNewTestDirName(root);
+//        fileSystem.createDirectory(dir);
+//
+//        assertTrue("Failed to generate test dir! " + dir, fileSystem.exists(dir));
+//
+//        return dir;
+//    }
 
     // Depends on: [createTestDir]
     protected void prepareTestDir(String testName) throws XenonException {
@@ -184,7 +184,7 @@ public abstract class FileSystemTestParent {
 
     // Depends on: Path.resolve, exists
     private Path createNewTestFileName(Path root) throws Exception {
-        Path file = resolve( "file" + getNextCounter());
+        Path file = root.resolve( "file" + getNextCounter());
         
         assertFalse("Generated NEW test file already exists! " + file, fileSystem.exists(file));
 
@@ -223,15 +223,15 @@ public abstract class FileSystemTestParent {
         return file;
     }
 
-    // Depends on: exists, isDirectory, delete
-    private void deleteTestFile(Path file) throws Exception {
-        assertTrue("Cannot delete non-existing file: " + file, fileSystem.exists(file));
-
-        PathAttributes att = fileSystem.getAttributes(file);
-        assertFalse("Cannot delete directory: " + file, att.isDirectory());
-
-        fileSystem.delete(file,false);
-    }
+//    // Depends on: exists, isDirectory, delete
+//    private void deleteTestFile(Path file) throws Exception {
+//        assertTrue("Cannot delete non-existing file: " + file, fileSystem.exists(file));
+//
+//        PathAttributes att = fileSystem.getAttributes(file);
+//        assertFalse("Cannot delete directory: " + file, att.isDirectory());
+//
+//        fileSystem.delete(file,false);
+//    }
 
     // Depends on: exists, isDirectory, delete
     protected void deleteTestDir(Path dir) throws Exception {
@@ -437,7 +437,7 @@ public abstract class FileSystemTestParent {
         Path file2 = createNewTestFileName(testDir);
         fileSystem.createFile(file);
         fileSystem.createFile(file2);
-        fileSystem.delete(testDir,false);
+        fileSystem.delete(testDir, false);
     }
 
 

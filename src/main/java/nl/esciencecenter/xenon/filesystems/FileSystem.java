@@ -581,9 +581,9 @@ public abstract class FileSystem {
 	public abstract void createSymbolicLink(Path link, Path target) throws XenonException;
 
 	// assumes directory exists
-	boolean isDirectoryEmpty(Path dir) throws XenonException{
-		return !list(dir,false).iterator().hasNext();
-	}
+//	boolean isDirectoryEmpty(Path dir) throws XenonException{
+//		return !list(dir,false).iterator().hasNext();
+//	}
 
 	/**
 	 * Deletes an existing path.
@@ -598,8 +598,10 @@ public abstract class FileSystem {
 	 *          the path to delete.
 	 * @param recursive
 	 * 			if the delete must be done recursively
+	 * @throws NoSuchPathException
+				if the path does not exist.
 	 * @throws XenonException
-	 *             If an I/O error occurred.
+	 *          if an I/O error occurred.
 	 */
 	public void delete(Path path, boolean recursive) throws XenonException {
 
@@ -607,16 +609,31 @@ public abstract class FileSystem {
 			return;
 		}
 
+		assertPathExists(path);
+		
 		if (getAttributes(path).isDirectory()) {
+			
+			Iterable<PathAttributes> itt = list(path, false);
+			
 			if (recursive) {
-				for (PathAttributes p : list(path, false)) {
+				for (PathAttributes p : itt) {
 					delete(p.getPath(), true);
 				}
 			} else {
-				if(!isDirectoryEmpty(path)) {
-					throw new DirectoryNotEmptyException(getAdaptorName(), "Directory not empty: " + path.getRelativePath());
+				if (itt.iterator().hasNext()) {
+					
+					System.out.println("NOT EMPTY " + path.getAbsolutePath());
+					
+					for (PathAttributes p : itt) {
+						System.out.println(" -- " + p.getPath().getAbsolutePath());
+					}	
+		
+					throw new DirectoryNotEmptyException(getAdaptorName(), "Directory not empty: " + path.getAbsolutePath());
 				}
 			}
+			
+			
+			
 			deleteDirectory(path);
 		} else {
 			deleteFile(path);
@@ -657,6 +674,9 @@ public abstract class FileSystem {
 	 *             If an I/O error occurred.
 	 */
 	public Iterable<PathAttributes> list(Path dir, boolean recursive) throws XenonException {
+		
+		assertDirectoryExists(dir);
+		
 		ArrayList<PathAttributes> result = new ArrayList<>();
 		list(dir, result, recursive);
 		return result;

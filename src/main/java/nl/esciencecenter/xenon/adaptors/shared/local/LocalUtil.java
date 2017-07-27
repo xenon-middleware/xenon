@@ -283,7 +283,12 @@ public class LocalUtil {
      *          if an error occurred
      */
     public static java.nio.file.Path javaPath(FileSystem fs, Path path) throws XenonException {
-        Path relPath = path.normalize();
+        
+    	if (path == null) { 
+    		throw new IllegalArgumentException("Path may not be null");
+    	}
+    	
+    	Path relPath = path.normalize();
         int numElems = relPath.getNameCount();
         String root = fs.getLocation();                
 
