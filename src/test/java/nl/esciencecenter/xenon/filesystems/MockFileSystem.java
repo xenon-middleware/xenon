@@ -505,6 +505,7 @@ public class MockFileSystem extends FileSystem {
 	@Override
 	public synchronized void close() throws XenonException {
 		this.close = true;
+		super.close();
 	}
 
 	@Override

@@ -445,7 +445,15 @@ public abstract class FileSystem {
 	 * @throws XenonException
 	 *             If the FileSystem failed to close or if an I/O error occurred.
 	 */
-	public abstract void close() throws XenonException;
+	public void close() throws XenonException {
+		try { 
+			pool.shutdown();
+			pool.awaitTermination(12, TimeUnit.SECONDS);
+			pool.shutdownNow();
+		} catch (Exception e) {
+			throw new XenonException(getAdaptorName(), "Failed to cleanly shutdown copy thread pool");
+		}
+	}
 
 	/**
 	 * Return if the connection to the FileSystem is open.

@@ -266,11 +266,6 @@ public class WebdavFileSystem extends FileSystem {
 	}
 
 	@Override
-	public void close() throws XenonException {
-		// ignored
-	}
-
-	@Override
 	public boolean isOpen() throws XenonException {
 		return true;
 	}
