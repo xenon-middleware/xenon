@@ -395,14 +395,12 @@ public abstract class FileSystem {
 		this.location = location;
 		this.entryPath = entryPath;
 		this.properties = properties;
-//		this.pool = Executors.newFixedThreadPool(1);
 		
 		ThreadFactory f = new ThreadFactory() {
-			
 			@Override
 			public Thread newThread(Runnable r) {
-				Thread t = new Thread(r, adaptor + "-" + uniqueID + "-copythread");
-				//t.setDaemon(true);
+				Thread t = new Thread(r, "CopyThread-" + adaptor + "-" + uniqueID);
+				t.setDaemon(true);
 				return t;
 			}
 		};
@@ -460,8 +458,6 @@ public abstract class FileSystem {
 	 */
 	public void close() throws XenonException {
 		try { 
-			pool.shutdown();
-			pool.awaitTermination(12, TimeUnit.SECONDS);
 			pool.shutdownNow();
 		} catch (Exception e) {
 			throw new XenonException(getAdaptorName(), "Failed to cleanly shutdown copy thread pool");
