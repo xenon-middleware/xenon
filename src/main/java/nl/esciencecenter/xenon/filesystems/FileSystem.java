@@ -582,13 +582,7 @@ public abstract class FileSystem {
 
 	// assumes directory exists
 	boolean isDirectoryEmpty(Path dir) throws XenonException{
-	    for(PathAttributes p  : list(dir,false)){
-	        if(!isDotDot(p.getPath())){
-	            return false;
-            }
-        }
-        return true;
-		//return !list(dir,false).iterator().hasNext();
+		return !list(dir,false).iterator().hasNext();
 	}
 
 	/**
@@ -1104,9 +1098,9 @@ public abstract class FileSystem {
 		Iterable<PathAttributes> tmp = listDirectory(dir);
 
 		for (PathAttributes p : tmp) {
-			//if(!isDotDot(p.getPath())) {
+			if(!isDotDot(p.getPath())) {
 				list.add(p);
-			//}
+			}
 		}
 
 		if (recursive) {
