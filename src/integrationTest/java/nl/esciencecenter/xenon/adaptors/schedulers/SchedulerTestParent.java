@@ -298,7 +298,7 @@ public abstract class SchedulerTestParent {
      	
     	assertTrue(status.isDone());
     }
-        
+    
     @Test
     public void test_getJobsQueueNameEmpty() throws XenonException {
     
@@ -345,9 +345,8 @@ public abstract class SchedulerTestParent {
      
      	// Clean up the mess...
        	cleanupJob(jobID);
-      }
-
-    
+    }
+       
     @Test
     public void test_getJobsQueueNameCorrect() throws XenonException {
     
@@ -395,7 +394,12 @@ public abstract class SchedulerTestParent {
      	// Clean up the mess...
        	cleanupJob(jobID);
     }    
- 
+
+    @Test(expected=NoSuchQueueException.class) 
+    public void test_getJobsQueueNameInCorrect() throws XenonException {
+        scheduler.getJobs("foobar");
+    }
+    
     @Test(expected=NoSuchJobException.class)
     public void test_getJobStatus_unknownJob() throws XenonException {
     	scheduler.getJobStatus("aap");
