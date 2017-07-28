@@ -180,6 +180,7 @@ public class SftpFileSystem extends FileSystem {
 
 		try {
 			result = client.lstat(path.getAbsolutePath());
+
 		} catch (IOException e) {
 			throw sftpExceptionToXenonException(e, "Failed to retrieve attributes from: " + path);
 		}
@@ -232,7 +233,6 @@ public class SftpFileSystem extends FileSystem {
 			assertDirectoryExists(path);
 		
 			ArrayList<PathAttributes> result = new ArrayList<>();
-			
 			for (SftpClient.DirEntry f : client.readDir(path.getAbsolutePath())) { 
 				result.add(convertAttributes(path.resolve(f.getFilename()), f.getAttributes()));
 			}
@@ -280,6 +280,7 @@ public class SftpFileSystem extends FileSystem {
 		
 		assertNotNull(path);
 		assertParentDirectoryExists(path);
+		assertPathIsNotDirectory(path);
 		
 		try {
 			return client.write(path.getAbsolutePath(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Create, SftpClient.OpenMode.Truncate);      	
@@ -308,6 +309,7 @@ public class SftpFileSystem extends FileSystem {
 
 	@Override
 	public PathAttributes getAttributes(Path path) throws XenonException {
+		assertNotNull(path);
 		return convertAttributes(path, stat(path));
 	}
 
@@ -338,6 +340,11 @@ public class SftpFileSystem extends FileSystem {
 	@Override
 	public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
 		LOGGER.debug("setPosixFilePermissions path = {} permissions = {}", path, permissions);
+		assertNotNull(path);
+		assertPathExists(path);
+		if(permissions == null) {
+			throw new IllegalArgumentException("Permissions is null");
+		}
 
 		try {
 			// We need to create a new Attributes object here. SFTP will only forward the fields that are actually set 

@@ -55,6 +55,20 @@ public abstract class FileAdaptor extends Adaptor implements FileSystemAdaptorDe
 		// By default, adaptors require a connection.
 		return false;
 	}
+
+	@Override
+	public boolean supportsPosixPermissions(){
+		return false;
+
+	}
+
+	@Override
+	public boolean supportsRename(){
+		return true;
+	}
+	@Override
+	public boolean canAppend(){ return true; }
+
 	
 	public abstract FileSystem createFileSystem(String location, Credential credential, Map<String,String> properties) throws XenonException;
 	

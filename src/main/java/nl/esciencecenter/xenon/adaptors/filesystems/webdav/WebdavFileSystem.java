@@ -368,7 +368,9 @@ public class WebdavFileSystem extends FileSystem {
 
 	@Override
 	public InputStream readFromFile(Path path) throws XenonException {
+		assertNotNull(path);
 		String filePath = toFilePath(path);
+
 		assertFileExists(path);
 		GetMethod method = new GetMethod(filePath);
 		try {
@@ -384,6 +386,7 @@ public class WebdavFileSystem extends FileSystem {
 		
 		assertPathNotExists(file);
 		assertParentDirectoryExists(file);
+		assertPathIsNotDirectory(file);
 		
 		String filePath = toFilePath(file);
 		PutMethod method = new PutMethod(filePath);
@@ -423,6 +426,8 @@ public class WebdavFileSystem extends FileSystem {
 
 	@Override
 	public PathAttributes getAttributes(Path path) throws XenonException {
+		assertNotNull(path);
+		// todo: cannot check if path exists here, because exists uses getattributes in nasty way
 		return getFileOrDirAttributes(path, client);
 	}
 

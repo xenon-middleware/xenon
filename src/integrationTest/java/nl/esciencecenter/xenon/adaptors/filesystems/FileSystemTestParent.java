@@ -15,16 +15,15 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+
+import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 import nl.esciencecenter.xenon.filesystems.*;
 import org.junit.After;
@@ -35,6 +34,7 @@ import org.junit.rules.ExpectedException;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.utils.OutputReader;
+import org.junit.rules.Timeout;
 
 public abstract class FileSystemTestParent {
 	
@@ -53,7 +53,11 @@ public abstract class FileSystemTestParent {
     	return counter++;
     }
 
-    
+
+    @Rule
+    public Timeout globalTimeout = Timeout.seconds(10); // 10 seconds max per method tested
+
+
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
@@ -127,25 +131,14 @@ public abstract class FileSystemTestParent {
     }
 
 
-//    private void throwMissingElements(String name, Collection elements) {
-//        fail(name + " did NOT produce elements: " + elements);
-//    }
-//
-//    private void throwUnexpected(String name, Throwable e) {
-//        throw new AssertionError(name + " throws unexpected Exception!", e);
-//    }
-//
-//    private void throwExpected(String name) {
-//        fail(name + " did NOT throw Exception which was expected!");
-//    }
-//
-//    private void throwWrong(String name, Object expected, Object result) {
-//        fail(name + " produced wrong result! Expected: " + expected + " but got: " + result);
-//    }
-//
-//    private void throwUnexpectedElement(String name, Object element) {
-//        fail(name + " produced unexpected element: " + element);
-//    }
+
+    private void throwUnexpected(String name, Throwable e) {
+        throw new AssertionError(name + " throws unexpected Exception!", e);
+    }
+
+    private void throwWrong(String name, Object expected, Object result) {
+        fail(name + " produced wrong result! Expected: " + expected + " but got: " + result);
+    }
 
     private String generateTestDirName() throws XenonException {
     	return "dir" + getNextCounter();
@@ -251,7 +244,18 @@ public abstract class FileSystemTestParent {
     	generateTestDir();
     	fileSystem.createDirectories(testDir);    	
     }
-    
+
+    private Path createTestSubDir(Path testDir) throws XenonException {
+        Path res = createTestSubDirName(testDir);
+        fileSystem.createDirectory(res);
+        return res;
+    }
+
+    private Path createTestSubDirName(Path testDir) throws XenonException {
+        return testDir.resolve(new Path(generateTestDirName()));
+    }
+
+
     // Tests to create directories
     
     @Test
@@ -440,313 +444,237 @@ public abstract class FileSystemTestParent {
         fileSystem.delete(testDir, false);
     }
 
-
-    /*
-
-
-    
-
-    // TODO: Test recursive delete!
-    
-    // ---------------------------------------------------------------------------------------------------------------------------
-    // TEST: delete
-    //
-    // Possible parameters:
-    //
-    // Path null / non-existing file / existing file / existing empty dir / existing non-empty dir /
-    //              existing non-writable file / closed filesystem
-    //
-    // Total combinations : 7
-    //
-    // Depends on: [getTestFileSystem], [createTestDir], [createNewTestFileName], delete, [deleteTestFile], [deleteTestDir]
-    //             [closeTestFileSystem]
-
-    private void test09_delete(Path path, boolean mustFail) throws Exception {
-        try {
-            fileSystem.delete(path,false);
-        } catch (Exception e) {
-            if (mustFail) {
-                // expected
-                return;
-            }
-
-            throwUnexpected("test09_delete", e);
-        }
-
-        if (fileSystem.exists(path)) {
-            throwWrong("test09_delete", "no file", "a file");
-        }
-
-        if (mustFail) {
-            throwExpected("test09_delete");
-        }
+    @Test
+    public void test_delete_Rec_existingNonEmptyDir_throwsException() throws Exception {
+        generateAndCreateTestDir();
+        Path file = createNewTestFileName(testDir);
+        Path file2 = createNewTestFileName(testDir);
+        fileSystem.createFile(file);
+        fileSystem.createFile(file2);
+        fileSystem.delete(testDir, true);
     }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void test_list_nullPath_throwsException() throws Exception {
+        fileSystem.list(null, true);
+    }
+
+
+    @Test(expected=NoSuchPathException.class)
+    public void test_list_nonExistentDir_throwsException() throws Exception {
+        generateAndCreateTestDir();
+        Path nonExistent = createNewTestFileName(testDir);
+        fileSystem.list(nonExistent,false);
+    }
+
 
     @Test
-    public void test09_delete_null_throw() throws Exception {
-        test09_delete(null, true);
-    }
+    public void test_list_canIterateTwice() throws Exception{
+        generateAndCreateTestDir();
+        byte[] data = "Hello World!".getBytes();
+        byte[] data2 = "Party people!".getBytes();
+        byte[] data3 = "yes | rm -rf ".getBytes();
+        byte[] data4 = "Use Xenon!".getBytes();
+        Path source = createTestSubDir(testDir);
+        Path file0 = createTestFile(source, data);
+        Path testSubDir = createTestSubDir(source);
 
-    @Test
-    public void test09_delete_unexistingFile_throw() throws Exception {
-        prepareTestDir("test09_delete");
-        Path unexistingFile = createNewTestFileName(testDir);
-
-        test09_delete(unexistingFile, true);
-    }
-
-    @Test
-    public void test09_delete_existingFile_noThrow() throws Exception {
-        prepareTestDir("test09_delete");
-        Path existingFile = createTestFile(testDir, null);
-
-        test09_delete(existingFile, false);
-    }
-
-    @Test
-    public void test09_delete_existingEmptyDir_noThrow() throws Exception {
-        prepareTestDir("test09_delete");
-        Path existingEmptyDir = createTestDir(testDir);
-
-        test09_delete(existingEmptyDir, false);
-    }
-
-    @Test
-    public void test09_delete_existingNonEmptyDir_throw() throws Exception {
-        prepareTestDir("test09_delete");
-        Path nonEmptyDir = createTestDir(testDir);
-        Path file = createTestFile(nonEmptyDir, null);
-
-        test09_delete(nonEmptyDir, true);
-
-        deleteTestFile(file);
-        deleteTestDir(nonEmptyDir);
-    }
-
-    @Test
-    public void test09_delete_closedFileSystem_throwIfSupported() throws Exception {
-    	assumeTrue(!description.isConnectionless());
-        prepareTestDir("test09_delete");
-
-        fileSystem.close();
-
-        try {
-        	fileSystem.delete(testDir,false);
-        } catch (FileSystemClosedException e) {
-            // This is the expected exception
-        } catch (Exception e) {
-            // We do not expect another exception
-            throwUnexpected("test09_delete", e);
-        } finally {
-            // set up for cleaning again
-            testDir = resolve( "test09_delete");
+        Path testSubDir2 = createTestSubDir(source);
+        Path file1 = createTestFile(testSubDir2,data2);
+        Path file2 = createTestFile(testSubDir,data3);
+        Path testSubSub = createTestSubDir(testSubDir);
+        Path file3 = createTestFile(testSubSub,data4);
+        Path target = createTestSubDir(testDir);
+        Iterable<PathAttributes> pa = fileSystem.list(testDir,true);
+        Iterator<PathAttributes> it1 = pa.iterator();
+        Iterator<PathAttributes> it2 = pa.iterator();
+        Set<PathAttributes> set1 = new HashSet<>();
+        while(it1.hasNext()){
+            set1.add(it1.next());
         }
+        Set<PathAttributes> set2 = new HashSet<>();
+        while(it2.hasNext()){
+            set2.add(it2.next());
+        }
+        assertEquals(set1,set2);
     }
 
-    
-    // TODO: Test recursive listing
-    
-    // ---------------------------------------------------------------------------------------------------------------------------
-    // TEST: list
-    //
-    // Possible parameters:
-    //
-    // Path null / non-existing dir / existing empty dir / existing non-empty dir / existing dir with subdirs /
-    //              existing file / closed filesystem
-    //
-    // Total combinations : 7
-    //
-    // Depends on: [getTestFileSystem], [createTestDir], [createNewTestDirName], [createTestFile], newDirectoryStream,
-    //             [deleteTestDir], , [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
-
-    private void test15_list(Path root, Set<PathAttributes> expected, boolean mustFail)
-            throws Exception {
-
-        Set<PathAttributes> tmp;
-
-        if (expected != null) {
-            tmp = new HashSet<>(expected);
-        } else {
-            tmp = new HashSet<>(0);
-        }
-
-        Iterable<PathAttributes> in = null;
-
-        try {
-            in = fileSystem.list(root, false);
-        } catch (Exception e) {
-            if (mustFail) {
-                // expected
-                return;
-            }
-
-            throwUnexpected("test15_list", e);
-        }
-
-        if (mustFail) {
-            throwExpected("test15_list");
-        }
-
-        logger.debug("Comparing PathAttributesPairs:");
-
-        for (PathAttributes p : in) {
-            logger.debug("Got input " + p);
-
-            PathAttributes found = null;
-
-            for (PathAttributes x : tmp) {
-                logger.debug("  Comparing to " + x.getPath() );
-
-                if (p.equals(x)) {
-                    logger.debug("Found!");
-                    found = x;
-                    break;
-                }
-            }
-
-            logger.debug("  Found = " + found);
-
-            if (found != null) {
-                tmp.remove(found);
+    private Set<PathAttributes> listSet(Path dir, boolean recursive) throws XenonException{
+        Set<PathAttributes> res = new HashSet<>();
+        for(PathAttributes p : fileSystem.list(dir,recursive)){
+            if(res.contains(p)){
+                throw new XenonException(fileSystem.getAdaptorName(),"Duplicate element in listing!");
             } else {
-                logger.debug("NOT Found!");
-                throwUnexpectedElement("test15_list", p.getPath());
+                res.add(p);
             }
         }
+        return res;
+    }
 
-        if (tmp.size() > 0) {
-            throwMissingElements("test15_list", tmp);
+    private void         assertListSetEqual(Set<PathAttributes> res, Set<PathAttributes> expected){
+        if(!res.equals(expected)){
+            Set superfluous = new HashSet(res);
+            superfluous.removeAll(expected);
+            Set missing = new HashSet(expected);
+            missing.removeAll(res);
+            String superfluousString;
+            String missingString;
+            if(!superfluous.isEmpty()){
+                superfluousString = "Superfluous elements : " + listPathsInString(res);
+            } else {
+                superfluousString = "";
+            }
+            if(!missing.isEmpty()){
+                missingString = "Missing elements : " + listPathsInString(missing);
+            } else {
+                missingString = "";
+            }
+            fail("listing is not as expected! " + superfluousString + " " + missingString);
         }
     }
 
+    private String listPathsInString(Set<PathAttributes> res) {
+        String superfluous = "";
+        for(PathAttributes p : res){
+            superfluous += p.getPath().getRelativePath() + " ";
+        }
+        return superfluous;
+    }
+
+
     @Test
-    public void test15_list_nullPath_throw() throws Exception {
-        test15_list(null, null, true);
+    public void test_list_existingEmptyDir() throws Exception {
+        generateAndCreateTestDir();
+        Set<PathAttributes> emptySet = new HashSet<>();
+        Set<PathAttributes> res = listSet(testDir, false);
+        assertListSetEqual(res,emptySet);
     }
 
     @Test
-    public void test15_list_nonExistingDir_throw() throws Exception {
-        prepareTestDir("test15_list");
-        Path nonExistingDir = createNewTestDirName(testDir);
-
-        test15_list(nonExistingDir, null, true);
+    public void test_list_existingFile() throws Exception {
+        generateAndCreateTestDir();
+        Path file = createNewTestFileName(testDir);
+        Set<PathAttributes> expected = new HashSet<>();
+        fileSystem.createFile(file);
+        expected.add(fileSystem.getAttributes(file));
+        Set<PathAttributes> res = listSet(testDir, false);
+        assertListSetEqual(res,expected);
     }
 
-    @Test
-    public void test15_list_existingDir_noThrow() throws Exception {
-        prepareTestDir("test15_list");
-
-        test15_list(testDir, null, false);
-    }
 
     @Test
-    public void test15_list_existingFile_noThrow() throws Exception {
-        prepareTestDir("test15_list");
-        test15_list(testDir, null, false);
-        Path existingFile = createTestFile(testDir, null);
-
-        test15_list(existingFile, null, true);
-
-        // cleanup
-        deleteTestFile(existingFile);
-    }
-
-    @Test
-    public void test15_list_nonEmptyDir_correctListing() throws Exception {
-        prepareTestDir("test15_list");
+    public void test_list_nonEmptyDir_correctListing() throws Exception {
+        generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, null);
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
-        Set<PathAttributes> result = new HashSet<>(6);
-        result.add(fileSystem.getAttributes(file0));
-        result.add(fileSystem.getAttributes(file1));
-        result.add(fileSystem.getAttributes(file2));
-        result.add(fileSystem.getAttributes(file3));
+        Set<PathAttributes> expected = new HashSet<>(6);
+        expected.add(fileSystem.getAttributes(file0));
+        expected.add(fileSystem.getAttributes(file1));
+        expected.add(fileSystem.getAttributes(file2));
+        expected.add(fileSystem.getAttributes(file3));
 
-        test15_list(testDir, result, false);
-
-        // cleanup
-        deleteTestFile(file3);
-        deleteTestFile(file2);
-        deleteTestFile(file1);
-        deleteTestFile(file0);
+        Set<PathAttributes> res = listSet(testDir, false);
+        assertListSetEqual(res,expected);
     }
 
+
     @Test
-    public void test15_list_withSubDirs_onlyListTopDirContents() throws Exception {
-        prepareTestDir("test15_list");
+    public void test_list_withSubDirs_onlyListTopDirContents() throws Exception {
+        generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, null);
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
-        Path subDir = createTestDir(testDir);
+        Path subDir = createTestSubDir(testDir);
         Path irrelevantFileInSubDir = createTestFile(subDir, null);
-        Set<PathAttributes> result = new HashSet<>(7);
-        result.add(fileSystem.getAttributes(file0));
-        result.add(fileSystem.getAttributes(file1));
-        result.add(fileSystem.getAttributes(file2));
-        result.add(fileSystem.getAttributes(file3));
-        result.add(fileSystem.getAttributes(subDir));  
+        Set<PathAttributes> expected = new HashSet<>(7);
+        expected.add(fileSystem.getAttributes(file0));
+        expected.add(fileSystem.getAttributes(file1));
+        expected.add(fileSystem.getAttributes(file2));
+        expected.add(fileSystem.getAttributes(file3));
+        expected.add(fileSystem.getAttributes(subDir));
 
-        test15_list(testDir, result, false);
+        Set<PathAttributes> res = listSet(testDir, false);
+        assertListSetEqual(res,expected);
 
-        // cleanup
-        deleteTestFile(irrelevantFileInSubDir);
-        deleteTestDir(subDir);
-        deleteTestFile(file3);
-        deleteTestFile(file2);
-        deleteTestFile(file1);
-        deleteTestFile(file0);
+    }
+
+
+
+
+    @Test
+    public void test_list_recursive_withSubDirs_listAll() throws Exception {
+        generateAndCreateTestDir();
+        Path file0 = createTestFile(testDir, null);
+        Path file1 = createTestFile(testDir, null);
+        Path file2 = createTestFile(testDir, null);
+        Path file3 = createTestFile(testDir, null);
+        Path subDir = createTestSubDir(testDir);
+        Path irrelevantFileInSubDir = createTestFile(subDir, null);
+        Set<PathAttributes> expected = new HashSet<>(7);
+        expected.add(fileSystem.getAttributes(file0));
+        expected.add(fileSystem.getAttributes(file1));
+        expected.add(fileSystem.getAttributes(file2));
+        expected.add(fileSystem.getAttributes(file3));
+        expected.add(fileSystem.getAttributes(subDir));
+        expected.add(fileSystem.getAttributes(irrelevantFileInSubDir));
+
+        Set<PathAttributes> res = listSet(testDir, true);
+        assertListSetEqual(res,expected);
+
     }
 
     @Test
-    public void test15_list_closedFileSystem_throw_IfSupported() throws Exception {
-    	assumeTrue(!description.isConnectionless());
-        prepareTestDir("test15_list");
-        fileSystem.close();
+    public void test_list_recursive() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        byte[] data2 = "Party people!".getBytes();
+        byte[] data3 = "yes | rm -rf ".getBytes();
+        byte[] data4 = "Use Xenon!".getBytes();
+        generateAndCreateTestDir();
+        Set<PathAttributes> list = new HashSet<>();
+        Path source = createTestSubDir(testDir);
+        list.add(fileSystem.getAttributes(source));
+        Path file0 = createTestFile(source, data);
+        list.add(fileSystem.getAttributes(file0));
+        Path testSubDir = createTestSubDir(source);
+        list.add(fileSystem.getAttributes(testSubDir));
 
-        try {
-            test15_list(testDir, null, true);
-        } finally {
-            // set up for cleaning again
-            testDir = resolve("test15_list");
-        }
+        Path testSubDir2 = createTestSubDir(source);
+        list.add(fileSystem.getAttributes(testSubDir2));
+        Path file1 = createTestFile(testSubDir2,data2);
+        list.add(fileSystem.getAttributes(file1));
+        Path file2 = createTestFile(testSubDir,data3);
+        list.add(fileSystem.getAttributes(file2));
+        Path testSubSub = createTestSubDir(testSubDir);
+        list.add(fileSystem.getAttributes(testSubSub));
+        Path file3 = createTestFile(testSubSub,data4);
+        list.add(fileSystem.getAttributes(file3));
+
+        assertListSetEqual(listSet(testDir,true), list);
     }
-    
 
-    // ---------------------------------------------------------------------------------------------------------------------------
-    // TEST: getAttributes
-    //
-    // Possible parameters:
-    //
-    // Path null / non-existing file / existing empty file / existing non-empty file / existing dir / existing link (!)
-    //              closed filesystem
-    //
-    // Total combinations : 7
-    //
-    // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories,
-    //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
+    @Test(expected=IllegalArgumentException.class)
+    public void test_getAttributes_nullPath_throwsException() throws Exception {
+        fileSystem.getAttributes(null);
+    }
 
-    private void test13_getAttributes(Path path, boolean isDirectory, long size, long currentTime, boolean mustFail)
+
+
+
+    @Test(expected=NoSuchPathException.class)
+    public void test_getAttributes_nonExistingFile_throwsException() throws Exception {
+        generateAndCreateTestDir();
+        // test with non-existing file
+        Path file0 = createNewTestFileName(testDir);
+        fileSystem.getAttributes(file0);
+    }
+
+    private void assertPathAttributesConsitent(Path path, boolean isDirectory, long size, long currentTime)
             throws Exception {
 
-        PathAttributes result = null;
-
-        try {
-            result = fileSystem.getAttributes(path);
-        } catch (Exception e) {
-            if (mustFail) {
-                // expected
-                return;
-            }
-
-            throwUnexpected("test13_getFileAttributes", e);
-        }
-
-        if (mustFail) {
-            throwExpected("test13_getFileAttributes");
-        }
+        PathAttributes result = fileSystem.getAttributes(path);
 
         if (result.isDirectory() && !isDirectory) {
             throwWrong("test13_getfileAttributes", "<not directory>", "<directory>");
@@ -770,8 +698,13 @@ public abstract class FileSystemTestParent {
         }
 
     }
-*/
-    
+
+    /*
+
+
+
+
+
     /**
      * Tests whether two times (in milliseconds) are within a mild margin of one another. The margin is large enough to be able to
      * cope with servers in other timezones and similar, expected, sources of discrepancy between times.
@@ -786,65 +719,687 @@ public abstract class FileSystemTestParent {
         final long margin = 30 * secondsPerHour * millisecondsPerSecond;
         return Math.abs(time1 - time2) < margin;
     }
-/*
+
     @Test
-    public void test13_getAttributes_nullPath_throw() throws Exception {
+    public void test_getAttributes_emptyFile() throws Exception {
         long currentTime = System.currentTimeMillis();
-        test13_getAttributes(null, false, -1, currentTime, true);
+        generateAndCreateTestDir();
+        // test with non-existing file
+        Path file0 = createNewTestFileName(testDir);
+        fileSystem.createFile(file0);
+        assertPathAttributesConsitent(file0,false,0,currentTime);
     }
 
     @Test
-    public void test13_getAttributes_nonExistingFile_throw() throws Exception {
+    public void test_getAttributes_nonEmptyFile() throws Exception {
         long currentTime = System.currentTimeMillis();
-        prepareTestDir("test13_getAttributes");
-        Path nonExistingFile = createNewTestFileName(testDir);
-
-        test13_getAttributes(nonExistingFile, false, -1, currentTime, true);
-    }
-
-    @Test
-    public void test13_getAttributes_emptyFile_noThrow() throws Exception {
-        long currentTime = System.currentTimeMillis();
-        prepareTestDir("test13_getAttributes");
-        Path emptyFile = createTestFile(testDir, null);
-
-        test13_getAttributes(emptyFile, false, 0, currentTime, false);
-        deleteTestFile(emptyFile);
-    }
-
-    @Test
-    public void test13_getAttributes_nonEmptyFile_noThrow() throws Exception {
-        long currentTime = System.currentTimeMillis();
-        prepareTestDir("test13_getAttributes");
+        generateAndCreateTestDir();
         Path nonEmptyFile = createTestFile(testDir, new byte[] { 1, 2, 3 });
 
-        test13_getAttributes(nonEmptyFile, false, 3, currentTime, false);
-        deleteTestFile(nonEmptyFile);
+        assertPathAttributesConsitent(nonEmptyFile, false, 3, currentTime);
     }
 
     @Test
-    public void test13_getAttributes_existingDir_noThrow() throws Exception {
+    public void test_getAttributes_existingDir() throws Exception {
         long currentTime = System.currentTimeMillis();
-        prepareTestDir("test13_getAttributes");
-        Path existingDir = createTestDir(testDir);
+        generateAndCreateTestDir();
 
-        test13_getAttributes(existingDir, true, -1, currentTime, false);
-        deleteTestDir(existingDir);
+        assertPathAttributesConsitent(testDir, true, -1, currentTime);
+    }
+
+
+    @Test(expected=IllegalArgumentException.class)
+    public void test_setPosixFilePermissions_nullPath_throwsException() throws Exception {
+        assumeTrue(description.supportsPosixPermissions());
+        fileSystem.setPosixFilePermissions(null, null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void test_setPosixFilePermissions_existingFileNullSet_throwsException() throws Exception {
+        assumeTrue(description.supportsPosixPermissions());
+        generateAndCreateTestDir();
+        Path existingFile = createTestFile(testDir,new byte[] { 1, 2, 3 });
+        fileSystem.setPosixFilePermissions(existingFile,null);
     }
 
     @Test
-    public void test13_getAttributes_closedFileSystem_throwIfSupported() throws Exception {
-    	assumeTrue(!description.isConnectionless());
-        long currentTime = System.currentTimeMillis();
-        prepareTestDir("test13_getAttributes");
-
-        fileSystem.close();
+    public void test_setPosixFilePermissions_existingFileZeroPermissions() throws Exception {
+        assumeTrue(description.supportsPosixPermissions());
+        generateAndCreateTestDir();
+        Path existingFile = createTestFile(testDir,new byte[] { 1, 2, 3 });
+        Set<PosixFilePermission> emptyPermissions = EnumSet.noneOf(PosixFilePermission.class);
         try {
-            test13_getAttributes(testDir, false, -1, currentTime, true);
+            assertPermissionsSetIsGet(existingFile, emptyPermissions);
         } finally {
-            // set up for cleaning again
-            testDir = resolve( "test13_getAttributes");
+            // Set the permissions to write again before we can remove it
+            fileSystem.setPosixFilePermissions(existingFile, getVariousPosixPermissions());
         }
     }
-*/
+
+    private void assertPermissionsSetIsGet(Path path, Set<PosixFilePermission> permissions) throws XenonException{
+        fileSystem.setPosixFilePermissions(path,permissions);
+        Set<PosixFilePermission> got = fileSystem.getAttributes(path).getPermissions();
+        assertEquals(permissions,got);
+    }
+
+    @Test
+    public void test_setPosixFilePermissions_existingFileFewPermissions() throws Exception {
+        assumeTrue(description.supportsPosixPermissions());
+        generateAndCreateTestDir();
+        Path existingFile = createTestFile(testDir,new byte[] { 1, 2, 3 });
+        Set<PosixFilePermission> permissions = EnumSet.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE);
+        try {
+            assertPermissionsSetIsGet(existingFile, permissions);
+        } finally {
+            // Set the permissions to write again before we can remove it
+            fileSystem.setPosixFilePermissions(existingFile, getVariousPosixPermissions());
+        }
+
+    }
+
+    @Test
+    public void test_setPosixFilePermissions_existingFileMorePermissions() throws Exception {
+        assumeTrue(description.supportsPosixPermissions());
+        generateAndCreateTestDir();
+        Path existingFile = createTestFile(testDir,new byte[] { 1, 2, 3 });
+        Set<PosixFilePermission> permissions = getVariousPosixPermissions();
+        try {
+            assertPermissionsSetIsGet(existingFile, permissions);
+        } finally {
+            // Set the permissions to write again before we can remove it
+            fileSystem.setPosixFilePermissions(existingFile, getVariousPosixPermissions());
+        }
+    }
+
+    @Test(expected=NoSuchPathException.class)
+    public void test_setPosixFilePermissions_nonExistingFile_throwsException() throws Exception {
+        assumeTrue(description.supportsPosixPermissions());
+        generateAndCreateTestDir();
+        Path nonExistingFile = createNewTestFileName(testDir);
+        Set<PosixFilePermission> permissions = getVariousPosixPermissions();
+        fileSystem.setPosixFilePermissions(nonExistingFile,permissions);
+    }
+
+    @Test
+    public void test_setPosixFilePermissions_existingDir() throws Exception {
+        assumeTrue(description.supportsPosixPermissions());
+        generateAndCreateTestDir();
+        Set<PosixFilePermission> permissions = getVariousPosixPermissions();
+        assertPermissionsSetIsGet(testDir, permissions);
+    }
+
+
+    private Set<PosixFilePermission> getVariousPosixPermissions() {
+        return EnumSet.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE,
+                PosixFilePermission.OTHERS_READ, PosixFilePermission.GROUP_READ);
+    }
+
+
+    @Test(expected=IllegalArgumentException.class)
+    public void test_readFromFile_null_throwsException() throws Exception {
+        fileSystem.readFromFile(null);
+    }
+
+    @Test(expected=NoSuchPathException.class)
+    public void test_readFromFile_nonExistingFile_throwsException() throws Exception {
+        generateAndCreateTestDir();
+        Path nonExistingFile = createNewTestFileName(testDir);
+        fileSystem.readFromFile(nonExistingFile);
+    }
+
+    /**
+     * Copy all bytes from an input stream to an output stream.
+     *
+     * A temporary buffer of size <code>100</code> is used.
+     * <p>
+     * NOTE: <code>in</code> and <code>out</code> will NOT be explicitly closed once the end of the stream is reached.
+     * </p>
+     *
+     * @param in
+     *            the InputStream to read from.
+     * @param out
+     *            the OutputStream to write to.
+     * @return the number of bytes copied.
+     * @throws IOException
+     *             if an I/O error occurs during the copy operation.
+     */
+    public static long copy(InputStream in, OutputStream out) throws IOException {
+        long bytes = 0;
+
+        byte[] buffer = new byte[100];
+
+        int len = in.read(buffer);
+
+        while (len != -1) {
+            bytes += len;
+            out.write(buffer, 0, len);
+            len = in.read(buffer);
+        }
+
+        return bytes;
+    }
+
+
+    /**
+     * Read all bytes from the input stream and return them in a byte array.
+     * <p>
+     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.
+     * </p>
+     *
+     * @param in
+     *            the input stream to read.
+     * @return a byte array containing all bytes that the input stream produced.
+     * @throws IOException
+     *             if an I/O error was produced while reading the stream.
+     */
+    public static byte[] readAllBytes(InputStream in) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        copy(in, buffer);
+
+        return buffer.toByteArray();
+    }
+
+
+
+    private void assertReadsExpected(Path file, byte[] expected) throws Exception {
+
+        InputStream in = fileSystem.readFromFile(file);
+
+
+        byte[] data = readAllBytes(in);
+        in.close();
+
+        if (expected == null) {
+            if (data.length != 0) {
+                throwWrong("readFromFile", "zero bytes", data.length + " bytes");
+            }
+            return;
+        }
+
+        if (expected.length != data.length) {
+            throwWrong("readFromFile", expected.length + " bytes", data.length + " bytes");
+        }
+
+        if (!Arrays.equals(expected, data)) {
+            throwWrong("readFromFile", Arrays.toString(expected), Arrays.toString(data));
+        }
+    }
+
+
+
+    @Test
+    public void test_readFromFile_existingEmptyFile() throws Exception {
+        generateAndCreateTestDir();
+        Path file1 = createTestFile(testDir, null);
+        assertReadsExpected(file1,null);
+    }
+
+    @Test
+    public void test_readFromFile_existingNonEmptyFile() throws Exception {
+        byte[] data = "Hello World".getBytes();
+        generateAndCreateTestDir();
+        Path file2 = createTestFile(testDir, data);
+
+        assertReadsExpected(file2, data);
+
+    }
+
+    @Test(expected = InvalidPathException.class)
+    public void test_readFromFile_existingDir_throw() throws Exception {
+        generateAndCreateTestDir();
+        fileSystem.readFromFile(testDir);
+    }
+
+    @Test
+    public void test_readFromFile_DoubleClose() throws Exception {
+
+        // See what happens when we close an in input stream twice and then reopen the stream. This failed
+        // on the SSH adaptor due to a bug in the sftp channel cache.
+
+        byte[] data = "Hello World".getBytes();
+        generateAndCreateTestDir();
+        Path file = createTestFile(testDir, data);
+
+        InputStream in = null;
+
+        try {
+            in = fileSystem.readFromFile(file);
+        } catch (Exception e) {
+            // should not fail
+            throwUnexpected("test_readFromFile_DoubleClose", e);
+        }
+
+        try {
+            // should not fail
+            in.close();
+        } catch (Exception e) {
+            throwUnexpected("test_readFromFile_DoubleClose", e);
+        }
+
+        try {
+            in.close();
+        } catch (Exception e) {
+            // should fail
+        }
+
+        try {
+            in = fileSystem.readFromFile(file);
+        } catch (Exception e) {
+            // should not fail
+            throwUnexpected("test_readFromFile_DoubleClose", e);
+        }
+
+        try {
+            in.close();
+        } catch (Exception e) {
+            // should not fail
+            throwUnexpected("test20b_newInputStreamDoubleClose", e);
+        }
+
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_writeToFile_nullPath_throwsException() throws Exception {
+        fileSystem.writeToFile(null,0);
+    }
+
+    @Test(expected = InvalidPathException.class)
+    public void test_writeToFile_existingDir_throwsException() throws Exception {
+        generateAndCreateTestDir();
+        fileSystem.writeToFile(testDir,0);
+    }
+
+
+
+    // No need for more tests for write: we already check that data written = data read when testing read (data is written before
+    // using write)
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_appendToFile_nullPath_throwsException() throws Exception{
+        assumeTrue(description.canAppend());
+        fileSystem.appendToFile(null);
+    }
+
+    @Test(expected = NoSuchPathException.class)
+    public void test_appendToFile_fileDoesNotExist_throwsException() throws Exception{
+        assumeTrue(description.canAppend());
+        generateAndCreateTestDir();
+
+        Path file = createNewTestFileName(testDir);
+        OutputStream out = fileSystem.appendToFile(file);
+    }
+
+    @Test(expected = InvalidPathException.class)
+    public void test_appendToFile_isDirectory_throwsException() throws Exception{
+        assumeTrue(description.canAppend());
+        generateAndCreateTestDir();
+        Path p = createTestSubDir(testDir);
+        OutputStream out = fileSystem.appendToFile(p);
+    }
+
+
+
+    @Test
+    public void test_appendToFile_append_nothing() throws Exception{
+        assumeTrue(description.canAppend());
+        generateAndCreateTestDir();
+        byte[] data = "Hello world!".getBytes();
+        Path file = createTestFile(testDir,data);
+        OutputStream out = fileSystem.appendToFile(file);
+        out.close();
+        assertContents(file,data);
+    }
+
+    @Test
+    public void test_appendToFile_append() throws Exception{
+        assumeTrue(description.canAppend());
+        generateAndCreateTestDir();
+        String a = "Hello world! ";
+        String b = "Pary people!";
+
+        Path file = createTestFile(testDir,a.getBytes());
+        OutputStream out = fileSystem.appendToFile(file);
+        out.write(b.getBytes());
+        out.close();
+        assertContents(file,(a+b).getBytes());
+    }
+
+
+    private void assertContents(Path source, byte[] data)throws Exception {
+        InputStream a = fileSystem.readFromFile(source);
+        byte[] abytes = readAllBytes(a);
+        if (!Arrays.equals(abytes, data)) {
+            throwWrong("copy", Arrays.toString(abytes), Arrays.toString(data));
+        }
+    }
+
+    private void assertSameContents(Path source, Path target) throws Exception {
+
+        InputStream a = fileSystem.readFromFile(source);
+        InputStream b = fileSystem.readFromFile(target);
+
+        byte[] abytes = readAllBytes(a);
+        byte[] bbytes = readAllBytes(b);
+        if (!Arrays.equals(abytes, bbytes)) {
+            throwWrong("copy", Arrays.toString(abytes), Arrays.toString(bbytes));
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_copy_null_throwsException() throws Exception {
+        fileSystem.copy(null,null,null,null,false);
+
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_copy_nullTarget_throwsException() throws Exception {
+        generateAndCreateTestDir();
+        Path file = createNewTestFileName(testDir);
+        fileSystem.copy(file,null,null,null,false);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_copy_nullTargetPath_throwsException() throws Exception {
+        generateAndCreateTestDir();
+        Path file = createNewTestFileName(testDir);
+        fileSystem.copy(file,fileSystem,null,null,false);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_copy_nullMode_throwsException() throws Exception {
+        generateAndCreateTestDir();
+        Path file = createTestFile(testDir,"bla".getBytes());
+        Path file2 = createNewTestFileName(testDir);
+        fileSystem.copy(new Path(file),fileSystem,new Path(file2),null,false);
+    }
+
+
+    @Test(expected = NoSuchPathException.class)
+    public void test_copy_nonExistingSource_throwsException() throws Throwable {
+        generateAndCreateTestDir();
+        Path nonExistingSource = createNewTestFileName(testDir);
+        Path target = createNewTestFileName(testDir);
+
+        String s = fileSystem.copy(nonExistingSource,fileSystem, target, CopyMode.CREATE, true);
+        waitUntilDoneException(s);
+    }
+
+
+
+    @Test(expected = InvalidPathException.class)
+    public void test_copy_directoryAsSource_throwsException() throws Throwable {
+        generateAndCreateTestDir();
+        Path target = createNewTestFileName(testDir);
+        Path dir0 = createTestSubDir(testDir);
+
+        String s = fileSystem.copy(dir0, fileSystem, target, CopyMode.CREATE,false);
+        waitUntilDoneException(s);
+
+
+    }
+
+    @Test
+    public void test_copy_nonExistingTarget_copiedFile() throws Throwable {
+        byte[] data = "Hello World!".getBytes();
+        generateAndCreateTestDir();
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createNewTestFileName(testDir);
+        String s = fileSystem.copy(file0, fileSystem,file1, CopyMode.CREATE, false);
+        waitUntilDoneException(s);
+        assertSameContents(file0,file1);
+    }
+
+    private void waitUntilDoneException(String s) throws Throwable{
+        CopyStatus status = fileSystem.waitUntilDone(s,1000);
+        if(status.hasException()){
+            throw status.getException();
+        }
+
+    }
+
+    @Test (expected = PathAlreadyExistsException.class)
+    public void test_copy_existingTarget_throwsException() throws Throwable {
+        byte[] data = "Hello World!".getBytes();
+        generateAndCreateTestDir();
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createTestFile(testDir,null);
+        String status = fileSystem.copy(file0, fileSystem,file1, CopyMode.CREATE, false);
+        waitUntilDoneException(status);
+    }
+
+    @Test
+    public void test_copy_existingTarget_replace() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        byte[] data2 = "Something else!".getBytes();
+        generateAndCreateTestDir();
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createTestFile(testDir,data2);
+        String copyId = fileSystem.copy(file0, fileSystem,file1, CopyMode.REPLACE, false);
+        fileSystem.waitUntilDone(copyId,1000);
+        assertSameContents(file0,file1);
+    }
+
+    @Test
+    public void test_copy_existingTarget_ignore() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        byte[] data2 = "Something else!".getBytes();
+        generateAndCreateTestDir();
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createTestFile(testDir,data2);
+        String copyId = fileSystem.copy(file0, fileSystem,file1, CopyMode.IGNORE, false);
+        fileSystem.waitUntilDone(copyId,1000);
+        assertContents(file1,data2);
+    }
+
+    @Test
+    public void test_copy() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        generateAndCreateTestDir();
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createNewTestFileName(testDir);
+        String copyId = fileSystem.copy(file0, fileSystem,file1, CopyMode.CREATE, false);
+        fileSystem.waitUntilDone(copyId,1000);
+        assertSameContents(file0,file1);
+    }
+
+    @Test
+    public void test_copy_rec() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        byte[] data2 = "Party people!".getBytes();
+        byte[] data3 = "yes | rm -rf ".getBytes();
+        byte[] data4 = "Use Xenon!".getBytes();
+        generateAndCreateTestDir();
+
+        Path source = createTestSubDir(testDir);
+        Path file0 = createTestFile(source, data);
+        Path testSubDir = createTestSubDir(source);
+
+        Path testSubDir2 = createTestSubDir(source);
+        Path file1 = createTestFile(testSubDir2,data2);
+        Path file2 = createTestFile(testSubDir,data3);
+        Path testSubSub = createTestSubDir(testSubDir);
+        Path file3 = createTestFile(testSubSub,data4);
+        Path target = createTestSubDir(testDir);
+        String copyId = fileSystem.copy(source, fileSystem,target, CopyMode.CREATE, true);
+        fileSystem.waitUntilDone(copyId,10000);
+        assertSameContentsDir(source,target);
+    }
+
+    private void assertSameContentsDir(Path dir1, Path dir2) throws Exception{
+        for(PathAttributes p : fileSystem.list(dir1, true)){
+            Path sub = dir1.relativize(p.getPath());
+            Path other = dir2.resolve(sub);
+            if(!fileSystem.exists(other)){
+                fail("Cannot find equivalent for " + p.getPath().getRelativePath() + " is not " + other.getRelativePath());
+            }
+            if(p.isRegular()){
+                assertSameContents(p.getPath(),other);
+            } else if(p.isDirectory()){
+                assert(fileSystem.getAttributes(other).isDirectory());
+            }
+        }
+
+    }
+
+
+    @Test (expected = NoSuchCopyException.class)
+    public void test_getStatus_noSuchCopy_throwsException() throws Exception {
+        fileSystem.getStatus("it would be a huge coincidence if this string would be linked to a copy status");
+    }
+
+    @Test
+    public void test_getStatus_copyDone() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        generateAndCreateTestDir();
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createNewTestFileName(testDir);
+        String copyId = fileSystem.copy(file0, fileSystem,file1, CopyMode.CREATE, false);
+
+        CopyStatus status = fileSystem.waitUntilDone(copyId,1000);
+        assert( status.isDone());
+
+    }
+
+    @Test
+    public void test_getStatus_bytesCorrect() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        generateAndCreateTestDir();
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createNewTestFileName(testDir);
+        String copyId = fileSystem.copy(file0, fileSystem,file1, CopyMode.CREATE, false);
+        CopyStatus status =  fileSystem.waitUntilDone(copyId,1000);
+        assertEquals(status.bytesCopied(),data.length);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_rename_nullSource_throwsException() throws Exception {
+        assumeTrue(description.supportsRename());
+        fileSystem.rename(null,null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_rename_nullTarget_throwsException() throws Exception {
+        assumeTrue(description.supportsRename());
+        generateAndCreateTestDir();
+        Path file0 = createTestFile(testDir, null);
+        fileSystem.rename(file0,null);
+    }
+
+    @Test (expected = NoSuchPathException.class)
+    public void test_rename_nonExistingSource() throws Exception {
+        assumeTrue(description.supportsRename());
+        generateAndCreateTestDir();
+        Path nonExistingFile = createNewTestFileName(testDir);
+        Path nonExistingFile2 = createNewTestFileName(testDir);
+        fileSystem.rename(nonExistingFile,nonExistingFile2);
+    }
+
+    private void assertRenameCorrect(Path a, Path b, byte[] data) throws Exception{
+        assertFalse(fileSystem.exists(a));
+        assertContents(b,data);
+    }
+
+    @Test
+    public void test_rename_existingSourceNonExistingTarget_success() throws Exception {
+        assumeTrue(description.supportsRename());
+        generateAndCreateTestDir();
+        Path nonExistingFile = createNewTestFileName(testDir);
+        byte[] data = "Hello everybody!".getBytes();
+        Path existingFile = createTestFile(testDir, data );
+        fileSystem.rename(existingFile,nonExistingFile);
+        assertRenameCorrect(existingFile,nonExistingFile,data);
+    }
+
+    @Test (expected =  PathAlreadyExistsException.class)
+    public void test_rename_existingSourceAndTarget_throw() throws Exception {
+        assumeTrue(description.supportsRename());
+        generateAndCreateTestDir();
+        Path existingFile1 = createTestFile(testDir, null);
+        Path existingFile2 = createTestFile(testDir, null);
+        fileSystem.rename(existingFile1,existingFile2);
+    }
+
+    @Test (expected = NoSuchPathException.class)
+    public void test_rename_existingSourceNonExistingTargetParent_throw() throws Exception {
+        generateAndCreateTestDir();
+        Path subDir = createTestSubDirName(testDir);
+        Path source = createTestFile(testDir,null);
+        Path target = createNewTestFileName(subDir);
+        fileSystem.rename(source,target);
+    }
+
+    @Test
+    public void test_rename_sourceEqualsTarget_noThrow() throws Exception {
+        generateAndCreateTestDir();
+        Path existingFile = createTestFile(testDir, "test data".getBytes());
+        fileSystem.rename(existingFile,existingFile);
+    }
+
+    @Test
+    public void test_rename_existingDirectoryNonExistingFile() throws Exception {
+        generateAndCreateTestDir();
+        Path subDir = createTestSubDir(testDir);
+        byte[] adata = "data".getBytes();
+        byte[] bdata = "content".getBytes();
+        Path a = createTestFile(subDir,adata);
+        Path b = createTestFile(subDir,bdata);
+        Path subDir2 = createTestSubDirName(testDir);
+        fileSystem.rename(subDir,subDir2);
+        assertFalse(fileSystem.exists(subDir));
+        assertTrue(fileSystem.exists(subDir2));
+        assertContents(subDir2.resolve(a.getFileName()),adata);
+        assertContents(subDir2.resolve(b.getFileName()),bdata);
+    }
+
+
+    @Test (expected = IllegalArgumentException.class)
+    public void test_readSymbolicLink_null_throwsException() throws Exception {
+        assumeTrue(description.canReadSymboliclinks());
+        fileSystem.readSymbolicLink(null);
+    }
+
+    @Test (expected = InvalidPathException.class)
+    public void test_readSymbolicLink_noLink_throwsException() throws Exception {
+        assumeTrue(description.canReadSymboliclinks());
+        generateAndCreateTestDir();
+        Path p = createTestFile(testDir,"not a link".getBytes());
+        fileSystem.readSymbolicLink(p);
+    }
+
+    @Test (expected = InvalidPathException.class)
+    public void test_readSymbolicLink_noLinkDir_throwsException() throws Exception {
+        assumeTrue(description.canReadSymboliclinks());
+        generateAndCreateTestDir();
+        fileSystem.readSymbolicLink(testDir);
+    }
+
+    @Test
+    public void test29_readSymbolicLink() throws Exception {
+        assumeTrue(description.canReadSymboliclinks());
+        Map.Entry<Path,Path> map = locationConfig.getSymbolicLinksToExistingFile();
+        Path res = fileSystem.readSymbolicLink(map.getKey());
+        assertEquals(res, map.getValue());
+    }
+
+
+    @Test
+    public void test_multipleFileSystemsOpenSimultaneously() throws Exception {
+        FileSystem fs1 = setupFileSystem();
+        assert (fileSystem.isOpen());
+        assert (fs1.isOpen());
+
+        // Close them both. We should get no exceptions.
+        fileSystem.close();
+    }
+
+    // TODO: Symbolic links in a cycle tests
+    // TODO: Test asynchronous exceptions
+
+
+
+
 }

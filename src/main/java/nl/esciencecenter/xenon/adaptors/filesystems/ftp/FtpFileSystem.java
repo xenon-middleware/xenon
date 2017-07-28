@@ -349,6 +349,8 @@ public class FtpFileSystem extends FileSystem {
 	@Override
 	public OutputStream writeToFile(Path path, long size) throws XenonException {
 		LOGGER.debug("writeToFile path = {} size = {}", path, size);
+		assertParentDirectoryExists(path);
+		assertPathIsNotDirectory(path);
 		
 		// Since FTP connections can only do a single thing a time, we need a new FTPClient to handle the stream.
 		FTPClient newClient = adaptor.connect(getLocation(), credential);
@@ -493,5 +495,10 @@ public class FtpFileSystem extends FileSystem {
     public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
         LOGGER.debug("setPosixFilePermissions path = {} permissions = {}", path, permissions);
         LOGGER.debug("setPosixFilePermissions OK");
+        assertNotNull(path);
+        if(permissions == null) {
+			throw new IllegalArgumentException("Permissions is null");
+		}
+		throw new Error("Implement me!");
     }
 }

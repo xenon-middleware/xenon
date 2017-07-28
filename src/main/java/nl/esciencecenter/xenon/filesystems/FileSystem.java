@@ -888,7 +888,7 @@ public abstract class FileSystem {
 				case CREATE:
 					throw new PathAlreadyExistsException(getAdaptorName(), "Destination path already exists: " + destination);
 				case IGNORE:
-					return;
+					return ;
 				case REPLACE:
 					// continue
 					break;
@@ -960,6 +960,8 @@ public abstract class FileSystem {
 		} catch (Exception e) {
 			throw new XenonException(getAdaptorName(), "Stream copy failed", e);
 		}
+
+
 	}
 
 	/**
@@ -980,9 +982,11 @@ public abstract class FileSystem {
 	 * @throws XenonException
 	 * 		if an error occurred.
 	 */
-	protected void performCopy(Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive, CopyCallback callback) throws XenonException {
+	protected void copyJob(Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive, CopyCallback callback) throws XenonException {
 
-		long bytesToCopy = 0;
+		if(!exists(source)){
+			throw new NoSuchPathException(getAdaptorName(),"No such file " + source.getRelativePath());
+		}
 
 		PathAttributes attributes = getAttributes(source);
 
@@ -1008,6 +1012,12 @@ public abstract class FileSystem {
 			destinationFS.createDirectory(destination);
 		}
 
+		copyRecursive(source, destinationFS, destination, mode, callback);
+
+	}
+
+	private void copyRecursive(Path source, FileSystem destinationFS, Path destination, CopyMode mode, CopyCallback callback) throws XenonException {
+		long bytesToCopy = 0;
 		Iterable<PathAttributes> listing = list(source, true);
 
 		for (PathAttributes p : listing) {
@@ -1039,8 +1049,13 @@ public abstract class FileSystem {
 
 				Path rel = source.relativize(p.getPath());
 				Path dst = destination.resolve(rel);
-
-				copyFile(p.getPath(), destinationFS, dst, mode, callback);;
+				try {
+					copyFile(p.getPath(), destinationFS, dst, mode, callback);
+				} catch(XenonException e){
+					throw e;
+				}catch (Exception e){
+					throw new XenonException(getAdaptorName(), "An error occured asynchronously : " + e.getMessage());
+				}
 				//bytesCopied += p.getSize();
 				//callback.setBytesCopied(bytesCopied);
 			}
@@ -1173,9 +1188,16 @@ public abstract class FileSystem {
 			throw new IllegalArgumentException("Destination path is null");
 		}
 
+		if(mode == null){
+			throw new IllegalArgumentException("Copy mode is null!");
+		}
+
 		String ID = getNextCopyID();
 
 		final CopyCallback callback = new CopyCallback();
+
+
+
 
 		Future<Void> future = pool.submit(new Callable<Void>() {
 			@Override
@@ -1184,8 +1206,7 @@ public abstract class FileSystem {
 				if (Thread.currentThread().isInterrupted()) {
 					throw new XenonException(getAdaptorName(), "Copy cancelled by user");
 				}
-
-				performCopy(source, destinationFS, destination, mode, recursive, callback);
+				copyJob(source, destinationFS, destination, mode, recursive, callback);
 				return null;
 			}
 		}) ;
@@ -1212,7 +1233,6 @@ public abstract class FileSystem {
 		if (copyIdentifier == null) {
 			throw new IllegalArgumentException("Copy identifier may not be null");
 		}
-
 		PendingCopy copy = pendingCopies.remove(copyIdentifier);
 
 		if (copy == null) {
@@ -1371,6 +1391,17 @@ public abstract class FileSystem {
 		}
 	}
 
+	protected void assertPathIsNotDirectory(Path path) throws XenonException{
+		assertNotNull(path);
+		if(exists(path)){
+
+			PathAttributes a = getAttributes(path);
+			if(a.isDirectory()){
+				throw new InvalidPathException(getAdaptorName(),"Was expecting a regular file, but got a directory: " + path.getRelativePath());
+			}
+		}
+	}
+
 	protected void assertPathIsFile(Path path) throws XenonException {
 
 		assertNotNull(path);
@@ -1416,6 +1447,14 @@ public abstract class FileSystem {
 		}
 
 		assertDirectoryExists(parent);
+	}
+
+	protected void assertFileIsSymbolicLink(Path link) throws XenonException{
+		assertNotNull(link);
+		assertPathExists(link);
+		if(!getAttributes(link).isSymbolicLink()){
+			throw new InvalidPathException(getAdaptorName(), "Not a symbolic link: " + link);
+		}
 	}
 
 	protected boolean areSamePaths(Path source, Path target) {
