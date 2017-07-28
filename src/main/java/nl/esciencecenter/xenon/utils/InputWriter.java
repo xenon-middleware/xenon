@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.schedulers;
+package nl.esciencecenter.xenon.utils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -44,9 +44,13 @@ public final class InputWriter extends Thread {
      * @param destination the destination to write to.
      */
     public InputWriter(String content, OutputStream destination) {
-        this.destination = destination;
 
-        this.content = content;
+    	if (destination == null) { 
+    		throw new IllegalArgumentException("Destination may not be null");
+    	}
+
+    	this.content = content;
+    	this.destination = destination;
 
         setDaemon(true);
         setName("Input Writer");

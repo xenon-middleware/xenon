@@ -24,9 +24,6 @@ import nl.esciencecenter.xenon.schedulers.Streams;
  * Streams is a container for the standard input, output and error streams of a job.
  * 
  * Note that these standard streams are only available for interactive jobs. 
- * 
- * @version 1.0
- * @since 1.0
  */
 public class StreamsImplementation implements Streams {
 

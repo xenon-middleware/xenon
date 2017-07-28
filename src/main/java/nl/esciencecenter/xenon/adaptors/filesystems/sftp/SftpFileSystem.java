@@ -72,7 +72,8 @@ public class SftpFileSystem extends FileSystem {
 		}
 
 		//info.getSession().disconnect();
-
+		
+		super.close();
 		LOGGER.debug("close OK");        
 	}
 	

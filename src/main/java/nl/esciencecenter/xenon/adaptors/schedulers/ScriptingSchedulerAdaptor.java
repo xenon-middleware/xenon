@@ -15,33 +15,14 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
-public abstract class SchedulerLocationConfig {
+import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
+import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 
-	public abstract String getLocation();
+public abstract class ScriptingSchedulerAdaptor extends SchedulerAdaptor {
 
-	public abstract String [] getQueueNames();
-	
-	public abstract String getDefaultQueueName();
-
-	public long getMaxWaitUntilRunning() { 
-		return 10*1000;
-	}
-
-	public long getMaxWaintUntilDone() { 
-		return 60*1000;
-	}
-	
-	public boolean supportsBatch() {
-		return true;
-	}
-	
-	public boolean supportsInteractive() {
-		return false;
-	}
-	
-	public boolean isEmbedded() {
-		return false;
-	}
-	
-    //public abstract Map.Entry<Path,Path> getSymbolicLinksToExistingFile();
+	protected ScriptingSchedulerAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) {  
+		super(name, description, locations, 
+				ScriptingUtils.mergeValidProperties(properties, SshSchedulerAdaptor.VALID_PROPERTIES, LocalSchedulerAdaptor.VALID_PROPERTIES));
+	}	
 }

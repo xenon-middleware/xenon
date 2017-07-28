@@ -33,6 +33,7 @@ import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
+import nl.esciencecenter.xenon.schedulers.QueueStatus;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.Streams;
 
@@ -88,6 +89,30 @@ public abstract class ScriptingScheduler extends Scheduler {
         return subFileSystem.getEntryPath();
     }
 
+	protected QueueStatus[] getQueueStatusses(Map<String, Map<String, String>> all, String... queueNames) { 
+		
+		QueueStatus[] result = new QueueStatus[queueNames.length];
+
+		for (int i = 0; i < queueNames.length; i++) {
+			if (queueNames[i] == null) {
+				result[i] = null;
+			} else {
+				//state for only the requested queuee
+				Map<String, String> map = all.get(queueNames[i]);
+
+                if (map == null) {
+					Exception exception = new NoSuchQueueException(getAdaptorName(),
+							"Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
+					result[i] = new QueueStatusImplementation(this, queueNames[i], exception, null);
+				} else {
+					result[i] = new QueueStatusImplementation(this, queueNames[i], null, map);
+				}
+			}
+		}
+
+        return result;
+	}
+	
     /**
      * Run a command on the remote scheduler machine.
      * 
@@ -103,7 +128,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      *          if an error occurs
      */
     public RemoteCommandRunner runCommand(String stdin, String executable, String... arguments) throws XenonException {
-        return new RemoteCommandRunner(subScheduler, getAdaptorName(), stdin, executable, arguments);
+        return new RemoteCommandRunner(subScheduler, stdin, executable, arguments);
     }
 
     // Subclasses can override this method to produce more specified exceptions
@@ -129,7 +154,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      *          if an error occurred
      */
     public String runCheckedCommand(String stdin, String executable, String... arguments) throws XenonException {
-        RemoteCommandRunner runner = new RemoteCommandRunner(subScheduler, getAdaptorName(), stdin, executable,
+        RemoteCommandRunner runner = new RemoteCommandRunner(subScheduler, stdin, executable,
                 arguments);
 
         if (!runner.success()) {

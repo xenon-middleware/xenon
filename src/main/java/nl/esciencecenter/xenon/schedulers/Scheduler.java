@@ -446,8 +446,10 @@ public abstract class Scheduler {
     			} else {
     				result[i] = null;
     			}
+    		} catch (NoSuchJobException e) { 
+    			result[i] = new JobStatusImplementation(jobIdentifiers[i], "UNKNOWN", null, e, false, false, null);
     		} catch (XenonException e) {
-    			result[i] = new JobStatusImplementation(jobIdentifiers[i], null, null, e, false, true, null);
+    			result[i] = new JobStatusImplementation(jobIdentifiers[i], "ERROR", null, e, false, false, null);
     		}
     	}
 

@@ -459,24 +459,26 @@ public class SlurmScheduler extends ScriptingScheduler {
 
         Map<String, Map<String, String>> info = getSinfoInfo(targetQueueNames);
 
-        QueueStatus[] result = new QueueStatus[targetQueueNames.length];
-
-        for (int i = 0; i < targetQueueNames.length; i++) {
-            if (targetQueueNames[i] == null) {
-                result[i] = null;
-            } else {
-                result[i] = getQueueStatusFromSInfo(info, targetQueueNames[i], this);
-
-                if (result[i] == null) {
-                    Exception exception = new NoSuchQueueException(ADAPTOR_NAME, "Cannot get status of queue \""
-                            + targetQueueNames[i] + "\" from server");
-                    result[i] = new QueueStatusImplementation(this, targetQueueNames[i], exception, null);
-                }
-            }
-        }
-        return result;
-
-    }
+        return getQueueStatusses(info, targetQueueNames);
+    }        
+        
+//        QueueStatus[] result = new QueueStatus[targetQueueNames.length];
+//
+//        for (int i = 0; i < targetQueueNames.length; i++) {
+//            if (targetQueueNames[i] == null) {
+//                result[i] = null;
+//            } else {
+//                result[i] = getQueueStatusFromSInfo(info, targetQueueNames[i], this);
+//
+//                if (result[i] == null) {
+//                    Exception exception = new NoSuchQueueException(ADAPTOR_NAME, "Cannot get status of queue \""
+//                            + targetQueueNames[i] + "\" from server");
+//                    result[i] = new QueueStatusImplementation(this, targetQueueNames[i], exception, null);
+//                }
+//            }
+//        }
+//        return result;
+//    }
 
 //    @Override
 //    public Streams getStreams(JobHandle job) throws XenonException {

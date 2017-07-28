@@ -25,7 +25,6 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 import nl.esciencecenter.xenon.XenonException;
 
 import org.junit.FixMethodOrder;
@@ -37,15 +36,6 @@ import org.junit.runners.MethodSorters;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ScriptingParserTest {
-
-    @Test
-    public void test00_constructorIsPrivate() throws Throwable {
-        Constructor<ScriptingParser> constructor = ScriptingParser.class.getDeclaredConstructor();
-        assertTrue(Modifier.isPrivate(constructor.getModifiers()));
-        constructor.setAccessible(true);
-        constructor.newInstance();
-        constructor.setAccessible(false);
-    }
 
     @Test
     public void test01a_parseKeyValuePairs_CorrectInput_ResultMap() throws Exception {
@@ -736,7 +726,11 @@ public class ScriptingParserTest {
         ScriptingParser.parseKeyValueRecords(input, "key0", ScriptingParser.EQUALS_REGEX, "fake");
     }
 
-
+    @Test
+    public void test_parseList_emptystring_emptylist() {
+        String[] out = ScriptingParser.parseList("");
+        assertArrayEquals(new String[0], out);
+    }
     
     
     

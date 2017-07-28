@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.InvalidPropertyException;
@@ -35,11 +35,30 @@ public class ScriptingUtils {
 		return (location == null || location.length() == 0 || location.equals("/"));
 	}
 
-	public static XenonPropertyDescription [] mergeValidProperties(XenonPropertyDescription[] a, XenonPropertyDescription[] b) { 
-		XenonPropertyDescription [] result = Arrays.copyOf(a, a.length + b.length);
-		System.arraycopy(b, 0, result, a.length, b.length);
-		return result;
+	public static XenonPropertyDescription [] mergeValidProperties(XenonPropertyDescription[] ... prop) {
+		
+		if (prop == null || prop.length == 0) { 
+			return new XenonPropertyDescription[0];
+		}
+		
+		ArrayList<XenonPropertyDescription> tmp = new ArrayList<>();
+		
+		for (XenonPropertyDescription [] pa : prop) {
+			if (pa != null) { 
+				for (XenonPropertyDescription p : pa) {
+					tmp.add(p);
+				}
+			}
+		}
+		
+		return tmp.toArray(new XenonPropertyDescription[tmp.size()]);
 	}
+	
+//	public static XenonPropertyDescription [] mergeValidProperties(XenonPropertyDescription[] a, XenonPropertyDescription[] b) { 
+//		XenonPropertyDescription [] result = Arrays.copyOf(a, a.length + b.length);
+//		System.arraycopy(b, 0, result, a.length, b.length);
+//		return result;
+//	}
 
 	public static XenonProperties getProperties(XenonPropertyDescription[] validProperties, String location, Map<String,String> properties) throws UnknownPropertyException, InvalidPropertyException { 
 		if (isLocal(location)) {

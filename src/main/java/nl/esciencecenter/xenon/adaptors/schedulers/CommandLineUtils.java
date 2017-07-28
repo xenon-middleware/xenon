@@ -22,10 +22,6 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
  * 
  */
 public final class CommandLineUtils {
-
-    private CommandLineUtils() { 
-        // DO NOT USE
-    }
     
     /**
      * Concatinate a series of <code>String</code>s using a <code>StringBuilder</code>.

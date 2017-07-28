@@ -71,7 +71,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
     public Streams getStreams() {
         return streams;
     }
-
+    
     public boolean isDone() {
         if (done) {
             return true;

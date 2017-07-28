@@ -176,8 +176,6 @@ public class WebdavFileSystem extends FileSystem {
 
 		String folderPath = toFolderPath(path);
 		
-		System.out.println("listDir " + path);
-		
 		PropFindMethod method = null;
 		try {
 			method = new PropFindMethod(folderPath, DavConstants.PROPFIND_ALL_PROP, DavConstants.DEPTH_1);
@@ -202,16 +200,11 @@ public class WebdavFileSystem extends FileSystem {
 
 	private void executeMethod(HttpClient client, HttpMethod method) throws IOException {
 		
-		System.out.println("Client: " + client + " " + method);
-		
 		int response = client.executeMethod(method);
-		
 		
 		String responseBodyAsString = method.getStatusLine().toString();
 		method.releaseConnection();
-		
-		System.out.println("Got response: " + responseBodyAsString);
-		
+			
 		if (!isOkish(response)) {
 			throw new IOException(responseBodyAsString);
 		}
@@ -270,11 +263,6 @@ public class WebdavFileSystem extends FileSystem {
 			properties = multiStatusResponse.getProperties(OK_CODE);
 		}
 		return properties;
-	}
-
-	@Override
-	public void close() throws XenonException {
-		// ignored
 	}
 
 	@Override

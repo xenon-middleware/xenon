@@ -25,8 +25,9 @@ task adaptorDocumentation(type: JavaExec) {
     main = 'nl.esciencecenter.xenon.utils.AdaptorDocGenerator'
     File output = file("${buildDir}/overview.html")
     args = [output]
-    classpath = sourceSets.main.runtimeClasspath
+    classpath = sourceSets.docGenerator.runtimeClasspath
     outputs.file output
 }
+
 javadoc.dependsOn adaptorDocumentation
 javadocDevel.dependsOn adaptorDocumentation

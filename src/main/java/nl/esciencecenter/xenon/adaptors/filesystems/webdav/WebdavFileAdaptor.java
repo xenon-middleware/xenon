@@ -117,9 +117,6 @@ public class WebdavFileAdaptor extends FileAdaptor {
     	
     	String hostPort = uri.getScheme() + "://" + host + ":" + port;
     	
-    	System.out.println("HOSTPORT=" + hostPort);
-    	System.out.println("ENTRYPATH=" + uri.getPath());
-    	
     	HttpClient client = getClient(host, port, (PasswordCredential) credential);
         HttpMethod method;
         try {

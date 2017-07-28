@@ -36,7 +36,6 @@ public interface SchedulerAdaptorDescription extends AdaptorDescription {
      */
 	boolean isEmbedded();
     
-    
     /**
      * Does this Scheduler support the submission of batch jobs ?
      * 

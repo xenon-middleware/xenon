@@ -20,12 +20,19 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
+
+import java.io.OutputStream;
+import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
@@ -34,8 +41,12 @@ import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
 import nl.esciencecenter.xenon.schedulers.QueueStatus;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
+import nl.esciencecenter.xenon.schedulers.Streams;
+import nl.esciencecenter.xenon.utils.OutputReader;
 
 public abstract class SchedulerTestParent {
+	
+	public static final Logger LOGGER = LoggerFactory.getLogger(SchedulerTestParent.class);
 
 	private Scheduler scheduler;
 	private SchedulerAdaptorDescription description;
@@ -134,12 +145,107 @@ public abstract class SchedulerTestParent {
     	
     	return true;
     }
+
+    private JobStatus waitUntilRunning(String jobID) throws XenonException {
+    	return waitUntilRunning(jobID, locationConfig.getMaxWaitUntilRunning());
+    }
+    
+    private JobStatus waitUntilRunning(String jobID, long maxTime) throws XenonException { 
+    	
+    	JobStatus status = scheduler.getJobStatus(jobID);
+    	
+    	long deadline = System.currentTimeMillis() + maxTime;
+    	
+    	while (!status.isRunning() && !status.isDone() && System.currentTimeMillis() < deadline) {
+    		System.out.println("Current jobs: " + Arrays.toString(scheduler.getJobs()));
+    		status = scheduler.waitUntilRunning(jobID, 1000);
+    	}
+    	
+    	return status;
+    }
+
+    private JobStatus waitUntilDone(String jobID) throws XenonException {
+    	return waitUntilDone(jobID, locationConfig.getMaxWaintUntilDone());
+    }
+    
+    private JobStatus waitUntilDone(String jobID, long maxTime) throws XenonException { 
+    	
+    	JobStatus status = scheduler.getJobStatus(jobID);
+    	
+    	long deadline = System.currentTimeMillis() + maxTime;
+    	
+    	while (!status.isDone() && System.currentTimeMillis() < deadline) {
+    		System.out.println("Current jobs: " + Arrays.toString(scheduler.getJobs()));
+    		status = scheduler.waitUntilDone(jobID, 1000);
+    	}
+    	
+    	return status;
+    }
+
+    private void cleanupJobs(String... jobIDs) throws XenonException {
+
+    	if (jobIDs == null || jobIDs.length == 0) { 
+    		return;
+    	}
+    	
+    	JobStatus [] stats = new JobStatus[jobIDs.length];
+    	
+    	for (int i=0;i<jobIDs.length;i++) { 
+    		if (jobIDs[i] != null) { 
+    			stats[i] = scheduler.cancelJob(jobIDs[i]);
+    		}
+    	}
+    	
+    	for (int i=0;i<jobIDs.length;i++) {
+    		if (stats[i] != null) { 
+    			if (!stats[i].isDone()) { 
+    				stats[i] = waitUntilDone(jobIDs[i]);
+    			}
+    		}  		    		
+    	}
+    	
+    	for (int i=0;i<jobIDs.length;i++) {
+    		if (stats[i] != null && !stats[i].isDone()) { 
+    			throw new XenonException("TEST", "Job " + jobIDs[i] + " not done yet!");
+    		}
+    	}
+    }
+    
+    private void cleanupJob(String jobID) throws XenonException { 
+        
+    	JobStatus status = null;
+    	
+    	// Clean up the mess..
+    	//try { 
+    		status = scheduler.cancelJob(jobID);
+//    	} catch (Exception e) {
+//    		LOGGER.warn("Failed to cancel job: " + jobID, e);
+//    		System.out.println("Failed to cancel job: " + jobID + " " + e);
+//    		e.printStackTrace();
+//    		return;
+//    	}
+
+    	if (!status.isDone()) { 
+    		
+//    	try { 
+    		status = waitUntilDone(jobID);
+//    	} catch (Exception e) {
+//    		LOGGER.warn("Failed to wait for job: " + jobID, e);
+//    		System.out.println("Failed to wait for job: " + jobID + " " + e);
+//    		e.printStackTrace();
+//    		return;
+    	}
+    	
+    	if (!status.isDone()) { 
+    		throw new XenonException("TEST", "Job " + jobID + " not done yet!");
+    	}
+    }
+
     
     @Test
     public void test_getQueueNames() throws XenonException {
     	assertTrue(unorderedEquals(locationConfig.getQueueNames(), scheduler.getQueueNames()));
     }
-  
     
     @Test
     public void test_getDefaultQueueNames() throws XenonException {
@@ -161,27 +267,33 @@ public abstract class SchedulerTestParent {
     
     @Test
     public void test_sleep() throws XenonException {
+    	
+    	assumeTrue(description.supportsBatch());
     	String jobID = scheduler.submitBatchJob(getSleepJob(null, 1));
-    	JobStatus status = scheduler.waitUntilDone(jobID, 60*1000);
+    	
+    	JobStatus status = waitUntilDone(jobID);
+    	
     	assertTrue("Job is not done yet", status.isDone());
     }
     
     @Test
     public void test_cancel() throws XenonException {
-    	
-    	String jobID = scheduler.submitBatchJob(getSleepJob(null, 120));
+    
+    	assumeTrue(description.supportsBatch());
+        
+    	String jobID = scheduler.submitBatchJob(getSleepJob(null, 240));
 
-    	// Wait up to 5 seconds until the job is running
-    	JobStatus status = scheduler.waitUntilRunning(jobID, 60*1000);
+    	// Wait until the job is running.
+    	JobStatus status = waitUntilRunning(jobID);
     	
-     	assertTrue("Job is not running yet", status.isRunning());
-     	assertFalse("Job is already done", status.isDone());
-         	
+    	assertFalse("Job is already done", status.isDone());
+        assertTrue("Job is not running yet", status.isRunning());
+     	 	
      	status = scheduler.cancelJob(jobID);
 
      	if (!status.isDone()) {
-     		// Wait up to 60 seconds until the job is completely done
-     		status = scheduler.waitUntilDone(jobID, 60*1000);
+     		// Wait up until the job is completely done
+     		status = waitUntilDone(jobID);
      	}
      	
     	assertTrue(status.isDone());
@@ -190,6 +302,8 @@ public abstract class SchedulerTestParent {
     @Test
     public void test_getJobsQueueNameEmpty() throws XenonException {
     
+    	assumeTrue(description.supportsBatch());
+        
     	// Get the available queues
     	String [] queueNames = locationConfig.getQueueNames();
     	
@@ -205,18 +319,15 @@ public abstract class SchedulerTestParent {
      	// Our job should be part of this
      	assertTrue(contains(jobs, jobID));
      
-     	// Clean up the mess...
-     	JobStatus status = scheduler.cancelJob(jobID);
-
-     	if (!status.isDone()) {
-     		// Wait up to 60 seconds until the job is completely done
-     		status = scheduler.waitUntilDone(jobID, 60*1000);
-     	}
+     	// Clean up the mess.
+     	cleanupJob(jobID);
     }
     
     @Test
     public void test_getJobsQueueNameNull() throws XenonException {
-    
+    	
+    	assumeTrue(description.supportsBatch());
+        
     	// Get the available queues
     	String [] queueNames = locationConfig.getQueueNames();
     	
@@ -233,18 +344,14 @@ public abstract class SchedulerTestParent {
      	assertTrue(contains(jobs, jobID));
      
      	// Clean up the mess...
-     	JobStatus status = scheduler.cancelJob(jobID);
-
-     	if (!status.isDone()) {
-     		// Wait up to 60 seconds until the job is completely done
-     		status = scheduler.waitUntilDone(jobID, 60*1000);
-     	}
+       	cleanupJob(jobID);
     }
-
-    
+       
     @Test
     public void test_getJobsQueueNameCorrect() throws XenonException {
     
+    	assumeTrue(description.supportsBatch());
+        
     	// Get the available queues
     	String [] queueNames = locationConfig.getQueueNames();
     	
@@ -261,17 +368,14 @@ public abstract class SchedulerTestParent {
      	assertTrue(contains(jobs, jobID));
      
      	// Clean up the mess...
-     	JobStatus status = scheduler.cancelJob(jobID);
-
-     	if (!status.isDone()) {
-     		// Wait up to 60 seconds until the job is completely done
-     		status = scheduler.waitUntilDone(jobID, 60*1000);
-     	}
+       	cleanupJob(jobID);
     }
 
     @Test
     public void test_getJobsQueueNameOtherQueue() throws XenonException {
     
+    	assumeTrue(description.supportsBatch());
+        
     	// Get the available queues
     	String [] queueNames = locationConfig.getQueueNames();
     	
@@ -288,15 +392,14 @@ public abstract class SchedulerTestParent {
      	assertFalse(contains(jobs, jobID));
      
      	// Clean up the mess...
-     	JobStatus status = scheduler.cancelJob(jobID);
-
-     	if (!status.isDone()) {
-     		// Wait up to 60 seconds until the job is completely done
-     		status = scheduler.waitUntilDone(jobID, 60*1000);
-     	}
+       	cleanupJob(jobID);
     }    
- 
 
+    @Test(expected=NoSuchQueueException.class) 
+    public void test_getJobsQueueNameInCorrect() throws XenonException {
+        scheduler.getJobs("foobar");
+    }
+    
     @Test(expected=NoSuchJobException.class)
     public void test_getJobStatus_unknownJob() throws XenonException {
     	scheduler.getJobStatus("aap");
@@ -310,6 +413,8 @@ public abstract class SchedulerTestParent {
     @Test
     public void test_getJobStatus_knownJob() throws XenonException {
 
+    	assumeTrue(description.supportsBatch());
+        
     	// Get the available queues
     	String [] queueNames = locationConfig.getQueueNames();
     	
@@ -317,7 +422,7 @@ public abstract class SchedulerTestParent {
     	assumeTrue(queueNames.length >= 1);
 
     	// Submit job to one queue 
-     	String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 5));
+     	String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 1));
     	
      	JobStatus status = scheduler.getJobStatus(jobID);
         
@@ -326,12 +431,7 @@ public abstract class SchedulerTestParent {
      	assertFalse(status.isDone());
      	
      	// Clean up the mess...
-     	status = scheduler.cancelJob(jobID);
-
-     	if (!status.isDone()) {
-     		// Wait up to 60 seconds until the job is completely done
-     		status = scheduler.waitUntilDone(jobID, 60*1000);
-     	}
+       	cleanupJob(jobID);
     }
     
     @Test
@@ -381,7 +481,9 @@ public abstract class SchedulerTestParent {
     
     @Test
     public void test_getJobStatusses_existingJobs() throws XenonException {
-    
+    	
+    	assumeTrue(description.supportsBatch());
+        
     	// Get the available queues
     	String [] queueNames = locationConfig.getQueueNames();
     	
@@ -407,28 +509,7 @@ public abstract class SchedulerTestParent {
     	assertFalse(result[1].isDone());
         
      	// Clean up the mess...
-     	JobStatus status1 = scheduler.cancelJob(jobID1);
-     	JobStatus status2 = scheduler.cancelJob(jobID2);
-
-     	try { 
-     		if (!status1.isDone()) {
-     			// Wait up to 60 seconds until the job is completely done
-     			status1 = scheduler.waitUntilDone(jobID1, 60*1000);
-     		}
-     	} catch (Exception e) {
-			System.err.println("WARN: Failed to wait for job: " + e);
-			e.printStackTrace(System.err);
-		}
-    
-     	try { 
-     		if (!status2.isDone()) {
-     			// Wait up to 60 seconds until the job is completely done
-     			status2 = scheduler.waitUntilDone(jobID2, 60*1000);
-     		}
-     	} catch (Exception e) {
-			System.err.println("WARN: Failed to wait for job: " + e);
-			e.printStackTrace(System.err);
-		}
+       	cleanupJobs(jobID1,jobID2);
     }
    
     @Test(expected=IllegalArgumentException.class)
@@ -532,9 +613,44 @@ public abstract class SchedulerTestParent {
     	}
     }
     
+    @Test(expected=UnsupportedOperationException.class)
+    public void test_interactiveJob_notSupported_throwsException() throws XenonException {
+    
+    	assumeFalse(description.supportsInteractive());
+    	
+    	JobDescription job = new JobDescription();
+    	job.setExecutable("/bin/cat");
+    	
+    	scheduler.submitInteractiveJob(job);
+    }
     
     
+    @Test
+    public void test_interactiveJob() throws Exception {
     
+    	assumeTrue(description.supportsInteractive());
+    	
+    	JobDescription job = new JobDescription();
+    	job.setExecutable("/bin/cat");
+    	
+    	Streams streams = scheduler.submitInteractiveJob(job);
+    	
+    	OutputReader out = new OutputReader(streams.getStdout());
+    	OutputReader err = new OutputReader(streams.getStderr());
+    	
+    	OutputStream stdin = streams.getStdin();
+    	
+    	stdin.write("Hello World\n".getBytes());
+    	stdin.write("Goodbye World\n".getBytes());
+    	stdin.close();
+    	
+    	out.waitUntilFinished();
+    	err.waitUntilFinished();
+    	
+    	assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
+    	
+       	cleanupJob(streams.getJobIdentifier());
+    }
     
     /*
     @Test(expected=XenonException.class)

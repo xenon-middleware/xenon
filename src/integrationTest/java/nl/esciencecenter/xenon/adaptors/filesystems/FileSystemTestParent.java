@@ -17,34 +17,29 @@ package nl.esciencecenter.xenon.adaptors.filesystems;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.OutputStream;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
-import nl.esciencecenter.xenon.filesystems.FileSystemClosedException;
 import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
+import nl.esciencecenter.xenon.utils.OutputReader;
 
 public abstract class FileSystemTestParent {
 	
@@ -75,15 +70,15 @@ public abstract class FileSystemTestParent {
         
         Path root = locationConfig.getWritableTestDir();
         
-        System.out.println("ROOT=" + root);
+        //System.out.println("ROOT=" + root);
         
         assertNotNull(root);
         
         testRoot = root.resolve(TEST_DIR);
         
-        System.out.println("TEST_ROOT=" + testRoot);
+        //System.out.println("TEST_ROOT=" + testRoot);
         
-        fileSystem.createDirectories(testRoot);
+        fileSystem.createDirectory(testRoot);
         
         testDir = null;
     }
@@ -93,6 +88,10 @@ public abstract class FileSystemTestParent {
     @After
     public void cleanup() throws XenonException {
         try {
+        	if (!fileSystem.isOpen()) { 
+        		return;
+        	}
+        	
             if (testRoot != null && fileSystem.exists(testRoot)) {
                 fileSystem.delete(testRoot, true);
             }
@@ -260,13 +259,23 @@ public abstract class FileSystemTestParent {
     
     // Tests to create directories
     
+    @Test
+    public void test_exists_ok() throws Exception {
+    	assertTrue(fileSystem.exists(locationConfig.getExistingPath()));
+    }
+  
+    @Test
+    public void test_exists_notExistsDir() throws Exception {
+    	assertFalse(fileSystem.exists(new Path("/foobar")));
+    }
+      
     @Test(expected=IllegalArgumentException.class)
-    public void createDirectory_null_throw() throws Exception {
+    public void test_createDirectory_null_throw() throws Exception {
     	fileSystem.createDirectory(null);
     }
     
     @Test
-    public void createDirectory_nonExisting_noThrow() throws Exception {
+    public void test_createDirectory_nonExisting_noThrow() throws Exception {
     	generateAndCreateTestDir();
     	assertTrue(fileSystem.exists(testDir));
     	
@@ -279,7 +288,7 @@ public abstract class FileSystemTestParent {
     }
 
     @Test(expected=PathAlreadyExistsException.class)
-    public void createDirectory_existingFile_throw() throws Exception {
+    public void test_createDirectory_existingFile_throw() throws Exception {
     	generateAndCreateTestDir();
 
     	String file = generateTestFileName();
@@ -292,7 +301,7 @@ public abstract class FileSystemTestParent {
     }
 
     @Test(expected=NoSuchPathException.class)
-    public void createDirectory_nonExistingParent_throw() throws Exception {
+    public void test_createDirectory_nonExistingParent_throw() throws Exception {
     	generateAndCreateTestDir();
     	fileSystem.createDirectory(testDir.resolve(new Path("aap", "noot")));
     }
@@ -323,24 +332,49 @@ public abstract class FileSystemTestParent {
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void createFile_null_throwsException() throws Exception {
+    public void test_createFile_null_throwsException() throws Exception {
     	fileSystem.createFile(null);
     }
 
     @Test
-    public void createFile_nonExistingFile() throws Exception {
+    public void test_createFile_nonExistingFile() throws Exception {
     	generateAndCreateTestDir();
     	Path file = testDir.resolve(generateTestFileName());    	
     	fileSystem.createFile(file);
     }
 
     @Test(expected=PathAlreadyExistsException.class)
-    public void createFile_existingFile_throwsException() throws Exception {
+    public void test_createFile_existingFile_throwsException() throws Exception {
     	generateAndCreateTestDir();
     	Path file = testDir.resolve(generateTestFileName());    	
     	fileSystem.createFile(file);
     	fileSystem.createFile(file);
     }
+    
+    @Test(expected=NoSuchPathException.class)
+    public void test_createFile_nonExistingParent_throwsException() throws Exception {
+    	generateAndCreateTestDir();
+    	Path dir = testDir.resolve(generateTestDirName());
+    	Path file = dir.resolve(generateTestFileName());    	
+    	fileSystem.createFile(file);
+    }
+    
+    @Test
+    public void test_readFromFile() throws Exception {
+    
+    	Path file = locationConfig.getExistingPath();
+    	
+    	OutputReader reader = new OutputReader(fileSystem.readFromFile(file));
+
+    	reader.waitUntilFinished();
+    	
+    	// System.out.println("READ: " + reader.getResultAsString());
+    	
+    	assertEquals("Hello World\n", reader.getResultAsString());    	
+    }
+   
+    
+    
     
     /*
 

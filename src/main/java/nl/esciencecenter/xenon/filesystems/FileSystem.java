@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -394,7 +395,17 @@ public abstract class FileSystem {
 		this.location = location;
 		this.entryPath = entryPath;
 		this.properties = properties;
-		this.pool = Executors.newFixedThreadPool(1);
+		
+		ThreadFactory f = new ThreadFactory() {
+			@Override
+			public Thread newThread(Runnable r) {
+				Thread t = new Thread(r, "CopyThread-" + adaptor + "-" + uniqueID);
+				t.setDaemon(true);
+				return t;
+			}
+		};
+		
+		this.pool = Executors.newFixedThreadPool(1, f); 
 	}
 
 	private synchronized String getNextCopyID() {
@@ -445,7 +456,13 @@ public abstract class FileSystem {
 	 * @throws XenonException
 	 *             If the FileSystem failed to close or if an I/O error occurred.
 	 */
-	public abstract void close() throws XenonException;
+	public void close() throws XenonException {
+		try { 
+			pool.shutdownNow();
+		} catch (Exception e) {
+			throw new XenonException(getAdaptorName(), "Failed to cleanly shutdown copy thread pool");
+		}
+	}
 
 	/**
 	 * Return if the connection to the FileSystem is open.
@@ -504,27 +521,17 @@ public abstract class FileSystem {
 	 */
 	public void createDirectories(Path dir) throws XenonException {
 
-		System.out.println("CREATEDIRS=" + dir);
-		
 		assertNotNull(dir);
 				
 		Path parent = dir.getParent();
 
-		System.out.println("PARENT=" + parent);
-		
 		if (parent != null) {
 
 			if (!exists(parent)) {
-				System.out.println("!EXISTS=" + parent);
 				// Recursive call
 				createDirectories(parent);
-			} else { 
-				System.out.println("EXISTS=" + parent);
-				
-			}
+			} 
 		}
-		
-		System.out.println("CREATE=" + dir);
 		
 		createDirectory(dir);
 	}

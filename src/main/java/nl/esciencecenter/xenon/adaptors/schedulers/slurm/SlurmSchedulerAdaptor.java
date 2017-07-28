@@ -21,13 +21,14 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingSchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 /**
  * Adaptor for Slurm scheduler.
  */
-public class SlurmSchedulerAdaptor extends SchedulerAdaptor {
+public class SlurmSchedulerAdaptor extends ScriptingSchedulerAdaptor {
 
 	/** The name of this adaptor */
     public static final String ADAPTOR_NAME = "slurm";

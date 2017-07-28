@@ -77,7 +77,7 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
     public static final String SUBMITTED = JOBS + "submitted";
     
     /** The locations supported by the adaptor */
-    public static final String [] ADAPTOR_LOCATIONS = new String [] { "local://" };
+    public static final String [] ADAPTOR_LOCATIONS = new String [] { "(null)", "(empty string)", "local://" };
     
     /** The properties supported by this adaptor */
     public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {  
@@ -131,14 +131,10 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
          
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
-        if (!(credential == null || credential instanceof DefaultCredential)) {
+        if (credential != null && !(credential instanceof DefaultCredential)) {
         	throw new InvalidCredentialException(ADAPTOR_NAME, "Local scheduler does not support this credential!");
         }
         
-        if (properties != null && properties.size() > 0) {
-            throw new UnknownPropertyException(ADAPTOR_NAME, "Cannot create local scheduler with additional properties!");
-        }
-
         String filesystemlocation = "/";
         if (LocalUtil.isWindows()) {
             filesystemlocation = "c:";
