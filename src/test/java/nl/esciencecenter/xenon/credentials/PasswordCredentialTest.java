@@ -15,41 +15,82 @@
  */
 package nl.esciencecenter.xenon.credentials;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertArrayEquals;
+import org.junit.Test;
 
 import java.util.Arrays;
 
-/**
- * 
- */
+import static org.junit.Assert.*;
+
 public class PasswordCredentialTest {
 
-    @org.junit.Test
+    @Test
     public void test_username() throws Exception {
         PasswordCredential pwc = new PasswordCredential("username", "password".toCharArray());
         assertEquals(pwc.getUsername(), "username");
     }
-    
-    @org.junit.Test
+
+    @Test
     public void test_password() throws Exception {
         PasswordCredential pwc = new PasswordCredential("username", "password".toCharArray());
         assertTrue(Arrays.equals(pwc.getPassword(), "password".toCharArray()));
     }
 
-    
-    @org.junit.Test
+    @Test
     public void test_toString() throws Exception {
         PasswordCredential pwc = new PasswordCredential("username", "password".toCharArray());
         assertTrue(pwc.toString().equals("PasswordCredential [username=username]"));
     }
  
-    @org.junit.Test
+    @Test
     public void test_password_null() throws Exception {
         PasswordCredential pwc = new PasswordCredential("username", null);
         assertArrayEquals(new char[0], pwc.getPassword());
     }
  
-    
+    @Test
+    public void test_hashcode() {
+        PasswordCredential pwc1 = new PasswordCredential("username", "password".toCharArray());
+        PasswordCredential pwc2 = new PasswordCredential("username", "password".toCharArray());
+        assertEquals(pwc1.hashCode(), pwc2.hashCode());
+    }
+
+    @Test
+    public void test_equals_sameobj() {
+        PasswordCredential pwc = new PasswordCredential("username", "password".toCharArray());
+        assertTrue(pwc.equals(pwc));
+    }
+
+    @Test
+    public void test_equals() {
+        PasswordCredential pwc1 = new PasswordCredential("username", "password".toCharArray());
+        PasswordCredential pwc2 = new PasswordCredential("username", "password".toCharArray());
+        assertTrue(pwc1.equals(pwc2));
+    }
+
+    @Test
+    public void test_equals_diffclass() {
+        PasswordCredential pwc1 = new PasswordCredential("username", "password".toCharArray());
+        String pwc2 = "not the same class";
+        assertFalse(pwc1.equals(pwc2));
+    }
+
+    @Test
+    public void test_equals_null() {
+        PasswordCredential pwc1 = new PasswordCredential("username", "password".toCharArray());
+        assertFalse(pwc1.equals(null));
+    }
+
+    @Test
+    public void test_equals_diffusername() {
+        PasswordCredential pwc1 = new PasswordCredential("username1", "password".toCharArray());
+        PasswordCredential pwc2 = new PasswordCredential("username2", "password".toCharArray());
+        assertFalse(pwc1.equals(pwc2));
+    }
+
+    @Test
+    public void test_equals_diffpassword() {
+        PasswordCredential pwc1 = new PasswordCredential("username", "password1".toCharArray());
+        PasswordCredential pwc2 = new PasswordCredential("username", "password2".toCharArray());
+        assertFalse(pwc1.equals(pwc2));
+    }
 }

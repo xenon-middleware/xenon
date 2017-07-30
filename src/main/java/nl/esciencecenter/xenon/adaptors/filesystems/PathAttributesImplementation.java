@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems;
 
+import java.util.Objects;
 import java.util.Set;
 
 import nl.esciencecenter.xenon.filesystems.AttributeNotSupportedException;
@@ -328,5 +329,33 @@ public class PathAttributesImplementation implements PathAttributes {
 	
 	public String toString() { 
 		return path.getAbsolutePath();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		PathAttributesImplementation that = (PathAttributesImplementation) o;
+		return isDirectory == that.isDirectory &&
+				isRegular == that.isRegular &&
+				isSymbolicLink == that.isSymbolicLink &&
+				isOther == that.isOther &&
+				executable == that.executable &&
+				readable == that.readable &&
+				writable == that.writable &&
+				hidden == that.hidden &&
+				creationTime == that.creationTime &&
+				lastAccessTime == that.lastAccessTime &&
+				lastModifiedTime == that.lastModifiedTime &&
+				size == that.size &&
+				Objects.equals(path, that.path) &&
+				Objects.equals(owner, that.owner) &&
+				Objects.equals(group, that.group) &&
+				Objects.equals(permissions, that.permissions);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(path, isDirectory, isRegular, isSymbolicLink, isOther, executable, readable, writable, hidden, creationTime, lastAccessTime, lastModifiedTime, size, owner, group, permissions);
 	}
 }
