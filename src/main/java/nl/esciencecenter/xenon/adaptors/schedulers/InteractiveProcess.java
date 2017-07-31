@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
 import nl.esciencecenter.xenon.schedulers.Streams;
 
 /**
- * 
+ *
  */
 public interface InteractiveProcess extends Process {
     Streams getStreams();

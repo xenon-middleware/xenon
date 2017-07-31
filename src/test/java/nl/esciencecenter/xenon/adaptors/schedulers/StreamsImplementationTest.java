@@ -27,48 +27,48 @@ import org.junit.Test;
 import nl.esciencecenter.xenon.schedulers.Streams;
 
 public class StreamsImplementationTest {
-	
-	@Test
-	public void test_handle() throws Exception {
-		String id = "JOB-42";
-		InputStream stdout = new ByteArrayInputStream(new byte[0]);
-		OutputStream stdin = new ByteArrayOutputStream();
-		InputStream stderr = new ByteArrayInputStream(new byte[0]);
-		
-		Streams s = new StreamsImplementation(id, stdout, stdin, stderr);
-		assertEquals(id, s.getJobIdentifier());
-	}
-	
-	@Test
-	public void test_stdout() throws Exception {
-		String id = "JOB-42";
-		InputStream stdout = new ByteArrayInputStream(new byte[0]);
-		OutputStream stdin = new ByteArrayOutputStream();
-		InputStream stderr = new ByteArrayInputStream(new byte[0]);
-		
-		Streams s = new StreamsImplementation(id, stdout, stdin, stderr);
-		assertEquals(stdout, s.getStdout());
-	}
-	
-	@Test
-	public void test_stderr() throws Exception {
-		String id = "JOB-42";
-		InputStream stdout = new ByteArrayInputStream(new byte[0]);
-		OutputStream stdin = new ByteArrayOutputStream();
-		InputStream stderr = new ByteArrayInputStream(new byte[0]);
-		
-		Streams s = new StreamsImplementation(id, stdout, stdin, stderr);
-		assertEquals(stderr, s.getStderr());
-	}
 
-	@Test
-	public void test_stdin() throws Exception {
-		String id = "JOB-42";
-		InputStream stdout = new ByteArrayInputStream(new byte[0]);
-		OutputStream stdin = new ByteArrayOutputStream();
-		InputStream stderr = new ByteArrayInputStream(new byte[0]);
-		
-		Streams s = new StreamsImplementation(id, stdout, stdin, stderr);
-		assertEquals(stdin, s.getStdin());
-	}
+    @Test
+    public void test_handle() throws Exception {
+        String id = "JOB-42";
+        InputStream stdout = new ByteArrayInputStream(new byte[0]);
+        OutputStream stdin = new ByteArrayOutputStream();
+        InputStream stderr = new ByteArrayInputStream(new byte[0]);
+
+        Streams s = new StreamsImplementation(id, stdout, stdin, stderr);
+        assertEquals(id, s.getJobIdentifier());
+    }
+
+    @Test
+    public void test_stdout() throws Exception {
+        String id = "JOB-42";
+        InputStream stdout = new ByteArrayInputStream(new byte[0]);
+        OutputStream stdin = new ByteArrayOutputStream();
+        InputStream stderr = new ByteArrayInputStream(new byte[0]);
+
+        Streams s = new StreamsImplementation(id, stdout, stdin, stderr);
+        assertEquals(stdout, s.getStdout());
+    }
+
+    @Test
+    public void test_stderr() throws Exception {
+        String id = "JOB-42";
+        InputStream stdout = new ByteArrayInputStream(new byte[0]);
+        OutputStream stdin = new ByteArrayOutputStream();
+        InputStream stderr = new ByteArrayInputStream(new byte[0]);
+
+        Streams s = new StreamsImplementation(id, stdout, stdin, stderr);
+        assertEquals(stderr, s.getStderr());
+    }
+
+    @Test
+    public void test_stdin() throws Exception {
+        String id = "JOB-42";
+        InputStream stdout = new ByteArrayInputStream(new byte[0]);
+        OutputStream stdin = new ByteArrayOutputStream();
+        InputStream stderr = new ByteArrayInputStream(new byte[0]);
+
+        Streams s = new StreamsImplementation(id, stdout, stdin, stderr);
+        assertEquals(stdin, s.getStdin());
+    }
 }

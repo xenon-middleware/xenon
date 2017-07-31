@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.filesystems;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that a requested file attribute is not supported by the underlying file system implementation.  
- * 
+ * Signals that a requested file attribute is not supported by the underlying file system implementation.
+ *
  * @version 1.0
  * @since 1.0
  */

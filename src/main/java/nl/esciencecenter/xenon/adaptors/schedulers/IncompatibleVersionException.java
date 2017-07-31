@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that an adaptor is unable to connect to a resource due to version problems.  
- * 
+ * Signals that an adaptor is unable to connect to a resource due to version problems.
+ *
  * @version 1.0
  * @since 1.0
  */

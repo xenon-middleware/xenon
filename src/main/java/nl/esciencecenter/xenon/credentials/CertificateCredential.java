@@ -16,7 +16,7 @@
 package nl.esciencecenter.xenon.credentials;
 
 /**
- * A container for security Information based upon certificates. 
+ * A container for security Information based upon certificates.
  */
 public class CertificateCredential extends PasswordCredential {
 
@@ -27,7 +27,7 @@ public class CertificateCredential extends PasswordCredential {
 
     /**
      * Constructs a {@link CertificateCredential} out of a username, a certificate file containing a private key, and an optional passphrase.
-     * 
+     *
      * @param username
      *          the username for this certificate
      * @param certfile
@@ -39,10 +39,10 @@ public class CertificateCredential extends PasswordCredential {
         super(username, passphrase);
         this.certfile = certfile;
     }
-    
+
     /**
      * Returns the certificate file.
-     * 
+     *
      * @return the certificate file.
      */
     public String getCertificateFile() {

@@ -41,10 +41,10 @@ public class LocalFileSystemTest extends FileSystemTestParent {
                 );
             }
 
-			@Override
-			public Path getWritableTestDir() {
-				return new Path("/tmp");
-			}
+            @Override
+            public Path getWritableTestDir() {
+                return new Path("/tmp");
+            }
         };
     }
 

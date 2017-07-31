@@ -17,31 +17,31 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
 
 public abstract class SchedulerLocationConfig {
 
-	public abstract String getLocation();
+    public abstract String getLocation();
 
-	public abstract String [] getQueueNames();
-	
-	public abstract String getDefaultQueueName();
+    public abstract String [] getQueueNames();
 
-	public long getMaxWaitUntilRunning() { 
-		return 10*1000;
-	}
+    public abstract String getDefaultQueueName();
 
-	public long getMaxWaintUntilDone() { 
-		return 60*1000;
-	}
-	
-	public boolean supportsBatch() {
-		return true;
-	}
-	
-	public boolean supportsInteractive() {
-		return false;
-	}
-	
-	public boolean isEmbedded() {
-		return false;
-	}
-	
+    public long getMaxWaitUntilRunning() {
+        return 10*1000;
+    }
+
+    public long getMaxWaintUntilDone() {
+        return 60*1000;
+    }
+
+    public boolean supportsBatch() {
+        return true;
+    }
+
+    public boolean supportsInteractive() {
+        return false;
+    }
+
+    public boolean isEmbedded() {
+        return false;
+    }
+
     //public abstract Map.Entry<Path,Path> getSymbolicLinksToExistingFile();
 }

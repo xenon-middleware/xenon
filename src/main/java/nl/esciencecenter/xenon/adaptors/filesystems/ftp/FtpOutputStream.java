@@ -59,12 +59,12 @@ public class FtpOutputStream extends OutputStream {
             ftpClient.completePendingCommand();
             completedPendingFtpCommand = true;
             ftpClient.disconnect();
-//            
+//
 //            int replyCode = ftpClient.getReplyCode();
 //            String replyString = ftpClient.getReplyString();
 //
 //            System.out.println("**REPLY " + replyCode + " " + replyString);
-//        	
+//
 //            ftpClient.disconnect();
         }
     }

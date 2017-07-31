@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that a jobs has been canceled by the user.  
- * 
+ * Signals that a jobs has been canceled by the user.
+ *
  * @version 1.0
  * @since 1.0
  */

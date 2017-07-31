@@ -37,16 +37,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Generator for GridEngine job script.
- * 
+ *
  */
 final class TorqueUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TorqueUtils.class);
 
     private static final int MINUTES_PER_HOUR = 60;
-    
+
     public static final Pattern QUEUE_INFO_NAME = Pattern.compile("^Queue: ([a-zA-Z_]+)$");
-    
+
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
     public static final String JOB_OPTION_JOB_CONTENTS = "job.contents";
     public static final String JOB_OPTION_RESOURCES = "job.resources";
@@ -92,7 +92,7 @@ final class TorqueUtils {
         System.out.println("--------------------------------");
         System.out.println(info.toString());
         System.out.println("--------------------------------");
-        
+
         ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "Job_Id", "job_state");
 
         String stateCode = jobInfo.get("job_state");
@@ -132,7 +132,7 @@ final class TorqueUtils {
         //set shell to sh
         script.format("#PBS -S /bin/sh\n");
 
-        //set name of job to xenon 
+        //set name of job to xenon
         script.format("#PBS -N xenon\n");
 
         //set working directory
@@ -156,7 +156,7 @@ final class TorqueUtils {
 
         //number of nodes and processes per node
         script.format("#PBS -l nodes=%d:ppn=%d\n", description.getNodeCount(), description.getProcessesPerNode());
-        
+
         //add maximum runtime in hour:minute:second format (converted from minutes in description)
         script.format("#PBS -l walltime=%02d:%02d:00\n",
                 description.getMaxTime() / MINUTES_PER_HOUR,

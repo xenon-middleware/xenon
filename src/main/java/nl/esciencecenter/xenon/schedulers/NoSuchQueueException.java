@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.schedulers;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that a unknown queue was provided.  
- * 
+ * Signals that a unknown queue was provided.
+ *
  * @version 1.0
  * @since 1.0
  */

@@ -16,7 +16,7 @@
 package nl.esciencecenter.xenon;
 
 /**
- * Throw when an unsupported optional operation is called.   
+ * Throw when an unsupported optional operation is called.
  */
 public class UnsupportedOperationException extends XenonException {
 

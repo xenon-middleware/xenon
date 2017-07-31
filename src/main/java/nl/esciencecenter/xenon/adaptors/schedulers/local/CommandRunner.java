@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Runs a command. Constructor waits for command to finish.
- * 
+ *
  */
 public class CommandRunner {
 
@@ -70,16 +70,16 @@ public class CommandRunner {
     }
 
     public CommandRunner(String stdin, File workingDir, String... command) throws CommandNotFoundException {
-        
-    	if (command.length == 0) {
+
+        if (command.length == 0) {
             throw new IllegalArgumentException("runCommand: command array has length 0");
         }
 
         // expand command using path
         command[0] = getExeFile(command[0]);
-        
+
         LOGGER.debug("CommandRunner running {}", Arrays.toString(command));
-        
+
         ProcessBuilder builder = new ProcessBuilder(command);
         if (workingDir != null) {
             builder.directory(workingDir);
@@ -108,7 +108,7 @@ public class CommandRunner {
             err.waitUntilFinished();
 
             LOGGER.debug("CommandRunner out: {}\nCommandRunner err: {}\n", out.getResultAsString(), err.getResultAsString());
-         
+
         } catch (InterruptedException e) {
             LOGGER.warn("CommandRunner was interrupted before termination!");
             Thread.currentThread().interrupt();

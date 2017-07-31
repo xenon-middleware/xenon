@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.filesystems;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that a unknown Copy handle was provided.  
- * 
+ * Signals that a unknown Copy handle was provided.
+ *
  * @version 1.0
  * @since 1.0
  */

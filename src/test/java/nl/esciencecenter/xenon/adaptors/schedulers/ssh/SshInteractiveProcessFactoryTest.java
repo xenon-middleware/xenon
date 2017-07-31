@@ -30,93 +30,93 @@ import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 public class SshInteractiveProcessFactoryTest {
 
-		
-	@Test(expected=IllegalArgumentException.class)
-	public void test_creatNullFails() throws XenonException { 
-		new SshInteractiveProcessFactory(null);
-	}
-	
-	@Test
-	public void test_isOpen() throws XenonException { 
-		MockClientSession session = new MockClientSession(false);
-		SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
-		assertTrue(p.isOpen());
-	}
 
-	@Test
-	public void test_close() throws XenonException { 
-		MockClientSession session = new MockClientSession(false);
-		SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
-		p.close();
-		assertFalse(p.isOpen());
-	}
+    @Test(expected=IllegalArgumentException.class)
+    public void test_creatNullFails() throws XenonException {
+        new SshInteractiveProcessFactory(null);
+    }
 
-	@Test(expected=SchedulerClosedException.class)
-	public void test_doublecloseFails() throws XenonException { 
-		MockClientSession session = new MockClientSession(false);
-		SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
-		p.close();
-		p.close();
-	}
-	
-	@Test(expected=XenonException.class)
-	public void test_closeSessionFails() throws XenonException { 
-		MockClientSession session = new MockClientSession(true);
-		SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
-		p.close();
-	}
-	
-	@Test(expected=SchedulerClosedException.class)
-	public void test_createProcessFailsClosed() throws XenonException { 
-		MockClientSession session = new MockClientSession(false);
-		SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
-		p.close();
+    @Test
+    public void test_isOpen() throws XenonException {
+        MockClientSession session = new MockClientSession(false);
+        SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
+        assertTrue(p.isOpen());
+    }
 
-		JobDescription desc = new JobDescription();
-		desc.setWorkingDirectory("workdir");
-		desc.setExecutable("exec");
-		
-		p.createInteractiveProcess(desc, "JOB-42");
-	}
+    @Test
+    public void test_close() throws XenonException {
+        MockClientSession session = new MockClientSession(false);
+        SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
+        p.close();
+        assertFalse(p.isOpen());
+    }
 
-	@Test(expected=IllegalArgumentException.class)
-	public void test_createProcessFailsNullDescription() throws XenonException { 
-		MockClientSession session = new MockClientSession(false);
-		SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
-		p.createInteractiveProcess(null, null);
-	}
+    @Test(expected=SchedulerClosedException.class)
+    public void test_doublecloseFails() throws XenonException {
+        MockClientSession session = new MockClientSession(false);
+        SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
+        p.close();
+        p.close();
+    }
 
-	@Test(expected=IllegalArgumentException.class)
-	public void test_createProcessFailsNullID() throws XenonException { 
-		MockClientSession session = new MockClientSession(false);
-		SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
-		JobDescription desc = new JobDescription();
-		desc.setWorkingDirectory("workdir");
-		desc.setExecutable("exec");
-		p.createInteractiveProcess(desc, null);
-	}
-	
-	@Test
-	public void test_createProcess() throws XenonException { 
-		MockClientSession session = new MockClientSession(false);
-		SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
-		
-		JobDescription desc = new JobDescription();
-		desc.setWorkingDirectory("workdir");
-		desc.setExecutable("exec");
-		
-		HashMap<String,String> env = new HashMap<>();
-		env.put("key1", "value1");
-		env.put("key2", "value2");
-		desc.setEnvironment(env);
-		desc.setArguments(new String [] { "a", "b", "c" });
-		p.createInteractiveProcess(desc, "JOB-42");
-		
-		MockChannelExec e = (MockChannelExec) session.exec;
-		
-		assertNotNull(e);
-		assertEquals("cd 'workdir' && exec 'a' 'b' 'c'", e.command);
-		assertEquals(env, e.env);
-	}
-	
+    @Test(expected=XenonException.class)
+    public void test_closeSessionFails() throws XenonException {
+        MockClientSession session = new MockClientSession(true);
+        SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
+        p.close();
+    }
+
+    @Test(expected=SchedulerClosedException.class)
+    public void test_createProcessFailsClosed() throws XenonException {
+        MockClientSession session = new MockClientSession(false);
+        SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
+        p.close();
+
+        JobDescription desc = new JobDescription();
+        desc.setWorkingDirectory("workdir");
+        desc.setExecutable("exec");
+
+        p.createInteractiveProcess(desc, "JOB-42");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void test_createProcessFailsNullDescription() throws XenonException {
+        MockClientSession session = new MockClientSession(false);
+        SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
+        p.createInteractiveProcess(null, null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void test_createProcessFailsNullID() throws XenonException {
+        MockClientSession session = new MockClientSession(false);
+        SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
+        JobDescription desc = new JobDescription();
+        desc.setWorkingDirectory("workdir");
+        desc.setExecutable("exec");
+        p.createInteractiveProcess(desc, null);
+    }
+
+    @Test
+    public void test_createProcess() throws XenonException {
+        MockClientSession session = new MockClientSession(false);
+        SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
+
+        JobDescription desc = new JobDescription();
+        desc.setWorkingDirectory("workdir");
+        desc.setExecutable("exec");
+
+        HashMap<String,String> env = new HashMap<>();
+        env.put("key1", "value1");
+        env.put("key2", "value2");
+        desc.setEnvironment(env);
+        desc.setArguments(new String [] { "a", "b", "c" });
+        p.createInteractiveProcess(desc, "JOB-42");
+
+        MockChannelExec e = (MockChannelExec) session.exec;
+
+        assertNotNull(e);
+        assertEquals("cd 'workdir' && exec 'a' 'b' 'c'", e.command);
+        assertEquals(env, e.env);
+    }
+
 }

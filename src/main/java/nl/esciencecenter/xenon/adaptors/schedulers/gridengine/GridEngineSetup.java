@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Holds some info on the specifics of the machine we are connected to, such as queues and parallel environments.
- * 
+ *
  */
 public class GridEngineSetup {
 
@@ -42,10 +42,10 @@ public class GridEngineSetup {
     private final Map<String, QueueInfo> queues;
 
     private final Map<String, ParallelEnvironmentInfo> parallelEnvironments;
-    
+
     /**
      * generate arguments to list details of all parallel environments given
-     * 
+     *
      * @param parallelEnvironmentNames
      *            names of parallel environments to list
      * @return a list of all qconf arguments needed to list all parallel environments
@@ -58,7 +58,7 @@ public class GridEngineSetup {
         }
         return result;
     }
-    
+
     private static String[] getQueueNames(GridEngineScheduler scheduler) throws XenonException {
         String queueListOutput = scheduler.runCheckedCommand(null, "qconf", "-sql");
 
@@ -82,7 +82,7 @@ public class GridEngineSetup {
     }
 
     public GridEngineSetup(GridEngineScheduler scheduler) throws XenonException {
-            
+
         this.queueNames = getQueueNames(scheduler);
 
         this.queues = getQueues(queueNames, scheduler);
@@ -91,7 +91,7 @@ public class GridEngineSetup {
 
         LOGGER.debug("Created setup info, queues = {}, parallel environments = {}", this.queues, this.parallelEnvironments);
     }
-    
+
     private static Map<String, ParallelEnvironmentInfo> getParallelEnvironments(GridEngineScheduler scheduler)
             throws XenonException {
         //first retrieve a list of parallel environments
@@ -127,7 +127,7 @@ public class GridEngineSetup {
 
     /**
      * Testing constructor.
-     * 
+     *
      * @param queueNames
      *            queue names to use.
      * @param queues

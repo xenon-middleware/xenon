@@ -20,43 +20,43 @@ import nl.esciencecenter.xenon.XenonPropertyDescription;
 
 public abstract class Adaptor implements AdaptorDescription {
 
-	private static int currentID = 1;
+    private static int currentID = 1;
 
-	private final String name;
-	private final String description;
-	private final String [] supportedLocations;
-	private final XenonPropertyDescription [] supportedProperties;
+    private final String name;
+    private final String description;
+    private final String [] supportedLocations;
+    private final XenonPropertyDescription [] supportedProperties;
 
-	protected Adaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) {  
-		this.name = name;
-		this.description = description;
-		this.supportedLocations = locations;
-		this.supportedProperties = properties;
-	}
+    protected Adaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) {
+        this.name = name;
+        this.description = description;
+        this.supportedLocations = locations;
+        this.supportedProperties = properties;
+    }
 
-	protected synchronized String getNewUniqueID() {
-		String res = name + "." + currentID;
-		currentID++;
-		return res;
-	}
+    protected synchronized String getNewUniqueID() {
+        String res = name + "." + currentID;
+        currentID++;
+        return res;
+    }
 
-	@Override
-	public String getName() { 
-		return name;
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public String getDescription() { 
-		return description;
-	}
+    @Override
+    public String getDescription() {
+        return description;
+    }
 
-	@Override
-	public String[] getSupportedLocations() { 
-		return supportedLocations.clone();
-	}
+    @Override
+    public String[] getSupportedLocations() {
+        return supportedLocations.clone();
+    }
 
-	@Override
-	public XenonPropertyDescription[] getSupportedProperties() { 
-		return supportedProperties.clone();
-	}
+    @Override
+    public XenonPropertyDescription[] getSupportedProperties() {
+        return supportedProperties.clone();
+    }
 }
