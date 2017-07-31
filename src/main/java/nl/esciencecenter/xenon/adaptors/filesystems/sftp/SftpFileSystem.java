@@ -318,7 +318,7 @@ public class SftpFileSystem extends FileSystem {
 		LOGGER.debug("readSymbolicLink path = {}", link);
 
 		Path result;
-
+		assertFileIsSymbolicLink(link);
 		try {
 			String target = client.readLink(link.getAbsolutePath());
 
@@ -360,11 +360,7 @@ public class SftpFileSystem extends FileSystem {
 	}
 	
 	private static long convertTime(FileTime time) { 
-		
-		if (time == null) { 
-			return 0;
-		}
-		
+
 		return time.toMillis();
 	}
 	
@@ -377,11 +373,22 @@ public class SftpFileSystem extends FileSystem {
 		result.setRegular(attributes.isRegularFile());
 		result.setOther(attributes.isOther());
 		result.setSymbolicLink(attributes.isSymbolicLink());
-		
-		result.setLastModifiedTime(convertTime(attributes.getModifyTime()));
-		result.setCreationTime(convertTime(attributes.getCreateTime()));
-		result.setLastAccessTime(convertTime(attributes.getAccessTime()));
-		
+		if(attributes.getModifyTime() == null){
+			result.setLastModifiedTime(0);
+		} else {
+			result.setLastModifiedTime(convertTime(attributes.getModifyTime()));
+		}
+		if(attributes.getCreateTime() == null) {
+			result.setCreationTime(result.getLastModifiedTime());
+		} else {
+			result.setCreationTime(convertTime(attributes.getCreateTime()));
+		}
+		if(attributes.getAccessTime() == null) {
+			result.setCreationTime(result.getLastModifiedTime());
+		} else {
+			result.setLastAccessTime(convertTime(attributes.getAccessTime()));
+		}
+
 		result.setSize(attributes.getSize());
 		
 		Set<PosixFilePermission> permission = PosixFileUtils.bitsToPermissions(attributes.getPermissions());

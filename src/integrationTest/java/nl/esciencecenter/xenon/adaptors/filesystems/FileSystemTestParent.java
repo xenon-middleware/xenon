@@ -678,23 +678,23 @@ public abstract class FileSystemTestParent {
         PathAttributes result = fileSystem.getAttributes(path);
 
         if (result.isDirectory() && !isDirectory) {
-            throwWrong("test13_getfileAttributes", "<not directory>", "<directory>");
+            throwWrong("test_getfileAttributes", "<not directory>", "<directory>");
         }
 
         if (size >= 0 && result.getSize() != size) {
-            throwWrong("test13_getfileAttributes", "size=" + size, "size=" + result.getSize());
+            throwWrong("test_getfileAttributes", "size=" + size, "size=" + result.getSize());
         }
 
-        if (!isWithinMargin(currentTime, result.getLastModifiedTime())) {
-            throwWrong("test13_getfileAttributes", "lastModifiedTime=" + currentTime,
-                    "lastModifiedTime=" + result.getLastModifiedTime());
+        if (!isWithinMargin(currentTime, result.getLastModifiedTime()) && result.getLastModifiedTime() != 0) {
+                throwWrong("test_getfileAttributes", "lastModifiedTime=" + currentTime,
+                        "lastModifiedTime=" + result.getLastModifiedTime());
+
+        }
+        if (!isWithinMargin(currentTime, result.getCreationTime()) && result.getCreationTime() != result.getLastModifiedTime()) {
+            throwWrong("test_getfileAttributes", "creationTime=" + currentTime, "creationTime=" + result.getCreationTime());
         }
 
-        if (!isWithinMargin(currentTime, result.getCreationTime())) {
-            throwWrong("test13_getfileAttributes", "creationTime=" + currentTime, "creationTime=" + result.getCreationTime());
-        }
-
-        if (!isWithinMargin(currentTime, result.getLastAccessTime())) {
+        if (!isWithinMargin(currentTime, result.getLastAccessTime()) && result.getLastAccessTime() != result.getLastModifiedTime()) {
             throwWrong("test13_getfileAttributes", "lastAccessTime=" + currentTime, "lastAccessTime=" + result.getLastAccessTime());
         }
 
@@ -717,7 +717,7 @@ public abstract class FileSystemTestParent {
     private boolean isWithinMargin(long time1, long time2) {
         final int millisecondsPerSecond = 1000;
         final int secondsPerHour = 3600;
-        final long margin = 30 * secondsPerHour * millisecondsPerSecond;
+        final long margin = 60 * secondsPerHour * millisecondsPerSecond;
         return Math.abs(time1 - time2) < margin;
     }
 
@@ -751,13 +751,13 @@ public abstract class FileSystemTestParent {
 
     @Test(expected=IllegalArgumentException.class)
     public void test_setPosixFilePermissions_nullPath_throwsException() throws Exception {
-        assumeTrue(description.supportsPosixPermissions());
+        assumeTrue(description.supportsSettingPosixPermissions());
         fileSystem.setPosixFilePermissions(null, null);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void test_setPosixFilePermissions_existingFileNullSet_throwsException() throws Exception {
-        assumeTrue(description.supportsPosixPermissions());
+        assumeTrue(description.supportsSettingPosixPermissions());
         generateAndCreateTestDir();
         Path existingFile = createTestFile(testDir,new byte[] { 1, 2, 3 });
         fileSystem.setPosixFilePermissions(existingFile,null);
@@ -765,7 +765,7 @@ public abstract class FileSystemTestParent {
 
     @Test
     public void test_setPosixFilePermissions_existingFileZeroPermissions() throws Exception {
-        assumeTrue(description.supportsPosixPermissions());
+        assumeTrue(description.supportsSettingPosixPermissions());
         generateAndCreateTestDir();
         Path existingFile = createTestFile(testDir,new byte[] { 1, 2, 3 });
         Set<PosixFilePermission> emptyPermissions = EnumSet.noneOf(PosixFilePermission.class);
@@ -778,6 +778,7 @@ public abstract class FileSystemTestParent {
     }
 
     private void assertPermissionsSetIsGet(Path path, Set<PosixFilePermission> permissions) throws XenonException{
+        assumeTrue(description.supportsSettingPosixPermissions());
         fileSystem.setPosixFilePermissions(path,permissions);
         Set<PosixFilePermission> got = fileSystem.getAttributes(path).getPermissions();
         assertEquals(permissions,got);
@@ -785,7 +786,7 @@ public abstract class FileSystemTestParent {
 
     @Test
     public void test_setPosixFilePermissions_existingFileFewPermissions() throws Exception {
-        assumeTrue(description.supportsPosixPermissions());
+        assumeTrue(description.supportsSettingPosixPermissions());
         generateAndCreateTestDir();
         Path existingFile = createTestFile(testDir,new byte[] { 1, 2, 3 });
         Set<PosixFilePermission> permissions = EnumSet.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ,
@@ -801,7 +802,7 @@ public abstract class FileSystemTestParent {
 
     @Test
     public void test_setPosixFilePermissions_existingFileMorePermissions() throws Exception {
-        assumeTrue(description.supportsPosixPermissions());
+        assumeTrue(description.supportsSettingPosixPermissions());
         generateAndCreateTestDir();
         Path existingFile = createTestFile(testDir,new byte[] { 1, 2, 3 });
         Set<PosixFilePermission> permissions = getVariousPosixPermissions();
@@ -815,7 +816,7 @@ public abstract class FileSystemTestParent {
 
     @Test(expected=NoSuchPathException.class)
     public void test_setPosixFilePermissions_nonExistingFile_throwsException() throws Exception {
-        assumeTrue(description.supportsPosixPermissions());
+        assumeTrue(description.supportsSettingPosixPermissions());
         generateAndCreateTestDir();
         Path nonExistingFile = createNewTestFileName(testDir);
         Set<PosixFilePermission> permissions = getVariousPosixPermissions();
@@ -824,7 +825,7 @@ public abstract class FileSystemTestParent {
 
     @Test
     public void test_setPosixFilePermissions_existingDir() throws Exception {
-        assumeTrue(description.supportsPosixPermissions());
+        assumeTrue(description.supportsSettingPosixPermissions());
         generateAndCreateTestDir();
         Set<PosixFilePermission> permissions = getVariousPosixPermissions();
         assertPermissionsSetIsGet(testDir, permissions);

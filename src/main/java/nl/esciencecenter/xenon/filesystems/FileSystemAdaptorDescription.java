@@ -54,7 +54,9 @@ public interface FileSystemAdaptorDescription extends AdaptorDescription {
     
     boolean isConnectionless();
 
-    boolean supportsPosixPermissions();
+    boolean supportsReadingPosixPermissions();
+
+    boolean supportsSettingPosixPermissions();
 
     boolean supportsRename();
 

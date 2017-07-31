@@ -373,6 +373,10 @@ public class FtpFileSystem extends FileSystem {
 	public OutputStream writeToFile(Path path) throws XenonException {
 		return writeToFile(path, -1);
 	}
+
+
+
+
 	
 	@Override
 	public OutputStream appendToFile(Path path) throws XenonException {
@@ -382,13 +386,16 @@ public class FtpFileSystem extends FileSystem {
 		assertPathIsNotDirectory(path);
 		
 		try {
-			OutputStream out = ftpClient.appendFileStream(path.getAbsolutePath());
+            // Since FTP connections can only do a single thing a time, we need a new FTPClient to handle the stream.
+            FTPClient newClient = adaptor.connect(getLocation(), credential);
+            newClient.enterLocalPassiveMode();
+			OutputStream out = newClient.appendFileStream(path.getAbsolutePath());
 			
 			if (out == null) { 
 				checkClientReply("Failed to append to path: "+ path.getAbsolutePath());
 			}
 
-			return new FtpOutputStream(out, ftpClient);
+			return new FtpOutputStream(out, newClient);
 		} catch (IOException e) {
 			throw new XenonException(ADAPTOR_NAME, "Failed to append to path: " + path);
 		}
@@ -474,6 +481,7 @@ public class FtpFileSystem extends FileSystem {
 	@Override
 	public PathAttributes getAttributes(Path path) throws XenonException {
 		LOGGER.debug("getAttributes path = {}", path);
+
 		assertPathExists(path);
 		PathAttributes fileAttributes = convertAttributes(path, getFtpFile(path));
 		LOGGER.debug("getAttributes OK result = {}", fileAttributes);
@@ -500,6 +508,6 @@ public class FtpFileSystem extends FileSystem {
         if(permissions == null) {
 			throw new IllegalArgumentException("Permissions is null");
 		}
-		throw new Error("Implement me!");
+		throw new UnsupportedOperationException(getAdaptorName(),"FTP does not support changing permissions.");
     }
 }

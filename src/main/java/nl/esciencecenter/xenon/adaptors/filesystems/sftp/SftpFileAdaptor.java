@@ -154,7 +154,12 @@ public class SftpFileAdaptor extends FileAdaptor {
 	}
 
 	@Override
-	public boolean supportsPosixPermissions(){
+	public boolean supportsReadingPosixPermissions(){
+		return true;
+	}
+
+	@Override
+	public boolean supportsSettingPosixPermissions(){
 		return true;
 	}
 }

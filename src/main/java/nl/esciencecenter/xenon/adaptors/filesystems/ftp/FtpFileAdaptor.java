@@ -171,7 +171,10 @@ public class FtpFileAdaptor extends FileAdaptor {
     }
 
     @Override
-    public boolean supportsPosixPermissions(){
+    public boolean supportsReadingPosixPermissions(){
         return true;
     }
+
+    @Override
+    public boolean canAppend(){ return false;}
 }

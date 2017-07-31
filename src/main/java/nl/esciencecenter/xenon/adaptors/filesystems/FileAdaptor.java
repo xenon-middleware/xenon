@@ -56,10 +56,15 @@ public abstract class FileAdaptor extends Adaptor implements FileSystemAdaptorDe
 		return false;
 	}
 
-	@Override
-	public boolean supportsPosixPermissions(){
-		return false;
 
+	@Override
+	public boolean supportsReadingPosixPermissions(){
+		return false;
+	}
+
+	@Override
+	public boolean supportsSettingPosixPermissions(){
+		return false;
 	}
 
 	@Override
