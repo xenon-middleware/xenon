@@ -27,166 +27,166 @@ import org.apache.sshd.common.future.SshFutureListener;
 
 public class MockChannelExec extends ChannelExec {
 
-    public boolean closed = false;
+	public boolean closed = false;
+	
+	public String command;
 
-    public String command;
+	public boolean gotClose = false;
+	
+	public boolean closeThrows = false;
+	
+	public HashMap<String, String> env = new HashMap<>();
 
-    public boolean gotClose = false;
+	public MockChannelExec(String command) {
+		super(command);
+		this.command = command;
+	}
 
-    public boolean closeThrows = false;
-
-    public HashMap<String, String> env = new HashMap<>();
-
-    public MockChannelExec(String command) {
-        super(command);
-        this.command = command;
-    }
-
-    @Override
+	@Override
     public Integer getExitStatus() {
-        return 42;
-    }
-
-    @Override
-    public void setEnv(String key, String value) {
-        env.put(key, value);
-    }
-
-    @Override
+		return 42;
+	}
+	
+	@Override
+	public void setEnv(String key, String value) {
+		env.put(key, value);
+	}
+	
+	@Override
     public boolean isClosed() {
-        System.out.println("CLOSED " + closed);
-        return closed;
-    }
-
-    @Override
+		System.out.println("CLOSED " + closed);
+		return closed;
+	}
+	
+	@Override
     public CloseFuture close(boolean immediately) {
+	
+		this.gotClose = true;
+		
+		return new CloseFuture() {
+			
+			@Override
+			public boolean isDone() {
+				return true;
+			}
+			
+			@Override
+			public boolean awaitUninterruptibly(long timeoutMillis) {
+				return true;
+			}
+			
+			@Override
+			public boolean await(long timeoutMillis) throws IOException {
+		
+				if (closeThrows) { 
+					throw new IOException("Bang!");
+				}
+				
+				return true;
+			}
+			
+			@Override
+			public CloseFuture removeListener(SshFutureListener<CloseFuture> listener) {
+				return null;
+			}
+			
+			@Override
+			public CloseFuture addListener(SshFutureListener<CloseFuture> listener) {
+				return null;
+			}
+			
+			@Override
+			public void setClosed() {
+			}
+			
+			@Override
+			public boolean isClosed() {
+				return true;
+			}
+		};
+		
+	}
+	
+	
+	@Override
+	public InputStream getInvertedOut() {
+		return null;
+	}
 
-        this.gotClose = true;
+	@Override
+	public OutputStream getInvertedIn() {
+		return null;
+	}
 
-        return new CloseFuture() {
+	@Override
+	public InputStream getInvertedErr() {
+		return null;
+	}
 
-            @Override
-            public boolean isDone() {
-                return true;
-            }
-
-            @Override
-            public boolean awaitUninterruptibly(long timeoutMillis) {
-                return true;
-            }
-
-            @Override
-            public boolean await(long timeoutMillis) throws IOException {
-
-                if (closeThrows) {
-                    throw new IOException("Bang!");
-                }
-
-                return true;
-            }
-
-            @Override
-            public CloseFuture removeListener(SshFutureListener<CloseFuture> listener) {
-                return null;
-            }
-
-            @Override
-            public CloseFuture addListener(SshFutureListener<CloseFuture> listener) {
-                return null;
-            }
-
-            @Override
-            public void setClosed() {
-            }
-
-            @Override
-            public boolean isClosed() {
-                return true;
-            }
-        };
-
-    }
-
-
-    @Override
-    public InputStream getInvertedOut() {
-        return null;
-    }
-
-    @Override
-    public OutputStream getInvertedIn() {
-        return null;
-    }
-
-    @Override
-    public InputStream getInvertedErr() {
-        return null;
-    }
-
-    @Override
+	@Override
     public OpenFuture open() throws IOException {
-
-        return new OpenFuture() {
-
-            @Override
-            public OpenFuture verify(long timeoutMillis) throws IOException {
-                return null;
-            }
-
-            @Override
-            public boolean isDone() {
-                return true;
-            }
-
-            @Override
-            public boolean awaitUninterruptibly(long timeoutMillis) {
-                return true;
-            }
-
-            @Override
-            public boolean await(long timeoutMillis) throws IOException {
-                return true;
-            }
-
-            @Override
-            public OpenFuture removeListener(SshFutureListener<OpenFuture> listener) {
-                return null;
-            }
-
-            @Override
-            public OpenFuture addListener(SshFutureListener<OpenFuture> listener) {
-                return null;
-            }
-
-            @Override
-            public void setOpened() {
-            }
-
-            @Override
-            public void setException(Throwable exception) {
-            }
-
-            @Override
-            public boolean isOpened() {
-                return true;
-            }
-
-            @Override
-            public boolean isCanceled() {
-                return false;
-            }
-
-            @Override
-            public Throwable getException() {
-                return null;
-            }
-
-            @Override
-            public void cancel() {
-            }
-        };
-
-
-    }
-
+		
+		return new OpenFuture() {
+			
+			@Override
+			public OpenFuture verify(long timeoutMillis) throws IOException {
+				return null;
+			}
+			
+			@Override
+			public boolean isDone() {
+				return true;
+			}
+			
+			@Override
+			public boolean awaitUninterruptibly(long timeoutMillis) {
+				return true;
+			}
+			
+			@Override
+			public boolean await(long timeoutMillis) throws IOException {
+				return true;
+			}
+			
+			@Override
+			public OpenFuture removeListener(SshFutureListener<OpenFuture> listener) {
+				return null;
+			}
+			
+			@Override
+			public OpenFuture addListener(SshFutureListener<OpenFuture> listener) {
+				return null;
+			}
+			
+			@Override
+			public void setOpened() {
+			}
+			
+			@Override
+			public void setException(Throwable exception) {
+			}
+			
+			@Override
+			public boolean isOpened() {
+				return true;
+			}
+			
+			@Override
+			public boolean isCanceled() {
+				return false;
+			}
+			
+			@Override
+			public Throwable getException() {
+				return null;
+			}
+			
+			@Override
+			public void cancel() {
+			}
+		};
+		
+		
+	}
+	
 }

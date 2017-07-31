@@ -33,123 +33,123 @@ import nl.esciencecenter.xenon.utils.OutputReader;
 
 public abstract class SshInteractiveProcessITest {
 
-    public abstract String getLocation();
+	public abstract String getLocation();
 
-    public abstract Credential getCorrectCredential();
+	public abstract Credential getCorrectCredential();
+	
+	@Test
+	public void test_run_hostname() throws Exception { 
+		SshClient client = SSHUtil.createSSHClient(false, false, false, false);
+		ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10*1000);
+		
+		JobDescription desc = new JobDescription();
+		desc.setExecutable("/bin/hostname");
+		
+		String id = "TESTID";
+		
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, id);
+		
+		Streams s = p.getStreams();
 
-    @Test
-    public void test_run_hostname() throws Exception {
-        SshClient client = SSHUtil.createSSHClient(false, false, false, false);
-        ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10*1000);
+		assertNotNull(s.getStdin());
+		assertNotNull(s.getStdout());
+		assertNotNull(s.getStderr());
 
-        JobDescription desc = new JobDescription();
-        desc.setExecutable("/bin/hostname");
-
-        String id = "TESTID";
-
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, id);
-
-        Streams s = p.getStreams();
-
-        assertNotNull(s.getStdin());
-        assertNotNull(s.getStdout());
-        assertNotNull(s.getStderr());
-
-        // No input, so close stdin
-        s.getStdin().close();
-
-        OutputReader stdout = new OutputReader(s.getStdout());
-        OutputReader stderr = new OutputReader(s.getStderr());
-
-        stderr.waitUntilFinished();
-        stdout.waitUntilFinished();
-
-        String output = stdout.getResultAsString();
-        String error = stderr.getResultAsString();
-
-        assertTrue(error.isEmpty());
-        assertFalse(output.isEmpty());
-        assertEquals(0, p.getExitStatus());
-    }
-
-
-    @Test
-    public void test_run_cat() throws Exception {
-        SshClient client = SSHUtil.createSSHClient(false, false, false, false);
-        ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10*1000);
-
-        JobDescription desc = new JobDescription();
-        desc.setExecutable("/bin/cat");
-
-        String id = "TESTID";
-
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, id);
-
-        Streams s = p.getStreams();
-
-        assertNotNull(s.getStdin());
-        assertNotNull(s.getStdout());
-        assertNotNull(s.getStderr());
-
-        String message = "Hello World!";
-
-        InputWriter stdin = new InputWriter(message, s.getStdin());
-        OutputReader stdout = new OutputReader(s.getStdout());
-        OutputReader stderr = new OutputReader(s.getStderr());
-
-        stdin.waitUntilFinished();
-        stderr.waitUntilFinished();
-        stdout.waitUntilFinished();
-
-        String output = stdout.getResultAsString();
-        String error = stderr.getResultAsString();
-
-        assertTrue(error.isEmpty());
-        assertEquals(message, output);
-        assertEquals(0, p.getExitStatus());
-    }
+		// No input, so close stdin
+		s.getStdin().close();
+		
+		OutputReader stdout = new OutputReader(s.getStdout());
+		OutputReader stderr = new OutputReader(s.getStderr());
+		
+		stderr.waitUntilFinished();
+		stdout.waitUntilFinished();
+		
+		String output = stdout.getResultAsString();
+		String error = stderr.getResultAsString();
+		
+		assertTrue(error.isEmpty());
+		assertFalse(output.isEmpty());
+		assertEquals(0, p.getExitStatus());
+	}
 
 
-    @Test
-    public void test_exitStatusBeforeFinish() throws Exception {
-        SshClient client = SSHUtil.createSSHClient(false, false, false, false);
-        ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10*1000);
+	@Test
+	public void test_run_cat() throws Exception { 
+		SshClient client = SSHUtil.createSSHClient(false, false, false, false);
+		ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10*1000);
+		
+		JobDescription desc = new JobDescription();
+		desc.setExecutable("/bin/cat");
+		
+		String id = "TESTID";
+		
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, id);
+		
+		Streams s = p.getStreams();
 
-        JobDescription desc = new JobDescription();
-        desc.setExecutable("/bin/sleep");
-        desc.addArgument("5");
+		assertNotNull(s.getStdin());
+		assertNotNull(s.getStdout());
+		assertNotNull(s.getStderr());
 
-        String id = "TESTID";
+		String message = "Hello World!";
+		
+		InputWriter stdin = new InputWriter(message, s.getStdin());
+		OutputReader stdout = new OutputReader(s.getStdout());
+		OutputReader stderr = new OutputReader(s.getStderr());
+		
+		stdin.waitUntilFinished();		
+		stderr.waitUntilFinished();
+		stdout.waitUntilFinished();
+		
+		String output = stdout.getResultAsString();
+		String error = stderr.getResultAsString();
+		
+		assertTrue(error.isEmpty());
+		assertEquals(message, output);
+		assertEquals(0, p.getExitStatus());
+	}
 
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, id);
+		
+	@Test
+	public void test_exitStatusBeforeFinish() throws Exception { 
+		SshClient client = SSHUtil.createSSHClient(false, false, false, false);
+		ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10*1000);
+		
+		JobDescription desc = new JobDescription();
+		desc.setExecutable("/bin/sleep");
+		desc.addArgument("5");
+		
+		String id = "TESTID";
+		
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, id);
+		
+		// Not done yet, so exit returns -1
+		assertEquals(-1, p.getExitStatus());
 
-        // Not done yet, so exit returns -1
-        assertEquals(-1, p.getExitStatus());
+		Streams s = p.getStreams();
 
-        Streams s = p.getStreams();
+		assertNotNull(s.getStdin());
+		assertNotNull(s.getStdout());
+		assertNotNull(s.getStderr());
 
-        assertNotNull(s.getStdin());
-        assertNotNull(s.getStdout());
-        assertNotNull(s.getStderr());
-
-        s.getStdin().close();
-
-        OutputReader stdout = new OutputReader(s.getStdout());
-        OutputReader stderr = new OutputReader(s.getStderr());
-
-        stderr.waitUntilFinished();
-        stdout.waitUntilFinished();
-
-        String output = stdout.getResultAsString();
-        String error = stderr.getResultAsString();
-
-        assertTrue(error.isEmpty());
-        assertTrue(output.isEmpty());
+		s.getStdin().close();
+		
+		OutputReader stdout = new OutputReader(s.getStdout());
+		OutputReader stderr = new OutputReader(s.getStderr());
+	
+		stderr.waitUntilFinished();
+		stdout.waitUntilFinished();
+		
+		String output = stdout.getResultAsString();
+		String error = stderr.getResultAsString();
+		
+		assertTrue(error.isEmpty());
+		assertTrue(output.isEmpty());
 
 
-        // Done yet, so exit returns 0
-        assertEquals(0, p.getExitStatus());
-    }
+		// Done yet, so exit returns 0
+		assertEquals(0, p.getExitStatus());
+	}
 //
-
+	
 }

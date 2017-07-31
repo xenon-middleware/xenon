@@ -33,7 +33,7 @@ import nl.esciencecenter.xenon.schedulers.Streams;
 
 /**
  * LocalInteractiveProcess implements a {@link InteractiveProcess} for local interactive processes.
- *
+ * 
  * @version 1.0
  * @since 1.0
  */
@@ -53,16 +53,16 @@ class LocalInteractiveProcess implements InteractiveProcess {
         builder.environment().putAll(description.getEnvironment());
 
         String workingDirectory = description.getWorkingDirectory();
-
+        
         if (workingDirectory == null) {
             workingDirectory = System.getProperty("user.dir");
         }
 
         builder.directory(new File(workingDirectory));
 
-        try {
+        try { 
             process = builder.start();
-        } catch (IOException e) {
+        } catch (IOException e) { 
             throw new XenonException(ADAPTOR_NAME, "Failed to start local process!", e);
         }
         streams = new StreamsImplementation(jobIdentifier, process.getInputStream(), process.getOutputStream(), process.getErrorStream());
@@ -71,7 +71,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
     public Streams getStreams() {
         return streams;
     }
-
+    
     public boolean isDone() {
         if (done) {
             return true;
@@ -104,7 +104,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
 
         boolean success = false;
 
-        if (!LocalUtil.isWindows()) {
+        if (!LocalUtil.isWindows()) { 
             try {
                 final Field pidField = process.getClass().getDeclaredField("pid");
 
@@ -125,7 +125,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
                 // Failed, so use the regular Java destroy.
             }
         }
-
+            
         if (!success) {
             process.destroy();
         }

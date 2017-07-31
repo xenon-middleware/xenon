@@ -20,7 +20,7 @@ import java.util.Map.Entry;
 
 /**
  * JobDescription contains a description of a job that can be submitted to a {@link Scheduler}.
- *
+ * 
  * @version 1.0
  * @since 1.0
  */
@@ -97,7 +97,7 @@ public class JobDescription {
 
     /**
      * Get the number of nodes.
-     *
+     * 
      * @return the number of nodes.
      */
     public int getNodeCount() {
@@ -106,7 +106,7 @@ public class JobDescription {
 
     /**
      * Set the number of nodes.
-     *
+     * 
      * @param nodeCount
      *            the number of nodes;
      */
@@ -116,7 +116,7 @@ public class JobDescription {
 
     /**
      * Get the number of processes to start on each node.
-     *
+     * 
      * @return the number of processesPerNode.
      */
     public int getProcessesPerNode() {
@@ -125,7 +125,7 @@ public class JobDescription {
 
     /**
      * Set the number of processes started on each node.
-     *
+     * 
      * @param processesPerNode
      *            the number of processes started on each node.
      */
@@ -135,7 +135,7 @@ public class JobDescription {
 
     /**
      * Is only a single process started?
-     *
+     * 
      * @return if only a single process is started.
      */
     public boolean isStartSingleProcess() {
@@ -145,7 +145,7 @@ public class JobDescription {
     /**
      * Set if only a single process is started, instead of nodeCount * processesPerNode. Resources are still reserved, but it is
      * up to the user to start all the processes. Mainly useful for MPI.
-     *
+     * 
      * @param startSingleProcess
      *            if only a single process is started.
      */
@@ -155,7 +155,7 @@ public class JobDescription {
 
     /**
      * Get the queue name;
-     *
+     * 
      * @return the queue name;
      */
     public String getQueueName() {
@@ -164,7 +164,7 @@ public class JobDescription {
 
     /**
      * Set the queue name;
-     *
+     * 
      * @param queueName
      *            the queue name;
      */
@@ -174,7 +174,7 @@ public class JobDescription {
 
     /**
      * Get the maximum job time (in minutes).
-     *
+     * 
      * @return the queue name;
      */
     public int getMaxTime() {
@@ -183,7 +183,7 @@ public class JobDescription {
 
     /**
      * Set the maximum job time (in minutes).
-     *
+     * 
      * @param maxTime
      *            the maximum job time (in minutes).
      */
@@ -193,7 +193,7 @@ public class JobDescription {
 
     /**
      * Get the path to the executable.
-     *
+     * 
      * @return the path to the executable.
      */
     public String getExecutable() {
@@ -202,7 +202,7 @@ public class JobDescription {
 
     /**
      * Sets the path to the executable.
-     *
+     * 
      * @param executable
      *            the path to the executable.
      */
@@ -212,7 +212,7 @@ public class JobDescription {
 
     /**
      * Get the command line arguments of the executable.
-     *
+     * 
      * @return Returns the arguments of the executable.
      */
     public List<String> getArguments() {
@@ -221,7 +221,7 @@ public class JobDescription {
 
     /**
      * Sets the command line arguments of the executable.
-     *
+     * 
      * @param arguments
      *            the command line arguments of the executable.
      */
@@ -235,9 +235,9 @@ public class JobDescription {
 
     /**
      * Add a command line argument for the executable.
-     *
+     * 
      * The argument may not be <code>null</code> or empty.
-     *
+     * 
      * @param argument
      *            the command line argument to add.
      */
@@ -252,10 +252,10 @@ public class JobDescription {
 
     /**
      * Get the environment of the executable.
-     *
+     * 
      * The environment of the executable consists of a {@link Map} of environment variables with their values (for example:
      * "JAVA_HOME", "/path/to/java").
-     *
+     * 
      * @return the environment of the executable.
      */
     public Map<String, String> getEnvironment() {
@@ -264,10 +264,10 @@ public class JobDescription {
 
     /**
      * Sets the environment of the executable.
-     *
+     * 
      * The environment of the executable consists of a {@link Map} of environment variables with their values (for example:
      * "JAVA_HOME", "/path/to/java").
-     *
+     * 
      * @param environment
      *            environment of the executable.
      */
@@ -284,12 +284,12 @@ public class JobDescription {
 
     /**
      * Add a variable to the environment of the executable.
-     *
+     * 
      * The environment of the executable consists of a {@link Map} of environment variables with their values (for example:
      * "JAVA_HOME", "/path/to/java").
-     *
+     * 
      * The key of an environment variable may not be <code>null</code> or empty.
-     *
+     * 
      * @param key
      *            the unique key under which to store the value.
      * @param value
@@ -306,9 +306,9 @@ public class JobDescription {
 
     /**
      * Get a copy of the job options of this job.
-     *
+     * 
      * The job options consist of a {@link Map} of options variables with their values (for example: "PE", "MPI").
-     *
+     * 
      * @return the job options of the job.
      */
     public Map<String, String> getJobOptions() {
@@ -317,9 +317,9 @@ public class JobDescription {
 
     /**
      * Sets the job options of the job.
-     *
+     * 
      * The job options consist of a {@link Map} of options variables with their values (for example: "PE", "MPI").
-     *
+     * 
      * @param options
      *            job options of the job.
      */
@@ -336,11 +336,11 @@ public class JobDescription {
 
     /**
      * Add a job option to the job.
-     *
+     * 
      * The job option consist of a key-value pair (for example: "PE", "MPI").
-     *
+     * 
      * Neither the key or value of a job option may be <code>null</code> or empty.
-     *
+     * 
      * @param key
      *            the unique key under which to store the job option.
      * @param value
@@ -361,7 +361,7 @@ public class JobDescription {
 
     /**
      * Sets the path to the file from which the executable must redirect stdin.
-     *
+     * 
      * @param stdin
      *            the path.
      */
@@ -371,7 +371,7 @@ public class JobDescription {
 
     /**
      * Sets the path to the file to which the executable must redirect stdout.
-     *
+     * 
      * @param stdout
      *            the path.
      */
@@ -381,7 +381,7 @@ public class JobDescription {
 
     /**
      * Sets the path to the file to which the executable must redirect stderr.
-     *
+     * 
      * @param stderr
      *            the path.
      */
@@ -391,7 +391,7 @@ public class JobDescription {
 
     /**
      * Sets the path of the working directory for the executable.
-     *
+     * 
      * @param workingDirectory
      *            path of the working directory.
      */
@@ -401,7 +401,7 @@ public class JobDescription {
 
     /**
      * Gets the path to the file from which the executable must redirect stdin.
-     *
+     * 
      * @return the path.
      */
     public String getStdin() {
@@ -410,7 +410,7 @@ public class JobDescription {
 
     /**
      * Gets the path to the file to which the executable must redirect stdout.
-     *
+     * 
      * @return the path.
      */
     public String getStdout() {
@@ -419,7 +419,7 @@ public class JobDescription {
 
     /**
      * Gets the path to the file to which the executable must redirect stderr.
-     *
+     * 
      * @return the path.
      */
     public String getStderr() {
@@ -428,7 +428,7 @@ public class JobDescription {
 
     /**
      * Gets the path of the working directory for the executable.
-     *
+     * 
      * @return workingDirectory path of the working directory.
      */
     public String getWorkingDirectory() {

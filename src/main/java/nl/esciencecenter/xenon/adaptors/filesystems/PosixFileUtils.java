@@ -21,16 +21,16 @@ import java.util.Set;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 
 /**
- * PosixFileUtils contains several utility functions related to Posix files.
- *
+ * PosixFileUtils contains several utility functions related to Posix files. 
+ * 
  * @version 1.0
  * @since 1.0
  *
  */
 @SuppressWarnings("OctalInteger")
 public class PosixFileUtils {
-
-    // FIXME: Are these correct ? Some seem to be missing ?
+    
+    // FIXME: Are these correct ? Some seem to be missing ?  
 
     /** read by owner */
     public static final int READ_OWNER = 00400;
@@ -61,7 +61,7 @@ public class PosixFileUtils {
 
     /** Bit mask for bits used */
     private static final int MASK = ~(READ_OWNER | WRITE_OWNER | EXEC_OWNER | READ_GROUP | WRITE_GROUP | EXEC_GROUP | READ_OTHERS | WRITE_OTHERS | EXEC_OTHERS);
-
+  
     @SuppressWarnings("PMD.NPathComplexity")
     public static Set<PosixFilePermission> bitsToPermissions(int bit) {
 
@@ -99,7 +99,7 @@ public class PosixFileUtils {
 
         return result;
     }
-
+    
     public static int permissionsToBits(Set<PosixFilePermission> permissions) {
 
         int bits = 0;

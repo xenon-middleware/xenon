@@ -26,30 +26,30 @@ import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
 
 public abstract class SchedulerAdaptor extends Adaptor implements SchedulerAdaptorDescription {
 
-    public static final String ADAPTORS_PREFIX = "xenon.adaptors.schedulers.";
-
-    protected SchedulerAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) {
-        super(name, description, locations, properties);
-    }
+	public static final String ADAPTORS_PREFIX = "xenon.adaptors.schedulers.";
+	
+	protected SchedulerAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) {  
+		super(name, description, locations, properties);
+	}
 
     @Override
     public boolean isEmbedded() {
-        // By default we assume the scheduler is not embedded into Xenon.
-        return false;
+    	// By default we assume the scheduler is not embedded into Xenon.
+    	return false;
     }
 
     @Override
-    public boolean supportsBatch() {
-        // By default we assume the scheduler supports batch jobs.
-        return true;
+    public boolean supportsBatch() { 
+    	// By default we assume the scheduler supports batch jobs.
+    	return true;
     }
-
+    
     @Override
-    public boolean supportsInteractive() {
-        // By default we assume the scheduler does not supports interactive jobs.
-        return false;
+    public boolean supportsInteractive() { 
+    	// By default we assume the scheduler does not supports interactive jobs.
+    	return false;
     }
-
-    public abstract Scheduler createScheduler(String location, Credential credential, Map<String,String> properties) throws XenonException;
-
+	
+	public abstract Scheduler createScheduler(String location, Credential credential, Map<String,String> properties) throws XenonException;
+	
 }

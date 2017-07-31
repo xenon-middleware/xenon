@@ -45,9 +45,9 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 
 public class WebdavFileAdaptor extends FileAdaptor {
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(WebdavFileAdaptor.class);
-
+    
     /** The name of this adaptor */
     public static final String ADAPTOR_NAME = "webdav";
 
@@ -62,70 +62,70 @@ public class WebdavFileAdaptor extends FileAdaptor {
 
     /** List of properties supported by this FTP adaptor */
     public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription[0];
-
+    
     /** The default buffer size for copy. Webdav doesn't use the standard copy engine. */
     protected static final int BUFFER_SIZE = 4 * 1024;
 
     public static final int OK_CODE = 200;
-
-    private static final int DEFAULT_PORT = 80;
-
+	
+    private static final int DEFAULT_PORT = 80; 
+	
     public WebdavFileAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
     }
 
-    @Override
-    public boolean canReadSymboliclinks() {
-        // Webdav cannot read symbolic links.
-        return false;
-    }
-
+	@Override
+	public boolean canReadSymboliclinks() {
+		// Webdav cannot read symbolic links.
+		return false;
+	}
+    
     protected static boolean isOkish(int response) {
         return response == HttpStatus.SC_OK || response == HttpStatus.SC_CREATED || response == HttpStatus.SC_MULTI_STATUS
                 || response == HttpStatus.SC_NO_CONTENT;
     }
-
+    
 //    protected boolean isFilePath(String path) {
-//        return !isFolderPath(path);
-//    }
-
+//		return !isFolderPath(path);
+//	}
+    
     @Override
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties)
             throws XenonException {
         LOGGER.debug("newFileSystem location = {} credential = {} properties = {}", location, credential,
                 properties);
 
-        if (!(credential instanceof PasswordCredential)) {
-            throw new InvalidCredentialException(ADAPTOR_NAME, "Only password credentials supported");
+        if (!(credential instanceof PasswordCredential)) { 
+        	throw new InvalidCredentialException(ADAPTOR_NAME, "Only password credentials supported");
         }
-
-
-        URI uri;
-
-        try {
-            uri = new URI(location);
-        } catch (Exception e) {
-            throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
-        }
-
-        String host = uri.getHost();
-        int port = uri.getPort();
-
-        if (port == -1) {
-            port = DEFAULT_PORT;
-        }
-
-        String hostPort = uri.getScheme() + "://" + host + ":" + port;
-
-        HttpClient client = getClient(host, port, (PasswordCredential) credential);
+        
+        
+        URI uri; 
+        
+    	try { 
+    		uri = new URI(location);
+    	} catch (Exception e) {
+    		throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
+		}
+        
+    	String host = uri.getHost();
+    	int port = uri.getPort();
+    	
+    	if (port == -1) { 
+    		port = DEFAULT_PORT;
+    	}
+    	
+    	String hostPort = uri.getScheme() + "://" + host + ":" + port;
+    	
+    	HttpClient client = getClient(host, port, (PasswordCredential) credential);
         HttpMethod method;
         try {
-            String loc = uri.toString();
-
-            if (!loc.endsWith("/")) {
-                loc = loc + "/";
-            }
-
+        	String loc = uri.toString();
+        	
+        	if (!loc.endsWith("/")) { 
+        		loc = loc + "/";
+        	}
+        	
             method = new OptionsMethod(loc);
             int response = client.executeMethod(method);
             String responseBodyAsString = method.getStatusLine().toString();
@@ -138,9 +138,9 @@ public class WebdavFileAdaptor extends FileAdaptor {
         }
 
         String cwd = uri.getPath();
-
+        
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
-
+       
         return new WebdavFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, hostPort, new Path(cwd), client, xp);
     }
 

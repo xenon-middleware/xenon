@@ -20,55 +20,55 @@ package nl.esciencecenter.xenon;
  */
 public interface AdaptorDescription {
 
-    /*
-    private final String name;
-    private final String description;
-    private final String [] supportedLocations;
-    private final XenonPropertyDescription [] supportedProperties;
-
-    public AdaptorDescription(String name, String description, String[] supportedLocations,
-            XenonPropertyDescription[] supportedProperties) {
-        super();
-        this.name = name;
-        this.description = description;
-        this.supportedLocations = supportedLocations;
-        this.supportedProperties = supportedProperties;
-    }
-     */
-
-    /**
+	/*
+	private final String name;
+	private final String description;
+	private final String [] supportedLocations;
+	private final XenonPropertyDescription [] supportedProperties;
+	
+	public AdaptorDescription(String name, String description, String[] supportedLocations, 
+			XenonPropertyDescription[] supportedProperties) {
+		super();
+		this.name = name;
+		this.description = description;
+		this.supportedLocations = supportedLocations;
+		this.supportedProperties = supportedProperties;
+	}
+	 */
+	
+	/**
      * Get the name of the adaptor.
-     *
+     * 
      * @return the name of the adaptor.
      */
     String getName();
-
+    
     /**
      * Get the description of the adaptor.
-     *
+     * 
      * @return the description of the adaptor.
      */
     String getDescription();
 
     /**
      * Get the supported locations for this adaptor.
-     *
+     * 
      * @return the locations supported by this adaptor.
      */
     String[] getSupportedLocations();
-
+    
     /**
      * Returns an array containing all properties this adaptor supports.
-     *
+     * 
      * @return an array containing all properties this adaptor supports.
      */
     XenonPropertyDescription[] getSupportedProperties();
 
 //    @Override
 //    public String toString() {
-//        return "AdaptorDescription [name=" + name + ", description=" + description +
-//                ", supportedLocations=" + Arrays.toString(supportedLocations) +
-//                ", supportedProperties=" + Arrays.toString(supportedProperties) + "]";
+//        return "AdaptorDescription [name=" + name + ", description=" + description + 
+//        		", supportedLocations=" + Arrays.toString(supportedLocations) +
+//        		", supportedProperties=" + Arrays.toString(supportedProperties) + "]";
 //    }
-
+    
 }

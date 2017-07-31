@@ -16,7 +16,7 @@
 package nl.esciencecenter.xenon;
 
 /**
- * Thrown when an unknown adaptor name is provided.
+ * Thrown when an unknown adaptor name is provided.  
  */
 public class UnknownAdaptorException extends XenonException {
 

@@ -18,37 +18,37 @@ package nl.esciencecenter.xenon.credentials;
 import java.util.Objects;
 
 /**
- * This class represents the default credential that may be used by the various adaptors.
- *
- * It mainly serves as a placeholder to indicate that the adaptor must revert to whatever default behavior it defines.
+ * This class represents the default credential that may be used by the various adaptors. 
+ * 
+ * It mainly serves as a placeholder to indicate that the adaptor must revert to whatever default behavior it defines.   
  */
 public class DefaultCredential implements Credential {
 
-    private final String username;
+	private final String username;
+	
+	public DefaultCredential() {
+		username = System.getProperty("user.name");
+	}
+	
+	public DefaultCredential(String username) {
+		this.username = username;
+	}
+	
+	@Override
+	public String getUsername() {
+		return username;
+	}
 
-    public DefaultCredential() {
-        username = System.getProperty("user.name");
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		DefaultCredential that = (DefaultCredential) o;
+		return Objects.equals(username, that.username);
+	}
 
-    public DefaultCredential(String username) {
-        this.username = username;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DefaultCredential that = (DefaultCredential) o;
-        return Objects.equals(username, that.username);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(username);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(username);
+	}
 }

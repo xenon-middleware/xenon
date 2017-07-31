@@ -46,92 +46,92 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 public class LocalSchedulerTest extends SchedulerTestParent {
 
-    @Override
-    protected SchedulerLocationConfig setupLocationConfig() {
+	@Override
+	protected SchedulerLocationConfig setupLocationConfig() {
 
-        return new SchedulerLocationConfig() {
+		return new SchedulerLocationConfig() {
+			
+			@Override
+			public String getLocation() {
+				return "local://";
+			}
 
-            @Override
-            public String getLocation() {
-                return "local://";
-            }
+			@Override
+			public String[] getQueueNames() {
+				return new String [] { "single", "multi", "unlimited" } ;
+			}
 
-            @Override
-            public String[] getQueueNames() {
-                return new String [] { "single", "multi", "unlimited" } ;
-            }
+			@Override
+			public String getDefaultQueueName() {
+				return "single";
+			}
+			
+			@Override
+			public boolean supportsInteractive() {
+				return true;
+			}
+			
+			@Override
+			public boolean isEmbedded() {
+				return true;
+			}
+		};
+	}
 
-            @Override
-            public String getDefaultQueueName() {
-                return "single";
-            }
+	@Override
+	public Scheduler setupScheduler() throws XenonException {
+		return Scheduler.create("local");
+	}
+	
+	@Test
+	public void test_location_null() throws XenonException {
+		Scheduler.create("local", null);
+	}
+	
+	@Test
+	public void test_location_empty() throws XenonException {
+		Scheduler.create("local", "");
+	}
+	
+	@Test
+	public void test_location_url() throws XenonException {
+		Scheduler.create("local", "local://");
+	}
+	
+	@Test(expected=InvalidLocationException.class)
+	public void test_location_wrong() throws XenonException {
+		Scheduler.create("local", "foobar");
+	}
+	
+	@Test
+	public void test_credential_null() throws XenonException {
+		Scheduler.create("local", "local://", null);
+	}
+	
+	@Test
+	public void test_credential_default() throws XenonException {
+		Scheduler.create("local", "local://", new DefaultCredential());
+	}
+	
+	@Test(expected=InvalidCredentialException.class)
+	public void test_credential_wrong() throws XenonException {
+		Scheduler.create("local", "local://", new PasswordCredential("user", "password".toCharArray()));
+	}
+	
+	@Test
+	public void test_properties_null() throws XenonException {
+		Scheduler.create("local", "local://", null, null);
+	}
+	
+	@Test
+	public void test_properties_empty() throws XenonException {
+		Scheduler.create("local", "local://", null, new HashMap<String,String>());
+	}
 
-            @Override
-            public boolean supportsInteractive() {
-                return true;
-            }
-
-            @Override
-            public boolean isEmbedded() {
-                return true;
-            }
-        };
-    }
-
-    @Override
-    public Scheduler setupScheduler() throws XenonException {
-        return Scheduler.create("local");
-    }
-
-    @Test
-    public void test_location_null() throws XenonException {
-        Scheduler.create("local", null);
-    }
-
-    @Test
-    public void test_location_empty() throws XenonException {
-        Scheduler.create("local", "");
-    }
-
-    @Test
-    public void test_location_url() throws XenonException {
-        Scheduler.create("local", "local://");
-    }
-
-    @Test(expected=InvalidLocationException.class)
-    public void test_location_wrong() throws XenonException {
-        Scheduler.create("local", "foobar");
-    }
-
-    @Test
-    public void test_credential_null() throws XenonException {
-        Scheduler.create("local", "local://", null);
-    }
-
-    @Test
-    public void test_credential_default() throws XenonException {
-        Scheduler.create("local", "local://", new DefaultCredential());
-    }
-
-    @Test(expected=InvalidCredentialException.class)
-    public void test_credential_wrong() throws XenonException {
-        Scheduler.create("local", "local://", new PasswordCredential("user", "password".toCharArray()));
-    }
-
-    @Test
-    public void test_properties_null() throws XenonException {
-        Scheduler.create("local", "local://", null, null);
-    }
-
-    @Test
-    public void test_properties_empty() throws XenonException {
-        Scheduler.create("local", "local://", null, new HashMap<String,String>());
-    }
-
-    @Test(expected=UnknownPropertyException.class)
-    public void test_properties_unknownProperty_throwsException() throws XenonException {
-        HashMap<String, String> map = new HashMap<>();
-        map.put("key", "value");
-        Scheduler.create("local", "local://", null, map);
-    }
+	@Test(expected=UnknownPropertyException.class)
+	public void test_properties_unknownProperty_throwsException() throws XenonException {
+		HashMap<String, String> map = new HashMap<>();
+		map.put("key", "value");
+		Scheduler.create("local", "local://", null, map);
+	}
 }

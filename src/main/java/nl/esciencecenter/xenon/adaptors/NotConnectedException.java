@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.adaptors;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that there was no connection.
- *
+ * Signals that there was no connection.  
+ * 
  * @version 1.0
  * @since 1.0
  */

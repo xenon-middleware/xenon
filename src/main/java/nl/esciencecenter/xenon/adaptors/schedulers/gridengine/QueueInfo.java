@@ -25,8 +25,8 @@ import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 
 /**
  * Class that holds some info on queues used in Grid Engine.
- *
- *
+ * 
+ * 
  */
 class QueueInfo {
     private final String name;
@@ -63,7 +63,7 @@ class QueueInfo {
 
     /**
      * Testing constructor
-     *
+     * 
      * @param name
      *            name of the queue
      * @param slots

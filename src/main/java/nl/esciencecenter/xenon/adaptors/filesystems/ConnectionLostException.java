@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.adaptors.filesystems;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that a connection was lost.
- *
+ * Signals that a connection was lost.  
+ * 
  * @version 1.0
  * @since 1.0
  */

@@ -31,94 +31,94 @@ import nl.esciencecenter.xenon.utils.OutputReader;
 
 public class OutputReaderTest {
 
-    @Test(expected=IllegalArgumentException.class)
-    public void test_create_null() {
-        OutputReader r = new OutputReader(null);
-    }
+	@Test(expected=IllegalArgumentException.class)
+	public void test_create_null() {
+		OutputReader r = new OutputReader(null);
+	}
+	
+	@Test
+	public void test_simpleInput() {
 
-    @Test
-    public void test_simpleInput() {
+		ByteArrayInputStream in = new ByteArrayInputStream("Hello World".getBytes());
+		
+		OutputReader r = new OutputReader(in);
+		
+		r.waitUntilFinished();
+		
+		assertTrue(r.isFinished());
+		assertEquals("Hello World", r.getResultAsString());
+	}
+	
+	@Test
+	public void test_bigInput() {
 
-        ByteArrayInputStream in = new ByteArrayInputStream("Hello World".getBytes());
+		byte [] tmp = new byte[2500];
+		
+		for (int i=0;i<tmp.length;i++) { 
+			tmp[i] = (byte) (i & 0xff);
+		}
+		
+		ByteArrayInputStream in = new ByteArrayInputStream(tmp);
+		
+		OutputReader r = new OutputReader(in);
+		
+		r.waitUntilFinished();
+		
+		assertArrayEquals(tmp, r.getResult());
+	}
 
-        OutputReader r = new OutputReader(in);
+	public class BrokenInputStream extends InputStream {
 
-        r.waitUntilFinished();
+		private int breakAfter;
+		private int readBytes;
+		
+		public BrokenInputStream(int breakAfter) { 
+			this.breakAfter = breakAfter;
+		}
+		
+		@Override
+		public int read() throws IOException {
+			if (readBytes >= breakAfter) { 
+	 			throw new IOException("Boom!");
+	 		}
+	 		readBytes++;
+			return 0;
+		} 
+		
+		@Override
+		public int read(byte[] b, int off, int len) throws IOException {
+	 		if (readBytes >= breakAfter) { 
+	 			throw new IOException("Boom!");
+	 		}
+	 		
+	 		if (readBytes + len >= breakAfter) { 
+	 			len = breakAfter - readBytes;
+	 			readBytes = breakAfter;
+	 			return len;
+	 		} else { 
+	 			readBytes += len;
+	 			return len;
+	 		}
+	 	}
+	 	
+		@Override
+		public void close() throws IOException { 
+	 		throw new IOException("Boom!");
+	 	}
+	}
+	
+	@Test
+	public void test_brokenStream() {
 
-        assertTrue(r.isFinished());
-        assertEquals("Hello World", r.getResultAsString());
-    }
+		BrokenInputStream in = new BrokenInputStream(2000);
+		
+		OutputReader r = new OutputReader(in);
+		
+		r.waitUntilFinished();
+		
+		assertTrue(r.isFinished());
+		assertEquals(2000, r.getResult().length);
+	}
 
-    @Test
-    public void test_bigInput() {
-
-        byte [] tmp = new byte[2500];
-
-        for (int i=0;i<tmp.length;i++) {
-            tmp[i] = (byte) (i & 0xff);
-        }
-
-        ByteArrayInputStream in = new ByteArrayInputStream(tmp);
-
-        OutputReader r = new OutputReader(in);
-
-        r.waitUntilFinished();
-
-        assertArrayEquals(tmp, r.getResult());
-    }
-
-    public class BrokenInputStream extends InputStream {
-
-        private int breakAfter;
-        private int readBytes;
-
-        public BrokenInputStream(int breakAfter) {
-            this.breakAfter = breakAfter;
-        }
-
-        @Override
-        public int read() throws IOException {
-            if (readBytes >= breakAfter) {
-                 throw new IOException("Boom!");
-             }
-             readBytes++;
-            return 0;
-        }
-
-        @Override
-        public int read(byte[] b, int off, int len) throws IOException {
-             if (readBytes >= breakAfter) {
-                 throw new IOException("Boom!");
-             }
-
-             if (readBytes + len >= breakAfter) {
-                 len = breakAfter - readBytes;
-                 readBytes = breakAfter;
-                 return len;
-             } else {
-                 readBytes += len;
-                 return len;
-             }
-         }
-
-        @Override
-        public void close() throws IOException {
-             throw new IOException("Boom!");
-         }
-    }
-
-    @Test
-    public void test_brokenStream() {
-
-        BrokenInputStream in = new BrokenInputStream(2000);
-
-        OutputReader r = new OutputReader(in);
-
-        r.waitUntilFinished();
-
-        assertTrue(r.isFinished());
-        assertEquals(2000, r.getResult().length);
-    }
-
-
+	
 }

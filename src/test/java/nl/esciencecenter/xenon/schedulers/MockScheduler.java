@@ -19,18 +19,18 @@ import nl.esciencecenter.xenon.adaptors.XenonProperties;
 
 public class MockScheduler extends MockDefaultScheduler {
 
-    private boolean isEmbedded;
-    private boolean supportsBatch;
-    private boolean supportsInteractive;
+	private boolean isEmbedded; 
+	private boolean supportsBatch; 
+	private boolean supportsInteractive; 
+	
+	public MockScheduler(String uniqueID, String adaptor, String location, boolean isEmbedded, boolean supportsBatch,
+			boolean supportsInteractive, XenonProperties properties) {
+		super(uniqueID, adaptor, location, properties);
+	
+		this.isEmbedded = isEmbedded;
+		this.supportsBatch = supportsBatch;
+		this.supportsInteractive = supportsInteractive;
+	}
 
-    public MockScheduler(String uniqueID, String adaptor, String location, boolean isEmbedded, boolean supportsBatch,
-            boolean supportsInteractive, XenonProperties properties) {
-        super(uniqueID, adaptor, location, properties);
-
-        this.isEmbedded = isEmbedded;
-        this.supportsBatch = supportsBatch;
-        this.supportsInteractive = supportsInteractive;
-    }
-
-
+	
 }

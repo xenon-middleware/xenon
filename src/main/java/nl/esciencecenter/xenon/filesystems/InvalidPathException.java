@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.filesystems;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that an end-of-file was encountered.
- *
+ * Signals that an end-of-file was encountered.  
+ * 
  * @version 1.0
  * @since 1.0
  */
