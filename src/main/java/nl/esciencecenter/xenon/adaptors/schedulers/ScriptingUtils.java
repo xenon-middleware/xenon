@@ -15,9 +15,6 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
@@ -28,6 +25,10 @@ import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
 
 public class ScriptingUtils {
 
@@ -45,9 +46,7 @@ public class ScriptingUtils {
 
         for (XenonPropertyDescription [] pa : prop) {
             if (pa != null) {
-                for (XenonPropertyDescription p : pa) {
-                    tmp.add(p);
-                }
+                tmp.addAll(Arrays.asList(pa));
             }
         }
 
@@ -128,8 +127,6 @@ public class ScriptingUtils {
      *
      * @param jobInfo
      *            the map the job info should be .
-     * @param job
-     *            the job to check the presence for.
      * @param adaptorName
      *            name of the current adaptor for error reporting.
      * @param jobIDField

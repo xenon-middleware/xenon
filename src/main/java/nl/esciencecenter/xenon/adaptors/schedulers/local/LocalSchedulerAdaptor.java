@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers.local;
 
-import java.util.Map;
-
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
@@ -30,12 +28,13 @@ import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
-import nl.esciencecenter.xenon.UnknownPropertyException;
+
+import java.util.Map;
 
 /**
  * LocalFiles implements an Xenon <code>Jobs</code> adaptor for local job operations.
  *
- * @see nl.esciencecenter.xenon.jobs.Jobs
+ * @see nl.esciencecenter.xenon.schedulers.Scheduler
  *
  * @version 1.0
  * @since 1.0
