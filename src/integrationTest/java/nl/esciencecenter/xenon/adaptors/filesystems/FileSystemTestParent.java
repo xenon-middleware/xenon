@@ -76,8 +76,9 @@ public abstract class FileSystemTestParent {
         testRoot = root.resolve(TEST_DIR);
         
         //System.out.println("TEST_ROOT=" + testRoot);
-        
+
         fileSystem.createDirectory(testRoot);
+
         
         testDir = null;
     }
@@ -1023,22 +1024,6 @@ public abstract class FileSystemTestParent {
         fileSystem.appendToFile(null);
     }
 
-    @Test(expected = NoSuchPathException.class)
-    public void test_appendToFile_fileDoesNotExist_throwsException() throws Exception{
-        assumeTrue(description.canAppend());
-        generateAndCreateTestDir();
-
-        Path file = createNewTestFileName(testDir);
-        OutputStream out = fileSystem.appendToFile(file);
-    }
-
-    @Test(expected = InvalidPathException.class)
-    public void test_appendToFile_isDirectory_throwsException() throws Exception{
-        assumeTrue(description.canAppend());
-        generateAndCreateTestDir();
-        Path p = createTestSubDir(testDir);
-        OutputStream out = fileSystem.appendToFile(p);
-    }
 
 
 
@@ -1065,6 +1050,23 @@ public abstract class FileSystemTestParent {
         out.write(b.getBytes());
         out.close();
         assertContents(file,(a+b).getBytes());
+    }
+
+    @Test(expected = NoSuchPathException.class)
+    public void test_appendToFile_fileDoesNotExist_throwsException() throws Exception{
+        assumeTrue(description.canAppend());
+        generateAndCreateTestDir();
+
+        Path file = createNewTestFileName(testDir);
+        OutputStream out = fileSystem.appendToFile(file);
+    }
+
+    @Test(expected = InvalidPathException.class)
+    public void test_appendToFile_isDirectory_throwsException() throws Exception{
+        assumeTrue(description.canAppend());
+        generateAndCreateTestDir();
+        Path p = createTestSubDir(testDir);
+        OutputStream out = fileSystem.appendToFile(p);
     }
 
 
@@ -1137,8 +1139,6 @@ public abstract class FileSystemTestParent {
 
         String s = fileSystem.copy(dir0, fileSystem, target, CopyMode.CREATE,false);
         waitUntilDoneException(s);
-
-
     }
 
     @Test
@@ -1389,11 +1389,13 @@ public abstract class FileSystemTestParent {
     @Test
     public void test_multipleFileSystemsOpenSimultaneously() throws Exception {
         FileSystem fs1 = setupFileSystem();
-        assert (fileSystem.isOpen());
+        FileSystem fs2 = setupFileSystem();
+        assert (fs2.isOpen());
         assert (fs1.isOpen());
 
         // Close them both. We should get no exceptions.
-        fileSystem.close();
+        fs1.close();
+        fs2.close();
     }
 
     // TODO: Symbolic links in a cycle tests

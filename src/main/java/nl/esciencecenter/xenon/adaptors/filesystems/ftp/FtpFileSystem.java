@@ -139,7 +139,7 @@ public class FtpFileSystem extends FileSystem {
     }
 
 	private PathAttributes convertAttributes(Path path, FTPFile attributes)  { 
-		
+
 		PathAttributesImplementation result = new PathAttributesImplementation();
 		
 		result.setPath(path);
@@ -280,7 +280,7 @@ public class FtpFileSystem extends FileSystem {
 			checkClientReply("Failed to check if file exists: " + path.getAbsolutePath());
 			return (listFiles != null && listFiles.length == 1);
 		} catch (Exception e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to check if file exists: " + path.getAbsolutePath(), e);
+			throw new XenonException(ADAPTOR_NAME, "Failed to check if file exists: " + path.getAbsolutePath() + " " + e.getMessage(), e);
 		}
 	}
 
@@ -379,6 +379,7 @@ public class FtpFileSystem extends FileSystem {
 		LOGGER.debug("appendToFile path = {}", path);
 
 		assertPathExists(path);
+		assertPathIsNotDirectory(path);
 		
 		try {
 			OutputStream out = ftpClient.appendFileStream(path.getAbsolutePath());
@@ -481,7 +482,7 @@ public class FtpFileSystem extends FileSystem {
 
 	@Override
 	public Path readSymbolicLink(Path path) throws XenonException {
-		
+		assertNotNull(path);
 		FTPFile file = getFtpFile(path);
 		
 		if (file.getType() != FTPFile.SYMBOLIC_LINK_TYPE) {
