@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
 import java.util.Map;
+import java.util.Objects;
 
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 
@@ -147,5 +148,24 @@ public class JobStatusImplementation implements JobStatus {
         return "JobStatus [jobIdentifier=" + jobIdentifier + ", state=" + state + ", exitCode=" + exitCode + ", exception=" + exception
                 + ", running=" + running + ", done=" + done + ", schedulerSpecificInformation=" + schedulerSpecificInformation
                 + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JobStatusImplementation that = (JobStatusImplementation) o;
+        return running == that.running &&
+                done == that.done &&
+                Objects.equals(jobIdentifier, that.jobIdentifier) &&
+                Objects.equals(state, that.state) &&
+                Objects.equals(exitCode, that.exitCode) &&
+                Objects.equals(exception, that.exception) &&
+                Objects.equals(schedulerSpecificInformation, that.schedulerSpecificInformation);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(jobIdentifier, state, exitCode, exception, running, done, schedulerSpecificInformation);
     }
 }

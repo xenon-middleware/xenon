@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -128,5 +128,19 @@ public class JobStatusImplementationTest {
                 + ", running=" + false + ", done=" + false + ", schedulerSpecificInformation=" + tmp + "]";
 		
 		assertEquals(expected, s.toString());		
+	}
+
+	@Test
+	public void test_hashcode() {
+		JobStatus a = new JobStatusImplementation("JOB-42", "STATE", 0, null, true, false, null);
+		JobStatus b = new JobStatusImplementation("JOB-42", "STATE", 0, null, true, false, null);
+		assertEquals(a.hashCode(), b.hashCode());
+	}
+
+	@Test
+	public void test_equals() {
+		JobStatus a = new JobStatusImplementation("JOB-42", "STATE", 0, null, true, false, null);
+		JobStatus b = new JobStatusImplementation("JOB-42", "STATE", 0, null, true, false, null);
+		assertTrue(a.equals(b));
 	}
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,17 +15,14 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
 
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
+
+import static org.junit.Assert.*;
 
 public class PathAttributesTest {
 
@@ -203,11 +200,38 @@ public class PathAttributesTest {
 		assertFalse(a.isHidden());
 	}
 
+    @Test
+    public void test_hashcode() {
+        PathAttributesImplementation a = new PathAttributesImplementation();
+        PathAttributesImplementation b = new PathAttributesImplementation();
+        assertEquals(a.hashCode(), b.hashCode());
+    }
 	
+	@Test
+    public void test_equals() {
+        PathAttributesImplementation a = new PathAttributesImplementation();
+        PathAttributesImplementation b = new PathAttributesImplementation();
+        assertTrue(a.equals(b));
+    }
 	
-	
-	
-	
+	@Test
+    public void test_equals_sameobj() {
+        PathAttributesImplementation a = new PathAttributesImplementation();
+        assertTrue(a.equals(a));
+    }
+
+    @Test
+    public void test_equals_diffclass() {
+        PathAttributesImplementation a = new PathAttributesImplementation();
+        String b = "different class";
+        assertFalse(a.equals(b));
+    }
+
+    @Test
+    public void test_equals_null() {
+        PathAttributesImplementation a = new PathAttributesImplementation();
+        assertFalse(a.equals(null));
+    }
 }
 
 

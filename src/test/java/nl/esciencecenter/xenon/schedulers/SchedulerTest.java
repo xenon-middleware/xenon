@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -219,8 +219,9 @@ public class SchedulerTest {
 	  
 	  @Test
 	  public void test_hashcode() throws Exception {
-		  Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
-		  assertEquals("ID0".hashCode(), s.hashCode());
+		  Scheduler s1 = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
+		  Scheduler s2 = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
+		  assertEquals(s2.hashCode(), s1.hashCode());
 	  }
 	  
 	  

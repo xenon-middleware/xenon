@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package nl.esciencecenter.xenon.credentials;
+
+import java.util.Objects;
 
 /**
  * This class represents the default credential that may be used by the various adaptors. 
@@ -35,5 +37,18 @@ public class DefaultCredential implements Credential {
 	@Override
 	public String getUsername() {
 		return username;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		DefaultCredential that = (DefaultCredential) o;
+		return Objects.equals(username, that.username);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(username);
 	}
 }

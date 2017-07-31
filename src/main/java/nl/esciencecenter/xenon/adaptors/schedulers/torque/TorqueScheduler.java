@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -214,30 +214,33 @@ public class TorqueScheduler extends ScriptingScheduler {
             queueNames = allMap.keySet().toArray(new String[allMap.size()]);
         }
 
-        QueueStatus[] result = new QueueStatus[queueNames.length];
-
-		for (int i = 0; i < queueNames.length; i++) {
-			if (queueNames[i] == null) {
-				result[i] = null;
-			} else {
-				//state for only the requested queuee
-				Map<String, String> map = allMap.get(queueNames[i]);
-
-                if (map == null) {
-					Exception exception = new NoSuchQueueException(ADAPTOR_NAME,
-							"Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
-					result[i] = new QueueStatusImplementation(this, queueNames[i], exception, null);
-				} else {
-					result[i] = new QueueStatusImplementation(this, queueNames[i], null, map);
-				}
-			}
-		}
-
-        return result;
+        return getQueueStatusses(allMap, queueNames);
+//        
+//        QueueStatus[] result = new QueueStatus[queueNames.length];
+//
+//		for (int i = 0; i < queueNames.length; i++) {
+//			if (queueNames[i] == null) {
+//				result[i] = null;
+//			} else {
+//				//state for only the requested queuee
+//				Map<String, String> map = allMap.get(queueNames[i]);
+//
+//                if (map == null) {
+//					Exception exception = new NoSuchQueueException(ADAPTOR_NAME,
+//							"Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
+//					result[i] = new QueueStatusImplementation(this, queueNames[i], exception, null);
+//				} else {
+//					result[i] = new QueueStatusImplementation(this, queueNames[i], null, map);
+//				}
+//			}
+//		}
+//
+//        return result;
     }
     
     protected Map<String, Map<String,String>> queryQueues(String... queueNames)
             throws XenonException {
+    	
         if (queueNames == null) {
             throw new IllegalArgumentException("Queue names cannot be null");
         }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,47 +15,20 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers.gridengine;
 
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.ACCOUNTING_GRACE_TIME_PROPERTY;
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.ADAPTOR_NAME;
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.IGNORE_VERSION_PROPERTY;
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.POLL_DELAY_PROPERTY;
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.VALID_PROPERTIES;
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.JOB_OPTION_JOB_SCRIPT;
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.QACCT_HEADER;
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.generate;
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.getJobStatusFromQacctInfo;
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.getJobStatusFromQstatInfo;
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.verifyJobDescription;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import nl.esciencecenter.xenon.UnsupportedOperationException;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.*;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.schedulers.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.esciencecenter.xenon.UnsupportedOperationException;
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
-import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
-import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
-import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
-import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
-import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingScheduler;
-import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.filesystems.Path;
-import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.JobStatus;
-import nl.esciencecenter.xenon.schedulers.NoSuchJobException;
-import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
-import nl.esciencecenter.xenon.schedulers.QueueStatus;
-import nl.esciencecenter.xenon.schedulers.Streams;
+import java.util.*;
+import java.util.Map.Entry;
+
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.*;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.*;
 
 /**
  * Interface to the GridEngine command line tools. Will run commands to submit/list/cancel jobs and get the status of queues.
@@ -157,9 +130,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
         updateJobsSeenMap(status.keySet());
 
-        for (String jobID : status.keySet()) {
-            result.add(jobID);
-        }
+        result.addAll(status.keySet());
 
     }
 
@@ -213,7 +184,8 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
     @Override
     public QueueStatus[] getQueueStatuses(String... queueNames) throws XenonException {
-        if (queueNames == null) {
+
+    	if (queueNames == null) {
             throw new IllegalArgumentException("Queue names cannot be null");
         }
 
@@ -221,30 +193,33 @@ public class GridEngineScheduler extends ScriptingScheduler {
             queueNames = getQueueNames();
         }
 
-        QueueStatus[] result = new QueueStatus[queueNames.length];
+//        QueueStatus[] result = new QueueStatus[queueNames.length];
 
         String qstatOutput = runCheckedCommand(null, "qstat", "-xml", "-g", "c");
-
+        
         Map<String, Map<String, String>> allMap = parser.parseQueueInfos(qstatOutput);
 
-        for (int i = 0; i < queueNames.length; i++) {
-            if (queueNames[i] == null) {
-                result[i] = null;
-            } else {
-                //state for only the requested queue
-                Map<String, String> map = allMap.get(queueNames[i]);
-
-                if (map == null || map.isEmpty()) {
-                    Exception exception = new NoSuchQueueException(ADAPTOR_NAME,
-                            "Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
-                    result[i] = new QueueStatusImplementation(this, queueNames[i], exception, null);
-                } else {
-                    result[i] = new QueueStatusImplementation(this, queueNames[i], null, map);
-                }
-            }
-        }
-
-        return result;
+        return getQueueStatusses(allMap, queueNames);
+//        
+//        
+//        for (int i = 0; i < queueNames.length; i++) {
+//            if (queueNames[i] == null) {
+//                result[i] = null;
+//            } else {
+//                //state for only the requested queue
+//                Map<String, String> map = allMap.get(queueNames[i]);
+//
+//                if (map == null || map.isEmpty()) {
+//                    Exception exception = new NoSuchQueueException(ADAPTOR_NAME,
+//                            "Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
+//                    result[i] = new QueueStatusImplementation(this, queueNames[i], exception, null);
+//                } else {
+//                    result[i] = new QueueStatusImplementation(this, queueNames[i], null, map);
+//                }
+//            }
+//        }
+//
+//        return result;
 
     }
 

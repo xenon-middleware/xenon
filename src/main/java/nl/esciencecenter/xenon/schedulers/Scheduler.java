@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.schedulers;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
@@ -50,7 +51,7 @@ public abstract class Scheduler {
 	private static final HashMap<String, SchedulerAdaptor> adaptors = new LinkedHashMap<>();
 
 	static { 
-		/** Load all supported file adaptors */
+		// Load all supported file adaptors
 		addAdaptor(new LocalSchedulerAdaptor());
 		addAdaptor(new SshSchedulerAdaptor());
 		addAdaptor(new GridEngineSchedulerAdaptor());
@@ -71,7 +72,7 @@ public abstract class Scheduler {
 		SchedulerAdaptor adaptor = adaptors.get(adaptorName);
 
 		if (adaptor == null) {
-			throw new UnknownAdaptorException(COMPONENT_NAME, "File adaptor not found " + adaptor);
+			throw new UnknownAdaptorException(COMPONENT_NAME, "File adaptor not found (null)");
 		}
 
 		return adaptor;
@@ -156,7 +157,7 @@ public abstract class Scheduler {
      *             If the creation of the Scheduler failed.
      */
 	public static Scheduler create(String adaptor, String location, Credential credential) throws XenonException {
-		return create(adaptor, location, credential, new HashMap<String, String>(0));
+		return create(adaptor, location, credential, new HashMap<>(0));
 	}
 	
 	/**
@@ -546,22 +547,17 @@ public abstract class Scheduler {
             throw new IllegalArgumentException(message + value);
 		}
 	}
-    
+
 	@Override
-	public int hashCode() {
-		return uniqueID.hashCode();
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Scheduler scheduler = (Scheduler) o;
+		return Objects.equals(uniqueID, scheduler.uniqueID);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-	
-		return uniqueID.equals(((Scheduler) obj).uniqueID);		
+	public int hashCode() {
+		return Objects.hash(uniqueID);
 	}
-    
 }

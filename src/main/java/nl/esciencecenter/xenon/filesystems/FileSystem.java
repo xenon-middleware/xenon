@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import nl.esciencecenter.xenon.UnknownAdaptorException;
+import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
@@ -55,350 +56,364 @@ import nl.esciencecenter.xenon.UnknownPropertyException;
  */
 public abstract class FileSystem {
 
-	/** The name of this component, for use in exceptions */
-	private static final String COMPONENT_NAME = "FileSystem";
+    /** The name of this component, for use in exceptions */
+    private static final String COMPONENT_NAME = "FileSystem";
 
-	/** The default buffer size */
-	private static final int BUFFER_SIZE = 4 * 1024;
+    /** The default buffer size */
+    private static final int BUFFER_SIZE = 4 * 1024;
 
-	private static final HashMap<String, FileAdaptor> adaptors = new LinkedHashMap<>();
+    private static final HashMap<String, FileAdaptor> adaptors = new LinkedHashMap<>();
 
-	static {
-		/** Load all supported file adaptors */
-		addAdaptor(new LocalFileAdaptor());
-		addAdaptor(new FtpFileAdaptor());
-		addAdaptor(new SftpFileAdaptor());
-		addAdaptor(new WebdavFileAdaptor());
-	//	addAdaptor(new S3FileAdaptor());
-	}
+    static {
+        // Load all supported file adaptors
+        addAdaptor(new LocalFileAdaptor());
+        addAdaptor(new FtpFileAdaptor());
+        addAdaptor(new SftpFileAdaptor());
+        addAdaptor(new WebdavFileAdaptor());
+    //    addAdaptor(new S3FileAdaptor());
+    }
 
-	private static void addAdaptor(FileAdaptor adaptor) {
-		adaptors.put(adaptor.getName(), adaptor);
-	}
+    private static void addAdaptor(FileAdaptor adaptor) {
+        adaptors.put(adaptor.getName(), adaptor);
+    }
 
-	private static FileAdaptor getAdaptorByName(String adaptorName) throws UnknownAdaptorException {
+    private static FileAdaptor getAdaptorByName(String adaptorName) throws UnknownAdaptorException {
 
-		if (adaptorName == null || adaptorName.trim().isEmpty()) {
-			throw new IllegalArgumentException("Adaptor name may not be null or empty");
-		}
+        if (adaptorName == null || adaptorName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Adaptor name may not be null or empty");
+        }
 
-		FileAdaptor adaptor = adaptors.get(adaptorName);
+        FileAdaptor adaptor = adaptors.get(adaptorName);
 
-		if (adaptor == null) {
-			throw new UnknownAdaptorException(COMPONENT_NAME, "File adaptor not found " + adaptor);
-		}
+        if (adaptor == null) {
+            throw new UnknownAdaptorException(COMPONENT_NAME, "File adaptor not found (null)");
+        }
 
-		return adaptor;
-	}
+        return adaptor;
+    }
 
-	public static String [] getAdaptorNames() {
-		return adaptors.keySet().toArray(new String[adaptors.size()]);
-	}
+    public static String [] getAdaptorNames() {
+        return adaptors.keySet().toArray(new String[adaptors.size()]);
+    }
 
-	public static FileSystemAdaptorDescription getAdaptorDescription(String adaptorName) throws UnknownAdaptorException {
-		return getAdaptorByName(adaptorName);
-	}
+    public static FileSystemAdaptorDescription getAdaptorDescription(String adaptorName) throws UnknownAdaptorException {
+        return getAdaptorByName(adaptorName);
+    }
 
-	public static FileSystemAdaptorDescription [] getAdaptorDescriptions() {
-		return adaptors.values().toArray(new FileSystemAdaptorDescription[adaptors.size()]);
-	}
-	
-	/**
-	 * CopyStatus contains status information for a specific copy operation.
-	 */
-	static class CopyStatusImplementation implements CopyStatus {
+    public static FileSystemAdaptorDescription [] getAdaptorDescriptions() {
+        return adaptors.values().toArray(new FileSystemAdaptorDescription[adaptors.size()]);
+    }
 
-		private final String copyIdentifier;
-		private final String state;
-		private final Throwable exception;
+    /**
+     * CopyStatus contains status information for a specific copy operation.
+     */
+    static class CopyStatusImplementation implements CopyStatus {
 
-		private final long bytesToCopy;
-		private final long bytesCopied;
+        private final String copyIdentifier;
+        private final String state;
+        private final Throwable exception;
 
-		public CopyStatusImplementation(String copyIdentifier, String state, long bytesToCopy, long bytesCopied, Throwable exception) {
-			super();
-			this.copyIdentifier = copyIdentifier;
-			this.state = state;
-			this.bytesToCopy = bytesToCopy;
-			this.bytesCopied = bytesCopied;
-			this.exception = exception;
-		}
+        private final long bytesToCopy;
+        private final long bytesCopied;
 
-		@Override
-		public String getCopyIdentifier() {
-			return copyIdentifier;
-		}
+        public CopyStatusImplementation(String copyIdentifier, String state, long bytesToCopy, long bytesCopied, Throwable exception) {
+            super();
+            this.copyIdentifier = copyIdentifier;
+            this.state = state;
+            this.bytesToCopy = bytesToCopy;
+            this.bytesCopied = bytesCopied;
+            this.exception = exception;
+        }
 
-		@Override
-		public String getState() {
-			return state;
-		}
+        @Override
+        public String getCopyIdentifier() {
+            return copyIdentifier;
+        }
 
-		@Override
-		public Throwable getException() {
-			return exception;
-		}
+        @Override
+        public String getState() {
+            return state;
+        }
 
-		@Override
-		public boolean isRunning() {
-			return "RUNNING".equals(state);
-		}
+        @Override
+        public Throwable getException() {
+            return exception;
+        }
 
-		@Override
-		public boolean isDone() {
-			return "DONE".equals(state) || "FAILED".equals(state);
-		}
+        @Override
+        public boolean isRunning() {
+            return "RUNNING".equals(state);
+        }
 
-		@Override
-		public boolean hasException() {
-			return exception != null;
-		}
+        @Override
+        public boolean isDone() {
+            return "DONE".equals(state) || "FAILED".equals(state);
+        }
 
-		@Override
-		public long bytesToCopy() {
-			return bytesToCopy;
-		}
+        @Override
+        public boolean hasException() {
+            return exception != null;
+        }
 
-		@Override
-		public long bytesCopied() {
-			return bytesCopied;
-		}
+        @Override
+        public long bytesToCopy() {
+            return bytesToCopy;
+        }
 
-		@Override
-		public String toString() {
-			return "CopyStatus [copyIdentifier=" + copyIdentifier + ", state=" + state + ", exception=" + exception + 
-					", bytesToCopy=" + bytesToCopy + ", bytesCopied=" + bytesCopied + "]";
-		}
-	}
-	
-	/**
-	 * Create a new FileSystem using the <code>adaptor</code> that connects to a data store 
-	 * at <code>location</code> using the <code>credentials</code> to get access. Use 
-	 * <code>properties</code> to (optionally) configure the FileSystem when it is created.  
-	 * 
-	 * Make sure to always close {@code FileSystem} instances by calling 
-	 * {@code close(FileSystem)} when you no longer need them, otherwise their 
-	 * associated resources remain allocated.
-	 * 
-	 * @param adaptor
-	 *            the type of file system to connect to (e.g. "sftp" or "webdav")
-	 * @param location
-	 *            the location of the FileSystem.
-	 * @param credential
-	 *            the Credentials to use to get access to the FileSystem.
-	 * @param properties
-	 *            optional properties to use when creating the FileSystem.
-	 *
-	 * @return the new FileSystem.
-	 *
-	 * @throws UnknownPropertyException
-	 *             If a unknown property was provided.
-	 * @throws InvalidPropertyException
-	 *             If a known property was provided with an invalid value.
-	 * @throws UnknownAdaptorException
-	 *             If the adaptor was invalid.
-	 * @throws InvalidLocationException
-	 *             If the location was invalid.
-	 * @throws InvalidCredentialException
-	 *             If the credential is invalid to access the location.
-	 *
-	 * @throws XenonException
-	 *             If the creation of the FileSystem failed.
-	 */
-	public static FileSystem create(String adaptor, String location, Credential credential, Map<String, String> properties) 
-			throws XenonException {
-		return getAdaptorByName(adaptor).createFileSystem(location, credential, properties);
-	}
+        @Override
+        public long bytesCopied() {
+            return bytesCopied;
+        }
 
-	/**
-	 * Create a new FileSystem using the <code>adaptor</code> that connects to a data store 
-	 * at <code>location</code> using the <code>credentials</code> to get access.   
-	 * 
-	 * Make sure to always close {@code FileSystem} instances by calling 
-	 * {@code close(FileSystem)} when you no longer need them, otherwise their 
-	 * associated resources remain allocated.
-	 * 
-	 * @param adaptor
-	 *            the type of file system to connect to (e.g. "sftp" or "webdav")
-	 * @param location
-	 *            the location of the FileSystem.
-	 * @param credential
-	 *            the Credentials to use to get access to the FileSystem.
-	 * 
-	 * @return the new FileSystem.
-	 * 
-	 * @throws UnknownPropertyException
-	 *             If a unknown property was provided.
-	 * @throws InvalidPropertyException
-	 *             If a known property was provided with an invalid value.
-	 * @throws UnknownAdaptorException
-	 *             If the adaptor was invalid.
-	 * @throws InvalidLocationException
-	 *             If the location was invalid.
-	 * @throws InvalidCredentialException
-	 *             If the credential is invalid to access the location.
-	 * 
-	 * @throws XenonException
-	 *             If the creation of the FileSystem failed.
-	 */
-	public static FileSystem create(String adaptor, String location, Credential credential) throws XenonException {
-		return create(adaptor, location, credential, new HashMap<String, String>(0));
-	}
+        @Override
+        public String toString() {
+            return "CopyStatus [copyIdentifier=" + copyIdentifier + ", state=" + state + ", exception=" + exception +
+                    ", bytesToCopy=" + bytesToCopy + ", bytesCopied=" + bytesCopied + "]";
+        }
 
-	/**
-	 * Create a new FileSystem using the <code>adaptor</code> that connects to a data store 
-	 * at <code>location</code> using the default credentials to get access.   
-	 * 
-	 * Make sure to always close {@code FileSystem} instances by calling 
-	 * {@code close(FileSystem)} when you no longer need them, otherwise their 
-	 * associated resources remain allocated.
-	 * 
-	 * @param adaptor
-	 *            the type of file system to connect to (e.g. "sftp" or "webdav")
-	 * @param location
-	 *            the location of the FileSystem.
-	 * 
-	 * @return the new FileSystem.
-	 * 
-	 * @throws UnknownPropertyException
-	 *             If a unknown property was provided.
-	 * @throws InvalidPropertyException
-	 *             If a known property was provided with an invalid value.
-	 * @throws UnknownAdaptorException
-	 *             If the adaptor was invalid.
-	 * @throws InvalidLocationException
-	 *             If the location was invalid.
-	 * @throws InvalidCredentialException
-	 *             If the credential is invalid to access the location.
-	 * 
-	 * @throws XenonException
-	 *             If the creation of the FileSystem failed.
-	 */
-	public static FileSystem create(String adaptor, String location) throws XenonException {
-		return create(adaptor, location, new DefaultCredential());
-	}
-	
-	/**
-	 * Create a new FileSystem using the <code>adaptor</code> that connects to a data store 
-	 * at the default location using the default credentials to get access.   
-	 * 
-	 * Note that there are very few filesystem adaptors that support a default location. The 
-	 * local filesystem adaptor is the prime example.  
-	 * 
-	 * Make sure to always close {@code FileSystem} instances by calling 
-	 * {@code close(FileSystem)} when you no longer need them, otherwise their 
-	 * associated resources remain allocated.
-	 * 
-	 * @param adaptor
-	 *            the type of file system to connect to (e.g. "sftp" or "webdav")
-	 * 
-	 * @return the new FileSystem.
-	 * 
-	 * @throws UnknownPropertyException
-	 *             If a unknown property was provided.
-	 * @throws InvalidPropertyException
-	 *             If a known property was provided with an invalid value.
-	 * @throws UnknownAdaptorException
-	 *             If the adaptor was invalid.
-	 * @throws InvalidLocationException
-	 *             If the location was invalid.
-	 * @throws InvalidCredentialException
-	 *             If the credential is invalid to access the location.
-	 * 
-	 * @throws XenonException
-	 *             If the creation of the FileSystem failed.
-	 */
-	public static FileSystem create(String adaptor) throws XenonException {
-		return create(adaptor, null);
-	}
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            CopyStatusImplementation that = (CopyStatusImplementation) o;
+            return bytesToCopy == that.bytesToCopy &&
+                    bytesCopied == that.bytesCopied &&
+                    Objects.equals(copyIdentifier, that.copyIdentifier) &&
+                    Objects.equals(state, that.state) &&
+                    Objects.equals(exception, that.exception);
+        }
 
-	class CopyCallback {
+        @Override
+        public int hashCode() {
+            return Objects.hash(copyIdentifier, state, exception, bytesToCopy, bytesCopied);
+        }
+    }
 
-		long bytesToCopy = 0;
-		long bytesCopied = 0;
+    /**
+     * Create a new FileSystem using the <code>adaptor</code> that connects to a data store
+     * at <code>location</code> using the <code>credentials</code> to get access. Use
+     * <code>properties</code> to (optionally) configure the FileSystem when it is created.
+     *
+     * Make sure to always close {@code FileSystem} instances by calling
+     * {@code close(FileSystem)} when you no longer need them, otherwise their
+     * associated resources remain allocated.
+     *
+     * @param adaptor
+     *            the type of file system to connect to (e.g. "sftp" or "webdav")
+     * @param location
+     *            the location of the FileSystem.
+     * @param credential
+     *            the Credentials to use to get access to the FileSystem.
+     * @param properties
+     *            optional properties to use when creating the FileSystem.
+     *
+     * @return the new FileSystem.
+     *
+     * @throws UnknownPropertyException
+     *             If a unknown property was provided.
+     * @throws InvalidPropertyException
+     *             If a known property was provided with an invalid value.
+     * @throws UnknownAdaptorException
+     *             If the adaptor was invalid.
+     * @throws InvalidLocationException
+     *             If the location was invalid.
+     * @throws InvalidCredentialException
+     *             If the credential is invalid to access the location.
+     *
+     * @throws XenonException
+     *             If the creation of the FileSystem failed.
+     */
+    public static FileSystem create(String adaptor, String location, Credential credential, Map<String, String> properties)
+            throws XenonException {
+        return getAdaptorByName(adaptor).createFileSystem(location, credential, properties);
+    }
 
-		boolean started = false;
-		boolean cancel = false;
+    /**
+     * Create a new FileSystem using the <code>adaptor</code> that connects to a data store
+     * at <code>location</code> using the <code>credentials</code> to get access.
+     *
+     * Make sure to always close {@code FileSystem} instances by calling
+     * {@code close(FileSystem)} when you no longer need them, otherwise their
+     * associated resources remain allocated.
+     *
+     * @param adaptor
+     *            the type of file system to connect to (e.g. "sftp" or "webdav")
+     * @param location
+     *            the location of the FileSystem.
+     * @param credential
+     *            the Credentials to use to get access to the FileSystem.
+     *
+     * @return the new FileSystem.
+     *
+     * @throws UnknownPropertyException
+     *             If a unknown property was provided.
+     * @throws InvalidPropertyException
+     *             If a known property was provided with an invalid value.
+     * @throws UnknownAdaptorException
+     *             If the adaptor was invalid.
+     * @throws InvalidLocationException
+     *             If the location was invalid.
+     * @throws InvalidCredentialException
+     *             If the credential is invalid to access the location.
+     *
+     * @throws XenonException
+     *             If the creation of the FileSystem failed.
+     */
+    public static FileSystem create(String adaptor, String location, Credential credential) throws XenonException {
+        return create(adaptor, location, credential, new HashMap<>(0));
+    }
 
-		synchronized void start(long bytesToCopy) {
-			if (!started) {
-				started = true;
-				this.bytesToCopy = bytesToCopy;
-			}
-		}
+    /**
+     * Create a new FileSystem using the <code>adaptor</code> that connects to a data store
+     * at <code>location</code> using the default credentials to get access.
+     *
+     * Make sure to always close {@code FileSystem} instances by calling
+     * {@code close(FileSystem)} when you no longer need them, otherwise their
+     * associated resources remain allocated.
+     *
+     * @param adaptor
+     *            the type of file system to connect to (e.g. "sftp" or "webdav")
+     * @param location
+     *            the location of the FileSystem.
+     *
+     * @return the new FileSystem.
+     *
+     * @throws UnknownPropertyException
+     *             If a unknown property was provided.
+     * @throws InvalidPropertyException
+     *             If a known property was provided with an invalid value.
+     * @throws UnknownAdaptorException
+     *             If the adaptor was invalid.
+     * @throws InvalidLocationException
+     *             If the location was invalid.
+     * @throws InvalidCredentialException
+     *             If the credential is invalid to access the location.
+     *
+     * @throws XenonException
+     *             If the creation of the FileSystem failed.
+     */
+    public static FileSystem create(String adaptor, String location) throws XenonException {
+        return create(adaptor, location, new DefaultCredential());
+    }
 
-		synchronized boolean isStarted() {
-			return started;
-		}
+    /**
+     * Create a new FileSystem using the <code>adaptor</code> that connects to a data store
+     * at the default location using the default credentials to get access.
+     *
+     * Note that there are very few filesystem adaptors that support a default location. The
+     * local filesystem adaptor is the prime example.
+     *
+     * Make sure to always close {@code FileSystem} instances by calling
+     * {@code close(FileSystem)} when you no longer need them, otherwise their
+     * associated resources remain allocated.
+     *
+     * @param adaptor
+     *            the type of file system to connect to (e.g. "sftp" or "webdav")
+     *
+     * @return the new FileSystem.
+     *
+     * @throws UnknownPropertyException
+     *             If a unknown property was provided.
+     * @throws InvalidPropertyException
+     *             If a known property was provided with an invalid value.
+     * @throws UnknownAdaptorException
+     *             If the adaptor was invalid.
+     * @throws InvalidLocationException
+     *             If the location was invalid.
+     * @throws InvalidCredentialException
+     *             If the credential is invalid to access the location.
+     *
+     * @throws XenonException
+     *             If the creation of the FileSystem failed.
+     */
+    public static FileSystem create(String adaptor) throws XenonException {
+        return create(adaptor, null);
+    }
 
-		synchronized void addBytesCopied(long bytes) {
-			this.bytesCopied += bytes;
-		}
+    class CopyCallback {
 
-		synchronized void cancel() {
-			cancel = true;
-		}
+        long bytesToCopy = 0;
+        long bytesCopied = 0;
 
-		synchronized boolean isCancelled() {
-			return cancel;
-		}
-	}
+        boolean started = false;
+        boolean cancelled = false;
 
-	private class PendingCopy {
+        synchronized void start(long bytesToCopy) {
+            if (!started) {
+                started = true;
+                this.bytesToCopy = bytesToCopy;
+            }
+        }
 
-		Future<Void> future;
-		CopyCallback callback;
+        synchronized boolean isStarted() {
+            return started;
+        }
 
-		public PendingCopy(Future<Void> future, CopyCallback callback) {
-			super();
-			this.future = future;
-			this.callback = callback;
-		}
-	}
+        synchronized void addBytesCopied(long bytes) {
+            this.bytesCopied += bytes;
+        }
 
-	private final String uniqueID;
-	private final String adaptor;
-	private final String location;
-	private final Path entryPath;
-	private final XenonProperties properties;
-	private final ExecutorService pool;
+        synchronized void cancel() {
+            cancelled = true;
+        }
 
-	private long nextCopyID = 0;
+        synchronized boolean isCancelled() {
+            return cancelled;
+        }
+    }
 
-	private final HashMap<String, PendingCopy> pendingCopies = new HashMap<>();
+    private class PendingCopy {
 
-	protected FileSystem(String uniqueID, String adaptor, String location, Path entryPath, XenonProperties properties) {
+        Future<Void> future;
+        CopyCallback callback;
 
-		if (uniqueID == null) {
-			throw new IllegalArgumentException("Identifier may not be null!");
-		}
+        public PendingCopy(Future<Void> future, CopyCallback callback) {
+            super();
+            this.future = future;
+            this.callback = callback;
+        }
+    }
 
-		if (adaptor == null) {
-			throw new IllegalArgumentException("Adaptor may not be null!");
-		}
+    private final String uniqueID;
+    private final String adaptor;
+    private final String location;
+    private final Path entryPath;
+    private final XenonProperties properties;
+    private final ExecutorService pool;
 
-		if (location == null) {
-			throw new IllegalArgumentException("Location may not be null!");
-		}
+    private long nextCopyID = 0;
 
-		if (entryPath == null) {
-			throw new IllegalArgumentException("EntryPath may not be null!");
-		}
+    private final HashMap<String, PendingCopy> pendingCopies = new HashMap<>();
 
-		this.uniqueID = uniqueID;
-		this.adaptor = adaptor;
-		this.location = location;
-		this.entryPath = entryPath;
-		this.properties = properties;
-		
-		ThreadFactory f = new ThreadFactory() {
-			@Override
-			public Thread newThread(Runnable r) {
-				Thread t = new Thread(r, "CopyThread-" + adaptor + "-" + uniqueID);
-				t.setDaemon(true);
-				return t;
-			}
-		};
+    protected FileSystem(String uniqueID, String adaptor, String location, Path entryPath, XenonProperties properties) {
+
+        if (uniqueID == null) {
+            throw new IllegalArgumentException("Identifier may not be null!");
+        }
+
+        if (adaptor == null) {
+            throw new IllegalArgumentException("Adaptor may not be null!");
+        }
+
+        if (location == null) {
+            throw new IllegalArgumentException("Location may not be null!");
+        }
+
+        if (entryPath == null) {
+            throw new IllegalArgumentException("EntryPath may not be null!");
+        }
+
+        this.uniqueID = uniqueID;
+        this.adaptor = adaptor;
+        this.location = location;
+        this.entryPath = entryPath;
+        this.properties = properties;
+
+        ThreadFactory f = r -> {
+            Thread t = new Thread(r, "CopyThread-" + adaptor + "-" + uniqueID);
+            t.setDaemon(true);
+            return t;
+        };
 		
 		this.pool = Executors.newFixedThreadPool(1, f); 
 	}
@@ -575,6 +590,10 @@ public abstract class FileSystem {
 	 *
 	 * @throws PathAlreadyExistsException
 	 *             If the link already exists.
+	 * @throws NoSuchPathException
+	 *             If the target or parent directory of link does not exist
+	 * @throws InvalidPathException
+	 * 			   If parent of link is not a directory
 	 * @throws XenonException
 	 *             If an I/O error occurred.
 	 */
@@ -598,8 +617,12 @@ public abstract class FileSystem {
 	 *          the path to delete.
 	 * @param recursive
 	 * 			if the delete must be done recursively
+	 * @throws DirectoryNotEmptyException
+	 * 		if the directory was not empty.
+	 * @throws InvalidPathException
+	 * 		if the provided path is invalid.
 	 * @throws NoSuchPathException
-				if the path does not exist.
+	 * 		if the provided path does not exist.
 	 * @throws XenonException
 	 *          if an I/O error occurred.
 	 */
@@ -982,7 +1005,7 @@ public abstract class FileSystem {
 	 * @throws XenonException
 	 * 		if an error occurred.
 	 */
-	protected void copyJob(Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive, CopyCallback callback) throws XenonException {
+	protected void performCopy(Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive, CopyCallback callback) throws XenonException {
 
 		if(!exists(source)){
 			throw new NoSuchPathException(getAdaptorName(),"No such file " + source.getRelativePath());
@@ -1049,13 +1072,8 @@ public abstract class FileSystem {
 
 				Path rel = source.relativize(p.getPath());
 				Path dst = destination.resolve(rel);
-				try {
-					copyFile(p.getPath(), destinationFS, dst, mode, callback);
-				} catch(XenonException e){
-					throw e;
-				}catch (Exception e){
-					throw new XenonException(getAdaptorName(), "An error occured asynchronously : " + e.getMessage());
-				}
+
+				copyFile(p.getPath(), destinationFS, dst, mode, callback);
 				//bytesCopied += p.getSize();
 				//callback.setBytesCopied(bytesCopied);
 			}
@@ -1070,9 +1088,9 @@ public abstract class FileSystem {
 	 * @param file
 	 * 		the file to remove
 	 * @throws InvalidPathException
-	 * 		if the provide path is not a file.
+	 * 		if the provided path is not a file.
 	 * @throws NoSuchPathException
-	 * 		if the provides file does not exist.
+	 * 		if the provided file does not exist.
 	 * @throws XenonException
 	 *      If the file could not be removed.
 	 */
@@ -1088,9 +1106,9 @@ public abstract class FileSystem {
 	 * @param path
 	 * 		the directory to remove
 	 * @throws InvalidPathException
-	 * 		if the provide path is not a directory.
+	 * 		if the provided path is not a directory.
 	 * @throws NoSuchPathException
-	 * 		if the provides path does not exist.
+	 * 		if the provided path does not exist.
 	 * @throws XenonException
 	 *      If the directory could not be removed.
 	 */
@@ -1142,7 +1160,7 @@ public abstract class FileSystem {
 			for (PathAttributes current : tmp) {
 				// traverse subdirs provided they are not "." or "..".
 				if (current.isDirectory() && !isDotDot(current.getPath())) {
-					list(dir.resolve(current.getPath().getFileNameAsString()), list, recursive);
+					list(dir.resolve(current.getPath().getFileNameAsString()), list, true);
 				}
 			}
 		}
@@ -1196,20 +1214,15 @@ public abstract class FileSystem {
 
 		final CopyCallback callback = new CopyCallback();
 
+		Future<Void> future = pool.submit(() -> {
 
+            if (Thread.currentThread().isInterrupted()) {
+                throw new XenonException(getAdaptorName(), "Copy cancelled by user");
+            }
 
-
-		Future<Void> future = pool.submit(new Callable<Void>() {
-			@Override
-			public Void call() throws Exception {
-
-				if (Thread.currentThread().isInterrupted()) {
-					throw new XenonException(getAdaptorName(), "Copy cancelled by user");
-				}
-				copyJob(source, destinationFS, destination, mode, recursive, callback);
-				return null;
-			}
-		}) ;
+            performCopy(source, destinationFS, destination, mode, recursive, callback);
+            return null;
+        }) ;
 
 		pendingCopies.put(ID, new PendingCopy(future, callback));
 		return ID;
@@ -1481,19 +1494,15 @@ public abstract class FileSystem {
 	}
 
 	@Override
-	public int hashCode() {
-		return uniqueID.hashCode();
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		FileSystem that = (FileSystem) o;
+		return Objects.equals(uniqueID, that.uniqueID);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-
-		return uniqueID.equals(((FileSystem)obj).uniqueID);
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(uniqueID);
+    }
 }
