@@ -51,5 +51,13 @@ public interface FileSystemAdaptorDescription extends AdaptorDescription {
      */
     boolean canCreateSymboliclinks();
     
-    boolean isConnectionless();    
+    boolean isConnectionless();
+
+    boolean supportsReadingPosixPermissions();
+
+    boolean supportsSettingPosixPermissions();
+
+    boolean supportsRename();
+
+    boolean canAppend();
 }

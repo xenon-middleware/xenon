@@ -180,6 +180,7 @@ public class SftpFileSystem extends FileSystem {
 
 		try {
 			result = client.lstat(path.getAbsolutePath());
+
 		} catch (IOException e) {
 			throw sftpExceptionToXenonException(e, "Failed to retrieve attributes from: " + path);
 		}
@@ -193,7 +194,7 @@ public class SftpFileSystem extends FileSystem {
 	public boolean exists(Path path) throws XenonException {
 
 		LOGGER.debug("exists path = {}", path);
-
+		assertNotNull(path);
 		try {
 			stat(path);
 			return true;
@@ -232,7 +233,6 @@ public class SftpFileSystem extends FileSystem {
 			assertDirectoryExists(path);
 		
 			ArrayList<PathAttributes> result = new ArrayList<>();
-			
 			for (SftpClient.DirEntry f : client.readDir(path.getAbsolutePath())) { 
 				result.add(convertAttributes(path.resolve(f.getFilename()), f.getAttributes()));
 			}
@@ -280,6 +280,7 @@ public class SftpFileSystem extends FileSystem {
 		
 		assertNotNull(path);
 		assertParentDirectoryExists(path);
+		assertPathIsNotDirectory(path);
 		
 		try {
 			return client.write(path.getAbsolutePath(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Create, SftpClient.OpenMode.Truncate);      	
@@ -308,6 +309,7 @@ public class SftpFileSystem extends FileSystem {
 
 	@Override
 	public PathAttributes getAttributes(Path path) throws XenonException {
+		assertNotNull(path);
 		return convertAttributes(path, stat(path));
 	}
 
@@ -316,7 +318,7 @@ public class SftpFileSystem extends FileSystem {
 		LOGGER.debug("readSymbolicLink path = {}", link);
 
 		Path result;
-
+		assertFileIsSymbolicLink(link);
 		try {
 			String target = client.readLink(link.getAbsolutePath());
 
@@ -338,6 +340,11 @@ public class SftpFileSystem extends FileSystem {
 	@Override
 	public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
 		LOGGER.debug("setPosixFilePermissions path = {} permissions = {}", path, permissions);
+		assertNotNull(path);
+		assertPathExists(path);
+		if(permissions == null) {
+			throw new IllegalArgumentException("Permissions is null");
+		}
 
 		try {
 			// We need to create a new Attributes object here. SFTP will only forward the fields that are actually set 
@@ -353,11 +360,7 @@ public class SftpFileSystem extends FileSystem {
 	}
 	
 	private static long convertTime(FileTime time) { 
-		
-		if (time == null) { 
-			return 0;
-		}
-		
+
 		return time.toMillis();
 	}
 	
@@ -370,11 +373,22 @@ public class SftpFileSystem extends FileSystem {
 		result.setRegular(attributes.isRegularFile());
 		result.setOther(attributes.isOther());
 		result.setSymbolicLink(attributes.isSymbolicLink());
-		
-		result.setLastModifiedTime(convertTime(attributes.getModifyTime()));
-		result.setCreationTime(convertTime(attributes.getCreateTime()));
-		result.setLastAccessTime(convertTime(attributes.getAccessTime()));
-		
+		if(attributes.getModifyTime() == null){
+			result.setLastModifiedTime(0);
+		} else {
+			result.setLastModifiedTime(convertTime(attributes.getModifyTime()));
+		}
+		if(attributes.getCreateTime() == null) {
+			result.setCreationTime(result.getLastModifiedTime());
+		} else {
+			result.setCreationTime(convertTime(attributes.getCreateTime()));
+		}
+		if(attributes.getAccessTime() == null) {
+			result.setCreationTime(result.getLastModifiedTime());
+		} else {
+			result.setLastAccessTime(convertTime(attributes.getAccessTime()));
+		}
+
 		result.setSize(attributes.getSize());
 		
 		Set<PosixFilePermission> permission = PosixFileUtils.bitsToPermissions(attributes.getPermissions());

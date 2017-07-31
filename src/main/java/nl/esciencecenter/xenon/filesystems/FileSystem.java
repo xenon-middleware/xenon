@@ -599,6 +599,10 @@ public abstract class FileSystem {
 	 */
 	public abstract void createSymbolicLink(Path link, Path target) throws XenonException;
 
+	// assumes directory exists
+//	boolean isDirectoryEmpty(Path dir) throws XenonException{
+//		return !list(dir,false).iterator().hasNext();
+//	}
 
 	/**
 	 * Deletes an existing path.
@@ -620,7 +624,7 @@ public abstract class FileSystem {
 	 * @throws NoSuchPathException
 	 * 		if the provided path does not exist.
 	 * @throws XenonException
-	 *             If an I/O error occurred.
+	 *          if an I/O error occurred.
 	 */
 	public void delete(Path path, boolean recursive) throws XenonException {
 
@@ -628,14 +632,31 @@ public abstract class FileSystem {
 			return;
 		}
 
+		assertPathExists(path);
+		
 		if (getAttributes(path).isDirectory()) {
-
-			for (PathAttributes p : list(path, false)) { 
-			if (recursive) { 
+			
+			Iterable<PathAttributes> itt = list(path, false);
+			
+			if (recursive) {
+				for (PathAttributes p : itt) {
 					delete(p.getPath(), true);
 				}
+			} else {
+				if (itt.iterator().hasNext()) {
+					
+					System.out.println("NOT EMPTY " + path.getAbsolutePath());
+					
+					for (PathAttributes p : itt) {
+						System.out.println(" -- " + p.getPath().getAbsolutePath());
+					}	
+		
+					throw new DirectoryNotEmptyException(getAdaptorName(), "Directory not empty: " + path.getAbsolutePath());
+				}
 			}
-
+			
+			
+			
 			deleteDirectory(path);
 		} else {
 			deleteFile(path);
@@ -676,6 +697,9 @@ public abstract class FileSystem {
 	 *             If an I/O error occurred.
 	 */
 	public Iterable<PathAttributes> list(Path dir, boolean recursive) throws XenonException {
+		
+		assertDirectoryExists(dir);
+		
 		ArrayList<PathAttributes> result = new ArrayList<>();
 		list(dir, result, recursive);
 		return result;
@@ -887,7 +911,7 @@ public abstract class FileSystem {
 				case CREATE:
 					throw new PathAlreadyExistsException(getAdaptorName(), "Destination path already exists: " + destination);
 				case IGNORE:
-					return;
+					return ;
 				case REPLACE:
 					// continue
 					break;
@@ -959,6 +983,8 @@ public abstract class FileSystem {
 		} catch (Exception e) {
 			throw new XenonException(getAdaptorName(), "Stream copy failed", e);
 		}
+
+
 	}
 
 	/**
@@ -981,7 +1007,9 @@ public abstract class FileSystem {
 	 */
 	protected void performCopy(Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive, CopyCallback callback) throws XenonException {
 
-		long bytesToCopy = 0;
+		if(!exists(source)){
+			throw new NoSuchPathException(getAdaptorName(),"No such file " + source.getRelativePath());
+		}
 
 		PathAttributes attributes = getAttributes(source);
 
@@ -1007,6 +1035,12 @@ public abstract class FileSystem {
 			destinationFS.createDirectory(destination);
 		}
 
+		copyRecursive(source, destinationFS, destination, mode, callback);
+
+	}
+
+	private void copyRecursive(Path source, FileSystem destinationFS, Path destination, CopyMode mode, CopyCallback callback) throws XenonException {
+		long bytesToCopy = 0;
 		Iterable<PathAttributes> listing = list(source, true);
 
 		for (PathAttributes p : listing) {
@@ -1047,7 +1081,7 @@ public abstract class FileSystem {
 	}
 
 	/**
-	 * Delete a file. If the file does not exist, an exception will be thrown.
+	 * Delete a file. Is only called on existing files
 	 *
 	 * This operation must be implemented by the various implementations of FileSystem.
 	 *
@@ -1063,7 +1097,7 @@ public abstract class FileSystem {
 	protected abstract void deleteFile(Path file) throws XenonException;
 
 	/**
-	 * Delete an empty directory. If the directory is not empty, an exception will be thrown.
+	 * Delete an empty directory. Is only called on empty directories
 	 *
 	 * This operation can only delete empty directories (analogous to <code>rmdir</code> in Linux).
 	 *
@@ -1071,8 +1105,6 @@ public abstract class FileSystem {
 	 *
 	 * @param path
 	 * 		the directory to remove
-	 * @throws DirectoryNotEmptyException
-	 * 		if the directory was not empty.
 	 * @throws InvalidPathException
 	 * 		if the provided path is not a directory.
 	 * @throws NoSuchPathException
@@ -1119,7 +1151,9 @@ public abstract class FileSystem {
 		Iterable<PathAttributes> tmp = listDirectory(dir);
 
 		for (PathAttributes p : tmp) {
-			list.add(p);
+			if(!isDotDot(p.getPath())) {
+				list.add(p);
+			}
 		}
 
 		if (recursive) {
@@ -1172,6 +1206,10 @@ public abstract class FileSystem {
 			throw new IllegalArgumentException("Destination path is null");
 		}
 
+		if(mode == null){
+			throw new IllegalArgumentException("Copy mode is null!");
+		}
+
 		String ID = getNextCopyID();
 
 		final CopyCallback callback = new CopyCallback();
@@ -1208,7 +1246,6 @@ public abstract class FileSystem {
 		if (copyIdentifier == null) {
 			throw new IllegalArgumentException("Copy identifier may not be null");
 		}
-
 		PendingCopy copy = pendingCopies.remove(copyIdentifier);
 
 		if (copy == null) {
@@ -1367,6 +1404,17 @@ public abstract class FileSystem {
 		}
 	}
 
+	protected void assertPathIsNotDirectory(Path path) throws XenonException{
+		assertNotNull(path);
+		if(exists(path)){
+
+			PathAttributes a = getAttributes(path);
+			if(a.isDirectory()){
+				throw new InvalidPathException(getAdaptorName(),"Was expecting a regular file, but got a directory: " + path.getRelativePath());
+			}
+		}
+	}
+
 	protected void assertPathIsFile(Path path) throws XenonException {
 
 		assertNotNull(path);
@@ -1412,6 +1460,14 @@ public abstract class FileSystem {
 		}
 
 		assertDirectoryExists(parent);
+	}
+
+	protected void assertFileIsSymbolicLink(Path link) throws XenonException{
+		assertNotNull(link);
+		assertPathExists(link);
+		if(!getAttributes(link).isSymbolicLink()){
+			throw new InvalidPathException(getAdaptorName(), "Not a symbolic link: " + link);
+		}
 	}
 
 	protected boolean areSamePaths(Path source, Path target) {

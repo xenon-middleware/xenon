@@ -152,4 +152,14 @@ public class SftpFileAdaptor extends FileAdaptor {
 
 		return new SftpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(wd), sftpClient, xp);
 	}
+
+	@Override
+	public boolean supportsReadingPosixPermissions(){
+		return true;
+	}
+
+	@Override
+	public boolean supportsSettingPosixPermissions(){
+		return true;
+	}
 }

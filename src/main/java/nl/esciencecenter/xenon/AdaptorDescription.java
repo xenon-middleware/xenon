@@ -64,6 +64,8 @@ public interface AdaptorDescription {
      */
     XenonPropertyDescription[] getSupportedProperties();
 
+
+
 //    @Override
 //    public String toString() {
 //        return "AdaptorDescription [name=" + name + ", description=" + description + 

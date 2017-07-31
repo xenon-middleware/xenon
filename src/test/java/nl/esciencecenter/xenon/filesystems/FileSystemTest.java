@@ -434,15 +434,10 @@ public class FileSystemTest {
 			list.add(p);
 		}
 
+		// Dot and DotDot should be removed here!
 		assertTrue(remove(list, "/test/aap/noot/file0"));
-		assertTrue(remove(list, "/test/aap/noot/.."));
-		assertTrue(remove(list, "/test/aap/noot/."));
 		assertTrue(remove(list, "/test/aap/noot"));
-		assertTrue(remove(list, "/test/aap/.."));
-		assertTrue(remove(list, "/test/aap/."));
 		assertTrue(remove(list, "/test/aap"));
-		assertTrue(remove(list, "/test/.."));
-		assertTrue(remove(list, "/test/."));
 		assertTrue(list.isEmpty());
 	}
 

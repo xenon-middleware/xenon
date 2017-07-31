@@ -168,4 +168,10 @@ public class WebdavFileAdaptor extends FileAdaptor {
         LOGGER.debug("end OK");
     }
 
+    @Override
+    public boolean isConnectionless() {
+
+        return true;
+    }
+
 }

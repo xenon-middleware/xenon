@@ -104,6 +104,14 @@ public class LocalFileAdaptor extends FileAdaptor {
 
 		return new LocalFileSystem(getNewUniqueID(), location, relativePath, xp);
 	}
-    
 
+    @Override
+    public boolean supportsReadingPosixPermissions(){
+        return true;
+    }
+
+    @Override
+    public boolean supportsSettingPosixPermissions(){
+        return true;
+    }
 }

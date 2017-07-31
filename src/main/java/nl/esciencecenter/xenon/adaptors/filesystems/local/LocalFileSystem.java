@@ -116,6 +116,7 @@ public class LocalFileSystem extends FileSystem {
     
     @Override
     public OutputStream writeToFile(Path path, long size) throws XenonException {
+		assertPathIsNotDirectory(path);
         try {
             return java.nio.file.Files.newOutputStream(LocalUtil.javaPath(this, path), 
             		StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
@@ -131,6 +132,8 @@ public class LocalFileSystem extends FileSystem {
 
     @Override
     public OutputStream appendToFile(Path path) throws XenonException {
+		assertFileExists(path);
+
         try {
             return java.nio.file.Files.newOutputStream(LocalUtil.javaPath(this, path), 
             		StandardOpenOption.WRITE, StandardOpenOption.APPEND);
@@ -141,11 +144,13 @@ public class LocalFileSystem extends FileSystem {
     
     @Override
     public PathAttributes getAttributes(Path path) throws XenonException {
+		assertPathExists(path);
     	return LocalUtil.getLocalFileAttributes(this, path);
     }
 
 	@Override
 	public Path readSymbolicLink(Path link) throws XenonException {
+		assertFileIsSymbolicLink(link);
 		try {
 			java.nio.file.Path path = LocalUtil.javaPath(this, link);
 			java.nio.file.Path target = java.nio.file.Files.readSymbolicLink(path);
@@ -162,11 +167,13 @@ public class LocalFileSystem extends FileSystem {
 		}
 	}
 
+
+
 	@Override
 	public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
 		
 		if (permissions == null) {
-			throw new XenonException(ADAPTOR_NAME, "Permissions is null!");
+			throw new IllegalArgumentException("Permissions is null!");
 		}
 
 		assertPathExists(path);

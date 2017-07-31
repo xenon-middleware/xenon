@@ -169,4 +169,12 @@ public class FtpFileAdaptor extends FileAdaptor {
         }
         ftp.login(user, password);
     }
+
+    @Override
+    public boolean supportsReadingPosixPermissions(){
+        return true;
+    }
+
+    @Override
+    public boolean canAppend(){ return false;}
 }
