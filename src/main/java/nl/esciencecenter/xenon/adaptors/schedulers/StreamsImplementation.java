@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Objects;
 
 import nl.esciencecenter.xenon.schedulers.Streams;
 
@@ -85,5 +86,18 @@ public class StreamsImplementation implements Streams {
 	 */
 	public OutputStream getStdin() {
 		return stdin;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		StreamsImplementation that = (StreamsImplementation) o;
+		return Objects.equals(jobIdentifier, that.jobIdentifier);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(jobIdentifier);
 	}
 }

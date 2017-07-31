@@ -16,6 +16,7 @@
 package nl.esciencecenter.xenon.credentials;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import nl.esciencecenter.xenon.credentials.Credential;
 
@@ -68,5 +69,19 @@ public class PasswordCredential implements Credential {
 	@Override
     public String toString() {
         return "PasswordCredential [username=" + getUsername() + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PasswordCredential that = (PasswordCredential) o;
+        return Objects.equals(username, that.username) &&
+                Arrays.equals(password, that.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, new String(password));
     }
 }

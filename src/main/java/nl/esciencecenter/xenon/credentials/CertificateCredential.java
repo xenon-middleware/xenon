@@ -15,6 +15,9 @@
  */
 package nl.esciencecenter.xenon.credentials;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * A container for security Information based upon certificates. 
  */
@@ -27,7 +30,7 @@ public class CertificateCredential extends PasswordCredential {
 
     /**
      * Constructs a {@link CertificateCredential} out of a username, a certificate file containing a private key, and an optional passphrase.
-     * 
+     *
      * @param username
      *          the username for this certificate
      * @param certfile
@@ -39,10 +42,10 @@ public class CertificateCredential extends PasswordCredential {
         super(username, passphrase);
         this.certfile = certfile;
     }
-    
+
     /**
      * Returns the certificate file.
-     * 
+     *
      * @return the certificate file.
      */
     public String getCertificateFile() {
@@ -52,5 +55,21 @@ public class CertificateCredential extends PasswordCredential {
     @Override
     public String toString() {
         return "CertificateCredential [username=" + getUsername() + ", certfile=" + certfile + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        CertificateCredential that = (CertificateCredential) o;
+        return Objects.equals(certfile, that.certfile) &&
+                Objects.equals(getUsername(), that.getUsername()) &&
+                Arrays.equals(getPassword(), that.getPassword());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), certfile);
     }
 }

@@ -18,13 +18,8 @@ package nl.esciencecenter.xenon.filesystems;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.util.*;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -69,7 +64,7 @@ public abstract class FileSystem {
 	private static final HashMap<String, FileAdaptor> adaptors = new LinkedHashMap<>();
 
 	static {
-		/** Load all supported file adaptors */
+		// Load all supported file adaptors
 		addAdaptor(new LocalFileAdaptor());
 		addAdaptor(new FtpFileAdaptor());
 		addAdaptor(new SftpFileAdaptor());
@@ -90,7 +85,7 @@ public abstract class FileSystem {
 		FileAdaptor adaptor = adaptors.get(adaptorName);
 
 		if (adaptor == null) {
-			throw new UnknownAdaptorException(COMPONENT_NAME, "File adaptor not found " + adaptor);
+			throw new UnknownAdaptorException(COMPONENT_NAME, "File adaptor not found (null)");
 		}
 
 		return adaptor;
@@ -174,6 +169,23 @@ public abstract class FileSystem {
 			return "CopyStatus [copyIdentifier=" + copyIdentifier + ", state=" + state + ", exception=" + exception + 
 					", bytesToCopy=" + bytesToCopy + ", bytesCopied=" + bytesCopied + "]";
 		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			CopyStatusImplementation that = (CopyStatusImplementation) o;
+			return bytesToCopy == that.bytesToCopy &&
+					bytesCopied == that.bytesCopied &&
+					Objects.equals(copyIdentifier, that.copyIdentifier) &&
+					Objects.equals(state, that.state) &&
+					Objects.equals(exception, that.exception);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(copyIdentifier, state, exception, bytesToCopy, bytesCopied);
+		}
 	}
 	
 	/**
@@ -247,7 +259,7 @@ public abstract class FileSystem {
 	 *             If the creation of the FileSystem failed.
 	 */
 	public static FileSystem create(String adaptor, String location, Credential credential) throws XenonException {
-		return create(adaptor, location, credential, new HashMap<String, String>(0));
+		return create(adaptor, location, credential, new HashMap<>(0));
 	}
 
 	/**
@@ -396,14 +408,11 @@ public abstract class FileSystem {
 		this.entryPath = entryPath;
 		this.properties = properties;
 		
-		ThreadFactory f = new ThreadFactory() {
-			@Override
-			public Thread newThread(Runnable r) {
-				Thread t = new Thread(r, "CopyThread-" + adaptor + "-" + uniqueID);
-				t.setDaemon(true);
-				return t;
-			}
-		};
+		ThreadFactory f = r -> {
+            Thread t = new Thread(r, "CopyThread-" + adaptor + "-" + uniqueID);
+            t.setDaemon(true);
+            return t;
+        };
 		
 		this.pool = Executors.newFixedThreadPool(1, f); 
 	}
@@ -580,6 +589,10 @@ public abstract class FileSystem {
 	 *
 	 * @throws PathAlreadyExistsException
 	 *             If the link already exists.
+	 * @throws NoSuchPathException
+	 *             If the target or parent directory of link does not exist
+	 * @throws InvalidPathException
+	 * 			   If parent of link is not a directory
 	 * @throws XenonException
 	 *             If an I/O error occurred.
 	 */
@@ -599,6 +612,12 @@ public abstract class FileSystem {
 	 *          the path to delete.
 	 * @param recursive
 	 * 			if the delete must be done recursively
+	 * @throws DirectoryNotEmptyException
+	 * 		if the directory was not empty.
+	 * @throws InvalidPathException
+	 * 		if the provided path is invalid.
+	 * @throws NoSuchPathException
+	 * 		if the provided path does not exist.
 	 * @throws XenonException
 	 *             If an I/O error occurred.
 	 */
@@ -1019,7 +1038,7 @@ public abstract class FileSystem {
 				Path rel = source.relativize(p.getPath());
 				Path dst = destination.resolve(rel);
 
-				copyFile(p.getPath(), destinationFS, dst, mode, callback);;
+				copyFile(p.getPath(), destinationFS, dst, mode, callback);
 				//bytesCopied += p.getSize();
 				//callback.setBytesCopied(bytesCopied);
 			}
@@ -1034,9 +1053,9 @@ public abstract class FileSystem {
 	 * @param file
 	 * 		the file to remove
 	 * @throws InvalidPathException
-	 * 		if the provide path is not a file.
+	 * 		if the provided path is not a file.
 	 * @throws NoSuchPathException
-	 * 		if the provides file does not exist.
+	 * 		if the provided file does not exist.
 	 * @throws XenonException
 	 *      If the file could not be removed.
 	 */
@@ -1054,9 +1073,9 @@ public abstract class FileSystem {
 	 * @throws DirectoryNotEmptyException
 	 * 		if the directory was not empty.
 	 * @throws InvalidPathException
-	 * 		if the provide path is not a directory.
+	 * 		if the provided path is not a directory.
 	 * @throws NoSuchPathException
-	 * 		if the provides path does not exist.
+	 * 		if the provided path does not exist.
 	 * @throws XenonException
 	 *      If the directory could not be removed.
 	 */
@@ -1106,7 +1125,7 @@ public abstract class FileSystem {
 			for (PathAttributes current : tmp) {
 				// traverse subdirs provided they are not "." or "..".
 				if (current.isDirectory() && !isDotDot(current.getPath())) {
-					list(dir.resolve(current.getPath().getFileNameAsString()), list, recursive);
+					list(dir.resolve(current.getPath().getFileNameAsString()), list, true);
 				}
 			}
 		}
@@ -1156,18 +1175,15 @@ public abstract class FileSystem {
 
 		final CopyCallback callback = new CopyCallback();
 
-		Future<Void> future = pool.submit(new Callable<Void>() {
-			@Override
-			public Void call() throws Exception {
+		Future<Void> future = pool.submit(() -> {
 
-				if (Thread.currentThread().isInterrupted()) {
-					throw new XenonException(getAdaptorName(), "Copy cancelled by user");
-				}
+            if (Thread.currentThread().isInterrupted()) {
+                throw new XenonException(getAdaptorName(), "Copy cancelled by user");
+            }
 
-				performCopy(source, destinationFS, destination, mode, recursive, callback);
-				return null;
-			}
-		}) ;
+            performCopy(source, destinationFS, destination, mode, recursive, callback);
+            return null;
+        }) ;
 
 		pendingCopies.put(ID, new PendingCopy(future, callback));
 		return ID;
@@ -1421,19 +1437,15 @@ public abstract class FileSystem {
 	}
 
 	@Override
-	public int hashCode() {
-		return uniqueID.hashCode();
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		FileSystem that = (FileSystem) o;
+		return Objects.equals(uniqueID, that.uniqueID);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-
-		return uniqueID.equals(((FileSystem)obj).uniqueID);
+	public int hashCode() {
+		return Objects.hash(uniqueID);
 	}
 }

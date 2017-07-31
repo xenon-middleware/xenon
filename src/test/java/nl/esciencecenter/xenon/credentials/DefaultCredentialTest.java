@@ -15,13 +15,62 @@
  */
 package nl.esciencecenter.xenon.credentials;
 
+import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 public class DefaultCredentialTest {
 
-	@org.junit.Test
+	@Test
 	public void test_username() throws Exception {
-		DefaultCredential pwc = new DefaultCredential("username");
-		assertEquals(pwc.getUsername(), "username");
+		DefaultCredential dc = new DefaultCredential("username");
+		assertEquals("username", dc.getUsername());
+	}
+
+	@Test
+	public void test_username_default_currentuserfromsystem() throws Exception {
+		DefaultCredential dc = new DefaultCredential();
+		String expected = System.getProperty("user.name");
+		assertEquals(expected, dc.getUsername());
+	}
+
+	@Test
+	public void test_hascode() throws Exception {
+		DefaultCredential dc1 = new DefaultCredential("username");
+		DefaultCredential dc2 = new DefaultCredential("username");
+		assertEquals(dc1.hashCode(), dc2.hashCode());
+	}
+
+	@Test
+	public void test_equals_sameobj() {
+		DefaultCredential dc = new DefaultCredential("username");
+		assertTrue(dc.equals(dc));
+	}
+
+	@Test
+	public void test_equals() {
+		DefaultCredential dc1 = new DefaultCredential("username");
+		DefaultCredential dc2 = new DefaultCredential("username");
+		assertTrue(dc1.equals(dc2));
+	}
+
+	@Test
+	public void test_equals_diffclass() {
+		DefaultCredential dc1 = new DefaultCredential("username");
+		String dc2 = "not the same class";
+		assertFalse(dc1.equals(dc2));
+	}
+
+	@Test
+	public void test_equals_null() {
+		DefaultCredential dc1 = new DefaultCredential("username");
+		assertFalse(dc1.equals(null));
+	}
+
+	@Test
+	public void test_equals_diffusername() {
+		DefaultCredential dc1 = new DefaultCredential("username1");
+		DefaultCredential dc2 = new DefaultCredential("username2");
+		assertFalse(dc1.equals(dc2));
 	}
 }
