@@ -15,22 +15,11 @@
  */
 package nl.esciencecenter.xenon.filesystems;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.*;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
+import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.UnknownAdaptorException;
+import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
@@ -42,10 +31,25 @@ import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
-import nl.esciencecenter.xenon.InvalidCredentialException;
-import nl.esciencecenter.xenon.InvalidLocationException;
-import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.UnknownPropertyException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * FileSystem represent a (possibly remote) file system that can be used to access data.
@@ -335,7 +339,7 @@ public abstract class FileSystem {
         long bytesCopied = 0;
 
         boolean started = false;
-        boolean cancel = false;
+        boolean cancelled = false;
 
         synchronized void start(long bytesToCopy) {
             if (!started) {
@@ -353,11 +357,11 @@ public abstract class FileSystem {
         }
 
         synchronized void cancel() {
-            cancel = true;
+            cancelled = true;
         }
 
         synchronized boolean isCancelled() {
-            return cancel;
+            return cancelled;
         }
     }
 
