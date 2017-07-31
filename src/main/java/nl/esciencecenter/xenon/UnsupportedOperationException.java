@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,7 @@
 package nl.esciencecenter.xenon;
 
 /**
- * Throw when an unsupported optional operation is called.   
+ * Throw when an unsupported optional operation is called.
  */
 public class UnsupportedOperationException extends XenonException {
 

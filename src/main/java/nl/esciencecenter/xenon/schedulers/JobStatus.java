@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,57 +24,57 @@ public interface JobStatus {
 
     /**
      * Get the job identifier of the Job for which this JobStatus was created.
-     * 
+     *
      * @return the Job.
      */
     String getJobIdentifier();
 
     /**
      * Get the state of the Job.
-     * 
+     *
      * @return the state of the Job.
      */
     String getState();
-    
+
     /**
      * Get the exit code for the Job.
-     * 
+     *
      * @return the exit code for the Job.
      */
     Integer getExitCode();
-    
+
     /**
      * Get the exception produced by the Job or while retrieving the status. If a job was canceled, will return a
      * JobCanceledException.
-     * 
+     *
      * @return the exception.
      */
     Exception getException();
 
     /**
      * Is the Job running.
-     * 
+     *
      * @return if the Job is running.
      */
     boolean isRunning();
 
     /**
      * Is the Job done.
-     * 
+     *
      * @return if the Job is done.
      */
     boolean isDone();
 
     /**
      * Has the Job or job retrieval produced a exception ?
-     * 
+     *
      * @return if the Job has an exception.
      */
     boolean hasException();
 
     /**
      * Get scheduler specific information on the Job.
-     * 
+     *
      * @return scheduler specific information on the Job.
      */
     public Map<String, String> getSchedulerSpecficInformation();

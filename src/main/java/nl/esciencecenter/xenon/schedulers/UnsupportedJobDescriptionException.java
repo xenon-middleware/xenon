@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.schedulers;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that a combination of options used in a JobDescription is not supported by a resource.  
- * 
+ * Signals that a combination of options used in a JobDescription is not supported by a resource.
+ *
  * @version 1.0
  * @since 1.0
  */

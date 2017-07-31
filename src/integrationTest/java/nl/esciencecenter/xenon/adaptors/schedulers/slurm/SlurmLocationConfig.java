@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,29 +19,29 @@ import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
 
 public class SlurmLocationConfig extends SchedulerLocationConfig {
 
-	private String location;
-	
-	public SlurmLocationConfig(String location) { 
-		this.location = location; 
-	}
-	
-	@Override
-	public String getLocation() {
-		return location;
-	}
+    private String location;
 
-	@Override
-	public String[] getQueueNames() {
-		return new String[] { "mypartition", "otherpartition" };
-	}
+    public SlurmLocationConfig(String location) {
+        this.location = location;
+    }
 
-	@Override
-	public String getDefaultQueueName() {
-		return "mypartition";
-	}
-	
-	@Override
-	public boolean supportsInteractive() {
-		return true;
-	}
+    @Override
+    public String getLocation() {
+        return location;
+    }
+
+    @Override
+    public String[] getQueueNames() {
+        return new String[] { "mypartition", "otherpartition" };
+    }
+
+    @Override
+    public String getDefaultQueueName() {
+        return "mypartition";
+    }
+
+    @Override
+    public boolean supportsInteractive() {
+        return true;
+    }
 }

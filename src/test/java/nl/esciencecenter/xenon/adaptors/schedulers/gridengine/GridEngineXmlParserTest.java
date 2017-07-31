@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,7 +67,7 @@ public class GridEngineXmlParserTest {
 
         parser.parseDocument(input);
     }
-    
+
     @Test
     public void test01d_checkVersion_WrongSchemaIgnoreVersion_Ignored() throws Throwable {
         String input = readFile("/fixtures/gridengine/jobs-wrong-schema.xml");
@@ -100,7 +100,7 @@ public class GridEngineXmlParserTest {
 
         assertArrayEquals(new Object[] { "all.q", "das3.q", "disabled.q", "fat.q", "gpu.q" }, queues);
     }
-    
+
     @Test(expected=XenonException.class)
     public void test02b_parseQueueInfo_NoQueues_ExceptionThrown() throws Throwable {
 
@@ -110,7 +110,7 @@ public class GridEngineXmlParserTest {
 
         parser.parseQueueInfos(input);
     }
-    
+
     @Test(expected=XenonException.class)
     public void test02c_parseQueueInfo_NoQueues_ExceptionThrown() throws Throwable {
 
@@ -120,7 +120,7 @@ public class GridEngineXmlParserTest {
 
         parser.parseQueueInfos(input);
     }
-    
+
     @Test(expected = XenonException.class)
     public void test02d_parseQueueInfo_queueEmptyName_exceptionThrown() throws Throwable {
         String input = readFile("/fixtures/gridengine/queues-queue-empty-name.xml");
@@ -167,8 +167,8 @@ public class GridEngineXmlParserTest {
 
         assertArrayEquals(expectedJobIDs, resultJobIDs);
     }
-    
-    
+
+
     @Test(expected = XenonException.class)
     public void test03b_parseJobInfo_jobEmptyJobNumber_exceptionThrown() throws Throwable {
         String input = readFile("/fixtures/gridengine/jobs-empty-jobnumber.xml");

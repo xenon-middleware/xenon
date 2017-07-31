@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,8 +38,8 @@ import org.xml.sax.SAXException;
 
 /**
  * Parses xml output from TORQUE batch system.
- * 
- * 
+ *
+ *
  */
 final class TorqueXmlParser {
 
@@ -74,7 +74,7 @@ final class TorqueXmlParser {
      * If a child node also has tags, those tags and their text values will also
      * be added. If multiple of the same tag names occur, the value of the last
      * occurrence will be stored.
-     * 
+     *
      * @param root XML element of which the children will be added to the map
      * @param result a mutable map that will have added to it tag names as keys and text values as values
      * @throws IllegalArgumentException if root is not an XML element
@@ -102,7 +102,7 @@ final class TorqueXmlParser {
 
     /**
      * Parses job info from "qstat -x"
-     * 
+     *
      * @param data
      *            the stream to get the xml data from
      * @return a list containing all queue names found

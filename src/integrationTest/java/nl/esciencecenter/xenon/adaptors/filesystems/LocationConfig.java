@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,13 +21,13 @@ import nl.esciencecenter.xenon.filesystems.Path;
 
 public abstract class LocationConfig {
 
-	public abstract Path getExistingPath();
+    public abstract Path getExistingPath();
 
     // TODO return SymbolicLink object
     public Map.Entry<Path,Path> getSymbolicLinksToExistingFile(){
         return null;
     }
-    
-    public abstract Path getWritableTestDir(); 
-    
+
+    public abstract Path getWritableTestDir();
+
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@ import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that directory is not empty.
- * 
+ *
  * @version 1.0
  * @since 1.0
  */

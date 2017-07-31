@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ import nl.esciencecenter.xenon.XenonException;
 //import nl.esciencecenter.xenon.util.Utils;
 
 /**
- * 
+ *
  */
 public final class ScriptingParser {
 
@@ -38,11 +38,11 @@ public final class ScriptingParser {
     public static final Pattern EQUALS_REGEX = Pattern.compile("\\s*=\\s*");
 
     public static final Pattern HORIZONTAL_LINE_REGEX = Pattern.compile("^\\s*([=_-]{3,}\\s*)+$");
-   
+
     /**
      * Parses a output with key=value pairs separated by whitespace, on one or more lines. This function fails if there is any
      * whitespace between the key and value, or whitespace inside the values.
-     * 
+     *
      * @param input
      *            the text to parse.
      * @param adaptorName
@@ -79,11 +79,11 @@ public final class ScriptingParser {
 
     /**
      * Returns if the given input String contains any of the option Strings given.
-     * 
-     * @param input String to check on  
+     *
+     * @param input String to check on
      * @param options Strings to check for
-     * 
-     * @return is any of the Strings in options is contain in the input string 
+     *
+     * @return is any of the Strings in options is contain in the input string
      */
     public static boolean containsAny(String input, String... options) {
         for (String string : options) {
@@ -97,7 +97,7 @@ public final class ScriptingParser {
     /**
      * Parses lines containing single key/value pairs separated by the given separator, possibly surrounded by whitespace. Will
      * ignore empty lines.
-     * 
+     *
      * @param input
      *            the input to parse
      * @param separatorRegEx
@@ -132,7 +132,7 @@ public final class ScriptingParser {
 
     /**
      * Get a JobID (number) from a line of input.
-     * 
+     *
      * @param input
      *            the line containing the jobID
      * @param adaptorName
@@ -167,16 +167,16 @@ public final class ScriptingParser {
     }
 
     /**
-     * Remove suffix from a string if present. 
-     * 
+     * Remove suffix from a string if present.
+     *
      * Although more than one possible suffix can be provided, only the first suffix encountered will be removed.
-     * 
+     *
      * @param value
      *          the text to clean
      * @param suffixes
      *          the possible suffixes to remove
      * @return
-     *          the cleaned text             
+     *          the cleaned text
      */
     public static String cleanValue(String value, String... suffixes) {
         String trimmed = value.trim();
@@ -191,23 +191,23 @@ public final class ScriptingParser {
 
     /**
      * Parses lines containing multiple values. The first line of the output must contain a header with the field names.
-     * 
+     *
      * @param input
      *            the input to parse
-     * 
+     *
      * @param keyField
      *            the field to use as the key in the result map. This field is mandatory in the output.
-     * 
+     *
      * @param fieldSeparatorRegEx
      *            a regular expression of the separator between fields. Usually whitespace.
-     * 
+     *
      * @param adaptorName
      *            the adaptor name to report in case parsing failed
-     * 
+     *
      * @param valueSuffixes
      *            suffixes to be removed from values in the table. Useful if the output contains special markers for defaults,
      *            disabled queues, broken nodes, etc
-     * 
+     *
      * @return a map containing key/value maps of all records.
      * @throws XenonException when parsing fails
      */
@@ -248,11 +248,11 @@ public final class ScriptingParser {
                 // do not parse separators
                 continue;
             }
- 
+
             String[] values = mergeTuples(fieldSeparatorRegEx.split(lines[i]));
-            
+
             if (fields.length != values.length) {
-                throw new XenonException(adaptorName, "Expected " + fields.length + " fields in output " + Arrays.toString(fields) 
+                throw new XenonException(adaptorName, "Expected " + fields.length + " fields in output " + Arrays.toString(fields)
                     + ", got line with " + values.length + " values: " + lines[i] + "parsed to: " + Arrays.toString(values) + " original input\n\n" + input + "\n\n");
             }
 
@@ -273,56 +273,56 @@ public final class ScriptingParser {
 
     /*
      * Attempt to support simple tuples in the output. The splitter will typically split these into two elements. For example:
-     * 
-     *     "(bla, bla)" 
-     *     
-     * will be split into 
-     * 
-     *     "(bla," 
+     *
+     *     "(bla, bla)"
+     *
+     * will be split into
+     *
+     *     "(bla,"
      *     "bla)
-     *     
-     * while we typically expect these to remain as one string.    
+     *
+     * while we typically expect these to remain as one string.
      */
-    private static String [] mergeTuples(String [] values) { 
-    
+    private static String [] mergeTuples(String [] values) {
+
         boolean inTuple = false;
-        
+
         ArrayList<String> tmp = new ArrayList<>();
-        
-        String current = null; 
-        
-        for (String v : values) {  
+
+        String current = null;
+
+        for (String v : values) {
 
             if (!inTuple) {
-                if (v.startsWith("(") && !v.endsWith(")")) { 
+                if (v.startsWith("(") && !v.endsWith(")")) {
                     inTuple = true;
                     current = v;
-                } else { 
+                } else {
                     tmp.add(v);
                 }
-            } else { 
+            } else {
                 current = CommandLineUtils.concat(current, " ", v); // Damn.. no clue which whitespace to use here :-(
 
                 if (v.endsWith(")") && !v.startsWith("(")) {
                     inTuple = false;
                     tmp.add(current);
                     current = null;
-                } 
+                }
             }
         }
-        
-        if (inTuple) { 
-            // Our tuple merging has gone pear shaped... resort to the original output! 
+
+        if (inTuple) {
+            // Our tuple merging has gone pear shaped... resort to the original output!
             return values;
-        } else { 
+        } else {
             return tmp.toArray(new String[tmp.size()]);
         }
     }
-    
+
     /**
      * Checks if the given text contains any of the given options. Returns which option it contains, throws an exception if it
      * doesn't.
-     * 
+     *
      * @param input
      *            the input text to check
      * @param adaptorName
@@ -345,7 +345,7 @@ public final class ScriptingParser {
     /**
      * Parses a list of strings, separated by whitespace (including newlines)
      * Trailing empty strings are not included.
-     * 
+     *
      * @param input
      *            the input to parse
      * @return an array of strings with no whitespace
@@ -361,7 +361,7 @@ public final class ScriptingParser {
     /**
      * Parses multiple key value records. A new record begins when the given key field is found. Each line contains a single
      * key/value pair, separated by the given separator.
-     * 
+     *
      * @param input
      *            the input to parse.
      * @param separatorRegEx

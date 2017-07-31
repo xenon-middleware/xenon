@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,9 +17,9 @@ package nl.esciencecenter.xenon.filesystems;
 
 /**
  * CopyOption is an enumeration containing all possible options for copying a file.
- * 
+ *
  * Note that the <code>CREATE</code>, <code>REPLACE</code> and <code>IGNORE</code> options
- * are mutually exclusive.  
+ * are mutually exclusive.
  */
 public enum CopyMode {
 
@@ -29,7 +29,7 @@ public enum CopyMode {
     CREATE,
 
     /**
-     * Replace the destination file if it already exists. 
+     * Replace the destination file if it already exists.
      */
     REPLACE,
 

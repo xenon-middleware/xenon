@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@ import org.junit.Test;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 /**
- * 
+ *
  */
 public class JobDescriptionTest {
 
@@ -47,13 +47,13 @@ public class JobDescriptionTest {
         JobDescription jd2 = new JobDescription(jd);
         assertEquals("aap", jd2.getExecutable());
     }
-    
+
     // TODO: split into seperate test
-    
+
     @Test
     public void test_setters_getters() throws Exception {
         JobDescription j = new JobDescription();
-      
+
         j.setWorkingDirectory("aap");
         String tmp = j.getWorkingDirectory();
         assertTrue(tmp.equals("aap"));
@@ -291,7 +291,7 @@ public class JobDescriptionTest {
         assertEquals(result, hash);
     }
 
-    
+
     @Test
     public void test_equals() throws Exception {
 
@@ -303,7 +303,7 @@ public class JobDescriptionTest {
 
         JobDescription other = new JobDescription();
         assertTrue(j.equals(other));
-       
+
         other.setMaxTime(42);
         assertFalse(j.equals(other));
         other.setMaxTime(15);
@@ -323,7 +323,7 @@ public class JobDescriptionTest {
         assertFalse(j.equals(other));
         other.setStartSingleProcess(false);
         assertTrue(j.equals(other));
-        
+
         other.setExecutable("aap");
         assertFalse(j.equals(other));
         other.setExecutable(null);

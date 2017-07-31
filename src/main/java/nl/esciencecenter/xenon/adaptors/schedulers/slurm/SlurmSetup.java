@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,9 +44,9 @@ public class SlurmSetup {
             throw new XenonException(ADAPTOR_NAME, "Slurm config does not contain version info");
         }
 
-        if (!checkVersion()) { 
-        	// Unsupported version, so print warning 
-        	LOGGER.warn("Slurm version {} not officially supported by Slurm Adaptor.", version);
+        if (!checkVersion()) {
+            // Unsupported version, so print warning
+            LOGGER.warn("Slurm version {} not officially supported by Slurm Adaptor.", version);
         }
 
         String accountingType = info.get("AccountingStorageType");
@@ -66,16 +66,16 @@ public class SlurmSetup {
                 return true;
             }
         }
-       
+
         return false;
     }
 
     public boolean accountingAvailable() {
         return accountingAvailable;
     }
-    
+
     public String version() {
         return version;
     }
-    
+
 }

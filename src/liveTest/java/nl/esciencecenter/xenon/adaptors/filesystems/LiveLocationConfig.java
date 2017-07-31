@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,9 +51,9 @@ public class LiveLocationConfig extends LocationConfig {
         );
     }
 
-	@Override
-	public Path getWritableTestDir() {
-		String baseDir = System.getProperty("xenon.basedir");
+    @Override
+    public Path getWritableTestDir() {
+        String baseDir = System.getProperty("xenon.basedir");
         if (baseDir == null) {
             return fileSystem.getEntryPath();
         }

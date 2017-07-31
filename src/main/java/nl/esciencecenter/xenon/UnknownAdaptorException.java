@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,7 @@
 package nl.esciencecenter.xenon;
 
 /**
- * Thrown when an unknown adaptor name is provided.  
+ * Thrown when an unknown adaptor name is provided.
  */
 public class UnknownAdaptorException extends XenonException {
 

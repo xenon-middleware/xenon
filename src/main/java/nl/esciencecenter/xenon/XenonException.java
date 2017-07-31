@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,9 +17,9 @@ package nl.esciencecenter.xenon;
 
 /**
  * XenonException is the parent exception for all exceptions raised in Xenon.
- * 
+ *
  * Next to the regular exception message and cause, XenonException add a source adaptor name to all exceptions.
- * 
+ *
  * @version 1.0
  * @since 1.0
  */

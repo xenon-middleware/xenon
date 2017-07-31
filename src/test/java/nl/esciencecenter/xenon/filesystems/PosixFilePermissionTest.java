@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.filesystems;
 
 import static org.junit.Assert.assertFalse;
@@ -29,7 +28,7 @@ import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
  *
  */
 public class PosixFilePermissionTest {
-    
+
     @Test
     public void testContainsAgainstNull() {
         assertFalse(PosixFilePermission.contains(PosixFilePermission.GROUP_EXECUTE, (PosixFilePermission[]) null));
@@ -44,12 +43,12 @@ public class PosixFilePermissionTest {
     public void testContainsNull() {
         assertFalse(PosixFilePermission.contains(null, PosixFilePermission.GROUP_EXECUTE));
     }
-    
+
     @Test
     public void testDoesNotContain() {
         assertFalse(PosixFilePermission.contains(PosixFilePermission.GROUP_EXECUTE, PosixFilePermission.GROUP_READ, PosixFilePermission.OTHERS_WRITE));
     }
-    
+
     @Test
     public void testDoesContain() {
         assertTrue(PosixFilePermission.contains(PosixFilePermission.OTHERS_WRITE, PosixFilePermission.GROUP_READ, PosixFilePermission.OTHERS_WRITE));

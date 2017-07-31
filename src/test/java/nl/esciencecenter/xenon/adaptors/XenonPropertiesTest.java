@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,7 @@ public class XenonPropertiesTest {
     public void testXenonProperties_supportsProperty_propertySet_true() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.STRING, "bla", "test property") 
+                new XenonPropertyDescription("key", Type.STRING, "bla", "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -53,12 +53,12 @@ public class XenonPropertiesTest {
     public void testXenonProperties_supportsProperty_useDefault_true() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.STRING,  "bla", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.STRING,  "bla",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(0);
-        
+
         XenonProperties xprop = new XenonProperties(valid, props);
 
         assertTrue(xprop.supportsProperty("key"));
@@ -68,8 +68,8 @@ public class XenonPropertiesTest {
     public void testXenonProperties_supportsProperty_propertySet_false() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.STRING,  "bla", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.STRING,  "bla",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -84,23 +84,23 @@ public class XenonPropertiesTest {
     public void testXenonProperties_supportsProperty_useDefault_false() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.STRING, "bla", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.STRING, "bla",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
-        
+
         XenonProperties xprop = new XenonProperties(valid, props);
 
         assertFalse(xprop.supportsProperty("aap"));
     }
-    
+
     @Test
     public void testXenonProperties_propertySet_true() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.STRING, "bla", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.STRING, "bla",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -115,23 +115,23 @@ public class XenonPropertiesTest {
     public void testXenonProperties_propertySet_false() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.STRING, "bla", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.STRING, "bla",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
-        
+
         XenonProperties xprop = new XenonProperties(valid, props);
 
         assertFalse(xprop.propertySet("key"));
     }
-    
+
     @Test(expected = UnknownPropertyException.class)
     public void testXenonProperties_propertySet_fails() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.STRING, "bla", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.STRING, "bla",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -139,14 +139,14 @@ public class XenonPropertiesTest {
 
         assertFalse(xprop.propertySet("aap"));
     }
- 
+
 
     @Test
     public void testXenonProperties_getProperty_propertySet() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.STRING, "bla", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.STRING, "bla",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -161,8 +161,8 @@ public class XenonPropertiesTest {
     public void testXenonProperties_getProperty_default() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.STRING, "bla", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.STRING, "bla",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -176,8 +176,8 @@ public class XenonPropertiesTest {
     public void testXenonProperties_getProperty_fails() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.STRING, "bla", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.STRING, "bla",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -186,15 +186,15 @@ public class XenonPropertiesTest {
         XenonProperties xprop = new XenonProperties(valid, props);
         xprop.getProperty("aap"); // throws exception
     }
-    
+
     @Test
     public void testXenonProperties_fromProperties() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.STRING, "bla", 
+                new XenonPropertyDescription("key", Type.STRING, "bla",
                         "test property")
         };
-                
+
 
         Map<String, String> props = new HashMap<>(2);
         props.put("key", "value");
@@ -206,12 +206,12 @@ public class XenonPropertiesTest {
 
     @Test(expected = UnknownPropertyException.class)
     public void testXenonProperties_fromDefaultsAndProperties_noOverlap() throws Exception {
-        
+
         XenonPropertyDescription [] supportedProperties = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.STRING, "value", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.STRING, "value",
+                        "test property")
         };
-        
+
         Map<String, String> props = new HashMap<>(2);
         props.put("key2", "value2");
 
@@ -220,12 +220,12 @@ public class XenonPropertiesTest {
 
     @Test
     public void testXenonProperties_fromDefaultsAndProperties_withOverlap() throws Exception {
-        
+
         XenonPropertyDescription [] supportedProperties = new XenonPropertyDescription [] {
                 new XenonPropertyDescription("key", Type.STRING, "value",
                         "test property"),
                 new XenonPropertyDescription("key2", Type.STRING, "value",
-                        "test property") 
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -240,8 +240,8 @@ public class XenonPropertiesTest {
     public void testGetBooleanProperty_true() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.BOOLEAN, "true", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.BOOLEAN, "true",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -255,10 +255,10 @@ public class XenonPropertiesTest {
     public void testGetBooleanProperty_false() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.BOOLEAN, "true", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.BOOLEAN, "true",
+                        "test property")
         };
-        
+
         Map<String, String> props = new HashMap<>(2);
         props.put("key", "false");
         XenonProperties xprop = new XenonProperties(valid, props);
@@ -270,10 +270,10 @@ public class XenonPropertiesTest {
     public void testGetBooleanProperty_default() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.BOOLEAN, "true", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.BOOLEAN, "true",
+                        "test property")
         };
-        
+
         Map<String, String> props = new HashMap<>(2);
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -284,10 +284,10 @@ public class XenonPropertiesTest {
     public void testGetBooleanProperty_emptyString_False() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.BOOLEAN, "true", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.BOOLEAN, "true",
+                        "test property")
         };
-        
+
         Map<String, String> props = new HashMap<>(2);
         props.put("key", "bla");
         new XenonProperties(valid, props);
@@ -297,10 +297,10 @@ public class XenonPropertiesTest {
     public void testGetBooleanProperty_invalidDefault() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.BOOLEAN, "aap", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.BOOLEAN, "aap",
+                        "test property")
         };
-        
+
         Map<String, String> props = new HashMap<>(2);
         new XenonProperties(valid, props).getBooleanProperty("key");
     }
@@ -309,33 +309,33 @@ public class XenonPropertiesTest {
     public void testGetBooleanProperty_invalidName() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.BOOLEAN, "true", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.BOOLEAN, "true",
+                        "test property")
         };
-        
+
         Map<String, String> props = new HashMap<>(2);
         new XenonProperties(valid, props).getBooleanProperty("noot");
     }
-    
+
     @Test(expected = PropertyTypeException.class)
     public void testGetBooleanProperty_wrongType() throws Exception {
 
         XenonPropertyDescription [] supportedProperties = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.STRING, "value", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.STRING, "value",
+                        "test property")
         };
-        
+
         Map<String, String> props = new HashMap<>(2);
         XenonProperties xprop = new XenonProperties(supportedProperties, props);
-        xprop.getBooleanProperty("key"); // throws exception        
+        xprop.getBooleanProperty("key"); // throws exception
     }
-    
+
     @Test
     public void testGetIntProperty_1() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.INTEGER, "42", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.INTEGER, "42",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -349,8 +349,8 @@ public class XenonPropertiesTest {
     public void testGetIntProperty_default() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.INTEGER, "42", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.INTEGER, "42",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -363,8 +363,8 @@ public class XenonPropertiesTest {
     public void testGetIntProperty_invalidDefault() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.INTEGER, "aap", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.INTEGER, "aap",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -375,8 +375,8 @@ public class XenonPropertiesTest {
     public void testGetDoubleProperty_1() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.DOUBLE, "42.0", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.DOUBLE, "42.0",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -390,8 +390,8 @@ public class XenonPropertiesTest {
     public void testGetDoubleProperty_default() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.DOUBLE, "42.0", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.DOUBLE, "42.0",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(0);
@@ -404,21 +404,21 @@ public class XenonPropertiesTest {
     public void testGetDoubleProperty_invalidDefault() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.DOUBLE, "aap", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.DOUBLE, "aap",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(0);
         new XenonProperties(valid, props).getDoubleProperty("key"); // throws exception
     }
 
-    
+
     @Test
     public void testGetSizeProperty_g() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.SIZE, "42g", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.SIZE, "42g",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -428,13 +428,13 @@ public class XenonPropertiesTest {
         //noinspection PointlessArithmeticExpression
         assertTrue(xprop.getSizeProperty("key") == 1L*1024L*1024L*1024L);
     }
-    
+
     @Test
     public void testGetSizeProperty_G() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.SIZE, "42g", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.SIZE, "42g",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -449,8 +449,8 @@ public class XenonPropertiesTest {
     public void testGetSizeProperty_m() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.SIZE, "42g", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.SIZE, "42g",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -460,13 +460,13 @@ public class XenonPropertiesTest {
         //noinspection PointlessArithmeticExpression
         assertTrue(xprop.getSizeProperty("key") == 1L*1024L*1024L);
     }
-    
+
     @Test
     public void testGetSizeProperty_M() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.SIZE, "42g", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.SIZE, "42g",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -481,8 +481,8 @@ public class XenonPropertiesTest {
     public void testGetSizeProperty_k() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.SIZE, "42g", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.SIZE, "42g",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -492,13 +492,13 @@ public class XenonPropertiesTest {
         //noinspection PointlessArithmeticExpression
         assertTrue(xprop.getSizeProperty("key") == 1L*1024L);
     }
-    
+
     @Test
     public void testGetSizeProperty_K() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.SIZE, "42g", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.SIZE, "42g",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -513,8 +513,8 @@ public class XenonPropertiesTest {
     public void testGetSizeProperty() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.SIZE, "42g", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.SIZE, "42g",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -523,13 +523,13 @@ public class XenonPropertiesTest {
 
         assertTrue(xprop.getSizeProperty("key") == 1L);
     }
-    
+
     @Test(expected = InvalidPropertyException.class)
     public void testGetSizeProperty_X_fails() throws Exception {
 
         XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
-                new XenonPropertyDescription("key", Type.SIZE, "42g", 
-                        "test property") 
+                new XenonPropertyDescription("key", Type.SIZE, "42g",
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(2);
@@ -540,122 +540,122 @@ public class XenonPropertiesTest {
 
     @Test
     public void testXenonProperties_filter_withPropertiesSet() throws Exception {
-        
+
         XenonPropertyDescription [] supportedProperties = new XenonPropertyDescription [] {
                 new XenonPropertyDescription("aap.key", Type.STRING, "aap",
                         "test property"),
                 new XenonPropertyDescription("noot.key", Type.STRING, "noot",
-                        "test property") 
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(3);
         props.put("aap.key", "aap2");
         props.put("noot.key", "noot2");
-        
+
         XenonProperties xprop = new XenonProperties(supportedProperties, props).filter("aap");
-        
+
         assertEquals("{aap.key=aap2}", xprop.toString());
     }
-    
+
     @Test
     public void testXenonProperties_filter_noPropertiesSet() throws Exception {
-        
+
         XenonPropertyDescription [] supportedProperties = new XenonPropertyDescription [] {
                 new XenonPropertyDescription("aap.key", Type.STRING, "aap",
                         "test property"),
                 new XenonPropertyDescription("noot.key", Type.STRING, "noot",
-                        "test property") 
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(0);
-        
+
         XenonProperties xprop = new XenonProperties(supportedProperties, props).filter("aap");
-        
+
         assertEquals("{<<aap.key=aap>>}", xprop.toString());
     }
 
     @Test
     public void testXenonProperties_filter_wrongPrefix() throws Exception {
-        
+
         XenonPropertyDescription [] supportedProperties = new XenonPropertyDescription [] {
                 new XenonPropertyDescription("aap.key", Type.STRING, "aap",
                         "test property"),
                 new XenonPropertyDescription("noot.key", Type.STRING, "noot",
-                        "test property") 
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(0);
-        
+
         XenonProperties xprop = new XenonProperties(supportedProperties, props).filter("bla");
-        
+
         assertEquals("{}", xprop.toString());
     }
 
     @Test
     public void testXenonProperties_exclude_withPropertiesSet() throws Exception {
-        
+
         XenonPropertyDescription [] supportedProperties = new XenonPropertyDescription [] {
                 new XenonPropertyDescription("aap.key", Type.STRING, "aap",
                         "test property"),
                 new XenonPropertyDescription("noot.key", Type.STRING, "noot",
-                        "test property") 
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(0);
         props.put("aap.key", "aap2");
         props.put("noot.key", "noot2");
-        
+
         XenonProperties xprop = new XenonProperties(supportedProperties, props).exclude("noot");
-        
+
         assertEquals("{aap.key=aap2}", xprop.toString());
     }
-    
+
     @Test
     public void testXenonProperties_exclude_noPropertiesSet() throws Exception {
-        
+
         XenonPropertyDescription [] supportedProperties = new XenonPropertyDescription [] {
                 new XenonPropertyDescription("aap.key", Type.STRING, "aap",
                         "test property"),
                 new XenonPropertyDescription("noot.key", Type.STRING, "noot",
-                        "test property") 
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(0);
-        
+
         XenonProperties xprop = new XenonProperties(supportedProperties, props).exclude("noot");
-        
+
         assertEquals("{<<aap.key=aap>>}", xprop.toString());
     }
 
     @Test
     public void testXenonProperties_exclude_wrongPrefix() throws Exception {
-        
+
         XenonPropertyDescription [] supportedProperties = new XenonPropertyDescription [] {
                 new XenonPropertyDescription("aap.key", Type.STRING, "aap",
-                        "test property") 
+                        "test property")
         };
 
         Map<String, String> props = new HashMap<>(0);
-        
+
         XenonProperties xprop = new XenonProperties(supportedProperties, props).exclude("bla");
-        
+
         assertEquals("{<<aap.key=aap>>}", xprop.toString());
     }
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     /*
      * FIXME!!!
-     * 
-        @Test(expected = InvalidPropertyException.class) 
+     *
+        @Test(expected = InvalidPropertyException.class)
         public void testGetIntegerProperty_emptyString_False() throws Exception {
 
-            XenonPropertyDescription [] valid = new XenonPropertyDescription [] { 
+            XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
                  new XenonPropertyDescription("key", Type.INTEGER, EnumSet.of(Level.XENON), "42", "test property")
             };
 
@@ -664,10 +664,10 @@ public class XenonPropertiesTest {
             new XenonProperties(valid, props);
         }
 
-        @Test(expected = PropertyTypeException.class) 
+        @Test(expected = PropertyTypeException.class)
         public void testGetIntegerProperty_emptyString_False() throws Exception {
 
-            XenonPropertyDescription [] valid = new XenonPropertyDescription [] { 
+            XenonPropertyDescription [] valid = new XenonPropertyDescription [] {
                  new XenonPropertyDescription("key", Type.INTEGER, EnumSet.of(Level.XENON), "42", "test property")
             };
 
@@ -676,13 +676,13 @@ public class XenonPropertiesTest {
             new XenonProperties(valid, props);
         }
 
-        
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
+
         @Test
         public void testGetIntProperty_int_int() throws Exception {
             Map<String,String> props = new HashMap<>();

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,25 +42,25 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
 public final class SlurmUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SlurmUtils.class);
-    
+
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
 
     private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
 
     /**
      * These are the states a job can be in when it has failed:
-     * FAILED:    the job terminated with non-zero exit code or other failure condition. 
+     * FAILED:    the job terminated with non-zero exit code or other failure condition.
      * CANCELLED: the job was explicitly cancelled by the user or system administrator.
-     * NODE_FAIL: the job terminated due to failure of one or more allocated nodes. 
+     * NODE_FAIL: the job terminated due to failure of one or more allocated nodes.
      * TIMEOUT:   the job terminated upon reaching its time limit.
-     * PREEMPTED: the job terminated due to preemption (a more important job took its place). 
+     * PREEMPTED: the job terminated due to preemption (a more important job took its place).
      * BOOT_FAIL: the job terminated due to a launch failure (typically a hardware failure).
      */
     private static final String[] FAILED_STATES = new String[] { "FAILED", "CANCELLED", "NODE_FAIL", "TIMEOUT", "PREEMPTED", "BOOT_FAIL" };
 
     /**
      * These are the states a job can be in when it is running:
-     * 
+     *
      * CONFIGURING: the resources are available and being preparing to run the job (for example by booting).
      * RUNNING:     the resources are running the job.
      * COMPLETING:  the job is in process of completing. Some processes may have completed, others may still be running.
@@ -69,32 +69,32 @@ public final class SlurmUtils {
 
     /**
      * These are the states a job can be in when it is pending:
-     * 
-     * PENDING:      the job is awaiting resource allocation. 
+     *
+     * PENDING:      the job is awaiting resource allocation.
      * STOPPED:      the job has an allocation, but execution has been stopped with SIGSTOP signal (allocation is retained).
-     * SUSPENDED:    the job has an allocation, but execution has been suspended (resources have been released for other jobs). 
-     * SPECIAL_EXIT: The job was requeued in a special state. 
+     * SUSPENDED:    the job has an allocation, but execution has been suspended (resources have been released for other jobs).
+     * SPECIAL_EXIT: The job was requeued in a special state.
      */
     private static final String[] PENDING_STATES = new String[] { "PENDING", "STOPPED", "SUSPENDED", "SPECIAL_EXIT" };
-    
-    /** In completed state, the job has terminated and all processes have returned exit code 0. */ 
-    private static final String DONE_STATE = "COMPLETED";
-    
- 	protected static String identifiersAsCSList(String[] jobs) {
- 		String result = null;
- 		for (String job : jobs) {
- 			if (job != null) {
- 				if (result == null) {
- 					result = job;
- 				} else {
- 					result = CommandLineUtils.concat(result, ",", job);
- 				}
- 			}
- 		}
- 		return result;
- 	}
 
- 	// Retrieve an exit code from the "ExitCode" output field of scontrol
+    /** In completed state, the job has terminated and all processes have returned exit code 0. */
+    private static final String DONE_STATE = "COMPLETED";
+
+     protected static String identifiersAsCSList(String[] jobs) {
+         String result = null;
+         for (String job : jobs) {
+             if (job != null) {
+                 if (result == null) {
+                     result = job;
+                 } else {
+                     result = CommandLineUtils.concat(result, ",", job);
+                 }
+             }
+         }
+         return result;
+     }
+
+     // Retrieve an exit code from the "ExitCode" output field of scontrol
     protected static Integer exitcodeFromString(String value) throws XenonException {
         if (value == null) {
             return null;
@@ -206,10 +206,10 @@ public final class SlurmUtils {
 
         return new QueueStatusImplementation(scheduler, queueName, null, queueInfo);
     }
-    
+
     /**
-     * Is the given state a running state ? 
-     * 
+     * Is the given state a running state ?
+     *
      * @param state the state to check
      * @return if the state is a running state.
      */
@@ -223,8 +223,8 @@ public final class SlurmUtils {
     }
 
     /**
-     * Is the given state a pending state ? 
-     * 
+     * Is the given state a pending state ?
+     *
      * @param state the state to check
      * @return if the state is a pending state.
      */
@@ -236,10 +236,10 @@ public final class SlurmUtils {
         }
         return false;
     }
-    
+
     /**
-     * Is the given state a done or failed state ? 
-     * 
+     * Is the given state a done or failed state ?
+     *
      * @param state the state to check
      * @return if the state is a done or failed state.
      */
@@ -248,21 +248,21 @@ public final class SlurmUtils {
     }
 
     /**
-     * Is the given state a done state ? 
-     * 
+     * Is the given state a done state ?
+     *
      * @param state the state to check
      * @return if the state is a done state.
      */
     protected static boolean isDoneState(String state) {
         return state.equals(DONE_STATE);
     }
-    
+
     /**
-     * Is the given state a failed state ? 
-     * 
+     * Is the given state a failed state ?
+     *
      * @param state the state to check
      * @return if the state is failed state.
-     */    
+     */
     protected static boolean isFailedState(String state) {
         for (String validState : FAILED_STATES) {
             if (state.startsWith(validState)) {
@@ -281,12 +281,12 @@ public final class SlurmUtils {
                 throw new InvalidJobDescriptionException(ADAPTOR_NAME,
                         "Custom job script not supported in interactive mode");
             }
-            
+
             if (description.isStartSingleProcess()) {
                 throw new InvalidJobDescriptionException(ADAPTOR_NAME,
                         "StartSingleProcess option not supported in interactive mode");
             }
-            
+
             if (description.getStdin() != null) {
                 throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Stdin redirect not supported in interactive mode");
             }
@@ -298,7 +298,7 @@ public final class SlurmUtils {
             if (description.getStderr() != null && !description.getStderr().equals("stderr.txt")) {
                 throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Stderr redirect not supported in interactive mode");
             }
-            
+
             if (description.getEnvironment().size() != 0) {
                 throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Environment variables not supported in interactive mode");
             }
@@ -313,7 +313,7 @@ public final class SlurmUtils {
         //Perform standard checks.
         ScriptingUtils.verifyJobDescription(description, ADAPTOR_NAME);
     }
-    
+
     private static String getWorkingDirPath(JobDescription description, Path fsEntryPath) {
         String path;
         if (description.getWorkingDirectory().startsWith("/")) {
@@ -326,7 +326,7 @@ public final class SlurmUtils {
 
         return path;
     }
-    
+
     public static String[] generateInteractiveArguments(JobDescription description, Path fsEntryPath, UUID tag) {
         ArrayList<String> arguments = new ArrayList<>();
 
@@ -335,7 +335,7 @@ public final class SlurmUtils {
 
         //add a tag so we can find the job back in the queue later
         arguments.add("--comment=" + tag.toString());
-        
+
         //set working directory
         if (description.getWorkingDirectory() != null) {
             String path = getWorkingDirPath(description, fsEntryPath);
@@ -357,7 +357,7 @@ public final class SlurmUtils {
 
         arguments.add(description.getExecutable());
         arguments.addAll(description.getArguments());
-        
+
         return arguments.toArray(new String[arguments.size()]);
     }
 
@@ -430,6 +430,6 @@ public final class SlurmUtils {
 
         return stringBuilder.toString();
     }
-    
-   
+
+
 }

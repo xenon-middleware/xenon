@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,9 +23,9 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
 
 public class LocalFileSystemUtils {
 
-	public static String NAME = "LocalFileSystemUtils";
-	
-	/**
+    public static String NAME = "LocalFileSystemUtils";
+
+    /**
      * Returns if we are currently running on Windows.
      *
      * @return if we are currently running on Window.
@@ -34,8 +34,8 @@ public class LocalFileSystemUtils {
         String os = System.getProperty("os.name");
         return (os != null && os.startsWith("Windows"));
     }
-	
-	/**
+
+    /**
      * Return the locally valid root element of an <code>String</code> representation of an absolute path.
      *
      * Examples of a root elements are "/" or "C:". If the provided path does not contain a locally valid root element, an
@@ -49,9 +49,9 @@ public class LocalFileSystemUtils {
      *             If the provided <code>path</code> is not absolute, or does not contain a locally valid root.
      */
     public static String getLocalRoot(String p) throws XenonException {
-        
+
         String path = p;
-        
+
         if (isWindows()) {
             if (path == null || path.isEmpty()) {
                 return "";
@@ -76,13 +76,13 @@ public class LocalFileSystemUtils {
 
         throw new InvalidLocationException(NAME, "Path is not absolute! " + path);
     }
-	
-	 /**
+
+     /**
      * Returns all local FileSystems.
-     * 
+     *
      * This method detects all local file system roots, and returns one or more <code>FileSystems</code> representing each of
      * these roots.
-     * 
+     *
      * @return all local FileSystems.
      *
      * @throws XenonException

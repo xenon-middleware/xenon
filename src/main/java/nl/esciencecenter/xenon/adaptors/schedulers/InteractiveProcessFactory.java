@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,12 +19,12 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 /**
- * 
+ *
  */
 public interface InteractiveProcessFactory {
     InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier) throws XenonException;
-    
+
     void close() throws XenonException;
-    
+
     boolean isOpen() throws XenonException;
 }

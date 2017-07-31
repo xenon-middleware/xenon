@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.filesystems;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that an invalid combination of OpenOptions have been specified.  
- * 
+ * Signals that an invalid combination of OpenOptions have been specified.
+ *
  * @version 1.0
  * @since 1.0
  */

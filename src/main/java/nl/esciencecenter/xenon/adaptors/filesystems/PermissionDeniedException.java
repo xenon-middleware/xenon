@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@ import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that the user does not have sufficient permissions to perform the operation.
- * 
+ *
  * @version 1.0
  * @since 1.0
  */

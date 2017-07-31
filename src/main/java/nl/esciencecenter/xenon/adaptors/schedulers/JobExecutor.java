@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,26 +25,26 @@ import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.Streams;
 
 /**
- * 
+ *
  */
 public class JobExecutor implements Runnable {
 
-    private static final String PENDING_STATE = "PENDING"; 
-    private static final String RUNNING_STATE = "RUNNING"; 
-    private static final String DONE_STATE = "DONE"; 
-    private static final String ERROR_STATE = "ERROR"; 
+    private static final String PENDING_STATE = "PENDING";
+    private static final String RUNNING_STATE = "RUNNING";
+    private static final String DONE_STATE = "DONE";
+    private static final String ERROR_STATE = "ERROR";
     private static final String KILLED_STATE = "KILLED";
-    
+
     /** Polling delay in ms. */
     private static final long POLLING_DELAY = 1000L;
-    
+
     /** Number of ms. per min. */
     private static final long MILLISECONDS_IN_MINUTE = 60L * 1000L;
 
     private final JobDescription description;
-    private final String jobIdentifier; 
+    private final String jobIdentifier;
     private final boolean interactive;
-    
+
     private final InteractiveProcessFactory factory;
 
     private final long pollingDelay;
@@ -111,7 +111,7 @@ public class JobExecutor implements Runnable {
     public JobDescription getJobDescription() {
         return description;
     }
-    
+
     public synchronized JobStatus getStatus() {
         if (!done && RUNNING_STATE.equals(state)) {
             triggerStatusUpdate();
@@ -162,17 +162,17 @@ public class JobExecutor implements Runnable {
             throw new XenonException(adaptorName, "Streams not available");
         }
 
-    	return streams;
+        return streams;
     }
-        
+
     public synchronized JobStatus waitUntilRunning(long timeout) {
 
         long deadline = Deadline.getDeadline(timeout);
-                
+
         triggerStatusUpdate();
 
         long leftover = deadline - System.currentTimeMillis();
-        
+
         while (leftover > 0 && PENDING_STATE.equals(state)) {
             try {
                 wait(leftover);
@@ -181,7 +181,7 @@ public class JobExecutor implements Runnable {
                 Thread.currentThread().interrupt();
                 break;
             }
-            
+
             leftover = deadline - System.currentTimeMillis();
         }
 
@@ -191,13 +191,13 @@ public class JobExecutor implements Runnable {
     public synchronized JobStatus waitUntilDone(long timeout) {
 
         long deadline = Deadline.getDeadline(timeout);
-        
+
         triggerStatusUpdate();
 
         long leftover = deadline - System.currentTimeMillis();
-        
+
         while (leftover > 0 && !done) {
-            
+
             try {
                 wait(leftover);
             } catch (InterruptedException e) {
@@ -205,7 +205,7 @@ public class JobExecutor implements Runnable {
                 Thread.currentThread().interrupt();
                 break;
             }
-            
+
             leftover = deadline - System.currentTimeMillis();
 
         }
@@ -227,7 +227,7 @@ public class JobExecutor implements Runnable {
 
     /**
      * Wait for a certain amount of time for an update.
-     * 
+     *
      * @param maxDelay
      *            the maximum time to wait
      */
@@ -236,12 +236,12 @@ public class JobExecutor implements Runnable {
         if (done || !updateSignal) {
             return;
         }
-        
+
         long deadline = Deadline.getDeadline(maxDelay);
-        
-        long left = maxDelay > 0 ? maxDelay : POLLING_DELAY; 
-        
-        while (!done && updateSignal && left > 0) { 
+
+        long left = maxDelay > 0 ? maxDelay : POLLING_DELAY;
+
+        while (!done && updateSignal && left > 0) {
             try {
                 wait(left);
             } catch (InterruptedException e) {
@@ -250,12 +250,12 @@ public class JobExecutor implements Runnable {
                 break;
             }
 
-            if (maxDelay > 0) { 
+            if (maxDelay > 0) {
                 left = deadline - System.currentTimeMillis();
-            } 
+            }
         }
     }
-    
+
     /**
      * Clear the update signal and wake up any waiting threads
      */
@@ -266,7 +266,7 @@ public class JobExecutor implements Runnable {
 
     /**
      * Sleep for a certain amount of time, provide the job is not done, and no one requested an update.
-     * 
+     *
      * @param maxDelay
      *            the maximum amount of time to wait
      */
@@ -275,12 +275,12 @@ public class JobExecutor implements Runnable {
         if (done || updateSignal || maxDelay <= 0) {
             return;
         }
-        
+
         long deadline = Deadline.getDeadline(maxDelay);
-        
+
         long left = deadline - System.currentTimeMillis();
-        
-        while (!done && !updateSignal && left > 0) { 
+
+        while (!done && !updateSignal && left > 0) {
             try {
                 wait(left);
             } catch (InterruptedException e) {
@@ -313,7 +313,7 @@ public class JobExecutor implements Runnable {
             if (interactive) {
                 InteractiveProcess p = factory.createInteractiveProcess(description, jobIdentifier);
                 setStreams(p.getStreams());
-                process = p; 
+                process = p;
             } else {
                 process = new BatchProcess(filesystem, workingDirectory, description, jobIdentifier, factory);
             }
@@ -334,7 +334,7 @@ public class JobExecutor implements Runnable {
             if (getKilled()) {
                 // Destroy first, update state last, otherwise we have a race condition!
                 process.destroy();
-                updateState(KILLED_STATE, -1, new JobCanceledException(adaptorName, "Process cancelled by user."));                
+                updateState(KILLED_STATE, -1, new JobCanceledException(adaptorName, "Process cancelled by user."));
                 return;
             }
 

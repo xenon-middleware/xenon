@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,8 @@
 package nl.esciencecenter.xenon;
 
 /**
- * Signals that an invalid location was provided.  
- * 
+ * Signals that an invalid location was provided.
+ *
  * @version 1.0
  * @since 1.0
  */

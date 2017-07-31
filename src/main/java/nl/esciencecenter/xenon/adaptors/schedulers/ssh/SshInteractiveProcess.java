@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,50 +40,50 @@ import org.slf4j.LoggerFactory;
 class SshInteractiveProcess implements InteractiveProcess {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SshInteractiveProcess.class);
-    
+
     private final ClientSession session;
     private final ChannelExec channel;
     private final Streams streams;
     private boolean done = false;
-    
+
     // FIXME: should be property or parameter!
     private final long timeout = 10*1000;
-    
-    SshInteractiveProcess(ClientSession session, JobDescription description, String jobIdentifier) throws XenonException {
-        
-    	if (session == null) { 
-    		throw new IllegalArgumentException("Session is null");
-    	}
-    	
-       	if (description == null) { 
-    		throw new IllegalArgumentException("Job description is null");
-    	}
 
-       	if (jobIdentifier == null) { 
-    		throw new IllegalArgumentException("Job identifier is null");
-    	}
-       	
-    	this.session = session;
-        
+    SshInteractiveProcess(ClientSession session, JobDescription description, String jobIdentifier) throws XenonException {
+
+        if (session == null) {
+            throw new IllegalArgumentException("Session is null");
+        }
+
+           if (description == null) {
+            throw new IllegalArgumentException("Job description is null");
+        }
+
+           if (jobIdentifier == null) {
+            throw new IllegalArgumentException("Job identifier is null");
+        }
+
+        this.session = session;
+
         try {
-			this.channel = session.createExecChannel(buildCommand(description));
-	
-			Map<String, String> environment = description.getEnvironment();
-        
-			for (Entry<String, String> entry : environment.entrySet()) {
-				channel.setEnv(entry.getKey(), entry.getValue());
-			}
-            
+            this.channel = session.createExecChannel(buildCommand(description));
+
+            Map<String, String> environment = description.getEnvironment();
+
+            for (Entry<String, String> entry : environment.entrySet()) {
+                channel.setEnv(entry.getKey(), entry.getValue());
+            }
+
             // TODO: Add agent FW
             // channel.setAgentForwarding(session.useAgentForwarding());
-            
+
             channel.open().verify(timeout);
 
-			// set the streams first, then connect the channel.
-            streams = new StreamsImplementation(jobIdentifier, channel.getInvertedOut(), channel.getInvertedIn(), channel.getInvertedErr());           
-            
+            // set the streams first, then connect the channel.
+            streams = new StreamsImplementation(jobIdentifier, channel.getInvertedOut(), channel.getInvertedIn(), channel.getInvertedErr());
+
         } catch (Exception e) {
-        	throw new XenonException(ADAPTOR_NAME, "Failed to start command", e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to start command", e);
         }
     }
 
@@ -115,7 +115,7 @@ class SshInteractiveProcess implements InteractiveProcess {
 
     private void cleanup() {
         try {
-        	channel.close(false).await();
+            channel.close(false).await();
         } catch (IOException e) {
             LOGGER.warn("SshInteractiveProcess failed to release exec channel!", e);
         }
@@ -139,13 +139,13 @@ class SshInteractiveProcess implements InteractiveProcess {
 
     @Override
     public int getExitStatus() {
-    	
-    	Integer status = channel.getExitStatus();
-    	
-    	if (status == null) { 
-    		return -1;
-    	}
-    	
+
+        Integer status = channel.getExitStatus();
+
+        if (status == null) {
+            return -1;
+        }
+
         return status.intValue();
     }
 
@@ -156,9 +156,9 @@ class SshInteractiveProcess implements InteractiveProcess {
         }
 
         try {
-        	// TODO: Unclear how to send signal ?
+            // TODO: Unclear how to send signal ?
             // channel.sendSignal("KILL");
-        	channel.close(true).await();
+            channel.close(true).await();
         } catch (Exception e) {
             LOGGER.warn("SshInteractiveProcess failed to kill remote process!", e);
         }

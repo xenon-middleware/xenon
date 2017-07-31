@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,39 +21,39 @@ import java.util.Map;
  * QueueStatus contains status information for a specific queue.
  */
 public interface QueueStatus {
-	
-	/**
-	 * Get the Scheduler that produced this QueueStatus.
-	 * 
-	 * @return the Scheduler.
-	 */
-	Scheduler getScheduler();
 
-	/**
-	 * Get the queue name.
-	 * 
-	 * @return the queue name.
-	 */
-	String getQueueName();
+    /**
+     * Get the Scheduler that produced this QueueStatus.
+     *
+     * @return the Scheduler.
+     */
+    Scheduler getScheduler();
 
-	/**
-	 * Did the queue produce an exception ?
-	 * 
-	 * @return if the queue produced an exception ?
-	 */
-	boolean hasException();
+    /**
+     * Get the queue name.
+     *
+     * @return the queue name.
+     */
+    String getQueueName();
 
-	/**
-	 * Get the exception produced by the queue, or <code>null</code> if <code>hasException()</code> returns <code>false</code>.
-	 * 
-	 * @return the exception.
-	 */
-	Exception getException();
+    /**
+     * Did the queue produce an exception ?
+     *
+     * @return if the queue produced an exception ?
+     */
+    boolean hasException();
 
-	/**
-	 * Get scheduler specific information on the queue.
-	 * 
-	 * @return Scheduler specific information on the queue.
-	 */
-	Map<String, String> getSchedulerSpecficInformation();
+    /**
+     * Get the exception produced by the queue, or <code>null</code> if <code>hasException()</code> returns <code>false</code>.
+     *
+     * @return the exception.
+     */
+    Exception getException();
+
+    /**
+     * Get scheduler specific information on the queue.
+     *
+     * @return Scheduler specific information on the queue.
+     */
+    Map<String, String> getSchedulerSpecficInformation();
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,12 +49,12 @@ public class FtpInputStream extends InputStream {
         if (!completedPendingFtpCommand) {
             ftpClient.completePendingCommand();
             completedPendingFtpCommand = true;
-//            
+//
 //            int replyCode = ftpClient.getReplyCode();
 //            String replyString = ftpClient.getReplyString();
 //
 //            System.out.println("**REPLY " + replyCode + " " + replyString);
-//        	
+//
             ftpClient.disconnect();
         }
     }

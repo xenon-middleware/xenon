@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,30 +22,30 @@ import java.util.Arrays;
 import static org.junit.Assert.*;
 
 /**
- * 
+ *
  */
 public class CertificateCredentialTest {
 
     @Test
-    public void test_username() throws Exception { 
+    public void test_username() throws Exception {
         CertificateCredential cc = new CertificateCredential("username", "certfile", "password".toCharArray());
         assertEquals(cc.getUsername(), "username");
     }
 
     @Test
-    public void test_certfile() throws Exception { 
+    public void test_certfile() throws Exception {
         CertificateCredential cc = new CertificateCredential("username", "certfile", "password".toCharArray());
         assertEquals(cc.getCertificateFile(), "certfile");
     }
-    
+
     @Test
-    public void test_password() throws Exception { 
+    public void test_password() throws Exception {
         CertificateCredential cc = new CertificateCredential("username", "certfile", "password".toCharArray());
         assertTrue(Arrays.equals(cc.getPassword(), "password".toCharArray()));
     }
-    
+
     @Test
-    public void test_toString() throws Exception { 
+    public void test_toString() throws Exception {
         CertificateCredential cc = new CertificateCredential("username", "certfile", "password".toCharArray());
         assertTrue(cc.toString().equals("CertificateCredential [username=username, certfile=certfile]"));
     }

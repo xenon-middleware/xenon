@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@ import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Class that holds some info on parallel environments used in Grid Engine.
- * 
+ *
  */
 class ParallelEnvironmentInfo {
 

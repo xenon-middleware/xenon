@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,20 +24,20 @@ import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 
 public class SshInteractiveProcessDockerTest extends SshInteractiveProcessITest {
-	
-	@ClassRule
-	public static DockerComposeRule docker = DockerComposeRule.builder()
-		.file("src/integrationTest/resources/docker-compose/openssh.yml")
-		.waitingForService("ssh", HealthChecks.toHaveAllPortsOpen())
-		.build();
 
-	public String getLocation() {
-		return docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT");
-	}
+    @ClassRule
+    public static DockerComposeRule docker = DockerComposeRule.builder()
+        .file("src/integrationTest/resources/docker-compose/openssh.yml")
+        .waitingForService("ssh", HealthChecks.toHaveAllPortsOpen())
+        .build();
 
-	@Override
-	public Credential getCorrectCredential() {
-		return new PasswordCredential("xenon", "javagat".toCharArray());
-	}
-	
+    public String getLocation() {
+        return docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT");
+    }
+
+    @Override
+    public Credential getCorrectCredential() {
+        return new PasswordCredential("xenon", "javagat".toCharArray());
+    }
+
 }

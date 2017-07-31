@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * A container for security Information based upon certificates. 
+ * A container for security Information based upon certificates.
  */
 public class CertificateCredential extends PasswordCredential {
 

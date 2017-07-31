@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,10 +16,10 @@
 package nl.esciencecenter.xenon;
 
 /**
- * XenonRuntimeException is the parent for all runtime exceptions raised in Xenon. 
- * 
- * Next to the regular exception message and cause, XenonRuntimeException add a source adaptor name to all runtime exceptions.  
- * 
+ * XenonRuntimeException is the parent for all runtime exceptions raised in Xenon.
+ *
+ * Next to the regular exception message and cause, XenonRuntimeException add a source adaptor name to all runtime exceptions.
+ *
  * @version 1.0
  * @since 1.0
  */

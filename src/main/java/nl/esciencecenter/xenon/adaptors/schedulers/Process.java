@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,11 +16,11 @@
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
 /**
- * 
+ *
  */
 public interface Process {
 
-    boolean isDone(); 
+    boolean isDone();
 
     int getExitStatus();
 

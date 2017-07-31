@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,7 @@ import nl.esciencecenter.xenon.utils.OutputReader;
 
 /**
  * Runs a command. Constructor waits for command to finish.
- * 
+ *
  */
 public class RemoteCommandRunner {
 
@@ -42,13 +42,9 @@ public class RemoteCommandRunner {
 
     /**
      * Run a command remotely, and save stdout, stderr, and exit code for later processing.
-     * 
-     * @param xenon
-     *            the Xenon to use
+     *
      * @param scheduler
      *            the scheduler to submit the job to
-     * @param adaptorName
-     *            the name of the adaptor running this command (used in exception if thrown)
      * @param stdin
      *            input to feed to the command
      * @param executable
@@ -65,7 +61,7 @@ public class RemoteCommandRunner {
         description.setExecutable(executable);
         description.setArguments(arguments);
         description.setQueueName("unlimited");
-            
+
         Streams streams = scheduler.submitInteractiveJob(description);
 
         InputWriter in = new InputWriter(stdin, streams.getStdin());

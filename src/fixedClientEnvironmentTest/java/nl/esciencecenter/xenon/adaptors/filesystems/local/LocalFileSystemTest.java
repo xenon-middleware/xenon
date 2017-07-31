@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,10 +41,10 @@ public class LocalFileSystemTest extends FileSystemTestParent {
                 );
             }
 
-			@Override
-			public Path getWritableTestDir() {
-				return new Path("/tmp");
-			}
+            @Override
+            public Path getWritableTestDir() {
+                return new Path("/tmp");
+            }
         };
     }
 
