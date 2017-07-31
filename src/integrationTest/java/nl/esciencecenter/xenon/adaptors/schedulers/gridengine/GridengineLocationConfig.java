@@ -19,24 +19,24 @@ import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
 
 public class GridengineLocationConfig extends SchedulerLocationConfig {
 
-	private String location;
-	
-	public GridengineLocationConfig(String location) { 
-		this.location = location; 
-	}
-	
-	@Override
-	public String getLocation() {
-		return location;
-	}
+    private String location;
 
-	@Override
-	public String[] getQueueNames() {
-		return new String[] { "default", "slow" };
-	}
+    public GridengineLocationConfig(String location) {
+        this.location = location;
+    }
 
-	@Override
-	public String getDefaultQueueName() {
-		return null;
-	}
+    @Override
+    public String getLocation() {
+        return location;
+    }
+
+    @Override
+    public String[] getQueueNames() {
+        return new String[] { "default", "slow" };
+    }
+
+    @Override
+    public String getDefaultQueueName() {
+        return null;
+    }
 }

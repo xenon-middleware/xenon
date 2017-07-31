@@ -55,7 +55,7 @@ import nl.esciencecenter.xenon.schedulers.UnsupportedJobDescriptionException;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class ExceptionsTest {
 
@@ -201,7 +201,7 @@ public class ExceptionsTest {
         Throwable t = new Throwable();
         testException(new EndOfFileException("name", "message", t), t);
     }
-    
+
     @Test
     public void testFileAlreadyExistsException1() throws Exception {
         testException(new PathAlreadyExistsException("name", "message"));
@@ -267,7 +267,7 @@ public class ExceptionsTest {
         Throwable t = new Throwable();
         testException(new CertificateNotFoundException("name", "message", t), t);
     }
-    
+
     @Test
     public void testInvalidDataException1() throws Exception {
         testException(new InvalidResumeTargetException("name", "message"));
@@ -426,7 +426,7 @@ public class ExceptionsTest {
     public void testPropertyTypeException1() throws Exception {
         testException(new PropertyTypeException("name", "message"));
     }
-    
+
     @Test
     public void testPropertyTypeException2() throws Exception {
         Throwable t = new Throwable();
@@ -478,6 +478,6 @@ public class ExceptionsTest {
         testException(new NoSpaceException("name", "message", t), t);
     }
 
-    
-    
+
+
 }

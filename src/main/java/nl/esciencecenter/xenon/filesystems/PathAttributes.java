@@ -24,146 +24,146 @@ public interface PathAttributes {
 
     /**
      * Get the path these attributes belong to.
-     * 
+     *
      * @return
-     *   	the path these attributes belong to.
+     *       the path these attributes belong to.
      */
     Path getPath();
-    
+
     /**
      * Does the path refer to a directory ?
-     * 
+     *
      * @return
      *          if the path refers to a directory.
      */
     boolean isDirectory();
-    
-	/**
+
+    /**
      * Does the path refer to a regular file ?
-     * 
-     * @return 
+     *
+     * @return
      *          if the path refers to a regular file.
      */
-	boolean isRegular();
-	
+    boolean isRegular();
+
     /**
      * Does the path refer to a symbolic link ?
-     * 
-     * @return 
+     *
+     * @return
      *          if the path refers to a symbolic link.
      */
-	boolean isSymbolicLink();
-	
+    boolean isSymbolicLink();
+
     /**
      * Is the path not a file, link or directory ?
-     * 
-     * @return 
+     *
+     * @return
      *          if the path does not refer to a file, link or directory.
      */
-	boolean isOther();
-	
+    boolean isOther();
+
     /**
      * Does the path refer to an executable file ?
-     * 
-     * @return 
+     *
+     * @return
      *          if the path refers an executable file ?
      */
-	boolean isExecutable();
-	
-	/**
+    boolean isExecutable();
+
+    /**
      * Does the path refer to an readable file ?
-     * 
-     * @return 
+     *
+     * @return
      *          if the path refers an readable file ?
      */
-	public boolean isReadable();
-	
+    public boolean isReadable();
+
     /**
      * Does the path refer to a writable file ?
-     * 
-     * @return 
+     *
+     * @return
      *          if the path refers a writable file ?
      */
-	boolean isWritable();
-	
+    boolean isWritable();
+
     /**
      * Does the path refer to an hidden file ?
-     * 
-     * @return 
+     *
+     * @return
      *          if the path refers an hidden file ?
      */
-	boolean isHidden();
-	
-	/**
+    boolean isHidden();
+
+    /**
      * Get the creation time for this file.
-     * 
+     *
      * If creationTime is not supported by the adaptor, {@link #getLastModifiedTime()} will be returned instead.
-     * 
-     * @return 
+     *
+     * @return
      *          the creation time for this file.
      */
-	long getCreationTime();
-	
+    long getCreationTime();
+
     /**
      * Get the last access time for this file.
-     * 
+     *
      * If lastAccessTime is not supported by the adaptor, use {@link #getLastModifiedTime()} will be returned instead.
      *
-     * @return 
+     * @return
      *          the last access time for this file.
      */
-	long getLastAccessTime();
-	
+    long getLastAccessTime();
+
     /**
      * Get the last modified time for this file.
-     * 
+     *
      * If lastModifiedTime is not supported by the adaptor, <code>0</code> will be returned instead.
      *
-     * @return 
+     * @return
      *          the last modified time for this file.
      */
-	long getLastModifiedTime();
-	
+    long getLastModifiedTime();
+
     /**
      * Get the size of this file in bytes.
-     * 
-     * If the file is not a regular file, <code>0</code> will be returned. 
-     * 
-     * @return 
+     *
+     * If the file is not a regular file, <code>0</code> will be returned.
+     *
+     * @return
      *          the size of this file.
      */
-	long getSize();
-	
+    long getSize();
+
     /**
      * Get the owner of this file (optional operation).
-     * 
-     * @return 
+     *
+     * @return
      *          the owner of this file.
-     * 
+     *
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
-	String getOwner() throws AttributeNotSupportedException;
-	
-	 /**
+    String getOwner() throws AttributeNotSupportedException;
+
+     /**
      * Get the group of this file (optional operation).
-     * 
-     * @return 
+     *
+     * @return
      *          the group of this file.
-     * 
+     *
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
-	String getGroup() throws AttributeNotSupportedException;
+    String getGroup() throws AttributeNotSupportedException;
 
     /**
      * Get the permissions of this file (optional operation).
-     * 
-     * @return 
+     *
+     * @return
      *          the permissions of this file.
-     * 
+     *
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
-	Set<PosixFilePermission> getPermissions() throws AttributeNotSupportedException;
+    Set<PosixFilePermission> getPermissions() throws AttributeNotSupportedException;
 }

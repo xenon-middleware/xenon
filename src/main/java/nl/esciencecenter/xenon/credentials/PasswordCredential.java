@@ -22,34 +22,34 @@ import nl.esciencecenter.xenon.credentials.Credential;
 
 /**
  * A Credential consisting of a username + password combination.
- * 
+ *
  */
 public class PasswordCredential implements Credential {
 
-	/**
-	 *  The user name associated with the credential.
-	 */
+    /**
+     *  The user name associated with the credential.
+     */
     private final String username;
 
     /**
      * Must be char array for security!! (Strings end up in the constant pool, etc.)
      */
     private final char[] password;
-    
+
     public PasswordCredential(String username, char[] password) {
 
-    	this.username = username;
-        
+        this.username = username;
+
         if (password != null) {
             this.password = Arrays.copyOf(password, password.length);
         } else {
             this.password = null;
         }
     }
-        
+
     /**
      * Gets the password.
-     * 
+     *
      * @return the password
      */
     public char[] getPassword() {
@@ -61,12 +61,12 @@ public class PasswordCredential implements Credential {
         return password.clone();
     }
 
-	@Override
-	public String getUsername() {
-		return username;
-	}
-	
-	@Override
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
     public String toString() {
         return "PasswordCredential [username=" + getUsername() + "]";
     }

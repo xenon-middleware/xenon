@@ -28,7 +28,7 @@ import nl.esciencecenter.xenon.utils.OutputReader;
 
 /**
  * Runs a command. Constructor waits for command to finish.
- * 
+ *
  */
 public class RemoteCommandRunner {
 
@@ -42,7 +42,7 @@ public class RemoteCommandRunner {
 
     /**
      * Run a command remotely, and save stdout, stderr, and exit code for later processing.
-     * 
+     *
      * @param xenon
      *            the Xenon to use
      * @param scheduler
@@ -65,7 +65,7 @@ public class RemoteCommandRunner {
         description.setExecutable(executable);
         description.setArguments(arguments);
         description.setQueueName("unlimited");
-            
+
         Streams streams = scheduler.submitInteractiveJob(description);
 
         InputWriter in = new InputWriter(stdin, streams.getStdin());

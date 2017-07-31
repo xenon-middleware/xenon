@@ -51,13 +51,13 @@ import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 
 /**
  * LocalUtils contains various utilities for local file operations.
- * 
+ *
  * @version 1.0
  * @since 1.0
  */
 public class LocalUtil {
 
-	/**
+    /**
      * Returns if we are currently running on Windows.
      *
      * @return if we are currently running on Window.
@@ -86,14 +86,14 @@ public class LocalUtil {
         String os = System.getProperty("os.name");
         return (os != null && os.equals("Linux"));
     }
-    
+
 
     /**
      * Check if <code>root</code> only contains a valid Windows root element such as "C:".
      *
      * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
      * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
-     * 
+     *
      * @param root
      *            The root to check.
      * @return If <code>root</code> only contains a valid Windows root element.
@@ -107,7 +107,7 @@ public class LocalUtil {
             return true;
         }
 
-        return (root.length() == 3 && root.endsWith(":") && Character.isLetter(root.charAt(0)) && root.charAt(3) == '\\');        
+        return (root.length() == 3 && root.endsWith(":") && Character.isLetter(root.charAt(0)) && root.charAt(3) == '\\');
     }
 
     /**
@@ -115,7 +115,7 @@ public class LocalUtil {
      *
      * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
      * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
-     * 
+     *
      * @param root
      *            The root to check.
      * @return If <code>root</code> only contains a valid Linux root element.
@@ -129,7 +129,7 @@ public class LocalUtil {
      *
      * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
      * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
-     * 
+     *
      * @param root
      *            The root to check.
      * @return If <code>root</code> only contains a valid OSX root element.
@@ -157,7 +157,7 @@ public class LocalUtil {
 
         return isLinuxRoot(root);
     }
-    
+
     /**
      * Checks if the provide path starts with a valid Linux root, that is "/".
      *
@@ -192,7 +192,7 @@ public class LocalUtil {
     public static boolean startWithRoot(String path) {
         return startsWithLinuxRoot(path) || startWithWindowsRoot(path);
     }
-    
+
     /**
      * Return the locally valid root element of an <code>String</code> representation of an absolute path.
      *
@@ -208,9 +208,9 @@ public class LocalUtil {
      */
     @SuppressWarnings("PMD.NPathComplexity")
     public static String getLocalRoot(String p) throws XenonException {
-        
+
         String path = p;
-        
+
         if (isWindows()) {
             if (path == null || path.isEmpty()) {
                 return "";
@@ -235,16 +235,16 @@ public class LocalUtil {
 
         throw new InvalidLocationException(ADAPTOR_NAME, "Path is not absolute! " + path);
     }
-    
+
     /**
      * Returns the local file system path separator character.
-     * 
+     *
      * @return The local file system path separator character.
      */
     public static char getLocalSeparator() {
         return File.separatorChar;
     }
-    
+
     /**
      * Provided with an absolute <code>path</code> and a <code>root</code>, this method returns a <code>RelativePath</code> that
      * represents the part of <code>path</code> that is relative to the <code>root</code>.
@@ -271,7 +271,7 @@ public class LocalUtil {
 
         return new Path(getLocalSeparator(), path.substring(root.length()));
     }
-    
+
     /**
      * Expand a Xenon Path to a Java Path.
      *
@@ -279,111 +279,111 @@ public class LocalUtil {
      *
      * @param path Xenon Path
      * @return a normalized java Path
-     * @throws XenonException 
+     * @throws XenonException
      *          if an error occurred
      */
     public static java.nio.file.Path javaPath(FileSystem fs, Path path) throws XenonException {
         Path relPath = path.normalize();
         int numElems = relPath.getNameCount();
-        String root = fs.getLocation();                
+        String root = fs.getLocation();
 
-        // replace tilde        
+        // replace tilde
         if (numElems != 0) {
             String firstPart = relPath.getName(0).getRelativePath();
-            if ("~".equals(firstPart)) {                
-                String tmp = System.getProperty("user.home");        
+            if ("~".equals(firstPart)) {
+                String tmp = System.getProperty("user.home");
                 root = getLocalRoot(tmp);
                 Path home = getRelativePath(tmp, root);
-                
+
                 if (numElems == 1) {
                     relPath = home;
                 } else {
                     relPath = home.resolve(relPath.subpath(1, numElems));
                 }
-            } 
+            }
         }
-        
+
         return FileSystems.getDefault().getPath(root, relPath.getAbsolutePath());
     }
 
     public static List<PathAttributes> listDirectory(FileSystem fs, Path dir) throws XenonException {
 
-    	try { 
-    		ArrayList<PathAttributes> result = new ArrayList<>();
+        try {
+            ArrayList<PathAttributes> result = new ArrayList<>();
 
-    		DirectoryStream<java.nio.file.Path> s = java.nio.file.Files.newDirectoryStream(LocalUtil.javaPath(fs, dir));
+            DirectoryStream<java.nio.file.Path> s = java.nio.file.Files.newDirectoryStream(LocalUtil.javaPath(fs, dir));
 
-    		for (java.nio.file.Path p : s) {
-    			result.add(getLocalFileAttributes(dir.resolve(p.getFileName().toString()), p));
-    		}
-    		
-    		return result;
-    	} catch (IOException e) {
-    		throw new XenonException(ADAPTOR_NAME, "Failed to list directory: " + dir, e);
-		}
+            for (java.nio.file.Path p : s) {
+                result.add(getLocalFileAttributes(dir.resolve(p.getFileName().toString()), p));
+            }
+
+            return result;
+        } catch (IOException e) {
+            throw new XenonException(ADAPTOR_NAME, "Failed to list directory: " + dir, e);
+        }
     }
-    
+
     public static PathAttributes getLocalFileAttributes(FileSystem fs, Path path) throws XenonException {
-    	return getLocalFileAttributes(path, javaPath(fs, path));
+        return getLocalFileAttributes(path, javaPath(fs, path));
     }
 
     public static PathAttributes getLocalFileAttributes(Path p, java.nio.file.Path path) throws XenonException {
-    	try {
+        try {
             PathAttributesImplementation result = new PathAttributesImplementation();
-            
+
             result.setPath(p);
             result.setExecutable(java.nio.file.Files.isExecutable(path));
             result.setReadable(java.nio.file.Files.isReadable(path));
             result.setReadable(java.nio.file.Files.isWritable(path));
-            
-            boolean isWindows = LocalUtil.isWindows(); 
+
+            boolean isWindows = LocalUtil.isWindows();
 
             BasicFileAttributes basicAttributes;
-            
-            if (isWindows) {                
+
+            if (isWindows) {
                 // TODO: Seems to fail in Windows ?
                 result.setHidden(false);
-                
+
                 // These should always work.
                 basicAttributes = java.nio.file.Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
-                
+
 //               // These are windows only.
-//                AclFileAttributeView aclAttributes = Files.getFileAttributeView(javaPath, AclFileAttributeView.class, 
+//                AclFileAttributeView aclAttributes = Files.getFileAttributeView(javaPath, AclFileAttributeView.class,
 //                        LinkOption.NOFOLLOW_LINKS);
-                
+
             } else {
-            	result.setHidden(java.nio.file.Files.isHidden(path));
-                
+                result.setHidden(java.nio.file.Files.isHidden(path));
+
                 // Note: when in a posix environment, basicAttributes point to posixAttributes.
-            	 java.nio.file.attribute.PosixFileAttributes posixAttributes = java.nio.file.Files.readAttributes(path,
-            			 java.nio.file.attribute.PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
-                
+                 java.nio.file.attribute.PosixFileAttributes posixAttributes = java.nio.file.Files.readAttributes(path,
+                         java.nio.file.attribute.PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+
                 basicAttributes = posixAttributes;
-    
+
                 result.setOwner(posixAttributes.owner().getName());
                 result.setGroup(posixAttributes.group().getName());
                 result.setPermissions(LocalUtil.xenonPermissions(posixAttributes.permissions()));
             }
-            
+
             result.setCreationTime(basicAttributes.creationTime().toMillis());
             result.setLastAccessTime(basicAttributes.lastAccessTime().toMillis());
             result.setLastModifiedTime(basicAttributes.lastModifiedTime().toMillis());
-            
+
             result.setDirectory(basicAttributes.isDirectory());
             result.setRegular(basicAttributes.isRegularFile());
             result.setSymbolicLink(basicAttributes.isSymbolicLink());
             result.setOther(basicAttributes.isOther());
-            
-            if (result.isRegular()) { 
+
+            if (result.isRegular()) {
                 result.setSize(basicAttributes.size());
-            } 
-            
+            }
+
             return result;
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Cannot read attributes.", e);
         }
     }
-    
+
     public static Set<java.nio.file.attribute.PosixFilePermission> javaPermissions(Set<PosixFilePermission> permissions) {
         if (permissions == null) {
             return new HashSet<>(0);
@@ -437,7 +437,7 @@ public class LocalUtil {
 //                result.add(StandardOpenOption.READ);
 //                break;
 //            default:
-//                // No other options left         
+//                // No other options left
 //            }
 //        }
 //
@@ -490,14 +490,14 @@ public class LocalUtil {
      * @throws XenonException
      * @throws NullPointerException if the path is not set
      */
-	public static void createSymbolicLink(FileSystem fs, Path link, Path path) throws XenonException {
+    public static void createSymbolicLink(FileSystem fs, Path link, Path path) throws XenonException {
 
-		try {
+        try {
             Files.createSymbolicLink(LocalUtil.javaPath(fs, link), LocalUtil.javaPath(fs, path));
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to create link " + link + " to " + path, e);
         }
-	}
+    }
 
     /*
      * Delete a local file
@@ -510,7 +510,7 @@ public class LocalUtil {
             Files.delete(LocalUtil.javaPath(fs, path));
         } catch (java.nio.file.NoSuchFileException e1) {
             throw new NoSuchPathException(ADAPTOR_NAME, "File " + path + " does not exist!", e1);
-        } catch (java.nio.file.DirectoryNotEmptyException e2) {            
+        } catch (java.nio.file.DirectoryNotEmptyException e2) {
             throw new DirectoryNotEmptyException(ADAPTOR_NAME, "Directory " + path + " not empty!", e2);
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to delete file " + path, e);
@@ -529,7 +529,7 @@ public class LocalUtil {
     public static void unixDestroy(Process process) {
         boolean success = false;
 
-        if (!isWindows()) { 
+        if (!isWindows()) {
             try {
                 final Field pidField = process.getClass().getDeclaredField("pid");
 
@@ -550,18 +550,18 @@ public class LocalUtil {
                 // Failed, so use the regular Java destroy.
             }
         }
-            
+
         if (!success) {
             process.destroy();
         }
     }
-    
+
     public static void checkCredential(String adaptorName, Credential credential) throws XenonException {
 
         if (credential == null || credential instanceof DefaultCredential) {
             return;
         }
-       
+
         throw new InvalidCredentialException(adaptorName, "Adaptor does not support this credential!");
     }
 }

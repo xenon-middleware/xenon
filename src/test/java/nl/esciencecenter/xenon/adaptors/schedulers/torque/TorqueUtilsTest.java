@@ -37,7 +37,7 @@ import nl.esciencecenter.xenon.schedulers.JobStatus;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TorqueUtilsTest {
 
-	@Test
+    @Test
     public void test01a_generate_EmptyDescription_Result() throws XenonException {
         JobDescription description = new JobDescription();
 
@@ -154,8 +154,8 @@ public class TorqueUtilsTest {
 
         assertEquals("serial script content incorrect", expected, output.out().toString());
     }
-    
-    
+
+
     @Test
     public void test01a_verifyJobDescription_ValidJobDescription_NoException() throws Exception {
         JobDescription description = new JobDescription();
@@ -166,7 +166,7 @@ public class TorqueUtilsTest {
         description.setProcessesPerNode(1);
         description.setMaxTime(1);
         //GridEngine specific info
-       
+
         TorqueUtils.verifyJobDescription(description);
     }
 
@@ -181,7 +181,7 @@ public class TorqueUtilsTest {
         description.setMaxTime(1);
         //GridEngine specific info
         description.addJobOption(TorqueUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
-     
+
         TorqueUtils.verifyJobDescription(description);
     }
 
@@ -191,7 +191,7 @@ public class TorqueUtilsTest {
 
         //set a job option
         description.addJobOption(TorqueUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
-     
+
         //All these settings are wrong. This should not lead to an error
         description.setExecutable(null);
         description.setNodeCount(0);
@@ -208,7 +208,7 @@ public class TorqueUtilsTest {
 
         //set a job option
         description.addJobOption("wrong.setting", "wrong.value");
-     
+
         TorqueUtils.verifyJobDescription(description);
     }
 
@@ -253,7 +253,7 @@ public class TorqueUtilsTest {
         TorqueUtils.verifyJobDescription(description);
     }
 
-    
+
     @Test(expected = InvalidJobDescriptionException.class)
     public void test01l_verifyJobDescription_JobScriptAndContents_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
@@ -264,14 +264,14 @@ public class TorqueUtilsTest {
 
         TorqueUtils.verifyJobDescription(description);
     }
-    
+
     @Test
     public void test04a_getJobStatusFromQstatInfo_PendingJob_JobStatus() throws XenonException {
         String jobID = "555.localhost";
         Map<String, String> jobInfo = new HashMap<>(3);
         jobInfo.put("Job_Id", jobID);
         jobInfo.put("job_state", "Q");
-        
+
         Map<String, Map<String, String>> input = new HashMap<>(2);
         input.put(jobID, jobInfo);
         JobStatus result = TorqueUtils.getJobStatusFromQstatInfo(input, jobID);
@@ -291,7 +291,7 @@ public class TorqueUtilsTest {
         Map<String, String> jobInfo = new HashMap<>(3);
         jobInfo.put("Job_Id", jobID);
         jobInfo.put("job_state", "R");
-        
+
         Map<String, Map<String, String>> input = new HashMap<>(2);
         input.put(jobID, jobInfo);
         JobStatus result = TorqueUtils.getJobStatusFromQstatInfo(input, jobID);
@@ -304,14 +304,14 @@ public class TorqueUtilsTest {
         assertFalse(result.isDone());
         assertEquals(jobInfo, result.getSchedulerSpecficInformation());
     }
-    
+
     @Test
     public void test04c_getJobStatusFromQstatInfo_ErrorJob_JobStatusWithExcepion() throws XenonException {
         String jobID = "555.localhost";
         Map<String, String> jobInfo = new HashMap<>(3);
         jobInfo.put("Job_Id", jobID);
         jobInfo.put("job_state", "E");
-        
+
         Map<String, Map<String, String>> input = new HashMap<>(2);
         input.put(jobID, jobInfo);
         JobStatus result = TorqueUtils.getJobStatusFromQstatInfo(input, jobID);

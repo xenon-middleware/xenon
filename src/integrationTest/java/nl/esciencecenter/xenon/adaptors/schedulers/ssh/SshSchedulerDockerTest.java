@@ -33,29 +33,29 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 
 public class SshSchedulerDockerTest extends SshSchedulerTestParent {
-	
-	@ClassRule
-	public static DockerComposeRule docker = DockerComposeRule.builder()
-		.file("src/integrationTest/resources/docker-compose/openssh.yml")
-		.waitingForService("ssh", HealthChecks.toHaveAllPortsOpen())
-		.build();
 
-	@Override
-	protected SchedulerLocationConfig setupLocationConfig() {
-		return new SshLocationConfig(docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT"));
-	}
+    @ClassRule
+    public static DockerComposeRule docker = DockerComposeRule.builder()
+        .file("src/integrationTest/resources/docker-compose/openssh.yml")
+        .waitingForService("ssh", HealthChecks.toHaveAllPortsOpen())
+        .build();
 
-	@Override
-	public Scheduler setupScheduler() throws XenonException {
-		String location = docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT");
-		PasswordCredential cred = new PasswordCredential("xenon", "javagat".toCharArray());
-		Map<String, String> props = new HashMap<>();
-		props.put(STRICT_HOST_KEY_CHECKING, "false");
-		props.put(LOAD_STANDARD_KNOWN_HOSTS, "false");
-		return Scheduler.create("ssh", location, cred, props);
-	}
-	
-	
-	
-	
+    @Override
+    protected SchedulerLocationConfig setupLocationConfig() {
+        return new SshLocationConfig(docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT"));
+    }
+
+    @Override
+    public Scheduler setupScheduler() throws XenonException {
+        String location = docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT");
+        PasswordCredential cred = new PasswordCredential("xenon", "javagat".toCharArray());
+        Map<String, String> props = new HashMap<>();
+        props.put(STRICT_HOST_KEY_CHECKING, "false");
+        props.put(LOAD_STANDARD_KNOWN_HOSTS, "false");
+        return Scheduler.create("ssh", location, cred, props);
+    }
+
+
+
+
 }

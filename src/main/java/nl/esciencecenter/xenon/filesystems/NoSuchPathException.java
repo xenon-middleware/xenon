@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.filesystems;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that a path does not exists.  
- * 
+ * Signals that a path does not exists.
+ *
  * @version 1.0
  * @since 1.0
  */

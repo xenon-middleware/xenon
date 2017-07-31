@@ -59,12 +59,12 @@ import nl.esciencecenter.xenon.schedulers.Streams;
 
 /**
  * Interface to the GridEngine command line tools. Will run commands to submit/list/cancel jobs and get the status of queues.
- * 
+ *
  */
 public class GridEngineScheduler extends ScriptingScheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GridEngineScheduler.class);
-   
+
     private final long accountingGraceTime;
 
     /**
@@ -81,7 +81,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
     private final GridEngineSetup setupInfo;
 
-    protected GridEngineScheduler(String uniqueID, String location, Credential credential, Map<String,String> prop) 
+    protected GridEngineScheduler(String uniqueID, String location, Credential credential, Map<String,String> prop)
             throws XenonException {
 
         super(uniqueID, ADAPTOR_NAME, location, credential, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
@@ -93,11 +93,11 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
         lastSeenMap = new HashMap<>();
         deletedJobs = new HashSet<>();
-        
+
         // Run a few commands to fetch info about the queue
         this.setupInfo = new GridEngineSetup(this);
     }
-        	    
+
     @Override
     public String[] getQueueNames() {
         return setupInfo.getQueueNames();
@@ -181,7 +181,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
                     //sge returns "1" as the exit code if there is something wrong with the queue, ignore
                     LOGGER.warn("Failed to get queue status for queue " + runner);
                     throw new NoSuchQueueException(ADAPTOR_NAME, "Failed to get queue status for queue \""
-                            + queueName + "\": " + runner);                    
+                            + queueName + "\": " + runner);
                 } else {
                     throw new XenonException(ADAPTOR_NAME, "Failed to get queue status for queue \""
                             + queueName + "\": " + runner);
@@ -194,9 +194,9 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
     @Override
     public QueueStatus getQueueStatus(String queueName) throws XenonException {
-    	
-    	assertNonNullOrEmpty(queueName, "Queue name cannot be null or empty!");
-    	
+
+        assertNonNullOrEmpty(queueName, "Queue name cannot be null or empty!");
+
         String qstatOutput = runCheckedCommand(null, "qstat", "-xml", "-g", "c");
 
         Map<String, Map<String, String>> allMap = parser.parseQueueInfos(qstatOutput);
@@ -214,7 +214,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
     @Override
     public QueueStatus[] getQueueStatuses(String... queueNames) throws XenonException {
 
-    	if (queueNames == null) {
+        if (queueNames == null) {
             throw new IllegalArgumentException("Queue names cannot be null");
         }
 
@@ -225,12 +225,12 @@ public class GridEngineScheduler extends ScriptingScheduler {
 //        QueueStatus[] result = new QueueStatus[queueNames.length];
 
         String qstatOutput = runCheckedCommand(null, "qstat", "-xml", "-g", "c");
-        
+
         Map<String, Map<String, String>> allMap = parser.parseQueueInfos(qstatOutput);
 
         return getQueueStatusses(allMap, queueNames);
-//        
-//        
+//
+//
 //        for (int i = 0; i < queueNames.length; i++) {
 //            if (queueNames[i] == null) {
 //                result[i] = null;
@@ -254,14 +254,14 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
     @Override
     public Streams submitInteractiveJob(JobDescription description) throws XenonException {
-    	throw new UnsupportedOperationException(ADAPTOR_NAME, "Interactive jobs not supported");
+        throw new UnsupportedOperationException(ADAPTOR_NAME, "Interactive jobs not supported");
     }
 
     @Override
     public String submitBatchJob(JobDescription description) throws XenonException {
-    	String output;
+        String output;
         Path fsEntryPath = getFsEntryPath();
-        
+
         verifyJobDescription(description);
 
         //check for option that overrides job script completely.
@@ -292,9 +292,9 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
     @Override
     public JobStatus cancelJob(String jobIdentifier) throws XenonException {
-    	
-    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
-    	
+
+        assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
+
         String qdelOutput = runCheckedCommand(null, "qdel", jobIdentifier);
 
         String killedOutput = "has registered the job " + jobIdentifier + " for deletion";
@@ -343,7 +343,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
     /**
      * Get job status. First checks given qstat info map, but also runs additional qacct and qdel commands if needed.
-     * 
+     *
      * @param qstatInfo
      *            the info to get the job status from.
      * @param jobIdentifier
@@ -390,9 +390,9 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
     @Override
     public JobStatus getJobStatus(String jobIdentifier) throws XenonException {
-        
-    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
-        
+
+        assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
+
         Map<String, Map<String, String>> info = getQstatInfo();
 
         JobStatus result = getJobStatus(info, jobIdentifier);
@@ -432,10 +432,10 @@ public class GridEngineScheduler extends ScriptingScheduler {
 //        throw new XenonException(ADAPTOR_NAME, "does not support interactive jobs");
 //    }
 
-	@Override
-	public boolean isOpen() throws XenonException {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public boolean isOpen() throws XenonException {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
 }

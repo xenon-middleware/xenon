@@ -34,91 +34,91 @@ import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 
 public class LocalFileSystem extends FileSystem {
 
-	protected LocalFileSystem(String uniqueID, String location, Path entryPath, XenonProperties properties) {
-		super(uniqueID, ADAPTOR_NAME, location, entryPath, properties);
-	}
-	
-	@Override
-	public boolean isOpen() throws XenonException {
-		return true;
-	}
+    protected LocalFileSystem(String uniqueID, String location, Path entryPath, XenonProperties properties) {
+        super(uniqueID, ADAPTOR_NAME, location, entryPath, properties);
+    }
 
-	@Override
-	public void rename(Path source, Path target) throws XenonException {
-		
-		if (areSamePaths(source, target)) {
-			return;
-		}
+    @Override
+    public boolean isOpen() throws XenonException {
+        return true;
+    }
 
-		assertPathExists(source);
-		assertPathNotExists(target);
-		assertParentDirectoryExists(target);
-		
-		LocalUtil.move(this, source, target);
-	}
+    @Override
+    public void rename(Path source, Path target) throws XenonException {
 
-	@Override
-	public void createDirectory(Path dir) throws XenonException {
-		
-		assertPathNotExists(dir);
-		assertParentDirectoryExists(dir);
-		
-		try {
-			java.nio.file.Files.createDirectory(LocalUtil.javaPath(this, dir));
-		} catch (IOException e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to create directory " + dir, e);
-		}
-	}
-	
-	@Override
-	public void createFile(Path path) throws XenonException {
+        if (areSamePaths(source, target)) {
+            return;
+        }
 
-		assertPathNotExists(path);
-		assertParentDirectoryExists(path);
+        assertPathExists(source);
+        assertPathNotExists(target);
+        assertParentDirectoryExists(target);
 
-		LocalUtil.createFile(this, path);
-	}
-	
-	@Override
-	public void createSymbolicLink(Path link, Path path) throws XenonException {
+        LocalUtil.move(this, source, target);
+    }
 
-		assertPathNotExists(link);
-		assertParentDirectoryExists(link);
+    @Override
+    public void createDirectory(Path dir) throws XenonException {
 
-		LocalUtil.createSymbolicLink(this, link, path);
-	}
-	
-	@Override
-	protected void deleteFile(Path path) throws XenonException {
-		LocalUtil.delete(this, path);
-	}
-	
-	@Override
-	protected void deleteDirectory(Path path) throws XenonException {
-		LocalUtil.delete(this, path);
-	}
-	
-	@Override
-	public boolean exists(Path path) throws XenonException {
-		return java.nio.file.Files.exists(LocalUtil.javaPath(this, path));
-	}
-	
-	@Override
+        assertPathNotExists(dir);
+        assertParentDirectoryExists(dir);
+
+        try {
+            java.nio.file.Files.createDirectory(LocalUtil.javaPath(this, dir));
+        } catch (IOException e) {
+            throw new XenonException(ADAPTOR_NAME, "Failed to create directory " + dir, e);
+        }
+    }
+
+    @Override
+    public void createFile(Path path) throws XenonException {
+
+        assertPathNotExists(path);
+        assertParentDirectoryExists(path);
+
+        LocalUtil.createFile(this, path);
+    }
+
+    @Override
+    public void createSymbolicLink(Path link, Path path) throws XenonException {
+
+        assertPathNotExists(link);
+        assertParentDirectoryExists(link);
+
+        LocalUtil.createSymbolicLink(this, link, path);
+    }
+
+    @Override
+    protected void deleteFile(Path path) throws XenonException {
+        LocalUtil.delete(this, path);
+    }
+
+    @Override
+    protected void deleteDirectory(Path path) throws XenonException {
+        LocalUtil.delete(this, path);
+    }
+
+    @Override
+    public boolean exists(Path path) throws XenonException {
+        return java.nio.file.Files.exists(LocalUtil.javaPath(this, path));
+    }
+
+    @Override
     protected List<PathAttributes> listDirectory(Path dir) throws XenonException {
-		return LocalUtil.listDirectory(this, dir);	
+        return LocalUtil.listDirectory(this, dir);
     }
 
     @Override
     public InputStream readFromFile(Path path) throws XenonException {
-    	assertFileExists(path);
+        assertFileExists(path);
         return LocalUtil.newInputStream(this, path);
     }
-    
+
     @Override
     public OutputStream writeToFile(Path path, long size) throws XenonException {
         try {
-            return java.nio.file.Files.newOutputStream(LocalUtil.javaPath(this, path), 
-            		StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            return java.nio.file.Files.newOutputStream(LocalUtil.javaPath(this, path),
+                    StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to create OutputStream.", e);
         }
@@ -126,51 +126,51 @@ public class LocalFileSystem extends FileSystem {
 
     @Override
     public OutputStream writeToFile(Path path) throws XenonException {
-    	return writeToFile(path, -1);
+        return writeToFile(path, -1);
     }
 
     @Override
     public OutputStream appendToFile(Path path) throws XenonException {
         try {
-            return java.nio.file.Files.newOutputStream(LocalUtil.javaPath(this, path), 
-            		StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+            return java.nio.file.Files.newOutputStream(LocalUtil.javaPath(this, path),
+                    StandardOpenOption.WRITE, StandardOpenOption.APPEND);
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to create OutputStream.", e);
         }
     }
-    
+
     @Override
     public PathAttributes getAttributes(Path path) throws XenonException {
-    	return LocalUtil.getLocalFileAttributes(this, path);
+        return LocalUtil.getLocalFileAttributes(this, path);
     }
 
-	@Override
-	public Path readSymbolicLink(Path link) throws XenonException {
-		try {
-			java.nio.file.Path path = LocalUtil.javaPath(this, link);
-			java.nio.file.Path target = java.nio.file.Files.readSymbolicLink(path);
+    @Override
+    public Path readSymbolicLink(Path link) throws XenonException {
+        try {
+            java.nio.file.Path path = LocalUtil.javaPath(this, link);
+            java.nio.file.Path target = java.nio.file.Files.readSymbolicLink(path);
 
-			Path parent = link.getParent();
+            Path parent = link.getParent();
 
-			if (parent == null || target.isAbsolute()) {
-				return new Path(target.toString());
-			}
+            if (parent == null || target.isAbsolute()) {
+                return new Path(target.toString());
+            }
 
-			return parent.resolve(new Path(target.toString()));
-		} catch (IOException e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to read symbolic link.", e);
-		}
-	}
+            return parent.resolve(new Path(target.toString()));
+        } catch (IOException e) {
+            throw new XenonException(ADAPTOR_NAME, "Failed to read symbolic link.", e);
+        }
+    }
 
-	@Override
-	public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
-		
-		if (permissions == null) {
-			throw new XenonException(ADAPTOR_NAME, "Permissions is null!");
-		}
+    @Override
+    public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
 
-		assertPathExists(path);
+        if (permissions == null) {
+            throw new XenonException(ADAPTOR_NAME, "Permissions is null!");
+        }
 
-		LocalUtil.setPosixFilePermissions(this, path, permissions);
-	}
+        assertPathExists(path);
+
+        LocalUtil.setPosixFilePermissions(this, path, permissions);
+    }
 }

@@ -40,22 +40,22 @@ import nl.esciencecenter.xenon.schedulers.JobStatus;
 final class GridEngineUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GridEngineUtils.class);
-    
+
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
 
     public static final String JOB_OPTION_PARALLEL_ENVIRONMENT = "parallel.environment";
 
     public static final String JOB_OPTION_PARALLEL_SLOTS = "parallel.slots";
-    
+
     public static final String JOB_OPTION_RESOURCES = "resources";
 
     private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_PARALLEL_ENVIRONMENT,
             JOB_OPTION_PARALLEL_SLOTS, JOB_OPTION_RESOURCES };
 
     public static final String QACCT_HEADER = "==============================================================";
-    
+
     private static final int MINUTES_PER_HOUR = 60;
-    
+
     protected static void generateParallelEnvironmentSpecification(JobDescription description, GridEngineSetup setup,
             Formatter script) throws XenonException {
         Map<String, String> options = description.getJobOptions();
@@ -72,7 +72,7 @@ final class GridEngineUtils {
             try {
                 slots = Integer.parseInt(slotsString);
             } catch (NumberFormatException e) {
-                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Error in parsing parallel slots option \"" + slotsString 
+                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Error in parsing parallel slots option \"" + slotsString
                         + "\"", e);
             }
         }
@@ -110,7 +110,7 @@ final class GridEngineUtils {
     @SuppressWarnings("PMD.NPathComplexity")
     protected static String generate(JobDescription description, Path fsEntryPath, GridEngineSetup setup)
             throws XenonException {
-        
+
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
@@ -119,7 +119,7 @@ final class GridEngineUtils {
         //set shell to sh
         script.format("#$ -S /bin/sh\n");
 
-        //set name of job to xenon 
+        //set name of job to xenon
         script.format("#$ -N xenon\n");
 
         //set working directory
@@ -145,13 +145,13 @@ final class GridEngineUtils {
         //add maximum runtime in hour:minute:second format (converted from minutes in description)
         script.format("#$ -l h_rt=%02d:%02d:00\n", description.getMaxTime() / MINUTES_PER_HOUR, description.getMaxTime()
                 % MINUTES_PER_HOUR);
-        
+
         String resources = description.getJobOptions().get(JOB_OPTION_RESOURCES);
-        
+
         if (resources != null) {
             script.format("#$ -l %s\n", resources);
         }
-        
+
         if (description.getStdin() != null) {
             script.format("#$ -i '%s'\n", description.getStdin());
         }
@@ -186,10 +186,10 @@ final class GridEngineUtils {
 
         return stringBuilder.toString();
     }
-    
+
     protected static void verifyJobDescription(JobDescription description) throws XenonException {
         ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
-        
+
         if (description.isStartSingleProcess()) {
             throw new InvalidJobDescriptionException(ADAPTOR_NAME, "StartSingleProcess option not supported");
         }

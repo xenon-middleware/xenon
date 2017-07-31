@@ -51,9 +51,9 @@ public class LiveLocationConfig extends LocationConfig {
         );
     }
 
-	@Override
-	public Path getWritableTestDir() {
-		String baseDir = System.getProperty("xenon.basedir");
+    @Override
+    public Path getWritableTestDir() {
+        String baseDir = System.getProperty("xenon.basedir");
         if (baseDir == null) {
             return fileSystem.getEntryPath();
         }

@@ -19,34 +19,34 @@ import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
 
 public class SshLocationConfig extends SchedulerLocationConfig {
 
-	private String location;
-	
-	public SshLocationConfig(String location) { 
-		this.location = location; 
-	}
-	
-	@Override
-	public String getLocation() {
-		return location;
-	}
+    private String location;
 
-	@Override
-	public String[] getQueueNames() {
-		return new String [] { "single", "multi", "unlimited" } ;
-	}
+    public SshLocationConfig(String location) {
+        this.location = location;
+    }
 
-	@Override
-	public String getDefaultQueueName() {
-		return "single";
-	}
-	
-	@Override
-	public boolean supportsInteractive() {
-		return true;
-	}
-	
-	@Override
-	public boolean isEmbedded() {
-		return true;
-	}
+    @Override
+    public String getLocation() {
+        return location;
+    }
+
+    @Override
+    public String[] getQueueNames() {
+        return new String [] { "single", "multi", "unlimited" } ;
+    }
+
+    @Override
+    public String getDefaultQueueName() {
+        return "single";
+    }
+
+    @Override
+    public boolean supportsInteractive() {
+        return true;
+    }
+
+    @Override
+    public boolean isEmbedded() {
+        return true;
+    }
 }

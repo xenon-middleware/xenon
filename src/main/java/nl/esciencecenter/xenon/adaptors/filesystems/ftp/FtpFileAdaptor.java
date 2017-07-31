@@ -41,13 +41,13 @@ public class FtpFileAdaptor extends FileAdaptor {
 
     /** The name of this adaptor */
     public static final String ADAPTOR_NAME = "ftp";
-    
+
     /** The default SSH port */
     protected static final int DEFAULT_PORT = 21;
 
     /** A description of this adaptor */
     private static final String ADAPTOR_DESCRIPTION = "The FTP adaptor implements file access on remote ftp servers.";
-   
+
     /** The locations supported by this adaptor */
     private static final String [] ADAPTOR_LOCATIONS = new String [] { "ftp://host[:port]" };
 
@@ -55,66 +55,66 @@ public class FtpFileAdaptor extends FileAdaptor {
     public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + "ftp.";
 
     /** List of properties supported by this FTP adaptor */
-    protected static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription[0]; 
-   
+    protected static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription[0];
+
     public FtpFileAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
     }
-    
-    protected FTPClient connect(String location, Credential credential) throws XenonException { 
 
-    	URI uri; 
-    	
-    	try { 
-    		uri = new URI(location);
-    	} catch (Exception e) {
-    		throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
-		}
-    	
-    	//FtpLocation ftpLocation = FtpLocation.parse(location);
+    protected FTPClient connect(String location, Credential credential) throws XenonException {
 
-    	FTPClient ftpClient = new FTPClient();
-    	ftpClient.setListHiddenFiles(true);
-    	
-    	String host = uri.getHost();
-    	int port = uri.getPort();
-    	
-    	if (port == -1) { 
-    		port = DEFAULT_PORT;
-    	}
-    	
-    	connectToServer(host, port, ftpClient);
-    	login(credential, ftpClient);
-    	
-    	try { 
-    		ftpClient.enterLocalPassiveMode();
-    	} catch (Exception e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to switch to PASSIVE mode");
-		}
-    	
-    	return ftpClient;
+        URI uri;
+
+        try {
+            uri = new URI(location);
+        } catch (Exception e) {
+            throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
+        }
+
+        //FtpLocation ftpLocation = FtpLocation.parse(location);
+
+        FTPClient ftpClient = new FTPClient();
+        ftpClient.setListHiddenFiles(true);
+
+        String host = uri.getHost();
+        int port = uri.getPort();
+
+        if (port == -1) {
+            port = DEFAULT_PORT;
+        }
+
+        connectToServer(host, port, ftpClient);
+        login(credential, ftpClient);
+
+        try {
+            ftpClient.enterLocalPassiveMode();
+        } catch (Exception e) {
+            throw new XenonException(ADAPTOR_NAME, "Failed to switch to PASSIVE mode");
+        }
+
+        return ftpClient;
     }
 
     @Override
-    public FileSystem createFileSystem(String location, Credential credential, Map<String,String> properties) throws XenonException { 
-    	LOGGER.debug("newFileSystem ftp location = {} credential = {} properties = {}", location, credential,
-    			properties);
+    public FileSystem createFileSystem(String location, Credential credential, Map<String,String> properties) throws XenonException {
+        LOGGER.debug("newFileSystem ftp location = {} credential = {} properties = {}", location, credential,
+                properties);
 
-    	if (credential == null) {
-    		throw new InvalidCredentialException(getName(), "Credentials was null.");
-    	}
+        if (credential == null) {
+            throw new InvalidCredentialException(getName(), "Credentials was null.");
+        }
 
-    	XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
+        XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
-    	FTPClient ftpClient = connect(location, credential);
-    	
-    	ftpClient.enterLocalPassiveMode();
-    	
-    	String cwd = getCurrentWorkingDirectory(ftpClient);
+        FTPClient ftpClient = connect(location, credential);
 
-    	return new FtpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), ftpClient, credential, this, xp);
+        ftpClient.enterLocalPassiveMode();
+
+        String cwd = getCurrentWorkingDirectory(ftpClient);
+
+        return new FtpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), ftpClient, credential, this, xp);
     }
-    
+
     private String getCurrentWorkingDirectory(FTPClient ftpClient) throws XenonException {
         String wd;
         try {
@@ -137,11 +137,11 @@ public class FtpFileAdaptor extends FileAdaptor {
         try {
             loginWithCredentialOrDefault(ftp, credential);
             int replyCode = ftp.getReplyCode();
-            
+
 //            System.out.println("LOGIN REPLY: " + replyCode);
-            
+
             verifyLoginSuccess(replyCode);
-                        
+
         } catch (XenonException | IOException e) {
             throw new XenonException(getName(), "Failed to login", e);
         }
