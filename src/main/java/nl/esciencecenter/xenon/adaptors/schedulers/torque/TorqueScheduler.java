@@ -57,16 +57,16 @@ import nl.esciencecenter.xenon.schedulers.Streams;
 
 /**
  * Interface to the TORQUE command line tools. Will run commands to submit/list/cancel jobs and get the status of queues.
- *
+ * 
  */
 public class TorqueScheduler extends ScriptingScheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TorqueScheduler.class);
-
+   
     private final long accountingGraceTime;
 
     /**
-     * Map with the last seen time of jobs. There is a delay between jobs disappearing from the qstat queue output.
+     * Map with the last seen time of jobs. There is a delay between jobs disappearing from the qstat queue output. 
      * Instead of throwing an exception, we allow for a certain grace
      * time. Jobs will report the status "pending" during this time. Typical delays are in the order of seconds.
      */
@@ -173,7 +173,7 @@ public class TorqueScheduler extends ScriptingScheduler {
                     //slurm returns "172" as the exit code if there is something wrong with the queue, ignore
                     LOGGER.warn("Failed to get queue status for queue {}", runner);
                     throw new NoSuchQueueException(ADAPTOR_NAME, "Failed to get queue status for queue \""
-                            + queueName + "\": " + runner);
+                            + queueName + "\": " + runner);                    
                 } else {
                     throw new XenonException(ADAPTOR_NAME, "Failed to get queue status for queue \""
                             + queueName + "\": " + runner);
@@ -186,9 +186,9 @@ public class TorqueScheduler extends ScriptingScheduler {
 
     @Override
     public QueueStatus getQueueStatus(String queueName) throws XenonException {
-
-        assertNonNullOrEmpty(queueName, "Queue name may not be null or empty");
-
+    	
+    	assertNonNullOrEmpty(queueName, "Queue name may not be null or empty");
+    	
         Map<String, Map<String,String>> allMap = queryQueues(queueName);
 
         Map<String, String> map = allMap.get(queueName);
@@ -203,11 +203,11 @@ public class TorqueScheduler extends ScriptingScheduler {
 
     @Override
     public QueueStatus[] getQueueStatuses(String... queueNames) throws XenonException {
-
-        if (queueNames == null) {
+        
+    	if (queueNames == null) {
             throw new IllegalArgumentException("Queue names may not be null");
         }
-
+    	
         Map<String, Map<String, String>> allMap = queryQueues(queueNames);
 
         if (queueNames.length == 0) {
@@ -216,26 +216,26 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         QueueStatus[] result = new QueueStatus[queueNames.length];
 
-        for (int i = 0; i < queueNames.length; i++) {
-            if (queueNames[i] == null) {
-                result[i] = null;
-            } else {
-                //state for only the requested queuee
-                Map<String, String> map = allMap.get(queueNames[i]);
+		for (int i = 0; i < queueNames.length; i++) {
+			if (queueNames[i] == null) {
+				result[i] = null;
+			} else {
+				//state for only the requested queuee
+				Map<String, String> map = allMap.get(queueNames[i]);
 
                 if (map == null) {
-                    Exception exception = new NoSuchQueueException(ADAPTOR_NAME,
-                            "Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
-                    result[i] = new QueueStatusImplementation(this, queueNames[i], exception, null);
-                } else {
-                    result[i] = new QueueStatusImplementation(this, queueNames[i], null, map);
-                }
-            }
-        }
+					Exception exception = new NoSuchQueueException(ADAPTOR_NAME,
+							"Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
+					result[i] = new QueueStatusImplementation(this, queueNames[i], exception, null);
+				} else {
+					result[i] = new QueueStatusImplementation(this, queueNames[i], null, map);
+				}
+			}
+		}
 
         return result;
     }
-
+    
     protected Map<String, Map<String,String>> queryQueues(String... queueNames)
             throws XenonException {
         if (queueNames == null) {
@@ -246,20 +246,20 @@ public class TorqueScheduler extends ScriptingScheduler {
         if (queueNames.length == 0) {
             output = runCheckedCommand(null, "qstat", "-Qf");
         } else {
-
-            ArrayList<String> args = new ArrayList<>();
-            args.add("-Qf");
-
-            for (String name : queueNames) {
-                if (name != null) {
-                    args.add(name);
-                }
-            }
+        	
+        	ArrayList<String> args = new ArrayList<>();
+        	args.add("-Qf");
+        	
+        	for (String name : queueNames) { 
+        		if (name != null) { 
+        			args.add(name);
+        		}
+        	}
 //            String[] args = new String[1 + queueNames.length];
 //            args[0] = "-Qf";
 //            System.arraycopy(queueNames, 0, args, 1, queueNames.length);
 
-            RemoteCommandRunner runner = runCommand(null, "qstat", args.toArray(new String[args.size()]));
+        	RemoteCommandRunner runner = runCommand(null, "qstat", args.toArray(new String[args.size()]));
 
             if (runner.success()) {
                 output = runner.getStdout();
@@ -272,7 +272,7 @@ public class TorqueScheduler extends ScriptingScheduler {
             }
         }
         String[] lines = ScriptingParser.NEWLINE_REGEX.split(output);
-
+        
         Map<String, Map<String,String>> result = new HashMap<>(10);
 
         Map<String, String> currentQueueMap = null;
@@ -300,14 +300,14 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         return result;
     }
-
+    
     @Override
     public String submitBatchJob(JobDescription description) throws XenonException {
-
-        String output;
-
-        Path fsEntryPath = getFsEntryPath();
-
+    
+    	String output;
+        
+    	Path fsEntryPath = getFsEntryPath();
+        
         verifyJobDescription(description);
 
         //check for option that overrides job script completely.
@@ -350,14 +350,14 @@ public class TorqueScheduler extends ScriptingScheduler {
 
     @Override
     public Streams submitInteractiveJob(JobDescription description) throws XenonException {
-        throw new UnsupportedOperationException(ADAPTOR_NAME, "Interactive jobs not supported");
+    	throw new UnsupportedOperationException(ADAPTOR_NAME, "Interactive jobs not supported");
     }
-
+    
     @Override
     public JobStatus cancelJob(String jobIdentifier) throws XenonException {
-
-        assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
-
+    	
+    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
+    	
         RemoteCommandRunner runner = runCommand(null, "qdel", jobIdentifier);
         if (runner.success()) {
             // deleted or already finished
@@ -390,7 +390,7 @@ public class TorqueScheduler extends ScriptingScheduler {
 
     /**
      * Get job status. First checks given qstat info map, but also runs additional qacct and qdel commands if needed.
-     *
+     * 
      * @param qstatInfo
      *            the info to get the job status from.
      * @param job
@@ -429,9 +429,9 @@ public class TorqueScheduler extends ScriptingScheduler {
 
     @Override
     public JobStatus getJobStatus(String jobIdentifier) throws XenonException {
-
-        assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
-
+        
+    	assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
+    	
         Map<String, Map<String, String>> info = getQstatInfo();
 
         JobStatus result = getJobStatus(info, jobIdentifier);
@@ -471,9 +471,9 @@ public class TorqueScheduler extends ScriptingScheduler {
 //        throw new XenonException(ADAPTOR_NAME, "does not support interactive jobs");
 //    }
 
-    @Override
-    public boolean isOpen() throws XenonException {
-        // TODO Auto-generated method stub
-        return false;
-    }
+	@Override
+	public boolean isOpen() throws XenonException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

@@ -21,39 +21,39 @@ import java.util.Map;
  * QueueStatus contains status information for a specific queue.
  */
 public interface QueueStatus {
+	
+	/**
+	 * Get the Scheduler that produced this QueueStatus.
+	 * 
+	 * @return the Scheduler.
+	 */
+	Scheduler getScheduler();
 
-    /**
-     * Get the Scheduler that produced this QueueStatus.
-     *
-     * @return the Scheduler.
-     */
-    Scheduler getScheduler();
+	/**
+	 * Get the queue name.
+	 * 
+	 * @return the queue name.
+	 */
+	String getQueueName();
 
-    /**
-     * Get the queue name.
-     *
-     * @return the queue name.
-     */
-    String getQueueName();
+	/**
+	 * Did the queue produce an exception ?
+	 * 
+	 * @return if the queue produced an exception ?
+	 */
+	boolean hasException();
 
-    /**
-     * Did the queue produce an exception ?
-     *
-     * @return if the queue produced an exception ?
-     */
-    boolean hasException();
+	/**
+	 * Get the exception produced by the queue, or <code>null</code> if <code>hasException()</code> returns <code>false</code>.
+	 * 
+	 * @return the exception.
+	 */
+	Exception getException();
 
-    /**
-     * Get the exception produced by the queue, or <code>null</code> if <code>hasException()</code> returns <code>false</code>.
-     *
-     * @return the exception.
-     */
-    Exception getException();
-
-    /**
-     * Get scheduler specific information on the queue.
-     *
-     * @return Scheduler specific information on the queue.
-     */
-    Map<String, String> getSchedulerSpecficInformation();
+	/**
+	 * Get scheduler specific information on the queue.
+	 * 
+	 * @return Scheduler specific information on the queue.
+	 */
+	Map<String, String> getSchedulerSpecficInformation();
 }

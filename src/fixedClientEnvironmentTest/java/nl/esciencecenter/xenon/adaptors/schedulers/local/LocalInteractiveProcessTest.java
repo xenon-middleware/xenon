@@ -32,112 +32,112 @@ import nl.esciencecenter.xenon.utils.OutputReader;
 
 public class LocalInteractiveProcessTest {
 
-    @Test
-    public void test_simpleJob() throws Exception {
+	@Test
+	public void test_simpleJob() throws Exception { 
 
-        assumeFalse(LocalUtil.isWindows());
+		assumeFalse(LocalUtil.isWindows());
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/cat");
+		JobDescription job = new JobDescription();
+		job.setExecutable("/bin/cat");
 
-        LocalInteractiveProcess p = new LocalInteractiveProcess(job, "job42");
+		LocalInteractiveProcess p = new LocalInteractiveProcess(job, "job42");
 
-        Streams streams = p.getStreams();
+		Streams streams = p.getStreams();
 
-        assertEquals("job42", streams.getJobIdentifier());
+		assertEquals("job42", streams.getJobIdentifier());
 
-        OutputReader out = new OutputReader(streams.getStdout());
-        OutputReader err = new OutputReader(streams.getStderr());
+		OutputReader out = new OutputReader(streams.getStdout());
+		OutputReader err = new OutputReader(streams.getStderr());
 
-        OutputStream stdin = streams.getStdin();
+		OutputStream stdin = streams.getStdin();
 
-        stdin.write("Hello World\n".getBytes());
-        stdin.write("Goodbye World\n".getBytes());
-        stdin.close();
+		stdin.write("Hello World\n".getBytes());
+		stdin.write("Goodbye World\n".getBytes());
+		stdin.close();
 
-        out.waitUntilFinished();
-        err.waitUntilFinished();
+		out.waitUntilFinished();
+		err.waitUntilFinished();
+		
+		// Wait up to 10 x 100 ms. until process is done.
+		int count = 0;
+		
+		while (!p.isDone() && count < 10) { 
+			Thread.sleep(100);
+			count++;
+		}
 
-        // Wait up to 10 x 100 ms. until process is done.
-        int count = 0;
+		assertTrue("Process not done", p.isDone());
+		assertEquals("Exitcode not 0", 0, p.getExitStatus());
+		assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
+	}
 
-        while (!p.isDone() && count < 10) {
-            Thread.sleep(100);
-            count++;
-        }
+	@Test(expected=XenonException.class)
+	public void test_simpleJob_unknownWorkDir_throwsException() throws Exception { 
 
-        assertTrue("Process not done", p.isDone());
-        assertEquals("Exitcode not 0", 0, p.getExitStatus());
-        assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
-    }
+		assumeFalse(LocalUtil.isWindows());
 
-    @Test(expected=XenonException.class)
-    public void test_simpleJob_unknownWorkDir_throwsException() throws Exception {
+		JobDescription job = new JobDescription();
+		job.setExecutable("/bin/cat");
+		job.setWorkingDirectory("/foo");
 
-        assumeFalse(LocalUtil.isWindows());
+		new LocalInteractiveProcess(job, "job42");
+	}
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/cat");
-        job.setWorkingDirectory("/foo");
+	@Test
+	public void test_simpleJob_destroyAfterDone() throws Exception { 
 
-        new LocalInteractiveProcess(job, "job42");
-    }
+		assumeFalse(LocalUtil.isWindows());
 
-    @Test
-    public void test_simpleJob_destroyAfterDone() throws Exception {
+		JobDescription job = new JobDescription();
+		job.setExecutable("/bin/cat");
 
-        assumeFalse(LocalUtil.isWindows());
+		LocalInteractiveProcess p = new LocalInteractiveProcess(job, "job42");
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/cat");
+		Streams streams = p.getStreams();
 
-        LocalInteractiveProcess p = new LocalInteractiveProcess(job, "job42");
+		assertEquals("job42", streams.getJobIdentifier());
 
-        Streams streams = p.getStreams();
+		OutputReader out = new OutputReader(streams.getStdout());
+		OutputReader err = new OutputReader(streams.getStderr());
 
-        assertEquals("job42", streams.getJobIdentifier());
+		OutputStream stdin = streams.getStdin();
 
-        OutputReader out = new OutputReader(streams.getStdout());
-        OutputReader err = new OutputReader(streams.getStderr());
+		stdin.write("Hello World\n".getBytes());
+		stdin.write("Goodbye World\n".getBytes());
+		stdin.close();
 
-        OutputStream stdin = streams.getStdin();
+		out.waitUntilFinished();
+		err.waitUntilFinished();
 
-        stdin.write("Hello World\n".getBytes());
-        stdin.write("Goodbye World\n".getBytes());
-        stdin.close();
+		assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
 
-        out.waitUntilFinished();
-        err.waitUntilFinished();
+		while (!p.isDone()) { 
+			Thread.sleep(500);
+		}
+		
+		// Should be a noop
+		p.destroy();
 
-        assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
+		assertTrue(p.isDone());
+	}
 
-        while (!p.isDone()) {
-            Thread.sleep(500);
-        }
+	@Test
+	public void test_simpleJob_destroyBeforeDone() throws Exception { 
 
-        // Should be a noop
-        p.destroy();
+		assumeFalse(LocalUtil.isWindows());
 
-        assertTrue(p.isDone());
-    }
+		JobDescription job = new JobDescription();
+		job.setExecutable("/bin/cat");
 
-    @Test
-    public void test_simpleJob_destroyBeforeDone() throws Exception {
+		LocalInteractiveProcess p = new LocalInteractiveProcess(job, "job42");
 
-        assumeFalse(LocalUtil.isWindows());
+		assertFalse(p.isDone());
+		
+		// Should be kill the process
+		p.destroy();
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/cat");
-
-        LocalInteractiveProcess p = new LocalInteractiveProcess(job, "job42");
-
-        assertFalse(p.isDone());
-
-        // Should be kill the process
-        p.destroy();
-
-        assertTrue(p.isDone());
-    }
+		assertTrue(p.isDone());
+	}
 
 
 }

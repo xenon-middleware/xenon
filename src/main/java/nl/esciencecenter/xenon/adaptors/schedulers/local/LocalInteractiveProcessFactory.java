@@ -25,28 +25,28 @@ import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 public class LocalInteractiveProcessFactory implements InteractiveProcessFactory {
 
-    private boolean open = true;
+	private boolean open = true;
 
-    @Override
-    public synchronized InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier) throws XenonException {
-        if (!open) {
-            throw new SchedulerClosedException(ADAPTOR_NAME, "Scheduler is closed");
-        }
-        return new LocalInteractiveProcess(description, jobIdentifier);
-    }
+	@Override
+	public synchronized InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier) throws XenonException {
+		if (!open) { 
+			throw new SchedulerClosedException(ADAPTOR_NAME, "Scheduler is closed");
+		}
+		return new LocalInteractiveProcess(description, jobIdentifier);
+	}
 
-    @Override
-    public synchronized void close() throws XenonException {
-        if (!open) {
-            throw new SchedulerClosedException(ADAPTOR_NAME, "Scheduler already closed");
-        }
-        open = false;
-    }
+	@Override
+	public synchronized void close() throws XenonException {
+		if (!open) { 
+			throw new SchedulerClosedException(ADAPTOR_NAME, "Scheduler already closed");
+		}
+		open = false;
+	}
 
-    @Override
-    public synchronized boolean isOpen() throws XenonException {
-        return open;
-    }
+	@Override
+	public synchronized boolean isOpen() throws XenonException {
+		return open;
+	}
 }
 
 

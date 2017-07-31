@@ -29,235 +29,235 @@ import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 public class SshInteractiveProcessTest {
 
-    @Test(expected = IllegalArgumentException.class)
-    public void test_createFailsSessionNull() throws XenonException {
+	@Test(expected = IllegalArgumentException.class)
+	public void test_createFailsSessionNull() throws XenonException {
+		
+		JobDescription desc = new JobDescription();
+		desc.setWorkingDirectory("workdir");
+		desc.setExecutable("exec");
+		
+		HashMap<String,String> env = new HashMap<>();
+		env.put("key1", "value1");
+		env.put("key2", "value2");
+		desc.setEnvironment(env);
+		desc.setArguments(new String [] { "a", "b", "c" });
+		
+		new SshInteractiveProcess(null, desc, "JOB-42");
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void test_createFailsJobNull() throws XenonException {
+		MockClientSession session = new MockClientSession(false);
+		new SshInteractiveProcess(session, null, "JOB-42");
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void test_createFailsIDNull() throws XenonException {
+		
+		JobDescription desc = new JobDescription();
+		desc.setWorkingDirectory("workdir");
+		desc.setExecutable("exec");
+		
+		HashMap<String,String> env = new HashMap<>();
+		env.put("key1", "value1");
+		env.put("key2", "value2");
+		desc.setEnvironment(env);
+		desc.setArguments(new String [] { "a", "b", "c" });
+		
+		new SshInteractiveProcess(null, desc, null);
+	}
+	
+	@Test(expected=XenonException.class)
+	public void test_createFails() throws XenonException {
+		
+		JobDescription desc = new JobDescription();
+		desc.setWorkingDirectory("workdir");
+		desc.setExecutable("exec");
+		
+		HashMap<String,String> env = new HashMap<>();
+		env.put("key1", "value1");
+		env.put("key2", "value2");
+		desc.setEnvironment(env);
+		desc.setArguments(new String [] { "a", "b", "c" });
+		
+		MockClientSession session = new MockClientSession(false, true);
+		new SshInteractiveProcess(session, desc, "JOB-42");
+	}
+	
+	@Test
+	public void test_create() throws XenonException {
+		JobDescription desc = new JobDescription();
+		desc.setWorkingDirectory("workdir");
+		desc.setExecutable("exec");
+		
+		HashMap<String,String> env = new HashMap<>();
+		env.put("key1", "value1");
+		env.put("key2", "value2");
+		desc.setEnvironment(env);
+		desc.setArguments(new String [] { "a", "b", "c" });
+		
+		MockClientSession session = new MockClientSession(false);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
+		
+		MockChannelExec e = (MockChannelExec) session.exec;
+		
+		assertNotNull(e);
+		assertEquals("cd 'workdir' && exec 'a' 'b' 'c'", e.command);
+		assertEquals(env, e.env);
+		assertEquals("JOB-42", p.getStreams().getJobIdentifier());
+	}
+	
+	@Test
+	public void test_create2() throws XenonException {
+		
+		JobDescription desc = new JobDescription();
+		desc.setExecutable("exec");
+		
+		HashMap<String,String> env = new HashMap<>();
+		env.put("key1", "value1");
+		env.put("key2", "value2");
+		desc.setEnvironment(env);
+		desc.setArguments(new String [] { "a", "b", "c" });
+		
+		MockClientSession session = new MockClientSession(false);
+		new SshInteractiveProcess(session, desc, "JOB-42");
+		
+		MockChannelExec e = (MockChannelExec) session.exec;
+		
+		assertNotNull(e);
+		assertEquals("exec 'a' 'b' 'c'", e.command);
+		assertEquals(env, e.env);
+	}
 
-        JobDescription desc = new JobDescription();
-        desc.setWorkingDirectory("workdir");
-        desc.setExecutable("exec");
+	@Test
+	public void test_isDoneFalse() throws XenonException {
+		
+		JobDescription desc = new JobDescription();
+		desc.setExecutable("exec");
+		
+		HashMap<String,String> env = new HashMap<>();
+		env.put("key1", "value1");
+		env.put("key2", "value2");
+		desc.setEnvironment(env);
+		desc.setArguments(new String [] { "a", "b", "c" });
+		
+		MockClientSession session = new MockClientSession(false);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
+		
+		assertFalse(p.isDone());
+	}
+	
+	
+	@Test
+	public void test_isDoneTrue() throws XenonException {
+		JobDescription desc = new JobDescription();
+		desc.setExecutable("exec");
+		
+		HashMap<String,String> env = new HashMap<>();
+		env.put("key1", "value1");
+		env.put("key2", "value2");
+		desc.setEnvironment(env);
+		desc.setArguments(new String [] { "a", "b", "c" });
+		
+		MockClientSession session = new MockClientSession(false);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
+		
+		MockChannelExec e = (MockChannelExec) session.exec;
+		e.closed = true;
 
-        HashMap<String,String> env = new HashMap<>();
-        env.put("key1", "value1");
-        env.put("key2", "value2");
-        desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
+		assertTrue(p.isDone());
+	}
+	
+	@Test
+	public void test_isDoubleDoneTrue() throws XenonException {
+		JobDescription desc = new JobDescription();
+		desc.setExecutable("exec");
+		
+		HashMap<String,String> env = new HashMap<>();
+		env.put("key1", "value1");
+		env.put("key2", "value2");
+		desc.setEnvironment(env);
+		desc.setArguments(new String [] { "a", "b", "c" });
+		
+		MockClientSession session = new MockClientSession(false);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
+		
+		assertNotNull(session.exec);
+		
+		MockChannelExec e = (MockChannelExec) session.exec;
+		e.closed = true;
 
-        new SshInteractiveProcess(null, desc, "JOB-42");
-    }
+		p.isDone();
+		
+		assertTrue(p.isDone());
+	}
+	
+	@Test
+	public void test_destroy() throws XenonException {
+		JobDescription desc = new JobDescription();
+		desc.setExecutable("exec");
+		
+		HashMap<String,String> env = new HashMap<>();
+		env.put("key1", "value1");
+		env.put("key2", "value2");
+		desc.setEnvironment(env);
+		desc.setArguments(new String [] { "a", "b", "c" });
+		
+		MockClientSession session = new MockClientSession(false);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
+		p.destroy();
+		
+		assertNotNull(session.exec);
+		MockChannelExec e = (MockChannelExec) session.exec;
+		assertTrue(e.gotClose);
+	}
 
-    @Test(expected = IllegalArgumentException.class)
-    public void test_createFailsJobNull() throws XenonException {
-        MockClientSession session = new MockClientSession(false);
-        new SshInteractiveProcess(session, null, "JOB-42");
-    }
+	@Test
+	public void test_destroyAfterDone() throws XenonException {
+		JobDescription desc = new JobDescription();
+		desc.setExecutable("exec");
+		
+		HashMap<String,String> env = new HashMap<>();
+		env.put("key1", "value1");
+		env.put("key2", "value2");
+		desc.setEnvironment(env);
+		desc.setArguments(new String [] { "a", "b", "c" });
+		
+		MockClientSession session = new MockClientSession(false);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
+		
+		assertNotNull(session.exec);
+		MockChannelExec e = (MockChannelExec) session.exec;
+		e.closed = true;
 
-    @Test(expected = IllegalArgumentException.class)
-    public void test_createFailsIDNull() throws XenonException {
+		p.isDone();
 
-        JobDescription desc = new JobDescription();
-        desc.setWorkingDirectory("workdir");
-        desc.setExecutable("exec");
+		p.destroy();
 
-        HashMap<String,String> env = new HashMap<>();
-        env.put("key1", "value1");
-        env.put("key2", "value2");
-        desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
+		assertTrue(e.gotClose);
+	}
 
-        new SshInteractiveProcess(null, desc, null);
-    }
+	@Test
+	public void test_forCoverage() throws XenonException {
+		JobDescription desc = new JobDescription();
+		desc.setExecutable("exec");
+		
+		HashMap<String,String> env = new HashMap<>();
+		env.put("key1", "value1");
+		env.put("key2", "value2");
+		desc.setEnvironment(env);
+		desc.setArguments(new String [] { "a", "b", "c" });
+		
+		MockClientSession session = new MockClientSession(false);
+		SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
+		
+		assertNotNull(session.exec);
+		MockChannelExec e = (MockChannelExec) session.exec;
+		e.closeThrows = true;
 
-    @Test(expected=XenonException.class)
-    public void test_createFails() throws XenonException {
-
-        JobDescription desc = new JobDescription();
-        desc.setWorkingDirectory("workdir");
-        desc.setExecutable("exec");
-
-        HashMap<String,String> env = new HashMap<>();
-        env.put("key1", "value1");
-        env.put("key2", "value2");
-        desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
-
-        MockClientSession session = new MockClientSession(false, true);
-        new SshInteractiveProcess(session, desc, "JOB-42");
-    }
-
-    @Test
-    public void test_create() throws XenonException {
-        JobDescription desc = new JobDescription();
-        desc.setWorkingDirectory("workdir");
-        desc.setExecutable("exec");
-
-        HashMap<String,String> env = new HashMap<>();
-        env.put("key1", "value1");
-        env.put("key2", "value2");
-        desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
-
-        MockClientSession session = new MockClientSession(false);
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
-
-        MockChannelExec e = (MockChannelExec) session.exec;
-
-        assertNotNull(e);
-        assertEquals("cd 'workdir' && exec 'a' 'b' 'c'", e.command);
-        assertEquals(env, e.env);
-        assertEquals("JOB-42", p.getStreams().getJobIdentifier());
-    }
-
-    @Test
-    public void test_create2() throws XenonException {
-
-        JobDescription desc = new JobDescription();
-        desc.setExecutable("exec");
-
-        HashMap<String,String> env = new HashMap<>();
-        env.put("key1", "value1");
-        env.put("key2", "value2");
-        desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
-
-        MockClientSession session = new MockClientSession(false);
-        new SshInteractiveProcess(session, desc, "JOB-42");
-
-        MockChannelExec e = (MockChannelExec) session.exec;
-
-        assertNotNull(e);
-        assertEquals("exec 'a' 'b' 'c'", e.command);
-        assertEquals(env, e.env);
-    }
-
-    @Test
-    public void test_isDoneFalse() throws XenonException {
-
-        JobDescription desc = new JobDescription();
-        desc.setExecutable("exec");
-
-        HashMap<String,String> env = new HashMap<>();
-        env.put("key1", "value1");
-        env.put("key2", "value2");
-        desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
-
-        MockClientSession session = new MockClientSession(false);
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
-
-        assertFalse(p.isDone());
-    }
-
-
-    @Test
-    public void test_isDoneTrue() throws XenonException {
-        JobDescription desc = new JobDescription();
-        desc.setExecutable("exec");
-
-        HashMap<String,String> env = new HashMap<>();
-        env.put("key1", "value1");
-        env.put("key2", "value2");
-        desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
-
-        MockClientSession session = new MockClientSession(false);
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
-
-        MockChannelExec e = (MockChannelExec) session.exec;
-        e.closed = true;
-
-        assertTrue(p.isDone());
-    }
-
-    @Test
-    public void test_isDoubleDoneTrue() throws XenonException {
-        JobDescription desc = new JobDescription();
-        desc.setExecutable("exec");
-
-        HashMap<String,String> env = new HashMap<>();
-        env.put("key1", "value1");
-        env.put("key2", "value2");
-        desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
-
-        MockClientSession session = new MockClientSession(false);
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
-
-        assertNotNull(session.exec);
-
-        MockChannelExec e = (MockChannelExec) session.exec;
-        e.closed = true;
-
-        p.isDone();
-
-        assertTrue(p.isDone());
-    }
-
-    @Test
-    public void test_destroy() throws XenonException {
-        JobDescription desc = new JobDescription();
-        desc.setExecutable("exec");
-
-        HashMap<String,String> env = new HashMap<>();
-        env.put("key1", "value1");
-        env.put("key2", "value2");
-        desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
-
-        MockClientSession session = new MockClientSession(false);
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
-        p.destroy();
-
-        assertNotNull(session.exec);
-        MockChannelExec e = (MockChannelExec) session.exec;
-        assertTrue(e.gotClose);
-    }
-
-    @Test
-    public void test_destroyAfterDone() throws XenonException {
-        JobDescription desc = new JobDescription();
-        desc.setExecutable("exec");
-
-        HashMap<String,String> env = new HashMap<>();
-        env.put("key1", "value1");
-        env.put("key2", "value2");
-        desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
-
-        MockClientSession session = new MockClientSession(false);
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
-
-        assertNotNull(session.exec);
-        MockChannelExec e = (MockChannelExec) session.exec;
-        e.closed = true;
-
-        p.isDone();
-
-        p.destroy();
-
-        assertTrue(e.gotClose);
-    }
-
-    @Test
-    public void test_forCoverage() throws XenonException {
-        JobDescription desc = new JobDescription();
-        desc.setExecutable("exec");
-
-        HashMap<String,String> env = new HashMap<>();
-        env.put("key1", "value1");
-        env.put("key2", "value2");
-        desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
-
-        MockClientSession session = new MockClientSession(false);
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
-
-        assertNotNull(session.exec);
-        MockChannelExec e = (MockChannelExec) session.exec;
-        e.closeThrows = true;
-
-        p.isDone();
-        p.destroy();
-        p.getExitStatus();
-    }
-
+		p.isDone();
+		p.destroy();
+		p.getExitStatus();
+	}
+	
 }

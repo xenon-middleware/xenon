@@ -38,66 +38,66 @@ import nl.esciencecenter.xenon.credentials.DefaultCredential;
 
 /**
  * Scheduler represents a (possibly remote) scheduler that can be used to submit jobs and retrieve queue information.
- *
+ * 
  * @version 1.0
  * @since 1.0
  */
 public abstract class Scheduler {
 
-    /** The name of this component, for use in exceptions */
-    private static final String COMPONENT_NAME = "Scheduler";
+	/** The name of this component, for use in exceptions */
+	private static final String COMPONENT_NAME = "Scheduler";
 
-    private static final HashMap<String, SchedulerAdaptor> adaptors = new LinkedHashMap<>();
+	private static final HashMap<String, SchedulerAdaptor> adaptors = new LinkedHashMap<>();
 
-    static {
-        /** Load all supported file adaptors */
-        addAdaptor(new LocalSchedulerAdaptor());
-        addAdaptor(new SshSchedulerAdaptor());
-        addAdaptor(new GridEngineSchedulerAdaptor());
-        addAdaptor(new SlurmSchedulerAdaptor());
-        addAdaptor(new TorqueSchedulerAdaptor());
-    }
+	static { 
+		/** Load all supported file adaptors */
+		addAdaptor(new LocalSchedulerAdaptor());
+		addAdaptor(new SshSchedulerAdaptor());
+		addAdaptor(new GridEngineSchedulerAdaptor());
+		addAdaptor(new SlurmSchedulerAdaptor());
+		addAdaptor(new TorqueSchedulerAdaptor());
+	}
 
-    private static void addAdaptor(SchedulerAdaptor adaptor) {
-        adaptors.put(adaptor.getName(), adaptor);
-    }
+	private static void addAdaptor(SchedulerAdaptor adaptor) { 
+		adaptors.put(adaptor.getName(), adaptor);
+	}
 
-    private static SchedulerAdaptor getAdaptorByName(String adaptorName) throws UnknownAdaptorException {
+	private static SchedulerAdaptor getAdaptorByName(String adaptorName) throws UnknownAdaptorException {
 
-        if (adaptorName == null || adaptorName.trim().isEmpty()) {
-            throw new UnknownAdaptorException(COMPONENT_NAME, "Adaptor name may not be null or empty");
-        }
+		if (adaptorName == null || adaptorName.trim().isEmpty()) {
+			throw new UnknownAdaptorException(COMPONENT_NAME, "Adaptor name may not be null or empty");
+		}
 
-        SchedulerAdaptor adaptor = adaptors.get(adaptorName);
+		SchedulerAdaptor adaptor = adaptors.get(adaptorName);
 
-        if (adaptor == null) {
-            throw new UnknownAdaptorException(COMPONENT_NAME, "File adaptor not found " + adaptor);
-        }
+		if (adaptor == null) {
+			throw new UnknownAdaptorException(COMPONENT_NAME, "File adaptor not found " + adaptor);
+		}
 
-        return adaptor;
-    }
+		return adaptor;
+	}
 
-    public static String [] getAdaptorNames() {
-        return adaptors.keySet().toArray(new String[adaptors.size()]);
-    }
+	public static String [] getAdaptorNames() {
+		return adaptors.keySet().toArray(new String[adaptors.size()]);
+	}
 
-    public static SchedulerAdaptorDescription getAdaptorDescription(String adaptorName) throws UnknownAdaptorException {
-        return getAdaptorByName(adaptorName);
-    }
+	public static SchedulerAdaptorDescription getAdaptorDescription(String adaptorName) throws UnknownAdaptorException {
+		return getAdaptorByName(adaptorName);
+	}
 
-    public static SchedulerAdaptorDescription [] getAdaptorDescriptions() {
-        return adaptors.values().toArray(new SchedulerAdaptorDescription[adaptors.size()]);
-    }
-
-    /**
-     * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code>
-     * using <code>credentials</code> to get access. Use <code>properties</code> to (optionally)
-     * configure the scheduler when it is created.
-     *
-     * Make sure to always close {@code Scheduler} instances
-     * by calling {@code Scheduler.close()} when you no longer need them,
+	public static SchedulerAdaptorDescription [] getAdaptorDescriptions() {
+		return adaptors.values().toArray(new SchedulerAdaptorDescription[adaptors.size()]);
+	}
+	
+	/**
+     * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code> 
+     * using <code>credentials</code> to get access. Use <code>properties</code> to (optionally) 
+     * configure the scheduler when it is created.  
+     * 
+     * Make sure to always close {@code Scheduler} instances 
+     * by calling {@code Scheduler.close()} when you no longer need them, 
      * otherwise their associated resources may remain allocated.
-     *
+     * 
      * @param adaptor
      *            the adaptor used to access the Scheduler.
      * @param location
@@ -106,9 +106,9 @@ public abstract class Scheduler {
      *            the Credentials to use to get access to the Scheduler.
      * @param properties
      *            optional properties to configure the Scheduler when it is created.
-     *
+     * 
      * @return the new Scheduler.
-     *
+     * 
      * @throws UnknownPropertyException
      *             If a unknown property was provided.
      * @throws InvalidPropertyException
@@ -117,32 +117,32 @@ public abstract class Scheduler {
      *             If the location was invalid.
      * @throws InvalidCredentialException
      *             If the credential is invalid to access the location.
-     *
+     * 
      * @throws XenonException
      *             If the creation of the Scheduler failed.
      */
-    public static Scheduler create(String adaptor, String location, Credential credential, Map<String, String> properties)
+	public static Scheduler create(String adaptor, String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
-        return getAdaptorByName(adaptor).createScheduler(location, credential, properties);
-    }
-
-    /**
-     * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code>
-     * using <code>credentials</code> to get access.
-     *
-     * Make sure to always close {@code Scheduler} instances
-     * by calling {@code Scheduler.close()} when you no longer need them,
+		return getAdaptorByName(adaptor).createScheduler(location, credential, properties);
+	}
+	
+	/**
+     * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code> 
+     * using <code>credentials</code> to get access.  
+     * 
+     * Make sure to always close {@code Scheduler} instances 
+     * by calling {@code Scheduler.close()} when you no longer need them, 
      * otherwise their associated resources may remain allocated.
-     *
+     * 
      * @param adaptor
      *            the adaptor used to access the Scheduler.
      * @param location
      *            the location of the Scheduler.
      * @param credential
      *            the Credentials to use to get access to the Scheduler.
-     *
+     * 
      * @return the new Scheduler.
-     *
+     * 
      * @throws UnknownPropertyException
      *             If a unknown property was provided.
      * @throws InvalidPropertyException
@@ -151,29 +151,29 @@ public abstract class Scheduler {
      *             If the location was invalid.
      * @throws InvalidCredentialException
      *             If the credential is invalid to access the location.
-     *
+     * 
      * @throws XenonException
      *             If the creation of the Scheduler failed.
      */
-    public static Scheduler create(String adaptor, String location, Credential credential) throws XenonException {
-        return create(adaptor, location, credential, new HashMap<String, String>(0));
-    }
-
-    /**
-     * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code>
-     * using the default credentials to get access.
-     *
-     * Make sure to always close {@code Scheduler} instances
-     * by calling {@code Scheduler.close()} when you no longer need them,
+	public static Scheduler create(String adaptor, String location, Credential credential) throws XenonException {
+		return create(adaptor, location, credential, new HashMap<String, String>(0));
+	}
+	
+	/**
+     * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code> 
+     * using the default credentials to get access.  
+     * 
+     * Make sure to always close {@code Scheduler} instances 
+     * by calling {@code Scheduler.close()} when you no longer need them, 
      * otherwise their associated resources may remain allocated.
-     *
+     * 
      * @param adaptor
      *            the adaptor used to access the Scheduler.
      * @param location
      *            the location of the Scheduler.
-     *
+     * 
      * @return the new Scheduler.
-     *
+     * 
      * @throws UnknownPropertyException
      *             If a unknown property was provided.
      * @throws InvalidPropertyException
@@ -182,30 +182,30 @@ public abstract class Scheduler {
      *             If the location was invalid.
      * @throws InvalidCredentialException
      *             If the credential is invalid to access the location.
-     *
+     * 
      * @throws XenonException
      *             If the creation of the Scheduler failed.
      */
-    public static Scheduler create(String adaptor, String location) throws XenonException {
-        return create(adaptor, location, new DefaultCredential());
-    }
-
-    /**
-     * Create a new Scheduler using the <code>adaptor</code> connecting to the default location
-     * and using the default credentials to get access.
-     *
-     * Note that there are very few adaptors that support a default scheduler location. The local
-     * scheduler adaptor is the prime example.
-     *
-     * Make sure to always close {@code Scheduler} instances
-     * by calling {@code Scheduler.close()} when you no longer need them,
+	public static Scheduler create(String adaptor, String location) throws XenonException {
+		return create(adaptor, location, new DefaultCredential());
+	}
+	
+	/**
+     * Create a new Scheduler using the <code>adaptor</code> connecting to the default location 
+     * and using the default credentials to get access.  
+     * 
+	 * Note that there are very few adaptors that support a default scheduler location. The local 
+	 * scheduler adaptor is the prime example.  
+     * 
+     * Make sure to always close {@code Scheduler} instances 
+     * by calling {@code Scheduler.close()} when you no longer need them, 
      * otherwise their associated resources may remain allocated.
-     *
+     * 
      * @param adaptor
      *            the adaptor used to access the Scheduler.
-     *
+     * 
      * @return the new Scheduler.
-     *
+     * 
      * @throws UnknownPropertyException
      *             If a unknown property was provided.
      * @throws InvalidPropertyException
@@ -214,79 +214,79 @@ public abstract class Scheduler {
      *             If the location was invalid.
      * @throws InvalidCredentialException
      *             If the credential is invalid to access the location.
-     *
+     * 
      * @throws XenonException
      *             If the creation of the Scheduler failed.
      */
-    public static Scheduler create(String adaptor) throws XenonException {
-        return create(adaptor, null);
-    }
+	public static Scheduler create(String adaptor) throws XenonException {
+		return create(adaptor, null);
+	}
+	
+	private final String uniqueID;
+	private final String adaptor;
+	private final String location;
+	protected final XenonProperties properties;
 
-    private final String uniqueID;
-    private final String adaptor;
-    private final String location;
-    protected final XenonProperties properties;
+	protected Scheduler(String uniqueID, String adaptor, String location, XenonProperties properties) {
 
-    protected Scheduler(String uniqueID, String adaptor, String location, XenonProperties properties) {
+		if (uniqueID == null) {
+			throw new IllegalArgumentException("Identifier may not be null!");
+		}
 
-        if (uniqueID == null) {
-            throw new IllegalArgumentException("Identifier may not be null!");
-        }
+		if (adaptor == null) {
+			throw new IllegalArgumentException("Adaptor may not be null!");
+		}
+	
+		if (location == null) {
+			throw new IllegalArgumentException("Location may not be null!");
+		}
 
-        if (adaptor == null) {
-            throw new IllegalArgumentException("Adaptor may not be null!");
-        }
+		this.uniqueID = uniqueID;
+		this.adaptor = adaptor;
+		this.location = location;
+		this.properties = properties;
+	}
 
-        if (location == null) {
-            throw new IllegalArgumentException("Location may not be null!");
-        }
+	/**
+	 * Get the name of the adaptor that created this Scheduler.
+	 * 
+	 * @return the name of the adaptor.
+	 */
+	public String getAdaptorName() { 
+		return adaptor;
+	}
 
-        this.uniqueID = uniqueID;
-        this.adaptor = adaptor;
-        this.location = location;
-        this.properties = properties;
-    }
+	/**
+	 * Get the location that this Scheduler is connected to.
+	 * 
+	 * @return the location this Scheduler is connected to.
+	 */
+	public String getLocation() { 
+		return location;
+	}
 
-    /**
-     * Get the name of the adaptor that created this Scheduler.
-     *
-     * @return the name of the adaptor.
-     */
-    public String getAdaptorName() {
-        return adaptor;
-    }
-
-    /**
-     * Get the location that this Scheduler is connected to.
-     *
-     * @return the location this Scheduler is connected to.
-     */
-    public String getLocation() {
-        return location;
-    }
-
-    /**
-     * Get the properties used to create this Scheduler.
-     *
-     * @return the properties used to create this Scheduler.
-     */
-    public Map<String, String> getProperties() {
-        return properties.toMap();
-    }
-
+	/**
+	 * Get the properties used to create this Scheduler.
+	 * 
+	 * @return the properties used to create this Scheduler.
+	 */
+	public Map<String, String> getProperties() { 
+		return properties.toMap();
+	}
+	
     /**
      * Get the queue names supported by this Scheduler.
-     *
+     * 
      * @return the queue names supported by this Scheduler.
-     *
+     * 
      * @throws XenonException
-     *                If an I/O error occurred.
+     * 		       If an I/O error occurred.
      */
     public abstract String[] getQueueNames() throws XenonException;
-
+    
     /**
      * Close this Scheduler.
-     *
+     * 
      * @throws XenonException
      *             If the Scheduler failed to close.
      */
@@ -294,37 +294,37 @@ public abstract class Scheduler {
 
     /**
      * Test if the connection of this Scheduler is open.
-     *
+     * 
      * @throws XenonException
      *             If an I/O error occurred.
-     * @return
-     *          <code>true</code> if the connection of this Scheduler is still open, <code>false</code> otherwise.
-     *
+     * @return  
+     *          <code>true</code> if the connection of this Scheduler is still open, <code>false</code> otherwise.             
+     *             
      */
     public abstract boolean isOpen() throws XenonException;
 
     /**
      * Get the name of the default queue.
-     *
+     * 
      * @return the name of the default queue for this scheduler, or <code>null</code> if no default queue is available.
-     *
+     * 
      * @throws XenonException
      *             If an I/O error occurred.
      */
     public abstract String getDefaultQueueName() throws XenonException;
 
     /**
-     * Get all job identifier of jobs currently in (one ore more) queues.
-     *
+     * Get all job identifier of jobs currently in (one ore more) queues. 
+     * 
      * If no queue names are specified, the job identifiers for all queues are returned.
-     *
+     * 
      * Note that job identifiers of jobs submitted by other users or other schedulers may also be returned.
-     *
+     * 
      * @param queueNames
      *            the names of the queues.
-     *
+     * 
      * @return an array containing the resulting job identifiers .
-     *
+     * 
      * @throws NoSuchQueueException
      *             If the queue does not exist in the scheduler.
      * @throws XenonException
@@ -334,12 +334,12 @@ public abstract class Scheduler {
 
     /**
      * Get the status of the <code>queue</code>.
-     *
+     * 
      * @param queueName
      *            the name of the queue.
-     *
+     * 
      * @return the resulting QueueStatus.
-     *
+     * 
      * @throws NoSuchQueueException
      *             If the queue does not exist in the scheduler.
      * @throws XenonException
@@ -348,18 +348,18 @@ public abstract class Scheduler {
     public abstract QueueStatus getQueueStatus(String queueName) throws XenonException;
 
     /**
-     * Get the status of all <code>queues</code>.
-     *
+     * Get the status of all <code>queues</code>. 
+     * 
      * Note that this method will only throw an exception when this exception will influence all status requests. For example, if
      * the scheduler is no longer connected.
-     *
+     * 
      * Exceptions that only refer to a single queue are returned in the QueueStatus returned for that queue.
-     *
+     * 
      * @param queueNames
      *            the names of the queues.
-     *
+     * 
      * @return an array containing the resulting QueueStatus.
-     *
+     * 
      * @throws XenonException
      *             If the Scheduler failed to get the statusses.
      */
@@ -367,12 +367,12 @@ public abstract class Scheduler {
 
     /**
      * Submit a batch job.
-     *
+     * 
      * @param description
      *            the description of the batch job to submit.
-     *
+     * 
      * @return the job identifier representing the running job.
-     *
+     * 
      * @throws IncompleteJobDescriptionException
      *             If the description did not contain the required information.
      * @throws InvalidJobDescriptionException
@@ -386,12 +386,12 @@ public abstract class Scheduler {
 
     /**
      * Submit an interactive job (optional operation).
-     *
+     * 
      * @param description
      *            the description of the interactive job to submit.
-     *
+     * 
      * @return a <code>Streams</code> object containing the job identifier and the standard streams of a job.
-     *
+     * 
      * @throws IncompleteJobDescriptionException
      *             If the description did not contain the required information.
      * @throws InvalidJobDescriptionException
@@ -405,12 +405,12 @@ public abstract class Scheduler {
 
     /**
      * Get the status of a Job.
-     *
+     * 
      * @param jobIdentifier
      *            the job identifier of the job to get the status for.
-     *
+     * 
      * @return the status of the Job.
-     *
+     * 
      * @throws NoSuchJobException
      *             If the job is not known.
      * @throws XenonException
@@ -429,48 +429,48 @@ public abstract class Scheduler {
      * </p>
      * @param jobIdentifiers
      *            the job identifiers for which to retrieve the status.
-     *
+     * 
      * @return an array of the resulting JobStatusses.
-     *
+     * 
      * @throws XenonException
      *             If an I/O error occurred
      */
-    public JobStatus[] getJobStatuses(String... jobIdentifiers) throws XenonException {
+    public JobStatus[] getJobStatuses(String... jobIdentifiers) throws XenonException { 
 
-        JobStatus[] result = new JobStatus[jobIdentifiers.length];
+    	JobStatus[] result = new JobStatus[jobIdentifiers.length];
 
-        for (int i = 0; i < jobIdentifiers.length; i++) {
-            try {
-                if (jobIdentifiers[i] != null) {
-                    result[i] = getJobStatus(jobIdentifiers[i]);
-                } else {
-                    result[i] = null;
-                }
-            } catch (NoSuchJobException e) {
-                result[i] = new JobStatusImplementation(jobIdentifiers[i], "UNKNOWN", null, e, false, false, null);
-            } catch (XenonException e) {
-                result[i] = new JobStatusImplementation(jobIdentifiers[i], "ERROR", null, e, false, false, null);
-            }
-        }
+    	for (int i = 0; i < jobIdentifiers.length; i++) {
+    		try {
+    			if (jobIdentifiers[i] != null) {
+    				result[i] = getJobStatus(jobIdentifiers[i]);
+    			} else {
+    				result[i] = null;
+    			}
+    		} catch (NoSuchJobException e) { 
+    			result[i] = new JobStatusImplementation(jobIdentifiers[i], "UNKNOWN", null, e, false, false, null);
+    		} catch (XenonException e) {
+    			result[i] = new JobStatusImplementation(jobIdentifiers[i], "ERROR", null, e, false, false, null);
+    		}
+    	}
 
-        return result;
+    	return result;
     }
-
+    
     /**
      * Cancel a job.
      * <p>
-     * A status is returned that indicates the state of the job after the cancel. If the job was already done it cannot be
+     * A status is returned that indicates the state of the job after the cancel. If the job was already done it cannot be 
      * cancelled.
      * </p>
      * <p>
-     * A {@link JobStatus} is returned that can be used to determine the state of the job after cancelJob returns. Note that it
-     * may take some time before the job has actually terminated. The {@link #waitUntilDone(String, long) waitUntilDone} method can
+     * A {@link JobStatus} is returned that can be used to determine the state of the job after cancelJob returns. Note that it 
+     * may take some time before the job has actually terminated. The {@link #waitUntilDone(String, long) waitUntilDone} method can 
      * be used to wait until the job is terminated.
      * </p>
      * @param jobIdentifier
      *            the identifier of job to kill.
      * @return the status of the Job.
-     *
+     * 
      * @throws NoSuchJobException
      *             If the job is not known.
      * @throws XenonException
@@ -481,12 +481,12 @@ public abstract class Scheduler {
     /**
      * Wait until a job is done or until a timeout expires.
      * <p>
-     * This method will wait until a job is done (either gracefully or by being killed or producing an error), or until the
+     * This method will wait until a job is done (either gracefully or by being killed or producing an error), or until the 
      * timeout expires, whichever comes first. If the timeout expires, the job will continue to run.
      * </p>
      * <p>
      * The timeout is in milliseconds and must be &gt;= 0. When timeout is 0, it will be ignored and this method will wait until
-     * the jobs is done.
+     * the jobs is done.  
      * </p>
      * <p>
      * A JobStatus is returned that can be used to determine why the call returned.
@@ -496,8 +496,8 @@ public abstract class Scheduler {
      * @param timeout
      *            the maximum time to wait for the job in milliseconds.
      * @return the status of the Job.
-     *
-     * @throws IllegalArgumentException
+     * 
+     * @throws IllegalArgumentException 
      *             If the value of timeout is negative
      * @throws NoSuchJobException
      *             If the job is not known.
@@ -510,12 +510,12 @@ public abstract class Scheduler {
      * Wait until a job starts running, or until a timeout expires.
      * <p>
      * This method will return as soon as the job is no longer waiting in the queue, or when the timeout expires, whichever comes
-     * first. If the job is no longer waiting in the queue, it may be running, but it may also be killed, finished or have produced
+     * first. If the job is no longer waiting in the queue, it may be running, but it may also be killed, finished or have produced 
      * an error. If the timeout expires, the job will continue to be queued normally.
      * </p>
      * <p>
      * The timeout is in milliseconds and must be &gt;= 0. When timeout is 0, it will be ignored and this method will wait until
-     * the job is no longer queued.
+     * the job is no longer queued.  
      * </p>
      * <p>
      * A JobStatus is returned that can be used to determine why the call returned.
@@ -525,8 +525,8 @@ public abstract class Scheduler {
      * @param timeout
      *            the maximum time to wait in milliseconds.
      * @return the status of the Job.
-     *
-     * @throws IllegalArgumentException
+     * 
+     * @throws IllegalArgumentException 
      *             If the value of timeout is negative
      * @throws NoSuchJobException
      *             If the job is not known.
@@ -534,34 +534,34 @@ public abstract class Scheduler {
      *             If the status of the job could not be retrieved.
      */
     public abstract JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException;
-
-    protected void assertNonNullOrEmpty(String s, String message) {
-        if (s == null || s.isEmpty()) {
-            throw new IllegalArgumentException(message);
-        }
+    
+	protected void assertNonNullOrEmpty(String s, String message) {
+		if (s == null || s.isEmpty()) { 
+    		throw new IllegalArgumentException(message);
+    	}
     }
-
+	
     protected void assertPositive(long value, String message) {
-        if (value < 0) {
+    	if (value < 0) { 
             throw new IllegalArgumentException(message + value);
-        }
-    }
+		}
+	}
+    
+	@Override
+	public int hashCode() {
+		return uniqueID.hashCode();
+	}
 
-    @Override
-    public int hashCode() {
-        return uniqueID.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-
-        return uniqueID.equals(((Scheduler) obj).uniqueID);
-    }
-
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+	
+		return uniqueID.equals(((Scheduler) obj).uniqueID);		
+	}
+    
 }

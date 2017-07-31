@@ -22,10 +22,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
- * A simple output reader that uses a daemon thread to read from an {@link java.io.InputStream} and buffer this data. Once
- * end-of-stream is reached, this data will be made available as a {@link java.lang.String}.
- *
- * Note that since the data is buffered in memory, so it is not advisable to use this OutputReader to read large amounts of data.
+ * A simple output reader that uses a daemon thread to read from an {@link java.io.InputStream} and buffer this data. Once 
+ * end-of-stream is reached, this data will be made available as a {@link java.lang.String}. 
+ * 
+ * Note that since the data is buffered in memory, so it is not advisable to use this OutputReader to read large amounts of data. 
  */
 public final class OutputReader extends Thread {
 
@@ -40,18 +40,18 @@ public final class OutputReader extends Thread {
 
     /**
      * Create an OutputReader that reads from <code>source</code>.
-     *
+     * 
      * @param source
      *          the {#link InputStream} to read from.
      */
-
+    
     public OutputReader(InputStream source) {
-
-        if (source == null) {
-            throw new IllegalArgumentException("Source stream may not be null");
-        }
-
-        this.source = source;
+       
+    	if (source == null) { 
+    		throw new IllegalArgumentException("Source stream may not be null");
+    	}
+    	
+    	this.source = source;
 
         buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
@@ -66,9 +66,9 @@ public final class OutputReader extends Thread {
     }
 
     /**
-     * Returns if the OutputReader has finished (i.e., has reached the end-of-stream on the input). If so, the data that has been
+     * Returns if the OutputReader has finished (i.e., has reached the end-of-stream on the input). If so, the data that has been 
      * read is now available through {@link #getResultAsString()}.
-     *
+     * 
      * @return
      *          if the OutputReader has finished reading.
      */
@@ -77,7 +77,7 @@ public final class OutputReader extends Thread {
     }
 
     /**
-     * Waits until the OutputReader has finished (i.e., has reached the end-of-stream on the input). After this method returns,
+     * Waits until the OutputReader has finished (i.e., has reached the end-of-stream on the input). After this method returns, 
      * the data that has been read is available through {@link #getResultAsString()}.
      */
     public synchronized void waitUntilFinished() {
@@ -106,7 +106,7 @@ public final class OutputReader extends Thread {
         buffer.put(bytes, 0, length);
     }
 
-    /**
+    /** 
      * Entry method for daemon thread.
      */
     public void run() {
@@ -131,15 +131,15 @@ public final class OutputReader extends Thread {
             } catch (IOException e) {
                 // ignore
             }
-
+            
             setFinished();
         }
     }
 
     /**
-     * Returns the data that has been read from the {@link java.io.InputStream} as a {@link java.lang.String}. If the
+     * Returns the data that has been read from the {@link java.io.InputStream} as a {@link java.lang.String}. If the 
      * OutputReader has not finished reading, this method will block until end-of-stream has been reached.
-     *
+     *  
      * @return
      *          the data that has been read.
      */
@@ -147,11 +147,11 @@ public final class OutputReader extends Thread {
         waitUntilFinished();
         return new String(buffer.array(), 0, buffer.position(), StandardCharsets.UTF_8);
     }
-
+    
     /**
-     * Returns the data that has been read from the {@link java.io.InputStream} as a byte array. If the
+     * Returns the data that has been read from the {@link java.io.InputStream} as a byte array. If the 
      * OutputReader has not finished reading, this method will block until end-of-stream has been reached.
-     *
+     *  
      * @return
      *          the data that has been read.
      */
@@ -159,6 +159,6 @@ public final class OutputReader extends Thread {
         waitUntilFinished();
         return Arrays.copyOfRange(buffer.array(), 0, buffer.position());
     }
-
-
+    
+    
 }

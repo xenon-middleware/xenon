@@ -27,22 +27,22 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 /**
  * Adaptor for TORQUE batch system.
- *
+ * 
  * @version 1.0
  * @since 1.0
  */
 public class TorqueSchedulerAdaptor extends ScriptingSchedulerAdaptor {
 
-    /** The name of this adaptor */
+	/** The name of this adaptor */
     public static final String ADAPTOR_NAME = "torque";
 
     /** The prefix used by all properties related to this adaptor */
     public static final String PREFIX = SchedulerAdaptor.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
 
     /** The locations supported by this adaptor */
-    public static final String [] ADAPTOR_LOCATIONS = new String [] { "(locations supported by local)",
+    public static final String [] ADAPTOR_LOCATIONS = new String [] { "(locations supported by local)", 
             "(locations supported by ssh)" };
-
+    
     /** Should the grid engine version on the target machine be ignored ? */
     public static final String IGNORE_VERSION_PROPERTY = PREFIX + "ignore.version";
 
@@ -57,22 +57,22 @@ public class TorqueSchedulerAdaptor extends ScriptingSchedulerAdaptor {
             + " This adaptor uses either the local or the ssh adaptor to gain access to the scheduler machine.";
 
     /** List of all properties supported by this adaptor */
-    public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {
-        new XenonPropertyDescription(IGNORE_VERSION_PROPERTY, Type.BOOLEAN,
+    public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {            
+        new XenonPropertyDescription(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, 
                 "false", "Skip version check is skipped when connecting to remote machines. "
                         + "WARNING: it is not recommended to use this setting in production environments!"),
-        new XenonPropertyDescription(ACCOUNTING_GRACE_TIME_PROPERTY, Type.LONG,
+        new XenonPropertyDescription(ACCOUNTING_GRACE_TIME_PROPERTY, Type.LONG, 
                 "60000", "Number of milliseconds a job is allowed to take going from the queue to the accinfo output."),
-        new XenonPropertyDescription(POLL_DELAY_PROPERTY, Type.LONG,
-                "1000", "Number of milliseconds between polling the status of a job.")
+        new XenonPropertyDescription(POLL_DELAY_PROPERTY, Type.LONG, 
+        		"1000", "Number of milliseconds between polling the status of a job.")
     };
 
     public TorqueSchedulerAdaptor() {
-        super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
-    }
+		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
+	}
 
-    @Override
-    public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) throws XenonException {
-        return new TorqueScheduler(getNewUniqueID(), location, credential, properties);
-    }
+	@Override
+	public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) throws XenonException {
+		return new TorqueScheduler(getNewUniqueID(), location, credential, properties);
+	}
 }

@@ -27,11 +27,11 @@ import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
  * FileAttributes represents a set of attributes of a path.
  */
 public class PathAttributesImplementation implements PathAttributes {
-
-    /** The path these attributes belong to */
-    private Path path;
-
-     /** Is this a directory ? */
+	
+	/** The path these attributes belong to */
+	private Path path;
+	
+	 /** Is this a directory ? */
     private boolean isDirectory;
 
     /** Is this a regular file ? */
@@ -39,10 +39,10 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /** Is this a symbolic link ? */
     private boolean isSymbolicLink;
-
+    
     /** Is this an other type of file ? */
     private boolean isOther;
-
+    
     /** Is the file executable ? */
     private boolean executable;
 
@@ -57,322 +57,322 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /** The creation time of this file */
     private long creationTime;
-
+    
     /** The last access time of this file */
     private long lastAccessTime;
-
+    
     /** The last modified time of this file */
     private long lastModifiedTime;
 
     /** The size of this file */
     private long size;
-
+    
     /** The owner of this file */
     private String owner;
-
+    
     /** The group of this file */
     private String group;
-
+    
     /** The permissions of this file (POSIX only) */
     private Set<PosixFilePermission> permissions;
-
-    public PathAttributesImplementation() {
-        // EMPTY
+    
+    public PathAttributesImplementation() { 
+    	// EMPTY
     }
 
     /**
      * Get the path these attributes belong to.
-     *
+     * 
      * @return
-     *       the path these attributes belong to.
+     *   	the path these attributes belong to.
      */
-    public Path getPath() {
-        return path;
-    }
+    public Path getPath() {  
+		return path;
+	}
 
-    public void setPath(Path path) {
-        this.path = path;
-    }
+	public void setPath(Path path) {
+		this.path = path;
+	}
 
     /**
      * Does the path refer to a directory ?
-     *
+     * 
      * @return
      *          if the path refers to a directory.
      */
     public boolean isDirectory() {
-        return isDirectory;
-    }
+		return isDirectory;
+	}
 
-    public void setDirectory(boolean isDirectory) {
-        this.isDirectory = isDirectory;
-    }
+	public void setDirectory(boolean isDirectory) {
+		this.isDirectory = isDirectory;
+	}
 
-    /**
+	/**
      * Does the path refer to a regular file ?
-     *
-     * @return
+     * 
+     * @return 
      *          if the path refers to a regular file.
      */
-    public boolean isRegular() {
-        return isRegular;
-    }
+	public boolean isRegular() {
+		return isRegular;
+	}
 
-    public void setRegular(boolean isRegular) {
-        this.isRegular = isRegular;
-    }
+	public void setRegular(boolean isRegular) {
+		this.isRegular = isRegular;
+	}
 
 
     /**
      * Does the path refer to a symbolic link ?
-     *
-     * @return
+     * 
+     * @return 
      *          if the path refers to a symbolic link.
      */
-    public boolean isSymbolicLink() {
-        return isSymbolicLink;
-    }
+	public boolean isSymbolicLink() {
+		return isSymbolicLink;
+	}
 
-    public void setSymbolicLink(boolean isSymbolicLink) {
-        this.isSymbolicLink = isSymbolicLink;
-    }
+	public void setSymbolicLink(boolean isSymbolicLink) {
+		this.isSymbolicLink = isSymbolicLink;
+	}
 
     /**
      * Is the path not a file, link or directory ?
-     *
-     * @return
+     * 
+     * @return 
      *          if the path does not refer to a file, link or directory.
      */
-    public boolean isOther() {
-        return isOther;
-    }
+	public boolean isOther() {
+		return isOther;
+	}
 
-    public void setOther(boolean isOther) {
-        this.isOther = isOther;
-    }
-
+	public void setOther(boolean isOther) {
+		this.isOther = isOther;
+	}
+	
     /**
      * Does the path refer to an executable file ?
-     *
-     * @return
+     * 
+     * @return 
      *          if the path refers an executable file ?
      */
-    public boolean isExecutable() {
-        return executable;
-    }
+	public boolean isExecutable() {
+		return executable;
+	}
 
-    public void setExecutable(boolean executable) {
-        this.executable = executable;
-    }
+	public void setExecutable(boolean executable) {
+		this.executable = executable;
+	}
 
-
-       /**
+	
+	   /**
      * Does the path refer to an readable file ?
-     *
-     * @return
+     * 
+     * @return 
      *          if the path refers an readable file ?
      */
-    public boolean isReadable() {
-        return readable;
-    }
+	public boolean isReadable() {
+		return readable;
+	}
 
-    public void setReadable(boolean readable) {
-        this.readable = readable;
-    }
+	public void setReadable(boolean readable) {
+		this.readable = readable;
+	}
 
     /**
      * Does the path refer to a writable file ?
-     *
-     * @return
+     * 
+     * @return 
      *          if the path refers a writable file ?
      */
-    public boolean isWritable() {
-        return writable;
-    }
+	public boolean isWritable() {
+		return writable;
+	}
 
-    public void setWritable(boolean writable) {
-        this.writable = writable;
-    }
+	public void setWritable(boolean writable) {
+		this.writable = writable;
+	}
 
     /**
      * Does the path refer to an hidden file ?
-     *
-     * @return
+     * 
+     * @return 
      *          if the path refers an hidden file ?
      */
-    public boolean isHidden() {
-        return hidden;
-    }
+	public boolean isHidden() {
+		return hidden;
+	}
 
-    public void setHidden(boolean hidden) {
-        this.hidden = hidden;
-    }
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
+	}
 
-
-    /**
+	
+	/**
      * Get the creation time for this file.
-     *
+     * 
      * If creationTime is not supported by the adaptor, {@link #getLastModifiedTime()} will be returned instead.
-     *
-     * @return
+     * 
+     * @return 
      *          the creation time for this file.
      */
-    public long getCreationTime() {
-        return creationTime;
-    }
+	public long getCreationTime() {
+		return creationTime;
+	}
 
-    public void setCreationTime(long creationTime) {
-        this.creationTime = creationTime;
-    }
+	public void setCreationTime(long creationTime) {
+		this.creationTime = creationTime;
+	}
 
     /**
      * Get the last access time for this file.
-     *
+     * 
      * If lastAccessTime is not supported by the adaptor, use {@link #getLastModifiedTime()} will be returned instead.
      *
-     * @return
+     * @return 
      *          the last access time for this file.
      */
-    public long getLastAccessTime() {
-        return lastAccessTime;
-    }
+	public long getLastAccessTime() {
+		return lastAccessTime;
+	}
 
-    public void setLastAccessTime(long lastAccessTime) {
-        this.lastAccessTime = lastAccessTime;
-    }
+	public void setLastAccessTime(long lastAccessTime) {
+		this.lastAccessTime = lastAccessTime;
+	}
 
     /**
      * Get the last modified time for this file.
-     *
+     * 
      * If lastModifiedTime is not supported by the adaptor, <code>0</code> will be returned instead.
      *
-     * @return
+     * @return 
      *          the last modified time for this file.
      */
-    public long getLastModifiedTime() {
-        return lastModifiedTime;
-    }
+	public long getLastModifiedTime() {
+		return lastModifiedTime;
+	}
 
-    public void setLastModifiedTime(long lastModifiedTime) {
-        this.lastModifiedTime = lastModifiedTime;
-    }
+	public void setLastModifiedTime(long lastModifiedTime) {
+		this.lastModifiedTime = lastModifiedTime;
+	}
 
-
+	
     /**
      * Get the size of this file in bytes.
-     *
-     * If the file is not a regular file, <code>0</code> will be returned.
-     *
-     * @return
+     * 
+     * If the file is not a regular file, <code>0</code> will be returned. 
+     * 
+     * @return 
      *          the size of this file.
      */
-    public long getSize() {
-        return size;
-    }
+	public long getSize() {
+		return size;
+	}
 
-    public void setSize(long size) {
-        this.size = size;
-    }
+	public void setSize(long size) {
+		this.size = size;
+	}
 
-
+	
     /**
      * Get the owner of this file.
-     *
-     * @return
+     * 
+     * @return 
      *          the owner of this file.
-     *
+     * 
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
-    public String getOwner() throws AttributeNotSupportedException {
-        return owner;
-    }
+	public String getOwner() throws AttributeNotSupportedException {
+		return owner;
+	}
 
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
 
-     /**
+	 /**
      * Get the group of this file.
-     *
-     * @return
+     * 
+     * @return 
      *          the group of this file.
-     *
+     * 
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
-    public String getGroup() throws AttributeNotSupportedException {
-        return group;
-    }
+	public String getGroup() throws AttributeNotSupportedException {
+		return group;
+	}
 
-    public void setGroup(String group) {
-        this.group = group;
-    }
+	public void setGroup(String group) {
+		this.group = group;
+	}
 
     /**
      * Get the permissions of this file.
-     *
-     * @return
+     * 
+     * @return 
      *          the permissions of this file.
-     *
+     * 
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
-    public Set<PosixFilePermission> getPermissions() throws AttributeNotSupportedException {
-        return permissions;
-    }
+	public Set<PosixFilePermission> getPermissions() throws AttributeNotSupportedException {
+		return permissions;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
 
-        PathAttributesImplementation that = (PathAttributesImplementation) o;
+		PathAttributesImplementation that = (PathAttributesImplementation) o;
 
-        if (isDirectory != that.isDirectory) return false;
-        if (isRegular != that.isRegular) return false;
-        if (isSymbolicLink != that.isSymbolicLink) return false;
-        if (isOther != that.isOther) return false;
-        if (executable != that.executable) return false;
-        if (readable != that.readable) return false;
-        if (writable != that.writable) return false;
-        if (hidden != that.hidden) return false;
-        if (creationTime != that.creationTime) return false;
-        if (lastAccessTime != that.lastAccessTime) return false;
-        if (lastModifiedTime != that.lastModifiedTime) return false;
-        if (size != that.size) return false;
-        if (!path.equals(that.path)) return false;
-        if (owner != null ? !owner.equals(that.owner) : that.owner != null) return false;
-        if (group != null ? !group.equals(that.group) : that.group != null) return false;
-        return permissions != null ? permissions.equals(that.permissions) : that.permissions == null;
-    }
+		if (isDirectory != that.isDirectory) return false;
+		if (isRegular != that.isRegular) return false;
+		if (isSymbolicLink != that.isSymbolicLink) return false;
+		if (isOther != that.isOther) return false;
+		if (executable != that.executable) return false;
+		if (readable != that.readable) return false;
+		if (writable != that.writable) return false;
+		if (hidden != that.hidden) return false;
+		if (creationTime != that.creationTime) return false;
+		if (lastAccessTime != that.lastAccessTime) return false;
+		if (lastModifiedTime != that.lastModifiedTime) return false;
+		if (size != that.size) return false;
+		if (!path.equals(that.path)) return false;
+		if (owner != null ? !owner.equals(that.owner) : that.owner != null) return false;
+		if (group != null ? !group.equals(that.group) : that.group != null) return false;
+		return permissions != null ? permissions.equals(that.permissions) : that.permissions == null;
+	}
 
-    @Override
-    public int hashCode() {
-        int result = path.hashCode();
-        result = 31 * result + (isDirectory ? 1 : 0);
-        result = 31 * result + (isRegular ? 1 : 0);
-        result = 31 * result + (isSymbolicLink ? 1 : 0);
-        result = 31 * result + (isOther ? 1 : 0);
-        result = 31 * result + (executable ? 1 : 0);
-        result = 31 * result + (readable ? 1 : 0);
-        result = 31 * result + (writable ? 1 : 0);
-        result = 31 * result + (hidden ? 1 : 0);
-        result = 31 * result + (int) (creationTime ^ (creationTime >>> 32));
-        result = 31 * result + (int) (lastAccessTime ^ (lastAccessTime >>> 32));
-        result = 31 * result + (int) (lastModifiedTime ^ (lastModifiedTime >>> 32));
-        result = 31 * result + (int) (size ^ (size >>> 32));
-        result = 31 * result + (owner != null ? owner.hashCode() : 0);
-        result = 31 * result + (group != null ? group.hashCode() : 0);
-        result = 31 * result + (permissions != null ? permissions.hashCode() : 0);
-        return result;
-    }
+	@Override
+	public int hashCode() {
+		int result = path.hashCode();
+		result = 31 * result + (isDirectory ? 1 : 0);
+		result = 31 * result + (isRegular ? 1 : 0);
+		result = 31 * result + (isSymbolicLink ? 1 : 0);
+		result = 31 * result + (isOther ? 1 : 0);
+		result = 31 * result + (executable ? 1 : 0);
+		result = 31 * result + (readable ? 1 : 0);
+		result = 31 * result + (writable ? 1 : 0);
+		result = 31 * result + (hidden ? 1 : 0);
+		result = 31 * result + (int) (creationTime ^ (creationTime >>> 32));
+		result = 31 * result + (int) (lastAccessTime ^ (lastAccessTime >>> 32));
+		result = 31 * result + (int) (lastModifiedTime ^ (lastModifiedTime >>> 32));
+		result = 31 * result + (int) (size ^ (size >>> 32));
+		result = 31 * result + (owner != null ? owner.hashCode() : 0);
+		result = 31 * result + (group != null ? group.hashCode() : 0);
+		result = 31 * result + (permissions != null ? permissions.hashCode() : 0);
+		return result;
+	}
 
-    public void setPermissions(Set<PosixFilePermission> permissions) {
-        this.permissions = permissions;
-    }
-
-    public String toString() {
-        return path.getAbsolutePath();
-    }
+	public void setPermissions(Set<PosixFilePermission> permissions) {
+		this.permissions = permissions;
+	}   
+	
+	public String toString() { 
+		return path.getAbsolutePath();
+	}
 }

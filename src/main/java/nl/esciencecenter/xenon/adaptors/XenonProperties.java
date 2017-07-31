@@ -47,7 +47,7 @@ public class XenonProperties {
 
     /**
      * Creates empty mutable Map with sufficient initial capacity.
-     *
+     * 
      * @param <K>
      *            key type
      * @param <V>
@@ -59,7 +59,7 @@ public class XenonProperties {
     public static <K, V> Map<K, V> emptyMap(int capacity) {
         return new HashMap<>((capacity + 1) * 4 / 3);
     }
-
+    
     /** Contains a description of all properties this XenonProperties should accept, including their type, default, etc. */
     private final Map<String, XenonPropertyDescription> supportedProperties;
 
@@ -69,7 +69,7 @@ public class XenonProperties {
     /**
      * Private constructor for XenonProperties using in copying and filtering. The <code>properties</code> parameter is assumed
      * to only contain valid supported properties and have values of the correct type.
-     *
+     * 
      * @param supportedProperties
      *            a map containing a description of all supported properties.
      * @param properties
@@ -91,7 +91,7 @@ public class XenonProperties {
     /**
      * Create a new XenonProperties that will support the properties in <code>supportedProperties</code>. All properties in
      * <code>properties</code> will be added.
-     *
+     * 
      * @param supportedProperties
      *            the properties to support
      * @param properties
@@ -119,7 +119,7 @@ public class XenonProperties {
 
     /**
      * Adds the specified properties to the current ones and checks if their names and types are correct.
-     *
+     * 
      * @param properties
      *            the properties to add.
      * @throws UnknownPropertyException
@@ -151,7 +151,7 @@ public class XenonProperties {
         }
     }
 
-
+    
     private void checkType(XenonPropertyDescription description, String key, String value) throws InvalidPropertyException {
         Type t = description.getType();
 
@@ -181,14 +181,14 @@ public class XenonProperties {
                 throw new InvalidPropertyException(NAME, "Unknown property \"" + key + "=" + value + " provided");
             }
         } catch (IllegalArgumentException | InvalidPropertyException e) {
-            throw new InvalidPropertyException(NAME, "Property \"" + key + "\" has invalid value: " + value + " (expected " + t
+            throw new InvalidPropertyException(NAME, "Property \"" + key + "\" has invalid value: " + value + " (expected " + t 
                     + ")", e);
         }
     }
 
     /**
      * Check if this XenonProperties supports a property with the given name.
-     *
+     * 
      * @param name
      *            the name of the property.
      * @return <code>true</code> if this XenonProperties supports a property with the given name, <code>false</code> otherwise.
@@ -199,7 +199,7 @@ public class XenonProperties {
 
     /**
      * Check if the property with the given name is set.
-     *
+     * 
      * @param name
      *            the name of the property.
      * @return <code>true</code> if the property with the given name is set, <code>false</code> otherwise.
@@ -217,10 +217,10 @@ public class XenonProperties {
 
     /**
      * Retrieves the value of a property with the given name without checking its type.
-     *
+     * 
      * If the property is not set, its default value will be returned. That the type of the value is not checked. Instead its
      * <code>String</code> representation is always returned.
-     *
+     * 
      * @param name
      *            the name of the property.
      * @return the value of the property with the given name or its default value if it is not set.
@@ -267,11 +267,11 @@ public class XenonProperties {
 
     /**
      * Retrieves the value of a boolean property with the given name.
-     *
+     * 
      * @return the value of a boolean property with the given name.
      * @param name
      *            the name of the property
-     *
+     * 
      * @throws UnknownPropertyException
      *             if the given name is not a supported property.
      * @throws PropertyTypeException
@@ -283,23 +283,23 @@ public class XenonProperties {
             InvalidPropertyException {
 
         String value = getProperty(name, Type.BOOLEAN);
-
-        if (value.equalsIgnoreCase("true")) {
+            
+        if (value.equalsIgnoreCase("true")) { 
             return true;
         } else if (value.equalsIgnoreCase("false")) {
-            return false;
-        } else {
+            return false; 
+        } else { 
             throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected BOOLEAN)");
         }
     }
 
     /**
      * Retrieves the value of an integer property with the given name.
-     *
+     * 
      * @return the value of an integer property with the given name.
      * @param name
      *            the name of the property
-     *
+     * 
      * @throws UnknownPropertyException
      *             if the given name is not a supported property.
      * @throws PropertyTypeException
@@ -321,12 +321,12 @@ public class XenonProperties {
 
     /**
      * Retrieves the value of an integer property with the given name.
-     *
+     * 
      * @return the value of an integer property with the given name.
      * @param name
      *            the name of the property
      * @param defaultValue
-     *            the value to return if the property is not found
+     *            the value to return if the property is not found  
      * @throws UnknownPropertyException
      *             if the given name is not a supported property.
      * @throws PropertyTypeException
@@ -353,11 +353,11 @@ public class XenonProperties {
 
     /**
      * Retrieves the value of an long property with the given name.
-     *
+     * 
      * @return the value of an long property with the given name.
      * @param name
      *            the name of the property
-     *
+     * 
      * @throws UnknownPropertyException
      *             if the given name is not a supported property.
      * @throws PropertyTypeException
@@ -378,11 +378,11 @@ public class XenonProperties {
 
     /**
      * Retrieves the value of an natural number property (e.g. a long with value >= 0) with the given name.
-     *
+     * 
      * @return the value of an natural number property with the given name.
      * @param name
      *            the name of the property
-     *
+     * 
      * @throws UnknownPropertyException
      *             if the given name is not a supported property.
      * @throws PropertyTypeException
@@ -397,25 +397,25 @@ public class XenonProperties {
         try {
             long result = Long.parseLong(value);
 
-            if (result < 0) {
-                throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected NATURAL NUMBER)");
+            if (result < 0) { 
+            	throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected NATURAL NUMBER)");
             }
-
+        
             return result;
         } catch (NumberFormatException e) {
             throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected NATURAL NUMBER)", e);
         }
     }
 
-
-
+    
+    
     /**
      * Retrieves the value of an double property with the given name.
-     *
+     * 
      * @return the value of an double property with the given name.
      * @param name
      *            the name of the property
-     *
+     * 
      * @throws UnknownPropertyException
      *             if the given name is not a supported property.
      * @throws PropertyTypeException
@@ -437,11 +437,11 @@ public class XenonProperties {
 
     /**
      * Retrieves the value of a string property with the given name.
-     *
+     * 
      * @return the value of an string property with the given name.
      * @param name
      *            the name of the property
-     *
+     * 
      * @throws UnknownPropertyException
      *             if the given name is not a supported property.
      * @throws PropertyTypeException
@@ -451,7 +451,7 @@ public class XenonProperties {
         return getProperty(name, Type.STRING);
     }
 
-    private long parseSizeValue(String value) throws InvalidPropertyException {
+    private long parseSizeValue(String value) throws InvalidPropertyException {  
         try {
             if (value.endsWith("G") || value.endsWith("g")) {
                 return Long.parseLong(value.substring(0, value.length() - 1)) * GIGA;
@@ -471,17 +471,17 @@ public class XenonProperties {
             throw new InvalidPropertyException(NAME, "Invalid SIZE value: " + value, e);
         }
     }
-
+    
     /**
      * Retrieves the value of a size property with the given name.
-     *
+     * 
      * Valid values for the property are a long or a long a long followed by either a K, M or G. These size modifiers multiply the
      * value by 1024, 1024^2 and 1024^3 respectively.
-     *
+     * 
      * @return the value of an size property with the given name.
      * @param name
      *            the name of the property
-     *
+     * 
      * @throws UnknownPropertyException
      *             if the given name is not a supported property.
      * @throws PropertyTypeException
@@ -495,7 +495,7 @@ public class XenonProperties {
 
     /**
      * Returns a new XenonProperties that contains only the properties whose key start with a certain prefix.
-     *
+     * 
      * @return an XenonProperties containing only the matching properties.
      * @param prefix
      *            the desired prefix
@@ -525,7 +525,7 @@ public class XenonProperties {
     /**
      * Returns a copy of this XenonProperties that contains all properties except the properties that start with the given
      * prefix. Note that these properties are also removed from the supported properties set.
-     *
+     * 
      * @param prefix
      *            the prefix of the properties to exclude
      * @return an XenonProperties containing all properties except the properties with the given prefix.
@@ -556,7 +556,7 @@ public class XenonProperties {
     /**
      * Returns a copy of this XenonProperties that contains all properties but clears the properties that start with the given
      * prefix. Note that these properties are not removed from the supported properties set.
-     *
+     * 
      * @param prefix
      *            the prefix of the properties to exclude
      * @return an XenonProperties containing all properties except the properties with the given prefix.
@@ -583,7 +583,7 @@ public class XenonProperties {
 
     /**
      * Returns the descriptions of all supported properties.
-     *
+     * 
      * @return the descriptions of all supported properties.
      */
     public XenonPropertyDescription[] getSupportedProperties() {
@@ -593,7 +593,7 @@ public class XenonProperties {
 
     /**
      * Returns a sorted list of all supported property names.
-     *
+     * 
      * @return Sorted list of supported property names.
      */
     public String[] getPropertyNames() {
@@ -604,7 +604,7 @@ public class XenonProperties {
 
     /**
      * Returns all properties that are set in a new Map.
-     *
+     * 
      * @return all properties that are set in a new Map.
      */
     public Map<String, String> toMap() {
@@ -613,7 +613,7 @@ public class XenonProperties {
 
     /**
      * Prints properties (including default properties) to a stream.
-     *
+     * 
      * @param out
      *            The stream to write output to.
      * @param prefix

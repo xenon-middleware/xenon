@@ -30,7 +30,7 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
  */
 public class SlurmSchedulerAdaptor extends ScriptingSchedulerAdaptor {
 
-    /** The name of this adaptor */
+	/** The name of this adaptor */
     public static final String ADAPTOR_NAME = "slurm";
 
     /** The prefix used by all properties related to this adaptor */
@@ -39,7 +39,7 @@ public class SlurmSchedulerAdaptor extends ScriptingSchedulerAdaptor {
     /** The locations supported by this adaptor */
     public static final String [] ADAPTOR_LOCATIONS = new String [] { "(locations supported by local)",
             "(locations supported by ssh)" };
-
+    
     /** Should the accounting usage be disabled? */
     public static final String DISABLE_ACCOUNTING_USAGE = PREFIX + "disable.accounting.usage";
 
@@ -51,32 +51,32 @@ public class SlurmSchedulerAdaptor extends ScriptingSchedulerAdaptor {
             + "or the ssh adaptor to gain access to the scheduler machine.";
 
     /** List of all properties supported by this adaptor */
-    public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {
+    public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {       
         new XenonPropertyDescription(DISABLE_ACCOUNTING_USAGE, Type.BOOLEAN,
                 "false", "Do not use accounting info of slurm, even when available. Mostly for testing purposes"),
-
-        new XenonPropertyDescription(POLL_DELAY_PROPERTY, Type.LONG,
-                "1000", "Number of milliseconds between polling the status of a job.")
+                
+        new XenonPropertyDescription(POLL_DELAY_PROPERTY, Type.LONG, 
+        		"1000", "Number of milliseconds between polling the status of a job.")
     };
 
     public static final long SLURM_UPDATE_TIMEOUT = 60L*1000L; // 30 second update timeout
-
+    
     public static final long SLURM_UPDATE_SLEEP = 1000L; // 1 second update sleep
-
+    
     public static final String[] SUPPORTED_VERSIONS = { "2.3.", "2.5.", "2.6.", "14.03.0", "14.11.9-Bull.1.0", "15.08.6"};
-
+    
     public SlurmSchedulerAdaptor() {
-        super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
-    }
-
-    @Override
-    public boolean supportsInteractive() {
-        // The slurm scheduler supports interactive jobs
-        return true;
-    }
-
-    @Override
-    public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) throws XenonException {
-        return new SlurmScheduler(getNewUniqueID(), location, credential, properties);
-    }
+		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
+	}
+    
+	@Override
+	public boolean supportsInteractive() { 
+		// The slurm scheduler supports interactive jobs
+		return true;
+	}
+    
+	@Override
+	public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) throws XenonException {
+		return new SlurmScheduler(getNewUniqueID(), location, credential, properties);
+	}
 }

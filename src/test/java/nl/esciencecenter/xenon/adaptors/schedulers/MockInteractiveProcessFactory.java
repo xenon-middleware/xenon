@@ -19,35 +19,35 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 public class MockInteractiveProcessFactory implements InteractiveProcessFactory{
+	
+	private long delay;
+	private long killDelay;
+	
+	public MockInteractiveProcessFactory() { 
+		this(0);
+	}
+	
+	public MockInteractiveProcessFactory(long delay) { 
+		this(delay, 0);
+	}
+	
+	public MockInteractiveProcessFactory(long delay, long killDelay) { 
+		this.delay = delay;
+		this.killDelay = killDelay;
+	}
+	
+	public InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier) throws XenonException {
+		return new MockInteractiveProcess(description, jobIdentifier, delay, killDelay);
+	}
 
-    private long delay;
-    private long killDelay;
+	@Override
+	public void close() throws XenonException {
+		
+	}
 
-    public MockInteractiveProcessFactory() {
-        this(0);
-    }
-
-    public MockInteractiveProcessFactory(long delay) {
-        this(delay, 0);
-    }
-
-    public MockInteractiveProcessFactory(long delay, long killDelay) {
-        this.delay = delay;
-        this.killDelay = killDelay;
-    }
-
-    public InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier) throws XenonException {
-        return new MockInteractiveProcess(description, jobIdentifier, delay, killDelay);
-    }
-
-    @Override
-    public void close() throws XenonException {
-
-    }
-
-    @Override
-    public boolean isOpen() throws XenonException {
-        return true;
-    }
+	@Override
+	public boolean isOpen() throws XenonException {
+		return true;
+	}
 
 }

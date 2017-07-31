@@ -16,11 +16,11 @@
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
 /**
- *
+ * 
  */
 public interface Process {
 
-    boolean isDone();
+    boolean isDone(); 
 
     int getExitStatus();
 

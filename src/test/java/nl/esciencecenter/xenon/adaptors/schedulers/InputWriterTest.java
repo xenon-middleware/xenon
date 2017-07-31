@@ -34,53 +34,53 @@ import nl.esciencecenter.xenon.utils.InputWriter;
 
 public class InputWriterTest {
 
-    @Test
-    public void testCreate_null_input() {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	@Test
+	public void testCreate_null_input() { 
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		
+		InputWriter w = new InputWriter(null, bos);
+		w.waitUntilFinished();
+	
+		assertTrue(w.isFinished());
+		assertEquals(0, bos.toByteArray().length);
+	}
 
-        InputWriter w = new InputWriter(null, bos);
-        w.waitUntilFinished();
+	@Test(expected=IllegalArgumentException.class)
+	public void testCreate_null_output() { 
+		new InputWriter("Hello World", null);
+	}
 
-        assertTrue(w.isFinished());
-        assertEquals(0, bos.toByteArray().length);
-    }
+	@Test
+	public void test_simple() { 
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		
+		InputWriter w = new InputWriter("Hello World", bos);
+		w.waitUntilFinished();
+	
+		assertTrue(w.isFinished());
+		assertArrayEquals("Hello World".getBytes(), bos.toByteArray());
+	}
+	
+	class BrokenOutputStream extends OutputStream {
 
-    @Test(expected=IllegalArgumentException.class)
-    public void testCreate_null_output() {
-        new InputWriter("Hello World", null);
-    }
+		public void write(int arg0) throws IOException {
+			throw new IOException("Boom!");
+		} 
 
-    @Test
-    public void test_simple() {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		public void write(byte [] data, int off, int len) throws IOException {
+			throw new IOException("Boom!");
+		} 
 
-        InputWriter w = new InputWriter("Hello World", bos);
-        w.waitUntilFinished();
-
-        assertTrue(w.isFinished());
-        assertArrayEquals("Hello World".getBytes(), bos.toByteArray());
-    }
-
-    class BrokenOutputStream extends OutputStream {
-
-        public void write(int arg0) throws IOException {
-            throw new IOException("Boom!");
-        }
-
-        public void write(byte [] data, int off, int len) throws IOException {
-            throw new IOException("Boom!");
-        }
-
-        public void close() throws IOException {
-            throw new IOException("Boom!");
-        }
-    }
-
-    @Test
-    public void test_brokenStream() {
-        InputWriter w = new InputWriter("Hello World", new BrokenOutputStream());
-        w.waitUntilFinished();
-        assertTrue(w.isFinished());
-    }
-
+		public void close() throws IOException {
+			throw new IOException("Boom!");
+		} 
+	}
+	
+	@Test
+	public void test_brokenStream() { 
+		InputWriter w = new InputWriter("Hello World", new BrokenOutputStream());
+		w.waitUntilFinished();
+		assertTrue(w.isFinished());
+	}
+	
 }

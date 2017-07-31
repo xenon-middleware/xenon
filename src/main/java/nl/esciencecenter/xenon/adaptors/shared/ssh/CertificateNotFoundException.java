@@ -18,20 +18,20 @@ package nl.esciencecenter.xenon.adaptors.shared.ssh;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that a certificate file could not be found.
- *
+ * Signals that a certificate file could not be found.  
+ * 
  * @version 1.0
  * @since 1.0
  *
  */
 public class CertificateNotFoundException extends XenonException {
-
+    
     private static final long serialVersionUID = 1L;
 
     public CertificateNotFoundException(String adaptorName, String message, Throwable t) {
         super(adaptorName, message, t);
     }
-
+    
     public CertificateNotFoundException(String adaptorName, String message) {
         super(adaptorName, message);
     }

@@ -22,7 +22,7 @@ import static org.junit.Assert.assertArrayEquals;
 import java.util.Arrays;
 
 /**
- *
+ * 
  */
 public class PasswordCredentialTest {
 
@@ -31,25 +31,25 @@ public class PasswordCredentialTest {
         PasswordCredential pwc = new PasswordCredential("username", "password".toCharArray());
         assertEquals(pwc.getUsername(), "username");
     }
-
+    
     @org.junit.Test
     public void test_password() throws Exception {
         PasswordCredential pwc = new PasswordCredential("username", "password".toCharArray());
         assertTrue(Arrays.equals(pwc.getPassword(), "password".toCharArray()));
     }
 
-
+    
     @org.junit.Test
     public void test_toString() throws Exception {
         PasswordCredential pwc = new PasswordCredential("username", "password".toCharArray());
         assertTrue(pwc.toString().equals("PasswordCredential [username=username]"));
     }
-
+ 
     @org.junit.Test
     public void test_password_null() throws Exception {
         PasswordCredential pwc = new PasswordCredential("username", null);
         assertArrayEquals(new char[0], pwc.getPassword());
     }
-
-
+ 
+    
 }

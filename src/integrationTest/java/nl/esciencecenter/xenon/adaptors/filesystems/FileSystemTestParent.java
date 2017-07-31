@@ -37,20 +37,20 @@ import nl.esciencecenter.xenon.utils.OutputReader;
 import org.junit.rules.Timeout;
 
 public abstract class FileSystemTestParent {
-
-    public static final String TEST_DIR = "xenon_test";
-
+	
+	public static final String TEST_DIR = "xenon_test";
+    
     private Path testRoot;
-
+    
     private FileSystem fileSystem;
     private FileSystemAdaptorDescription description;
     private LocationConfig locationConfig;
     private Path testDir;
 
     private static long counter = 0;
-
-    private static long getNextCounter() {
-        return counter++;
+    
+    private static long getNextCounter() { 
+    	return counter++;
     }
 
 
@@ -66,20 +66,20 @@ public abstract class FileSystemTestParent {
         fileSystem = setupFileSystem();
         description = setupDescription();
         locationConfig = setupLocationConfig(fileSystem);
-
+        
         Path root = locationConfig.getWritableTestDir();
-
+        
         //System.out.println("ROOT=" + root);
-
+        
         assertNotNull(root);
-
+        
         testRoot = root.resolve(TEST_DIR);
-
+        
         //System.out.println("TEST_ROOT=" + testRoot);
 
         fileSystem.createDirectory(testRoot);
 
-
+        
         testDir = null;
     }
 
@@ -88,10 +88,10 @@ public abstract class FileSystemTestParent {
     @After
     public void cleanup() throws XenonException {
         try {
-            if (!fileSystem.isOpen()) {
-                return;
-            }
-
+        	if (!fileSystem.isOpen()) { 
+        		return;
+        	}
+        	
             if (testRoot != null && fileSystem.exists(testRoot)) {
                 fileSystem.delete(testRoot, true);
             }
@@ -119,8 +119,8 @@ public abstract class FileSystemTestParent {
 
     @Test
     public void readSymbolicLink_linkToExistingFile_targetMatches() throws XenonException {
-        assumeTrue("Does not support reading of symlinks", description.canReadSymboliclinks());
-        Map.Entry<Path, Path> linkTarget = locationConfig.getSymbolicLinksToExistingFile();
+    	assumeTrue("Does not support reading of symlinks", description.canReadSymboliclinks());
+    	Map.Entry<Path, Path> linkTarget = locationConfig.getSymbolicLinksToExistingFile();
         Path target = fileSystem.readSymbolicLink(linkTarget.getKey());
         Path expectedTarget = linkTarget.getValue();
         assertEquals(target, expectedTarget);
@@ -142,17 +142,17 @@ public abstract class FileSystemTestParent {
     }
 
     private String generateTestDirName() throws XenonException {
-        return "dir" + getNextCounter();
+    	return "dir" + getNextCounter();
     }
 
     private String generateTestFileName() throws XenonException {
-        return "file" + getNextCounter();
+    	return "file" + getNextCounter();
     }
 
     // Depends on: Path.resolve, RelativePath, exists
 //    private Path createNewTestDirName(Path root) throws XenonException {
 //        Path dir = resolve("dir" + getNextCounter());
-//
+//        
 //        assertFalse("Generated test dir already exists! " + dir, fileSystem.exists(dir));
 //
 //        return dir;
@@ -179,7 +179,7 @@ public abstract class FileSystemTestParent {
     // Depends on: Path.resolve, exists
     private Path createNewTestFileName(Path root) throws Exception {
         Path file = root.resolve( "file" + getNextCounter());
-
+        
         assertFalse("Generated NEW test file already exists! " + file, fileSystem.exists(file));
 
         return file;
@@ -191,7 +191,7 @@ public abstract class FileSystemTestParent {
         OutputStream out = null;
 
         try {
-            out = fileSystem.writeToFile(testFile, data.length);
+        	out = fileSystem.writeToFile(testFile, data.length);
 
             if (data != null) {
                 out.write(data);
@@ -237,13 +237,13 @@ public abstract class FileSystemTestParent {
         fileSystem.delete(dir,true);
     }
 
-    private void generateTestDir() throws XenonException {
-        testDir = resolve(generateTestDirName());
+    private void generateTestDir() throws XenonException { 
+    	testDir = resolve(generateTestDirName());    	
     }
-
-    private void generateAndCreateTestDir() throws XenonException {
-        generateTestDir();
-        fileSystem.createDirectories(testDir);
+    
+    private void generateAndCreateTestDir() throws XenonException { 
+    	generateTestDir();
+    	fileSystem.createDirectories(testDir);    	
     }
 
     private Path createTestSubDir(Path testDir) throws XenonException {
@@ -258,54 +258,54 @@ public abstract class FileSystemTestParent {
 
 
     // Tests to create directories
-
+    
     @Test
     public void test_exists_ok() throws Exception {
-        assertTrue(fileSystem.exists(locationConfig.getExistingPath()));
+    	assertTrue(fileSystem.exists(locationConfig.getExistingPath()));
     }
-
+  
     @Test
     public void test_exists_notExistsDir() throws Exception {
-        assertFalse(fileSystem.exists(new Path("/foobar")));
+    	assertFalse(fileSystem.exists(new Path("/foobar")));
     }
-
+      
     @Test(expected=IllegalArgumentException.class)
     public void test_createDirectory_null_throw() throws Exception {
-        fileSystem.createDirectory(null);
+    	fileSystem.createDirectory(null);
     }
-
+    
     @Test
     public void test_createDirectory_nonExisting_noThrow() throws Exception {
-        generateAndCreateTestDir();
-        assertTrue(fileSystem.exists(testDir));
-
+    	generateAndCreateTestDir();
+    	assertTrue(fileSystem.exists(testDir));
+    	
     }
 
     @Test(expected=PathAlreadyExistsException.class)
     public void createDirectory_existing_throw() throws Exception {
-        generateAndCreateTestDir();
+    	generateAndCreateTestDir();
         fileSystem.createDirectory(testDir);
     }
 
     @Test(expected=PathAlreadyExistsException.class)
     public void test_createDirectory_existingFile_throw() throws Exception {
-        generateAndCreateTestDir();
+    	generateAndCreateTestDir();
 
-        String file = generateTestFileName();
-
+    	String file = generateTestFileName();
+        
         Path tmp = testDir.resolve(file);
         fileSystem.createFile(tmp);
-
+        
         // Should fail!
         fileSystem.createDirectory(tmp);
     }
 
     @Test(expected=NoSuchPathException.class)
     public void test_createDirectory_nonExistingParent_throw() throws Exception {
-        generateAndCreateTestDir();
-        fileSystem.createDirectory(testDir.resolve(new Path("aap", "noot")));
+    	generateAndCreateTestDir();
+    	fileSystem.createDirectory(testDir.resolve(new Path("aap", "noot")));
     }
-
+    
 //    @Test(expected=XenonException.class)
 //    public void createDirectory_closedFileSystemIfSupported_throw() throws Exception {
 //        assumeFalse(description.isConnectionless());
@@ -316,22 +316,22 @@ public abstract class FileSystemTestParent {
 
     @Test(expected=IllegalArgumentException.class)
     public void test_createFile_null_throwsException() throws Exception {
-        fileSystem.createFile(null);
+    	fileSystem.createFile(null);
     }
 
     @Test
     public void test_createFile_nonExistingFile() throws Exception {
-        generateAndCreateTestDir();
-        Path file = testDir.resolve(generateTestFileName());
-        fileSystem.createFile(file);
+    	generateAndCreateTestDir();
+    	Path file = testDir.resolve(generateTestFileName());    	
+    	fileSystem.createFile(file);
     }
 
     @Test(expected=PathAlreadyExistsException.class)
     public void test_createFile_existingFile_throwsException() throws Exception {
-        generateAndCreateTestDir();
-        Path file = testDir.resolve(generateTestFileName());
-        fileSystem.createFile(file);
-        fileSystem.createFile(file);
+    	generateAndCreateTestDir();
+    	Path file = testDir.resolve(generateTestFileName());    	
+    	fileSystem.createFile(file);
+    	fileSystem.createFile(file);
     }
 
     @Test(expected=PathAlreadyExistsException.class)
@@ -344,10 +344,10 @@ public abstract class FileSystemTestParent {
 
     @Test(expected=NoSuchPathException.class)
     public void test_createFile_nonExistingParent_throwsException() throws Exception {
-        generateAndCreateTestDir();
-        Path dir = testDir.resolve(generateTestDirName());
-        Path file = dir.resolve(generateTestFileName());
-        fileSystem.createFile(file);
+    	generateAndCreateTestDir();
+    	Path dir = testDir.resolve(generateTestDirName());
+    	Path file = dir.resolve(generateTestFileName());    	
+    	fileSystem.createFile(file);
     }
 
     /* TODO: Fixme!
@@ -360,19 +360,19 @@ public abstract class FileSystemTestParent {
         fileSystem.createFile(file0);
     }
     */
-
+    
     @Test
     public void test_readFromFile() throws Exception {
+    
+    	Path file = locationConfig.getExistingPath();
+    	
+    	OutputReader reader = new OutputReader(fileSystem.readFromFile(file));
 
-        Path file = locationConfig.getExistingPath();
-
-        OutputReader reader = new OutputReader(fileSystem.readFromFile(file));
-
-        reader.waitUntilFinished();
-
-        // System.out.println("READ: " + reader.getResultAsString());
-
-        assertEquals("Hello World\n", reader.getResultAsString());
+    	reader.waitUntilFinished();
+    	
+    	// System.out.println("READ: " + reader.getResultAsString());
+    	
+    	assertEquals("Hello World\n", reader.getResultAsString());    	
     }
 
 

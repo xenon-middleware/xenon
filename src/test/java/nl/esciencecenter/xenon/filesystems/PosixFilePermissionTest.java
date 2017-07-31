@@ -29,7 +29,7 @@ import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
  *
  */
 public class PosixFilePermissionTest {
-
+    
     @Test
     public void testContainsAgainstNull() {
         assertFalse(PosixFilePermission.contains(PosixFilePermission.GROUP_EXECUTE, (PosixFilePermission[]) null));
@@ -44,12 +44,12 @@ public class PosixFilePermissionTest {
     public void testContainsNull() {
         assertFalse(PosixFilePermission.contains(null, PosixFilePermission.GROUP_EXECUTE));
     }
-
+    
     @Test
     public void testDoesNotContain() {
         assertFalse(PosixFilePermission.contains(PosixFilePermission.GROUP_EXECUTE, PosixFilePermission.GROUP_READ, PosixFilePermission.OTHERS_WRITE));
     }
-
+    
     @Test
     public void testDoesContain() {
         assertTrue(PosixFilePermission.contains(PosixFilePermission.OTHERS_WRITE, PosixFilePermission.GROUP_READ, PosixFilePermission.OTHERS_WRITE));

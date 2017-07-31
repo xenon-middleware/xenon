@@ -42,483 +42,483 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * 
  */
 public class JobQueueScheduler extends Scheduler {
 
-    /**
-     * Simple thread factory which returns daemon threads instead of normal threads
-     *
-     */
-    private class DaemonThreadFactory implements ThreadFactory {
-        public Thread newThread(Runnable runnable) {
-            Thread thread = Executors.defaultThreadFactory().newThread(runnable);
-            thread.setDaemon(true);
-            return thread;
-        }
-    }
+	/**
+	 * Simple thread factory which returns daemon threads instead of normal threads
+	 *
+	 */
+	private class DaemonThreadFactory implements ThreadFactory {
+		public Thread newThread(Runnable runnable) {
+			Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+			thread.setDaemon(true);
+			return thread;
+		}
+	}
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobQueueScheduler.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(JobQueueScheduler.class);
 
-    private static final String SINGLE_QUEUE_NAME = "single";
+	private static final String SINGLE_QUEUE_NAME = "single";
 
-    private static final String MULTI_QUEUE_NAME = "multi";
+	private static final String MULTI_QUEUE_NAME = "multi";
 
-    private static final String UNLIMITED_QUEUE_NAME = "unlimited";
+	private static final String UNLIMITED_QUEUE_NAME = "unlimited";
 
-    /** The minimal allowed value for the polling delay */
-    public static final int MIN_POLLING_DELAY = 100;
+	/** The minimal allowed value for the polling delay */
+	public static final int MIN_POLLING_DELAY = 100;
 
-    /** The maximum allowed value for the polling delay */
-    public static final int MAX_POLLING_DELAY = 60000;
+	/** The maximum allowed value for the polling delay */
+	public static final int MAX_POLLING_DELAY = 60000;
 
-    private final String adaptorName;
+	private final String adaptorName;
 
-    private final FileSystem filesystem;
+	private final FileSystem filesystem;
 
-    private final Path workingDirectory;
+	private final Path workingDirectory;
 
-    private final List<JobExecutor> singleQ = new LinkedList<>();
+	private final List<JobExecutor> singleQ = new LinkedList<>();
 
-    private final List<JobExecutor> multiQ = new LinkedList<>();
+	private final List<JobExecutor> multiQ = new LinkedList<>();
 
-    private final List<JobExecutor> unlimitedQ = new LinkedList<>();
+	private final List<JobExecutor> unlimitedQ = new LinkedList<>();
 
-    private final ExecutorService singleExecutor;
+	private final ExecutorService singleExecutor;
 
-    private final ExecutorService multiExecutor;
+	private final ExecutorService multiExecutor;
 
-    private final ExecutorService unlimitedExecutor;
+	private final ExecutorService unlimitedExecutor;
 
-    private final long pollingDelay;
+	private final long pollingDelay;
 
-    private final InteractiveProcessFactory factory;
+	private final InteractiveProcessFactory factory;
 
-    private final AtomicLong jobID = new AtomicLong(0L);
+	private final AtomicLong jobID = new AtomicLong(0L);
 
-    private final ArrayList<List<JobExecutor>> queues = new ArrayList<List<JobExecutor>>();
+	private final ArrayList<List<JobExecutor>> queues = new ArrayList<List<JobExecutor>>(); 
 
-    public JobQueueScheduler(String uniqueID, String adaptorName, String location, InteractiveProcessFactory factory,
-            FileSystem filesystem, Path workingDirectory, int multiQThreads, long pollingDelay, XenonProperties properties) throws BadParameterException {
+	public JobQueueScheduler(String uniqueID, String adaptorName, String location, InteractiveProcessFactory factory, 
+			FileSystem filesystem, Path workingDirectory, int multiQThreads, long pollingDelay, XenonProperties properties) throws BadParameterException {
 
-        super(uniqueID, adaptorName, location, properties);
+		super(uniqueID, adaptorName, location, properties);
 
-        LOGGER.debug("Creating JobQueueScheduler for Adaptor {} with multiQThreads: {} and pollingDelay: {}", adaptorName, multiQThreads,
-                pollingDelay);
+		LOGGER.debug("Creating JobQueueScheduler for Adaptor {} with multiQThreads: {} and pollingDelay: {}", adaptorName, multiQThreads,
+				pollingDelay);
 
-        this.adaptorName = adaptorName;
-        this.filesystem = filesystem;
-        this.workingDirectory = workingDirectory;
-        this.factory = factory;
-        this.pollingDelay = pollingDelay;
+		this.adaptorName = adaptorName;
+		this.filesystem = filesystem;
+		this.workingDirectory = workingDirectory;
+		this.factory = factory;
+		this.pollingDelay = pollingDelay;
 
-        queues.add(singleQ);
-        queues.add(multiQ);
-        queues.add(unlimitedQ);
+		queues.add(singleQ);
+		queues.add(multiQ);
+		queues.add(unlimitedQ);
 
-        if (multiQThreads < 1) {
-            throw new BadParameterException(adaptorName, "Number of slots for the multi queue cannot be smaller than one!");
-        }
+		if (multiQThreads < 1) {
+			throw new BadParameterException(adaptorName, "Number of slots for the multi queue cannot be smaller than one!");
+		}
 
-        if (pollingDelay < MIN_POLLING_DELAY || pollingDelay > MAX_POLLING_DELAY) {
-            throw new BadParameterException(adaptorName, "Polling delay must be between " + MIN_POLLING_DELAY + " and "
-                    + MAX_POLLING_DELAY + "!");
-        }
+		if (pollingDelay < MIN_POLLING_DELAY || pollingDelay > MAX_POLLING_DELAY) {
+			throw new BadParameterException(adaptorName, "Polling delay must be between " + MIN_POLLING_DELAY + " and "
+					+ MAX_POLLING_DELAY + "!");
+		}
 
-        ThreadFactory threadFactory = new DaemonThreadFactory();
+		ThreadFactory threadFactory = new DaemonThreadFactory();
 
-        unlimitedExecutor = Executors.newCachedThreadPool(threadFactory);
-        singleExecutor = Executors.newSingleThreadExecutor(threadFactory);
-        multiExecutor = Executors.newFixedThreadPool(multiQThreads, threadFactory);
-    }
+		unlimitedExecutor = Executors.newCachedThreadPool(threadFactory);
+		singleExecutor = Executors.newSingleThreadExecutor(threadFactory);
+		multiExecutor = Executors.newFixedThreadPool(multiQThreads, threadFactory);
+	}
+	
+	public long getCurrentJobID() {
+		return jobID.get();
+	}
 
-    public long getCurrentJobID() {
-        return jobID.get();
-    }
+	private void getJobs(List<JobExecutor> list, List<String> out) {
+		for (JobExecutor e : list) {
+			out.add(e.getJobIdentifier());
+		}
+	}
 
-    private void getJobs(List<JobExecutor> list, List<String> out) {
-        for (JobExecutor e : list) {
-            out.add(e.getJobIdentifier());
-        }
-    }
+	public String getDefaultQueueName() throws XenonException {
+		return SINGLE_QUEUE_NAME;
+	}
 
-    public String getDefaultQueueName() throws XenonException {
-        return SINGLE_QUEUE_NAME;
-    }
+	public String[] getJobs(String... queueNames) throws NoSuchQueueException {
 
-    public String[] getJobs(String... queueNames) throws NoSuchQueueException {
+		LOGGER.debug("{}: getJobs for queues {}", adaptorName, queueNames);
 
-        LOGGER.debug("{}: getJobs for queues {}", adaptorName, queueNames);
+		LinkedList<String> out = new LinkedList<>();
 
-        LinkedList<String> out = new LinkedList<>();
+		if (queueNames == null || queueNames.length == 0) {
+			getJobs(singleQ, out);
+			getJobs(multiQ, out);
+			getJobs(unlimitedQ, out);
+		} else {
+			for (String name : queueNames) {
+				if (SINGLE_QUEUE_NAME.equals(name)) {
+					getJobs(singleQ, out);
+				} else if (MULTI_QUEUE_NAME.equals(name)) {
+					getJobs(multiQ, out);
+				} else if (UNLIMITED_QUEUE_NAME.equals(name)) {
+					getJobs(unlimitedQ, out);
+				} else {
+					throw new NoSuchQueueException(adaptorName, "Queue \"" + name + "\" does not exist");
+				}
+			}
+		}
 
-        if (queueNames == null || queueNames.length == 0) {
-            getJobs(singleQ, out);
-            getJobs(multiQ, out);
-            getJobs(unlimitedQ, out);
-        } else {
-            for (String name : queueNames) {
-                if (SINGLE_QUEUE_NAME.equals(name)) {
-                    getJobs(singleQ, out);
-                } else if (MULTI_QUEUE_NAME.equals(name)) {
-                    getJobs(multiQ, out);
-                } else if (UNLIMITED_QUEUE_NAME.equals(name)) {
-                    getJobs(unlimitedQ, out);
-                } else {
-                    throw new NoSuchQueueException(adaptorName, "Queue \"" + name + "\" does not exist");
-                }
-            }
-        }
+		LOGGER.debug("{}: getJobs for queues {} returns {}", adaptorName, queueNames, out);
 
-        LOGGER.debug("{}: getJobs for queues {} returns {}", adaptorName, queueNames, out);
+		return out.toArray(new String[out.size()]);
+	}
 
-        return out.toArray(new String[out.size()]);
-    }
+	//    private List<JobExecutor> findQueue(String queueName) throws XenonException {
+	//
+	//        if (queueName == null || SINGLE_QUEUE_NAME.equals(queueName)) {
+	//            return singleQ;
+	//        } else if (MULTI_QUEUE_NAME.equals(queueName)) {
+	//            return multiQ;
+	//        } else if (UNLIMITED_QUEUE_NAME.equals(queueName)) {
+	//            return unlimitedQ;
+	//        } else {
+	//            throw new XenonException(adaptorName, "Queue \"" + queueName + "\" does not exist!");
+	//        }
+	//    }
 
-    //    private List<JobExecutor> findQueue(String queueName) throws XenonException {
-    //
-    //        if (queueName == null || SINGLE_QUEUE_NAME.equals(queueName)) {
-    //            return singleQ;
-    //        } else if (MULTI_QUEUE_NAME.equals(queueName)) {
-    //            return multiQ;
-    //        } else if (UNLIMITED_QUEUE_NAME.equals(queueName)) {
-    //            return unlimitedQ;
-    //        } else {
-    //            throw new XenonException(adaptorName, "Queue \"" + queueName + "\" does not exist!");
-    //        }
-    //    }
+	private JobExecutor findJob(List<JobExecutor> queue, String jobIdentifier) throws XenonException {
 
-    private JobExecutor findJob(List<JobExecutor> queue, String jobIdentifier) throws XenonException {
+		LOGGER.debug("{}: findJob for job {}", adaptorName, jobIdentifier);
 
-        LOGGER.debug("{}: findJob for job {}", adaptorName, jobIdentifier);
+		for (JobExecutor e : queue) {
+			if (jobIdentifier.equals(e.getJobIdentifier())) {
+				return e;
+			}
+		}
 
-        for (JobExecutor e : queue) {
-            if (jobIdentifier.equals(e.getJobIdentifier())) {
-                return e;
-            }
-        }
+		return null;
+	}
 
-        return null;
-    }
+	private JobExecutor findJob(String jobIdentifier) throws XenonException {
 
-    private JobExecutor findJob(String jobIdentifier) throws XenonException {
+		LOGGER.debug("{}: findJob for job {}", adaptorName, jobIdentifier);
 
-        LOGGER.debug("{}: findJob for job {}", adaptorName, jobIdentifier);
+		assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
+		
+		JobExecutor e = null;
 
-        assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
+		for (List<JobExecutor> queue : queues) { 
+			e = findJob(queue, jobIdentifier);
 
-        JobExecutor e = null;
+			if (e != null) { 
+				return e;
+			}
+		}
 
-        for (List<JobExecutor> queue : queues) {
-            e = findJob(queue, jobIdentifier);
+		throw new NoSuchJobException(adaptorName, "Job " + jobIdentifier + " does not exist!");
+	}
 
-            if (e != null) {
-                return e;
-            }
-        }
+	private boolean cleanupJob(List<JobExecutor> queue, String jobIdentifier) {
 
-        throw new NoSuchJobException(adaptorName, "Job " + jobIdentifier + " does not exist!");
-    }
+		LOGGER.debug("{}: cleanupJob for job {}", adaptorName, jobIdentifier);
 
-    private boolean cleanupJob(List<JobExecutor> queue, String jobIdentifier) {
+		Iterator<JobExecutor> itt = queue.iterator();
 
-        LOGGER.debug("{}: cleanupJob for job {}", adaptorName, jobIdentifier);
+		while (itt.hasNext()) {
+			JobExecutor e = itt.next();
 
-        Iterator<JobExecutor> itt = queue.iterator();
+			if (e.getJobIdentifier().equals(jobIdentifier)) {
+				itt.remove();
+				return true;
+			}
+		}
 
-        while (itt.hasNext()) {
-            JobExecutor e = itt.next();
+		return false;
+	}
 
-            if (e.getJobIdentifier().equals(jobIdentifier)) {
-                itt.remove();
-                return true;
-            }
-        }
+	private void cleanupJob(String jobIdentifier) {
 
-        return false;
-    }
-
-    private void cleanupJob(String jobIdentifier) {
-
-        for (List<JobExecutor> queue : queues) {
-            if (cleanupJob(queue, jobIdentifier)) {
-                return;
-            }
-        }
-    }
+		for (List<JobExecutor> queue : queues) { 
+			if (cleanupJob(queue, jobIdentifier)) { 
+				return;
+			}
+		}
+	}
 
 
-    public JobStatus getJobStatus(String jobIdentifier) throws XenonException {
-        LOGGER.debug("{}: getJobStatus for job {}", adaptorName, jobIdentifier);
+	public JobStatus getJobStatus(String jobIdentifier) throws XenonException {
+		LOGGER.debug("{}: getJobStatus for job {}", adaptorName, jobIdentifier);
+		
+		JobStatus status = findJob(jobIdentifier).getStatus();
 
-        JobStatus status = findJob(jobIdentifier).getStatus();
+		if (status.isDone()) {
+			cleanupJob(jobIdentifier);
+		}
 
-        if (status.isDone()) {
-            cleanupJob(jobIdentifier);
-        }
+		return status;
+	}
 
-        return status;
-    }
-
-//    public JobStatus[] getJobStatuses(String... jobs) {
+//	public JobStatus[] getJobStatuses(String... jobs) {
 //
-//        LOGGER.debug("{}: getJobStatuses for jobs {}", adaptorName, jobs);
+//		LOGGER.debug("{}: getJobStatuses for jobs {}", adaptorName, jobs);
 //
-//        JobStatus[] result = new JobStatus[jobs.length];
+//		JobStatus[] result = new JobStatus[jobs.length];
 //
-//        for (int i = 0; i < jobs.length; i++) {
-//            try {
-//                if (jobs[i] != null) {
-//                    result[i] = getJobStatus(jobs[i]);
-//                } else {
-//                    result[i] = null;
-//                }
-//            } catch (XenonException e) {
-//                result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, false, null);
-//            }
-//        }
+//		for (int i = 0; i < jobs.length; i++) {
+//			try {
+//				if (jobs[i] != null) {
+//					result[i] = getJobStatus(jobs[i]);
+//				} else {
+//					result[i] = null;
+//				}
+//			} catch (XenonException e) {
+//				result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, false, null);
+//			}
+//		}
 //
-//        return result;
-//    }
+//		return result;
+//	}
 
-    public JobStatus waitUntilDone(String jobIdentifier, long timeout) throws XenonException {
-        LOGGER.debug("{}: Waiting for job {} for {} ms.", adaptorName, jobIdentifier, timeout);
+	public JobStatus waitUntilDone(String jobIdentifier, long timeout) throws XenonException {
+		LOGGER.debug("{}: Waiting for job {} for {} ms.", adaptorName, jobIdentifier, timeout);
 
-        JobExecutor ex = findJob(jobIdentifier);
+		JobExecutor ex = findJob(jobIdentifier);
+		
+		assertPositive(timeout, "Illegal timeout ");
+		
+		JobStatus status = ex.waitUntilDone(timeout);
 
-        assertPositive(timeout, "Illegal timeout ");
+		if (status.isDone()) {
+			LOGGER.debug("{}: Job {} is done after {} ms.", adaptorName, jobIdentifier, timeout);
+			cleanupJob(jobIdentifier);
+		} else {
+			LOGGER.debug("{}: Job {} is NOT done after {} ms.", adaptorName, jobIdentifier, timeout);
+		}
 
-        JobStatus status = ex.waitUntilDone(timeout);
+		return status;
+	}
 
-        if (status.isDone()) {
-            LOGGER.debug("{}: Job {} is done after {} ms.", adaptorName, jobIdentifier, timeout);
-            cleanupJob(jobIdentifier);
-        } else {
-            LOGGER.debug("{}: Job {} is NOT done after {} ms.", adaptorName, jobIdentifier, timeout);
-        }
+	public JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException {
 
-        return status;
-    }
+		LOGGER.debug("{}: Waiting for job {} to start for {} ms.", adaptorName, jobIdentifier, timeout);
 
-    public JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException {
+		JobExecutor ex = findJob(jobIdentifier);
+		
+		assertPositive(timeout, "Illegal timeout ");
+		
+		JobStatus status = ex.waitUntilRunning(timeout);
 
-        LOGGER.debug("{}: Waiting for job {} to start for {} ms.", adaptorName, jobIdentifier, timeout);
+		if (status.isDone()) {
+			LOGGER.debug("{}: Job {} is done within {} ms.", adaptorName, jobIdentifier, timeout);
+			cleanupJob(jobIdentifier);
+		} else {
+			LOGGER.debug("{}: Job {} is NOT done after {} ms.", adaptorName, jobIdentifier, timeout);
+		}
 
-        JobExecutor ex = findJob(jobIdentifier);
+		return status;
+	}
 
-        assertPositive(timeout, "Illegal timeout ");
+	@SuppressWarnings("PMD.NPathComplexity")
+	private void verifyJobDescription(JobDescription description, boolean interactive) throws XenonException {
 
-        JobStatus status = ex.waitUntilRunning(timeout);
+		String queue = description.getQueueName();
 
-        if (status.isDone()) {
-            LOGGER.debug("{}: Job {} is done within {} ms.", adaptorName, jobIdentifier, timeout);
-            cleanupJob(jobIdentifier);
-        } else {
-            LOGGER.debug("{}: Job {} is NOT done after {} ms.", adaptorName, jobIdentifier, timeout);
-        }
+		if (queue == null) {
+			queue = SINGLE_QUEUE_NAME;
+			description.setQueueName(SINGLE_QUEUE_NAME);
+		}
 
-        return status;
-    }
+		if (!(SINGLE_QUEUE_NAME.equals(queue) || MULTI_QUEUE_NAME.equals(queue) || UNLIMITED_QUEUE_NAME.equals(queue))) {
+			throw new InvalidJobDescriptionException(adaptorName, "Queue " + queue + " not available locally!");
+		}
 
-    @SuppressWarnings("PMD.NPathComplexity")
-    private void verifyJobDescription(JobDescription description, boolean interactive) throws XenonException {
+		String executable = description.getExecutable();
 
-        String queue = description.getQueueName();
+		if (executable == null) {
+			throw new IncompleteJobDescriptionException(adaptorName, "Executable missing in JobDescription!");
+		}
 
-        if (queue == null) {
-            queue = SINGLE_QUEUE_NAME;
-            description.setQueueName(SINGLE_QUEUE_NAME);
-        }
+		int nodeCount = description.getNodeCount();
 
-        if (!(SINGLE_QUEUE_NAME.equals(queue) || MULTI_QUEUE_NAME.equals(queue) || UNLIMITED_QUEUE_NAME.equals(queue))) {
-            throw new InvalidJobDescriptionException(adaptorName, "Queue " + queue + " not available locally!");
-        }
+		if (nodeCount != 1) {
+			throw new InvalidJobDescriptionException(adaptorName, "Illegal node count: " + nodeCount);
+		}
 
-        String executable = description.getExecutable();
+		int processesPerNode = description.getProcessesPerNode();
 
-        if (executable == null) {
-            throw new IncompleteJobDescriptionException(adaptorName, "Executable missing in JobDescription!");
-        }
+		if (processesPerNode != 1) {
+			throw new InvalidJobDescriptionException(adaptorName, "Illegal processes per node count: " + processesPerNode);
+		}
 
-        int nodeCount = description.getNodeCount();
+		int maxTime = description.getMaxTime();
 
-        if (nodeCount != 1) {
-            throw new InvalidJobDescriptionException(adaptorName, "Illegal node count: " + nodeCount);
-        }
+		if (maxTime < 0) {
+			throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);
+		}
 
-        int processesPerNode = description.getProcessesPerNode();
+		if (interactive) {
 
-        if (processesPerNode != 1) {
-            throw new InvalidJobDescriptionException(adaptorName, "Illegal processes per node count: " + processesPerNode);
-        }
+			if (description.getStdin() != null) {
+				throw new InvalidJobDescriptionException(adaptorName, "Illegal stdin redirect for interactive job!");
+			}
 
-        int maxTime = description.getMaxTime();
+			if (description.getStdout() != null && !description.getStdout().equals("stdout.txt")) {
+				throw new InvalidJobDescriptionException(adaptorName, "Illegal stdout redirect for interactive job!");
+			}
 
-        if (maxTime < 0) {
-            throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);
-        }
+			if (description.getStderr() != null && !description.getStderr().equals("stderr.txt")) {
+				throw new InvalidJobDescriptionException(adaptorName, "Illegal stderr redirect for interactive job!");
+			}
+		}
+	}
 
-        if (interactive) {
+	private JobExecutor submit(JobDescription description, boolean interactive) throws XenonException {
 
-            if (description.getStdin() != null) {
-                throw new InvalidJobDescriptionException(adaptorName, "Illegal stdin redirect for interactive job!");
-            }
+		LOGGER.debug("{}: Submitting job", adaptorName);
 
-            if (description.getStdout() != null && !description.getStdout().equals("stdout.txt")) {
-                throw new InvalidJobDescriptionException(adaptorName, "Illegal stdout redirect for interactive job!");
-            }
+		verifyJobDescription(description, interactive);
 
-            if (description.getStderr() != null && !description.getStderr().equals("stderr.txt")) {
-                throw new InvalidJobDescriptionException(adaptorName, "Illegal stderr redirect for interactive job!");
-            }
-        }
-    }
+		String jobIdentifier = adaptorName + "-" + jobID.getAndIncrement();
 
-    private JobExecutor submit(JobDescription description, boolean interactive) throws XenonException {
+		LOGGER.debug("{}: Created Job {}", adaptorName, jobIdentifier);
 
-        LOGGER.debug("{}: Submitting job", adaptorName);
+		JobExecutor executor = new JobExecutor(adaptorName, filesystem, workingDirectory, factory, 
+				new JobDescription(description), jobIdentifier, interactive, pollingDelay);
 
-        verifyJobDescription(description, interactive);
+		String queueName = description.getQueueName();
 
-        String jobIdentifier = adaptorName + "-" + jobID.getAndIncrement();
+		LOGGER.debug("{}: Submitting job to queue {}", adaptorName, queueName);
 
-        LOGGER.debug("{}: Created Job {}", adaptorName, jobIdentifier);
+		// NOTE: the verifyJobDescription ensures that the queueName has a valid value!
+		if (UNLIMITED_QUEUE_NAME.equals(queueName)) {
+			unlimitedQ.add(executor);
+			unlimitedExecutor.execute(executor);
+		} else if (MULTI_QUEUE_NAME.equals(queueName)) {
+			multiQ.add(executor);
+			multiExecutor.execute(executor);
+		} else { // queueName must be SINGLE_QUEUE_NAME
+			singleQ.add(executor);
+			singleExecutor.execute(executor);
+		}
 
-        JobExecutor executor = new JobExecutor(adaptorName, filesystem, workingDirectory, factory,
-                new JobDescription(description), jobIdentifier, interactive, pollingDelay);
+		return executor;
+	}    
 
-        String queueName = description.getQueueName();
+	public String submitBatchJob(JobDescription description) throws XenonException {
+		return submit(description, false).getJobIdentifier();
+	}
 
-        LOGGER.debug("{}: Submitting job to queue {}", adaptorName, queueName);
+	public Streams submitInteractiveJob(JobDescription description) throws XenonException {
 
-        // NOTE: the verifyJobDescription ensures that the queueName has a valid value!
-        if (UNLIMITED_QUEUE_NAME.equals(queueName)) {
-            unlimitedQ.add(executor);
-            unlimitedExecutor.execute(executor);
-        } else if (MULTI_QUEUE_NAME.equals(queueName)) {
-            multiQ.add(executor);
-            multiExecutor.execute(executor);
-        } else { // queueName must be SINGLE_QUEUE_NAME
-            singleQ.add(executor);
-            singleExecutor.execute(executor);
-        }
+		JobExecutor executor = submit(description, true);
 
-        return executor;
-    }
+		LOGGER.debug("{}: Waiting for interactive job to start.", adaptorName);
 
-    public String submitBatchJob(JobDescription description) throws XenonException {
-        return submit(description, false).getJobIdentifier();
-    }
+		executor.waitUntilRunning(0);
 
-    public Streams submitInteractiveJob(JobDescription description) throws XenonException {
+		if (executor.isDone() && !executor.hasRun()) {
+			cleanupJob(executor.getJobIdentifier());
+			throw new XenonException(adaptorName, "Interactive job failed to start!", executor.getError());
+		}
 
-        JobExecutor executor = submit(description, true);
+		return executor.getStreams();
+	}
 
-        LOGGER.debug("{}: Waiting for interactive job to start.", adaptorName);
 
-        executor.waitUntilRunning(0);
+	public JobStatus cancelJob(String jobIdentifier) throws XenonException {
+		LOGGER.debug("{}: Cancel job {}", adaptorName, jobIdentifier);
 
-        if (executor.isDone() && !executor.hasRun()) {
-            cleanupJob(executor.getJobIdentifier());
-            throw new XenonException(adaptorName, "Interactive job failed to start!", executor.getError());
-        }
+		JobExecutor e = findJob(jobIdentifier);
+		
+		boolean killed = e.kill();
 
-        return executor.getStreams();
-    }
+		JobStatus status;
 
+		if (killed) {
+			status = e.getStatus();
+		} else {
+			status = e.waitUntilDone(pollingDelay);
+		}
 
-    public JobStatus cancelJob(String jobIdentifier) throws XenonException {
-        LOGGER.debug("{}: Cancel job {}", adaptorName, jobIdentifier);
+		if (status.isDone()) {
+			cleanupJob(jobIdentifier);
+		}
 
-        JobExecutor e = findJob(jobIdentifier);
+		return status;
+	}
 
-        boolean killed = e.kill();
+	public QueueStatus getQueueStatus(String queueName) throws XenonException {
 
-        JobStatus status;
+		LOGGER.debug("{}: getQueueStatus {}", adaptorName, queueName);
 
-        if (killed) {
-            status = e.getStatus();
-        } else {
-            status = e.waitUntilDone(pollingDelay);
-        }
+		if (queueName == null) {
+			throw new IllegalArgumentException("Adaptor " + adaptorName + ": Queue name is null!");
+		}
 
-        if (status.isDone()) {
-            cleanupJob(jobIdentifier);
-        }
+		if (SINGLE_QUEUE_NAME.equals(queueName)) {
+			return new QueueStatusImplementation(this, SINGLE_QUEUE_NAME, null, null);
+		} else if (MULTI_QUEUE_NAME.equals(queueName)) {
+			return new QueueStatusImplementation(this, MULTI_QUEUE_NAME, null, null);
+		} else if (UNLIMITED_QUEUE_NAME.equals(queueName)) {
+			return new QueueStatusImplementation(this, UNLIMITED_QUEUE_NAME, null, null);
+		} else {
+			throw new NoSuchQueueException(adaptorName, "No such queue: " + queueName);
+		}
+	}
 
-        return status;
-    }
+	public String [] getQueueNames() { 
+		return new String[] { SINGLE_QUEUE_NAME, MULTI_QUEUE_NAME, UNLIMITED_QUEUE_NAME };
+	}
 
-    public QueueStatus getQueueStatus(String queueName) throws XenonException {
+	public QueueStatus[] getQueueStatuses(String... queueNames) throws XenonException {
 
-        LOGGER.debug("{}: getQueueStatus {}", adaptorName, queueName);
+		String[] names = queueNames;
 
-        if (queueName == null) {
-            throw new IllegalArgumentException("Adaptor " + adaptorName + ": Queue name is null!");
-        }
+		if (names == null) {
+			throw new IllegalArgumentException("Adaptor " + adaptorName + ": Queue names are null!");
+		}
 
-        if (SINGLE_QUEUE_NAME.equals(queueName)) {
-            return new QueueStatusImplementation(this, SINGLE_QUEUE_NAME, null, null);
-        } else if (MULTI_QUEUE_NAME.equals(queueName)) {
-            return new QueueStatusImplementation(this, MULTI_QUEUE_NAME, null, null);
-        } else if (UNLIMITED_QUEUE_NAME.equals(queueName)) {
-            return new QueueStatusImplementation(this, UNLIMITED_QUEUE_NAME, null, null);
-        } else {
-            throw new NoSuchQueueException(adaptorName, "No such queue: " + queueName);
-        }
-    }
+		if (names.length == 0) {
+			names = new String[] { SINGLE_QUEUE_NAME, MULTI_QUEUE_NAME, UNLIMITED_QUEUE_NAME };
+		}
 
-    public String [] getQueueNames() {
-        return new String[] { SINGLE_QUEUE_NAME, MULTI_QUEUE_NAME, UNLIMITED_QUEUE_NAME };
-    }
+		QueueStatus[] result = new QueueStatus[names.length];
 
-    public QueueStatus[] getQueueStatuses(String... queueNames) throws XenonException {
+		for (int i = 0; i < names.length; i++) {
+			if (names[i] == null) { 
+				result[i] = null;
+			} else { 
+				try {
+					result[i] = getQueueStatus(names[i]);
+				} catch (XenonException e) {
+					result[i] = new QueueStatusImplementation(this, names[i], e, null);
+				}
+			}
+		}
 
-        String[] names = queueNames;
+		return result;
+	}
 
-        if (names == null) {
-            throw new IllegalArgumentException("Adaptor " + adaptorName + ": Queue names are null!");
-        }
+	//    public Streams getStreams(JobHandle job) throws XenonException {
+	//        checkScheduler(job.getScheduler());
+	//        return findJob(job).getStreams();
+	//    }
 
-        if (names.length == 0) {
-            names = new String[] { SINGLE_QUEUE_NAME, MULTI_QUEUE_NAME, UNLIMITED_QUEUE_NAME };
-        }
+	public void end() {
+		singleExecutor.shutdownNow();
+		multiExecutor.shutdownNow();
+		unlimitedExecutor.shutdownNow();
+	}
 
-        QueueStatus[] result = new QueueStatus[names.length];
+	@Override
+	public void close() throws XenonException {
+		factory.close();
+	}
 
-        for (int i = 0; i < names.length; i++) {
-            if (names[i] == null) {
-                result[i] = null;
-            } else {
-                try {
-                    result[i] = getQueueStatus(names[i]);
-                } catch (XenonException e) {
-                    result[i] = new QueueStatusImplementation(this, names[i], e, null);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    //    public Streams getStreams(JobHandle job) throws XenonException {
-    //        checkScheduler(job.getScheduler());
-    //        return findJob(job).getStreams();
-    //    }
-
-    public void end() {
-        singleExecutor.shutdownNow();
-        multiExecutor.shutdownNow();
-        unlimitedExecutor.shutdownNow();
-    }
-
-    @Override
-    public void close() throws XenonException {
-        factory.close();
-    }
-
-    @Override
-    public boolean isOpen() throws XenonException {
-        return factory.isOpen();
-    }
+	@Override
+	public boolean isOpen() throws XenonException {
+		return factory.isOpen();
+	}
 }

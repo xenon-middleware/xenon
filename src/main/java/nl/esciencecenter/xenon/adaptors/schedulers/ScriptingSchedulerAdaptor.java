@@ -21,8 +21,8 @@ import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 
 public abstract class ScriptingSchedulerAdaptor extends SchedulerAdaptor {
 
-    protected ScriptingSchedulerAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) {
-        super(name, description, locations,
-                ScriptingUtils.mergeValidProperties(properties, SshSchedulerAdaptor.VALID_PROPERTIES, LocalSchedulerAdaptor.VALID_PROPERTIES));
-    }
+	protected ScriptingSchedulerAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) {  
+		super(name, description, locations, 
+				ScriptingUtils.mergeValidProperties(properties, SshSchedulerAdaptor.VALID_PROPERTIES, LocalSchedulerAdaptor.VALID_PROPERTIES));
+	}	
 }

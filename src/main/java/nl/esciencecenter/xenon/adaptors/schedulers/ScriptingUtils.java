@@ -31,137 +31,137 @@ import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 public class ScriptingUtils {
 
-    public static boolean isLocal(String location) {
-        return (location == null || location.length() == 0 || location.equals("/"));
-    }
+	public static boolean isLocal(String location) { 
+		return (location == null || location.length() == 0 || location.equals("/"));
+	}
 
-    public static XenonPropertyDescription [] mergeValidProperties(XenonPropertyDescription[] ... prop) {
+	public static XenonPropertyDescription [] mergeValidProperties(XenonPropertyDescription[] ... prop) {
+		
+		if (prop == null || prop.length == 0) { 
+			return new XenonPropertyDescription[0];
+		}
+		
+		ArrayList<XenonPropertyDescription> tmp = new ArrayList<>();
+		
+		for (XenonPropertyDescription [] pa : prop) {
+			if (pa != null) { 
+				for (XenonPropertyDescription p : pa) {
+					tmp.add(p);
+				}
+			}
+		}
+		
+		return tmp.toArray(new XenonPropertyDescription[tmp.size()]);
+	}
+	
+//	public static XenonPropertyDescription [] mergeValidProperties(XenonPropertyDescription[] a, XenonPropertyDescription[] b) { 
+//		XenonPropertyDescription [] result = Arrays.copyOf(a, a.length + b.length);
+//		System.arraycopy(b, 0, result, a.length, b.length);
+//		return result;
+//	}
 
-        if (prop == null || prop.length == 0) {
-            return new XenonPropertyDescription[0];
-        }
+	public static XenonProperties getProperties(XenonPropertyDescription[] validProperties, String location, Map<String,String> properties) throws UnknownPropertyException, InvalidPropertyException { 
+		if (isLocal(location)) {
+			return new XenonProperties(mergeValidProperties(validProperties, LocalSchedulerAdaptor.VALID_PROPERTIES), properties);
+		} else {
+			return new XenonProperties(mergeValidProperties(validProperties, SshSchedulerAdaptor.VALID_PROPERTIES), properties);
+		}
+	}
 
-        ArrayList<XenonPropertyDescription> tmp = new ArrayList<>();
+	/**
+	 * Do some checks on a job description.
+	 * 
+	 * @param description
+	 *            the job description to check
+	 * @param adaptorName
+	 *            the name of the adaptor. Used when an exception is thrown
+	 * @throws IncompleteJobDescriptionException
+	 *             if the description is missing a mandatory value.
+	 * @throws InvalidJobDescriptionException
+	 *             if the description contains illegal values.
+	 */
+	public static void verifyJobDescription(JobDescription description, String adaptorName) throws XenonException {
+		String executable = description.getExecutable();
 
-        for (XenonPropertyDescription [] pa : prop) {
-            if (pa != null) {
-                for (XenonPropertyDescription p : pa) {
-                    tmp.add(p);
-                }
-            }
-        }
+		if (executable == null) {
+			throw new IncompleteJobDescriptionException(adaptorName, "Executable missing in JobDescription!");
+		}
 
-        return tmp.toArray(new XenonPropertyDescription[tmp.size()]);
-    }
+		int nodeCount = description.getNodeCount();
 
-//    public static XenonPropertyDescription [] mergeValidProperties(XenonPropertyDescription[] a, XenonPropertyDescription[] b) {
-//        XenonPropertyDescription [] result = Arrays.copyOf(a, a.length + b.length);
-//        System.arraycopy(b, 0, result, a.length, b.length);
-//        return result;
-//    }
+		if (nodeCount < 1) {
+			throw new InvalidJobDescriptionException(adaptorName, "Illegal node count: " + nodeCount);
+		}
 
-    public static XenonProperties getProperties(XenonPropertyDescription[] validProperties, String location, Map<String,String> properties) throws UnknownPropertyException, InvalidPropertyException {
-        if (isLocal(location)) {
-            return new XenonProperties(mergeValidProperties(validProperties, LocalSchedulerAdaptor.VALID_PROPERTIES), properties);
-        } else {
-            return new XenonProperties(mergeValidProperties(validProperties, SshSchedulerAdaptor.VALID_PROPERTIES), properties);
-        }
-    }
+		int processesPerNode = description.getProcessesPerNode();
 
-    /**
-     * Do some checks on a job description.
-     *
-     * @param description
-     *            the job description to check
-     * @param adaptorName
-     *            the name of the adaptor. Used when an exception is thrown
-     * @throws IncompleteJobDescriptionException
-     *             if the description is missing a mandatory value.
-     * @throws InvalidJobDescriptionException
-     *             if the description contains illegal values.
-     */
-    public static void verifyJobDescription(JobDescription description, String adaptorName) throws XenonException {
-        String executable = description.getExecutable();
+		if (processesPerNode < 1) {
+			throw new InvalidJobDescriptionException(adaptorName, "Illegal processes per node count: " + processesPerNode);
+		}
 
-        if (executable == null) {
-            throw new IncompleteJobDescriptionException(adaptorName, "Executable missing in JobDescription!");
-        }
+		int maxTime = description.getMaxTime();
 
-        int nodeCount = description.getNodeCount();
+		if (maxTime <= 0) {
+			throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);
+		}
+	}
 
-        if (nodeCount < 1) {
-            throw new InvalidJobDescriptionException(adaptorName, "Illegal node count: " + nodeCount);
-        }
+	public static void verifyJobOptions(Map<String, String> options, String[] validOptions, String adaptorName)
+			throws InvalidJobDescriptionException {
 
-        int processesPerNode = description.getProcessesPerNode();
+		//check if all given job options are valid
+		for (String option : options.keySet()) {
+			boolean found = false;
+			for (String validOption : validOptions) {
+				if (validOption.equals(option)) {
+					found = true;
+				}
+			}
+			if (!found) {
+				throw new InvalidJobDescriptionException(adaptorName, "Given Job option \"" + option + "\" not supported");
+			}
+		}
+	}
 
-        if (processesPerNode < 1) {
-            throw new InvalidJobDescriptionException(adaptorName, "Illegal processes per node count: " + processesPerNode);
-        }
+	/**
+	 * Check if the info map for a job exists, contains the expected job ID, and contains the given additional fields
+	 * 
+	 * @param jobInfo
+	 *            the map the job info should be .
+	 * @param job
+	 *            the job to check the presence for.
+	 * @param adaptorName
+	 *            name of the current adaptor for error reporting.
+	 * @param jobIDField
+	 *            the field which contains the job id.
+	 * @param additionalFields
+	 *            any additional fields to check the presence of.
+	 * @throws XenonException
+	 *             if any fields are missing or incorrect
+	 */
+	public static void verifyJobInfo(Map<String, String> jobInfo, String jobIdentifier, String adaptorName, String jobIDField,
+			String... additionalFields) throws XenonException {
+		if (jobInfo == null) {
+			//redundant check, calling functions usually already check for this and return null.
+			throw new XenonException(adaptorName, "Job " + jobIdentifier + " not found in job info");
+		}
 
-        int maxTime = description.getMaxTime();
+		String jobID = jobInfo.get(jobIDField);
 
-        if (maxTime <= 0) {
-            throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);
-        }
-    }
+		if (jobID == null) {
+			throw new XenonException(adaptorName, "Invalid job info. Info does not contain job id");
+		}
 
-    public static void verifyJobOptions(Map<String, String> options, String[] validOptions, String adaptorName)
-            throws InvalidJobDescriptionException {
+		if (!jobID.equals(jobIdentifier)) {
+			throw new XenonException(adaptorName, "Invalid job info. Found job id \"" + jobID + "\" does not match " + jobIdentifier);
+		}
 
-        //check if all given job options are valid
-        for (String option : options.keySet()) {
-            boolean found = false;
-            for (String validOption : validOptions) {
-                if (validOption.equals(option)) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                throw new InvalidJobDescriptionException(adaptorName, "Given Job option \"" + option + "\" not supported");
-            }
-        }
-    }
-
-    /**
-     * Check if the info map for a job exists, contains the expected job ID, and contains the given additional fields
-     *
-     * @param jobInfo
-     *            the map the job info should be .
-     * @param job
-     *            the job to check the presence for.
-     * @param adaptorName
-     *            name of the current adaptor for error reporting.
-     * @param jobIDField
-     *            the field which contains the job id.
-     * @param additionalFields
-     *            any additional fields to check the presence of.
-     * @throws XenonException
-     *             if any fields are missing or incorrect
-     */
-    public static void verifyJobInfo(Map<String, String> jobInfo, String jobIdentifier, String adaptorName, String jobIDField,
-            String... additionalFields) throws XenonException {
-        if (jobInfo == null) {
-            //redundant check, calling functions usually already check for this and return null.
-            throw new XenonException(adaptorName, "Job " + jobIdentifier + " not found in job info");
-        }
-
-        String jobID = jobInfo.get(jobIDField);
-
-        if (jobID == null) {
-            throw new XenonException(adaptorName, "Invalid job info. Info does not contain job id");
-        }
-
-        if (!jobID.equals(jobIdentifier)) {
-            throw new XenonException(adaptorName, "Invalid job info. Found job id \"" + jobID + "\" does not match " + jobIdentifier);
-        }
-
-        for (String field : additionalFields) {
-            if (!jobInfo.containsKey(field)) {
-                throw new XenonException(adaptorName, "Invalid job info. Info does not contain mandatory field \"" + field + "\"");
-            }
-        }
-    }
+		for (String field : additionalFields) {
+			if (!jobInfo.containsKey(field)) {
+				throw new XenonException(adaptorName, "Invalid job info. Info does not contain mandatory field \"" + field + "\"");
+			}
+		}
+	}
 
 
 

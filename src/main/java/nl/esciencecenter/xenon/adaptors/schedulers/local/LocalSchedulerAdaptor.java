@@ -34,15 +34,15 @@ import nl.esciencecenter.xenon.UnknownPropertyException;
 
 /**
  * LocalFiles implements an Xenon <code>Jobs</code> adaptor for local job operations.
- *
+ * 
  * @see nl.esciencecenter.xenon.jobs.Jobs
- *
+ * 
  * @version 1.0
  * @since 1.0
  */
 public class LocalSchedulerAdaptor extends SchedulerAdaptor {
-
-     /** Name of the local adaptor is defined in the engine. */
+    
+	 /** Name of the local adaptor is defined in the engine. */
     public static final String ADAPTOR_NAME = "local";
 
     /** Local properties start with this prefix. */
@@ -72,47 +72,47 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
 
     /** Local job information start with this prefix. */
     public static final String JOBS = INFO + "jobs.";
-
+    
     /** How many jobs have been submitted locally. */
     public static final String SUBMITTED = JOBS + "submitted";
-
+    
     /** The locations supported by the adaptor */
     public static final String [] ADAPTOR_LOCATIONS = new String [] { "(null)", "(empty string)", "local://" };
-
+    
     /** The properties supported by this adaptor */
-    public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {
-                    new XenonPropertyDescription(POLLING_DELAY, Type.INTEGER,
+    public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {  
+                    new XenonPropertyDescription(POLLING_DELAY, Type.INTEGER, 
                             "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
-                    new XenonPropertyDescription(MULTIQ_MAX_CONCURRENT, Type.INTEGER,
+                    new XenonPropertyDescription(MULTIQ_MAX_CONCURRENT, Type.INTEGER,  
                             "4", "The maximum number of concurrent jobs in the multiq.")
     };
-
+	
     public LocalSchedulerAdaptor() {
-        super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
+    	super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
     }
-
+        
     @Override
-    public boolean isEmbedded() {
-        // The local scheduler is embedded
-        return true;
-    }
+	public boolean isEmbedded() {
+		// The local scheduler is embedded
+		return true;
+	}
 
-    @Override
-    public boolean supportsInteractive() {
-        // The local scheduler supports interactive jobs
-        return true;
-    }
-
-
-    /**
-     * Check if a location string is valid for the local scheduler.
-     *
-     * The only valid options are null, "" or "local://".
-     *
+	@Override
+	public boolean supportsInteractive() { 
+		// The local scheduler supports interactive jobs
+		return true;
+	}
+	
+	
+    /** 
+     * Check if a location string is valid for the local scheduler. 
+     * 
+     * The only valid options are null, "" or "local://". 
+     * 
      * @param location
      *          the location to check.
      * @throws InvalidLocationException
-     *          if the location is invalid.
+     *          if the location is invalid.                   
      */
     private static void checkLocation(String location) throws InvalidLocationException {
         if (location == null || location.isEmpty() || location.equals("local://")) {
@@ -121,32 +121,32 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
 
         throw new InvalidLocationException(ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
     }
-
+	
     @Override
-    public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties)
+    public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
 
-        // Location should be: null, empty, or local://
-        checkLocation(location);
-
+    	// Location should be: null, empty, or local:// 
+    	checkLocation(location);
+         
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
         if (credential != null && !(credential instanceof DefaultCredential)) {
-            throw new InvalidCredentialException(ADAPTOR_NAME, "Local scheduler does not support this credential!");
+        	throw new InvalidCredentialException(ADAPTOR_NAME, "Local scheduler does not support this credential!");
         }
-
+        
         String filesystemlocation = "/";
         if (LocalUtil.isWindows()) {
             filesystemlocation = "c:";
         }
-
+        
         FileSystem filesystem = FileSystem.create("file", filesystemlocation, credential, properties);
-
+        
         int processors = Runtime.getRuntime().availableProcessors();
         int multiQThreads = xp.getIntegerProperty(MULTIQ_MAX_CONCURRENT, processors);
         int pollingDelay = xp.getIntegerProperty(POLLING_DELAY);
-
-        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, "local://", new LocalInteractiveProcessFactory(),
-                filesystem, filesystem.getEntryPath(), multiQThreads, pollingDelay, xp);
+        
+        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, "local://", new LocalInteractiveProcessFactory(), 
+        		filesystem, filesystem.getEntryPath(), multiQThreads, pollingDelay, xp);
     }
 }
