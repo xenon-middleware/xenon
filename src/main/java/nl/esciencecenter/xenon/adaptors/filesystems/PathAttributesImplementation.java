@@ -323,51 +323,7 @@ public class PathAttributesImplementation implements PathAttributes {
 		return permissions;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
 
-		PathAttributesImplementation that = (PathAttributesImplementation) o;
-
-		if (isDirectory != that.isDirectory) return false;
-		if (isRegular != that.isRegular) return false;
-		if (isSymbolicLink != that.isSymbolicLink) return false;
-		if (isOther != that.isOther) return false;
-		if (executable != that.executable) return false;
-		if (readable != that.readable) return false;
-		if (writable != that.writable) return false;
-		if (hidden != that.hidden) return false;
-		if (creationTime != that.creationTime) return false;
-		if (lastAccessTime != that.lastAccessTime) return false;
-		if (lastModifiedTime != that.lastModifiedTime) return false;
-		if (size != that.size) return false;
-		if (!path.equals(that.path)) return false;
-		if (owner != null ? !owner.equals(that.owner) : that.owner != null) return false;
-		if (group != null ? !group.equals(that.group) : that.group != null) return false;
-		return permissions != null ? permissions.equals(that.permissions) : that.permissions == null;
-	}
-
-	@Override
-	public int hashCode() {
-		int result = path.hashCode();
-		result = 31 * result + (isDirectory ? 1 : 0);
-		result = 31 * result + (isRegular ? 1 : 0);
-		result = 31 * result + (isSymbolicLink ? 1 : 0);
-		result = 31 * result + (isOther ? 1 : 0);
-		result = 31 * result + (executable ? 1 : 0);
-		result = 31 * result + (readable ? 1 : 0);
-		result = 31 * result + (writable ? 1 : 0);
-		result = 31 * result + (hidden ? 1 : 0);
-		result = 31 * result + (int) (creationTime ^ (creationTime >>> 32));
-		result = 31 * result + (int) (lastAccessTime ^ (lastAccessTime >>> 32));
-		result = 31 * result + (int) (lastModifiedTime ^ (lastModifiedTime >>> 32));
-		result = 31 * result + (int) (size ^ (size >>> 32));
-		result = 31 * result + (owner != null ? owner.hashCode() : 0);
-		result = 31 * result + (group != null ? group.hashCode() : 0);
-		result = 31 * result + (permissions != null ? permissions.hashCode() : 0);
-		return result;
-	}
 
 	public void setPermissions(Set<PosixFilePermission> permissions) {
 		this.permissions = permissions;

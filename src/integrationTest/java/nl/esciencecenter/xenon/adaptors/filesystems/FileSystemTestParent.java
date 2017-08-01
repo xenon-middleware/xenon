@@ -74,8 +74,10 @@ public abstract class FileSystemTestParent {
         assertNotNull(root);
         
         testRoot = root.resolve(TEST_DIR);
+
+        assertNotNull(testRoot);
         
-        //System.out.println("TEST_ROOT=" + testRoot);
+        System.out.println("TEST_ROOT=" + testRoot);
 
         fileSystem.createDirectory(testRoot);
 
