@@ -92,14 +92,28 @@ public abstract class FileSystem {
         return adaptor;
     }
 
+    /**
+     * Gives a list names of the available adaptors.
+     */
     public static String [] getAdaptorNames() {
         return adaptors.keySet().toArray(new String[adaptors.size()]);
     }
 
+    /**
+     * Gives the description of adaptor with the given name.
+     *
+     * @param adaptorName
+     *            the type of file system to connect to (e.g. "sftp" or "webdav")
+     * @throws UnknownAdaptorException
+     *          If the adaptor name is absent in {@link #getAdaptorNames()}.
+     */
     public static FileSystemAdaptorDescription getAdaptorDescription(String adaptorName) throws UnknownAdaptorException {
         return getAdaptorByName(adaptorName);
     }
 
+    /**
+     * Gives a list of the descriptions of the available adaptors.
+     */
     public static FileSystemAdaptorDescription [] getAdaptorDescriptions() {
         return adaptors.values().toArray(new FileSystemAdaptorDescription[adaptors.size()]);
     }
@@ -229,6 +243,8 @@ public abstract class FileSystem {
      *
      * @throws XenonException
      *             If the creation of the FileSystem failed.
+     * @throws IllegalArgumentException
+     *             If adaptor is null.
      */
     public static FileSystem create(String adaptor, String location, Credential credential, Map<String, String> properties)
             throws XenonException {
@@ -262,9 +278,10 @@ public abstract class FileSystem {
      *             If the location was invalid.
      * @throws InvalidCredentialException
      *             If the credential is invalid to access the location.
-     *
      * @throws XenonException
      *             If the creation of the FileSystem failed.
+     * @throws IllegalArgumentException
+     *             If adaptor is null.
      */
     public static FileSystem create(String adaptor, String location, Credential credential) throws XenonException {
         return create(adaptor, location, credential, new HashMap<>(0));
@@ -298,6 +315,8 @@ public abstract class FileSystem {
      *
      * @throws XenonException
      *             If the creation of the FileSystem failed.
+     * @throws IllegalArgumentException
+     *             If adaptor is null.
      */
     public static FileSystem create(String adaptor, String location) throws XenonException {
         return create(adaptor, location, new DefaultCredential());
@@ -332,6 +351,8 @@ public abstract class FileSystem {
      *
      * @throws XenonException
      *             If the creation of the FileSystem failed.
+     * @throws IllegalArgumentException
+     *             If adaptor is null.
      */
     public static FileSystem create(String adaptor) throws XenonException {
         return create(adaptor, null);
@@ -468,7 +489,7 @@ public abstract class FileSystem {
 	}
 
 	/**
-	 * Close this FileSystem.
+	 * Close this FileSystem. If the adaptor does not support closing this is a no-op.
 	 *
 	 * @throws XenonException
 	 *             If the FileSystem failed to close or if an I/O error occurred.
@@ -482,7 +503,7 @@ public abstract class FileSystem {
 	}
 
 	/**
-	 * Return if the connection to the FileSystem is open.
+	 * Return if the connection to the FileSystem is open. An adaptor which does not support closing is always open.
 	 *
 	 * @throws XenonException
 	 *          if the test failed or an I/O error occurred.
