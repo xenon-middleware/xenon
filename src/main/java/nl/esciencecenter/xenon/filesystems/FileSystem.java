@@ -968,6 +968,7 @@ public abstract class FileSystem {
 				case IGNORE:
 					return;
 				case REPLACE:
+				    destinationFS.delete(destination,true);
 					// continue
 					break;
 			}

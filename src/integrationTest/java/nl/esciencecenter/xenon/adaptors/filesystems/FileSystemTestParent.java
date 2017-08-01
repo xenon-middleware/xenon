@@ -1317,6 +1317,76 @@ public abstract class FileSystemTestParent {
         assertContents(file4,data4);
     }
 
+
+    @Test (expected = PathAlreadyExistsException.class)
+    public void test_copy_target_directory_source_file_create() throws Throwable {
+        byte[] data = "Hello World!".getBytes();
+        byte[] data2 = "Party people!".getBytes();
+        byte[] data3 = "yes | rm -rf ".getBytes();
+        byte[] data4 = "Use Xenon!".getBytes();
+        generateAndCreateTestDir();
+        Path target = createTestSubDir(testDir);
+        Path subtarget = createTestSubDir(target);
+        Path file = createTestFile(subtarget, data3);
+        Path file2 = createTestFile(subtarget, data3);
+        Path file3 = createTestFile(subtarget, data3);
+        Path file4 = createTestFile(subtarget, data4);
+
+        Path source = createTestFile(testDir,data);
+
+        copySync(source,target,CopyMode.CREATE,true);
+
+
+    }
+
+
+    @Test
+    public void test_copy_target_directory_source_file_replace() throws Throwable {
+        byte[] data = "Hello World!".getBytes();
+        byte[] data2 = "Party people!".getBytes();
+        byte[] data3 = "yes | rm -rf ".getBytes();
+        byte[] data4 = "Use Xenon!".getBytes();
+        generateAndCreateTestDir();
+        Path target = createTestSubDir(testDir);
+        Path subtarget = createTestSubDir(target);
+        Path file = createTestFile(subtarget, data3);
+        Path file2 = createTestFile(subtarget, data3);
+        Path file3 = createTestFile(subtarget, data3);
+        Path file4 = createTestFile(subtarget, data4);
+
+        Path source = createTestFile(testDir,data);
+
+        copySync(source,target,CopyMode.REPLACE,true);
+
+        assertContents(target,data);
+    }
+
+
+    @Test
+    public void test_copy_target_directory_source_file_ignore() throws Throwable {
+        byte[] data = "Hello World!".getBytes();
+        byte[] data2 = "Party people!".getBytes();
+        byte[] data3 = "yes | rm -rf ".getBytes();
+        byte[] data4 = "Use Xenon!".getBytes();
+        generateAndCreateTestDir();
+        Path target = createTestSubDir(testDir);
+        Path subtarget = createTestSubDir(target);
+        Path file = createTestFile(subtarget, data);
+        Path file2 = createTestFile(subtarget, data2);
+        Path file3 = createTestFile(subtarget, data3);
+        Path file4 = createTestFile(subtarget, data4);
+
+        Path source = createTestFile(testDir,data);
+
+        copySync(source,target,CopyMode.IGNORE,true);
+
+        assertContents(file,data);
+        assertContents(file2,data2);
+        assertContents(file3,data3);
+        assertContents(file4,data4);
+    }
+
+
     private void assertSameContentsDir(Path dir1, Path dir2) throws Exception{
         for(PathAttributes p : fileSystem.list(dir1, true)){
             Path sub = dir1.relativize(p.getPath());
