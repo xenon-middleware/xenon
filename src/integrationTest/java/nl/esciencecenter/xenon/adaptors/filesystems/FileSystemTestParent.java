@@ -129,6 +129,14 @@ public abstract class FileSystemTestParent {
         return testRoot.resolve(new Path(path));
     }
 
+    private void copySync(Path source, Path target, CopyMode mode, boolean recursive) throws Throwable{
+        String s = fileSystem.copy(source,fileSystem,target,mode,recursive);
+        CopyStatus status = fileSystem.waitUntilDone(s, 1000);
+        if(status.hasException()){
+            throw status.getException();
+        }
+    }
+
 
 
     private void throwUnexpected(String name, Throwable e) {
@@ -209,6 +217,10 @@ public abstract class FileSystemTestParent {
         
         System.out.println("CREATE TEST FILE: " + file);
 
+        return createNamedTestFile(file,data);
+    }
+
+    private Path createNamedTestFile(Path file, byte[] data) throws Exception {
         fileSystem.createFile(file);
 
         if (data != null && data.length > 0) {
@@ -1141,9 +1153,7 @@ public abstract class FileSystemTestParent {
         generateAndCreateTestDir();
         Path nonExistingSource = createNewTestFileName(testDir);
         Path target = createNewTestFileName(testDir);
-
-        String s = fileSystem.copy(nonExistingSource,fileSystem, target, CopyMode.CREATE, true);
-        waitUntilDoneException(s);
+        copySync(nonExistingSource,target,CopyMode.CREATE,true);
     }
 
 
@@ -1154,8 +1164,7 @@ public abstract class FileSystemTestParent {
         Path target = createNewTestFileName(testDir);
         Path dir0 = createTestSubDir(testDir);
 
-        String s = fileSystem.copy(dir0, fileSystem, target, CopyMode.CREATE,false);
-        waitUntilDoneException(s);
+        copySync(dir0,target,CopyMode.CREATE,false);
     }
 
     @Test
@@ -1164,18 +1173,10 @@ public abstract class FileSystemTestParent {
         generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, data);
         Path file1 = createNewTestFileName(testDir);
-        String s = fileSystem.copy(file0, fileSystem,file1, CopyMode.CREATE, false);
-        waitUntilDoneException(s);
+        copySync(file0,file1,CopyMode.CREATE,false);
         assertSameContents(file0,file1);
     }
 
-    private void waitUntilDoneException(String s) throws Throwable{
-        CopyStatus status = fileSystem.waitUntilDone(s,1000);
-        if(status.hasException()){
-            throw status.getException();
-        }
-
-    }
 
     @Test (expected = PathAlreadyExistsException.class)
     public void test_copy_existingTarget_throwsException() throws Throwable {
@@ -1183,47 +1184,43 @@ public abstract class FileSystemTestParent {
         generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, data);
         Path file1 = createTestFile(testDir,null);
-        String status = fileSystem.copy(file0, fileSystem,file1, CopyMode.CREATE, false);
-        waitUntilDoneException(status);
+        copySync(file0,file1,CopyMode.CREATE,false);
     }
 
     @Test
-    public void test_copy_existingTarget_replace() throws Exception {
+    public void test_copy_existingTarget_replace() throws Throwable {
         byte[] data = "Hello World!".getBytes();
         byte[] data2 = "Something else!".getBytes();
         generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, data);
         Path file1 = createTestFile(testDir,data2);
-        String copyId = fileSystem.copy(file0, fileSystem,file1, CopyMode.REPLACE, false);
-        fileSystem.waitUntilDone(copyId,1000);
+        copySync(file0,file1,CopyMode.REPLACE,false);
         assertSameContents(file0,file1);
     }
 
     @Test
-    public void test_copy_existingTarget_ignore() throws Exception {
+    public void test_copy_existingTarget_ignore() throws Throwable {
         byte[] data = "Hello World!".getBytes();
         byte[] data2 = "Something else!".getBytes();
         generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, data);
         Path file1 = createTestFile(testDir,data2);
-        String copyId = fileSystem.copy(file0, fileSystem,file1, CopyMode.IGNORE, false);
-        fileSystem.waitUntilDone(copyId,1000);
+        copySync(file0,file1,CopyMode.IGNORE,false);
         assertContents(file1,data2);
     }
 
     @Test
-    public void test_copy() throws Exception {
+    public void test_copy() throws Throwable {
         byte[] data = "Hello World!".getBytes();
         generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, data);
         Path file1 = createNewTestFileName(testDir);
-        String copyId = fileSystem.copy(file0, fileSystem,file1, CopyMode.CREATE, false);
-        fileSystem.waitUntilDone(copyId,1000);
+        copySync(file0,file1,CopyMode.CREATE,false);
         assertSameContents(file0,file1);
     }
 
     @Test
-    public void test_copy_rec() throws Exception {
+    public void test_copy_rec() throws Throwable {
         byte[] data = "Hello World!".getBytes();
         byte[] data2 = "Party people!".getBytes();
         byte[] data3 = "yes | rm -rf ".getBytes();
@@ -1242,9 +1239,82 @@ public abstract class FileSystemTestParent {
         createTestFile(testSubSub,data4);
         
         Path target = createTestSubDir(testDir);
-        String copyId = fileSystem.copy(source, fileSystem,target, CopyMode.CREATE, true);
-        fileSystem.waitUntilDone(copyId,10000);
+        copySync(source,target,CopyMode.CREATE,true);
         assertSameContentsDir(source,target);
+    }
+
+    @Test (expected = PathAlreadyExistsException.class)
+    public void test_copy_rec_create() throws Throwable {
+        byte[] data = "Hello World!".getBytes();
+        byte[] data2 = "Party people!".getBytes();
+        byte[] data3 = "yes | rm -rf ".getBytes();
+        byte[] data4 = "Use Xenon!".getBytes();
+        generateAndCreateTestDir();
+        Path target = createTestSubDir(testDir);
+        Path source = createTestSubDir(testDir);
+        Path file = createTestFile(target, data3);
+        Path file2 = createTestFile(target, data3);
+        Path file3 = createTestFile(target, data3);
+        Path file4 = createTestFile(target, data4);
+
+        Path srcFile = createNamedTestFile(source.resolve(file.getFileName()),data);
+        Path srcFile2 = createNamedTestFile(source.resolve(file2.getFileName()),data2);
+
+        copySync(source,target,CopyMode.CREATE,true);
+    }
+
+    @Test
+    public void test_copy_rec_replace() throws Throwable {
+        byte[] data = "Hello World!".getBytes();
+        byte[] data2 = "Party people!".getBytes();
+        byte[] data3 = "yes | rm -rf ".getBytes();
+        byte[] data4 = "Use Xenon!".getBytes();
+        generateAndCreateTestDir();
+        Path target = createTestSubDir(testDir);
+        Path subtarget = createTestSubDir(target);
+        Path source = createTestSubDir(testDir);
+        Path subsource = source.resolve(subtarget.getFileName());
+        fileSystem.createDirectory(subsource);
+        Path file = createTestFile(subtarget, data3);
+        Path file2 = createTestFile(subtarget, data3);
+        Path file3 = createTestFile(subtarget, data3);
+        Path file4 = createTestFile(subtarget, data4);
+
+        Path srcFile = createNamedTestFile(subsource.resolve(file.getFileName()),data);
+        Path srcFile2 = createNamedTestFile(subsource.resolve(file2.getFileName()),data2);
+
+        copySync(source,target,CopyMode.REPLACE,true);
+        assertContents(file,data);
+        assertContents(file2,data2);
+        assertContents(file3,data3);
+        assertContents(file4,data4);
+    }
+
+    @Test
+    public void test_copy_rec_ignore() throws Throwable {
+        byte[] data = "Hello World!".getBytes();
+        byte[] data2 = "Party people!".getBytes();
+        byte[] data3 = "yes | rm -rf ".getBytes();
+        byte[] data4 = "Use Xenon!".getBytes();
+        generateAndCreateTestDir();
+        Path target = createTestSubDir(testDir);
+        Path subtarget = createTestSubDir(target);
+        Path source = createTestSubDir(testDir);
+        Path subsource = source.resolve(subtarget.getFileName());
+        fileSystem.createDirectory(subsource);
+        Path file = createTestFile(subtarget, data3);
+        Path file2 = createTestFile(subtarget, data3);
+        Path file3 = createTestFile(subtarget, data3);
+        Path file4 = createTestFile(subtarget, data4);
+
+        Path srcFile = createNamedTestFile(subsource.resolve(file.getFileName()),data);
+        Path srcFile2 = createNamedTestFile(subsource.resolve(file2.getFileName()),data2);
+
+        copySync(source,target,CopyMode.IGNORE,true);
+        assertContents(file,data3);
+        assertContents(file2,data3);
+        assertContents(file3,data3);
+        assertContents(file4,data4);
     }
 
     private void assertSameContentsDir(Path dir1, Path dir2) throws Exception{
