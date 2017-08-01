@@ -15,6 +15,9 @@
  */
 package nl.esciencecenter.xenon.filesystems;
 
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.NotConnectedException;
+
 /**
  * CopyStatus contains status information for a specific copy operation.
  */
@@ -40,6 +43,23 @@ public interface CopyStatus {
 	 * @return the exception.
 	 */
 	Throwable getException();
+
+
+	/**
+	 * Throws the exception that occured during copying, if it exists. Otherwise continue.
+	 *
+	 * @throws PathAlreadyExistsException
+	 *            If the target already exists and the mode is {@link CopyMode#CREATE}.
+	 * @throws CopyCancelledException
+	 *				If the copy was cancelled via {@link FileSystem#cancel(String)}
+	 * @throws NoSuchPathException
+	 *          If the source does not exist or the target's parent does not exist
+     * @throws NotConnectedException
+     *             If file system is closed.
+     * @throws XenonException
+     *          if an I/O error occurred.
+	 */
+	void maybeThrowException() throws XenonException;
 
 	/**
 	 * Is the Copy still running?
