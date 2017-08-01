@@ -100,7 +100,7 @@ public abstract class FileSystem {
     }
 
     /**
-     * Gives the description of adaptor with the given name.
+     * Gives the description of the adaptor with the given name.
      *
      * @param adaptorName
      *            the type of file system to connect to (e.g. "sftp" or "webdav")
