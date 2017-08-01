@@ -164,10 +164,10 @@ public class SlurmScheduler extends ScriptingScheduler {
 
     private String findInteractiveJobInMap(Map<String, Map<String, String>> queueInfo, String tag, String interactiveJobID) {
 
-        //find job with "tag" as a comment in the job info
+        //find job with "tag" as a job name in the job info. NAME is produced by squeue, JobName by sacct
         for (Map.Entry<String, Map<String, String>> entry : queueInfo.entrySet()) {
-            if (entry.getValue().containsKey("COMMENT") && entry.getValue().get("COMMENT").equals(tag) ||
-                entry.getValue().containsKey("Comment") && entry.getValue().get("Comment").equals(tag)) {
+            if (entry.getValue().containsKey("NAME") && entry.getValue().get("NAME").equals(tag) ||
+                entry.getValue().containsKey("JobName") && entry.getValue().get("JobName").equals(tag)) {
 
                 String jobID = entry.getKey();
 

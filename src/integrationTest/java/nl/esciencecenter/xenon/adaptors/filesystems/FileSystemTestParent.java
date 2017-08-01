@@ -37,26 +37,24 @@ import nl.esciencecenter.xenon.utils.OutputReader;
 import org.junit.rules.Timeout;
 
 public abstract class FileSystemTestParent {
-	
-	public static final String TEST_DIR = "xenon_test";
-    
+
+    public static final String TEST_DIR = "xenon_test";
+
     private Path testRoot;
-    
+
     private FileSystem fileSystem;
     private FileSystemAdaptorDescription description;
     private LocationConfig locationConfig;
     private Path testDir;
 
     private static long counter = 0;
-    
-    private static long getNextCounter() { 
-    	return counter++;
-    }
 
+    private static long getNextCounter() { 
+        return counter++;
+    }
 
     @Rule
     public Timeout globalTimeout = Timeout.seconds(10); // 10 seconds max per method tested
-
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -66,22 +64,22 @@ public abstract class FileSystemTestParent {
         fileSystem = setupFileSystem();
         description = setupDescription();
         locationConfig = setupLocationConfig(fileSystem);
-        
-        Path root = locationConfig.getWritableTestDir();
-        
-        //System.out.println("ROOT=" + root);
-        
-        assertNotNull(root);
-        
-        testRoot = root.resolve(TEST_DIR);
 
+        Path root = locationConfig.getWritableTestDir();
+
+        //System.out.println("ROOT=" + root);
+
+        assertNotNull(root);
+
+        testRoot = root.resolve(TEST_DIR);
+        
         assertNotNull(testRoot);
         
-        System.out.println("TEST_ROOT=" + testRoot);
+        //System.out.println("TEST_ROOT=" + testRoot);
 
         fileSystem.createDirectory(testRoot);
 
-        
+
         testDir = null;
     }
 
@@ -90,10 +88,10 @@ public abstract class FileSystemTestParent {
     @After
     public void cleanup() throws XenonException {
         try {
-        	if (!fileSystem.isOpen()) { 
-        		return;
-        	}
-        	
+            if (!fileSystem.isOpen()) { 
+                return;
+            }
+
             if (testRoot != null && fileSystem.exists(testRoot)) {
                 fileSystem.delete(testRoot, true);
             }
@@ -121,8 +119,8 @@ public abstract class FileSystemTestParent {
 
     @Test
     public void readSymbolicLink_linkToExistingFile_targetMatches() throws XenonException {
-    	assumeTrue("Does not support reading of symlinks", description.canReadSymboliclinks());
-    	Map.Entry<Path, Path> linkTarget = locationConfig.getSymbolicLinksToExistingFile();
+        assumeTrue("Does not support reading of symlinks", description.canReadSymboliclinks());
+        Map.Entry<Path, Path> linkTarget = locationConfig.getSymbolicLinksToExistingFile();
         Path target = fileSystem.readSymbolicLink(linkTarget.getKey());
         Path expectedTarget = linkTarget.getValue();
         assertEquals(target, expectedTarget);
@@ -144,31 +142,31 @@ public abstract class FileSystemTestParent {
     }
 
     private String generateTestDirName() throws XenonException {
-    	return "dir" + getNextCounter();
+        return "dir" + getNextCounter();
     }
 
     private String generateTestFileName() throws XenonException {
-    	return "file" + getNextCounter();
+        return "file" + getNextCounter();
     }
 
     // Depends on: Path.resolve, RelativePath, exists
-//    private Path createNewTestDirName(Path root) throws XenonException {
-//        Path dir = resolve("dir" + getNextCounter());
-//        
-//        assertFalse("Generated test dir already exists! " + dir, fileSystem.exists(dir));
-//
-//        return dir;
-//    }
+    //    private Path createNewTestDirName(Path root) throws XenonException {
+    //        Path dir = resolve("dir" + getNextCounter());
+    //        
+    //        assertFalse("Generated test dir already exists! " + dir, fileSystem.exists(dir));
+    //
+    //        return dir;
+    //    }
 
     // Depends on: [createNewTestDirName], createDirectory, exists
-//    private Path createTestDir(Path root) throws Exception {
-//        Path dir = createNewTestDirName(root);
-//        fileSystem.createDirectory(dir);
-//
-//        assertTrue("Failed to generate test dir! " + dir, fileSystem.exists(dir));
-//
-//        return dir;
-//    }
+    //    private Path createTestDir(Path root) throws Exception {
+    //        Path dir = createNewTestDirName(root);
+    //        fileSystem.createDirectory(dir);
+    //
+    //        assertTrue("Failed to generate test dir! " + dir, fileSystem.exists(dir));
+    //
+    //        return dir;
+    //    }
 
     // Depends on: [createTestDir]
     protected void prepareTestDir(String testName) throws XenonException {
@@ -181,7 +179,7 @@ public abstract class FileSystemTestParent {
     // Depends on: Path.resolve, exists
     private Path createNewTestFileName(Path root) throws Exception {
         Path file = root.resolve( "file" + getNextCounter());
-        
+
         assertFalse("Generated NEW test file already exists! " + file, fileSystem.exists(file));
 
         return file;
@@ -193,7 +191,7 @@ public abstract class FileSystemTestParent {
         OutputStream out = null;
 
         try {
-        	out = fileSystem.writeToFile(testFile, data.length);
+            out = fileSystem.writeToFile(testFile, data.length);
 
             if (data != null) {
                 out.write(data);
@@ -210,6 +208,8 @@ public abstract class FileSystemTestParent {
     // Depends on: [createNewTestFileName], createFile, [writeData]
     protected Path createTestFile(Path root, byte[] data) throws Exception {
         Path file = createNewTestFileName(root);
+        
+        System.out.println("CREATE TEST FILE: " + file);
 
         fileSystem.createFile(file);
 
@@ -219,15 +219,15 @@ public abstract class FileSystemTestParent {
         return file;
     }
 
-//    // Depends on: exists, isDirectory, delete
-//    private void deleteTestFile(Path file) throws Exception {
-//        assertTrue("Cannot delete non-existing file: " + file, fileSystem.exists(file));
-//
-//        PathAttributes att = fileSystem.getAttributes(file);
-//        assertFalse("Cannot delete directory: " + file, att.isDirectory());
-//
-//        fileSystem.delete(file,false);
-//    }
+    //    // Depends on: exists, isDirectory, delete
+    //    private void deleteTestFile(Path file) throws Exception {
+    //        assertTrue("Cannot delete non-existing file: " + file, fileSystem.exists(file));
+    //
+    //        PathAttributes att = fileSystem.getAttributes(file);
+    //        assertFalse("Cannot delete directory: " + file, att.isDirectory());
+    //
+    //        fileSystem.delete(file,false);
+    //    }
 
     // Depends on: exists, isDirectory, delete
     protected void deleteTestDir(Path dir) throws Exception {
@@ -240,12 +240,12 @@ public abstract class FileSystemTestParent {
     }
 
     private void generateTestDir() throws XenonException { 
-    	testDir = resolve(generateTestDirName());    	
+        testDir = resolve(generateTestDirName());    	
     }
-    
+
     private void generateAndCreateTestDir() throws XenonException { 
-    	generateTestDir();
-    	fileSystem.createDirectories(testDir);    	
+        generateTestDir();
+        fileSystem.createDirectories(testDir);    	
     }
 
     private Path createTestSubDir(Path testDir) throws XenonException {
@@ -260,80 +260,80 @@ public abstract class FileSystemTestParent {
 
 
     // Tests to create directories
-    
+
     @Test
     public void test_exists_ok() throws Exception {
-    	assertTrue(fileSystem.exists(locationConfig.getExistingPath()));
+        assertTrue(fileSystem.exists(locationConfig.getExistingPath()));
     }
-  
+
     @Test
     public void test_exists_notExistsDir() throws Exception {
-    	assertFalse(fileSystem.exists(new Path("/foobar")));
+        assertFalse(fileSystem.exists(new Path("/foobar")));
     }
-      
+
     @Test(expected=IllegalArgumentException.class)
     public void test_createDirectory_null_throw() throws Exception {
-    	fileSystem.createDirectory(null);
+        fileSystem.createDirectory(null);
     }
-    
+
     @Test
     public void test_createDirectory_nonExisting_noThrow() throws Exception {
-    	generateAndCreateTestDir();
-    	assertTrue(fileSystem.exists(testDir));
-    	
+        generateAndCreateTestDir();
+        assertTrue(fileSystem.exists(testDir));
+
     }
 
     @Test(expected=PathAlreadyExistsException.class)
     public void createDirectory_existing_throw() throws Exception {
-    	generateAndCreateTestDir();
+        generateAndCreateTestDir();
         fileSystem.createDirectory(testDir);
     }
 
     @Test(expected=PathAlreadyExistsException.class)
     public void test_createDirectory_existingFile_throw() throws Exception {
-    	generateAndCreateTestDir();
+        generateAndCreateTestDir();
 
-    	String file = generateTestFileName();
-        
+        String file = generateTestFileName();
+
         Path tmp = testDir.resolve(file);
         fileSystem.createFile(tmp);
-        
+
         // Should fail!
         fileSystem.createDirectory(tmp);
     }
 
     @Test(expected=NoSuchPathException.class)
     public void test_createDirectory_nonExistingParent_throw() throws Exception {
-    	generateAndCreateTestDir();
-    	fileSystem.createDirectory(testDir.resolve(new Path("aap", "noot")));
+        generateAndCreateTestDir();
+        fileSystem.createDirectory(testDir.resolve(new Path("aap", "noot")));
     }
-    
-//    @Test(expected=XenonException.class)
-//    public void createDirectory_closedFileSystemIfSupported_throw() throws Exception {
-//        assumeFalse(description.isConnectionless());
-//        fileSystem.close();
-//        generateAndCreateTestDir();
-//    }
+
+    //    @Test(expected=XenonException.class)
+    //    public void createDirectory_closedFileSystemIfSupported_throw() throws Exception {
+    //        assumeFalse(description.isConnectionless());
+    //        fileSystem.close();
+    //        generateAndCreateTestDir();
+    //    }
 
 
     @Test(expected=IllegalArgumentException.class)
     public void test_createFile_null_throwsException() throws Exception {
-    	fileSystem.createFile(null);
+        fileSystem.createFile(null);
     }
 
     @Test
     public void test_createFile_nonExistingFile() throws Exception {
-    	generateAndCreateTestDir();
-    	Path file = testDir.resolve(generateTestFileName());    	
-    	fileSystem.createFile(file);
+        generateAndCreateTestDir();
+        Path file = testDir.resolve(generateTestFileName());    	
+        fileSystem.createFile(file);
     }
 
     @Test(expected=PathAlreadyExistsException.class)
     public void test_createFile_existingFile_throwsException() throws Exception {
-    	generateAndCreateTestDir();
-    	Path file = testDir.resolve(generateTestFileName());    	
-    	fileSystem.createFile(file);
-    	fileSystem.createFile(file);
+        generateAndCreateTestDir();
+        Path file = testDir.resolve(generateTestFileName());    	
+        fileSystem.createFile(file);
+        fileSystem.createFile(file);
     }
 
     @Test(expected=PathAlreadyExistsException.class)
@@ -346,10 +346,10 @@ public abstract class FileSystemTestParent {
 
     @Test(expected=NoSuchPathException.class)
     public void test_createFile_nonExistingParent_throwsException() throws Exception {
-    	generateAndCreateTestDir();
-    	Path dir = testDir.resolve(generateTestDirName());
-    	Path file = dir.resolve(generateTestFileName());    	
-    	fileSystem.createFile(file);
+        generateAndCreateTestDir();
+        Path dir = testDir.resolve(generateTestDirName());
+        Path file = dir.resolve(generateTestFileName());    	
+        fileSystem.createFile(file);
     }
 
     /* TODO: Fixme!
@@ -361,20 +361,20 @@ public abstract class FileSystemTestParent {
         fileSystem.close();
         fileSystem.createFile(file0);
     }
-    */
-    
+     */
+
     @Test
     public void test_readFromFile() throws Exception {
-    
-    	Path file = locationConfig.getExistingPath();
-    	
-    	OutputReader reader = new OutputReader(fileSystem.readFromFile(file));
 
-    	reader.waitUntilFinished();
-    	
-    	// System.out.println("READ: " + reader.getResultAsString());
-    	
-    	assertEquals("Hello World\n", reader.getResultAsString());    	
+        Path file = locationConfig.getExistingPath();
+
+        OutputReader reader = new OutputReader(fileSystem.readFromFile(file));
+
+        reader.waitUntilFinished();
+
+        // System.out.println("READ: " + reader.getResultAsString());
+
+        assertEquals("Hello World\n", reader.getResultAsString());    	
     }
 
 
@@ -478,16 +478,19 @@ public abstract class FileSystemTestParent {
         byte[] data2 = "Party people!".getBytes();
         byte[] data3 = "yes | rm -rf ".getBytes();
         byte[] data4 = "Use Xenon!".getBytes();
-        Path source = createTestSubDir(testDir);
-        Path file0 = createTestFile(source, data);
-        Path testSubDir = createTestSubDir(source);
 
+        Path source = createTestSubDir(testDir);
+        createTestFile(source, data);
+
+        Path testSubDir = createTestSubDir(source);
         Path testSubDir2 = createTestSubDir(source);
-        Path file1 = createTestFile(testSubDir2,data2);
-        Path file2 = createTestFile(testSubDir,data3);
+        createTestFile(testSubDir2,data2);
+        createTestFile(testSubDir,data3);
+
         Path testSubSub = createTestSubDir(testSubDir);
-        Path file3 = createTestFile(testSubSub,data4);
-        Path target = createTestSubDir(testDir);
+        createTestFile(testSubSub,data4);
+        createTestSubDir(testDir);
+
         Iterable<PathAttributes> pa = fileSystem.list(testDir,true);
         Iterator<PathAttributes> it1 = pa.iterator();
         Iterator<PathAttributes> it2 = pa.iterator();
@@ -508,17 +511,18 @@ public abstract class FileSystemTestParent {
             if(res.contains(p)){
                 throw new XenonException(fileSystem.getAdaptorName(),"Duplicate element in listing!");
             } else {
+                System.out.println("ADDING TO LIST: " + p);
                 res.add(p);
             }
         }
         return res;
     }
 
-    private void         assertListSetEqual(Set<PathAttributes> res, Set<PathAttributes> expected){
+    private void assertListSetEqual(Set<PathAttributes> res, Set<PathAttributes> expected){
         if(!res.equals(expected)){
-            Set superfluous = new HashSet(res);
+            Set<PathAttributes> superfluous = new HashSet<>(res);
             superfluous.removeAll(expected);
-            Set missing = new HashSet(expected);
+            Set<PathAttributes> missing = new HashSet<>(expected);
             missing.removeAll(res);
             String superfluousString;
             String missingString;
@@ -591,7 +595,7 @@ public abstract class FileSystemTestParent {
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
         Path subDir = createTestSubDir(testDir);
-        Path irrelevantFileInSubDir = createTestFile(subDir, null);
+        createTestFile(subDir, null);
         Set<PathAttributes> expected = new HashSet<>(7);
         expected.add(fileSystem.getAttributes(file0));
         expected.add(fileSystem.getAttributes(file1));
@@ -610,6 +614,7 @@ public abstract class FileSystemTestParent {
     @Test
     public void test_list_recursive_withSubDirs_listAll() throws Exception {
         generateAndCreateTestDir();
+        
         Path file0 = createTestFile(testDir, null);
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
@@ -635,26 +640,37 @@ public abstract class FileSystemTestParent {
         byte[] data2 = "Party people!".getBytes();
         byte[] data3 = "yes | rm -rf ".getBytes();
         byte[] data4 = "Use Xenon!".getBytes();
+        
         generateAndCreateTestDir();
+        
         Set<PathAttributes> list = new HashSet<>();
+        
         Path source = createTestSubDir(testDir);
         list.add(fileSystem.getAttributes(source));
+        
         Path file0 = createTestFile(source, data);
         list.add(fileSystem.getAttributes(file0));
+        
         Path testSubDir = createTestSubDir(source);
         list.add(fileSystem.getAttributes(testSubDir));
 
         Path testSubDir2 = createTestSubDir(source);
         list.add(fileSystem.getAttributes(testSubDir2));
+        
         Path file1 = createTestFile(testSubDir2,data2);
         list.add(fileSystem.getAttributes(file1));
+        
         Path file2 = createTestFile(testSubDir,data3);
         list.add(fileSystem.getAttributes(file2));
+        
         Path testSubSub = createTestSubDir(testSubDir);
         list.add(fileSystem.getAttributes(testSubSub));
+        
         Path file3 = createTestFile(testSubSub,data4);
         list.add(fileSystem.getAttributes(file3));
 
+        System.out.println("DONE CREATING!");
+        
         assertListSetEqual(listSet(testDir,true), list);
     }
 
@@ -688,8 +704,8 @@ public abstract class FileSystemTestParent {
         }
 
         if (!isWithinMargin(currentTime, result.getLastModifiedTime()) && result.getLastModifiedTime() != 0) {
-                throwWrong("test_getfileAttributes", "lastModifiedTime=" + currentTime,
-                        "lastModifiedTime=" + result.getLastModifiedTime());
+            throwWrong("test_getfileAttributes", "lastModifiedTime=" + currentTime,
+                    "lastModifiedTime=" + result.getLastModifiedTime());
 
         }
         if (!isWithinMargin(currentTime, result.getCreationTime()) && result.getCreationTime() != result.getLastModifiedTime()) {
@@ -1061,7 +1077,7 @@ public abstract class FileSystemTestParent {
         generateAndCreateTestDir();
 
         Path file = createNewTestFileName(testDir);
-        OutputStream out = fileSystem.appendToFile(file);
+        fileSystem.appendToFile(file);
     }
 
     @Test(expected = InvalidPathException.class)
@@ -1069,7 +1085,7 @@ public abstract class FileSystemTestParent {
         assumeTrue(description.canAppend());
         generateAndCreateTestDir();
         Path p = createTestSubDir(testDir);
-        OutputStream out = fileSystem.appendToFile(p);
+        fileSystem.appendToFile(p);
     }
 
 
@@ -1217,14 +1233,16 @@ public abstract class FileSystemTestParent {
         generateAndCreateTestDir();
 
         Path source = createTestSubDir(testDir);
-        Path file0 = createTestFile(source, data);
+        createTestFile(source, data);
         Path testSubDir = createTestSubDir(source);
 
         Path testSubDir2 = createTestSubDir(source);
-        Path file1 = createTestFile(testSubDir2,data2);
-        Path file2 = createTestFile(testSubDir,data3);
+        createTestFile(testSubDir2,data2);
+        createTestFile(testSubDir,data3);
+        
         Path testSubSub = createTestSubDir(testSubDir);
-        Path file3 = createTestFile(testSubSub,data4);
+        createTestFile(testSubSub,data4);
+        
         Path target = createTestSubDir(testDir);
         String copyId = fileSystem.copy(source, fileSystem,target, CopyMode.CREATE, true);
         fileSystem.waitUntilDone(copyId,10000);

@@ -334,7 +334,7 @@ public final class SlurmUtils {
         arguments.add("--quiet");
 
         //add a tag so we can find the job back in the queue later
-        arguments.add("--comment=" + tag.toString());
+        arguments.add("--job-name=" + tag.toString());
         
         //set working directory
         if (description.getWorkingDirectory() != null) {
