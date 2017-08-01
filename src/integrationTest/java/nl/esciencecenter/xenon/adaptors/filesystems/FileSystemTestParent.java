@@ -17,19 +17,15 @@ package nl.esciencecenter.xenon.adaptors.filesystems;
 
 
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.*;
 
+import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.filesystems.*;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 
 import nl.esciencecenter.xenon.XenonException;
@@ -86,7 +82,8 @@ public abstract class FileSystemTestParent {
     @After
     public void cleanup() throws XenonException {
         try {
-            if (!fileSystem.isOpen()) { 
+            if (!fileSystem.isOpen()) {
+                fileSystem = setupFileSystem();
                 return;
             }
 
@@ -209,10 +206,12 @@ public abstract class FileSystemTestParent {
         
         System.out.println("CREATE TEST FILE: " + file);
 
-        fileSystem.createFile(file);
+
 
         if (data != null && data.length > 0) {
             writeData(file, data);
+        } else {
+            fileSystem.createFile(file);
         }
         return file;
     }
@@ -401,6 +400,33 @@ public abstract class FileSystemTestParent {
         assertTrue(fileSystem.exists(file0));
     }
 
+    @Test
+    public void test_exists_existingDir_returnTrue() throws Exception {
+        generateAndCreateTestDir();
+
+        // test with non-existing file
+        Path file0 = createNewTestFileName(testDir);
+        assertTrue(fileSystem.exists(testDir));
+    }
+
+    @Test
+    public void test_exists_existingSymbolicLink_returnTrue() throws Exception {
+        generateAndCreateTestDir();
+
+        // test with non-existing file
+        Path file0 = createNewTestFileName(testDir);
+        Path link = createNewTestFileName(testDir);
+        fileSystem.createFile(file0);
+        fileSystem.createSymbolicLink(link,file0);
+        assertTrue(fileSystem.exists(link));
+    }
+
+    @Test
+    @Ignore("Dunno how to create other?")
+    public void test_exists_existingOther_returnTrue() throws Exception {
+
+    }
+
     @Test(expected=IllegalArgumentException.class)
     public void test_delete_nonRec_null_throwsException() throws Exception {
         fileSystem.delete(null,false);
@@ -419,6 +445,35 @@ public abstract class FileSystemTestParent {
         fileSystem.delete(nonExistent, false);
     }
 
+    @Test
+    public void test_delete_symlink() throws Exception {
+        assumeTrue(description.canCreateSymboliclinks());
+        generateAndCreateTestDir();
+        Path file = createNewTestFileName(testDir);
+        Path link = createNewTestFileName(testDir);
+        fileSystem.createFile(file);
+        fileSystem.createSymbolicLink(link,file);
+        fileSystem.delete(link,false);
+        assertTrue("Target not deleted", fileSystem.exists(file));
+        assertFalse("Link deleted", fileSystem.exists(link));
+    }
+
+
+    @Test
+    public void test_delete_dangling_symlink() throws Exception {
+        assumeTrue(description.canCreateSymboliclinks());
+        generateAndCreateTestDir();
+        Path file = createNewTestFileName(testDir);
+        Path link = createNewTestFileName(testDir);
+        fileSystem.createFile(file);
+        fileSystem.createSymbolicLink(link,file);
+        fileSystem.delete(file,false);
+
+        fileSystem.delete(link,false);
+
+        assertFalse("Target deleted", fileSystem.exists(file));
+        assertFalse("Link deleted", fileSystem.exists(link));
+    }
     @Test
     public void test_delete_existingFile() throws Exception {
         generateAndCreateTestDir();
@@ -468,6 +523,30 @@ public abstract class FileSystemTestParent {
         fileSystem.list(nonExistent,false);
     }
 
+
+    @Test(expected=InvalidPathException.class)
+    public void test_list_file_throwsException() throws Exception {
+        generateAndCreateTestDir();
+        Path file = createTestFile(testDir,null);
+        fileSystem.list(file,false);
+    }
+
+    @Test(expected=InvalidPathException.class)
+    public void test_list_symlinkToFile_throwsException() throws Exception {
+        generateAndCreateTestDir();
+        Path file = createTestFile(testDir,null);
+        Path link = createNewTestFileName(testDir);
+        fileSystem.createSymbolicLink(link,file);
+        fileSystem.list(link,false);
+    }
+
+    @Test(expected=InvalidPathException.class)
+    public void test_list_symlinkToDir_throwsException() throws Exception {
+        generateAndCreateTestDir();
+        Path link = createNewTestFileName(testDir);
+        fileSystem.createSymbolicLink(link,testDir);
+        fileSystem.list(link,false);
+    }
 
     @Test
     public void test_list_canIterateTwice() throws Exception{
@@ -1019,15 +1098,43 @@ public abstract class FileSystemTestParent {
     }
 
 
+    // TODO: not connected exceptions test for every function
+
+    @Test (expected = NotConnectedException.class)
+    public void test_readFromFile_closed_throwsException() throws Exception {
+        assumeFalse(description.isConnectionless());
+        fileSystem.close();
+        fileSystem.readFromFile(testDir);
+
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void test_writeToFile_nullPath_throwsException() throws Exception {
         fileSystem.writeToFile(null,0);
     }
 
-    @Test(expected = InvalidPathException.class)
+    @Test(expected = PathAlreadyExistsException.class)
+    public void test_writeToFile_existingFile_throwsException() throws Exception {
+        generateAndCreateTestDir();
+        Path file = createTestFile(testDir,null);
+
+        fileSystem.writeToFile(file,0);
+    }
+
+    @Test(expected = PathAlreadyExistsException.class)
     public void test_writeToFile_existingDir_throwsException() throws Exception {
         generateAndCreateTestDir();
         fileSystem.writeToFile(testDir,0);
+    }
+
+    @Test(expected = PathAlreadyExistsException.class)
+    public void test_writeToFile_symlinkToFile_throwsException() throws Exception {
+        assumeTrue(description.canCreateSymboliclinks());
+        generateAndCreateTestDir();
+        Path file = createTestFile(testDir,null);
+        Path link = createNewTestFileName(testDir);
+        fileSystem.createSymbolicLink(link,file);
+        fileSystem.writeToFile(link,0);
     }
 
 
@@ -1194,6 +1301,7 @@ public abstract class FileSystemTestParent {
         generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, data);
         Path file1 = createTestFile(testDir,data2);
+
         String copyId = fileSystem.copy(file0, fileSystem,file1, CopyMode.REPLACE, false);
         fileSystem.waitUntilDone(copyId,1000);
         assertSameContents(file0,file1);
@@ -1419,6 +1527,7 @@ public abstract class FileSystemTestParent {
 
     // TODO: Symbolic links in a cycle tests
     // TODO: Test asynchronous exceptions
+    // TODO: Test create symbolic link
 
 
 

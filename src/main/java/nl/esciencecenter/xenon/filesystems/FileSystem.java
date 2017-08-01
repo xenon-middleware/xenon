@@ -504,8 +504,9 @@ public abstract class FileSystem {
 	 *            the existing source path.
 	 * @param target
 	 *            the non existing target path.
+
 	 * @throws UnsupportedOperationException
-	 * 				If the adapter does not support renaming.
+	 * 			   If the adapter does not support renaming.
 	 * @throws NoSuchPathException
 	 *             If the source file does not exist or the target parent directory does not exist.
 	 * @throws PathAlreadyExistsException
@@ -514,6 +515,8 @@ public abstract class FileSystem {
 	 *             If file system is closed.
 	 * @throws XenonException
 	 *             If the move failed.
+     * @throws IllegalArgumentException
+     *             If one or both of the arguments are null.
 	 */
 	public abstract void rename(Path source, Path target) throws XenonException;
 
@@ -526,8 +529,12 @@ public abstract class FileSystem {
 	 * @throws PathAlreadyExistsException
 	 *             If the directory already exists or if a parent directory could not be created because a file with the same name
 	 *             already exists.
+     * @throws NotConnectedException
+     *             If file system is closed.
 	 * @throws XenonException
 	 *             If an I/O error occurred.
+     * @throws IllegalArgumentException
+     *             If one or both of the arguments are null.
 	 */
 	public void createDirectories(Path dir) throws XenonException {
 
@@ -553,13 +560,18 @@ public abstract class FileSystem {
 	 *
 	 * @param dir
 	 *            the directory to create.
-	 *
+
 	 * @throws PathAlreadyExistsException
 	 *             If the directory already exists.
 	 * @throws NoSuchPathException
 	 *             If the parent directory does not exist.
+     * @throws NotConnectedException
+     *             If file system is closed.
 	 * @throws XenonException
 	 *             If an I/O error occurred.
+     * @throws IllegalArgumentException
+     *             If the argument is null.
+     *
 	 */
 	public abstract void createDirectory(Path dir) throws XenonException;
 
@@ -575,8 +587,12 @@ public abstract class FileSystem {
 	 *             If the file already exists.
 	 * @throws NoSuchPathException
 	 *             If the parent directory does not exist.
+     * @throws NotConnectedException
+     *             If file system is closed.
 	 * @throws XenonException
 	 *             If an I/O error occurred.
+     * @throws IllegalArgumentException
+     *             If one or both of the arguments are null.
 	 */
 	public abstract void createFile(Path file) throws XenonException;
 
@@ -594,15 +610,15 @@ public abstract class FileSystem {
 	 *             If the target or parent directory of link does not exist
 	 * @throws InvalidPathException
 	 * 			   If parent of link is not a directory
+     * @throws NotConnectedException
+     *             If file system is closed.
 	 * @throws XenonException
 	 *             If an I/O error occurred.
+     * @throws IllegalArgumentException
+     *             If one or both of the arguments are null.
 	 */
 	public abstract void createSymbolicLink(Path link, Path target) throws XenonException;
 
-	// assumes directory exists
-//	boolean isDirectoryEmpty(Path dir) throws XenonException{
-//		return !list(dir,false).iterator().hasNext();
-//	}
 
 	/**
 	 * Deletes an existing path.
@@ -618,13 +634,15 @@ public abstract class FileSystem {
 	 * @param recursive
 	 * 			if the delete must be done recursively
 	 * @throws DirectoryNotEmptyException
-	 * 		if the directory was not empty.
-	 * @throws InvalidPathException
-	 * 		if the provided path is invalid.
+	 * 		if the directory was not empty (and the delete was not recursive).
 	 * @throws NoSuchPathException
 	 * 		if the provided path does not exist.
+     * @throws NotConnectedException
+     *             If file system is closed.
 	 * @throws XenonException
 	 *          if an I/O error occurred.
+     * @throws IllegalArgumentException
+     *             If path is null.
 	 */
 	public void delete(Path path, boolean recursive) throws XenonException {
 
@@ -671,8 +689,12 @@ public abstract class FileSystem {
 	 *
 	 * @return If the path exists.
 	 *
-	 * @throws XenonException
-	 *             If an I/O error occurred.
+     * @throws NotConnectedException
+     *             If file system is closed.
+     * @throws XenonException
+     *          if an I/O error occurred.
+     * @throws IllegalArgumentException
+     *             If path is null.
 	 */
 	public abstract boolean exists(Path path) throws XenonException;
 
@@ -681,6 +703,8 @@ public abstract class FileSystem {
 	 *
 	 * All entries in the directory are returned, but subdirectories will not be traversed by default.
 	 * Set <code>recursive</code> to <code>true</code>, include the listing of all subdirectories.
+     *
+     * Symbolic links are not followed.
 	 *
 	 * @param dir
 	 *            the target directory.
@@ -693,8 +717,12 @@ public abstract class FileSystem {
 	 *             If a directory does not exists.
 	 * @throws InvalidPathException
 	 *             If <code>dir</code> is not a directory.
-	 * @throws XenonException
-	 *             If an I/O error occurred.
+     * @throws NotConnectedException
+     *             If file system is closed.
+     * @throws XenonException
+     *          if an I/O error occurred.
+     * @throws IllegalArgumentException
+     *             If path is null.
 	 */
 	public Iterable<PathAttributes> list(Path dir, boolean recursive) throws XenonException {
 		
@@ -717,16 +745,19 @@ public abstract class FileSystem {
 	 *             If the file does not exists.
 	 * @throws InvalidPathException
 	 *             If the file is not regular file.
-	 * @throws XenonException
-	 *             If an I/O error occurred.
+     * @throws NotConnectedException
+     *             If file system is closed.
+     * @throws XenonException
+     *          if an I/O error occurred.
+     * @throws IllegalArgumentException
+     *             If path is null.
 	 */
 	public abstract InputStream readFromFile(Path file) throws XenonException;
 
 	/**
 	 * Open a file and return an {@link OutputStream} to write to this file.
 	 * <p>
-	 * If the file already exists it will be replaced and its data will be lost.
-	 *
+
 	 * The size of the file (once all data has been written) must be specified using
 	 * the <code>size</code> parameter. This is required by some implementations
 	 * (typically blob-stores).
@@ -739,11 +770,14 @@ public abstract class FileSystem {
 	 *
 	 * @return the {@link OutputStream} to write to the file.
 	 *
-	 * @throws InvalidPathException
-	 *             If the file could not be created.
-	 *
-	 * @throws XenonException
-	 *             If an I/O error occurred.
+	 * @throws PathAlreadyExistsException
+	 *             If the target existed.
+     * @throws NotConnectedException
+     *             If file system is closed.
+     * @throws XenonException
+     *          if an I/O error occurred.
+     * @throws IllegalArgumentException
+     *             If path is null.
 	 */
 	public abstract OutputStream writeToFile(Path path, long size) throws XenonException;
 
@@ -968,6 +1002,7 @@ public abstract class FileSystem {
 				case IGNORE:
 					return;
 				case REPLACE:
+				    destinationFS.delete(destination,true);
 					// continue
 					break;
 			}

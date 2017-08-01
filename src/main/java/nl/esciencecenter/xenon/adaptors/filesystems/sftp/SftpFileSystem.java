@@ -279,8 +279,8 @@ public class SftpFileSystem extends FileSystem {
 	public OutputStream writeToFile(Path path, long size) throws XenonException {
 		
 		assertNotNull(path);
+		assertPathNotExists(path);
 		assertParentDirectoryExists(path);
-		assertPathIsNotDirectory(path);
 		
 		try {
 			return client.write(path.getAbsolutePath(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Create, SftpClient.OpenMode.Truncate);      	

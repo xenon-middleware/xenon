@@ -114,4 +114,7 @@ public class LocalFileAdaptor extends FileAdaptor {
     public boolean supportsSettingPosixPermissions(){
         return true;
     }
+
+    @Override
+    public boolean isConnectionless() { return true; }
 }
