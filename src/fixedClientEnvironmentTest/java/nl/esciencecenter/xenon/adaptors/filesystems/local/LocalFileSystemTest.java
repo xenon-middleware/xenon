@@ -15,14 +15,18 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.local;
 
-import java.util.AbstractMap;
-import java.util.Map;
-
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileSystemTestParent;
 import nl.esciencecenter.xenon.adaptors.filesystems.LocationConfig;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PathAttributes;
+import org.junit.Test;
+
+import java.util.AbstractMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertTrue;
 
 public class LocalFileSystemTest extends FileSystemTestParent {
     @Override
@@ -51,5 +55,18 @@ public class LocalFileSystemTest extends FileSystemTestParent {
     @Override
     public FileSystem setupFileSystem() throws XenonException {
         return FileSystem.create("file");
+    }
+
+    @Test
+    public void test_getAttributes_fileStartingWithDot_HiddenFile() throws Exception {
+        // TODO move to FileSystemTestParent when we can detect adaptor/filesystem supports hidden files
+        generateAndCreateTestDir();
+        // assumes location has UNIX-like file system where starts with '.' means hidden
+        Path path = testDir.resolve(".myhiddenfile");
+        fileSystem.createFile(path);
+
+        PathAttributes result = fileSystem.getAttributes(path);
+
+        assertTrue(result.isHidden());
     }
 }
