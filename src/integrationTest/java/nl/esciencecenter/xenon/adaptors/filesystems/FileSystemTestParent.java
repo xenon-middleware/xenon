@@ -16,21 +16,47 @@
 package nl.esciencecenter.xenon.adaptors.filesystems;
 
 
-import static org.junit.Assert.*;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.NotConnectedException;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
+import nl.esciencecenter.xenon.filesystems.CopyStatus;
+import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
+import nl.esciencecenter.xenon.filesystems.InvalidPathException;
+import nl.esciencecenter.xenon.filesystems.NoSuchCopyException;
+import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
+import nl.esciencecenter.xenon.filesystems.PathAttributes;
+import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
+import nl.esciencecenter.xenon.utils.OutputReader;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.Timeout;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
-
-import java.io.*;
-import java.util.*;
-
-import nl.esciencecenter.xenon.adaptors.NotConnectedException;
-import nl.esciencecenter.xenon.filesystems.*;
-import org.junit.*;
-import org.junit.rules.ExpectedException;
-
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.utils.OutputReader;
-import org.junit.rules.Timeout;
 
 public abstract class FileSystemTestParent {
 
@@ -71,8 +97,10 @@ public abstract class FileSystemTestParent {
 
         //System.out.println("TEST_ROOT=" + testRoot);
 
+        if (fileSystem.exists(testRoot)) {
+            fileSystem.delete(testRoot, true);
+        }
         fileSystem.createDirectory(testRoot);
-
 
         testDir = null;
     }
@@ -1158,8 +1186,8 @@ public abstract class FileSystemTestParent {
     public void test_readFromFile_closed_throwsException() throws Exception {
         assumeFalse(description.isConnectionless());
         fileSystem.close();
-        fileSystem.readFromFile(testDir);
 
+        fileSystem.readFromFile(locationConfig.getExistingPath());
     }
 
     @Test(expected = IllegalArgumentException.class)
