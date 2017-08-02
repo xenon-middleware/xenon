@@ -15,12 +15,12 @@
  */
 package nl.esciencecenter.xenon.filesystems;
 
+import nl.esciencecenter.xenon.XenonException;
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import nl.esciencecenter.xenon.XenonException;
-import org.junit.Test;
 
 public class CopyStatusTest {
 
@@ -29,31 +29,31 @@ public class CopyStatusTest {
 		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", "TEST_STATE", 42, 31, null);
 		assertEquals("ID", s.getCopyIdentifier());
 	}
-	
+
 	@Test
 	public void test_getState() {
 		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", "TEST_STATE", 42, 31, null);
 		assertEquals("TEST_STATE", s.getState());
 	}
-	
+
 	@Test
 	public void test_bytesToCopy() {
 		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", "TEST_STATE", 42, 31, null);
 		assertEquals(42, s.bytesToCopy());
 	}
-	
+
 	@Test
 	public void test_bytesCopied() {
 		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", "TEST_STATE", 42, 31, null);
 		assertEquals(31, s.bytesCopied());
 	}
-	
+
 	@Test
 	public void test_hasException_null_false() {
 		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", "TEST_STATE", 42, 31, null);
 		assertFalse(s.hasException());
 	}
-	
+
 	@Test
 	public void test_hasException2_filled_true() {
 		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", "TEST_STATE", 42, 31, new XenonException("file", "Something went wrong"));
@@ -63,8 +63,7 @@ public class CopyStatusTest {
 	@Test
 	public void test_getException() {
 		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", "TEST_STATE", 42, 31, new XenonException("file", "Something went wrong"));
-		XenonException expected = new XenonException("file", "Something went wrong");
-		assertEquals(expected, s.getException());
+		assertEquals("file adaptor: Something went wrong", s.getException().getMessage());
 	}
 
 	@Test( expected = XenonException.class)
@@ -103,17 +102,17 @@ public class CopyStatusTest {
 		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", "FAILED", 42, 31, null);
 		assertTrue(s.isDone());
 	}
-	
+
 	@Test
 	public void test_toString() {
 		String state = "STATE";
 		XenonException e = new XenonException("file", "Something went wrong");
 		long bytesToCopy = 42;
 		long bytesCopied = 3;
-		
-		String expected = "CopyStatus [copyIdentifier=ID" + ", state=" + state + ", exception=" + e + 
+
+		String expected = "CopyStatus [copyIdentifier=ID" + ", state=" + state + ", exception=" + e +
 				", bytesToCopy=" + bytesToCopy + ", bytesCopied=" + bytesCopied + "]";
-		
+
 		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", state, bytesToCopy, bytesCopied, e);
 		assertEquals(expected, s.toString());
 	}
