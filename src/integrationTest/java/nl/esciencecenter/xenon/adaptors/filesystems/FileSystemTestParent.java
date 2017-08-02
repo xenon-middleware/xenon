@@ -54,7 +54,7 @@ public abstract class FileSystemTestParent {
     }
 
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(10); // 10 seconds max per method tested
+    public Timeout globalTimeout = Timeout.seconds(60); // 10 seconds max per method tested
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -190,10 +190,7 @@ public abstract class FileSystemTestParent {
 
         try {
             out = fileSystem.writeToFile(testFile, data.length);
-
-            if (data != null) {
-                out.write(data);
-            }
+            out.write(data);
         } finally {
             try {
                 out.close();
@@ -212,6 +209,7 @@ public abstract class FileSystemTestParent {
         fileSystem.createFile(file);
 
         if (data != null && data.length > 0) {
+            System.out.println("WRITE DATA TO FILE: " + file + " " + data.length);
             writeData(file, data);
         }
         return file;
@@ -335,7 +333,7 @@ public abstract class FileSystemTestParent {
     }
 
     @Test(expected=PathAlreadyExistsException.class)
-    public void test07_createFile_existingDir_throwsException() throws Exception {
+    public void test_createFile_existingDir_throwsException() throws Exception {
         generateAndCreateTestDir();
         fileSystem.createFile(testDir);
     }
@@ -350,6 +348,48 @@ public abstract class FileSystemTestParent {
         fileSystem.createFile(file);
     }
 
+    @Test
+    public void test_createFile_empty() throws Exception {
+        generateAndCreateTestDir();
+        Path file = testDir.resolve(generateTestFileName());        
+        fileSystem.createFile(file);
+        assertTrue("File does not exist!", fileSystem.exists(file));
+    }
+
+    @Test
+    public void test_createFile_withData_sizeUnknown() throws Exception {
+        
+        byte [] data = "Hello World\n".getBytes();
+        
+        generateAndCreateTestDir();
+        Path file = testDir.resolve(generateTestFileName());        
+       
+        OutputStream out = fileSystem.writeToFile(file);
+        out.write(data);
+        out.close();
+        
+        assertTrue("File does not exist!", fileSystem.exists(file));
+        assertEquals("File has wrong size!", data.length, fileSystem.getAttributes(file).getSize());
+        
+    }
+
+    @Test
+    public void test_createFile_withData_sizeKnown() throws Exception {
+        
+        byte [] data = "Hello World\n".getBytes();
+        
+        generateAndCreateTestDir();
+        Path file = testDir.resolve(generateTestFileName());        
+       
+        OutputStream out = fileSystem.writeToFile(file, data.length);
+        out.write(data);
+        out.close();
+        
+        assertTrue("File does not exist!", fileSystem.exists(file));
+        assertEquals("File has wrong size!", data.length, fileSystem.getAttributes(file).getSize());
+        
+    }
+    
     /* TODO: Fixme!
     @Test(expected=XenonException.class)
     public void test_createFile_closedFileSystem_throwsException() throws Exception {
