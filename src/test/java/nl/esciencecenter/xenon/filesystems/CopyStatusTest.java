@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import nl.esciencecenter.xenon.XenonException;
 import org.junit.Test;
 
 public class CopyStatusTest {
@@ -48,17 +49,30 @@ public class CopyStatusTest {
 	}
 	
 	@Test
-	public void test_hasException1() {
+	public void test_hasException_null_false() {
 		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", "TEST_STATE", 42, 31, null);
 		assertFalse(s.hasException());
 	}
 	
 	@Test
-	public void test_hasException2() {
-		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", "TEST_STATE", 42, 31, new Exception());
+	public void test_hasException2_filled_true() {
+		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", "TEST_STATE", 42, 31, new XenonException("file", "Something went wrong"));
 		assertTrue(s.hasException());
 	}
-	
+
+	@Test
+	public void test_getException() {
+		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", "TEST_STATE", 42, 31, new XenonException("file", "Something went wrong"));
+		XenonException expected = new XenonException("file", "Something went wrong");
+		assertEquals(expected, s.getException());
+	}
+
+	@Test( expected = XenonException.class)
+	public void test_maybeThrowException() throws XenonException {
+		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", "TEST_STATE", 42, 31, new XenonException("file", "Something went wrong"));
+		s.maybeThrowException();
+	}
+
 	@Test
 	public void test_isRunning1() {
 		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", "TEST_STATE", 42, 31, null);
@@ -93,7 +107,7 @@ public class CopyStatusTest {
 	@Test
 	public void test_toString() {
 		String state = "STATE";
-		Exception e = new Exception("OOPS");
+		XenonException e = new XenonException("file", "Something went wrong");
 		long bytesToCopy = 42;
 		long bytesCopied = 3;
 		
@@ -103,8 +117,4 @@ public class CopyStatusTest {
 		CopyStatus s = new FileSystem.CopyStatusImplementation("ID", state, bytesToCopy, bytesCopied, e);
 		assertEquals(expected, s.toString());
 	}
-
-			
-
-	
 }

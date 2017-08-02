@@ -1443,7 +1443,12 @@ public abstract class FileSystem {
 		} catch (TimeoutException e) {
 			state = "RUNNING";
 		} catch (ExecutionException ee) {
-			ex = new XenonException(getAdaptorName(), ee.getMessage(),ee);
+		    Throwable cause = ee.getCause();
+		    if (cause instanceof XenonException) {
+		        ex = (XenonException) cause;
+            } else {
+                ex = new XenonException(getAdaptorName(), cause.getMessage(), cause);
+            }
 			state = "FAILED";
 		} catch (CancellationException | InterruptedException ec) {
 			ex = new CopyCancelledException(getAdaptorName(), "Copy cancelled by user");
