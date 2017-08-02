@@ -562,7 +562,7 @@ public abstract class FileSystemTestParent {
         assertEquals(set1,set2);
     }
 
-    private Set<PathAttributes> listSet(Path dir, boolean recursive) throws XenonException{
+    protected Set<PathAttributes> listSet(Path dir, boolean recursive) throws XenonException{
         Set<PathAttributes> res = new HashSet<>();
         for(PathAttributes p : fileSystem.list(dir,recursive)){
             if(res.contains(p)){
@@ -624,7 +624,6 @@ public abstract class FileSystemTestParent {
         Set<PathAttributes> res = listSet(testDir, false);
         assertListSetEqual(res,expected);
     }
-
 
     @Test
     public void test_list_nonEmptyDir_correctListing() throws Exception {

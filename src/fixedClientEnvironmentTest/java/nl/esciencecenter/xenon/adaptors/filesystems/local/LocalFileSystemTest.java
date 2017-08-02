@@ -25,8 +25,11 @@ import org.junit.Test;
 
 import java.util.AbstractMap;
 import java.util.Map;
+import java.util.Set;
 
+import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.isWindows;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 
 public class LocalFileSystemTest extends FileSystemTestParent {
     @Override
@@ -68,5 +71,18 @@ public class LocalFileSystemTest extends FileSystemTestParent {
         PathAttributes result = fileSystem.getAttributes(path);
 
         assertTrue(result.isHidden());
+    }
+
+    @Test
+    public void test_list_hiddenFile() throws Exception {
+        assumeFalse(isWindows());
+        generateAndCreateTestDir();
+        // assumes location has UNIX-like file system where starts with '.' means hidden
+        Path path = testDir.resolve(".myhiddenfile");
+        fileSystem.createFile(path);
+
+        Set<PathAttributes> res = listSet(testDir, false);
+
+        assertTrue("Listing contains hidden file", res.stream().anyMatch(PathAttributes::isHidden));
     }
 }

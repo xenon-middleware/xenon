@@ -20,6 +20,8 @@ import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import org.junit.Test;
 
+import java.util.Set;
+
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -39,5 +41,17 @@ public abstract class SftpFileSystemTestParent extends FileSystemTestParent {
         PathAttributes result = fileSystem.getAttributes(path);
 
         assertTrue(result.isHidden());
+    }
+
+    @Test
+    public void test_list_hiddenFile() throws Exception {
+        generateAndCreateTestDir();
+        // assumes location has UNIX-like file system where starts with '.' means hidden
+        Path path = testDir.resolve(".myhiddenfile");
+        fileSystem.createFile(path);
+
+        Set<PathAttributes> res = listSet(testDir, false);
+
+        assertTrue("Listing contains hidden file", res.stream().anyMatch(PathAttributes::isHidden));
     }
 }
