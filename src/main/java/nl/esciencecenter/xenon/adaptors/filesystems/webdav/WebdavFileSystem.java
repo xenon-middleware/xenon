@@ -197,11 +197,24 @@ public class WebdavFileSystem extends FileSystem {
 
 	private void executeMethod(HttpClient client, HttpMethod method) throws IOException {
 		
+	    System.out.println("EXECUTE METHOD " + method);
+	    
 		int response = client.executeMethod(method);
 		
+		System.out.println("RESPONSE " + response);
+    	
 		String responseBodyAsString = method.getStatusLine().toString();
+		  
+		System.out.println("STATUS AS STRING " + responseBodyAsString);
+		
+		String tmp = method.getResponseBodyAsString();
+		
+		System.out.println("RESPONSE BODY AS STRING " + tmp);
+        
+		
 		method.releaseConnection();
-			
+		    
+		
 		if (!isOkish(response)) {
 			throw new IOException(responseBodyAsString);
 		}
@@ -381,21 +394,45 @@ public class WebdavFileSystem extends FileSystem {
 		}
 	}
 
-	private void createFile(Path file, long size, InputStream data) throws XenonException {
+    private void createFile(Path file, long size, InputStream data) throws XenonException {
 		LOGGER.debug("createFile path = {}", file);
 		
-		assertPathNotExists(file);
-		assertParentDirectoryExists(file);
-		assertPathIsNotDirectory(file);
-		
+		if (exists(file)) { 
+		    assertPathIsNotDirectory(file);
+		} else { 
+		    assertParentDirectoryExists(file);
+		}
+		    
 		String filePath = toFilePath(file);
+		
+	    System.out.println("WEBDAV CREATE FILE WITH DATA " + filePath + " " + size);
+        
 		PutMethod method = new PutMethod(filePath);
-		method.setRequestEntity(new InputStreamRequestEntity(data, size));
+		
+		
+		
+		if (size < 0) { 
+		    method.setRequestEntity(new InputStreamRequestEntity(data, null));
+	    } else { 
+		    method.setRequestEntity(new InputStreamRequestEntity(data, size));
+		}
+		
 		try {
 			executeMethod(client, method);
-		} catch (IOException e) {
+
+			MultiStatus doc = method.getResponseBodyAsMultiStatus();
+		
+			for (MultiStatusResponse m : doc.getResponses()) {
+			    System.out.println("MULTI " + m.getResponseDescription());
+			}
+			
+		
+		} catch (Exception e) {
 			throw new XenonException(ADAPTOR_NAME, "Could not create file " + filePath, e);
 		}
+		
+		System.out.println("WEBDAV CREATE DONE " + filePath + " " + size);
+        
 		LOGGER.debug("createFile OK");
 	}
 	
@@ -403,6 +440,11 @@ public class WebdavFileSystem extends FileSystem {
 	public OutputStream writeToFile(Path file, long size) throws XenonException {
 	
 		try { 
+		    
+		    System.out.println("WEBDAV WRITE DATA");
+		    
+		    
+		    
 			PipedInputStream in = new PipedInputStream(4096);
 			PipedOutputStream out = new PipedOutputStream(in);
 		
