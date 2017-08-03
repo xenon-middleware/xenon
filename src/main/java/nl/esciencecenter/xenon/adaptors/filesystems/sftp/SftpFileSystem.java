@@ -15,6 +15,17 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.sftp;
 
+import static nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor.ADAPTOR_NAME;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.attribute.FileTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
@@ -30,22 +41,12 @@ import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
+
 import org.apache.sshd.client.subsystem.sftp.SftpClient;
 import org.apache.sshd.common.subsystem.sftp.SftpConstants;
 import org.apache.sshd.common.subsystem.sftp.SftpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.attribute.FileTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import static nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor.ADAPTOR_NAME;
 
 public class SftpFileSystem extends FileSystem {
 
