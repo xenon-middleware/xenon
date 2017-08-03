@@ -968,6 +968,7 @@ public abstract class FileSystem {
 				case IGNORE:
 					return;
 				case REPLACE:
+				    destinationFS.delete(destination,true);
 					// continue
 					break;
 			}
@@ -1053,8 +1054,22 @@ public abstract class FileSystem {
 
 				Path rel = source.relativize(p.getPath());
 				Path dst = destination.resolve(rel);
-
-				destinationFS.createDirectories(dst);
+                if(destinationFS.exists(dst)){
+                    if(destinationFS.getAttributes(dst).isDirectory()) {
+                        switch (mode) {
+                            case CREATE:
+                                throw new  PathAlreadyExistsException(getAdaptorName(), "Directory already exists: " + dst);
+                            case REPLACE:
+                                break; // leave directory
+                            case IGNORE:
+                                return; // ignore subdir
+                        }
+                    } else {
+                        destinationFS.delete(dst,true);
+                    }
+                } else {
+                    destinationFS.createDirectories(dst);
+                }
 			} else if (p.isRegular()) {
 				bytesToCopy += p.getSize();
 			}
