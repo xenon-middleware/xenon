@@ -247,61 +247,61 @@ public class PathTest {
         Path path = new Path('/', (String[]) null);
         assertEquals(path.toString(), "");
     }
-/*
+
     @Test
     public void testRelativePathPathSeperator5b() {
-        Path path = new Path('/', (String[]) null);
-        assertEquals(path.getAbsolutePath(), "/");
+        Path path = new Path('/', (String[]) null).toAbsolutePath();
+        assertEquals(path.toString(), "/");
     }
 
     @Test
     public void testRelativePathPathSeperator6a() {
         Path path = new Path("mydir", null);
-        assertEquals(path.getRelativePath(), "mydir");
+        assertEquals(path.toString(), "mydir");
     }
 
     @Test
     public void testRelativePathPathSeperator6b() {
-        Path path = new Path("mydir", null);
-        assertEquals(path.getAbsolutePath(), "/mydir");
+        Path path = new Path("mydir", null).toAbsolutePath();
+        assertEquals(path.toString(), "/mydir");
     }
 
     @Test
     public void testRelativePathPathSeperator7a() {
         Path path = new Path("mydir", "");
-        assertEquals(path.getRelativePath(), "mydir");
+        assertEquals(path.toString(), "mydir");
     }
 
     @Test
     public void testRelativePathPathSeperator7b() {
-        Path path = new Path("mydir", "");
-        assertEquals(path.getAbsolutePath(), "/mydir");
+        Path path = new Path("mydir", "").toAbsolutePath();
+        assertEquals(path.toString(), "/mydir");
     }
 
     @Test
     public void testRelativePathPathSeperator8a() {
         Path path = new Path('/');
-        assertEquals(path.getRelativePath(), "");
+        assertEquals(path.toString(), "");
     }
 
     @Test
     public void testRelativePathPathSeperator8b() {
-        Path path = new Path('/');
-        assertEquals(path.getAbsolutePath(), "/");
+        Path path = new Path('/').toAbsolutePath();
+        assertEquals(path.toString(), "/");
     }
     
     @Test
     public void testRelativePathStringArraySeperator1a() {
         String[] strings = new String[] { "mydir", "myfile" };
         Path path = new Path('@', strings);
-        assertEquals(path.getRelativePath(), "mydir@myfile");
+        assertEquals(path.toString(), "mydir@myfile");
     }
 
     @Test
     public void testRelativePathStringArraySeperator1b() {
         String[] strings = new String[] { "mydir", "myfile" };
-        Path path = new Path('@', strings);
-        assertEquals(path.getAbsolutePath(), "@mydir@myfile");
+        Path path = new Path('@', strings).toAbsolutePath();
+        assertEquals(path.toString(), "@mydir@myfile");
     }
 
     
@@ -351,7 +351,7 @@ public class PathTest {
     public void testGetName_IndexWithinElements_ReturnsElement() {
         Path path = new Path("mydir/myfile");
         Path element = path.getName(1);
-        assertEquals(element.getRelativePath(), "myfile");
+        assertEquals(element.toString(), "myfile");
     }
 
     @Test
@@ -364,7 +364,7 @@ public class PathTest {
             assertEquals("Index: 3, Size: 2", e.getMessage());
         }
     }
-
+/*
     public void doSubPath(String[] input_path, int beginIndex, int endIndex, String[] epath) {
         Path path = new Path(input_path);
         Path expected_path = new Path(epath);
