@@ -20,7 +20,7 @@ import nl.esciencecenter.xenon.adaptors.filesystems.FileSystemTestParent;
 /**
  * Extend this class for docker tests and live tests
  *
- * Can contain extra tests for sftp filesystem
+ * Can contain extra tests for webdav filesystem
  */
 public abstract class WebdavFileSystemTestParent extends FileSystemTestParent {
 }
