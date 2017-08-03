@@ -63,7 +63,7 @@ public class SlurmSchedulerAdaptor extends ScriptingSchedulerAdaptor {
     
     public static final long SLURM_UPDATE_SLEEP = 1000L; // 1 second update sleep
     
-    public static final String[] SUPPORTED_VERSIONS = { "2.3.", "2.5.", "2.6.", "14.03.0", "14.11.9-Bull.1.0", "15.08.6"};
+    public static final String[] SUPPORTED_VERSIONS = { "2.3.", "2.5.", "2.6.", "14.", "15.", "16.", "17."};
     
     public SlurmSchedulerAdaptor() {
 		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
