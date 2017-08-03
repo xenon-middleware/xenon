@@ -29,5 +29,6 @@ public abstract class LocationConfig {
     }
     
     public abstract Path getWritableTestDir(); 
-    
+
+    public Path getExpectedEntryPath() { return null; }
 }

@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.ByteArrayOutputStream;
@@ -1732,6 +1733,16 @@ public abstract class FileSystemTestParent {
         // Close them both. We should get no exceptions.
         fs1.close();
         fs2.close();
+    }
+
+    @Test
+    public void test_getEntryPath() {
+        Path expected = locationConfig.getExpectedEntryPath();
+        assumeNotNull(expected);
+
+        Path result = fileSystem.getEntryPath();
+
+        assertEquals(expected, result);
     }
 
     // TODO: Symbolic links in a cycle tests
