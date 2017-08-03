@@ -15,39 +15,30 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.webdav;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpConnectionManager;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
-import org.apache.jackrabbit.webdav.client.methods.OptionsMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.esciencecenter.xenon.InvalidCredentialException;
+import com.github.sardine.Sardine;
+import com.github.sardine.SardineFactory;
+
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 
 public class WebdavFileAdaptor extends FileAdaptor {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(WebdavFileAdaptor.class);
-    
+
     /** The name of this adaptor */
     public static final String ADAPTOR_NAME = "webdav";
 
@@ -62,116 +53,69 @@ public class WebdavFileAdaptor extends FileAdaptor {
 
     /** List of properties supported by this FTP adaptor */
     public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription[0];
-    
+
     /** The default buffer size for copy. Webdav doesn't use the standard copy engine. */
     protected static final int BUFFER_SIZE = 4 * 1024;
 
     public static final int OK_CODE = 200;
-	
-    private static final int DEFAULT_PORT = 80; 
-	
+
     public WebdavFileAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
     }
 
-	@Override
-	public boolean canReadSymboliclinks() {
-		// Webdav cannot read symbolic links.
-		return false;
-	}
-    
-    protected static boolean isOkish(int response) {
-        return response == HttpStatus.SC_OK || response == HttpStatus.SC_CREATED || response == HttpStatus.SC_MULTI_STATUS
-                || response == HttpStatus.SC_NO_CONTENT;
-    }
-    
-//    protected boolean isFilePath(String path) {
-//		return !isFolderPath(path);
-//	}
-    
     @Override
-    public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties)
-            throws XenonException {
-        LOGGER.debug("newFileSystem location = {} credential = {} properties = {}", location, credential,
-                properties);
-
-        if (!(credential instanceof PasswordCredential)) { 
-        	throw new InvalidCredentialException(ADAPTOR_NAME, "Only password credentials supported");
-        }
-        
-        
-        URI uri; 
-        
-    	try { 
-    		uri = new URI(location);
-    	} catch (Exception e) {
-    		throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
-		}
-        
-    	String host = uri.getHost();
-    	int port = uri.getPort();
-    	
-    	if (port == -1) { 
-    		port = DEFAULT_PORT;
-    	}
-    	
-    	String hostPort = uri.getScheme() + "://" + host + ":" + port;
-    	
-    	HttpClient client = getClient(host, port, (PasswordCredential) credential);
-        HttpMethod method;
-        try {
-        	String loc = uri.toString();
-        	
-        	if (!loc.endsWith("/")) { 
-        		loc = loc + "/";
-        	}
-        	
-            method = new OptionsMethod(loc);
-            int response = client.executeMethod(method);
-            String responseBodyAsString = method.getStatusLine().toString();
-            method.releaseConnection();
-            if (!isOkish(response)) {
-                throw new IOException(responseBodyAsString);
-            }
-        } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME, "Could not open connection to " + location, e);
-        }
-
-        String cwd = uri.getPath();
-        
-        XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
-       
-        return new WebdavFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, hostPort, new Path(cwd), client, xp);
-    }
-
-    private HttpClient getClient(String host, int port, PasswordCredential credential) {
-        HostConfiguration hostConfig = new HostConfiguration();
-        hostConfig.setHost(host, port);
-        HttpConnectionManager connectionManager = getConnectionManager(hostConfig);
-        HttpClient client = new HttpClient(connectionManager);
-        Credentials creds = new UsernamePasswordCredentials(credential.getUsername(), new String(credential.getPassword()));
-        client.getState().setCredentials(AuthScope.ANY, creds);
-        client.setHostConfiguration(hostConfig);
-        return client;
-    }
-
-    private HttpConnectionManager getConnectionManager(HostConfiguration hostConfig) {
-        HttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
-        HttpConnectionManagerParams params = new HttpConnectionManagerParams();
-        int maxHostConnections = 20;
-        params.setMaxConnectionsPerHost(hostConfig, maxHostConnections);
-        connectionManager.setParams(params);
-        return connectionManager;
-    }
-
-    public void end() {
-        LOGGER.debug("end OK");
+    public boolean canReadSymboliclinks() {
+        // Webdav cannot read symbolic links.
+        return false;
     }
 
     @Override
     public boolean isConnectionless() {
-
+        // Webdav is connectionless.
         return true;
+    }
+
+    @Override
+    public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties)
+            throws XenonException {
+
+        LOGGER.debug("newFileSystem location = {} credential = {} properties = {}", location, credential,
+                properties);
+
+        URI uri; 
+
+        try { 
+            uri = new URI(location);
+        } catch (Exception e) {
+            throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
+        }
+
+        Sardine sardine = null;
+
+        if (credential == null || credential instanceof DefaultCredential) {
+            sardine = SardineFactory.begin();
+        } else if (credential instanceof PasswordCredential) {
+            PasswordCredential tmp = (PasswordCredential) credential;
+            sardine = SardineFactory.begin(tmp.getUsername(), new String(tmp.getPassword()));
+        }
+
+        String server = uri.getScheme() + "://" + uri.getHost();
+
+        int port = uri.getPort();
+
+        if (port != -1) { 
+            server = server + ":" + port;
+        }
+
+        String cwd = uri.getPath();
+
+        XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
+
+        return new WebdavFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, server, new Path(cwd), sardine, xp);
+    }
+
+    public void end() {
+        LOGGER.debug("end OK");
     }
 
 }
