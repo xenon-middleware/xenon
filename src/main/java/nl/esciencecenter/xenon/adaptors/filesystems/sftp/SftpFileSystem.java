@@ -400,6 +400,9 @@ public class SftpFileSystem extends FileSystem {
 		result.setGroup(attributes.getGroup());
 		result.setOwner(attributes.getOwner());
 
+		// assume UNIX-like filesystem
+		result.setHidden(path.getFileNameAsString().startsWith("."));
+
 		return result;
 	}
 

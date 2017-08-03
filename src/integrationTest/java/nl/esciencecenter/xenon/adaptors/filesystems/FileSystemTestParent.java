@@ -17,7 +17,6 @@ package nl.esciencecenter.xenon.adaptors.filesystems;
 
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.filesystems.CopyMode;
 import nl.esciencecenter.xenon.filesystems.CopyStatus;
 import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
@@ -33,7 +32,6 @@ import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 import nl.esciencecenter.xenon.utils.OutputReader;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -55,7 +53,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 public abstract class FileSystemTestParent {
@@ -64,10 +61,10 @@ public abstract class FileSystemTestParent {
 
     private Path testRoot;
 
-    private FileSystem fileSystem;
+    protected FileSystem fileSystem;
     private FileSystemAdaptorDescription description;
     private LocationConfig locationConfig;
-    private Path testDir;
+    protected Path testDir;
 
     private static long counter = 0;
 
@@ -280,7 +277,7 @@ public abstract class FileSystemTestParent {
         testDir = resolve(generateTestDirName());
     }
 
-    private void generateAndCreateTestDir() throws XenonException {
+    protected void generateAndCreateTestDir() throws XenonException {
         generateTestDir();
         fileSystem.createDirectories(testDir);
     }
@@ -664,7 +661,7 @@ public abstract class FileSystemTestParent {
         assertEquals(set1,set2);
     }
 
-    private Set<PathAttributes> listSet(Path dir, boolean recursive) throws XenonException{
+    protected Set<PathAttributes> listSet(Path dir, boolean recursive) throws XenonException{
         Set<PathAttributes> res = new HashSet<>();
         for(PathAttributes p : fileSystem.list(dir,recursive)){
             if(res.contains(p)){
@@ -726,7 +723,6 @@ public abstract class FileSystemTestParent {
         Set<PathAttributes> res = listSet(testDir, false);
         assertListSetEqual(res,expected);
     }
-
 
     @Test
     public void test_list_nonEmptyDir_correctListing() throws Exception {
