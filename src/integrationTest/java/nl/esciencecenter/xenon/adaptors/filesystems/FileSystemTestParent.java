@@ -78,7 +78,7 @@ public abstract class FileSystemTestParent {
     }
 
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(60); // 60 seconds max per method tested
+    public Timeout globalTimeout = Timeout.seconds(10); // 60 seconds max per method tested
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -159,12 +159,15 @@ public abstract class FileSystemTestParent {
     private void copySync(Path source, Path target, CopyMode mode, boolean recursive) throws Throwable{
         String s = fileSystem.copy(source,fileSystem,target,mode,recursive);
         CopyStatus status = fileSystem.waitUntilDone(s, 1000);
+        
+        // For some adaptors (like webdav) it may take a few moments for the copy to fully arrive at the server. 
+        // To prevent the next operation from overtaking this copy, we slee for a 
+        Thread.sleep(1000);
+        
         if(status.hasException()){
             throw status.getException();
         }
     }
-
-
 
     private void throwUnexpected(String name, Throwable e) {
         throw new AssertionError(name + " throws unexpected Exception!", e);
@@ -222,47 +225,45 @@ public abstract class FileSystemTestParent {
 
         long deadline = System.currentTimeMillis() + maxTimeout;
 
-        while (!fileSystem.exists(testFile) && deadline <= System.currentTimeMillis()) { 
-            Thread.sleep(100);
-        }
+        while (!fileSystem.exists(testFile)) {
+            System.out.println("NOT EXISTS: " + testFile);
 
-        if (!fileSystem.exists(testFile)) { 
-            fail("Failed to ensure file " + testFile + " exists after " + maxTimeout + " ms. ");
-        }
-
-        if (data != null && data.length > 0) { 
-            PathAttributes att = fileSystem.getAttributes(testFile);
-
-            while (att.getSize() != data.length && deadline <= System.currentTimeMillis()) {
-                Thread.sleep(100);
-                att = fileSystem.getAttributes(testFile);
+            if (System.currentTimeMillis() > deadline) { 
+                fail("Failed to ensure file " + testFile + " exists after " + maxTimeout + " ms. ");
             }
 
-            if (att.getSize() != data.length) {
-                fail("Failed to ensure file " + testFile + " contains " + data.length + " bytes after " 
-                        + maxTimeout + " ms. ");
+            Thread.sleep(500);
+        }
+
+        if (data != null && data.length > 0) {
+            
+            PathAttributes att = fileSystem.getAttributes(testFile);
+
+            while (att.getSize() != data.length) {
+
+                System.out.println("Wrong size " + att.getSize() + " != " + data.length);
+
+                if (System.currentTimeMillis() > deadline) { 
+                    fail("Failed to ensure file " + testFile + " contains " + data.length + " bytes after " 
+                            + maxTimeout + " ms. ");
+                }
+
+                Thread.sleep(500);
+                att = fileSystem.getAttributes(testFile);
             }
         }
     }
 
     private void writeData(Path testFile, byte[] data) throws Exception {
 
-        OutputStream out = null;
+        OutputStream out = fileSystem.writeToFile(testFile, data.length);
 
-        try {
-            out = fileSystem.writeToFile(testFile, data.length);
-
-            if (data != null) {
-                out.write(data);
-            }
-        } finally {
-            try {
-                out.close();
-            } catch (Exception e) {
-                //ignore
-            }
+        if (data != null) {
+            out.write(data);
         }
-
+        
+        out.close();
+        
         // Note: it may take some time for the data to become available on the server side. This may lead to problems 
         // if any subsequent commands (like exists or readFromFile) overtaking this write on the network. Therefore we 
         // wait for the remote file to be updated. 
@@ -272,16 +273,12 @@ public abstract class FileSystemTestParent {
     // Depends on: [createNewTestFileName], createFile, [writeData]
     protected Path createTestFile(Path root, byte[] data) throws Exception {
         Path file = createNewTestFileName(root);
-
-        System.out.println("CREATE TEST FILE: " + file);
-
         return createNamedTestFile(file,data);
     }
 
     private Path createNamedTestFile(Path file, byte[] data) throws Exception {
 
         if (data != null && data.length > 0) {
-            System.out.println("WRITE DATA TO FILE: " + file + " " + data.length);
             writeData(file, data);
         } else {
             fileSystem.createFile(file);
@@ -526,6 +523,8 @@ public abstract class FileSystemTestParent {
 
     @Test
     public void test_exists_existingSymbolicLink_returnTrue() throws Exception {
+        assumeTrue(description.canCreateSymboliclinks());
+        
         generateAndCreateTestDir();
 
         // test with non-existing file
@@ -648,6 +647,7 @@ public abstract class FileSystemTestParent {
 
     @Test(expected=InvalidPathException.class)
     public void test_list_symlinkToFile_throwsException() throws Exception {
+        assumeTrue(description.canCreateSymboliclinks());
         generateAndCreateTestDir();
         Path file = createTestFile(testDir,null);
         Path link = createNewTestFileName(testDir);
@@ -657,6 +657,7 @@ public abstract class FileSystemTestParent {
 
     @Test(expected=InvalidPathException.class)
     public void test_list_symlinkToDir_throwsException() throws Exception {
+        assumeTrue(description.canCreateSymboliclinks());
         generateAndCreateTestDir();
         Path link = createNewTestFileName(testDir);
         fileSystem.createSymbolicLink(link,testDir);
@@ -1218,7 +1219,6 @@ public abstract class FileSystemTestParent {
     public void test_readFromFile_closed_throwsException() throws Exception {
         assumeFalse(description.isConnectionless());
         fileSystem.close();
-
         fileSystem.readFromFile(locationConfig.getExistingPath());
     }
 
@@ -1308,8 +1308,8 @@ public abstract class FileSystemTestParent {
     }
 
 
-    private void assertContents(Path source, byte[] data)throws Exception {
-        InputStream a = fileSystem.readFromFile(source);
+    private void assertContents(Path file, byte[] data)throws Exception {
+        InputStream a = fileSystem.readFromFile(file);
         byte[] abytes = readAllBytes(a);
         if (!Arrays.equals(abytes, data)) {
             throwWrong("copy", Arrays.toString(abytes), Arrays.toString(data));
@@ -1556,6 +1556,11 @@ public abstract class FileSystemTestParent {
         byte[] data3 = "yes | rm -rf ".getBytes();
         byte[] data4 = "Use Xenon!".getBytes();
         generateAndCreateTestDir();
+
+        // Create a source file 
+        Path source = createTestFile(testDir,data);
+
+        // Create a target directory with contents
         Path target = createTestSubDir(testDir);
         Path subtarget = createTestSubDir(target);
         Path file = createTestFile(subtarget, data3);
@@ -1563,10 +1568,10 @@ public abstract class FileSystemTestParent {
         Path file3 = createTestFile(subtarget, data3);
         Path file4 = createTestFile(subtarget, data4);
 
-        Path source = createTestFile(testDir,data);
-
+        // Copy source to target, replacing the directory with a file.
         copySync(source,target,CopyMode.REPLACE,true);
 
+        // Check if target is now a file with correct content.
         assertContents(target,data);
     }
 
@@ -1710,15 +1715,23 @@ public abstract class FileSystemTestParent {
     @Test
     public void test_rename_existingDirectoryNonExistingFile() throws Exception {
         generateAndCreateTestDir();
+        
         Path subDir = createTestSubDir(testDir);
+        
         byte[] adata = "data".getBytes();
-        byte[] bdata = "content".getBytes();
+        byte[] bdata = "content".getBytes();        
         Path a = createTestFile(subDir,adata);
         Path b = createTestFile(subDir,bdata);
+        
+                
         Path subDir2 = createTestSubDirName(testDir);
         fileSystem.rename(subDir,subDir2);
-        assertFalse(fileSystem.exists(subDir));
+        
+        Thread.sleep(1000);
+
         assertTrue(fileSystem.exists(subDir2));
+        assertFalse(fileSystem.exists(subDir));
+        
         assertContents(subDir2.resolve(a.getFileName()),adata);
         assertContents(subDir2.resolve(b.getFileName()),bdata);
     }

@@ -1541,7 +1541,9 @@ public abstract class FileSystem {
 	}
 
 	protected void assertPathIsNotDirectory(Path path) throws XenonException{
-		assertNotNull(path);
+		
+	    assertNotNull(path);
+		
 		if(exists(path)){
 
 			PathAttributes a = getAttributes(path);
@@ -1598,7 +1600,7 @@ public abstract class FileSystem {
 		assertDirectoryExists(parent);
 	}
 
-	protected void assertFileIsSymbolicLink(Path link) throws XenonException{
+	protected void assertFileIsSymbolicLink(Path link) throws XenonException {
 		assertNotNull(link);
 		assertPathExists(link);
 		if(!getAttributes(link).isSymbolicLink()){
@@ -1606,6 +1608,12 @@ public abstract class FileSystem {
 		}
 	}
 
+	protected void assertIsOpen() throws XenonException {
+	    if (!isOpen()) { 
+	        throw new NotConnectedException(getAdaptorName(), "Connection is closed");
+	    }
+    }
+	
 	protected boolean areSamePaths(Path source, Path target) {
 
 		if (source == null) {

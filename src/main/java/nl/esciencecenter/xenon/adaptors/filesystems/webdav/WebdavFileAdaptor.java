@@ -76,6 +76,12 @@ public class WebdavFileAdaptor extends FileAdaptor {
     }
 
     @Override
+    public boolean canAppend() {
+        // Webdav cannot append to a file.
+        return false;
+    }
+
+    @Override
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties)
             throws XenonException {
 
