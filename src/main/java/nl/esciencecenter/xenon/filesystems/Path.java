@@ -109,10 +109,12 @@ public class Path implements Iterable<Path> {
      *            the path elements to use.
      */
     public Path(Path... paths) {
+
         if (paths == null || paths.length == 0) {
             elements = new ArrayList<>(0);
             separator = DEFAULT_SEPARATOR;
         } else {
+            isAbsolute = paths[0].isAbsolute;
             elements = new ArrayList<>(paths.length);
             
             Character sep = null;
@@ -195,6 +197,7 @@ public class Path implements Iterable<Path> {
         this.isAbsolute = isAbsolute;
         this.elements = elements;
     }
+
     List<String> filterNonEmpty(List<String> elts){
         List<String> res = new LinkedList<>();
         for(String s : elts){
@@ -204,6 +207,7 @@ public class Path implements Iterable<Path> {
         }
         return res;
     }
+
     /**
      * Get the file name, or <code>null</code> if the Path is empty.
      * 
@@ -253,7 +257,7 @@ public class Path implements Iterable<Path> {
             return null;
         }
 
-        return new Path(separator, elements.subList(0, elements.size() - 1));
+        return new Path(separator, isAbsolute, elements.subList(0, elements.size() - 1));
     }
 
     /**
@@ -299,8 +303,8 @@ public class Path implements Iterable<Path> {
         if (beginIndex == endIndex) {
             throw new IllegalArgumentException("beginIndex " + beginIndex + " equal to endIndex " + endIndex);
         }
-
-        return new Path(separator, elements.subList(beginIndex, endIndex));
+        boolean alsoAbsolute = beginIndex == 0 && isAbsolute;
+        return new Path(separator, alsoAbsolute, elements.subList(beginIndex, endIndex));
     }
 
     /**
@@ -315,7 +319,7 @@ public class Path implements Iterable<Path> {
      * @return If this Path start with the name elements in the other Path.
      */
     public boolean startsWith(Path other) {
-        return other.elements.size() <= elements.size()
+        return other.isAbsolute == isAbsolute && other.elements.size() <= elements.size()
             && elements.subList(0, other.elements.size()).equals(other.elements);
     }
 
@@ -331,6 +335,9 @@ public class Path implements Iterable<Path> {
      * @return If this Path ends with the name elements in the other Path.
      */
     public boolean endsWith(Path other) {
+        if(other.isAbsolute){
+            return equals(other);
+        }
         int offset = elements.size() - other.elements.size();
 
         return other.elements.size() <= elements.size() &&
@@ -384,10 +391,11 @@ public class Path implements Iterable<Path> {
             return other;
         }
 
+
         ArrayList<String> tmp = new ArrayList<>(elements.size() + other.elements.size());
         tmp.addAll(elements);
         tmp.addAll(other.elements);
-        return new Path(separator, tmp);
+        return new Path(separator,isAbsolute, tmp);
     }
 
     /**
@@ -480,7 +488,7 @@ public class Path implements Iterable<Path> {
             throw new IllegalArgumentException("Cannot relativize " + other + " to " + this);
         }
 
-        return new Path(separator, normalizedOther.subList(normalized.size(), normalizedOther.size()));
+        return new Path(separator, false, normalizedOther.subList(normalized.size(), normalizedOther.size()));
     }
 
     /**
@@ -587,12 +595,13 @@ public class Path implements Iterable<Path> {
         if (this == obj) {
             return true;
         }
+
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
         Path other = (Path) obj;
-        return separator == other.separator && elements.equals(other.elements);
+        return isAbsolute == other.isAbsolute && separator == other.separator && elements.equals(other.elements);
     }
 
     @Override
@@ -605,15 +614,15 @@ public class Path implements Iterable<Path> {
         }
     }
 
-    public boolean isAbsolute(){
+    public boolean isAbsolute() {
         return isAbsolute;
     }
 
-    public Path toRelativePath(){
+    public Path toRelativePath() {
         return new Path(separator,false, elements);
     }
 
-    public Path toAbsolutePath(){
+    public Path toAbsolutePath() {
         return new Path(separator,true, elements);
     }
 }

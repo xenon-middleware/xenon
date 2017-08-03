@@ -690,7 +690,7 @@ public class SlurmUtilsTest {
 
 		String [] expected = new String [] { 
 				"--quiet", 
-				"--comment=" + tag.toString(), 
+				"--job-name=" + tag.toString(),
 				"--nodes=1",
 				"--ntasks-per-node=1",
 				"--time=15", 
@@ -718,8 +718,8 @@ public class SlurmUtilsTest {
 
 		String [] expected = new String [] { 
 				"--quiet", 
-				"--comment=" + tag.toString(), 
-				"--chdir=" + entry.resolve("workdir").toString(),
+				"--job-name=" + tag,
+				"--chdir=" + entry.resolve("workdir"),
 				"--partition=queue", 
 				"--nodes=1",
 				"--ntasks-per-node=1",
@@ -748,7 +748,7 @@ public class SlurmUtilsTest {
 
 		String [] expected = new String [] { 
 				"--quiet", 
-				"--comment=" + tag.toString(), 
+				"--job-name=" + tag.toString(),
 				"--chdir=/workdir",
 				"--partition=queue", 
 				"--nodes=1",

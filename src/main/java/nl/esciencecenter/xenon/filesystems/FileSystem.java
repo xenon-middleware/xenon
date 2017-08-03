@@ -18,9 +18,13 @@ package nl.esciencecenter.xenon.filesystems;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.*;
-
-import java.util.concurrent.Callable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -30,6 +34,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.UnsupportedOperationException;
@@ -43,10 +50,6 @@ import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
-import nl.esciencecenter.xenon.InvalidCredentialException;
-import nl.esciencecenter.xenon.InvalidLocationException;
-import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.UnknownPropertyException;
 
 /**
  * FileSystem represent a (possibly remote) file system that can be used to access data.
@@ -94,6 +97,8 @@ public abstract class FileSystem {
 
     /**
      * Gives a list names of the available adaptors.
+     *
+     * @return the list
      */
     public static String [] getAdaptorNames() {
         return adaptors.keySet().toArray(new String[adaptors.size()]);
@@ -104,6 +109,7 @@ public abstract class FileSystem {
      *
      * @param adaptorName
      *            the type of file system to connect to (e.g. "sftp" or "webdav")
+     * @return the description
      * @throws UnknownAdaptorException
      *          If the adaptor name is absent in {@link #getAdaptorNames()}.
      */
@@ -113,6 +119,8 @@ public abstract class FileSystem {
 
     /**
      * Gives a list of the descriptions of the available adaptors.
+     *
+     * @return the list
      */
     public static FileSystemAdaptorDescription [] getAdaptorDescriptions() {
         return adaptors.values().toArray(new FileSystemAdaptorDescription[adaptors.size()]);
@@ -442,8 +450,8 @@ public abstract class FileSystem {
             t.setDaemon(true);
             return t;
         };
-		
-		this.pool = Executors.newFixedThreadPool(1, f); 
+
+		this.pool = Executors.newFixedThreadPool(1, f);
 	}
 
 	private synchronized String getNextCopyID() {
@@ -495,7 +503,7 @@ public abstract class FileSystem {
 	 *             If the FileSystem failed to close or if an I/O error occurred.
 	 */
 	public void close() throws XenonException {
-		try { 
+		try {
 			pool.shutdownNow();
 		} catch (Exception e) {
 			throw new XenonException(getAdaptorName(), "Failed to cleanly shutdown copy thread pool");
@@ -567,7 +575,7 @@ public abstract class FileSystem {
 	public void createDirectories(Path dir) throws XenonException {
 
 		assertNotNull(dir);
-				
+
 		Path parent = dir.getParent();
 
 		if (parent != null) {
@@ -575,9 +583,9 @@ public abstract class FileSystem {
 			if (!exists(parent)) {
 				// Recursive call
 				createDirectories(parent);
-			} 
+			}
 		}
-		
+
 		createDirectory(dir);
 	}
 
@@ -679,30 +687,30 @@ public abstract class FileSystem {
 		}
 
 		assertPathExists(path);
-		
+
 		if (getAttributes(path).isDirectory()) {
-			
+
 			Iterable<PathAttributes> itt = list(path, false);
-			
+
 			if (recursive) {
 				for (PathAttributes p : itt) {
 					delete(p.getPath(), true);
 				}
 			} else {
 				if (itt.iterator().hasNext()) {
-					
+
 					System.out.println("NOT EMPTY " + path.toString());
-					
+
 					for (PathAttributes p : itt) {
 						System.out.println(" -- " + p.getPath().toString());
-					}	
-		
+					}
+
 					throw new DirectoryNotEmptyException(getAdaptorName(), "Directory not empty: " + path.toString());
 				}
 			}
-			
-			
-			
+
+
+
 			deleteDirectory(path);
 		} else {
 			deleteFile(path);
@@ -753,9 +761,9 @@ public abstract class FileSystem {
      *             If path is null.
 	 */
 	public Iterable<PathAttributes> list(Path dir, boolean recursive) throws XenonException {
-		
+
 		assertDirectoryExists(dir);
-		
+
 		ArrayList<PathAttributes> result = new ArrayList<>();
 		list(dir, result, recursive);
 		return result;
@@ -1413,7 +1421,7 @@ public abstract class FileSystem {
 	 * @return a {@link CopyStatus} containing the status of the copy.
 	 *
 	 * @throws IllegalArgumentException
-	 *
+     *             If argument is illegal.
 	 * @throws NoSuchCopyException
 	 *             If the copy handle is not known.
      * @throws NotConnectedException
@@ -1443,7 +1451,12 @@ public abstract class FileSystem {
 		} catch (TimeoutException e) {
 			state = "RUNNING";
 		} catch (ExecutionException ee) {
-			ex = new XenonException(getAdaptorName(), ee.getMessage(),ee);
+		    Throwable cause = ee.getCause();
+		    if (cause instanceof XenonException) {
+		        ex = (XenonException) cause;
+            } else {
+                ex = new XenonException(getAdaptorName(), cause.getMessage(), cause);
+            }
 			state = "FAILED";
 		} catch (CancellationException | InterruptedException ec) {
 			ex = new CopyCancelledException(getAdaptorName(), "Copy cancelled by user");
@@ -1516,9 +1529,9 @@ public abstract class FileSystem {
 			throw new IllegalArgumentException("Path is null");
 		}
 	}
-	
+
 	protected void assertPathExists(Path path) throws XenonException {
-		
+
 		assertNotNull(path);
 
 		if (!exists(path)) {
@@ -1536,7 +1549,9 @@ public abstract class FileSystem {
 	}
 
 	protected void assertPathIsNotDirectory(Path path) throws XenonException{
-		assertNotNull(path);
+
+	    assertNotNull(path);
+
 		if(exists(path)){
 
 			PathAttributes a = getAttributes(path);
@@ -1560,11 +1575,11 @@ public abstract class FileSystem {
 		assertNotNull(path);
 
 		PathAttributes a = getAttributes(path);
-		
-		if (a == null) { 
+
+		if (a == null) {
 			throw new InvalidPathException(getAdaptorName(), "Path failed to produce attributes: " + path);
 		}
-		
+
 		if (!a.isDirectory()) {
 			throw new InvalidPathException(getAdaptorName(), "Path is not a directory: " + path);
 		}
@@ -1583,7 +1598,8 @@ public abstract class FileSystem {
 	protected void assertParentDirectoryExists(Path path) throws XenonException {
 
 		assertNotNull(path);
-
+        System.out.println("Me : " + path) ;
+        System.out.println("Dad: " + path.getParent());
 		Path parent = path.getParent();
 
 		if (parent == null) {
@@ -1593,13 +1609,19 @@ public abstract class FileSystem {
 		assertDirectoryExists(parent);
 	}
 
-	protected void assertFileIsSymbolicLink(Path link) throws XenonException{
+	protected void assertFileIsSymbolicLink(Path link) throws XenonException {
 		assertNotNull(link);
 		assertPathExists(link);
 		if(!getAttributes(link).isSymbolicLink()){
 			throw new InvalidPathException(getAdaptorName(), "Not a symbolic link: " + link);
 		}
 	}
+
+	protected void assertIsOpen() throws XenonException {
+	    if (!isOpen()) {
+	        throw new NotConnectedException(getAdaptorName(), "Connection is closed");
+	    }
+    }
 
 	protected boolean areSamePaths(Path source, Path target) {
 

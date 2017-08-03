@@ -119,6 +119,7 @@ public class FtpFileAdaptor extends FileAdaptor {
         String wd;
         try {
             wd = ftpClient.printWorkingDirectory();
+            System.out.println(wd);
         } catch (IOException e) {
             throw new XenonException(getName(), "Could not retrieve current working directory", e);
         }
@@ -176,5 +177,8 @@ public class FtpFileAdaptor extends FileAdaptor {
     }
 
     @Override
-    public boolean canAppend(){ return false;}
+    public boolean canAppend() { 
+        return false;
+    }
+    
 }

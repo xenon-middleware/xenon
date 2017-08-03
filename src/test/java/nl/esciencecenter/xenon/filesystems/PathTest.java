@@ -364,7 +364,7 @@ public class PathTest {
             assertEquals("Index: 3, Size: 2", e.getMessage());
         }
     }
-/*
+
     public void doSubPath(String[] input_path, int beginIndex, int endIndex, String[] epath) {
         Path path = new Path(input_path);
         Path expected_path = new Path(epath);
@@ -578,7 +578,7 @@ public class PathTest {
     public void testRelativize() {
         Path path = new Path("/a/b");
         Path path2 = new Path("/a/b/c/d");
-        Path path3 = new Path("/c/d");
+        Path path3 = new Path("c/d");
         Path path4 = path.relativize(path2);
         assertEquals(path3, path4);
     }
@@ -633,21 +633,21 @@ public class PathTest {
     @Test
     public void testGetPath_MultiElement_FilledString() {
         Path path = new Path("mydir/myfile");
-        String path_as_string = path.getRelativePath();
+        String path_as_string = path.toString();
         assertEquals(path_as_string, "mydir/myfile");
     }
 
     @Test
     public void testGetPath_OneElement_FilledString() {
         Path path = new Path("myfile");
-        String path_as_string = path.getRelativePath();
+        String path_as_string = path.toString();
         assertEquals(path_as_string, "myfile");
     }
 
     @Test
     public void testGetPath_NullElement_EmptyString() {
         Path path = new Path();
-        String path_as_string = path.getRelativePath();
+        String path_as_string = path.toString();
         assertEquals(path_as_string, "");
     }
 
@@ -666,7 +666,7 @@ public class PathTest {
     @Test
     public void testNormalize_DoubleDotsAfterFirstElement_SamePath() {
         Path path = new Path("mydir/../myfile");
-        Path epath = new Path("/myfile");
+        Path epath = new Path("myfile");
         assertEquals(path.normalize(), epath);
     }
 
@@ -887,7 +887,7 @@ public class PathTest {
     public void test_copyArrayWithEmpty() {
     	
     	Path [] p = new Path[3];
-    	p[0] = new Path("aap");
+    	p[0] = new Path("/aap");
     	p[1] = null;
     	p[2] = new Path("noot");
     	
@@ -914,5 +914,80 @@ public class PathTest {
         
         assertEquals(result, p1.hashCode());
     }
-    */
+
+
+
+    @Test
+    public void testStartsRoundTripAbsolute() {
+	    String s = "/aap/noot/mies";
+        assertEquals(s,new Path(s).toString());
+    }
+
+    @Test
+    public void testStartsRoundTripRelative() {
+        String s = "aap/noot/mies";
+        assertEquals(s,new Path(s).toString());
+    }
+
+    @Test
+    public void testStartsRoundTripRelativeParent() {
+        String s = "aap/noot/mies";
+        Path p = new Path(s);
+        assertEquals(p.getParent(),new Path("aap/noot"));
+    }
+
+    @Test
+    public void testStartsRoundTripAbsoluteParent() {
+        String s = "/aap/noot/mies";
+        Path p = new Path(s);
+        assertEquals(p.getParent(),new Path("/aap/noot"));
+    }
+
+    @Test
+    public void testStartsIsAbsoluteSubString() {
+        String s = "/aap/noot/mies";
+        Path p = new Path(s);
+        assertEquals(p.subpath(0,2),new Path("/aap/noot"));
+    }
+
+    @Test
+    public void testStartsNoMoreAbsoluteSubString() {
+        String s = "/aap/noot/mies";
+        Path p = new Path(s);
+        assertEquals(p.subpath(1,3),new Path("noot/mies"));
+    }
+
+
+    @Test
+    public void testStartResolveAbsolute() {
+        String s = "/aap/noot";
+        Path p = new Path(s);
+        assertEquals(p.resolve(new Path("mies")),new Path("/aap/noot/mies"));
+    }
+
+    @Test
+    public void testStartResolveRelative() {
+        String s = "aap/noot";
+        Path p = new Path(s);
+        assertEquals(p.resolve(new Path("mies")),new Path("aap/noot/mies"));
+    }
+
+    @Test
+    public void testStartRelativize() {
+        Path p = new Path("/aap/noot");
+        Path q = new Path("/aap/noot/mies/bla");
+        Path z = p.relativize(q);
+        assertEquals(q, p.resolve(z));
+    }
+
+    @Test
+    public void testHome(){
+	    String s = "~xenon/bla/bla";
+	    Path q = new Path(s);
+	    assertEquals(s,q.toString());
+    }
+
+
+
+
 }

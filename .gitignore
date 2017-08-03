@@ -22,3 +22,4 @@
 # Sonar
 /.scannerwork
 /.sonarlint
+/build-eclipse/

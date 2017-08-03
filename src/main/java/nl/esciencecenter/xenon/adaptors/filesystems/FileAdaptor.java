@@ -58,22 +58,24 @@ public abstract class FileAdaptor extends Adaptor implements FileSystemAdaptorDe
 
 
 	@Override
-	public boolean supportsReadingPosixPermissions(){
+	public boolean supportsReadingPosixPermissions() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsSettingPosixPermissions(){
+	public boolean supportsSettingPosixPermissions() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsRename(){
+	public boolean supportsRename() { 
 		return true;
 	}
+	
 	@Override
-	public boolean canAppend(){ return true; }
-
+	public boolean canAppend() { 
+	    return true; 
+	}
 	
 	public abstract FileSystem createFileSystem(String location, Credential credential, Map<String,String> properties) throws XenonException;
 	

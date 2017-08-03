@@ -25,25 +25,24 @@ public interface CopyStatus {
 
 	/**
 	 * Get the copy identifier for which this CopyStatus was created.
-	 * 
+	 *
 	 * @return the Copy.
 	 */
 	String getCopyIdentifier();
 
 	/**
 	 * Get the state of the Copy operation.
-	 * 
+	 *
 	 * @return the state of the Copy operation.
 	 */
 	String getState();
 
 	/**
 	 * Get the exception produced by the Copy or while retrieving the status.
-	 * 
+	 *
 	 * @return the exception.
 	 */
-	Throwable getException();
-
+	XenonException getException();
 
 	/**
 	 * Throws the exception that occured during copying, if it exists. Otherwise continue.
@@ -63,35 +62,35 @@ public interface CopyStatus {
 
 	/**
 	 * Is the Copy still running?
-	 * 
+	 *
 	 * @return if the Copy is running.
 	 */
 	boolean isRunning();
 
 	/**
 	 * Is the Copy done?
-	 * 
+	 *
 	 * @return if the Copy is done.
 	 */
 	boolean isDone();
 
 	/**
 	 * Has the Copy or status retrieval produced a exception ?
-	 * 
+	 *
 	 * @return if the Copy or status retrieval produced a exception.
 	 */
 	boolean hasException();
 
 	/**
 	 * Get the number of bytes that need to be copied for the entire copy operation.
-	 * 
+	 *
 	 * @return the number of bytes that need to be copied.
 	 */
 	long bytesToCopy();
 
 	/**
 	 * Get the number of bytes that have been copied.
-	 * 
+	 *
 	 * @return the number of bytes that have been copied.
 	 */
 	long bytesCopied();
