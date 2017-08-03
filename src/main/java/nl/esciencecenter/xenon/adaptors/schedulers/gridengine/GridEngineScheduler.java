@@ -248,7 +248,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
             //convert to absolute path if needed
             if (!customScriptFile.startsWith("/")) {
                 Path scriptFile = fsEntryPath.resolve(customScriptFile);
-                customScriptFile = scriptFile.getAbsolutePath();
+                customScriptFile = scriptFile.toString();
             }
 
             output = runCheckedCommand(null, "qsub", customScriptFile);

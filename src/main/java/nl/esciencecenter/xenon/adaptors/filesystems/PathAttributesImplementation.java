@@ -327,7 +327,7 @@ public class PathAttributesImplementation implements PathAttributes {
     }
 
     public String toString() { 
-        return path.getAbsolutePath();
+        return path.toString();
     }
 
     @Override

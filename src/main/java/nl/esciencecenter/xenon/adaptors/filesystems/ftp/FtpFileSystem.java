@@ -204,12 +204,12 @@ public class FtpFileSystem extends FileSystem {
 		assertParentDirectoryExists(target);
 		
 		try { 
-			ftpClient.rename(source.getAbsolutePath(), target.getAbsolutePath());
+			ftpClient.rename(source.toString(), target.toString());
 		} catch (Exception e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to rename " + source.getAbsolutePath() + " to " + target.getAbsolutePath(), e);
+			throw new XenonException(ADAPTOR_NAME, "Failed to rename " + source.toString() + " to " + target.toString(), e);
 		}
 		
-		checkClientReply("Failed to rename " + source.getAbsolutePath() + " to " + target.getAbsolutePath());
+		checkClientReply("Failed to rename " + source.toString() + " to " + target.toString());
 	}
 
 	@Override
@@ -220,12 +220,12 @@ public class FtpFileSystem extends FileSystem {
 		assertParentDirectoryExists(path);
 		
 		try { 
-			ftpClient.makeDirectory(path.getAbsolutePath());
+			ftpClient.makeDirectory(path.toString());
 		} catch (Exception e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to createDirectory " + path.getAbsolutePath(), e);
+			throw new XenonException(ADAPTOR_NAME, "Failed to createDirectory " + path.toString(), e);
 		}
 		
-		checkClientReply("Failed to create directory: " + path.getAbsolutePath());
+		checkClientReply("Failed to create directory: " + path.toString());
 	}
 
 	@Override
@@ -237,12 +237,12 @@ public class FtpFileSystem extends FileSystem {
 		
 		try {
 			ByteArrayInputStream dummy = new ByteArrayInputStream(new byte[0]);
-			ftpClient.storeFile(path.getAbsolutePath(), dummy);
+			ftpClient.storeFile(path.toString(), dummy);
 		} catch (Exception e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to createDirectory " + path.getAbsolutePath(), e);
+			throw new XenonException(ADAPTOR_NAME, "Failed to createDirectory " + path.toString(), e);
 		}
 
-		checkClientReply("Failed to create file: " + path.getAbsolutePath());
+		checkClientReply("Failed to create file: " + path.toString());
 	}
 
 	@Override
@@ -254,34 +254,34 @@ public class FtpFileSystem extends FileSystem {
 	protected void deleteDirectory(Path path) throws XenonException {
 		
 		try {
-			ftpClient.removeDirectory(path.getAbsolutePath());
+			ftpClient.removeDirectory(path.toString());
 		} catch (Exception e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to createDirectory " + path.getAbsolutePath(), e);
+			throw new XenonException(ADAPTOR_NAME, "Failed to createDirectory " + path.toString(), e);
 		}
 		
-		checkClientReply("Failed to delete directory: " + path.getAbsolutePath());
+		checkClientReply("Failed to delete directory: " + path.toString());
 	}
 	
 	@Override
 	protected void deleteFile(Path path) throws XenonException {
 		try {
-			ftpClient.deleteFile(path.getAbsolutePath());
+			ftpClient.deleteFile(path.toString());
 		} catch (Exception e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to createDirectory " + path.getAbsolutePath(), e);
+			throw new XenonException(ADAPTOR_NAME, "Failed to createDirectory " + path.toString(), e);
 		}
 		
-		checkClientReply("Failed to delete file: " + path.getAbsolutePath());
+		checkClientReply("Failed to delete file: " + path.toString());
 	}
 
 	
 	private boolean fileExists(Path path) throws XenonException {
 		
 		try { 
-			FTPFile[] listFiles = ftpClient.listFiles(path.getAbsolutePath());
-			checkClientReply("Failed to check if file exists: " + path.getAbsolutePath());
+			FTPFile[] listFiles = ftpClient.listFiles(path.toString());
+			checkClientReply("Failed to check if file exists: " + path.toString());
 			return (listFiles != null && listFiles.length == 1);
 		} catch (Exception e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to check if file exists: " + path.getAbsolutePath() + " " + e.getMessage(), e);
+			throw new XenonException(ADAPTOR_NAME, "Failed to check if file exists: " + path.toString() + " " + e.getMessage(), e);
 		}
 	}
 
@@ -289,14 +289,14 @@ public class FtpFileSystem extends FileSystem {
 		
 		try { 
 			String originalWorkingDirectory = ftpClient.printWorkingDirectory();
-			boolean pathExists = ftpClient.changeWorkingDirectory(path.getAbsolutePath());
+			boolean pathExists = ftpClient.changeWorkingDirectory(path.toString());
 			
-			// checkClientReply("Failed to check if directory exists: " + path.getAbsolutePath());
+			// checkClientReply("Failed to check if directory exists: " + path.toString());
 			
 			ftpClient.changeWorkingDirectory(originalWorkingDirectory);
 			return pathExists;
 		} catch (Exception e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to check if directory exists: " + path.getAbsolutePath(), e);
+			throw new XenonException(ADAPTOR_NAME, "Failed to check if directory exists: " + path.toString(), e);
 		}
 	}
 	
@@ -313,7 +313,7 @@ public class FtpFileSystem extends FileSystem {
 		
 			ArrayList<PathAttributes> result = new ArrayList<>();
 			
-			for (FTPFile f : ftpClient.listFiles(path.getAbsolutePath(), FTPFileFilters.NON_NULL)) { 
+			for (FTPFile f : ftpClient.listFiles(path.toString(), FTPFileFilters.NON_NULL)) {
 				result.add(convertAttributes(path.resolve(f.getName()), f));
 			}
 	
@@ -335,10 +335,10 @@ public class FtpFileSystem extends FileSystem {
 		newClient.enterLocalPassiveMode();
 		
 		try {
-			InputStream in = newClient.retrieveFileStream(path.getAbsolutePath()); 
+			InputStream in = newClient.retrieveFileStream(path.toString());
 			
 			//if (in == null) { 
-				checkClientReply(newClient, "Failed to read from path: " + path.getAbsolutePath());
+				checkClientReply(newClient, "Failed to read from path: " + path.toString());
 			//}
 			
 			return new FtpInputStream(in, newClient);
@@ -358,10 +358,10 @@ public class FtpFileSystem extends FileSystem {
 		newClient.enterLocalPassiveMode();
 		
 		try {
-			OutputStream out = newClient.storeFileStream(path.getAbsolutePath());
+			OutputStream out = newClient.storeFileStream(path.toString());
 			
 			//if (out == null) { 
-				checkClientReply(newClient, "Failed to write to path: " + path.getAbsolutePath());
+				checkClientReply(newClient, "Failed to write to path: " + path.toString());
 			//}
 
 			return new FtpOutputStream(out, newClient);
@@ -390,10 +390,10 @@ public class FtpFileSystem extends FileSystem {
             // Since FTP connections can only do a single thing a time, we need a new FTPClient to handle the stream.
             FTPClient newClient = adaptor.connect(getLocation(), credential);
             newClient.enterLocalPassiveMode();
-			OutputStream out = newClient.appendFileStream(path.getAbsolutePath());
+			OutputStream out = newClient.appendFileStream(path.toString());
 			
 			if (out == null) { 
-				checkClientReply("Failed to append to path: "+ path.getAbsolutePath());
+				checkClientReply("Failed to append to path: "+ path.toString());
 			}
 
 			return new FtpOutputStream(out, newClient);
@@ -416,7 +416,7 @@ public class FtpFileSystem extends FileSystem {
 //		try {
 //			ftpClient.pasv();
 //			
-//			FTPFile [] result = ftpClient.listFiles(path.getAbsolutePath());
+//			FTPFile [] result = ftpClient.listFiles(path.toString());
 //		
 //			String replyString = ftpClient.getReplyString();
 //	        int code = ftpClient.getReplyCode();
@@ -429,11 +429,11 @@ public class FtpFileSystem extends FileSystem {
 //		}
 		
 		try { 
-			FTPFile [] result = ftpClient.listFiles(path.getAbsolutePath());
-			checkClientReply("Failed to retrieve attributes of path: " + path.getAbsolutePath());
+			FTPFile [] result = ftpClient.listFiles(path.toString());
+			checkClientReply("Failed to retrieve attributes of path: " + path.toString());
 			return result[0];
 		} catch (IOException e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to retrieve attributes of path: " + path.getAbsolutePath());
+			throw new XenonException(ADAPTOR_NAME, "Failed to retrieve attributes of path: " + path.toString());
 		}
 		
 //		
@@ -451,7 +451,7 @@ public class FtpFileSystem extends FileSystem {
 	private FTPFile getDirectoryFtpFile(Path path) throws XenonException {
 
 		try { 
-			FTPFile[] result = ftpClient.listDirectories(path.getAbsolutePath());
+			FTPFile[] result = ftpClient.listDirectories(path.toString());
 			checkClientReply("Failed to retrieve attributes of directory");
 			return result[0];
 		} catch (Exception e) {

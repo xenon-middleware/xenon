@@ -79,11 +79,11 @@ public class WebdavFileSystem extends FileSystem {
 	}
     
 	private String toFolderPath(Path path) {
-		return server + path.getAbsolutePath() + "/";
+		return server + path.toString() + "/";
     }
 
 	private String toFilePath(Path path) {
-		return server + path.getAbsolutePath();
+		return server + path.toString();
 	}
     
     private boolean isFolderPath(String path) {

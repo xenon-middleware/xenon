@@ -97,7 +97,7 @@ public class SftpFileSystem extends FileSystem {
 		assertParentDirectoryExists(target);
 
 		try {
-			client.rename(source.getAbsolutePath(), target.getAbsolutePath());
+			client.rename(source.toString(), target.toString());
 		} catch (IOException e) {
 			throw new XenonException(ADAPTOR_NAME, "Failed to rename path", e);
 		}
@@ -114,7 +114,7 @@ public class SftpFileSystem extends FileSystem {
 		assertParentDirectoryExists(dir);
 		
 		try {
-			client.mkdir(dir.getAbsolutePath());
+			client.mkdir(dir.toString());
 		} catch (IOException e) {
 			throw new XenonException(ADAPTOR_NAME, "Failed to mkdir", e);
 		}
@@ -149,7 +149,7 @@ public class SftpFileSystem extends FileSystem {
 	@Override
 	public void createSymbolicLink(Path link, Path path) throws XenonException {
 		try {
-			client.symLink(link.getAbsolutePath(), path.getAbsolutePath());
+			client.symLink(link.toString(), path.toString());
 		} catch (IOException e) {
 			sftpExceptionToXenonException(e, "Cannot create link: " + link + " -> "+ path);
 		}
@@ -157,7 +157,7 @@ public class SftpFileSystem extends FileSystem {
 	@Override
 	protected void deleteFile(Path file) throws XenonException { 
 		try { 
-			client.remove(file.getAbsolutePath());
+			client.remove(file.toString());
 		} catch (IOException e) {
 			sftpExceptionToXenonException(e, "Cannot delete file: " + file);
 		}
@@ -166,7 +166,7 @@ public class SftpFileSystem extends FileSystem {
 	@Override
 	protected void deleteDirectory(Path dir) throws XenonException { 
 		try { 
-			client.rmdir(dir.getAbsolutePath());
+			client.rmdir(dir.toString());
 		} catch (IOException e) {
 			sftpExceptionToXenonException(e, "Cannot delete directory: " + dir);
 		}
@@ -179,7 +179,7 @@ public class SftpFileSystem extends FileSystem {
 		SftpClient.Attributes result;
 
 		try {
-			result = client.lstat(path.getAbsolutePath());
+			result = client.lstat(path.toString());
 
 		} catch (IOException e) {
 			throw sftpExceptionToXenonException(e, "Failed to retrieve attributes from: " + path);
@@ -216,7 +216,7 @@ public class SftpFileSystem extends FileSystem {
 //		ArrayList<PathAttributesPair> result = new ArrayList<>();
 //		
 //		try { 
-//			for (SftpClient.DirEntry e : client.readDir(path.getAbsolutePath())) { 
+//			for (SftpClient.DirEntry e : client.readDir(path.toString())) {
 //				result.add(convert(path, e));
 //			}
 //		} catch (IOException e) { 
@@ -233,7 +233,7 @@ public class SftpFileSystem extends FileSystem {
 			assertDirectoryExists(path);
 		
 			ArrayList<PathAttributes> result = new ArrayList<>();
-			for (SftpClient.DirEntry f : client.readDir(path.getAbsolutePath())) { 
+			for (SftpClient.DirEntry f : client.readDir(path.toString())) {
 				result.add(convertAttributes(path.resolve(f.getFilename()), f.getAttributes()));
 			}
 	
@@ -265,7 +265,7 @@ public class SftpFileSystem extends FileSystem {
 		InputStream in;
 
 		try {
-			in = client.read(path.getAbsolutePath());        	
+			in = client.read(path.toString());
 		} catch (IOException e) {
 			throw new XenonException(ADAPTOR_NAME, "Failed to open stream to read from " + path, e);
 		}
@@ -283,7 +283,7 @@ public class SftpFileSystem extends FileSystem {
 		assertParentDirectoryExists(path);
 		
 		try {
-			return client.write(path.getAbsolutePath(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Create, SftpClient.OpenMode.Truncate);      	
+			return client.write(path.toString(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Create, SftpClient.OpenMode.Truncate);
 		} catch (IOException e) {
 			throw new XenonException(ADAPTOR_NAME, "Failed open stream to write to: " + path, e);
 		}
@@ -301,7 +301,7 @@ public class SftpFileSystem extends FileSystem {
 		assertFileExists(path);
 		
 		try {
-			return client.write(path.getAbsolutePath(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Append);      	
+			return client.write(path.toString(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Append);
 		} catch (IOException e) {
 			throw new XenonException(ADAPTOR_NAME, "Failed open stream to write to: " + path, e);
 		}
@@ -320,7 +320,7 @@ public class SftpFileSystem extends FileSystem {
 		Path result;
 		assertFileIsSymbolicLink(link);
 		try {
-			String target = client.readLink(link.getAbsolutePath());
+			String target = client.readLink(link.toString());
 
 			if (!target.startsWith(File.separator)) {                
 				Path parent = link.getParent();
@@ -352,7 +352,7 @@ public class SftpFileSystem extends FileSystem {
 			// we'll receive an error since some of the other attributes cannot be changed (learned this the hard way).
 			SftpClient.Attributes a = new SftpClient.Attributes();
 			a.setPermissions(PosixFileUtils.permissionsToBits(permissions));
-			client.setStat(path.getAbsolutePath(), a);
+			client.setStat(path.toString(), a);
 		} catch (IOException e) {
 			throw new XenonException(ADAPTOR_NAME, "Failed to set permissions on: " + path, e);
 		}

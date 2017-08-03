@@ -314,7 +314,7 @@ public class MockFileSystem extends FileSystem {
 				}
 			}
 			
-			System.out.println("List of " + attributes.getPath().getAbsolutePath() + " " + result);
+			System.out.println("List of " + attributes.getPath().toString() + " " + result);
 			
 			return result;
 		}

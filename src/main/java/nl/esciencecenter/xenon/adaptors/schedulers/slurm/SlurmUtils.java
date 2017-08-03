@@ -321,7 +321,7 @@ public final class SlurmUtils {
         } else {
             //make relative path absolute
             Path workingDirectory = fsEntryPath.resolve(description.getWorkingDirectory());
-            path = workingDirectory.getAbsolutePath();
+            path = workingDirectory.toString();
         }
 
         return path;

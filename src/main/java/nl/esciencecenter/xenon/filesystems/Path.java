@@ -15,12 +15,7 @@
  */
 package nl.esciencecenter.xenon.filesystems;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * Path contains a sequence of path elements separated by a separator.
@@ -40,6 +35,9 @@ public class Path implements Iterable<Path> {
 
     /** The separator used in this relative path */
     private final char separator;
+
+    /** Does path start with / ? **/
+    private boolean isAbsolute;
 
     /** Estimate of path element String length. */
     private static final int PATH_ELEMENT_LENGTH = 25;
@@ -173,23 +171,38 @@ public class Path implements Iterable<Path> {
         
         if (tmp == null) {
             tmp = new ArrayList<>(0);
+        } else {
+            tmp = filterNonEmpty(tmp);
         }
-        
-        this.separator = separator;
-
         String delim = String.valueOf(separator);
+
+        this.isAbsolute = !tmp.isEmpty() && tmp.get(0).startsWith(delim);
+
+        this.separator = separator;
 
         this.elements = new ArrayList<>(tmp.size());
         for (String elt : tmp) {
-            if (elt == null || elt.isEmpty()) {
-                continue;
-            }
             StringTokenizer tok = new StringTokenizer(elt, delim);
 
             while (tok.hasMoreTokens()) {
                 this.elements.add(tok.nextToken());
             }
         }
+    }
+
+    private Path(char separator, boolean isAbsolute, List<String> elements) {
+        this.separator = separator;
+        this.isAbsolute = isAbsolute;
+        this.elements = elements;
+    }
+    List<String> filterNonEmpty(List<String> elts){
+        List<String> res = new LinkedList<>();
+        for(String s : elts){
+            if(s != null && !s.isEmpty()){
+                res.add(s);
+            }
+        }
+        return res;
     }
     /**
      * Get the file name, or <code>null</code> if the Path is empty.
@@ -459,12 +472,12 @@ public class Path implements Iterable<Path> {
 
         // The source may not be longer that target
         if (normalized.size() > normalizedOther.size()) {
-            throw new IllegalArgumentException("Cannot relativize " + other.getAbsolutePath() + " to " + getAbsolutePath());
+            throw new IllegalArgumentException("Cannot relativize " + other + " to " + this);
         }
 
         // Source and target must have the same start.
         if (!normalizedOther.subList(0, normalized.size()).equals(normalized)) {
-            throw new IllegalArgumentException("Cannot relativize " + other.getAbsolutePath() + " to " + getAbsolutePath());
+            throw new IllegalArgumentException("Cannot relativize " + other + " to " + this);
         }
 
         return new Path(separator, normalizedOther.subList(normalized.size(), normalizedOther.size()));
@@ -488,7 +501,7 @@ public class Path implements Iterable<Path> {
      * 
      * @return a String representation of this Path interpreted as a relative path.
      */
-    public String getRelativePath() {
+    private String getRelativePath() {
         StringBuilder tmp = new StringBuilder(elements.size() * PATH_ELEMENT_LENGTH);
 
         String sep = "";
@@ -509,7 +522,7 @@ public class Path implements Iterable<Path> {
      * 
      * @return a String representation of this path interpreted as an absolute path.
      */
-    public String getAbsolutePath() {
+    private String getAbsolutePath() {
         return separator + getRelativePath();
     }
 
@@ -584,6 +597,23 @@ public class Path implements Iterable<Path> {
 
     @Override
     public String toString() {
-        return getAbsolutePath();
+
+        if(isAbsolute) {
+            return getAbsolutePath();
+        } else {
+            return getRelativePath();
+        }
+    }
+
+    public boolean isAbsolute(){
+        return isAbsolute;
+    }
+
+    public Path toRelativePath(){
+        return new Path(separator,false, elements);
+    }
+
+    public Path toAbsolutePath(){
+        return new Path(separator,true, elements);
     }
 }
