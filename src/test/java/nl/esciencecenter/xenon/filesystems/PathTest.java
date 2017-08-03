@@ -988,6 +988,12 @@ public class PathTest {
     }
 
 
+    @Test
+    public void testPathArrayNullAbsolute(){
+        Path q = new Path(new Path[]{null,null, new Path("/"), null, new Path("") , new Path("aap")});
+        assertEquals(q.toString(),"/aap");
+    }
+
 
 
 }

@@ -114,17 +114,22 @@ public class Path implements Iterable<Path> {
             elements = new ArrayList<>(0);
             separator = DEFAULT_SEPARATOR;
         } else {
-            isAbsolute = paths[0].isAbsolute;
+            boolean isAbsoluteSet = false;
             elements = new ArrayList<>(paths.length);
             
             Character sep = null;
             
             for (Path path : paths) {
                 if (path != null) {
-                    elements.addAll(path.elements);
-                    
-                    if (sep == null) { 
-                    	sep = new Character(paths[0].separator);
+                    if (!isAbsoluteSet) {
+                        isAbsolute = path.isAbsolute;
+                        isAbsoluteSet = true;
+                    }
+                    if (!path.isEmpty()) {
+                        elements.addAll(path.elements);
+                    }
+                    if (sep == null) {
+                        sep = new Character(path.separator);
                     }
                 }
             }
@@ -135,6 +140,7 @@ public class Path implements Iterable<Path> {
             	separator = sep.charValue();
             }
         }
+
     }
 
     /**
