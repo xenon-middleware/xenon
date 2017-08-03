@@ -100,7 +100,7 @@ public class LocalFileSystem extends FileSystem {
 	
 	@Override
 	public boolean exists(Path path) throws XenonException {
-		return java.nio.file.Files.exists(LocalUtil.javaPath(this, path));
+		return java.nio.file.Files.exists(LocalUtil.javaPath(this, path),java.nio.file.LinkOption.NOFOLLOW_LINKS);
 	}
 	
 	@Override
@@ -116,7 +116,7 @@ public class LocalFileSystem extends FileSystem {
     
     @Override
     public OutputStream writeToFile(Path path, long size) throws XenonException {
-		assertPathIsNotDirectory(path);
+		assertPathNotExists(path);
         try {
             return java.nio.file.Files.newOutputStream(LocalUtil.javaPath(this, path), 
             		StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);

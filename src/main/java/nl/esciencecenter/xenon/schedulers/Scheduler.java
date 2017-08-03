@@ -26,6 +26,7 @@ import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
@@ -78,14 +79,28 @@ public abstract class Scheduler {
 		return adaptor;
 	}
 
+    /**
+     * Gives a list names of the available adaptors.
+     */
 	public static String [] getAdaptorNames() {
 		return adaptors.keySet().toArray(new String[adaptors.size()]);
 	}
 
+    /**
+     * Gives the description of the adaptor with the given name.
+     *
+     * @param adaptorName
+     *            the type of scheduler to connect to (e.g. "slurm" or "torque")
+     * @throws UnknownAdaptorException
+     *          If the adaptor name is absent in {@link #getAdaptorNames()}.
+     */
 	public static SchedulerAdaptorDescription getAdaptorDescription(String adaptorName) throws UnknownAdaptorException {
 		return getAdaptorByName(adaptorName);
 	}
 
+    /**
+     * Gives a list of the descriptions of the available adaptors.
+     */
 	public static SchedulerAdaptorDescription [] getAdaptorDescriptions() {
 		return adaptors.values().toArray(new SchedulerAdaptorDescription[adaptors.size()]);
 	}
@@ -121,6 +136,8 @@ public abstract class Scheduler {
      * 
      * @throws XenonException
      *             If the creation of the Scheduler failed.
+     * @throws IllegalArgumentException
+     *             If adaptor is null.
      */
 	public static Scheduler create(String adaptor, String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
@@ -155,6 +172,8 @@ public abstract class Scheduler {
      * 
      * @throws XenonException
      *             If the creation of the Scheduler failed.
+     * @throws IllegalArgumentException
+     *             If adaptor is null.
      */
 	public static Scheduler create(String adaptor, String location, Credential credential) throws XenonException {
 		return create(adaptor, location, credential, new HashMap<>(0));
@@ -186,6 +205,8 @@ public abstract class Scheduler {
      * 
      * @throws XenonException
      *             If the creation of the Scheduler failed.
+     * @throws IllegalArgumentException
+     *             If adaptor is null.
      */
 	public static Scheduler create(String adaptor, String location) throws XenonException {
 		return create(adaptor, location, new DefaultCredential());
@@ -218,6 +239,8 @@ public abstract class Scheduler {
      * 
      * @throws XenonException
      *             If the creation of the Scheduler failed.
+     * @throws IllegalArgumentException
+     *             If adaptor is null.
      */
 	public static Scheduler create(String adaptor) throws XenonException {
 		return create(adaptor, null);
@@ -279,7 +302,9 @@ public abstract class Scheduler {
      * Get the queue names supported by this Scheduler.
      * 
      * @return the queue names supported by this Scheduler.
-     * 
+     *
+     * @throws NotConnectedException
+     *             If scheduler is closed.
      * @throws XenonException
      * 		       If an I/O error occurred.
      */
@@ -308,7 +333,9 @@ public abstract class Scheduler {
      * Get the name of the default queue.
      * 
      * @return the name of the default queue for this scheduler, or <code>null</code> if no default queue is available.
-     * 
+     *
+     * @throws NotConnectedException
+     *             If scheduler is closed.
      * @throws XenonException
      *             If an I/O error occurred.
      */
@@ -325,7 +352,10 @@ public abstract class Scheduler {
      *            the names of the queues.
      * 
      * @return an array containing the resulting job identifiers .
-     * 
+     *
+     *
+     * @throws NotConnectedException
+     *             If scheduler is closed.
      * @throws NoSuchQueueException
      *             If the queue does not exist in the scheduler.
      * @throws XenonException

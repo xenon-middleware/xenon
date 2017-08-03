@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPFileFilters;
@@ -69,7 +70,7 @@ public class FtpFileSystem extends FileSystem {
 		LOGGER.debug("close fileSystem = {}", this);
 
 		if (!isOpen()) {
-			throw new XenonException(ADAPTOR_NAME, "File system is already closed");
+			throw new NotConnectedException(ADAPTOR_NAME, "File system is already closed");
 		}
 
 		try {

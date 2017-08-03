@@ -15,11 +15,6 @@
  */
 package nl.esciencecenter.xenon.filesystems;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -37,6 +32,9 @@ import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation
 import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
 
 import org.junit.Test;
+
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.*;
 
 public class FileSystemTest {
 
@@ -997,7 +995,7 @@ public class FileSystemTest {
 
 		assertTrue(s.isDone());
 		assertTrue(s.hasException());
-		assertTrue(s.getException() instanceof PathAlreadyExistsException);
+		assertThat(s.getException(), instanceOf(PathAlreadyExistsException.class));
 	}
 
 	@Test
@@ -1066,7 +1064,7 @@ public class FileSystemTest {
 
 		assertTrue(s.isDone());
 		assertTrue(s.hasException());
-		assertTrue(s.getException() instanceof NoSuchPathException);
+		assertThat(s.getException(), instanceOf(NoSuchPathException.class));
 	}
 
 	@Test
@@ -1083,7 +1081,7 @@ public class FileSystemTest {
 
 		assertTrue(s.isDone());
 		assertTrue(s.hasException());
-		assertTrue(s.getException() instanceof InvalidPathException);
+		assertThat(s.getException(), instanceOf(InvalidPathException.class));
 	}
 
 	@Test
@@ -1106,7 +1104,7 @@ public class FileSystemTest {
 
 		assertTrue(s.isDone());
 		assertTrue(s.hasException());
-		assertTrue(s.getException() instanceof InvalidPathException);
+		assertThat(s.getException(), instanceOf(InvalidPathException.class));
 	}
 
 	@Test
@@ -1209,7 +1207,7 @@ public class FileSystemTest {
 
 		assertTrue(s2.isDone());
 		assertTrue(s2.hasException());
-		assertTrue(s2.getException() instanceof XenonException);
+		assertThat(s2.getException(), instanceOf(XenonException.class));
 	}
 
 	private void sleep(long delay) { 
