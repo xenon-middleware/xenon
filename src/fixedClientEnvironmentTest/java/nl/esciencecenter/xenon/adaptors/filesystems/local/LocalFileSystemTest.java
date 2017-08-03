@@ -45,6 +45,11 @@ public class LocalFileSystemTest extends FileSystemTestParent {
 			public Path getWritableTestDir() {
 				return new Path("/tmp");
 			}
+
+            @Override
+            public Path getExpectedEntryPath() {
+                return new Path(System.getProperty("user.dir"));
+            }
         };
     }
 

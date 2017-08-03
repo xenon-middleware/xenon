@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.local;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.util.Map;
 
@@ -99,10 +100,9 @@ public class LocalFileAdaptor extends FileAdaptor {
 
 		XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
-		String root = LocalUtil.getLocalRoot(location);
-		Path relativePath = new Path(root).relativize(new Path(location));
+		Path entry = new Path(File.separatorChar, System.getProperty("user.dir"));
 
-		return new LocalFileSystem(getNewUniqueID(), location, relativePath, xp);
+		return new LocalFileSystem(getNewUniqueID(), location, entry, xp);
 	}
 
     @Override

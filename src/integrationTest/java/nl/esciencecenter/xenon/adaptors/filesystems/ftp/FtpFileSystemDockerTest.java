@@ -58,6 +58,11 @@ public class FtpFileSystemDockerTest extends FtpFileSystemTestParent {
     		public Path getWritableTestDir() {
     			return fileSystem.getEntryPath();
     		}
+
+			@Override
+			public Path getExpectedEntryPath() {
+				return new Path("/home/xenon");
+			}
 		};
     }
 
