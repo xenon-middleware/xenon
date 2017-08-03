@@ -101,6 +101,7 @@ public class LocalFileAdaptor extends FileAdaptor {
 		XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
 		Path entry = new Path(File.separatorChar, System.getProperty("user.dir"));
+        // for Windows remove the drive letter from entry?
 
 		return new LocalFileSystem(getNewUniqueID(), location, entry, xp);
 	}
