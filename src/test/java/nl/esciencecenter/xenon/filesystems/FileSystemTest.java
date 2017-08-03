@@ -879,7 +879,7 @@ public class FileSystemTest {
 		f0.addInputStream(f, new CountJunkInputStream(1024*1024));
 
 		// should cancel after 1 block ?
-		f0.copyFile(f, f1, f, CopyMode.CREATE, f0.createCallback(false, 4*1024));
+		f0.copyFile(f, f1, f, CopyMode.CREATE, f0.createCallback(0));
 	}
 
 	// copy
