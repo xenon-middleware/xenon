@@ -61,7 +61,6 @@ public class FtpFileSystem extends FileSystem {
 	protected FtpFileSystem(String uniqueID, String name, String location, Path entryPath, 
 			FTPClient ftpClient, Credential credential, FtpFileAdaptor adaptor, XenonProperties properties) {
 		super(uniqueID, name, location, entryPath, properties);
-		System.out.println(entryPath.toString());
 		this.ftpClient = ftpClient;
 		this.credential = credential;
 		this.adaptor = adaptor;

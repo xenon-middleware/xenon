@@ -1598,8 +1598,6 @@ public abstract class FileSystem {
 	protected void assertParentDirectoryExists(Path path) throws XenonException {
 
 		assertNotNull(path);
-        System.out.println("Me : " + path) ;
-        System.out.println("Dad: " + path.getParent());
 		Path parent = path.getParent();
 
 		if (parent == null) {
