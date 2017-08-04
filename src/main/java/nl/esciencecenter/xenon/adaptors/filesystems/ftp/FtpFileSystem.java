@@ -459,15 +459,6 @@ public class FtpFileSystem extends FileSystem {
 
     @Override
     public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
-        LOGGER.debug("setPosixFilePermissions path = {} permissions = {}", path, permissions);
-        LOGGER.debug("setPosixFilePermissions OK");
-        
-        assertNotNull(path);
-        assertIsOpen();
-
-        if(permissions == null) {
-			throw new IllegalArgumentException("Permissions is null");
-		}
-		throw new UnsupportedOperationException(getAdaptorName(),"FTP does not support changing permissions.");
+        throw new UnsupportedOperationException(getAdaptorName(),"FTP does not support changing permissions.");
     }
 }
