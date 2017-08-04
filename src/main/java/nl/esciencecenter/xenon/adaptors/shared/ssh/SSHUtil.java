@@ -193,7 +193,14 @@ public class SSHUtil {
 			
 			try { 
 				InputStream inputStream = Files.newInputStream(path, IoUtils.EMPTY_OPEN_OPTIONS);
-				pair = SecurityUtils.loadKeyPairIdentity(path.toString(), inputStream, new PasswordProvider(c.getPassword()));
+				
+				char [] password = c.getPassword();
+				
+				if (password.length == 0) { 
+	                pair = SecurityUtils.loadKeyPairIdentity(path.toString(), inputStream, null);
+				} else { 
+				    pair = SecurityUtils.loadKeyPairIdentity(path.toString(), inputStream, new PasswordProvider(password));
+				}
 			} catch (Exception e) {
 				throw new XenonException(adaptorName, "Failed to load certificate: " + path, e);
 			}
