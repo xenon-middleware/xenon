@@ -62,7 +62,12 @@ public class SftpFileSystemDockerTest extends SftpFileSystemTestParent {
     		@Override
     		public Path getWritableTestDir() {
     			return fileSystem.getEntryPath();
-    		}			
+    		}
+
+			@Override
+			public Path getExpectedEntryPath() {
+				return new Path("/home/xenon");
+			}
 		};
     }
 

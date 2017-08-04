@@ -36,26 +36,16 @@ public class MockFileSystem extends FileSystem {
 	
 	public class Callback extends FileSystem.CopyCallback {
 
-		boolean initial = true;
 		long maxBytes;
-
-		Callback(boolean initial, long maxBytes){
-			this.initial = initial;
-			this.maxBytes = maxBytes;
-		}
-
+		
 		Callback(long maxBytes){ 
 			this.maxBytes = maxBytes;
 		}
 
 		@Override
-		public boolean isCancelled() {
-			return (bytesCopied >= maxBytes);
+		public synchronized boolean isCancelled() {
+		    return (bytesCopied >= maxBytes);
 		} 
-	}
-	
-	public Callback createCallback(boolean initial, long maxBytes){
-		return new Callback(initial, maxBytes);
 	}
 	
 	public Callback createCallback(long maxBytes){

@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.local;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.util.Map;
 
@@ -99,10 +100,10 @@ public class LocalFileAdaptor extends FileAdaptor {
 
 		XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
-		String root = LocalUtil.getLocalRoot(location);
-		Path relativePath = new Path(root).relativize(new Path(location));
+		Path entry = new Path(File.separatorChar, System.getProperty("user.dir"));
+        // for Windows remove the drive letter from entry?
 
-		return new LocalFileSystem(getNewUniqueID(), location, relativePath, xp);
+		return new LocalFileSystem(getNewUniqueID(), location, entry, xp);
 	}
 
     @Override
@@ -114,4 +115,7 @@ public class LocalFileAdaptor extends FileAdaptor {
     public boolean supportsSettingPosixPermissions(){
         return true;
     }
+
+    @Override
+    public boolean isConnectionless() { return true; }
 }

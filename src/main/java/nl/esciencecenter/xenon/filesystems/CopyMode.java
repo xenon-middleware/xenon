@@ -29,7 +29,12 @@ public enum CopyMode {
     CREATE,
 
     /**
-     * Replace the destination file if it already exists. 
+     * If the destination is a regular file, the file will be replaced.
+     *
+     * If the destination exists and is not a file and the source is a file, then the destination will be (recursively) deleted before copying.
+     *
+     * If the source and destination are directories then additional files in the destination directory are <b>not</b> touched.
+     *
      */
     REPLACE,
 

@@ -46,6 +46,11 @@ public class WebdavFileSystemDockerTest extends WebdavFileSystemTestParent {
 			public Path getWritableTestDir() {
 				return fileSystem.getEntryPath().resolve("uploads");
 			}
+
+			@Override
+			public Path getExpectedEntryPath() {
+				return new Path("/~xenon");
+			}
 		};
 	}
 
