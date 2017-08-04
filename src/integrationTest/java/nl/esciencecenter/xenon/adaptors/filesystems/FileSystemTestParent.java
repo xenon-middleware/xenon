@@ -435,7 +435,7 @@ public abstract class FileSystemTestParent {
 
     @Test
     public void test_createFile_withData_sizeUnknown() throws Exception {
-
+        assumeTrue(!description.needsSizeBeforehand());
         byte [] data = "Hello World\n".getBytes();
 
         generateAndCreateTestDir();
@@ -863,7 +863,6 @@ public abstract class FileSystemTestParent {
         Path file3 = createTestFile(testSubSub,data4);
         expected.add(fileSystem.getAttributes(file3));
 
-        System.out.println("DONE CREATING!");
 
         assertListSetEqual(listSet(testDir,true), expected);
     }
@@ -1700,6 +1699,7 @@ public abstract class FileSystemTestParent {
 
     @Test (expected = NoSuchPathException.class)
     public void test_rename_existingSourceNonExistingTargetParent_throw() throws Exception {
+        assumeTrue(description.supportsRename());
         generateAndCreateTestDir();
         Path subDir = createTestSubDirName(testDir);
         Path source = createTestFile(testDir,null);
@@ -1709,6 +1709,7 @@ public abstract class FileSystemTestParent {
 
     @Test
     public void test_rename_sourceEqualsTarget_noThrow() throws Exception {
+        assumeTrue(description.supportsRename());
         generateAndCreateTestDir();
         Path existingFile = createTestFile(testDir, "test data".getBytes());
         fileSystem.rename(existingFile,existingFile);
@@ -1716,6 +1717,7 @@ public abstract class FileSystemTestParent {
 
     @Test
     public void test_rename_existingDirectoryNonExistingFile() throws Exception {
+        assumeTrue(description.supportsRename());
         generateAndCreateTestDir();
         
         Path subDir = createTestSubDir(testDir);

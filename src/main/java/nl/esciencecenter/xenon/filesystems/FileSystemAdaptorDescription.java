@@ -60,4 +60,6 @@ public interface FileSystemAdaptorDescription extends AdaptorDescription {
     boolean supportsRename();
 
     boolean canAppend();
+
+    boolean needsSizeBeforehand();
 }

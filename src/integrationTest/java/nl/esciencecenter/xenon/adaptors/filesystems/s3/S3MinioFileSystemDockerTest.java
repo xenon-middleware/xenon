@@ -19,7 +19,7 @@ public class S3MinioFileSystemDockerTest extends S3FileSystemTestParent {
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder()
         .file("src/integrationTest/resources/docker-compose/minio.yml")
-        .waitingForService("minio", HealthChecks.toHaveAllPortsOpen()).saveLogsTo("/var/tmp/bla").skipShutdown(true)
+        .waitingForService("minio", HealthChecks.toHaveAllPortsOpen()).saveLogsTo("/var/tmp/bla")
         .build();
 
     @Override

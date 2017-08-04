@@ -73,22 +73,43 @@ public class S3FileAdaptor extends FileAdaptor {
     }
 
     @Override
-    public boolean supportsReadingPosixPermissions(){
+    public boolean supportsReadingPosixPermissions() {
         return false;
     }
 
     @Override
-    public boolean supportsSettingPosixPermissions(){
+    public boolean supportsSettingPosixPermissions() {
         return false;
     }
 
     @Override
-    public boolean canAppend(){ return false;}
+    public boolean canAppend() {
+        return false;
+    }
 
     @Override
-    public boolean canReadSymboliclinks() { return false; }
+    public boolean canReadSymboliclinks() {
+        return false;
+    }
 
     @Override
-    public boolean canCreateSymboliclinks() { return false; }
+    public boolean canCreateSymboliclinks() {
+        return false;
+    }
+
+    @Override
+    public boolean needsSizeBeforehand(){
+        return true;
+    }
+
+    @Override
+    public boolean supportsRename(){
+        return false;
+    }
+
+    @Override
+    public boolean isConnectionless(){
+        return true;
+    }
 
 }
