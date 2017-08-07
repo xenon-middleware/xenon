@@ -47,6 +47,7 @@ import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
+import nl.esciencecenter.xenon.adaptors.filesystems.s3.S3FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
@@ -73,7 +74,7 @@ public abstract class FileSystem {
         addAdaptor(new FtpFileAdaptor());
         addAdaptor(new SftpFileAdaptor());
         addAdaptor(new WebdavFileAdaptor());
-    //    addAdaptor(new S3FileAdaptor());
+        addAdaptor(new S3FileAdaptor());
     }
 
     private static void addAdaptor(FileAdaptor adaptor) {
@@ -1599,11 +1600,9 @@ public abstract class FileSystem {
 
 		Path parent = path.getParent();
 
-		if (parent == null) {
-			throw new InvalidPathException(getAdaptorName(), "Parent directory does not exist: " + path);
-		}
-
-		assertDirectoryExists(parent);
+		if (parent != null) {
+		    assertDirectoryExists(parent);
+                }	
 	}
 
 	protected void assertFileIsSymbolicLink(Path link) throws XenonException {
