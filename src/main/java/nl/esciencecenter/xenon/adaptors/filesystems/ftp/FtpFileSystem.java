@@ -328,7 +328,7 @@ public class FtpFileSystem extends FileSystem {
                 p = new Path("/");
             }
 
-            boolean pathExists = ftpClient.changeWorkingDirectory(p.getAbsolutePath());
+            boolean pathExists = ftpClient.changeWorkingDirectory(p.toString());
 
             if (!pathExists) { 
                 // parent must be an existing dir, otherwise dir/path certainly does not exist. 

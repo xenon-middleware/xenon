@@ -625,10 +625,10 @@ public class Path implements Iterable<Path> {
     }
 
     public Path toRelativePath() {
-        return new Path(separator,false, elements);
+        return new Path(separator, false, elements);
     }
 
     public Path toAbsolutePath() {
-        return new Path(separator,true, elements);
+        return new Path(separator, true, elements);
     }
 }

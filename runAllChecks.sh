@@ -23,3 +23,8 @@ echo "+-----------------------------+"
 echo "| generate merged test report |"
 echo "+-----------------------------+"
 ./gradlew jacocoMergedTestReport
+
+echo "+--------------------------+"
+echo "| checking license headers |"
+echo "+--------------------------+"
+./gradlew license
