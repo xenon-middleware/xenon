@@ -15,9 +15,11 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.local;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
@@ -75,7 +77,7 @@ public class LocalFileAdaptor extends FileAdaptor {
      *          if the location is invalid.                   
      */
     private static void checkFileLocation(String location) throws InvalidLocationException {
-        if (location == null || location.isEmpty() || LocalUtil.isLocalRoot(location)) {
+        if (location == null || location.isEmpty() || LocalFileSystemUtils.isLocalRoot(location)) {
             return;
         }
 
@@ -88,7 +90,7 @@ public class LocalFileAdaptor extends FileAdaptor {
 		checkFileLocation(location);
 		
 		if (location == null){
-		    if (LocalUtil.isWindows()) {
+		    if (LocalFileSystemUtils.isWindows()) {
 		        location = "c:";
             } else {
                 location = "/";
@@ -99,10 +101,10 @@ public class LocalFileAdaptor extends FileAdaptor {
 
 		XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
-		String root = LocalUtil.getLocalRoot(location);
-		Path relativePath = new Path(root).relativize(new Path(location));
+		Path entry = new Path(File.separatorChar, System.getProperty("user.dir"));
+        // for Windows remove the drive letter from entry?
 
-		return new LocalFileSystem(getNewUniqueID(), location, relativePath, xp);
+		return new LocalFileSystem(getNewUniqueID(), location, entry, xp);
 	}
 
     @Override
@@ -114,4 +116,7 @@ public class LocalFileAdaptor extends FileAdaptor {
     public boolean supportsSettingPosixPermissions(){
         return true;
     }
+
+    @Override
+    public boolean isConnectionless() { return true; }
 }

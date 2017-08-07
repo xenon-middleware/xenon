@@ -16,6 +16,13 @@
 package nl.esciencecenter.xenon.adaptors.filesystems.sftp;
 
 import nl.esciencecenter.xenon.adaptors.filesystems.FileSystemTestParent;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PathAttributes;
+import org.junit.Test;
+
+import java.util.Set;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Extend this class for docker tests and live tests
@@ -23,4 +30,28 @@ import nl.esciencecenter.xenon.adaptors.filesystems.FileSystemTestParent;
  * Can contain extra tests for sftp filesystem
  */
 public abstract class SftpFileSystemTestParent extends FileSystemTestParent {
+    @Test
+    public void test_getAttributes_fileStartingWithDot_HiddenFile() throws Exception {
+        // TODO move to FileSystemTestParent when we can detect adaptor/filesystem supports hidden files
+        generateAndCreateTestDir();
+        // assumes location has UNIX-like file system where starts with '.' means hidden
+        Path path = testDir.resolve(".myhiddenfile");
+        fileSystem.createFile(path);
+
+        PathAttributes result = fileSystem.getAttributes(path);
+
+        assertTrue(result.isHidden());
+    }
+
+    @Test
+    public void test_list_hiddenFile() throws Exception {
+        generateAndCreateTestDir();
+        // assumes location has UNIX-like file system where starts with '.' means hidden
+        Path path = testDir.resolve(".myhiddenfile");
+        fileSystem.createFile(path);
+
+        Set<PathAttributes> res = listSet(testDir, false);
+
+        assertTrue("Listing contains hidden file", res.stream().anyMatch(PathAttributes::isHidden));
+    }
 }

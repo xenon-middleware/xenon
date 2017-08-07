@@ -327,36 +327,35 @@ public class PathAttributesImplementation implements PathAttributes {
         this.permissions = permissions;
     }
 
-    public String toString() { 
-        return path.getAbsolutePath();
-    }
-
+//    public String toString() { 
+//        return path.getAbsolutePath();
+//    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        
         PathAttributesImplementation that = (PathAttributesImplementation) o;
-        return isDirectory == that.isDirectory &&
+        return Objects.equals(path, that.path) && 
+                isDirectory == that.isDirectory &&
                 isRegular == that.isRegular &&
                 isSymbolicLink == that.isSymbolicLink &&
-                isOther == that.isOther &&
-                executable == that.executable &&
-                readable == that.readable &&
-                writable == that.writable &&
-                hidden == that.hidden &&
-                creationTime == that.creationTime &&
-                lastAccessTime == that.lastAccessTime &&
-                lastModifiedTime == that.lastModifiedTime &&
-                size == that.size &&
-                Objects.equals(path, that.path) &&
-                Objects.equals(owner, that.owner) &&
-                Objects.equals(group, that.group) &&
-                Objects.equals(permissions, that.permissions);
+                isOther == that.isOther;
+    }
+
+    @Override
+    public String toString() {
+        return "PathAttributesImplementation [path=" + path + ", isDirectory=" + isDirectory + ", isRegular="
+                + isRegular + ", isSymbolicLink=" + isSymbolicLink + ", isOther=" + isOther + ", executable="
+                + executable + ", readable=" + readable + ", writable=" + writable + ", hidden=" + hidden
+                + ", creationTime=" + creationTime + ", lastAccessTime=" + lastAccessTime + ", lastModifiedTime="
+                + lastModifiedTime + ", size=" + size + ", owner=" + owner + ", group=" + group + ", permissions="
+                + permissions + "]";
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(path, isDirectory, isRegular, isSymbolicLink, isOther, executable, readable, writable, 
-                hidden, creationTime, lastAccessTime, lastModifiedTime, size, owner, group, permissions);
+        return Objects.hash(path, isDirectory, isRegular, isSymbolicLink, isOther);
     }
 }

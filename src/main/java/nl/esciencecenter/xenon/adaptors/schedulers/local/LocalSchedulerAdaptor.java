@@ -30,6 +30,7 @@ import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
+import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 
 /**
  * LocalFiles implements an Xenon <code>Jobs</code> adaptor for local job operations.
@@ -135,8 +136,8 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
         }
 
         String filesystemlocation = "/";
-        if (LocalUtil.isWindows()) {
-            filesystemlocation = "c:";
+        if (LocalFileSystemUtils.isWindows()) {
+            filesystemlocation = "C:";
         }
 
         FileSystem filesystem = FileSystem.create("file", filesystemlocation, credential, properties);

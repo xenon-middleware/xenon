@@ -13,22 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.filesystems;
+package nl.esciencecenter.xenon.adaptors.shared.local;
 
-import java.util.Map;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import nl.esciencecenter.xenon.filesystems.Path;
+import org.junit.Test;
 
-public abstract class LocationConfig {
+public class LocalUtilFixedClientTest {
 
-	public abstract Path getExistingPath();
-
-    // TODO return SymbolicLink object
-    public Map.Entry<Path,Path> getSymbolicLinksToExistingFile(){
-        return null;
-    }
     
-    public abstract Path getWritableTestDir(); 
-
-    public Path getExpectedEntryPath() { return null; }
+    
 }
+

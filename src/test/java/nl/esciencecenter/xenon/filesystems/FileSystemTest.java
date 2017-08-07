@@ -15,11 +15,6 @@
  */
 package nl.esciencecenter.xenon.filesystems;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -37,6 +32,9 @@ import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation
 import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
 
 import org.junit.Test;
+
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.*;
 
 public class FileSystemTest {
 
@@ -881,9 +879,9 @@ public class FileSystemTest {
 		f0.addInputStream(f, new CountJunkInputStream(1024*1024));
 
 		// should cancel after 1 block ?
-		f0.copyFile(f, f1, f, CopyMode.CREATE, f0.createCallback(false, 4*1024));
+		f0.copyFile(f, f1, f, CopyMode.CREATE, f0.createCallback(0));
 	}
-
+	
 	// copy
 
 	@Test(expected=IllegalArgumentException.class)
@@ -997,7 +995,7 @@ public class FileSystemTest {
 
 		assertTrue(s.isDone());
 		assertTrue(s.hasException());
-		assertTrue(s.getException() instanceof PathAlreadyExistsException);
+		assertThat(s.getException(), instanceOf(PathAlreadyExistsException.class));
 	}
 
 	@Test
@@ -1066,7 +1064,7 @@ public class FileSystemTest {
 
 		assertTrue(s.isDone());
 		assertTrue(s.hasException());
-		assertTrue(s.getException() instanceof NoSuchPathException);
+		assertThat(s.getException(), instanceOf(NoSuchPathException.class));
 	}
 
 	@Test
@@ -1083,7 +1081,7 @@ public class FileSystemTest {
 
 		assertTrue(s.isDone());
 		assertTrue(s.hasException());
-		assertTrue(s.getException() instanceof InvalidPathException);
+		assertThat(s.getException(), instanceOf(InvalidPathException.class));
 	}
 
 	@Test
@@ -1106,7 +1104,7 @@ public class FileSystemTest {
 
 		assertTrue(s.isDone());
 		assertTrue(s.hasException());
-		assertTrue(s.getException() instanceof InvalidPathException);
+		assertThat(s.getException(), instanceOf(InvalidPathException.class));
 	}
 
 	@Test
@@ -1174,6 +1172,7 @@ public class FileSystemTest {
 		f.cancel("AAP");
 	}
 
+	/*
 	@Test
 	public void test_cancelImmediately() throws XenonException {
 		Path entry = new Path("/test");
@@ -1199,7 +1198,7 @@ public class FileSystemTest {
 		String h1 = f0.copy(file1, f1, file1, CopyMode.REPLACE, false);
 		String h2 = f0.copy(file2, f1, file2, CopyMode.REPLACE, false);
 
-		// cancel h2 immediately -- the coopy should not have a chance to start
+		// cancel h2 immediately -- the copy should not have a chance to start
 		CopyStatus s2 = f0.cancel(h2);
 
 		CopyStatus s1 = f0.waitUntilDone(h1, 5*1000);
@@ -1209,9 +1208,10 @@ public class FileSystemTest {
 
 		assertTrue(s2.isDone());
 		assertTrue(s2.hasException());
-		assertTrue(s2.getException() instanceof XenonException);
+		assertThat(s2.getException(), instanceOf(XenonException.class));
 	}
-
+	 */
+	
 	private void sleep(long delay) { 
 		try {
 			Thread.sleep(delay);

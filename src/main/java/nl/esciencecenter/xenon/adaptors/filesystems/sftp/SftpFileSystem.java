@@ -26,12 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.sshd.client.subsystem.sftp.SftpClient;
-import org.apache.sshd.common.subsystem.sftp.SftpConstants;
-import org.apache.sshd.common.subsystem.sftp.SftpException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
@@ -48,13 +42,19 @@ import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 
+import org.apache.sshd.client.subsystem.sftp.SftpClient;
+import org.apache.sshd.common.subsystem.sftp.SftpConstants;
+import org.apache.sshd.common.subsystem.sftp.SftpException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SftpFileSystem extends FileSystem {
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(SftpFileSystem.class);
-	
+
 	private final SftpClient client;
-	
-	protected SftpFileSystem(String uniqueID, String name, String location, Path entryPath, SftpClient client, 
+
+	protected SftpFileSystem(String uniqueID, String name, String location, Path entryPath, SftpClient client,
 			XenonProperties properties) {
 		super(uniqueID, name, location, entryPath, properties);
 		this.client = client;
@@ -62,7 +62,7 @@ public class SftpFileSystem extends FileSystem {
 
 	@Override
 	public void close() throws XenonException {
-		
+
 		LOGGER.debug("close fileSystem = {}", this);
 
 		try {
@@ -72,11 +72,11 @@ public class SftpFileSystem extends FileSystem {
 		}
 
 		//info.getSession().disconnect();
-		
+
 		super.close();
-		LOGGER.debug("close OK");        
+		LOGGER.debug("close OK");
 	}
-	
+
 	@Override
 	public boolean isOpen() throws XenonException {
 		return client.isOpen();
@@ -84,11 +84,11 @@ public class SftpFileSystem extends FileSystem {
 
 	@Override
 	public void rename(Path source, Path target) throws XenonException {
-		
+
 		LOGGER.debug("move source = {} target = {}", source, target);
-		
+
 		assertPathExists(source);
-		
+
 		if (areSamePaths(source, target)) {
 			return;
 		}
@@ -109,24 +109,24 @@ public class SftpFileSystem extends FileSystem {
 	public void createDirectory(Path dir) throws XenonException {
 
 		LOGGER.debug("createDirectory dir = {}", dir);
-		
+
 		assertPathNotExists(dir);
 		assertParentDirectoryExists(dir);
-		
+
 		try {
 			client.mkdir(dir.getAbsolutePath());
 		} catch (IOException e) {
 			throw new XenonException(ADAPTOR_NAME, "Failed to mkdir", e);
 		}
 
-		LOGGER.debug("createDirectory OK");        
+		LOGGER.debug("createDirectory OK");
 	}
 
 	@Override
 	public void createFile(Path file) throws XenonException {
-		
+
 		assertPathNotExists(file);
-		
+
 		LOGGER.debug("createFile path = {}", file);
 
 		OutputStream out = null;
@@ -145,7 +145,7 @@ public class SftpFileSystem extends FileSystem {
 
 		LOGGER.debug("createFile OK");
 	}
-	
+
 	@Override
 	public void createSymbolicLink(Path link, Path path) throws XenonException {
 		try {
@@ -155,17 +155,17 @@ public class SftpFileSystem extends FileSystem {
 		}
 	}
 	@Override
-	protected void deleteFile(Path file) throws XenonException { 
-		try { 
+	protected void deleteFile(Path file) throws XenonException {
+		try {
 			client.remove(file.getAbsolutePath());
 		} catch (IOException e) {
 			sftpExceptionToXenonException(e, "Cannot delete file: " + file);
 		}
 	}
-	   
+
 	@Override
-	protected void deleteDirectory(Path dir) throws XenonException { 
-		try { 
+	protected void deleteDirectory(Path dir) throws XenonException {
+		try {
 			client.rmdir(dir.getAbsolutePath());
 		} catch (IOException e) {
 			sftpExceptionToXenonException(e, "Cannot delete directory: " + dir);
@@ -189,7 +189,7 @@ public class SftpFileSystem extends FileSystem {
 
 		return result;
 	}
-	
+
 	@Override
 	public boolean exists(Path path) throws XenonException {
 
@@ -203,47 +203,47 @@ public class SftpFileSystem extends FileSystem {
 		}
 	}
 
-//	private PathAttributesPair convert(Path root, SftpClient.DirEntry e) { 
+//	private PathAttributesPair convert(Path root, SftpClient.DirEntry e) {
 //		FileAttributes attributes = convertAttributes(e.getAttributes());
 //		return new PathAttributesPair(root.resolve(e.getFilename()), attributes);
 //	}
 //
-//	
+//
 //	private List<PathAttributesPair> listDirectory(Path path) throws XenonException {
-//		
+//
 //		assertDirectoryExists(path);
 //
 //		ArrayList<PathAttributesPair> result = new ArrayList<>();
-//		
-//		try { 
-//			for (SftpClient.DirEntry e : client.readDir(path.getAbsolutePath())) { 
+//
+//		try {
+//			for (SftpClient.DirEntry e : client.readDir(path.getAbsolutePath())) {
 //				result.add(convert(path, e));
 //			}
-//		} catch (IOException e) { 
+//		} catch (IOException e) {
 //			throw new XenonException(ADAPTOR_NAME,"Failed to retrieve directory listing of " + path);
 //		}
-//		
-//		return result;		
+//
+//		return result;
 //	}
-		
+
 	@Override
 	protected List<PathAttributes> listDirectory(Path path) throws XenonException {
 
 		try {
 			assertDirectoryExists(path);
-		
+
 			ArrayList<PathAttributes> result = new ArrayList<>();
-			for (SftpClient.DirEntry f : client.readDir(path.getAbsolutePath())) { 
+			for (SftpClient.DirEntry f : client.readDir(path.getAbsolutePath())) {
 				result.add(convertAttributes(path.resolve(f.getFilename()), f.getAttributes()));
 			}
-	
+
 			return result;
 		} catch (IOException e) {
 			throw sftpExceptionToXenonException(e, "Failed to list directory " + path);
 		}
 	}
-	
-	
+
+
 //	@Override
 //	public DirectoryStream<Path> newDirectoryStream(Path dir, Filter filter) throws XenonException {
 //		LOGGER.debug("newDirectoryStream path = {} filter = <?>", dir);
@@ -261,11 +261,11 @@ public class SftpFileSystem extends FileSystem {
 		LOGGER.debug("newInputStream path = {}", path);
 
 		assertFileExists(path);
-		
+
 		InputStream in;
 
 		try {
-			in = client.read(path.getAbsolutePath());        	
+			in = client.read(path.getAbsolutePath());
 		} catch (IOException e) {
 			throw new XenonException(ADAPTOR_NAME, "Failed to open stream to read from " + path, e);
 		}
@@ -277,18 +277,18 @@ public class SftpFileSystem extends FileSystem {
 
 	@Override
 	public OutputStream writeToFile(Path path, long size) throws XenonException {
-		
+
 		assertNotNull(path);
+		assertPathNotExists(path);
 		assertParentDirectoryExists(path);
-		assertPathIsNotDirectory(path);
-		
+
 		try {
-			return client.write(path.getAbsolutePath(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Create, SftpClient.OpenMode.Truncate);      	
+			return client.write(path.getAbsolutePath(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Create, SftpClient.OpenMode.Truncate);
 		} catch (IOException e) {
 			throw new XenonException(ADAPTOR_NAME, "Failed open stream to write to: " + path, e);
 		}
 	}
-		
+
 	@Override
 	public OutputStream writeToFile(Path path) throws XenonException {
 		return writeToFile(path, -1);
@@ -299,9 +299,9 @@ public class SftpFileSystem extends FileSystem {
 
 		assertNotNull(path);
 		assertFileExists(path);
-		
+
 		try {
-			return client.write(path.getAbsolutePath(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Append);      	
+			return client.write(path.getAbsolutePath(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Append);
 		} catch (IOException e) {
 			throw new XenonException(ADAPTOR_NAME, "Failed open stream to write to: " + path, e);
 		}
@@ -322,7 +322,7 @@ public class SftpFileSystem extends FileSystem {
 		try {
 			String target = client.readLink(link.getAbsolutePath());
 
-			if (!target.startsWith(File.separator)) {                
+			if (!target.startsWith(File.separator)) {
 				Path parent = link.getParent();
 				result = parent.resolve(target);
 			} else {
@@ -347,8 +347,8 @@ public class SftpFileSystem extends FileSystem {
 		}
 
 		try {
-			// We need to create a new Attributes object here. SFTP will only forward the fields that are actually set 
-			// when we call setStat. If we retrieve the existing attributes, change permissions and send the lot back 
+			// We need to create a new Attributes object here. SFTP will only forward the fields that are actually set
+			// when we call setStat. If we retrieve the existing attributes, change permissions and send the lot back
 			// we'll receive an error since some of the other attributes cannot be changed (learned this the hard way).
 			SftpClient.Attributes a = new SftpClient.Attributes();
 			a.setPermissions(PosixFileUtils.permissionsToBits(permissions));
@@ -358,16 +358,16 @@ public class SftpFileSystem extends FileSystem {
 		}
 		LOGGER.debug("setPosixFilePermissions OK");
 	}
-	
-	private static long convertTime(FileTime time) { 
+
+	private static long convertTime(FileTime time) {
 
 		return time.toMillis();
 	}
-	
-	private static PathAttributes convertAttributes(Path path, SftpClient.Attributes attributes) { 
-		
+
+	private static PathAttributes convertAttributes(Path path, SftpClient.Attributes attributes) {
+
 		PathAttributesImplementation result = new PathAttributesImplementation();
-		
+
 		result.setPath(path);
 		result.setDirectory(attributes.isDirectory());
 		result.setRegular(attributes.isRegularFile());
@@ -390,26 +390,29 @@ public class SftpFileSystem extends FileSystem {
 		}
 
 		result.setSize(attributes.getSize());
-		
+
 		Set<PosixFilePermission> permission = PosixFileUtils.bitsToPermissions(attributes.getPermissions());
 		result.setPermissions(permission);
-		
+
 		result.setExecutable(permission.contains(PosixFilePermission.OWNER_EXECUTE));
 		result.setReadable(permission.contains(PosixFilePermission.OWNER_READ));
 		result.setWritable(permission.contains(PosixFilePermission.OWNER_WRITE));
-		
+
 		result.setGroup(attributes.getGroup());
 		result.setOwner(attributes.getOwner());
-		
+
+		// assume UNIX-like filesystem
+		result.setHidden(path.getFileNameAsString().startsWith("."));
+
 		return result;
 	}
-	
-	
+
+
 	private static XenonException sftpExceptionToXenonException(IOException e, String message) {
 
-		if (e instanceof SftpException) { 
+		if (e instanceof SftpException) {
 			SftpException x = (SftpException) e;
-			switch (x.getStatus()) { 
+			switch (x.getStatus()) {
 
 			case SftpConstants.SSH_FX_EOF:
 				return new EndOfFileException(ADAPTOR_NAME, "Unexpected EOF", e);
@@ -493,9 +496,12 @@ public class SftpFileSystem extends FileSystem {
 
 			}
 
-			// Fall through if we do not know the error
-		} 
 
+		}
+		if (e.getMessage().contains("client is close")) {
+			return new NotConnectedException(ADAPTOR_NAME, e.getMessage());
+		}
+		// Fall through if we do not know the error
 		return new XenonException(ADAPTOR_NAME, message, e);
 	}
 }

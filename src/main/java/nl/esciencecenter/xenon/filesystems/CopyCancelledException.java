@@ -13,22 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.filesystems;
+package nl.esciencecenter.xenon.filesystems;
 
-import java.util.Map;
+import nl.esciencecenter.xenon.XenonException;
 
-import nl.esciencecenter.xenon.filesystems.Path;
 
-public abstract class LocationConfig {
-
-	public abstract Path getExistingPath();
-
-    // TODO return SymbolicLink object
-    public Map.Entry<Path,Path> getSymbolicLinksToExistingFile(){
-        return null;
+public class CopyCancelledException extends XenonException {
+    public CopyCancelledException(String adaptorName, String s) {
+        super(adaptorName,s);
     }
-    
-    public abstract Path getWritableTestDir(); 
 
-    public Path getExpectedEntryPath() { return null; }
 }
