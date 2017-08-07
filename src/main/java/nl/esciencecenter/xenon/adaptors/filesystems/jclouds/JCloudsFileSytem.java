@@ -99,7 +99,6 @@ public class JCloudsFileSytem extends FileSystem {
     private void makeNonEmptyFile(Path dir) {
         String existsFile = dir.getRelativePath() +  "/" + NOT_EMPTY;
         final Blob b = context.getBlobStore().blobBuilder(bucket).name(existsFile).payload(new ByteArrayInputStream(new byte[]{})).contentLength(0).build();
-        System.out.println("Bla");
         context.getBlobStore().putBlob(bucket,b);
     }
 
@@ -223,11 +222,14 @@ public class JCloudsFileSytem extends FileSystem {
     }
 
     PathAttributes toPathAttributes(final StorageMetadata m, final BlobAccess access){
-        Path p = new Path(m.getName());
+
         switch(m.getType()){
             case RELATIVE_PATH:
+                System.out.println("Dir: " + m.getName());
                 return makeDirAttributes(m,access);
-            case BLOB: return makeBlobAttributes(m.getName());
+            case BLOB:
+                System.out.println("File: " + m.getName());
+                return makeBlobAttributes(m.getName());
             default: throw new Error("Unknow file type" + m.getType());
         }
 
@@ -240,6 +242,8 @@ public class JCloudsFileSytem extends FileSystem {
         PathAttributesImplementation pa = new PathAttributesImplementation();
         pa.setPath(new Path(name));
         pa.setLastAccessTime(md.getLastModified().getTime());
+        pa.setSize(md.getSize());
+        pa.setRegular(true);
         if(md.getCreationDate() == null){
             pa.setCreationTime(pa.getLastModifiedTime());
         } else {
@@ -258,19 +262,14 @@ public class JCloudsFileSytem extends FileSystem {
         PageSet<? extends StorageMetadata> curPageSet;
         StorageMetadata nxt;
 
-        ListingIterator(ListContainerOptions options,  PageSet<? extends StorageMetadata> pageSet){
+        ListingIterator(ListContainerOptions options, PageSet<? extends StorageMetadata> pageSet){
             this.options = options;
             this.curPageSet = pageSet;
             this.curIterator = curPageSet.iterator();
+
             getNext();
         }
 
-        ListingIterator(ListContainerOptions options, Iterator<? extends StorageMetadata> curIterator, PageSet<? extends StorageMetadata> pageSet){
-            this.options = options;
-            this.curIterator = curIterator;
-            this.curPageSet = pageSet;
-            getNext();
-        }
 
         void getNext(){
             if (!curIterator.hasNext() && curPageSet.getNextMarker() != null){
@@ -306,12 +305,24 @@ public class JCloudsFileSytem extends FileSystem {
         }
     }
 
+    public Iterator<PathAttributes> listNonRecursiveIterator(Path dir) {
+        ListContainerOptions options = new ListContainerOptions().prefix(dir.getRelativePath() +"/");
+        // JClouds on S3 does not list directories if recursive is set :( Fixing it ourselves
+        //if(recursive) { options = options.recursive(); }
+        final ListContainerOptions optionsFinal = options;
+
+
+                return new ListingIterator(optionsFinal,   context.getBlobStore().list(bucket,optionsFinal));
+
+    }
+
 
     public Iterable<PathAttributes> list(Path dir, boolean recursive) throws XenonException{
         checkClosed();
         assertPathIsDirectory(dir);
         ListContainerOptions options = new ListContainerOptions().prefix(dir.getRelativePath() +"/");
-        if(recursive) { options = options.recursive(); }
+        // JClouds on S3 does not list directories if recursive is set :( Fixing it ourselves
+        //if(recursive) { options = options.recursive(); }
         final ListContainerOptions optionsFinal = options;
         final PageSet<? extends StorageMetadata> ps = context.getBlobStore().list(bucket,optionsFinal);
         final Iterator<? extends StorageMetadata> curIt = ps.iterator();
@@ -322,12 +333,22 @@ public class JCloudsFileSytem extends FileSystem {
                 throw new NoSuchPathException(adaptorName, "No such directory: " + dir.getRelativePath());
             }
         }
-        return new Iterable<PathAttributes>() {
-            @Override
-            public Iterator<PathAttributes> iterator() {
-                return new ListingIterator(optionsFinal, curIt,   context.getBlobStore().list(bucket,optionsFinal));
-            }
-        };
+        if(!recursive) {
+            return new Iterable<PathAttributes>() {
+                @Override
+                public Iterator<PathAttributes> iterator() {
+                    return listNonRecursiveIterator(dir);
+                }
+            };
+        } else {
+            return new Iterable<PathAttributes>() {
+                @Override
+                public Iterator<PathAttributes> iterator() {
+                    return new RecursiveListIterator(listNonRecursiveIterator(dir));
+                }
+            };
+        }
+
 
     }
 
@@ -348,6 +369,7 @@ public class JCloudsFileSytem extends FileSystem {
 
     @Override
     public InputStream readFromFile(Path path) throws XenonException {
+        assertPathIsFile(path);
         String name = path.getRelativePath();
         boolean exists = context.getBlobStore().blobExists(bucket,name);
         if(exists) {
@@ -364,7 +386,7 @@ public class JCloudsFileSytem extends FileSystem {
 
     @Override
     public OutputStream writeToFile(Path path, long size) throws XenonException {
-        assertPathIsNotDirectory(path);
+        assertPathNotExists(path);
         final PipedInputStream read = new PipedInputStream();
         final Blob b = context.getBlobStore().blobBuilder(bucket).name(path.getRelativePath()).payload(read).contentLength(size).build();
         try {
@@ -437,7 +459,38 @@ public class JCloudsFileSytem extends FileSystem {
     }
 
 
+    private class RecursiveListIterator implements Iterator<PathAttributes> {
+        final Stack<Iterator<PathAttributes>> stack;
+        public RecursiveListIterator(Iterator<PathAttributes> root) {
+            stack = new Stack<>();
+            stack.push(root);
+        }
+
+        void popEmpties(){
+            while(!stack.empty()){
+                if(!stack.peek().hasNext()){
+                    stack.pop();
+                } else {
+                    return;
+                }
+            }
+        }
 
 
+        @Override
+        public boolean hasNext() {
+            popEmpties();
+            return !stack.isEmpty();
+        }
 
+        @Override
+        public PathAttributes next() {
+            PathAttributes nxt = stack.peek().next();
+            if(nxt.isDirectory()){
+                stack.push(listNonRecursiveIterator(nxt.getPath()));
+            }
+            popEmpties();
+            return nxt;
+        }
+    }
 }
