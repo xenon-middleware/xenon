@@ -318,6 +318,7 @@ public class PathAttributesImplementation implements PathAttributes {
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
+
     public Set<PosixFilePermission> getPermissions() throws AttributeNotSupportedException {
         return permissions;
     }

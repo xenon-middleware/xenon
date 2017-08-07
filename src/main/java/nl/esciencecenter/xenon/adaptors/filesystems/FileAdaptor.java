@@ -76,6 +76,10 @@ public abstract class FileAdaptor extends Adaptor implements FileSystemAdaptorDe
         return true; 
     }
 
-    public abstract FileSystem createFileSystem(String location, Credential credential, Map<String,String> properties) throws XenonException;
+    @Override
+    public boolean needsSizeBeforehand(){
+        return false;
+    }
 
+    public abstract FileSystem createFileSystem(String location, Credential credential, Map<String,String> properties) throws XenonException;
 }
