@@ -28,7 +28,6 @@ import java.util.Set;
 
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPFileFilters;
 
@@ -42,6 +41,7 @@ import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
+import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
@@ -283,41 +283,74 @@ public class FtpFileSystem extends FileSystem {
 		checkClientReply("Failed to delete file: " + path.getAbsolutePath());
 	}
 
-	
-	private boolean fileExists(Path path) throws XenonException {
-			    
-		try { 
-			FTPFile[] listFiles = ftpClient.listFiles(path.getAbsolutePath());
-			checkClientReply("Failed to check if file exists: " + path.getAbsolutePath());
-			return (listFiles != null && listFiles.length == 1);
-		} catch (FTPConnectionClosedException ec) { 
-		    throw new NotConnectedException(ADAPTOR_NAME, "Connection closed");
-		} catch (Exception e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to check if file exists: " + path.getAbsolutePath() + " " + e.getMessage(), e);
-		}
-	}
-
-	private boolean directoryExists(Path path) throws XenonException {
-		
-		try { 
-			String originalWorkingDirectory = ftpClient.printWorkingDirectory();
-			boolean pathExists = ftpClient.changeWorkingDirectory(path.getAbsolutePath());
-			ftpClient.changeWorkingDirectory(originalWorkingDirectory);
-			return pathExists;
-        } catch (FTPConnectionClosedException ec) { 
-            throw new NotConnectedException(ADAPTOR_NAME, "Connection closed");
-		} catch (Exception e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to check if directory exists: " + path.getAbsolutePath(), e);
-		}
-	}
-	
 	@Override
 	public boolean exists(Path path) throws XenonException {
-	    assertIsOpen();
-		assertNotNull(path);
-		return fileExists(path) || directoryExists(path);
+	    
+	    try { 
+	        getFTPFileInfo(path);
+	        return true;
+	    } catch (NoSuchPathException e) {
+	        return false;
+        }
 	}
 	
+    private FTPFile findFTPFile(FTPFile [] files, Path path) throws NoSuchPathException { 
+        
+        if (files == null || files.length == 0) { 
+            throw new NoSuchPathException(ADAPTOR_NAME, "Path not found: " + path);
+        }
+        
+        String name = path.getFileNameAsString();
+        
+        for (FTPFile f : files) { 
+            
+            if (f != null && f.getName().equals(name)) { 
+                return f;
+            }
+        }
+
+        throw new NoSuchPathException(ADAPTOR_NAME, "Path not found: " + path);
+    }
+    
+	private FTPFile getFTPFileInfo(Path path) throws XenonException {
+
+	    assertIsOpen();
+        assertNotNull(path);
+
+        // We cannot always get the FTPFile of the path directly, behavior of FTP servers seems to vary. Instead, 
+        // we get the listing of the parent directory and extract the information we need from there.
+        try { 
+            Path p = path.getParent();
+
+            String originalWorkingDirectory = ftpClient.printWorkingDirectory();
+
+            if (p == null) {
+                p = new Path("/");
+            }
+
+            boolean pathExists = ftpClient.changeWorkingDirectory(p.getAbsolutePath());
+
+            if (!pathExists) { 
+                // parent must be an existing dir, otherwise dir/path certainly does not exist. 
+                throw new NoSuchPathException(ADAPTOR_NAME, "Path not found: " + path);
+            }
+
+            FTPFile [] files = ftpClient.listFiles();
+
+            ftpClient.changeWorkingDirectory(originalWorkingDirectory);
+
+            return findFTPFile(files, path);
+        } catch (IOException e) {
+            throw new XenonException(ADAPTOR_NAME, "Failed to get attributes for path: " + path, e);
+        }
+	}
+    
+	@Override
+	public PathAttributes getAttributes(Path path) throws XenonException {
+	    LOGGER.debug("getAttributes path = {}", path);
+	    return convertAttributes(path, getFTPFileInfo(path));
+	}
+		
 	@Override
 	protected List<PathAttributes> listDirectory(Path path) throws XenonException {
         assertIsOpen();
@@ -412,102 +445,10 @@ public class FtpFileSystem extends FileSystem {
 		}
 	}
 	
-	private FTPFile getFtpFile(Path path) throws XenonException {
-		FTPFile ftpFile = getRegularFtpFile(path);
-		if (ftpFile == null) {
-			ftpFile = getDirectoryFtpFile(path);
-		}
-		return ftpFile;
-	}
-
-	private FTPFile getRegularFtpFile(Path path) throws XenonException {
-		
-		
-//		try {
-//			ftpClient.pasv();
-//			
-//			FTPFile [] result = ftpClient.listFiles(path.getAbsolutePath());
-//		
-//			String replyString = ftpClient.getReplyString();
-//	        int code = ftpClient.getReplyCode();
-//			
-//			System.out.println("FTP " + replyString + " " + code + " " + result + " " + result.length);
-//	        
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
-		try { 
-			FTPFile [] result = ftpClient.listFiles(path.getAbsolutePath());
-			checkClientReply("Failed to retrieve attributes of path: " + path.getAbsolutePath());
-			return result[0];
-		} catch (IOException e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to retrieve attributes of path: " + path.getAbsolutePath());
-		}
-		
-//		
-//		
-//		FtpQuery<FTPFile> ftpQuery = new FtpQuery<FTPFile>() {
-//			@Override
-//			public void doWork(FTPClient ftpClient, String path) throws IOException {
-//				setResult(ftpClient.listFiles(path)[0]);
-//			}  
-//		};
-//		ftpQuery.execute(ftpClient, pathToRegularFile, "Failed to retrieve attributes of path");
-//		return ftpQuery.getResult();
-	}
-	
-	private FTPFile getDirectoryFtpFile(Path path) throws XenonException {
-
-		try { 
-			FTPFile[] result = ftpClient.listDirectories(path.getAbsolutePath());
-			checkClientReply("Failed to retrieve attributes of directory");
-			return result[0];
-		} catch (Exception e) {
-			throw new XenonException(ADAPTOR_NAME, "Failed to retrieve attributes of directory: " + path);
-		}
-			
-		
-//		
-//		
-//		
-//		FtpQuery<FTPFile> ftpQuery = new FtpQuery<FTPFile>() {
-//			@Override
-//			public void doWork(FTPClient ftpClient, String path) throws IOException {
-//				String targetName = ".";
-//				FTPFile[] listFiles = ftpClient.listDirectories(path);
-//				for (FTPFile listFile : listFiles) {
-//					if (listFile.getName().equals(targetName)) {
-//						setResult(listFile);
-//						break;
-//					}
-//				}
-//			}
-//		};
-//		ftpQuery.execute(ftpClient, path, "Failed to retrieve attributes of directory");
-//		return ftpQuery.getResult();
-	}
-	
-	@Override
-	public PathAttributes getAttributes(Path path) throws XenonException {
-		LOGGER.debug("getAttributes path = {}", path);
-
-		assertIsOpen();
-		assertPathExists(path);
-		
-		PathAttributes fileAttributes = convertAttributes(path, getFtpFile(path));
-		LOGGER.debug("getAttributes OK result = {}", fileAttributes);
-		return fileAttributes;
-	}
-
 	@Override
 	public Path readSymbolicLink(Path path) throws XenonException {
 	    
-	    assertNotNull(path);
-	    assertIsOpen();
-
-	    FTPFile file = getFtpFile(path);
+	    FTPFile file = getFTPFileInfo(path);
 		
 		if (file.getType() != FTPFile.SYMBOLIC_LINK_TYPE) {
 			throw new InvalidPathException(ADAPTOR_NAME, "Path is not a symbolic link: " + path);
@@ -518,15 +459,6 @@ public class FtpFileSystem extends FileSystem {
 
     @Override
     public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
-        LOGGER.debug("setPosixFilePermissions path = {} permissions = {}", path, permissions);
-        LOGGER.debug("setPosixFilePermissions OK");
-        
-        assertNotNull(path);
-        assertIsOpen();
-
-        if(permissions == null) {
-			throw new IllegalArgumentException("Permissions is null");
-		}
-		throw new UnsupportedOperationException(getAdaptorName(),"FTP does not support changing permissions.");
+        throw new UnsupportedOperationException(getAdaptorName(),"FTP does not support changing permissions.");
     }
 }

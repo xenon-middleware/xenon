@@ -177,7 +177,7 @@ public class FtpFileAdaptor extends FileAdaptor {
 
     @Override
     public boolean canAppend() { 
-        return false;
+        return true;
     }
     
 }

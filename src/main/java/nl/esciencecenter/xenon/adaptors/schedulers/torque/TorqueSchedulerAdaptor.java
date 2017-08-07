@@ -40,8 +40,8 @@ public class TorqueSchedulerAdaptor extends ScriptingSchedulerAdaptor {
     public static final String PREFIX = SchedulerAdaptor.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
 
     /** The locations supported by this adaptor */
-    public static final String [] ADAPTOR_LOCATIONS = new String [] { "(locations supported by local)", 
-            "(locations supported by ssh)" };
+    public static final String [] ADAPTOR_LOCATIONS = new String [] { "(locations supported by local scheduler adaptor)", 
+            "(locations supported by ssh scheduler adaptor)" };
     
     /** Should the grid engine version on the target machine be ignored ? */
     public static final String IGNORE_VERSION_PROPERTY = PREFIX + "ignore.version";

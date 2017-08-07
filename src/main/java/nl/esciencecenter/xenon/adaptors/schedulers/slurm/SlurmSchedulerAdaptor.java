@@ -37,8 +37,8 @@ public class SlurmSchedulerAdaptor extends ScriptingSchedulerAdaptor {
     public static final String PREFIX = SchedulerAdaptor.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
 
     /** The locations supported by this adaptor */
-    public static final String [] ADAPTOR_LOCATIONS = new String [] { "(locations supported by local)",
-            "(locations supported by ssh)" };
+    public static final String [] ADAPTOR_LOCATIONS = new String [] { "(locations supported by local scheduler adaptor)",
+            "(locations supported by ssh scheduler adaptor)" };
     
     /** Should the accounting usage be disabled? */
     public static final String DISABLE_ACCOUNTING_USAGE = PREFIX + "disable.accounting.usage";
@@ -63,7 +63,7 @@ public class SlurmSchedulerAdaptor extends ScriptingSchedulerAdaptor {
     
     public static final long SLURM_UPDATE_SLEEP = 1000L; // 1 second update sleep
     
-    public static final String[] SUPPORTED_VERSIONS = { "2.3.", "2.5.", "2.6.", "14.03.0", "14.11.9-Bull.1.0", "15.08.6"};
+    public static final String[] SUPPORTED_VERSIONS = { "2.3.", "2.5.", "2.6.", "14.", "15.", "16.", "17."};
     
     public SlurmSchedulerAdaptor() {
 		super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);

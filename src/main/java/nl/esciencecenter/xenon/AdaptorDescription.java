@@ -19,22 +19,6 @@ package nl.esciencecenter.xenon;
  * AdaptorStatus contains information on a specific adaptor.
  */
 public interface AdaptorDescription {
-
-	/*
-	private final String name;
-	private final String description;
-	private final String [] supportedLocations;
-	private final XenonPropertyDescription [] supportedProperties;
-	
-	public AdaptorDescription(String name, String description, String[] supportedLocations, 
-			XenonPropertyDescription[] supportedProperties) {
-		super();
-		this.name = name;
-		this.description = description;
-		this.supportedLocations = supportedLocations;
-		this.supportedProperties = supportedProperties;
-	}
-	 */
 	
 	/**
      * Get the name of the adaptor.
@@ -63,15 +47,4 @@ public interface AdaptorDescription {
      * @return an array containing all properties this adaptor supports.
      */
     XenonPropertyDescription[] getSupportedProperties();
-
-
-
-
-//    @Override
-//    public String toString() {
-//        return "AdaptorDescription [name=" + name + ", description=" + description + 
-//        		", supportedLocations=" + Arrays.toString(supportedLocations) +
-//        		", supportedProperties=" + Arrays.toString(supportedProperties) + "]";
-//    }
-    
 }

@@ -29,6 +29,7 @@ import nl.esciencecenter.xenon.adaptors.schedulers.StreamsImplementation;
 import nl.esciencecenter.xenon.adaptors.shared.local.LocalUtil;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
+import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 
 
 /**
@@ -104,7 +105,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
 
         boolean success = false;
 
-        if (!LocalUtil.isWindows()) { 
+        if (!LocalFileSystemUtils.isWindows()) { 
             try {
                 final Field pidField = process.getClass().getDeclaredField("pid");
 
