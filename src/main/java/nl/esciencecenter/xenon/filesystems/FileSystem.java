@@ -1601,11 +1601,9 @@ public abstract class FileSystem {
 
 		Path parent = path.getParent();
 
-		if (parent == null) {
-			throw new InvalidPathException(getAdaptorName(), "Parent directory does not exist: " + path);
+		if (parent != null) {
+		    assertDirectoryExists(parent);
 		}
-
-		assertDirectoryExists(parent);
 	}
 
 	protected void assertFileIsSymbolicLink(Path link) throws XenonException {

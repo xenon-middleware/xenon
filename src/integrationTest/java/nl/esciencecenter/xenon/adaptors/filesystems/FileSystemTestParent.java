@@ -161,7 +161,7 @@ public abstract class FileSystemTestParent {
         CopyStatus status = fileSystem.waitUntilDone(s, 1000);
         
         // For some adaptors (like webdav) it may take a few moments for the copy to fully arrive at the server. 
-        // To prevent the next operation from overtaking this copy, we slee for a 
+        // To prevent the next operation from overtaking this copy, we sleep for a second to let the target settle. 
         Thread.sleep(1000);
         
         if(status.hasException()){
