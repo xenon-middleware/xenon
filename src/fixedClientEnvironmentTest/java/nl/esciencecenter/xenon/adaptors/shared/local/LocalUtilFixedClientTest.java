@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.filesystems.webdav;
+package nl.esciencecenter.xenon.adaptors.shared.local;
 
-import nl.esciencecenter.xenon.adaptors.filesystems.FileSystemTestParent;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-/**
- * Extend this class for docker tests and live tests
- *
- * Can contain extra tests for webdav filesystem
- */
-public abstract class WebdavFileSystemTestParent extends FileSystemTestParent {
+import org.junit.Test;
+
+public class LocalUtilFixedClientTest {
+
+    
+    
 }
+

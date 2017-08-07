@@ -17,7 +17,6 @@ package nl.esciencecenter.xenon.adaptors.shared.local;
 
 import static nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor.ADAPTOR_NAME;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -35,8 +34,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
+
 import nl.esciencecenter.xenon.InvalidCredentialException;
-import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.local.CommandRunner;
@@ -56,194 +56,6 @@ import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
  * @since 1.0
  */
 public class LocalUtil {
-
-	/**
-     * Returns if we are currently running on Windows.
-     *
-     * @return if we are currently running on Window.
-     */
-    public static boolean isWindows() {
-        String os = System.getProperty("os.name");
-        return (os != null && os.startsWith("Windows"));
-    }
-
-    /**
-     * Returns if we are currently running on OSX.
-     *
-     * @return if we are currently running on OSX.
-     */
-    public static boolean isOSX() {
-        String os = System.getProperty("os.name");
-        return (os != null && os.equals("MacOSX"));
-    }
-
-    /**
-     * Returns if we are currently running on Linux.
-     *
-     * @return if we are currently running on Linux.
-     */
-    public static boolean isLinux() {
-        String os = System.getProperty("os.name");
-        return (os != null && os.equals("Linux"));
-    }
-    
-
-    /**
-     * Check if <code>root</code> only contains a valid Windows root element such as "C:".
-     *
-     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
-     * 
-     * @param root
-     *            The root to check.
-     * @return If <code>root</code> only contains a valid Windows root element.
-     */
-    public static boolean isWindowsRoot(String root) {
-        if (root == null) {
-            return false;
-        }
-
-        if (root.length() == 2 && root.endsWith(":") && Character.isLetter(root.charAt(0))) {
-            return true;
-        }
-
-        return (root.length() == 3 && root.endsWith(":") && Character.isLetter(root.charAt(0)) && root.charAt(3) == '\\');        
-    }
-
-    /**
-     * Check if <code>root</code> only contains a valid Linux root element, which is "/".
-     *
-     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
-     * 
-     * @param root
-     *            The root to check.
-     * @return If <code>root</code> only contains a valid Linux root element.
-     */
-    public static boolean isLinuxRoot(String root) {
-        return (root != null && root.equals("/"));
-    }
-
-    /**
-     * Check if <code>root</code> contains a valid OSX root element, which is "/".
-     *
-     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
-     * 
-     * @param root
-     *            The root to check.
-     * @return If <code>root</code> only contains a valid OSX root element.
-     */
-    public static boolean isOSXRoot(String root) {
-        return (root != null && root.equals("/"));
-    }
-
-    /**
-     * Check if <code>root</code> contains a locally valid root element, such as "C:" on Windows or "/" on Linux and OSX.
-     *
-     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
-     *
-     * Note that the result of this method depends on the OS the application is running on.
-     *
-     * @param root
-     *            The root to check.
-     * @return If <code>root</code> only contains a valid OSX root element.
-     */
-    public static boolean isLocalRoot(String root) {
-        if (isWindows()) {
-            return isWindowsRoot(root);
-        }
-
-        return isLinuxRoot(root);
-    }
-    
-    /**
-     * Checks if the provide path starts with a valid Linux root, that is "/".
-     *
-     * @param path
-     *            The path to check.
-     * @return If the provide path starts with a valid Linux root.
-     */
-    public static boolean startsWithLinuxRoot(String path) {
-        return path != null && path.startsWith("/");
-
-    }
-
-    /**
-     * Checks if the provide path starts with a valid Windows root, for example "C:".
-     *
-     * @param path
-     *            The path to check.
-     * @return If the provide path starts with a valid Windows root.
-     */
-    public static boolean startWithWindowsRoot(String path) {
-        return path != null && path.length() >= 2 && path.charAt(1) == ':' && Character.isLetter(path.charAt(0));
-
-    }
-
-    /**
-     * Checks if the provide path starts with a valid root, such as "/" or "C:".
-     *
-     * @param path
-     *            The path to check.
-     * @return If the provide path starts with a valid root.
-     */
-    public static boolean startWithRoot(String path) {
-        return startsWithLinuxRoot(path) || startWithWindowsRoot(path);
-    }
-    
-    /**
-     * Return the locally valid root element of an <code>String</code> representation of an absolute path.
-     *
-     * Examples of a root elements are "/" or "C:". If the provided path does not contain a locally valid root element, an
-     * exception will be thrown. For example, providing "/user/local" will return "/" on Linux or OSX, but throw an exception on
-     * Windows; providing "C:\test" will return "C:" on Windows but throw an exception on Linux or OSX.
-     *
-     * @param p
-     *            The absolute path for which to determine the root element.
-     * @return The locally valid root element.
-     * @throws XenonException
-     *             If the provided <code>path</code> is not absolute, or does not contain a locally valid root.
-     */
-    @SuppressWarnings("PMD.NPathComplexity")
-    public static String getLocalRoot(String p) throws XenonException {
-        
-        String path = p;
-        
-        if (isWindows()) {
-            if (path == null || path.isEmpty()) {
-                return "";
-            }
-            if (!path.contains("/") && !path.contains("\\")) {
-                // Windows URS, network drive
-                return path;
-            }
-            if (path.charAt(0) == '/') {
-                path = path.substring(1);
-            }
-            if (path.length() >= 2 && (path.charAt(1) == ':') && Character.isLetter(path.charAt(0))) {
-                return path.substring(0, 2).toUpperCase();
-            }
-
-            throw new InvalidLocationException(ADAPTOR_NAME, "Path does not include drive name! " + path);
-        }
-
-        if (path == null || path.isEmpty() || (path.length() >= 1 && path.charAt(0) == '/')) {
-            return "/";
-        }
-
-        throw new InvalidLocationException(ADAPTOR_NAME, "Path is not absolute! " + path);
-    }
-    
-    /**
-     * Returns the local file system path separator character.
-     * 
-     * @return The local file system path separator character.
-     */
-    public static char getLocalSeparator() {
-        return File.separatorChar;
-    }
     
     /**
      * Provided with an absolute <code>path</code> and a <code>root</code>, this method returns a <code>RelativePath</code> that
@@ -266,10 +78,10 @@ public class LocalUtil {
         }
 
         if (root.length() == path.length()) {
-            return new Path(getLocalSeparator());
+            return new Path(LocalFileSystemUtils.getLocalSeparator());
         }
 
-        return new Path(getLocalSeparator(), path.substring(root.length()));
+        return new Path(LocalFileSystemUtils.getLocalSeparator(), path.substring(root.length()));
     }
     
     /**
@@ -297,7 +109,7 @@ public class LocalUtil {
             String firstPart = relPath.getName(0).toString();
             if ("~".equals(firstPart)) {                
                 String tmp = System.getProperty("user.home");        
-                root = getLocalRoot(tmp);
+                root = LocalFileSystemUtils.getLocalRoot(tmp);
                 Path home = getRelativePath(tmp, root);
                 
                 if (numElems == 1) {
@@ -341,7 +153,7 @@ public class LocalUtil {
             result.setReadable(java.nio.file.Files.isReadable(path));
             result.setReadable(java.nio.file.Files.isWritable(path));
             
-            boolean isWindows = LocalUtil.isWindows(); 
+            boolean isWindows = LocalFileSystemUtils.isWindows(); 
 
             BasicFileAttributes basicAttributes;
             
@@ -534,7 +346,7 @@ public class LocalUtil {
     public static void unixDestroy(Process process) {
         boolean success = false;
 
-        if (!isWindows()) { 
+        if (!LocalFileSystemUtils.isWindows()) { 
             try {
                 final Field pidField = process.getClass().getDeclaredField("pid");
 

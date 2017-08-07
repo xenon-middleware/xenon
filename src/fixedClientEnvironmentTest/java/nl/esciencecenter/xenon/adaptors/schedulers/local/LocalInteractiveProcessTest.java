@@ -25,9 +25,9 @@ import java.io.OutputStream;
 import org.junit.Test;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.shared.local.LocalUtil;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
+import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 import nl.esciencecenter.xenon.utils.OutputReader;
 
 public class LocalInteractiveProcessTest {
@@ -35,7 +35,7 @@ public class LocalInteractiveProcessTest {
 	@Test
 	public void test_simpleJob() throws Exception { 
 
-		assumeFalse(LocalUtil.isWindows());
+		assumeFalse(LocalFileSystemUtils.isWindows());
 
 		JobDescription job = new JobDescription();
 		job.setExecutable("/bin/cat");
@@ -74,7 +74,7 @@ public class LocalInteractiveProcessTest {
 	@Test(expected=XenonException.class)
 	public void test_simpleJob_unknownWorkDir_throwsException() throws Exception { 
 
-		assumeFalse(LocalUtil.isWindows());
+		assumeFalse(LocalFileSystemUtils.isWindows());
 
 		JobDescription job = new JobDescription();
 		job.setExecutable("/bin/cat");
@@ -86,7 +86,7 @@ public class LocalInteractiveProcessTest {
 	@Test
 	public void test_simpleJob_destroyAfterDone() throws Exception { 
 
-		assumeFalse(LocalUtil.isWindows());
+		assumeFalse(LocalFileSystemUtils.isWindows());
 
 		JobDescription job = new JobDescription();
 		job.setExecutable("/bin/cat");
@@ -124,7 +124,7 @@ public class LocalInteractiveProcessTest {
 	@Test
 	public void test_simpleJob_destroyBeforeDone() throws Exception { 
 
-		assumeFalse(LocalUtil.isWindows());
+		assumeFalse(LocalFileSystemUtils.isWindows());
 
 		JobDescription job = new JobDescription();
 		job.setExecutable("/bin/cat");

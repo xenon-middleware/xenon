@@ -19,6 +19,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
@@ -76,7 +77,7 @@ public class LocalFileAdaptor extends FileAdaptor {
      *          if the location is invalid.                   
      */
     private static void checkFileLocation(String location) throws InvalidLocationException {
-        if (location == null || location.isEmpty() || LocalUtil.isLocalRoot(location)) {
+        if (location == null || location.isEmpty() || LocalFileSystemUtils.isLocalRoot(location)) {
             return;
         }
 
@@ -89,7 +90,7 @@ public class LocalFileAdaptor extends FileAdaptor {
 		checkFileLocation(location);
 		
 		if (location == null){
-		    if (LocalUtil.isWindows()) {
+		    if (LocalFileSystemUtils.isWindows()) {
 		        location = "c:";
             } else {
                 location = "/";

@@ -24,7 +24,7 @@ import java.io.File;
 import org.junit.Test;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.shared.local.LocalUtil;
+import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 
 public class CommandRunnerTest {
 
@@ -41,7 +41,7 @@ public class CommandRunnerTest {
 	@Test
 	public void test_runCommand() throws XenonException {
 		
-		assumeFalse(LocalUtil.isWindows());
+		assumeFalse(LocalFileSystemUtils.isWindows());
 		
 		File workingDir = new File("/tmp");
 		
@@ -56,7 +56,7 @@ public class CommandRunnerTest {
 	@Test
 	public void test_runCommandInPath() throws XenonException {
 		
-		assumeFalse(LocalUtil.isWindows());
+		assumeFalse(LocalFileSystemUtils.isWindows());
 		
 		File workingDir = new File("/tmp");
 		
@@ -70,7 +70,7 @@ public class CommandRunnerTest {
 	@Test
 	public void test_runCommandWithoutWorkingDir() throws XenonException {
 		
-		assumeFalse(LocalUtil.isWindows());
+		assumeFalse(LocalFileSystemUtils.isWindows());
 		
 		File workingDir = null;
 		
@@ -85,7 +85,7 @@ public class CommandRunnerTest {
 	@Test(expected=CommandNotFoundException.class)
 	public void test_runCommand_nonExistantWorkingDir() throws XenonException {
 		
-		assumeFalse(LocalUtil.isWindows());
+		assumeFalse(LocalFileSystemUtils.isWindows());
 		
 		File workingDir = new File("/foo");
 		
