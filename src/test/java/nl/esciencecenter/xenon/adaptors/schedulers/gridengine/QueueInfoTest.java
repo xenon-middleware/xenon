@@ -22,15 +22,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.QueueInfo;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 /**
- * 
- * 
+ *
+ *
  */
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

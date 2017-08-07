@@ -27,33 +27,32 @@ import java.util.List;
 
 import org.junit.Test;
 
-import nl.esciencecenter.xenon.filesystems.Path;
 
 public class PathTest {
 
-	@Test
-	public void testStartsWithTrue() {
-		Path path = new Path("/aap/noot");
-		assertTrue(path.startsWith("/aap"));
-	}
+    @Test
+    public void testStartsWithTrue() {
+        Path path = new Path("/aap/noot");
+        assertTrue(path.startsWith("/aap"));
+    }
 
-	@Test
-	public void testStartsWithFalse() {
-		Path path = new Path("/aap/noot");
-		assertFalse(path.startsWith("/noot"));
-	}
-	
-	@Test
-	public void testEndsWithTrue() {
-		Path path = new Path("/aap/noot");
-		assertTrue(path.endsWith("noot"));
-	}
+    @Test
+    public void testStartsWithFalse() {
+        Path path = new Path("/aap/noot");
+        assertFalse(path.startsWith("/noot"));
+    }
 
-	@Test
-	public void testEndsWithFalse() {
-		Path path = new Path("/aap/noot");
-		assertFalse(path.endsWith("aap"));
-	}
+    @Test
+    public void testEndsWithTrue() {
+        Path path = new Path("/aap/noot");
+        assertTrue(path.endsWith("noot"));
+    }
+
+    @Test
+    public void testEndsWithFalse() {
+        Path path = new Path("/aap/noot");
+        assertFalse(path.endsWith("aap"));
+    }
 
     @Test
     public void testRelativePath1a() {
@@ -78,7 +77,7 @@ public class PathTest {
         Path path = new Path(new Path[0]).toAbsolutePath();
         assertEquals(path.toString(), "" + path.getSeparator());
     }
-    
+
     @Test
     public void testRelativePath3a() {
         String s = null;
@@ -104,7 +103,7 @@ public class PathTest {
         Path path = new Path("mydir/myfile").toAbsolutePath();
         assertEquals(path.toString(), "/mydir/myfile");
     }
-    
+
     @Test
     public void testRelativePathStringArray() {
         String[] strings = new String[2];
@@ -131,7 +130,7 @@ public class PathTest {
         Path path = new Path(paths);
         assertEquals(path.toString(), "mydir/myfile");
     }
-    
+
     @Test
     public void testRelativePathRelativePathArray1b() {
         Path[] paths = new Path[2];
@@ -178,7 +177,7 @@ public class PathTest {
         Path path = new Path(path1, path2).toAbsolutePath();
         assertEquals(path.toString(), "/mydir/myfile");
     }
-    
+
     @Test
     public void testRelativePathRelativePath1a() {
         Path path1 = new Path("mydir/myfile");
@@ -211,7 +210,7 @@ public class PathTest {
         Path path = new Path('/', "mydir", "myfile");
         assertEquals(path.toString(), "mydir/myfile");
     }
-    
+
     @Test
     public void testRelativePathPathSeperator2() {
         Path path = new Path('/', "mydir", "myfile").toAbsolutePath();
@@ -235,7 +234,7 @@ public class PathTest {
         Path path = new Path('/', "mydir", "", "myfile");
         assertEquals(path.toString(), "mydir/myfile");
     }
-    
+
     @Test
     public void testRelativePathPathSeperator4b() {
         Path path = new Path('/', "mydir", "", "myfile").toAbsolutePath();
@@ -289,7 +288,7 @@ public class PathTest {
         Path path = new Path('/').toAbsolutePath();
         assertEquals(path.toString(), "/");
     }
-    
+
     @Test
     public void testRelativePathStringArraySeperator1a() {
         String[] strings = new String[] { "mydir", "myfile" };
@@ -304,7 +303,7 @@ public class PathTest {
         assertEquals(path.toString(), "@mydir@myfile");
     }
 
-    
+
     @Test
     public void testGetFileName_WithFile_LastElement() {
         Path path = new Path("mydir/myfile");
@@ -387,7 +386,7 @@ public class PathTest {
         doSubPath(new String[] { "a", "b", "c" }, 1, 1, new String[] { "a" });
     }
 
-    
+
     @Test
     public void testSubpath_First() {
         doSubPath(new String[] { "a", "b", "c" }, 0, 1, new String[] { "a" });
@@ -837,8 +836,8 @@ public class PathTest {
         boolean v = p1.endsWith(p2);
         assert (!v);
     }
-    
-    
+
+
     @Test
     public void testGetFileName() {
         Path p1 = new Path("/a/b/c");
@@ -846,7 +845,7 @@ public class PathTest {
 
         assertEquals(p2, new Path("c"));
     }
-    
+
     @Test
     public void testGetFileNameNull() {
         Path p1 = new Path("");
@@ -858,60 +857,60 @@ public class PathTest {
     @Test
     public void test_create_eltNull() {
 
-    	List<String> elt = null;
-    	Path p = new Path('/', elt);
-    	assertTrue(p.isEmpty());
+        List<String> elt = null;
+        Path p = new Path('/', elt);
+        assertTrue(p.isEmpty());
     }
 
     @Test
     public void test_copyNull() {
-    	Path t = new Path((Path [])null);
-    	assertTrue(t.isEmpty());
+        Path t = new Path((Path [])null);
+        assertTrue(t.isEmpty());
     }
-    
+
     @Test
     public void test_copyNullIndirect() {
-    	Path p = null;
-    	Path t = new Path(p);
-    	assertTrue(t.isEmpty());
+        Path p = null;
+        Path t = new Path(p);
+        assertTrue(t.isEmpty());
     }
 
     @Test
     public void test_copyEmptyArray() {
-    	Path [] p = new Path[0];
-    	Path t = new Path(p);
-    	assertTrue(t.isEmpty());
-    }
-    
-    @Test
-    public void test_copyArrayWithEmpty() {
-    	
-    	Path [] p = new Path[3];
-    	p[0] = new Path("/aap");
-    	p[1] = null;
-    	p[2] = new Path("noot");
-    	
-    	Path t = new Path(p);
-    	assertEquals(new Path("/aap/noot"), t);
+        Path [] p = new Path[0];
+        Path t = new Path(p);
+        assertTrue(t.isEmpty());
     }
 
-    
+    @Test
+    public void test_copyArrayWithEmpty() {
+
+        Path [] p = new Path[3];
+        p[0] = new Path("/aap");
+        p[1] = null;
+        p[2] = new Path("noot");
+
+        Path t = new Path(p);
+        assertEquals(new Path("/aap/noot"), t);
+    }
+
+
 
     @Test
     public void test_hashcode() {
         Path p1 = new Path("/aap/noot");
-        
+
         List<String> elements = new ArrayList<>();
         elements.add("aap");
         elements.add("noot");
-    
+
         char separator = '/';
-        
+
         final int prime = 31;
         int result = 1;
         result = prime * result + elements.hashCode();
         result = prime * result + separator;
-        
+
         assertEquals(result, p1.hashCode());
     }
 
@@ -919,7 +918,7 @@ public class PathTest {
 
     @Test
     public void testStartsRoundTripAbsolute() {
-	    String s = "/aap/noot/mies";
+        String s = "/aap/noot/mies";
         assertEquals(s,new Path(s).toString());
     }
 
@@ -981,15 +980,15 @@ public class PathTest {
     }
 
     @Test
-    public void testHome(){
-	    String s = "~xenon/bla/bla";
-	    Path q = new Path(s);
-	    assertEquals(s,q.toString());
+    public void testHome() {
+        String s = "~xenon/bla/bla";
+        Path q = new Path(s);
+        assertEquals(s,q.toString());
     }
 
 
     @Test
-    public void testPathArrayNullAbsolute(){
+    public void testPathArrayNullAbsolute() {
         Path q = new Path(new Path[]{null,null, new Path("/"), null, new Path("") , new Path("aap")});
         assertEquals(q.toString(),"/aap");
     }

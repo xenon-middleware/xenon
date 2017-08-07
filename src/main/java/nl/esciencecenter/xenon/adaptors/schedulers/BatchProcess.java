@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.shared.local.LocalUtil;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
@@ -30,21 +29,21 @@ import nl.esciencecenter.xenon.utils.StreamForwarder;
 
 /**
  * BatchProcess wraps an {@link InteractiveProcess} to emulate a batch process.
- * 
+ *
  * @version 1.0
  * @since 1.0
  */
 class BatchProcess implements Process {
 
-    /** Time to wait for a StreamForwarder to terminate (in ms.) */ 
+    /** Time to wait for a StreamForwarder to terminate (in ms.) */
     private static final long TERMINATION_DELAY = 1000L;
-    
+
     private final InteractiveProcess process;
 
     private StreamForwarder stdinForwarder;
     private StreamForwarder stdoutForwarder;
     private StreamForwarder stderrForwarder;
-   
+
     public BatchProcess(FileSystem filesystem, Path workingDirectory, JobDescription description, String jobIdentifier, InteractiveProcessFactory factory)
             throws XenonException, IOException {
 
@@ -88,7 +87,7 @@ class BatchProcess implements Process {
 
         if (path == null) {
             result = root;
-        } else if (LocalFileSystemUtils.startWithRoot(path)) { 
+        } else if (LocalFileSystemUtils.startWithRoot(path)) {
             result = new Path(path);
         } else {
             result = root.resolve(path);
@@ -106,11 +105,11 @@ class BatchProcess implements Process {
         Path file = processPath(filesystem, workdir, filename);
 
         // Create the files for the output stream. Will fail if the files already exist!
-        if (filesystem.exists(file)) { 
-        	throw new PathAlreadyExistsException(filesystem.getAdaptorName(), "File already exists: " + file);	
+        if (filesystem.exists(file)) {
+            throw new PathAlreadyExistsException(filesystem.getAdaptorName(), "File already exists: " + file);
         }
-        
-        // Create the output stream and return it. 
+
+        // Create the output stream and return it.
         return filesystem.writeToFile(file);
     }
 
@@ -132,7 +131,7 @@ class BatchProcess implements Process {
         }
     }
 
-    public boolean isDone()  {
+    public boolean isDone() {
 
         if (process.isDone()) {
             closeStreams();

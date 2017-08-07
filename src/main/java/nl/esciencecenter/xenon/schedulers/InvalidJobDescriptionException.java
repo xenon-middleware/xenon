@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.schedulers;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that a JobDescription contains invalid values for certain options.  
- * 
+ * Signals that a JobDescription contains invalid values for certain options.
+ *
  * @version 1.0
  * @since 1.0
  */

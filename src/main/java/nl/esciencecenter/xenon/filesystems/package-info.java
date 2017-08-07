@@ -17,4 +17,3 @@
  * This package contains classes and interfaces for manipulating files.
  */
 package nl.esciencecenter.xenon.filesystems;
-

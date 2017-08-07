@@ -28,7 +28,7 @@ import nl.esciencecenter.xenon.utils.OutputReader;
 
 /**
  * Runs a command. Constructor waits for command to finish.
- * 
+ *
  */
 public class RemoteCommandRunner {
 

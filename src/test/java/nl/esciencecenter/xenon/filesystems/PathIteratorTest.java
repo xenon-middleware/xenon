@@ -22,10 +22,9 @@ import java.util.NoSuchElementException;
 
 import org.junit.Test;
 
-import nl.esciencecenter.xenon.filesystems.Path;
 
 /**
- * 
+ *
  */
 public class PathIteratorTest {
 

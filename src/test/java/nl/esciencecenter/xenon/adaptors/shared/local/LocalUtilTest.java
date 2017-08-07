@@ -26,7 +26,7 @@ import nl.esciencecenter.xenon.filesystems.Path;
 public class LocalUtilTest {
 
     @Test
-    public void test_constructor() { 
+    public void test_constructor() {
         new LocalUtil();
     }
 

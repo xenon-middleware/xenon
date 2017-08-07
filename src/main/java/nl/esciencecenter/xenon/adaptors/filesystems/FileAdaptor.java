@@ -28,12 +28,12 @@ public abstract class FileAdaptor extends Adaptor implements FileSystemAdaptorDe
 
     public static final String ADAPTORS_PREFIX = "xenon.adaptors.file.";
 
-    protected FileAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) { 
+    protected FileAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) {
         super(name, description, locations, properties);
     }
 
     @Override
-    public boolean supportsThirdPartyCopy() { 
+    public boolean supportsThirdPartyCopy() {
         // By default, adaptors do not support third party copy.
         return false;
     }
@@ -45,13 +45,13 @@ public abstract class FileAdaptor extends Adaptor implements FileSystemAdaptorDe
     }
 
     @Override
-    public boolean canCreateSymboliclinks() { 
+    public boolean canCreateSymboliclinks() {
         // By default, adaptors cannot create symbolic links.
         return false;
     }
 
     @Override
-    public boolean isConnectionless() { 
+    public boolean isConnectionless() {
         // By default, adaptors require a connection.
         return false;
     }
@@ -67,17 +67,17 @@ public abstract class FileAdaptor extends Adaptor implements FileSystemAdaptorDe
     }
 
     @Override
-    public boolean supportsRename() { 
+    public boolean supportsRename() {
         return true;
     }
 
     @Override
-    public boolean canAppend() { 
-        return true; 
+    public boolean canAppend() {
+        return true;
     }
 
     @Override
-    public boolean needsSizeBeforehand(){
+    public boolean needsSizeBeforehand() {
         return false;
     }
 

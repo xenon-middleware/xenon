@@ -17,4 +17,3 @@
  * This package contains classes and interfaces for managing credentials.
  */
 package nl.esciencecenter.xenon.credentials;
-

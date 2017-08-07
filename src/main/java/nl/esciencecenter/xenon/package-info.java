@@ -17,4 +17,3 @@
  * This package is the main entry point into the Xenon API.
  */
 package nl.esciencecenter.xenon;
-

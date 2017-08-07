@@ -20,39 +20,39 @@ import java.io.OutputStream;
 
 /**
  * Streams is a container for the standard input, output and error streams of a job.
- * 
- * Note that these standard streams are only available for interactive jobs. 
- * 
+ *
+ * Note that these standard streams are only available for interactive jobs.
+ *
  * @version 1.0
  * @since 1.0
  */
 public interface Streams {
 
-	/**
-	 * Get the identifier of the job for which this Streams was created.
-	 * 
-	 * @return the identifier of the ob.
-	 */
-	String getJobIdentifier();
+    /**
+     * Get the identifier of the job for which this Streams was created.
+     *
+     * @return the identifier of the ob.
+     */
+    String getJobIdentifier();
 
-	/**
-	 * Returns the standard output stream of job.
-	 * 
-	 * @return the standard output stream of job.
-	 */
-	InputStream getStdout();
+    /**
+     * Returns the standard output stream of job.
+     *
+     * @return the standard output stream of job.
+     */
+    InputStream getStdout();
 
-	/**
-	 * Returns the standard error stream of job.
-	 * 
-	 * @return the standard error stream of job.
-	 */
-	InputStream getStderr();
+    /**
+     * Returns the standard error stream of job.
+     *
+     * @return the standard error stream of job.
+     */
+    InputStream getStderr();
 
-	/**
-	 * Returns the standard input stream of job.
-	 * 
-	 * @return the standard input stream of this job.
-	 */
-	OutputStream getStdin();
+    /**
+     * Returns the standard input stream of job.
+     *
+     * @return the standard input stream of this job.
+     */
+    OutputStream getStdin();
 }

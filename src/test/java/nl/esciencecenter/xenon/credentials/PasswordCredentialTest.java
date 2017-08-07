@@ -40,13 +40,13 @@ public class PasswordCredentialTest {
         PasswordCredential pwc = new PasswordCredential("username", "password".toCharArray());
         assertTrue(pwc.toString().equals("PasswordCredential [username=username]"));
     }
- 
+
     @Test
     public void test_password_null() throws Exception {
         PasswordCredential pwc = new PasswordCredential("username", null);
         assertArrayEquals(new char[0], pwc.getPassword());
     }
- 
+
     @Test
     public void test_hashcode() {
         PasswordCredential pwc1 = new PasswordCredential("username", "password".toCharArray());

@@ -22,9 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSetup;
-import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.ParallelEnvironmentInfo;
-import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.QueueInfo;
 import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.ParallelEnvironmentInfo.AllocationRule;
 
 import org.junit.FixMethodOrder;
@@ -32,8 +29,8 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 /**
- * 
- * 
+ *
+ *
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GridEngineSetupTest {
@@ -140,7 +137,7 @@ public class GridEngineSetupTest {
         testSetup.calculateSlots("some.pe", "some.q", 2);
         // Should fail.
     }
-    
+
     @Test
     public void test02e_calculateSlots_integerPe_slots() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
@@ -194,9 +191,9 @@ public class GridEngineSetupTest {
         String[] input = new String[] { "some.pe", "other.pe", "this.pe", "that.pe" };
 
         String[] expected = new String[] { "-sp", "some.pe", "-sp", "other.pe", "-sp", "this.pe", "-sp", "that.pe" };
-        
+
         String[] result = GridEngineSetup.qconfPeDetailsArguments(input);
-        
+
         assertArrayEquals("setup does not generate pe arguments properly", expected, result);
     }
 

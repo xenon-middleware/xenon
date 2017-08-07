@@ -1,29 +1,41 @@
-// Check coding style with PMD
+// Check coding style with spotless
 // Depends on plugins:
-//    id 'pmd'
+//    id "com.diffplug.gradle.spotless" version "3.4.1"
 
-/*
-dependencies {
-    pmd(
-        'net.sourceforge.pmd:pmd-core:5.4.0',
-        'net.sourceforge.pmd:pmd-java:5.4.0'
-    )
+spotless {
+	java {
+		trimTrailingWhitespace()
+		indentWithSpaces(4)
+		endWithNewline()
+		removeUnusedImports() 
+
+		replace      'Not enough space after if', 'if(', 'if ('
+		replaceRegex 'Too much space after if', 'if +\\(', 'if ('
+
+		replace      'Not enough space after for', 'for(', 'for ('
+		replaceRegex 'Too much space after for', 'for +\\(', 'for ('
+
+		replace      'Not enough space after while', 'while(', 'while ('
+		replaceRegex 'Too much space after while', 'while +\\(', 'while ('
+
+		replace      'Not enough space after try', 'try{', 'try {'
+		replaceRegex 'Too much space after try', 'try +\\{', 'try {'
+
+		replace      'Not enough space between brackets', '){', ') {'
+
+//		licenseHeader '/* Licensed under Apache-2.0 */'	// License header
+//		licenseHeaderFile 'spotless.license.java'		// License header file
+
+		// Obviously, you can't specify both licenseHeader and licenseHeaderFile at the same time
+
+//		importOrder 'java', 'javax', 'org', 'com', 'com.diffplug', ''	// A sequence of package names
+//		importOrderFile 'spotless.importorder'				// An import ordering file, exported from Eclipse
+
+
+//		eclipse().configFile 'spotless.eclipseformat.xml'	// XML file dumped out by the Eclipse formatter
+		// If you have Eclipse preference or property files, you can use them too.
+	}
 }
 
-pmd {
-    // TODO: remove when PMD warnings are fixed
-    ignoreFailures = true
-
-    toolVersion = '5.4.0'
-    ruleSets = []
-    ruleSetFiles = files("config/pmd/ruleset.xml")
-}
-
-def testRuleSetFiles = files("config/pmd/test_ruleset.xml")
-pmdTest.ruleSetFiles = testRuleSetFiles
-pmdIntegrationTest.ruleSetFiles = testRuleSetFiles
-pmdFixedClientEnvironmentTest.ruleSetFiles = testRuleSetFiles
-pmdLiveTest.ruleSetFiles = testRuleSetFiles
-*/
 
 

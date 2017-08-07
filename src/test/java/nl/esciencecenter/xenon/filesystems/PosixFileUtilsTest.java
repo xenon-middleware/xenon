@@ -25,10 +25,9 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import nl.esciencecenter.xenon.adaptors.filesystems.PosixFileUtils;
-import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 
 /**
- * 
+ *
  */
 public class PosixFileUtilsTest {
 
