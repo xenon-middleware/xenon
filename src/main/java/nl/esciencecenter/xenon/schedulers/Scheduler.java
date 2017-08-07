@@ -46,69 +46,69 @@ import nl.esciencecenter.xenon.credentials.DefaultCredential;
  */
 public abstract class Scheduler {
 
-	/** The name of this component, for use in exceptions */
-	private static final String COMPONENT_NAME = "Scheduler";
+    /** The name of this component, for use in exceptions */
+    private static final String COMPONENT_NAME = "Scheduler";
 
-	private static final HashMap<String, SchedulerAdaptor> adaptors = new LinkedHashMap<>();
+    private static final HashMap<String, SchedulerAdaptor> adaptors = new LinkedHashMap<>();
 
-	static {
-		// Load all supported file adaptors
-		addAdaptor(new LocalSchedulerAdaptor());
-		addAdaptor(new SshSchedulerAdaptor());
-		addAdaptor(new GridEngineSchedulerAdaptor());
-		addAdaptor(new SlurmSchedulerAdaptor());
-		addAdaptor(new TorqueSchedulerAdaptor());
-	}
+    static {
+        // Load all supported file adaptors
+        addAdaptor(new LocalSchedulerAdaptor());
+        addAdaptor(new SshSchedulerAdaptor());
+        addAdaptor(new GridEngineSchedulerAdaptor());
+        addAdaptor(new SlurmSchedulerAdaptor());
+        addAdaptor(new TorqueSchedulerAdaptor());
+    }
 
-	private static void addAdaptor(SchedulerAdaptor adaptor) {
-		adaptors.put(adaptor.getName(), adaptor);
-	}
+    private static void addAdaptor(SchedulerAdaptor adaptor) {
+        adaptors.put(adaptor.getName(), adaptor);
+    }
 
-	private static SchedulerAdaptor getAdaptorByName(String adaptorName) throws UnknownAdaptorException {
+    private static SchedulerAdaptor getAdaptorByName(String adaptorName) throws UnknownAdaptorException {
 
-		if (adaptorName == null || adaptorName.trim().isEmpty()) {
-			throw new UnknownAdaptorException(COMPONENT_NAME, "Adaptor name may not be null or empty");
-		}
+        if (adaptorName == null || adaptorName.trim().isEmpty()) {
+            throw new UnknownAdaptorException(COMPONENT_NAME, "Adaptor name may not be null or empty");
+        }
 
-		if (!adaptors.containsKey(adaptorName)) {
-			throw new UnknownAdaptorException(COMPONENT_NAME, String.format("Adaptor '%s' not found", adaptorName));
-		}
+        if (!adaptors.containsKey(adaptorName)) {
+            throw new UnknownAdaptorException(COMPONENT_NAME, String.format("Adaptor '%s' not found", adaptorName));
+        }
 
-		return adaptors.get(adaptorName);
-	}
+        return adaptors.get(adaptorName);
+    }
 
     /**
      * Gives a list names of the available adaptors.
-	 *
-	 * @return the list
+     *
+     * @return the list
      */
-	public static String [] getAdaptorNames() {
-		return adaptors.keySet().toArray(new String[adaptors.size()]);
-	}
+    public static String [] getAdaptorNames() {
+        return adaptors.keySet().toArray(new String[adaptors.size()]);
+    }
 
     /**
      * Gives the description of the adaptor with the given name.
      *
      * @param adaptorName
      *            the type of scheduler to connect to (e.g. "slurm" or "torque")
-	 * @return the description
+     * @return the description
      * @throws UnknownAdaptorException
      *          If the adaptor name is absent in {@link #getAdaptorNames()}.
      */
-	public static SchedulerAdaptorDescription getAdaptorDescription(String adaptorName) throws UnknownAdaptorException {
-		return getAdaptorByName(adaptorName);
-	}
+    public static SchedulerAdaptorDescription getAdaptorDescription(String adaptorName) throws UnknownAdaptorException {
+        return getAdaptorByName(adaptorName);
+    }
 
     /**
      * Gives a list of the descriptions of the available adaptors.
-	 *
-	 * @return the list
+     *
+     * @return the list
      */
-	public static SchedulerAdaptorDescription [] getAdaptorDescriptions() {
-		return adaptors.values().toArray(new SchedulerAdaptorDescription[adaptors.size()]);
-	}
+    public static SchedulerAdaptorDescription [] getAdaptorDescriptions() {
+        return adaptors.values().toArray(new SchedulerAdaptorDescription[adaptors.size()]);
+    }
 
-	/**
+    /**
      * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code>
      * using <code>credentials</code> to get access. Use <code>properties</code> to (optionally)
      * configure the scheduler when it is created.
@@ -142,12 +142,12 @@ public abstract class Scheduler {
      * @throws IllegalArgumentException
      *             If adaptor is null.
      */
-	public static Scheduler create(String adaptor, String location, Credential credential, Map<String, String> properties)
+    public static Scheduler create(String adaptor, String location, Credential credential, Map<String, String> properties)
             throws XenonException {
-		return getAdaptorByName(adaptor).createScheduler(location, credential, properties);
-	}
+        return getAdaptorByName(adaptor).createScheduler(location, credential, properties);
+    }
 
-	/**
+    /**
      * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code>
      * using <code>credentials</code> to get access.
      *
@@ -178,11 +178,11 @@ public abstract class Scheduler {
      * @throws IllegalArgumentException
      *             If adaptor is null.
      */
-	public static Scheduler create(String adaptor, String location, Credential credential) throws XenonException {
-		return create(adaptor, location, credential, new HashMap<>(0));
-	}
+    public static Scheduler create(String adaptor, String location, Credential credential) throws XenonException {
+        return create(adaptor, location, credential, new HashMap<>(0));
+    }
 
-	/**
+    /**
      * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code>
      * using the default credentials to get access.
      *
@@ -211,16 +211,16 @@ public abstract class Scheduler {
      * @throws IllegalArgumentException
      *             If adaptor is null.
      */
-	public static Scheduler create(String adaptor, String location) throws XenonException {
-		return create(adaptor, location, new DefaultCredential());
-	}
+    public static Scheduler create(String adaptor, String location) throws XenonException {
+        return create(adaptor, location, new DefaultCredential());
+    }
 
-	/**
+    /**
      * Create a new Scheduler using the <code>adaptor</code> connecting to the default location
      * and using the default credentials to get access.
      *
-	 * Note that there are very few adaptors that support a default scheduler location. The local
-	 * scheduler adaptor is the prime example.
+     * Note that there are very few adaptors that support a default scheduler location. The local
+     * scheduler adaptor is the prime example.
      *
      * Make sure to always close {@code Scheduler} instances
      * by calling {@code Scheduler.close()} when you no longer need them,
@@ -245,61 +245,61 @@ public abstract class Scheduler {
      * @throws IllegalArgumentException
      *             If adaptor is null.
      */
-	public static Scheduler create(String adaptor) throws XenonException {
-		return create(adaptor, null);
-	}
+    public static Scheduler create(String adaptor) throws XenonException {
+        return create(adaptor, null);
+    }
 
-	private final String uniqueID;
-	private final String adaptor;
-	private final String location;
-	protected final XenonProperties properties;
+    private final String uniqueID;
+    private final String adaptor;
+    private final String location;
+    protected final XenonProperties properties;
 
-	protected Scheduler(String uniqueID, String adaptor, String location, XenonProperties properties) {
+    protected Scheduler(String uniqueID, String adaptor, String location, XenonProperties properties) {
 
-		if (uniqueID == null) {
-			throw new IllegalArgumentException("Identifier may not be null!");
-		}
+        if (uniqueID == null) {
+            throw new IllegalArgumentException("Identifier may not be null!");
+        }
 
-		if (adaptor == null) {
-			throw new IllegalArgumentException("Adaptor may not be null!");
-		}
+        if (adaptor == null) {
+            throw new IllegalArgumentException("Adaptor may not be null!");
+        }
 
-		if (location == null) {
-			throw new IllegalArgumentException("Location may not be null!");
-		}
+        if (location == null) {
+            throw new IllegalArgumentException("Location may not be null!");
+        }
 
-		this.uniqueID = uniqueID;
-		this.adaptor = adaptor;
-		this.location = location;
-		this.properties = properties;
-	}
+        this.uniqueID = uniqueID;
+        this.adaptor = adaptor;
+        this.location = location;
+        this.properties = properties;
+    }
 
-	/**
-	 * Get the name of the adaptor that created this Scheduler.
-	 *
-	 * @return the name of the adaptor.
-	 */
-	public String getAdaptorName() {
-		return adaptor;
-	}
+    /**
+     * Get the name of the adaptor that created this Scheduler.
+     *
+     * @return the name of the adaptor.
+     */
+    public String getAdaptorName() {
+        return adaptor;
+    }
 
-	/**
-	 * Get the location that this Scheduler is connected to.
-	 *
-	 * @return the location this Scheduler is connected to.
-	 */
-	public String getLocation() {
-		return location;
-	}
+    /**
+     * Get the location that this Scheduler is connected to.
+     *
+     * @return the location this Scheduler is connected to.
+     */
+    public String getLocation() {
+        return location;
+    }
 
-	/**
-	 * Get the properties used to create this Scheduler.
-	 *
-	 * @return the properties used to create this Scheduler.
-	 */
-	public Map<String, String> getProperties() {
-		return properties.toMap();
-	}
+    /**
+     * Get the properties used to create this Scheduler.
+     *
+     * @return the properties used to create this Scheduler.
+     */
+    public Map<String, String> getProperties() {
+        return properties.toMap();
+    }
 
     /**
      * Get the queue names supported by this Scheduler.
@@ -471,23 +471,23 @@ public abstract class Scheduler {
      */
     public JobStatus[] getJobStatuses(String... jobIdentifiers) throws XenonException {
 
-    	JobStatus[] result = new JobStatus[jobIdentifiers.length];
+        JobStatus[] result = new JobStatus[jobIdentifiers.length];
 
-    	for (int i = 0; i < jobIdentifiers.length; i++) {
-    		try {
-    			if (jobIdentifiers[i] != null) {
-    				result[i] = getJobStatus(jobIdentifiers[i]);
-    			} else {
-    				result[i] = null;
-    			}
-    		} catch (NoSuchJobException e) {
-    			result[i] = new JobStatusImplementation(jobIdentifiers[i], "UNKNOWN", null, e, false, false, null);
-    		} catch (XenonException e) {
-    			result[i] = new JobStatusImplementation(jobIdentifiers[i], "ERROR", null, e, false, false, null);
-    		}
-    	}
+        for (int i = 0; i < jobIdentifiers.length; i++) {
+            try {
+                if (jobIdentifiers[i] != null) {
+                    result[i] = getJobStatus(jobIdentifiers[i]);
+                } else {
+                    result[i] = null;
+                }
+            } catch (NoSuchJobException e) {
+                result[i] = new JobStatusImplementation(jobIdentifiers[i], "UNKNOWN", null, e, false, false, null);
+            } catch (XenonException e) {
+                result[i] = new JobStatusImplementation(jobIdentifiers[i], "ERROR", null, e, false, false, null);
+            }
+        }
 
-    	return result;
+        return result;
     }
 
     /**
@@ -569,28 +569,28 @@ public abstract class Scheduler {
      */
     public abstract JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException;
 
-	protected void assertNonNullOrEmpty(String s, String message) {
-		if (s == null || s.isEmpty()) {
-    		throw new IllegalArgumentException(message);
-    	}
+    protected void assertNonNullOrEmpty(String s, String message) {
+        if (s == null || s.isEmpty()) {
+            throw new IllegalArgumentException(message);
+        }
     }
 
     protected void assertPositive(long value, String message) {
-    	if (value < 0) {
+        if (value < 0) {
             throw new IllegalArgumentException(message + value);
-		}
-	}
+        }
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		Scheduler scheduler = (Scheduler) o;
-		return Objects.equals(uniqueID, scheduler.uniqueID);
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Scheduler scheduler = (Scheduler) o;
+        return Objects.equals(uniqueID, scheduler.uniqueID);
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(uniqueID);
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(uniqueID);
+    }
 }

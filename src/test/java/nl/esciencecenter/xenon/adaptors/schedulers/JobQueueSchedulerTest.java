@@ -38,840 +38,840 @@ import nl.esciencecenter.xenon.utils.OutputReader;
 
 public class JobQueueSchedulerTest {
 
-	@Test
-	public void test_create() throws Exception { 
-		
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+    @Test
+    public void test_create() throws Exception {
 
-		assertEquals("MockS", s.getAdaptorName());
-		
-		s.end();
-	}
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
-	@Test(expected=BadParameterException.class)
-	public void test_create_invalidMultiQThreads() throws Exception { 
-		
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 0, 100, null);
-	}
 
-	@Test(expected=BadParameterException.class)
-	public void test_create_invalidPollTimeMin() throws Exception { 
-		
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 1, null);
-	}
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-	@Test(expected=BadParameterException.class)
-	public void test_create_invalidPollTimeMax() throws Exception { 
-		
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, Integer.MAX_VALUE, null);
-	}
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
 
-	@Test
-	public void test_getDefaultQueue() throws Exception { 
-		
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        assertEquals("MockS", s.getAdaptorName());
 
-		assertEquals("single", s.getDefaultQueueName());
-		
-		s.end();
-	}
+        s.end();
+    }
 
-	@Test
-	public void test_getQueues() throws Exception { 
-		
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+    @Test(expected=BadParameterException.class)
+    public void test_create_invalidMultiQThreads() throws Exception {
 
-		assertArrayEquals(new String [] { "single", "multi", "unlimited" }, s.getQueueNames());
-		
-		s.end();
-	}
-	
-	@Test
-	public void test_getCurrentJobID() throws Exception { 
-		
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
-		s.getCurrentJobID(); // BS test for coverage.
-	}
-	
-	@Test(expected=InvalidJobDescriptionException.class)
-	public void test_verifyJobDescription_invalidQueue() throws Exception { 
-		
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");;
-		job.setQueueName("foobar");
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-		try { 
-			s.submitBatchJob(job);
-		} finally {
-			s.end();
-		}
-	}
-	
-	@Test(expected=IncompleteJobDescriptionException.class)
-	public void test_verifyJobDescription_noExecutable() throws Exception { 
-		
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 0, 100, null);
+    }
 
-		JobDescription job = new JobDescription();
-		
-		try { 
-			s.submitBatchJob(job);
-		} finally {
-			s.end();
-		}
-	}
-	
-	@Test(expected=InvalidJobDescriptionException.class)
-	public void test_verifyJobDescription_invalidNodeCount() throws Exception { 
-		
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+    @Test(expected=BadParameterException.class)
+    public void test_create_invalidPollTimeMin() throws Exception {
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");;
-		job.setNodeCount(42);
-		try { 
-			
-			s.submitBatchJob(job);
-		} finally {
-			s.end();
-		}
-	}
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
-	@Test(expected=InvalidJobDescriptionException.class)
-	public void test_verifyJobDescription_invalidProcessCount() throws Exception { 
-		
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");;
-		job.setProcessesPerNode(42);
-		try { 
-			
-			s.submitBatchJob(job);
-		} finally {
-			s.end();
-		}
-	}
-	
-	@Test(expected=InvalidJobDescriptionException.class)
-	public void test_verifyJobDescription_invalidMaxTime() throws Exception { 
-		
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");;
-		job.setMaxTime(-1);
+        new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 1, null);
+    }
 
-		try { 
-			s.submitBatchJob(job);
-		} finally {
-			s.end();
-		}
-	}
+    @Test(expected=BadParameterException.class)
+    public void test_create_invalidPollTimeMax() throws Exception {
 
-	@Test(expected=InvalidJobDescriptionException.class)
-	public void test_verifyJobDescription_invalidStdin() throws Exception { 
-		
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");;
-		job.setStdin("/tmp/stdin.txt");
-		
-		try { 
-			s.submitInteractiveJob(job);
-		} finally {
-			s.end();
-		}
-	}
 
-	@Test(expected=InvalidJobDescriptionException.class)
-	public void test_verifyJobDescription_invalidStdout() throws Exception { 
-		
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");;
-		job.setStdout("/tmp/stdout.txt");
-		
-		try { 
-			s.submitInteractiveJob(job);
-		} finally {
-			s.end();
-		}
-	}
+        new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, Integer.MAX_VALUE, null);
+    }
 
-	@Test(expected=InvalidJobDescriptionException.class)
-	public void test_verifyJobDescription_invalidStderr() throws Exception { 
-		
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+    @Test
+    public void test_getDefaultQueue() throws Exception {
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");;
-		job.setStderr("/tmp/stderr.txt");
-		
-		try { 
-			s.submitInteractiveJob(job);
-		} finally {
-			s.end();
-		}
-	}
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
-	@Test
-	public void test_getJobs_empty() throws Exception { 
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
-		
-		String [] result = s.getJobs();
-	
-		assertNotNull(result);
-		assertTrue(result.length == 0);
-		
-		s.end();
-	}
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
 
-	@Test
-	public void test_getJobs_null() throws Exception { 
+        assertEquals("single", s.getDefaultQueueName());
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
-		
-		String [] queues = null;
-		String [] result = s.getJobs(queues);
-	
-		assertNotNull(result);
-		assertTrue(result.length == 0);
-		
-		s.end();
-	}
+        s.end();
+    }
 
-	
-	@Test
-	public void test_getJobs_notEmpty() throws Exception { 
+    @Test
+    public void test_getQueues() throws Exception {
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");;
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-		String jobID = s.submitBatchJob(job);
-		
-		String [] result = s.getJobs(new String[0]);
-	
-		assertNotNull(result);
-		assertTrue(result.length == 1);
-		assertEquals(jobID, result[0]);
-		
-		s.end();
-	}
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
 
-	@Test(expected=NoSuchQueueException.class)
-	public void test_getJobs_invalidQueue() throws Exception { 
+        assertArrayEquals(new String [] { "single", "multi", "unlimited" }, s.getQueueNames());
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        s.end();
+    }
 
-		try { 
-			s.getJobs("foobar");
-		} finally {
-			s.end();
-		}
-	}
-	
-	@Test
-	public void test_getJobs_specificQueueEmpty() throws Exception { 
+    @Test
+    public void test_getCurrentJobID() throws Exception {
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");
-		job.setQueueName("multi");
-		
-		String jobID = s.submitBatchJob(job);
-	
-		String [] result = s.getJobs("single");
-	
-		assertNotNull(result);
-		assertTrue(result.length == 0);
-		
-		result = s.getJobs("multi");
-	
-		assertNotNull(result);
-		assertTrue(result.length == 1);
-		assertEquals(jobID, result[0]);
-	
-		result = s.getJobs("unlimited");
-		
-		assertNotNull(result);
-		assertTrue(result.length == 0);
-		
-		s.end();
-	}
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-	@Test(expected=IllegalArgumentException.class)
-	public void test_getJobStatus_null() throws Exception { 
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        s.getCurrentJobID(); // BS test for coverage.
+    }
 
-		try { 
-			s.getJobStatus(null);
-		} finally {
-			s.end();
-		}
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void test_getJobStatus_empty() throws Exception { 
+    @Test(expected=InvalidJobDescriptionException.class)
+    public void test_verifyJobDescription_invalidQueue() throws Exception {
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
-		try { 
-			s.getJobStatus(null);
-		} finally {
-			s.end();
-		}
-	}
-	
-	@Test(expected=NoSuchJobException.class)
-	public void test_getJobStatus_unknownJob() throws Exception { 
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-		try { 
-			s.getJobStatus("foo");
-		} finally {
-			s.end();
-		}
-	}
-	
-	@Test
-	public void test_getJobStatus_knownJob() throws Exception { 
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");;
+        job.setQueueName("foobar");
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");
-		job.setQueueName("unlimited");
-		
-		String jobID = s.submitBatchJob(job);
-	
-		JobStatus status = s.getJobStatus(jobID);
-		
-		assertFalse(status.isDone()); 
-		
-		status = s.waitUntilDone(jobID, 1000);
-		
-		assertTrue(status.isDone()); 
-			
+        try {
+            s.submitBatchJob(job);
+        } finally {
+            s.end();
+        }
+    }
+
+    @Test(expected=IncompleteJobDescriptionException.class)
+    public void test_verifyJobDescription_noExecutable() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        JobDescription job = new JobDescription();
+
+        try {
+            s.submitBatchJob(job);
+        } finally {
+            s.end();
+        }
+    }
+
+    @Test(expected=InvalidJobDescriptionException.class)
+    public void test_verifyJobDescription_invalidNodeCount() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");;
+        job.setNodeCount(42);
+        try {
+
+            s.submitBatchJob(job);
+        } finally {
+            s.end();
+        }
+    }
+
+    @Test(expected=InvalidJobDescriptionException.class)
+    public void test_verifyJobDescription_invalidProcessCount() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");;
+        job.setProcessesPerNode(42);
+        try {
+
+            s.submitBatchJob(job);
+        } finally {
+            s.end();
+        }
+    }
+
+    @Test(expected=InvalidJobDescriptionException.class)
+    public void test_verifyJobDescription_invalidMaxTime() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");;
+        job.setMaxTime(-1);
+
+        try {
+            s.submitBatchJob(job);
+        } finally {
+            s.end();
+        }
+    }
+
+    @Test(expected=InvalidJobDescriptionException.class)
+    public void test_verifyJobDescription_invalidStdin() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");;
+        job.setStdin("/tmp/stdin.txt");
+
+        try {
+            s.submitInteractiveJob(job);
+        } finally {
+            s.end();
+        }
+    }
+
+    @Test(expected=InvalidJobDescriptionException.class)
+    public void test_verifyJobDescription_invalidStdout() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");;
+        job.setStdout("/tmp/stdout.txt");
+
+        try {
+            s.submitInteractiveJob(job);
+        } finally {
+            s.end();
+        }
+    }
+
+    @Test(expected=InvalidJobDescriptionException.class)
+    public void test_verifyJobDescription_invalidStderr() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");;
+        job.setStderr("/tmp/stderr.txt");
+
+        try {
+            s.submitInteractiveJob(job);
+        } finally {
+            s.end();
+        }
+    }
+
+    @Test
+    public void test_getJobs_empty() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        String [] result = s.getJobs();
+
+        assertNotNull(result);
+        assertTrue(result.length == 0);
+
+        s.end();
+    }
+
+    @Test
+    public void test_getJobs_null() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        String [] queues = null;
+        String [] result = s.getJobs(queues);
+
+        assertNotNull(result);
+        assertTrue(result.length == 0);
+
+        s.end();
+    }
+
+
+    @Test
+    public void test_getJobs_notEmpty() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");;
+
+        String jobID = s.submitBatchJob(job);
+
+        String [] result = s.getJobs(new String[0]);
+
+        assertNotNull(result);
+        assertTrue(result.length == 1);
+        assertEquals(jobID, result[0]);
+
+        s.end();
+    }
+
+    @Test(expected=NoSuchQueueException.class)
+    public void test_getJobs_invalidQueue() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        try {
+            s.getJobs("foobar");
+        } finally {
+            s.end();
+        }
+    }
+
+    @Test
+    public void test_getJobs_specificQueueEmpty() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");
+        job.setQueueName("multi");
+
+        String jobID = s.submitBatchJob(job);
+
+        String [] result = s.getJobs("single");
+
+        assertNotNull(result);
+        assertTrue(result.length == 0);
+
+        result = s.getJobs("multi");
+
+        assertNotNull(result);
+        assertTrue(result.length == 1);
+        assertEquals(jobID, result[0]);
+
+        result = s.getJobs("unlimited");
+
+        assertNotNull(result);
+        assertTrue(result.length == 0);
+
+        s.end();
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void test_getJobStatus_null() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        try {
+            s.getJobStatus(null);
+        } finally {
+            s.end();
+        }
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void test_getJobStatus_empty() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        try {
+            s.getJobStatus(null);
+        } finally {
+            s.end();
+        }
+    }
+
+    @Test(expected=NoSuchJobException.class)
+    public void test_getJobStatus_unknownJob() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        try {
+            s.getJobStatus("foo");
+        } finally {
+            s.end();
+        }
+    }
+
+    @Test
+    public void test_getJobStatus_knownJob() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");
+        job.setQueueName("unlimited");
+
+        String jobID = s.submitBatchJob(job);
+
+        JobStatus status = s.getJobStatus(jobID);
+
+        assertFalse(status.isDone());
+
+        status = s.waitUntilDone(jobID, 1000);
+
+        assertTrue(status.isDone());
+
 //		System.out.println(status.getJobIdentifier() + " " + status.getState() + " " + status.isDone() + " " + status.isRunning() + " " + status.hasException());
-		
-		s.end();
-	}
 
-	@Test
-	public void test_getJobStatus_afterDone() throws Exception { 
+        s.end();
+    }
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(50);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+    @Test
+    public void test_getJobStatus_afterDone() throws Exception {
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");
-		job.setQueueName("unlimited");
-		
-		// Submit 50 ms job.
-		String jobID = s.submitBatchJob(job);
-	
-		// Wait for 250 ms for the job to finish.
-		Thread.sleep(250);
-		
-		JobStatus status = s.getJobStatus(jobID);
-		
-		assertTrue(status.isDone()); 
-		
-		s.end();
-	}
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
-	
-	
-	@Test
-	public void test_waitUntilRunning() throws Exception { 
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(50);
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");
-		job.setQueueName("single");
-		
-		// Submit 2 100 ms. jobs that will be run sequentially
-		String jobID1 = s.submitBatchJob(job);
-		String jobID2 = s.submitBatchJob(job);
-		
-		// Wait up to 1000 ms for second job to start.
-		JobStatus status = s.waitUntilRunning(jobID2, 1000);
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");
+        job.setQueueName("unlimited");
 
-		// Second job should have started after this time. 
-		assertTrue(status.isRunning()); 
-		
-		// Wait up to 1000 ms for second job to finish.
-		status = s.waitUntilDone(jobID2, 1000);
-		
-		// Second job should have finished after this time. 
-		assertTrue(status.isDone()); 
-				
-		s.end();
-	}
+        // Submit 50 ms job.
+        String jobID = s.submitBatchJob(job);
 
-	@Test
-	public void test_waitUntilDone() throws Exception { 
+        // Wait for 250 ms for the job to finish.
+        Thread.sleep(250);
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        JobStatus status = s.getJobStatus(jobID);
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");
-		job.setQueueName("single");
-		
-		// Submit 2 100 ms. jobs that will be run sequentially
-		String jobID1 = s.submitBatchJob(job);
-		String jobID2 = s.submitBatchJob(job);
-		
-		// Wait up to 1000 ms for second job to start.
-		JobStatus status = s.waitUntilDone(jobID2, 1000);
+        assertTrue(status.isDone());
 
-		// Second job should have finished after this time. 
-		assertTrue(status.isDone()); 
-		
-		s.end();
-	}
+        s.end();
+    }
 
-	@Test
-	public void test_waitUntilRunningWhenDone() throws Exception { 
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");
-		job.setQueueName("single");
-		
-		// Submit 2 100 ms. jobs that will be run sequentially
-		String jobID1 = s.submitBatchJob(job);
-		String jobID2 = s.submitBatchJob(job);
-		
-		// Wait up to 1000 ms for second job to start.
-		JobStatus status = s.waitUntilDone(jobID2, 1000);
+    @Test
+    public void test_waitUntilRunning() throws Exception {
 
-		// Both jobs should have finished after this time. 
-		assertTrue(status.isDone()); 
-		
-		// First job should already be done! 
-		status = s.waitUntilRunning(jobID1, 1000);
-	
-		assertTrue(status.isDone()); 
-		
-		s.end();
-	}
-	
-	@Test
-	public void test_waitUntilDoneWhenNotDone() throws Exception { 
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(500);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");
-		job.setQueueName("single");
-		
-		// Submit a 500 ms. job
-		String jobID = s.submitBatchJob(job);
-		
-		// Wait up to 100 ms for job to start.
-		JobStatus status = s.waitUntilRunning(jobID, 100);
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
 
-		// Job should be running now 
-		assertTrue(status.isRunning());
-		
-		// Wait up to 100 ms for job to finish.
-		status = s.waitUntilDone(jobID, 100);
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");
+        job.setQueueName("single");
 
-		// Job should not be done 
-		assertFalse(status.isDone());
-		
-		// Now wait up to 1000 ms for job to finish 
-		status = s.waitUntilDone(jobID, 1000);
-	
-		// And now it should be done!
-		assertTrue(status.isDone()); 
-		
-		s.end();
-	}
-	
-	
-	@Test
-	public void test_cancel_immediately() throws Exception { 
+        // Submit 2 100 ms. jobs that will be run sequentially
+        String jobID1 = s.submitBatchJob(job);
+        String jobID2 = s.submitBatchJob(job);
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(500);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        // Wait up to 1000 ms for second job to start.
+        JobStatus status = s.waitUntilRunning(jobID2, 1000);
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");
-		job.setQueueName("unlimited");
-		
-		// Submit 50 ms job.
-		String jobID = s.submitBatchJob(job);
-	
-		JobStatus status = s.cancelJob(jobID);
-		
-		assertTrue(status.isDone()); 
-		
-		s.end();
-	}
+        // Second job should have started after this time.
+        assertTrue(status.isRunning());
 
-	@Test
-	public void test_cancel_whenRunning() throws Exception { 
+        // Wait up to 1000 ms for second job to finish.
+        status = s.waitUntilDone(jobID2, 1000);
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(500);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        // Second job should have finished after this time.
+        assertTrue(status.isDone());
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");
-		job.setQueueName("unlimited");
-		
-		// Submit 50 ms job.
-		String jobID = s.submitBatchJob(job);
-	
-		JobStatus status = s.waitUntilRunning(jobID, 250);
-		
-		assertTrue(status.isRunning());
-		
-		status = s.cancelJob(jobID);
-		
-		assertTrue(status.isDone()); 
-		
-		s.end();
-	}
+        s.end();
+    }
 
-	@Test
-	public void test_cancel_afterDone() throws Exception { 
+    @Test
+    public void test_waitUntilDone() throws Exception {
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");
-		job.setQueueName("unlimited");
-		
-		// Submit 100 ms job.
-		String jobID = s.submitBatchJob(job);
-	
-		JobStatus status = s.waitUntilRunning(jobID, 500);
-		
-		assertTrue(status.isRunning());
-		
-		Thread.sleep(200);
-		
-		status = s.cancelJob(jobID);
-		
-		assertTrue(status.isDone()); 
-		
-		s.end();
-	}
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
 
-	@Test
-	public void test_submitInteractive() throws Exception { 
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");
+        job.setQueueName("single");
 
-		JobDescription job = new JobDescription();
-		job.setExecutable("/bin/aap");
-		
-		// Submit 100 ms job.
-		Streams streams = s.submitInteractiveJob(job);
-	
-		OutputReader stdout = new OutputReader(streams.getStdout());
-		OutputReader stderr = new OutputReader(streams.getStderr());
-		
-		streams.getStdin().close();
-		
-		stdout.waitUntilFinished();
-		
-		assertEquals("Hello World\n", stdout.getResultAsString());
+        // Submit 2 100 ms. jobs that will be run sequentially
+        String jobID1 = s.submitBatchJob(job);
+        String jobID2 = s.submitBatchJob(job);
 
-		JobStatus status = s.cancelJob(streams.getJobIdentifier());
-		
-		if (!status.isDone()) { 
-			status = s.waitUntilDone(streams.getJobIdentifier(), 1000);
-		}
-		
-		assertTrue(status.isDone());
-		s.end();
-	}
+        // Wait up to 1000 ms for second job to start.
+        JobStatus status = s.waitUntilDone(jobID2, 1000);
 
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void test_getQueueStatus_null() throws Exception { 
+        // Second job should have finished after this time.
+        assertTrue(status.isDone());
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        s.end();
+    }
 
-		try { 
-			s.getQueueStatus(null);
-		} finally {
-			s.end();
-		}
-	}
+    @Test
+    public void test_waitUntilRunningWhenDone() throws Exception {
 
-	@Test(expected=NoSuchQueueException.class)
-	public void test_getQueueStatus_unknownQueue() throws Exception { 
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
 
-		try { 
-			s.getQueueStatus("foobar");
-		} finally {
-			s.end();
-		}
-	}
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
 
-	@Test
-	public void test_getQueueStatus_validQueues() throws Exception { 
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");
+        job.setQueueName("single");
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        // Submit 2 100 ms. jobs that will be run sequentially
+        String jobID1 = s.submitBatchJob(job);
+        String jobID2 = s.submitBatchJob(job);
 
-		String [] queueNames = s.getQueueNames();
-			
-		for (String q : queueNames) {
-			QueueStatus status = s.getQueueStatus(q);
-			assertEquals(q, status.getQueueName());
-		}
-		s.end();
-	}
+        // Wait up to 1000 ms for second job to start.
+        JobStatus status = s.waitUntilDone(jobID2, 1000);
 
-	@Test(expected=IllegalArgumentException.class)
-	public void test_getQueueStatusses_null() throws Exception { 
+        // Both jobs should have finished after this time.
+        assertTrue(status.isDone());
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        // First job should already be done!
+        status = s.waitUntilRunning(jobID1, 1000);
 
-		String [] q = null;
-		
-		try { 
-			s.getQueueStatuses(q);
-		} finally {
-			s.end();
-		}
-	}
-	
-	@Test
-	public void test_getQueueStatusses_empty() throws Exception { 
+        assertTrue(status.isDone());
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        s.end();
+    }
 
-		QueueStatus [] status = s.getQueueStatuses();
-		
-		assertNotNull(status);
-		assertTrue(status.length == 3);
-		assertEquals("single", status[0].getQueueName());
-		assertEquals("multi", status[1].getQueueName());
-		assertEquals("unlimited", status[2].getQueueName());
-		
-		s.end();
-	}
-	
-	@Test
-	public void test_getQueueStatusses() throws Exception { 
+    @Test
+    public void test_waitUntilDoneWhenNotDone() throws Exception {
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
-		QueueStatus [] status = s.getQueueStatuses(s.getQueueNames());
-		
-		assertNotNull(status);
-		assertTrue(status.length == 3);
-		assertEquals("single", status[0].getQueueName());
-		assertEquals("multi", status[1].getQueueName());
-		assertEquals("unlimited", status[2].getQueueName());
-		
-		s.end();
-	}
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(500);
 
-	@Test
-	public void test_getQueueStatusses_withNull() throws Exception { 
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
 
-		MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
-		
-		MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
-	
-		JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");
+        job.setQueueName("single");
 
-		QueueStatus [] status = s.getQueueStatuses(new String [] { "multi", null, "single" });
-		
-		assertNotNull(status);
-		assertTrue(status.length == 3);
-		assertEquals("multi", status[0].getQueueName());
-		assertNull(status[1]);
-		assertEquals("single", status[2].getQueueName());
-			
-		s.end();
-	}
+        // Submit a 500 ms. job
+        String jobID = s.submitBatchJob(job);
+
+        // Wait up to 100 ms for job to start.
+        JobStatus status = s.waitUntilRunning(jobID, 100);
+
+        // Job should be running now
+        assertTrue(status.isRunning());
+
+        // Wait up to 100 ms for job to finish.
+        status = s.waitUntilDone(jobID, 100);
+
+        // Job should not be done
+        assertFalse(status.isDone());
+
+        // Now wait up to 1000 ms for job to finish
+        status = s.waitUntilDone(jobID, 1000);
+
+        // And now it should be done!
+        assertTrue(status.isDone());
+
+        s.end();
+    }
+
+
+    @Test
+    public void test_cancel_immediately() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(500);
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");
+        job.setQueueName("unlimited");
+
+        // Submit 50 ms job.
+        String jobID = s.submitBatchJob(job);
+
+        JobStatus status = s.cancelJob(jobID);
+
+        assertTrue(status.isDone());
+
+        s.end();
+    }
+
+    @Test
+    public void test_cancel_whenRunning() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(500);
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");
+        job.setQueueName("unlimited");
+
+        // Submit 50 ms job.
+        String jobID = s.submitBatchJob(job);
+
+        JobStatus status = s.waitUntilRunning(jobID, 250);
+
+        assertTrue(status.isRunning());
+
+        status = s.cancelJob(jobID);
+
+        assertTrue(status.isDone());
+
+        s.end();
+    }
+
+    @Test
+    public void test_cancel_afterDone() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");
+        job.setQueueName("unlimited");
+
+        // Submit 100 ms job.
+        String jobID = s.submitBatchJob(job);
+
+        JobStatus status = s.waitUntilRunning(jobID, 500);
+
+        assertTrue(status.isRunning());
+
+        Thread.sleep(200);
+
+        status = s.cancelJob(jobID);
+
+        assertTrue(status.isDone());
+
+        s.end();
+    }
+
+    @Test
+    public void test_submitInteractive() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/aap");
+
+        // Submit 100 ms job.
+        Streams streams = s.submitInteractiveJob(job);
+
+        OutputReader stdout = new OutputReader(streams.getStdout());
+        OutputReader stderr = new OutputReader(streams.getStderr());
+
+        streams.getStdin().close();
+
+        stdout.waitUntilFinished();
+
+        assertEquals("Hello World\n", stdout.getResultAsString());
+
+        JobStatus status = s.cancelJob(streams.getJobIdentifier());
+
+        if (!status.isDone()) {
+            status = s.waitUntilDone(streams.getJobIdentifier(), 1000);
+        }
+
+        assertTrue(status.isDone());
+        s.end();
+    }
+
+
+    @Test(expected=IllegalArgumentException.class)
+    public void test_getQueueStatus_null() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        try {
+            s.getQueueStatus(null);
+        } finally {
+            s.end();
+        }
+    }
+
+    @Test(expected=NoSuchQueueException.class)
+    public void test_getQueueStatus_unknownQueue() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        try {
+            s.getQueueStatus("foobar");
+        } finally {
+            s.end();
+        }
+    }
+
+    @Test
+    public void test_getQueueStatus_validQueues() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        String [] queueNames = s.getQueueNames();
+
+        for (String q : queueNames) {
+            QueueStatus status = s.getQueueStatus(q);
+            assertEquals(q, status.getQueueName());
+        }
+        s.end();
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void test_getQueueStatusses_null() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        String [] q = null;
+
+        try {
+            s.getQueueStatuses(q);
+        } finally {
+            s.end();
+        }
+    }
+
+    @Test
+    public void test_getQueueStatusses_empty() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        QueueStatus [] status = s.getQueueStatuses();
+
+        assertNotNull(status);
+        assertTrue(status.length == 3);
+        assertEquals("single", status[0].getQueueName());
+        assertEquals("multi", status[1].getQueueName());
+        assertEquals("unlimited", status[2].getQueueName());
+
+        s.end();
+    }
+
+    @Test
+    public void test_getQueueStatusses() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        QueueStatus [] status = s.getQueueStatuses(s.getQueueNames());
+
+        assertNotNull(status);
+        assertTrue(status.length == 3);
+        assertEquals("single", status[0].getQueueName());
+        assertEquals("multi", status[1].getQueueName());
+        assertEquals("unlimited", status[2].getQueueName());
+
+        s.end();
+    }
+
+    @Test
+    public void test_getQueueStatusses_withNull() throws Exception {
+
+        MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
+
+        MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
+
+        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", factory, fs, new Path("/home/xenon"), 2, 100, null);
+
+        QueueStatus [] status = s.getQueueStatuses(new String [] { "multi", null, "single" });
+
+        assertNotNull(status);
+        assertTrue(status.length == 3);
+        assertEquals("multi", status[0].getQueueName());
+        assertNull(status[1]);
+        assertEquals("single", status[2].getQueueName());
+
+        s.end();
+    }
 
 }

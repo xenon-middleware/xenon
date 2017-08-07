@@ -28,73 +28,70 @@ import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 
 public class CommandRunnerTest {
 
-	@Test(expected=IllegalArgumentException.class)
-	public void test_withoutCommand_throwsException() throws XenonException { 
-		new CommandRunner();
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void test_emptyCommand_throwsException() throws XenonException { 
-		new CommandRunner(new String[0]);
-	}
+    @Test(expected=IllegalArgumentException.class)
+    public void test_withoutCommand_throwsException() throws XenonException {
+        new CommandRunner();
+    }
 
-	@Test
-	public void test_runCommand() throws XenonException {
-		
-		assumeFalse(LocalFileSystemUtils.isWindows());
-		
-		File workingDir = new File("/tmp");
-		
-		CommandRunner r = new CommandRunner("Hello World\n", workingDir, "/bin/cat");
+    @Test(expected=IllegalArgumentException.class)
+    public void test_emptyCommand_throwsException() throws XenonException {
+        new CommandRunner(new String[0]);
+    }
 
-		assertEquals(0, r.getExitCode());
-		assertEquals("Hello World\n", r.getStdout());
-		assertTrue(r.getStderr().isEmpty());
-		
-	}
-	
-	@Test
-	public void test_runCommandInPath() throws XenonException {
-		
-		assumeFalse(LocalFileSystemUtils.isWindows());
-		
-		File workingDir = new File("/tmp");
-		
-		CommandRunner r = new CommandRunner("Hello World\n", workingDir, "cat");
+    @Test
+    public void test_runCommand() throws XenonException {
 
-		assertEquals(0, r.getExitCode());
-		assertEquals("Hello World\n", r.getStdout());
-		assertTrue(r.getStderr().isEmpty());		
-	}
-	
-	@Test
-	public void test_runCommandWithoutWorkingDir() throws XenonException {
-		
-		assumeFalse(LocalFileSystemUtils.isWindows());
-		
-		File workingDir = null;
-		
-		CommandRunner r = new CommandRunner("Hello World\n", workingDir, "/bin/cat");
+        assumeFalse(LocalFileSystemUtils.isWindows());
 
-		assertEquals(0, r.getExitCode());
-		assertEquals("Hello World\n", r.getStdout());
-		assertTrue(r.getStderr().isEmpty());
-		
-	}
+        File workingDir = new File("/tmp");
 
-	@Test(expected=CommandNotFoundException.class)
-	public void test_runCommand_nonExistantWorkingDir() throws XenonException {
-		
-		assumeFalse(LocalFileSystemUtils.isWindows());
-		
-		File workingDir = new File("/foo");
-		
-		new CommandRunner("Hello World\n", workingDir, "/bin/cat");
-	}
+        CommandRunner r = new CommandRunner("Hello World\n", workingDir, "/bin/cat");
 
-	
-	
+        assertEquals(0, r.getExitCode());
+        assertEquals("Hello World\n", r.getStdout());
+        assertTrue(r.getStderr().isEmpty());
+
+    }
+
+    @Test
+    public void test_runCommandInPath() throws XenonException {
+
+        assumeFalse(LocalFileSystemUtils.isWindows());
+
+        File workingDir = new File("/tmp");
+
+        CommandRunner r = new CommandRunner("Hello World\n", workingDir, "cat");
+
+        assertEquals(0, r.getExitCode());
+        assertEquals("Hello World\n", r.getStdout());
+        assertTrue(r.getStderr().isEmpty());
+    }
+
+    @Test
+    public void test_runCommandWithoutWorkingDir() throws XenonException {
+
+        assumeFalse(LocalFileSystemUtils.isWindows());
+
+        File workingDir = null;
+
+        CommandRunner r = new CommandRunner("Hello World\n", workingDir, "/bin/cat");
+
+        assertEquals(0, r.getExitCode());
+        assertEquals("Hello World\n", r.getStdout());
+        assertTrue(r.getStderr().isEmpty());
+
+    }
+
+    @Test(expected=CommandNotFoundException.class)
+    public void test_runCommand_nonExistantWorkingDir() throws XenonException {
+
+        assumeFalse(LocalFileSystemUtils.isWindows());
+
+        File workingDir = new File("/foo");
+
+        new CommandRunner("Hello World\n", workingDir, "/bin/cat");
+    }
+
+
+
 }
-
-
-

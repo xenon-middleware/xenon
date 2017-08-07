@@ -62,7 +62,7 @@ public class LocalFileSystemUtils {
      *
      * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
      * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
-     * 
+     *
      * @param root
      *            The root to check.
      * @return If <code>root</code> only contains a valid Windows root element.
@@ -76,7 +76,7 @@ public class LocalFileSystemUtils {
             return true;
         }
 
-        return (root.length() == 3 && root.charAt(1) == ':' && Character.isLetter(root.charAt(0)) && root.charAt(2) == '\\');        
+        return (root.length() == 3 && root.charAt(1) == ':' && Character.isLetter(root.charAt(0)) && root.charAt(2) == '\\');
     }
 
     /**
@@ -84,7 +84,7 @@ public class LocalFileSystemUtils {
      *
      * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
      * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
-     * 
+     *
      * @param root
      *            The root to check.
      * @return If <code>root</code> only contains a valid Linux root element.
@@ -98,7 +98,7 @@ public class LocalFileSystemUtils {
      *
      * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
      * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
-     * 
+     *
      * @param root
      *            The root to check.
      * @return If <code>root</code> only contains a valid OSX root element.
@@ -203,7 +203,7 @@ public class LocalFileSystemUtils {
 
     /**
      * Returns the local file system path separator character.
-     * 
+     *
      * @return The local file system path separator character.
      */
     public static char getLocalSeparator() {
@@ -254,10 +254,10 @@ public class LocalFileSystemUtils {
 
     /**
      * Returns all local FileSystems.
-     * 
+     *
      * This method detects all local file system roots, and returns one or more <code>FileSystems</code> representing each of
      * these roots.
-     * 
+     *
      * @return all local FileSystems.
      *
      * @throws XenonException

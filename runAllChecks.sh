@@ -28,3 +28,8 @@ echo "+--------------------------+"
 echo "| checking license headers |"
 echo "+--------------------------+"
 ./gradlew license
+
+echo "+---------------------+"
+echo "| checking code style |"
+echo "+---------------------+"
+./gradlew spotlessJavaCheck

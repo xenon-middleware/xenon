@@ -26,7 +26,6 @@ import org.junit.Test;
 
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.filesystems.Path;
 
 public class LocalFileSystemUtilsTest {
 
@@ -72,105 +71,105 @@ public class LocalFileSystemUtilsTest {
     }
 
     @Test
-    public void test_windowsRootNull() { 
+    public void test_windowsRootNull() {
         assertFalse(LocalFileSystemUtils.isWindowsRoot(null));
     }
 
     @Test
-    public void test_windowsRoot_correctDriveLetter() { 
+    public void test_windowsRoot_correctDriveLetter() {
         assertTrue(LocalFileSystemUtils.isWindowsRoot("C:"));
     }
 
     @Test
-    public void test_windowsRoot_invalidDriveLetter() { 
+    public void test_windowsRoot_invalidDriveLetter() {
         assertFalse(LocalFileSystemUtils.isWindowsRoot("1:"));
     }
 
     @Test
-    public void test_windowsRoot_correctDriveLetterSlash() { 
+    public void test_windowsRoot_correctDriveLetterSlash() {
         assertTrue(LocalFileSystemUtils.isWindowsRoot("C:\\"));
     }
 
     @Test
-    public void test_windowsRoot_invalidDriveLetterSlash() { 
+    public void test_windowsRoot_invalidDriveLetterSlash() {
         assertFalse(LocalFileSystemUtils.isWindowsRoot("1:\\"));
     }
 
     @Test
-    public void test_windowsRoot_noSlash() { 
+    public void test_windowsRoot_noSlash() {
         assertFalse(LocalFileSystemUtils.isWindowsRoot("C:X"));
     }
 
     @Test
-    public void test_windowsRoot_invalidString1() { 
+    public void test_windowsRoot_invalidString1() {
         assertFalse(LocalFileSystemUtils.isWindowsRoot("C"));
     }
 
     @Test
-    public void test_windowsRoot_invalidString2() { 
+    public void test_windowsRoot_invalidString2() {
         assertFalse(LocalFileSystemUtils.isWindowsRoot("CC"));
     }
 
     @Test
-    public void test_windowsRoot_invalidString3() { 
+    public void test_windowsRoot_invalidString3() {
         assertFalse(LocalFileSystemUtils.isWindowsRoot("CCC"));
     }
 
     @Test
-    public void test_windowsRoot_invalidString4() { 
+    public void test_windowsRoot_invalidString4() {
         assertFalse(LocalFileSystemUtils.isWindowsRoot("CCCC"));
     }
 
     @Test
-    public void test_linuxRootNull() { 
+    public void test_linuxRootNull() {
         assertFalse(LocalFileSystemUtils.isLinuxRoot(null));
     }
 
     @Test
-    public void test_linuxRootSlash() { 
+    public void test_linuxRootSlash() {
         assertTrue(LocalFileSystemUtils.isLinuxRoot("/"));
     }
 
     @Test
-    public void test_linuxRootOther() { 
+    public void test_linuxRootOther() {
         assertFalse(LocalFileSystemUtils.isLinuxRoot("C:"));
     }
 
     @Test
-    public void test_osxRootNull() { 
+    public void test_osxRootNull() {
         assertFalse(LocalFileSystemUtils.isOSXRoot(null));
     }
 
     @Test
-    public void test_osxRootSlash() { 
+    public void test_osxRootSlash() {
         assertTrue(LocalFileSystemUtils.isOSXRoot("/"));
     }
 
     @Test
-    public void test_osxRootOther() { 
+    public void test_osxRootOther() {
         assertFalse(LocalFileSystemUtils.isOSXRoot("C:"));
     }
 
     @Test
-    public void test_isLocalRootLinuxTrue() { 
+    public void test_isLocalRootLinuxTrue() {
         System.setProperty("os.name", "Linux");
         assertTrue(LocalFileSystemUtils.isLocalRoot("/"));
     }
 
     @Test
-    public void test_isLocalRootLinuxFalse() { 
+    public void test_isLocalRootLinuxFalse() {
         System.setProperty("os.name", "Linux");
         assertFalse(LocalFileSystemUtils.isLocalRoot("C:"));
     }
 
     @Test
-    public void test_isLocalRootWindowsTrue() { 
+    public void test_isLocalRootWindowsTrue() {
         System.setProperty("os.name", "Windows7");
         assertFalse(LocalFileSystemUtils.isLocalRoot("/"));
     }
 
     @Test
-    public void test_isLocalRootWindowsFalse() { 
+    public void test_isLocalRootWindowsFalse() {
         System.setProperty("os.name", "Windows7");
         assertTrue(LocalFileSystemUtils.isLocalRoot("C:"));
     }
@@ -221,27 +220,27 @@ public class LocalFileSystemUtilsTest {
     }
 
     @Test
-    public void test_startsWithRootNull() { 
+    public void test_startsWithRootNull() {
         assertFalse(LocalFileSystemUtils.startWithRoot(null));
     }
 
     @Test
-    public void test_startsWithRoot_linux() { 
+    public void test_startsWithRoot_linux() {
         assertTrue(LocalFileSystemUtils.startWithRoot("/usr/local"));
     }
 
     @Test
-    public void test_startsWithRoot_windows() { 
+    public void test_startsWithRoot_windows() {
         assertTrue(LocalFileSystemUtils.startWithRoot("C:/Users"));
     }
 
     @Test
-    public void test_startsWithRoot_noRoot() { 
+    public void test_startsWithRoot_noRoot() {
         assertFalse(LocalFileSystemUtils.startWithRoot("Hello World"));
     }
 
     @Test
-    public void test_localSeparator() { 
+    public void test_localSeparator() {
         assertEquals(File.separatorChar, LocalFileSystemUtils.getLocalSeparator());
     }
 

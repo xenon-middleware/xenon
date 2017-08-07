@@ -19,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import nl.esciencecenter.xenon.filesystems.CopyMode;
 
 public class CopyOptionTest {
 

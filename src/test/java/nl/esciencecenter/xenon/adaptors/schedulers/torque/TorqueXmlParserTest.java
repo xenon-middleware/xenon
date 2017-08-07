@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Scanner;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueXmlParser;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -91,11 +90,11 @@ public class TorqueXmlParserTest {
 
     @Test
     public void test03d_parseJobInfo_emptyJobInfo() throws Throwable {
-    	Map<String, Map<String, String>> result = new TorqueXmlParser().parseJobInfos("");
-    	assertTrue(result.isEmpty());
+        Map<String, Map<String, String>> result = new TorqueXmlParser().parseJobInfos("");
+        assertTrue(result.isEmpty());
     }
 
-    
+
     @Test
     public void test04a_recursiveMap() throws Throwable {
         String input = readFile("/fixtures/torque/propertymap.xml");
@@ -103,7 +102,7 @@ public class TorqueXmlParserTest {
         Document document = parser.parseDocument(input);
         Map<String, String> result = new HashMap<>();
         parser.recursiveMapFromElement(document.getDocumentElement(), result);
-        
+
         Map<String, String> expectedResult = new HashMap<>();
         expectedResult.put("a", "1");
         expectedResult.put("b", "2");
@@ -117,7 +116,7 @@ public class TorqueXmlParserTest {
         Document document = parser.parseDocument(input);
         Map<String, String> result = new HashMap<>();
         parser.recursiveMapFromElement(document.getDocumentElement(), result);
-        
+
         Map<String, String> expectedResult = new HashMap<>();
         expectedResult.put("a", "1");
         expectedResult.put("b", "2");
@@ -132,7 +131,7 @@ public class TorqueXmlParserTest {
         Document document = parser.parseDocument(input);
         Map<String, String> result = new HashMap<>();
         parser.recursiveMapFromElement(document.getDocumentElement(), result);
-        
+
         Map<String, String> expectedResult = new HashMap<>();
         expectedResult.put("a", "3");
         expectedResult.put("b", "2");
@@ -146,7 +145,7 @@ public class TorqueXmlParserTest {
         Document document = parser.parseDocument(input);
         Map<String, String> result = new HashMap<>();
         parser.recursiveMapFromElement(document.getDocumentElement(), result);
-        
+
         Map<String, String> expectedResult = new HashMap<>();
         expectedResult.put("a", "3");
         expectedResult.put("b", "2");

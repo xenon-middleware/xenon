@@ -28,7 +28,7 @@ public abstract class SchedulerAdaptor extends Adaptor implements SchedulerAdapt
 
     public static final String ADAPTORS_PREFIX = "xenon.adaptors.schedulers.";
 
-    protected SchedulerAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) {  
+    protected SchedulerAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) {
         super(name, description, locations, properties);
     }
 
@@ -39,13 +39,13 @@ public abstract class SchedulerAdaptor extends Adaptor implements SchedulerAdapt
     }
 
     @Override
-    public boolean supportsBatch() { 
+    public boolean supportsBatch() {
         // By default we assume the scheduler supports batch jobs.
         return true;
     }
 
     @Override
-    public boolean supportsInteractive() { 
+    public boolean supportsInteractive() {
         // By default we assume the scheduler does not supports interactive jobs.
         return false;
     }

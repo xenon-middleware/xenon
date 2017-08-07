@@ -88,9 +88,9 @@ public class WebdavFileAdaptor extends FileAdaptor {
         LOGGER.debug("newFileSystem location = {} credential = {} properties = {}", location, credential,
                 properties);
 
-        URI uri; 
+        URI uri;
 
-        try { 
+        try {
             uri = new URI(location);
         } catch (Exception e) {
             throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
@@ -109,7 +109,7 @@ public class WebdavFileAdaptor extends FileAdaptor {
 
         int port = uri.getPort();
 
-        if (port != -1) { 
+        if (port != -1) {
             server = server + ":" + port;
         }
 
