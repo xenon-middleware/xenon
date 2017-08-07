@@ -25,6 +25,7 @@ import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
+import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 import nl.esciencecenter.xenon.utils.StreamForwarder;
 
 /**
@@ -87,7 +88,7 @@ class BatchProcess implements Process {
 
         if (path == null) {
             result = root;
-        } else if (LocalUtil.startWithRoot(path)) { 
+        } else if (LocalFileSystemUtils.startWithRoot(path)) { 
             result = new Path(path);
         } else {
             result = root.resolve(path);
