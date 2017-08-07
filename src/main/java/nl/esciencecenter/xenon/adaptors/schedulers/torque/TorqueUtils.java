@@ -140,7 +140,7 @@ final class TorqueUtils {
             String workingDirectory = description.getWorkingDirectory();
             if (!workingDirectory.startsWith("/")) {
                 //make relative path absolute
-                workingDirectory = fsEntryPath.resolve(workingDirectory).getAbsolutePath();
+                workingDirectory = fsEntryPath.resolve(workingDirectory).toString();
             }
             script.format("#PBS -w '%s'\n", workingDirectory);
         }

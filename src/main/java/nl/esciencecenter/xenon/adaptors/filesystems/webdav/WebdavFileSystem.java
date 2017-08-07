@@ -68,10 +68,10 @@ public class WebdavFileSystem extends FileSystem {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebdavFileAdaptor.class);
 
-    class StreamToFileWriter extends Thread { 
+    class StreamToFileWriter extends Thread {
 
-        private final String url; 
-        private final InputStream in; 
+        private final String url;
+        private final InputStream in;
 
         StreamToFileWriter(String url, InputStream in) {
             this.url = url;
@@ -80,8 +80,8 @@ public class WebdavFileSystem extends FileSystem {
             setDaemon(true);
         }
 
-        public void run() { 
-            try { 
+        public void run() {
+            try {
                 client.put(url, in);
             } catch (Exception e) {
 
@@ -99,15 +99,16 @@ public class WebdavFileSystem extends FileSystem {
         this.server = server;
     }
 
-    private String getFilePath(Path path) { 
-        return server + path.getAbsolutePath();
+    private String getFilePath(Path path) {
+
+        return server + (path.isAbsolute() ? "" : "/") +  path.toString();
     }
 
-    private String getDirectoryPath(Path path) { 
-        return server + path.getAbsolutePath() + "/";
+    private String getDirectoryPath(Path path) {
+        return server + path.toString() + "/";
     }
 
-    private PathAttributes getAttributes(Path path, DavResource p) { 
+    private PathAttributes getAttributes(Path path, DavResource p) {
         PathAttributesImplementation attributes = new PathAttributesImplementation();
 
         attributes.setPath(path);
@@ -116,7 +117,7 @@ public class WebdavFileSystem extends FileSystem {
 
         attributes.setCreationTime(p.getCreation().getTime());
         attributes.setLastModifiedTime(p.getModified().getTime());
-        attributes.setLastAccessTime(0);
+        attributes.setLastAccessTime(attributes.getLastModifiedTime());
         attributes.setSize(p.getContentLength());
 
         // TODO: no clue if this is right ?
@@ -131,7 +132,7 @@ public class WebdavFileSystem extends FileSystem {
 
         List<DavResource> list = null;
 
-        try { 
+        try {
             list = client.list(getDirectoryPath(path), 1);
         } catch (Exception e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to list directory: " + path, e);
@@ -139,11 +140,11 @@ public class WebdavFileSystem extends FileSystem {
 
         ArrayList<PathAttributes> result = new ArrayList<>(list.size());
 
-        String dirPath = path.getAbsolutePath() + "/";
+        String dirPath = path.toString() + "/";
 
-        for (DavResource d : list) { 
+        for (DavResource d : list) {
             // The list also returns the directory itself, so ensure we don't return it!
-            if (!dirPath.equals(d.getPath())) { 
+            if (!dirPath.equals(d.getPath())) {
                 String filename = d.getName();
                 result.add(getAttributes(path.resolve(filename), d));
             }
@@ -172,15 +173,15 @@ public class WebdavFileSystem extends FileSystem {
         assertPathNotExists(target);
 
         PathAttributes a = getAttributes(source);
-        
-        try { 
-            if (a.isDirectory()) { 
+
+        try {
+            if (a.isDirectory()) {
                 client.move(getDirectoryPath(source), getDirectoryPath(target), false);
             } else {
                 client.move(getFilePath(source), getFilePath(target), false);
-            } 
+            }
         } catch (SardineException e) {
-            if (e.getStatusCode() == HttpStatus.SC_MOVED_PERMANENTLY) { 
+            if (e.getStatusCode() == HttpStatus.SC_MOVED_PERMANENTLY) {
                 return;
             }
             throw new XenonException(ADAPTOR_NAME, "Failed to move from " + source + " to " + target, e);
@@ -196,7 +197,7 @@ public class WebdavFileSystem extends FileSystem {
         assertPathNotExists(dir);
         assertParentDirectoryExists(dir);
 
-        try { 
+        try {
             client.createDirectory(getDirectoryPath(dir));
         } catch (Exception e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to create directory: " + dir, e);
@@ -210,7 +211,7 @@ public class WebdavFileSystem extends FileSystem {
         assertPathNotExists(file);
         assertParentDirectoryExists(file);
 
-        try { 
+        try {
             client.put(getFilePath(file), new byte[0]);
         } catch (Exception e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to create file: " + file, e);
@@ -224,7 +225,7 @@ public class WebdavFileSystem extends FileSystem {
 
     @Override
     protected void deleteFile(Path path) throws XenonException {
-        try { 
+        try {
             client.delete(getFilePath(path));
         } catch (Exception e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to delete file: " + path, e);
@@ -242,11 +243,11 @@ public class WebdavFileSystem extends FileSystem {
 
     @Override
     public boolean exists(Path path) throws XenonException {
-        
+
         assertNotNull(path);
-        
+
         try {
-            return client.exists(getDirectoryPath(path)) || client.exists(getFilePath(path)); 
+            return client.exists(getDirectoryPath(path)) || client.exists(getFilePath(path));
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to check existence of directory: " + path);
         }
@@ -269,8 +270,8 @@ public class WebdavFileSystem extends FileSystem {
 
         assertParentDirectoryExists(file);
         assertPathNotExists(file);
-        
-        try { 
+
+        try {
             PipedInputStream in = new PipedInputStream(4096);
             PipedOutputStream out = new PipedOutputStream(in);
 
@@ -297,16 +298,16 @@ public class WebdavFileSystem extends FileSystem {
     public PathAttributes getAttributes(Path path) throws XenonException {
 
         assertPathExists(path);
-        
+
 //        if (directoryExist(path)) {
-//            try { 
+//            try {
 //                List<DavResource> result = client.list(getFilePath(path), 1);
 //
-//                for (DavResource d : result) { 
+//                for (DavResource d : result) {
 //
 //                    String dirPath = path.getAbsolutePath() + "/";
 //
-//                    if (dirPath.equals(d.getPath())) { 
+//                    if (dirPath.equals(d.getPath())) {
 //                        return getAttributes(path, d);
 //                    }
 //                }
@@ -315,13 +316,13 @@ public class WebdavFileSystem extends FileSystem {
 //            }
 //        } else if (fileExist(path)) {
 
-            try { 
+            try {
                 List<DavResource> result = client.list(getFilePath(path), 0);
                 return getAttributes(path, result.get(0));
             } catch (Exception e) {
                 throw new XenonException(ADAPTOR_NAME, "Failed to get attributes for file: " + path, e);
             }
-//        }    
+//        }
 //        throw new NoSuchPathException(ADAPTOR_NAME, "Path not found: " + path);
     }
 

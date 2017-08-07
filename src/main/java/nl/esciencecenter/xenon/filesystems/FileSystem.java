@@ -698,13 +698,13 @@ public abstract class FileSystem {
 			} else {
 				if (itt.iterator().hasNext()) {
 
-					System.out.println("NOT EMPTY " + path.getAbsolutePath());
+					System.out.println("NOT EMPTY " + path.toString());
 
 					for (PathAttributes p : itt) {
-						System.out.println(" -- " + p.getPath().getAbsolutePath());
+						System.out.println(" -- " + p.getPath().toString());
 					}
 
-					throw new DirectoryNotEmptyException(getAdaptorName(), "Directory not empty: " + path.getAbsolutePath());
+					throw new DirectoryNotEmptyException(getAdaptorName(), "Directory not empty: " + path.toString());
 				}
 			}
 
@@ -1109,7 +1109,7 @@ public abstract class FileSystem {
 	protected void performCopy(Path source, FileSystem destinationFS, Path destination, CopyMode mode, boolean recursive, CopyCallback callback) throws XenonException {
 
 		if(!exists(source)){
-			throw new NoSuchPathException(getAdaptorName(),"No such file " + source.getRelativePath());
+			throw new NoSuchPathException(getAdaptorName(),"No such file " + source.toString());
 		}
 
 		PathAttributes attributes = getAttributes(source);
@@ -1548,14 +1548,14 @@ public abstract class FileSystem {
 	}
 
 	protected void assertPathIsNotDirectory(Path path) throws XenonException{
-		
+
 	    assertNotNull(path);
-		
+
 		if(exists(path)){
 
 			PathAttributes a = getAttributes(path);
 			if(a.isDirectory()){
-				throw new InvalidPathException(getAdaptorName(),"Was expecting a regular file, but got a directory: " + path.getRelativePath());
+				throw new InvalidPathException(getAdaptorName(),"Was expecting a regular file, but got a directory: " + path.toString());
 			}
 		}
 	}
@@ -1597,7 +1597,6 @@ public abstract class FileSystem {
 	protected void assertParentDirectoryExists(Path path) throws XenonException {
 
 		assertNotNull(path);
-
 		Path parent = path.getParent();
 
 		if (parent != null) {
@@ -1614,11 +1613,11 @@ public abstract class FileSystem {
 	}
 
 	protected void assertIsOpen() throws XenonException {
-	    if (!isOpen()) { 
+	    if (!isOpen()) {
 	        throw new NotConnectedException(getAdaptorName(), "Connection is closed");
 	    }
     }
-	
+
 	protected boolean areSamePaths(Path source, Path target) {
 
 		if (source == null) {

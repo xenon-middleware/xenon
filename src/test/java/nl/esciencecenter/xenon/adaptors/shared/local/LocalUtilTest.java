@@ -38,18 +38,18 @@ public class LocalUtilTest {
     @Test
     public void test_getLocalRoot() throws XenonException {
         Path tmp = LocalUtil.getRelativePath("/usr/local", "/usr");
-        assertEquals(tmp.getRelativePath(), "local");
+        assertEquals("/local", tmp.toString());
     }
 
     @Test
     public void test_getLocalRoot_nothingLeft() throws XenonException {
         Path tmp = LocalUtil.getRelativePath("/usr/local", "/usr/local");
-        assertTrue(tmp.getRelativePath().isEmpty());
+        assertTrue(tmp.toString().isEmpty());
     }
 
     @Test
     public void test_javaPath_() throws XenonException {
         Path tmp = LocalUtil.getRelativePath("/usr/local", "/usr/local");
-        assertTrue(tmp.getRelativePath().isEmpty());
+        assertTrue(tmp.toString().isEmpty());
     }
 }

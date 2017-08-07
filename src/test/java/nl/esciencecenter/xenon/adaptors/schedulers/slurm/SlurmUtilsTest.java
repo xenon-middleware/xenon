@@ -690,7 +690,7 @@ public class SlurmUtilsTest {
 
 		String [] expected = new String [] { 
 				"--quiet", 
-				"--job-name=" + tag.toString(), 
+				"--job-name=" + tag.toString(),
 				"--nodes=1",
 				"--ntasks-per-node=1",
 				"--time=15", 
@@ -718,8 +718,8 @@ public class SlurmUtilsTest {
 
 		String [] expected = new String [] { 
 				"--quiet", 
-				"--job-name=" + tag.toString(), 
-				"--chdir=" + entry.resolve("workdir").getAbsolutePath(),
+				"--job-name=" + tag,
+				"--chdir=" + entry.resolve("workdir"),
 				"--partition=queue", 
 				"--nodes=1",
 				"--ntasks-per-node=1",
@@ -748,7 +748,7 @@ public class SlurmUtilsTest {
 
 		String [] expected = new String [] { 
 				"--quiet", 
-				"--job-name=" + tag.toString(), 
+				"--job-name=" + tag.toString(),
 				"--chdir=/workdir",
 				"--partition=queue", 
 				"--nodes=1",
@@ -810,7 +810,7 @@ public class SlurmUtilsTest {
 		
 		String expected = "#!/bin/sh\n" + 
 			"#SBATCH --job-name xenon\n" +
-			"#SBATCH --workdir='" + entry.resolve("workdir").getAbsolutePath() + "'\n" + 
+			"#SBATCH --workdir='" + entry.resolve("workdir").toString() + "'\n" +
 			"#SBATCH --partition=queue\n" +
 			"#SBATCH --nodes=1\n" + 
 			"#SBATCH --ntasks-per-node=1\n" +

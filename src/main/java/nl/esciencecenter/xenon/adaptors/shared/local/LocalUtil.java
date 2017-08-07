@@ -106,7 +106,7 @@ public class LocalUtil {
 
         // replace tilde        
         if (numElems != 0) {
-            String firstPart = relPath.getName(0).getRelativePath();
+            String firstPart = relPath.getName(0).toString();
             if ("~".equals(firstPart)) {                
                 String tmp = System.getProperty("user.home");        
                 root = LocalFileSystemUtils.getLocalRoot(tmp);
@@ -120,7 +120,7 @@ public class LocalUtil {
             } 
         }
         
-        return FileSystems.getDefault().getPath(root, relPath.getAbsolutePath());
+        return FileSystems.getDefault().getPath(root, relPath.toString());
     }
 
     public static List<PathAttributes> listDirectory(FileSystem fs, Path dir) throws XenonException {

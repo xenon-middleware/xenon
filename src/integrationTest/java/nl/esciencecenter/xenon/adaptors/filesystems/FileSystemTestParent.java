@@ -141,7 +141,7 @@ public abstract class FileSystemTestParent {
     @Test
     public void exists_fileDoesExist_fileExists() throws XenonException {
         Path path = locationConfig.getExistingPath();
-        assertTrue(path.getAbsolutePath(), fileSystem.exists(path));
+        assertTrue(path.toString(), fileSystem.exists(path));
     }
 
     @Test
@@ -738,7 +738,7 @@ public abstract class FileSystemTestParent {
     private String listPathsInString(Set<PathAttributes> res) {
         String superfluous = "";
         for(PathAttributes p : res){
-            superfluous += p.getPath().getRelativePath() + " ";
+            superfluous += p.getPath().toString() + " ";
         }
         return superfluous;
     }
@@ -896,18 +896,18 @@ public abstract class FileSystemTestParent {
             throwWrong("test_getfileAttributes", "size=" + size, "size=" + result.getSize());
         }
 
-//        if (!isWithinMargin(currentTime, result.getLastModifiedTime()) && result.getLastModifiedTime() != 0) {
-//            throwWrong("test_getfileAttributes", "lastModifiedTime=" + currentTime,
-//                    "lastModifiedTime=" + result.getLastModifiedTime());
-//
-//        }
-//        if (!isWithinMargin(currentTime, result.getCreationTime()) && result.getCreationTime() != result.getLastModifiedTime()) {
-//            throwWrong("test_getfileAttributes", "creationTime=" + currentTime, "creationTime=" + result.getCreationTime());
-//        }
-//
-//        if (!isWithinMargin(currentTime, result.getLastAccessTime()) && result.getLastAccessTime() != result.getLastModifiedTime()) {
-//            throwWrong("test13_getfileAttributes", "lastAccessTime=" + currentTime, "lastAccessTime=" + result.getLastAccessTime());
-//        }
+        if (!isWithinMargin(currentTime, result.getLastModifiedTime()) && result.getLastModifiedTime() != 0) {
+            throwWrong("test_getfileAttributes", "lastModifiedTime=" + currentTime,
+                    "lastModifiedTime=" + result.getLastModifiedTime());
+
+        }
+        if (!isWithinMargin(currentTime, result.getCreationTime()) && result.getCreationTime() != result.getLastModifiedTime()) {
+            throwWrong("test_getfileAttributes", "creationTime=" + currentTime, "creationTime=" + result.getCreationTime());
+        }
+
+        if (!isWithinMargin(currentTime, result.getLastAccessTime()) && result.getLastAccessTime() != result.getLastModifiedTime()) {
+            throwWrong("test13_getfileAttributes", "lastAccessTime=" + currentTime, "lastAccessTime=" + result.getLastAccessTime());
+        }
 
     }
 
@@ -925,12 +925,12 @@ public abstract class FileSystemTestParent {
      * @param time2
      * @return
      */
-//    private boolean isWithinMargin(long time1, long time2) {
-//        final int millisecondsPerSecond = 1000;
-//        final int secondsPerHour = 3600;
-//        final long margin = 60 * secondsPerHour * millisecondsPerSecond;
-//        return Math.abs(time1 - time2) < margin;
-//    }
+    private boolean isWithinMargin(long time1, long time2) {
+        final int millisecondsPerSecond = 1000;
+        final int secondsPerHour = 3600;
+        final long margin = 60 * secondsPerHour * millisecondsPerSecond;
+        return Math.abs(time1 - time2) < margin;
+    }
 
     @Test
     public void test_getAttributes_emptyFile() throws Exception {
@@ -1607,7 +1607,7 @@ public abstract class FileSystemTestParent {
             Path sub = dir1.relativize(p.getPath());
             Path other = dir2.resolve(sub);
             if(!fileSystem.exists(other)){
-                fail("Cannot find equivalent for " + p.getPath().getRelativePath() + " is not " + other.getRelativePath());
+                fail("Cannot find equivalent for " + p.getPath().toString() + " is not " + other.toString());
             }
             if(p.isRegular()){
                 assertSameContents(p.getPath(),other);

@@ -129,7 +129,7 @@ final class GridEngineUtils {
             } else {
                 //make relative path absolute
                 Path workingDirectory = fsEntryPath.resolve(description.getWorkingDirectory());
-                script.format("#$ -wd '%s'\n", workingDirectory.getAbsolutePath());
+                script.format("#$ -wd '%s'\n", workingDirectory.toString());
             }
         }
 

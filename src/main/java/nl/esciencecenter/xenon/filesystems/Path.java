@@ -15,12 +15,7 @@
  */
 package nl.esciencecenter.xenon.filesystems;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * Path contains a sequence of path elements separated by a separator.
@@ -40,6 +35,9 @@ public class Path implements Iterable<Path> {
 
     /** The separator used in this relative path */
     private final char separator;
+
+    /** Does path start with / ? **/
+    private boolean isAbsolute;
 
     /** Estimate of path element String length. */
     private static final int PATH_ELEMENT_LENGTH = 25;
@@ -111,20 +109,27 @@ public class Path implements Iterable<Path> {
      *            the path elements to use.
      */
     public Path(Path... paths) {
+
         if (paths == null || paths.length == 0) {
             elements = new ArrayList<>(0);
             separator = DEFAULT_SEPARATOR;
         } else {
+            boolean isAbsoluteSet = false;
             elements = new ArrayList<>(paths.length);
             
             Character sep = null;
             
             for (Path path : paths) {
                 if (path != null) {
-                    elements.addAll(path.elements);
-                    
-                    if (sep == null) { 
-                    	sep = new Character(paths[0].separator);
+                    if (!isAbsoluteSet) {
+                        isAbsolute = path.isAbsolute;
+                        isAbsoluteSet = true;
+                    }
+                    if (!path.isEmpty()) {
+                        elements.addAll(path.elements);
+                    }
+                    if (sep == null) {
+                        sep = new Character(path.separator);
                     }
                 }
             }
@@ -135,6 +140,7 @@ public class Path implements Iterable<Path> {
             	separator = sep.charValue();
             }
         }
+
     }
 
     /**
@@ -173,17 +179,17 @@ public class Path implements Iterable<Path> {
         
         if (tmp == null) {
             tmp = new ArrayList<>(0);
+        } else {
+            tmp = filterNonEmpty(tmp);
         }
-        
-        this.separator = separator;
-
         String delim = String.valueOf(separator);
+
+        this.isAbsolute = !tmp.isEmpty() && tmp.get(0).startsWith(delim);
+
+        this.separator = separator;
 
         this.elements = new ArrayList<>(tmp.size());
         for (String elt : tmp) {
-            if (elt == null || elt.isEmpty()) {
-                continue;
-            }
             StringTokenizer tok = new StringTokenizer(elt, delim);
 
             while (tok.hasMoreTokens()) {
@@ -191,6 +197,23 @@ public class Path implements Iterable<Path> {
             }
         }
     }
+
+    private Path(char separator, boolean isAbsolute, List<String> elements) {
+        this.separator = separator;
+        this.isAbsolute = isAbsolute;
+        this.elements = elements;
+    }
+
+    List<String> filterNonEmpty(List<String> elts){
+        List<String> res = new LinkedList<>();
+        for(String s : elts){
+            if(s != null && !s.isEmpty()){
+                res.add(s);
+            }
+        }
+        return res;
+    }
+
     /**
      * Get the file name, or <code>null</code> if the Path is empty.
      * 
@@ -240,7 +263,7 @@ public class Path implements Iterable<Path> {
             return null;
         }
 
-        return new Path(separator, elements.subList(0, elements.size() - 1));
+        return new Path(separator, isAbsolute, elements.subList(0, elements.size() - 1));
     }
 
     /**
@@ -286,8 +309,8 @@ public class Path implements Iterable<Path> {
         if (beginIndex == endIndex) {
             throw new IllegalArgumentException("beginIndex " + beginIndex + " equal to endIndex " + endIndex);
         }
-
-        return new Path(separator, elements.subList(beginIndex, endIndex));
+        boolean alsoAbsolute = beginIndex == 0 && isAbsolute;
+        return new Path(separator, alsoAbsolute, elements.subList(beginIndex, endIndex));
     }
 
     /**
@@ -302,7 +325,7 @@ public class Path implements Iterable<Path> {
      * @return If this Path start with the name elements in the other Path.
      */
     public boolean startsWith(Path other) {
-        return other.elements.size() <= elements.size()
+        return other.isAbsolute == isAbsolute && other.elements.size() <= elements.size()
             && elements.subList(0, other.elements.size()).equals(other.elements);
     }
 
@@ -318,6 +341,9 @@ public class Path implements Iterable<Path> {
      * @return If this Path ends with the name elements in the other Path.
      */
     public boolean endsWith(Path other) {
+        if(other.isAbsolute){
+            return equals(other);
+        }
         int offset = elements.size() - other.elements.size();
 
         return other.elements.size() <= elements.size() &&
@@ -371,10 +397,11 @@ public class Path implements Iterable<Path> {
             return other;
         }
 
+
         ArrayList<String> tmp = new ArrayList<>(elements.size() + other.elements.size());
         tmp.addAll(elements);
         tmp.addAll(other.elements);
-        return new Path(separator, tmp);
+        return new Path(separator,isAbsolute, tmp);
     }
 
     /**
@@ -459,15 +486,15 @@ public class Path implements Iterable<Path> {
 
         // The source may not be longer that target
         if (normalized.size() > normalizedOther.size()) {
-            throw new IllegalArgumentException("Cannot relativize " + other.getAbsolutePath() + " to " + getAbsolutePath());
+            throw new IllegalArgumentException("Cannot relativize " + other + " to " + this);
         }
 
         // Source and target must have the same start.
         if (!normalizedOther.subList(0, normalized.size()).equals(normalized)) {
-            throw new IllegalArgumentException("Cannot relativize " + other.getAbsolutePath() + " to " + getAbsolutePath());
+            throw new IllegalArgumentException("Cannot relativize " + other + " to " + this);
         }
 
-        return new Path(separator, normalizedOther.subList(normalized.size(), normalizedOther.size()));
+        return new Path(separator, false, normalizedOther.subList(normalized.size(), normalizedOther.size()));
     }
 
     /**
@@ -488,7 +515,7 @@ public class Path implements Iterable<Path> {
      * 
      * @return a String representation of this Path interpreted as a relative path.
      */
-    public String getRelativePath() {
+    private String getRelativePath() {
         StringBuilder tmp = new StringBuilder(elements.size() * PATH_ELEMENT_LENGTH);
 
         String sep = "";
@@ -509,7 +536,7 @@ public class Path implements Iterable<Path> {
      * 
      * @return a String representation of this path interpreted as an absolute path.
      */
-    public String getAbsolutePath() {
+    private String getAbsolutePath() {
         return separator + getRelativePath();
     }
 
@@ -574,16 +601,34 @@ public class Path implements Iterable<Path> {
         if (this == obj) {
             return true;
         }
+
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
         Path other = (Path) obj;
-        return separator == other.separator && elements.equals(other.elements);
+        return isAbsolute == other.isAbsolute && separator == other.separator && elements.equals(other.elements);
     }
 
     @Override
     public String toString() {
-        return getAbsolutePath();
+
+        if(isAbsolute) {
+            return getAbsolutePath();
+        } else {
+            return getRelativePath();
+        }
+    }
+
+    public boolean isAbsolute() {
+        return isAbsolute;
+    }
+
+    public Path toRelativePath() {
+        return new Path(separator, false, elements);
+    }
+
+    public Path toAbsolutePath() {
+        return new Path(separator, true, elements);
     }
 }

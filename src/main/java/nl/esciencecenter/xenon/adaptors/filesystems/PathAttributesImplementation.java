@@ -327,17 +327,18 @@ public class PathAttributesImplementation implements PathAttributes {
         this.permissions = permissions;
     }
 
-//    public String toString() { 
+
+//    public String toString() {
 //        return path.getAbsolutePath();
 //    }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        
+
         PathAttributesImplementation that = (PathAttributesImplementation) o;
-        return Objects.equals(path, that.path) && 
+        return Objects.equals(path, that.path) &&
                 isDirectory == that.isDirectory &&
                 isRegular == that.isRegular &&
                 isSymbolicLink == that.isSymbolicLink &&
