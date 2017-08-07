@@ -70,13 +70,11 @@ public abstract class Scheduler {
 			throw new UnknownAdaptorException(COMPONENT_NAME, "Adaptor name may not be null or empty");
 		}
 
-		SchedulerAdaptor adaptor = adaptors.get(adaptorName);
-
-		if (adaptor == null) {
-			throw new UnknownAdaptorException(COMPONENT_NAME, "File adaptor not found (null)");
+		if (!adaptors.containsKey(adaptorName)) {
+			throw new UnknownAdaptorException(COMPONENT_NAME, String.format("Adaptor '%s' not found", adaptorName));
 		}
 
-		return adaptor;
+		return adaptors.get(adaptorName);
 	}
 
     /**
