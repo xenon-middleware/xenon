@@ -54,7 +54,7 @@ public class SSHUtil {
 
 	private static final int DEFAULT_SSH_PORT = 22;
 	
-	private static class PasswordProvider implements FilePasswordProvider {
+	static class PasswordProvider implements FilePasswordProvider {
 
 		private final char [] password;
 		
