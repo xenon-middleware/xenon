@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Signals that a parameter has an invalid value.  
- * 
+ * Signals that a parameter has an invalid value.
+ *
  * @version 1.0
  * @since 1.0
  */

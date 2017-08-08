@@ -23,81 +23,81 @@ import nl.esciencecenter.xenon.schedulers.Streams;
 
 /**
  * Streams is a container for the standard input, output and error streams of a job.
- * 
- * Note that these standard streams are only available for interactive jobs. 
+ *
+ * Note that these standard streams are only available for interactive jobs.
  */
 public class StreamsImplementation implements Streams {
 
-	private final String jobIdentifier;
-	private final InputStream stdout;
-	private final InputStream stderr;
-	private final OutputStream stdin;
+    private final String jobIdentifier;
+    private final InputStream stdout;
+    private final InputStream stderr;
+    private final OutputStream stdin;
 
-	/**
-	 * Create a Streams containing the job and its standard streams.
-	 * 
-	 * @param jobIdentifier
-	 *            the identifier of the job.
-	 * @param stdout
-	 *            the standard output stream.
-	 * @param stdin
-	 *            the standard input stream.
-	 * @param stderr
-	 *            the standard error stream.
-	 */
-	public StreamsImplementation(String jobIdentifier, InputStream stdout, OutputStream stdin, InputStream stderr) {
-		this.jobIdentifier = jobIdentifier;
-		this.stdout = stdout;
-		this.stdin = stdin;
-		this.stderr = stderr;
-	}
+    /**
+     * Create a Streams containing the job and its standard streams.
+     *
+     * @param jobIdentifier
+     *            the identifier of the job.
+     * @param stdout
+     *            the standard output stream.
+     * @param stdin
+     *            the standard input stream.
+     * @param stderr
+     *            the standard error stream.
+     */
+    public StreamsImplementation(String jobIdentifier, InputStream stdout, OutputStream stdin, InputStream stderr) {
+        this.jobIdentifier = jobIdentifier;
+        this.stdout = stdout;
+        this.stdin = stdin;
+        this.stderr = stderr;
+    }
 
-	/**
-	 * Get the identifier of the job for which this Streams was created.
-	 * 
-	 * @return the identifier of the ob.
-	 */
-	public String getJobIdentifier() {
-		return jobIdentifier;
-	}
+    /**
+     * Get the identifier of the job for which this Streams was created.
+     *
+     * @return the identifier of the ob.
+     */
+    public String getJobIdentifier() {
+        return jobIdentifier;
+    }
 
-	/**
-	 * Returns the standard output stream of job.
-	 * 
-	 * @return the standard output stream of job.
-	 */
-	public InputStream getStdout() {
-		return stdout;
-	}
+    /**
+     * Returns the standard output stream of job.
+     *
+     * @return the standard output stream of job.
+     */
+    public InputStream getStdout() {
+        return stdout;
+    }
 
-	/**
-	 * Returns the standard error stream of job.
-	 * 
-	 * @return the standard error stream of job.
-	 */
-	public InputStream getStderr() {
-		return stderr;
-	}
+    /**
+     * Returns the standard error stream of job.
+     *
+     * @return the standard error stream of job.
+     */
+    public InputStream getStderr() {
+        return stderr;
+    }
 
-	/**
-	 * Returns the standard input stream of job.
-	 * 
-	 * @return the standard input stream of this job.
-	 */
-	public OutputStream getStdin() {
-		return stdin;
-	}
+    /**
+     * Returns the standard input stream of job.
+     *
+     * @return the standard input stream of this job.
+     */
+    public OutputStream getStdin() {
+        return stdin;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		StreamsImplementation that = (StreamsImplementation) o;
-		return Objects.equals(jobIdentifier, that.jobIdentifier);
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StreamsImplementation that = (StreamsImplementation) o;
+        return Objects.equals(jobIdentifier, that.jobIdentifier);
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(jobIdentifier);
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(jobIdentifier);
+    }
 }

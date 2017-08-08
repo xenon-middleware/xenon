@@ -23,72 +23,72 @@ import nl.esciencecenter.xenon.schedulers.Streams;
 
 public class MockInteractiveProcess implements InteractiveProcess {
 
-	JobDescription job;
-	String jobID;
-	
-	long deadline;
-	long killDeadline;
-	long killDelay;
-	
-	Streams streams;
-	
-	boolean destroyed = false;
-	
-	public MockInteractiveProcess(JobDescription job, String jobID, long delay, long killDelay) { 
-		this.job = job;
-		this.jobID = jobID;
-	
-		ByteArrayInputStream stdout = new ByteArrayInputStream("Hello World\n".getBytes());
-		ByteArrayInputStream stderr = new ByteArrayInputStream(new byte[0]);
-		
-		ByteArrayOutputStream stdin = new ByteArrayOutputStream();
-		
-		this.streams = new StreamsImplementation(jobID, stdout, stdin, stderr);
-	
-		this.deadline = System.currentTimeMillis() + delay;
-		this.killDelay = killDelay;
-	}
-	
-	@Override
-	public synchronized boolean isDone() {
-		
-		if (System.currentTimeMillis() >= deadline) { 
-			return true;
-		}
-		
-		if (destroyed && System.currentTimeMillis() >= killDeadline) { 
-			return true;
-		}
-		
-		return false;
-	}
+    JobDescription job;
+    String jobID;
 
-	@Override
-	public synchronized int getExitStatus() {
-		if (destroyed) { 
-			return 1;
-		}
-		
-		if (isDone()) {
-			return 0;
-		}
+    long deadline;
+    long killDeadline;
+    long killDelay;
 
-		return -1;
-	}
+    Streams streams;
 
-	@Override
-	public synchronized void destroy() {
-		if (destroyed || isDone()) { 
-			return;
-		}
-		
-		destroyed = true;
-		killDeadline = System.currentTimeMillis() + killDelay;
-	}
+    boolean destroyed = false;
 
-	@Override
-	public Streams getStreams() {
-		return streams;
-	}
+    public MockInteractiveProcess(JobDescription job, String jobID, long delay, long killDelay) {
+        this.job = job;
+        this.jobID = jobID;
+
+        ByteArrayInputStream stdout = new ByteArrayInputStream("Hello World\n".getBytes());
+        ByteArrayInputStream stderr = new ByteArrayInputStream(new byte[0]);
+
+        ByteArrayOutputStream stdin = new ByteArrayOutputStream();
+
+        this.streams = new StreamsImplementation(jobID, stdout, stdin, stderr);
+
+        this.deadline = System.currentTimeMillis() + delay;
+        this.killDelay = killDelay;
+    }
+
+    @Override
+    public synchronized boolean isDone() {
+
+        if (System.currentTimeMillis() >= deadline) {
+            return true;
+        }
+
+        if (destroyed && System.currentTimeMillis() >= killDeadline) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public synchronized int getExitStatus() {
+        if (destroyed) {
+            return 1;
+        }
+
+        if (isDone()) {
+            return 0;
+        }
+
+        return -1;
+    }
+
+    @Override
+    public synchronized void destroy() {
+        if (destroyed || isDone()) {
+            return;
+        }
+
+        destroyed = true;
+        killDeadline = System.currentTimeMillis() + killDelay;
+    }
+
+    @Override
+    public Streams getStreams() {
+        return streams;
+    }
 
 }

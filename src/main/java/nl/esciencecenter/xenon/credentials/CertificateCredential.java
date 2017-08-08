@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * A container for security Information based upon certificates. 
+ * A container for security Information based upon certificates.
  */
 public class CertificateCredential extends PasswordCredential {
 

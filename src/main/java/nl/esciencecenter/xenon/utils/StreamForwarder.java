@@ -24,8 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A simple stream forwarder that uses a daemon thread to read from an {@link java.io.InputStream} and write it to a 
- * {@link java.io.OutputStream}. 
+ * A simple stream forwarder that uses a daemon thread to read from an {@link java.io.InputStream} and write it to a
+ * {@link java.io.OutputStream}.
  * A small buffer is used (typically 1 KB) to improve performance. Any exceptions will be ignored.
  */
 public final class StreamForwarder extends Thread {
@@ -38,10 +38,10 @@ public final class StreamForwarder extends Thread {
     private final OutputStream out;
 
     private boolean done = false;
-    
+
     /**
      * Create a new StreamForwarder and start it immediately.
-     * 
+     *
      * @param in the {@link java.io.InputStream} to read from.
      * @param out the {@link java.io.OutputStream} to write to.
      */
@@ -56,8 +56,8 @@ public final class StreamForwarder extends Thread {
 
     /**
      * Closes the input stream, thereby stopping the stream forwarder, and closing the output stream.
-     * 
-     * @param c The {@link java.io.Closeable} to close (i.e., the {@link java.io.InputStream} or {@link java.io.OutputStream}) 
+     *
+     * @param c The {@link java.io.Closeable} to close (i.e., the {@link java.io.InputStream} or {@link java.io.OutputStream})
      * @param error The error message to print if the close results in an Exception
      */
     private void close(Closeable c, String error) {
@@ -77,29 +77,29 @@ public final class StreamForwarder extends Thread {
         done = true;
         notifyAll();
     }
-    
+
     /**
      * Wait for a given timeout for the StreamForwarder to terminate by reading an end-of-stream on the input. When the timeout
      * expires both input and output streams will be closed, regardless of whether the input has reached end-of-line.
-     * 
+     *
      * @param timeout
-     *          The number of milliseconds to wait for termination. 
+     *          The number of milliseconds to wait for termination.
      */
-    public synchronized void terminate(long timeout) { 
+    public synchronized void terminate(long timeout) {
 
-        if (done) { 
+        if (done) {
             return;
         }
-        
-        if (timeout > 0) { 
+
+        if (timeout > 0) {
             long deadline = System.currentTimeMillis() + timeout;
             long left = timeout;
 
-            while (!done && left > 0) { 
-            
-                try { 
+            while (!done && left > 0) {
+
+                try {
                     wait(left);
-                } catch (InterruptedException e) { 
+                } catch (InterruptedException e) {
                     LOGGER.warn("StreamForwarder.terminate was interrupted!");
                     Thread.currentThread().interrupt();
                     break;
@@ -108,28 +108,28 @@ public final class StreamForwarder extends Thread {
                 left = deadline - System.currentTimeMillis();
             }
         }
-        
+
         if (!done) {
             close(in, "InputStream did not close within " + timeout + " ms. Forcing close!");
-            
-            if (out != null) { 
+
+            if (out != null) {
                 close(out, null);
             }
         }
     }
-    
+
     /**
      * Main entry method for the daemon thread.
      */
     public void run() {
         try {
             byte[] buffer = new byte[BUFFER_SIZE];
-            
+
             while (true) {
                 int read = in.read(buffer);
 
                 if (read == -1) {
-                    // NOTE: Streams must be closed before done is called, or we'll have a race condition!                  
+                    // NOTE: Streams must be closed before done is called, or we'll have a race condition!
                     close(in, null);
 
                     if (out != null) {
@@ -139,7 +139,7 @@ public final class StreamForwarder extends Thread {
                     done();
                     return;
                 }
-                                
+
                 if (out != null) {
                     out.write(buffer, 0, read);
                 }

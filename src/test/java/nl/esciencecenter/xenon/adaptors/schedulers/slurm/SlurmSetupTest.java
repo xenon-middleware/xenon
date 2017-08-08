@@ -27,7 +27,7 @@ import org.junit.Test;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * 
+ *
  */
 public class SlurmSetupTest {
 

@@ -27,11 +27,8 @@ import nl.esciencecenter.xenon.adaptors.filesystems.jclouds.JCloudsFileSytem;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
-import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
 import org.jclouds.ContextBuilder;
 import org.jclouds.blobstore.BlobStoreContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,8 +37,6 @@ import java.util.Map;
  * Created by atze on 29-6-17.
  */
 public class S3FileAdaptor extends FileAdaptor {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(S3FileAdaptor.class);
 
     /** The default SSH port */
     protected static final int DEFAULT_PORT = 21;
@@ -58,16 +53,14 @@ public class S3FileAdaptor extends FileAdaptor {
     protected static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription[0];
 
     public S3FileAdaptor() {
-
         super("s3", ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
     }
-
 
     @Override
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
 
         int split = location.lastIndexOf("/");
-        if(split < 0){
+        if (split < 0) {
             throw new InvalidLocationException("s3","No bucket found in url: " + location);
         }
 
@@ -76,12 +69,16 @@ public class S3FileAdaptor extends FileAdaptor {
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
-        if (!(credential instanceof PasswordCredential)){
+        if (!(credential instanceof PasswordCredential)) {
             throw new InvalidCredentialException("s3", "No secret key given for s3 connection.");
         }
+
         PasswordCredential pwUser = (PasswordCredential) credential;
-        if(properties == null) { properties = new HashMap<>(); }
-        System.err.println("server : " + server);
+
+        if (properties == null) {
+            properties = new HashMap<>();
+        }
+
         BlobStoreContext context = ContextBuilder.newBuilder("s3").endpoint(server).
                 credentials(pwUser.getUsername(), new String(pwUser.getPassword())).buildView(BlobStoreContext.class);
         return new JCloudsFileSytem(getNewUniqueID(),"s3", server, context,  bucket,xp);
@@ -113,18 +110,17 @@ public class S3FileAdaptor extends FileAdaptor {
     }
 
     @Override
-    public boolean needsSizeBeforehand(){
+    public boolean needsSizeBeforehand() {
         return true;
     }
 
     @Override
-    public boolean supportsRename(){
+    public boolean supportsRename() {
         return false;
     }
 
     @Override
-    public boolean isConnectionless(){
+    public boolean isConnectionless() {
         return true;
     }
-
 }

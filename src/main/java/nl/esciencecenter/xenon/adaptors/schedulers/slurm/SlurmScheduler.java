@@ -195,7 +195,7 @@ public class SlurmScheduler extends ScriptingScheduler {
             return result;
         }
 
-        // See if the job can be found in the accounting.                
+        // See if the job can be found in the accounting.
         return findInteractiveJobInMap(getSacctInfo(), tag, interactiveJob);
     }
 
@@ -212,12 +212,12 @@ public class SlurmScheduler extends ScriptingScheduler {
 
         String[] arguments = generateInteractiveArguments(description, fsEntryPath, tag);
 
-        // There is a two step job submission here, since we submit a job to via a subscheduler (typically SSH). 
-        // So the job we get back here is the local SSH job that connects to the remote machine running slurm. 
+        // There is a two step job submission here, since we submit a job to via a subscheduler (typically SSH).
+        // So the job we get back here is the local SSH job that connects to the remote machine running slurm.
         Streams interactiveJob = startInteractiveCommand("salloc", arguments);
 
         // Next we try to find information on the remote slurm job. Note that this job may not be visible in the queue yet, or
-        // if may already have finished. 
+        // if may already have finished.
         String result = findInteractiveJob(tag.toString(), interactiveJob.getJobIdentifier());
 
         long end = System.currentTimeMillis() + SLURM_UPDATE_TIMEOUT;
@@ -340,7 +340,7 @@ public class SlurmScheduler extends ScriptingScheduler {
         RemoteCommandRunner runner;
 
         // This command will not complain if the job given does not exist
-        // but it may produce output on stderr when it finds non-standard lines in the accounting log        
+        // but it may produce output on stderr when it finds non-standard lines in the accounting log
         if (jobs == null || jobs.length == 0) {
             runner = runCommand(null, "sacct", "-X", "-p", "--format=JobID,JobName,Partition,NTasks,"
                 + "Elapsed,State,ExitCode,AllocCPUS,DerivedExitCode,Submit,"
@@ -396,7 +396,7 @@ public class SlurmScheduler extends ScriptingScheduler {
 //    @Override
 //    public JobStatus[] getJobStatuses(String... jobs) throws XenonException {
 //        JobStatus[] result = new JobStatus[jobs.length];
-//        
+//
 //        //fetch queue info for all jobs in one go
 //        Map<String, Map<String, String>> squeueInfo = getSqueueInfo(jobs);
 //
@@ -488,15 +488,15 @@ public class SlurmScheduler extends ScriptingScheduler {
 //    @Override
 //    public Streams getStreams(JobHandle job) throws XenonException {
 //        JobHandle interactiveJob;
-//        
+//
 //        synchronized (this) {
 //            interactiveJob = interactiveJobs.get(job.getIdentifier());
 //        }
-//        
+//
 //        if (interactiveJob == null) {
 //            throw new NoSuchJobException(ADAPTOR_NAME, "Unknown Job, or not an interactive job: " + job);
 //        }
-//        
+//
 //        return subScheduler.getStreams(interactiveJob);
 //    }
 

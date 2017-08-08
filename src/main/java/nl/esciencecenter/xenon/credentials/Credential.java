@@ -22,8 +22,8 @@ public interface Credential {
 
     /**
      * Get user name associated with this Credential.
-     * 
+     *
      * @return the name of the adaptor.
      */
-	String getUsername();
+    String getUsername();
 }

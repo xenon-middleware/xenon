@@ -96,9 +96,9 @@ public abstract class FileSystemTestParent {
         assertNotNull(root);
 
         testRoot = root.resolve(TEST_DIR);
-        
+
         assertNotNull(testRoot);
-        
+
         //System.out.println("TEST_ROOT=" + testRoot);
 
         if (fileSystem.exists(testRoot)) {
@@ -161,12 +161,12 @@ public abstract class FileSystemTestParent {
     private void copySync(Path source, Path target, CopyMode mode, boolean recursive) throws Throwable{
         String s = fileSystem.copy(source,fileSystem,target,mode,recursive);
         CopyStatus status = fileSystem.waitUntilDone(s, 1000);
-        
-        // For some adaptors (like webdav) it may take a few moments for the copy to fully arrive at the server. 
-        // To prevent the next operation from overtaking this copy, we sleep for a second to let the target settle. 
+
+        // For some adaptors (like webdav) it may take a few moments for the copy to fully arrive at the server.
+        // To prevent the next operation from overtaking this copy, we sleep for a second to let the target settle.
         Thread.sleep(1000);
-        
-        if(status.hasException()){
+
+        if (status.hasException()) {
             throw status.getException();
         }
     }
@@ -230,7 +230,7 @@ public abstract class FileSystemTestParent {
         while (!fileSystem.exists(testFile)) {
             System.out.println("NOT EXISTS: " + testFile);
 
-            if (System.currentTimeMillis() > deadline) { 
+            if (System.currentTimeMillis() > deadline) {
                 fail("Failed to ensure file " + testFile + " exists after " + maxTimeout + " ms. ");
             }
 
@@ -238,15 +238,15 @@ public abstract class FileSystemTestParent {
         }
 
         if (data != null && data.length > 0) {
-            
+
             PathAttributes att = fileSystem.getAttributes(testFile);
 
             while (att.getSize() != data.length) {
 
                 System.out.println("Wrong size " + att.getSize() + " != " + data.length);
 
-                if (System.currentTimeMillis() > deadline) { 
-                    fail("Failed to ensure file " + testFile + " contains " + data.length + " bytes after " 
+                if (System.currentTimeMillis() > deadline) {
+                    fail("Failed to ensure file " + testFile + " contains " + data.length + " bytes after "
                             + maxTimeout + " ms. ");
                 }
 
@@ -263,12 +263,12 @@ public abstract class FileSystemTestParent {
         if (data != null) {
             out.write(data);
         }
-        
+
         out.close();
-        
-        // Note: it may take some time for the data to become available on the server side. This may lead to problems 
-        // if any subsequent commands (like exists or readFromFile) overtaking this write on the network. Therefore we 
-        // wait for the remote file to be updated. 
+
+        // Note: it may take some time for the data to become available on the server side. This may lead to problems
+        // if any subsequent commands (like exists or readFromFile) overtaking this write on the network. Therefore we
+        // wait for the remote file to be updated.
         ensureUpToDate(testFile, data, 5000);
     }
 
@@ -526,7 +526,7 @@ public abstract class FileSystemTestParent {
     @Test
     public void test_exists_existingSymbolicLink_returnTrue() throws Exception {
         assumeTrue(description.canCreateSymboliclinks());
-        
+
         generateAndCreateTestDir();
 
         // test with non-existing file
@@ -690,11 +690,11 @@ public abstract class FileSystemTestParent {
         Iterator<PathAttributes> it1 = pa.iterator();
         Iterator<PathAttributes> it2 = pa.iterator();
         Set<PathAttributes> set1 = new HashSet<>();
-        while(it1.hasNext()){
+        while (it1.hasNext()) {
             set1.add(it1.next());
         }
         Set<PathAttributes> set2 = new HashSet<>();
-        while(it2.hasNext()){
+        while (it2.hasNext()) {
             set2.add(it2.next());
         }
         assertEquals(set1,set2);
@@ -702,8 +702,8 @@ public abstract class FileSystemTestParent {
 
     protected Set<PathAttributes> listSet(Path dir, boolean recursive) throws XenonException{
         Set<PathAttributes> res = new HashSet<>();
-        for(PathAttributes p : fileSystem.list(dir,recursive)){
-            if(res.contains(p)){
+        for (PathAttributes p : fileSystem.list(dir,recursive)) {
+            if (res.contains(p)) {
                 throw new XenonException(fileSystem.getAdaptorName(),"Duplicate element in listing!");
             } else {
                 System.out.println("ADDING TO LIST: " + p);
@@ -713,20 +713,20 @@ public abstract class FileSystemTestParent {
         return res;
     }
 
-    private void assertListSetEqual(Set<PathAttributes> res, Set<PathAttributes> expected){
-        if(!res.equals(expected)){
+    private void assertListSetEqual(Set<PathAttributes> res, Set<PathAttributes> expected) {
+        if (!res.equals(expected)) {
             Set<PathAttributes> superfluous = new HashSet<>(res);
             superfluous.removeAll(expected);
             Set<PathAttributes> missing = new HashSet<>(expected);
             missing.removeAll(res);
             String superfluousString;
             String missingString;
-            if(!superfluous.isEmpty()){
+            if (!superfluous.isEmpty()) {
                 superfluousString = "Superfluous elements : " + listPathsInString(res);
             } else {
                 superfluousString = "";
             }
-            if(!missing.isEmpty()){
+            if (!missing.isEmpty()) {
                 missingString = "Missing elements : " + listPathsInString(missing);
             } else {
                 missingString = "";
@@ -737,7 +737,7 @@ public abstract class FileSystemTestParent {
 
     private String listPathsInString(Set<PathAttributes> res) {
         String superfluous = "";
-        for(PathAttributes p : res){
+        for (PathAttributes p : res) {
             superfluous += p.getPath().toString() + " ";
         }
         return superfluous;
@@ -1558,7 +1558,7 @@ public abstract class FileSystemTestParent {
         byte[] data4 = "Use Xenon!".getBytes();
         generateAndCreateTestDir();
 
-        // Create a source file 
+        // Create a source file
         Path source = createTestFile(testDir,data);
 
         // Create a target directory with contents
@@ -1603,15 +1603,15 @@ public abstract class FileSystemTestParent {
 
 
     private void assertSameContentsDir(Path dir1, Path dir2) throws Exception{
-        for(PathAttributes p : fileSystem.list(dir1, true)){
+        for (PathAttributes p : fileSystem.list(dir1, true)) {
             Path sub = dir1.relativize(p.getPath());
             Path other = dir2.resolve(sub);
-            if(!fileSystem.exists(other)){
+            if (!fileSystem.exists(other)) {
                 fail("Cannot find equivalent for " + p.getPath().toString() + " is not " + other.toString());
             }
-            if(p.isRegular()){
+            if (p.isRegular()) {
                 assertSameContents(p.getPath(),other);
-            } else if(p.isDirectory()){
+            } else if (p.isDirectory()) {
                 assert(fileSystem.getAttributes(other).isDirectory());
             }
         }
@@ -1719,23 +1719,23 @@ public abstract class FileSystemTestParent {
     public void test_rename_existingDirectoryNonExistingFile() throws Exception {
         assumeTrue(description.supportsRename());
         generateAndCreateTestDir();
-        
+
         Path subDir = createTestSubDir(testDir);
-        
+
         byte[] adata = "data".getBytes();
-        byte[] bdata = "content".getBytes();        
+        byte[] bdata = "content".getBytes();
         Path a = createTestFile(subDir,adata);
         Path b = createTestFile(subDir,bdata);
-        
-                
+
+
         Path subDir2 = createTestSubDirName(testDir);
         fileSystem.rename(subDir,subDir2);
-        
+
         Thread.sleep(1000);
 
         assertTrue(fileSystem.exists(subDir2));
         assertFalse(fileSystem.exists(subDir));
-        
+
         assertContents(subDir2.resolve(a.getFileName()),adata);
         assertContents(subDir2.resolve(b.getFileName()),bdata);
     }

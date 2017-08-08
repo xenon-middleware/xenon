@@ -77,17 +77,17 @@ public class PathAttributesImplementation implements PathAttributes {
     /** The permissions of this file (POSIX only) */
     private Set<PosixFilePermission> permissions;
 
-    public PathAttributesImplementation() { 
+    public PathAttributesImplementation() {
         // EMPTY
     }
 
     /**
      * Get the path these attributes belong to.
-     * 
+     *
      * @return
      *   	the path these attributes belong to.
      */
-    public Path getPath() {  
+    public Path getPath() {
         return path;
     }
 
@@ -97,7 +97,7 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /**
      * Does the path refer to a directory ?
-     * 
+     *
      * @return
      *          if the path refers to a directory.
      */
@@ -111,8 +111,8 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /**
      * Does the path refer to a regular file ?
-     * 
-     * @return 
+     *
+     * @return
      *          if the path refers to a regular file.
      */
     public boolean isRegular() {
@@ -125,8 +125,8 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /**
      * Does the path refer to a symbolic link ?
-     * 
-     * @return 
+     *
+     * @return
      *          if the path refers to a symbolic link.
      */
     public boolean isSymbolicLink() {
@@ -139,8 +139,8 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /**
      * Is the path not a file, link or directory ?
-     * 
-     * @return 
+     *
+     * @return
      *          if the path does not refer to a file, link or directory.
      */
     public boolean isOther() {
@@ -153,8 +153,8 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /**
      * Does the path refer to an executable file ?
-     * 
-     * @return 
+     *
+     * @return
      *          if the path refers an executable file ?
      */
     public boolean isExecutable() {
@@ -168,8 +168,8 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /**
      * Does the path refer to an readable file ?
-     * 
-     * @return 
+     *
+     * @return
      *          if the path refers an readable file ?
      */
     public boolean isReadable() {
@@ -182,8 +182,8 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /**
      * Does the path refer to a writable file ?
-     * 
-     * @return 
+     *
+     * @return
      *          if the path refers a writable file ?
      */
     public boolean isWritable() {
@@ -196,8 +196,8 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /**
      * Does the path refer to an hidden file ?
-     * 
-     * @return 
+     *
+     * @return
      *          if the path refers an hidden file ?
      */
     public boolean isHidden() {
@@ -211,10 +211,10 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /**
      * Get the creation time for this file.
-     * 
+     *
      * If creationTime is not supported by the adaptor, {@link #getLastModifiedTime()} will be returned instead.
-     * 
-     * @return 
+     *
+     * @return
      *          the creation time for this file.
      */
     public long getCreationTime() {
@@ -227,10 +227,10 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /**
      * Get the last access time for this file.
-     * 
+     *
      * If lastAccessTime is not supported by the adaptor, use {@link #getLastModifiedTime()} will be returned instead.
      *
-     * @return 
+     * @return
      *          the last access time for this file.
      */
     public long getLastAccessTime() {
@@ -243,10 +243,10 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /**
      * Get the last modified time for this file.
-     * 
+     *
      * If lastModifiedTime is not supported by the adaptor, <code>0</code> will be returned instead.
      *
-     * @return 
+     * @return
      *          the last modified time for this file.
      */
     public long getLastModifiedTime() {
@@ -260,10 +260,10 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /**
      * Get the size of this file in bytes.
-     * 
-     * If the file is not a regular file, <code>0</code> will be returned. 
-     * 
-     * @return 
+     *
+     * If the file is not a regular file, <code>0</code> will be returned.
+     *
+     * @return
      *          the size of this file.
      */
     public long getSize() {
@@ -277,10 +277,10 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /**
      * Get the owner of this file.
-     * 
-     * @return 
+     *
+     * @return
      *          the owner of this file.
-     * 
+     *
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
@@ -294,10 +294,10 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /**
      * Get the group of this file.
-     * 
-     * @return 
+     *
+     * @return
      *          the group of this file.
-     * 
+     *
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
@@ -311,10 +311,10 @@ public class PathAttributesImplementation implements PathAttributes {
 
     /**
      * Get the permissions of this file.
-     * 
-     * @return 
+     *
+     * @return
      *          the permissions of this file.
-     * 
+     *
      * @throws AttributeNotSupportedException
      *          If the attribute is not supported by the adaptor.
      */
