@@ -14,6 +14,8 @@ plugins {
     id 'eclipse'
     // code style
     id "com.diffplug.gradle.spotless" version "3.4.1"
+    // quality
+    id 'org.sonarqube' version '2.5'
     // code coverage
     id 'jacoco'
     // license

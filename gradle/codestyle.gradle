@@ -35,5 +35,22 @@ spotless {
 	}
 }
 
-
-
+sonarqube {
+    properties {
+        property 'sonar.host.url', 'https://sonarqube.com'
+        property 'sonar.organization', 'nlesc'
+        property 'sonar.projectKey', 'nlesc:Xenon'
+        property 'sonar.projectName', 'Xenon'
+        property 'sonar.language', 'java'
+        property 'sonar.links.homepage', 'https://github.com/NLeSC/Xenon'
+        property 'sonar.links.scm', 'https://github.com/NLeSC/Xenon'
+        property 'sonar.links.issue', 'https://github.com/NLeSC/Xenon/issues'
+        property 'sonar.links.ci', 'https://travis-ci.org/NLeSC/Xenon'
+        properties['sonar.tests'] += sourceSets.integrationTest.allSource.srcDirs
+        properties['sonar.tests'] += sourceSets.fixedClientEnvironmentTest.allSource.srcDirs
+        properties['sonar.java.test.binaries'] += sourceSets.integrationTest.output.classesDirs
+        properties['sonar.java.test.binaries'] += sourceSets.fixedClientEnvironmentTest.output.classesDirs
+        property "sonar.junit.reportsPath", "build/test-results"
+        property 'sonar.jacoco.reportPaths', [jacocoTestReport.executionData, jacocoIntegrationTestReport.executionData, jacocoFixedClientEnvironmentTestReport.executionData]
+    }
+}
