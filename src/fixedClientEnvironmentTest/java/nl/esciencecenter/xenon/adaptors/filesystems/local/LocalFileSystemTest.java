@@ -62,7 +62,7 @@ public class LocalFileSystemTest extends FileSystemTestParent {
             }
 
             @Override
-            public Path getExpectedEntryPath() {
+            public Path getExpectedWorkingDirectory() {
                 return new Path(System.getProperty("user.dir"));
             }
         };

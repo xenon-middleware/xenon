@@ -24,11 +24,13 @@ public abstract class LocationConfig {
     public abstract Path getExistingPath();
 
     // TODO return SymbolicLink object
-    public Map.Entry<Path,Path> getSymbolicLinksToExistingFile() {
+    public Map.Entry<Path, Path> getSymbolicLinksToExistingFile() {
         return null;
     }
 
     public abstract Path getWritableTestDir();
 
-    public Path getExpectedEntryPath() { return null; }
+    public Path getExpectedWorkingDirectory() {
+        return null;
+    }
 }

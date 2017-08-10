@@ -26,16 +26,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPFileFilters;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -50,7 +49,8 @@ public class FtpFileSystem extends FileSystem {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FtpFileSystem.class);
 
-    private static final int[] PERMISSION_TYPES = { FTPFile.READ_PERMISSION, FTPFile.WRITE_PERMISSION, FTPFile.EXECUTE_PERMISSION };
+    private static final int[] PERMISSION_TYPES = { FTPFile.READ_PERMISSION, FTPFile.WRITE_PERMISSION,
+            FTPFile.EXECUTE_PERMISSION };
 
     private static final int[] USER_TYPES = { FTPFile.USER_ACCESS, FTPFile.GROUP_ACCESS, FTPFile.WORLD_ACCESS };
 
@@ -58,8 +58,8 @@ public class FtpFileSystem extends FileSystem {
     private final Credential credential;
     private final FtpFileAdaptor adaptor;
 
-    protected FtpFileSystem(String uniqueID, String name, String location, Path entryPath,
-            FTPClient ftpClient, Credential credential, FtpFileAdaptor adaptor, XenonProperties properties) {
+    protected FtpFileSystem(String uniqueID, String name, String location, Path entryPath, FTPClient ftpClient,
+            Credential credential, FtpFileAdaptor adaptor, XenonProperties properties) {
         super(uniqueID, name, location, entryPath, properties);
         this.ftpClient = ftpClient;
         this.credential = credential;
@@ -175,16 +175,15 @@ public class FtpFileSystem extends FileSystem {
         int replyCode = client.getReplyCode();
         String replyString = client.getReplyString();
 
-        //System.out.println("REPLY " + replyCode + " " + replyString);
+        // System.out.println("REPLY " + replyCode + " " + replyString);
 
         if (replyCode >= 100 && replyCode < 300) {
             return;
         }
 
-        //String replyString = ftpClient.getReplyString();
+        // String replyString = ftpClient.getReplyString();
         throw new XenonException(ADAPTOR_NAME, message, new IOException(replyString));
     }
-
 
     private void checkClientReply(String message) throws XenonException {
         checkClientReply(ftpClient, message);
@@ -196,6 +195,9 @@ public class FtpFileSystem extends FileSystem {
         LOGGER.debug("move source = {} target = {}", source, target);
 
         assertIsOpen();
+
+        source = toAbsolutePath(source);
+        target = toAbsolutePath(target);
 
         assertPathExists(source);
 
@@ -209,7 +211,8 @@ public class FtpFileSystem extends FileSystem {
         try {
             ftpClient.rename(source.toString(), target.toString());
         } catch (Exception e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to rename " + source.toString() + " to " + target.toString(), e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to rename " + source.toString() + " to " + target.toString(),
+                    e);
         }
 
         checkClientReply("Failed to rename " + source.toString() + " to " + target.toString());
@@ -220,6 +223,8 @@ public class FtpFileSystem extends FileSystem {
         LOGGER.debug("createDirectory dir = {}", path);
 
         assertIsOpen();
+
+        path = toAbsolutePath(path);
         assertPathNotExists(path);
         assertParentDirectoryExists(path);
 
@@ -236,6 +241,7 @@ public class FtpFileSystem extends FileSystem {
     public void createFile(Path path) throws XenonException {
         LOGGER.debug("createFile path = {}", path);
 
+        path = toAbsolutePath(path);
         assertIsOpen();
         assertPathNotExists(path);
         assertParentDirectoryExists(path);
@@ -287,14 +293,14 @@ public class FtpFileSystem extends FileSystem {
     public boolean exists(Path path) throws XenonException {
 
         try {
-            getFTPFileInfo(path);
+            getFTPFileInfo(toAbsolutePath(path));
             return true;
         } catch (NoSuchPathException e) {
             return false;
         }
     }
 
-    private FTPFile findFTPFile(FTPFile [] files, Path path) throws NoSuchPathException {
+    private FTPFile findFTPFile(FTPFile[] files, Path path) throws NoSuchPathException {
 
         if (files == null || files.length == 0) {
             throw new NoSuchPathException(ADAPTOR_NAME, "Path not found: " + path);
@@ -312,13 +318,15 @@ public class FtpFileSystem extends FileSystem {
         throw new NoSuchPathException(ADAPTOR_NAME, "Path not found: " + path);
     }
 
+    // We assume path is non-null, absolute and normalized.
     private FTPFile getFTPFileInfo(Path path) throws XenonException {
 
         assertIsOpen();
-        assertNotNull(path);
 
-        // We cannot always get the FTPFile of the path directly, behavior of FTP servers seems to vary. Instead,
-        // we get the listing of the parent directory and extract the information we need from there.
+        // We cannot always get the FTPFile of the path directly, behavior of
+        // FTP servers seems to vary. Instead,
+        // we get the listing of the parent directory and extract the
+        // information we need from there.
         try {
             Path p = path.getParent();
 
@@ -331,11 +339,12 @@ public class FtpFileSystem extends FileSystem {
             boolean pathExists = ftpClient.changeWorkingDirectory(p.toString());
 
             if (!pathExists) {
-                // parent must be an existing dir, otherwise dir/path certainly does not exist.
+                // parent must be an existing dir, otherwise dir/path certainly
+                // does not exist.
                 throw new NoSuchPathException(ADAPTOR_NAME, "Path not found: " + path);
             }
 
-            FTPFile [] files = ftpClient.listFiles();
+            FTPFile[] files = ftpClient.listFiles();
 
             ftpClient.changeWorkingDirectory(originalWorkingDirectory);
 
@@ -348,6 +357,7 @@ public class FtpFileSystem extends FileSystem {
     @Override
     public PathAttributes getAttributes(Path path) throws XenonException {
         LOGGER.debug("getAttributes path = {}", path);
+        path = toAbsolutePath(path);
         return convertAttributes(path, getFTPFileInfo(path));
     }
 
@@ -365,7 +375,7 @@ public class FtpFileSystem extends FileSystem {
 
             return result;
         } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME,"Failed to retrieve directory listing of " + path, e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to retrieve directory listing of " + path, e);
         }
     }
 
@@ -374,19 +384,21 @@ public class FtpFileSystem extends FileSystem {
         LOGGER.debug("newInputStream path = {}", path);
 
         assertIsOpen();
+        path = toAbsolutePath(path);
         assertPathExists(path);
         assertPathIsFile(path);
 
-        // Since FTP connections can only do a single thing a time, we need a new FTPClient to handle the stream.
+        // Since FTP connections can only do a single thing a time, we need a
+        // new FTPClient to handle the stream.
         FTPClient newClient = adaptor.connect(getLocation(), credential);
         newClient.enterLocalPassiveMode();
 
         try {
             InputStream in = newClient.retrieveFileStream(path.toString());
 
-            //if (in == null) {
-                checkClientReply(newClient, "Failed to read from path: " + path.toString());
-            //}
+            // if (in == null) {
+            checkClientReply(newClient, "Failed to read from path: " + path.toString());
+            // }
 
             return new FtpInputStream(in, newClient);
         } catch (IOException e) {
@@ -399,10 +411,12 @@ public class FtpFileSystem extends FileSystem {
         LOGGER.debug("writeToFile path = {} size = {}", path, size);
 
         assertIsOpen();
+        path = toAbsolutePath(path);
         assertPathNotExists(path);
         assertParentDirectoryExists(path);
 
-        // Since FTP connections can only do a single thing a time, we need a new FTPClient to handle the stream.
+        // Since FTP connections can only do a single thing a time, we need a
+        // new FTPClient to handle the stream.
         FTPClient newClient = adaptor.connect(getLocation(), credential);
         newClient.enterLocalPassiveMode();
 
@@ -426,17 +440,19 @@ public class FtpFileSystem extends FileSystem {
         LOGGER.debug("appendToFile path = {}", path);
 
         assertIsOpen();
+        path = toAbsolutePath(path);
         assertPathExists(path);
         assertPathIsNotDirectory(path);
 
         try {
-            // Since FTP connections can only do a single thing a time, we need a new FTPClient to handle the stream.
+            // Since FTP connections can only do a single thing a time, we need
+            // a new FTPClient to handle the stream.
             FTPClient newClient = adaptor.connect(getLocation(), credential);
             newClient.enterLocalPassiveMode();
             OutputStream out = newClient.appendFileStream(path.toString());
 
             if (out == null) {
-                checkClientReply("Failed to append to path: "+ path.toString());
+                checkClientReply("Failed to append to path: " + path.toString());
             }
 
             return new FtpOutputStream(out, newClient);
@@ -447,6 +463,8 @@ public class FtpFileSystem extends FileSystem {
 
     @Override
     public Path readSymbolicLink(Path path) throws XenonException {
+
+        path = toAbsolutePath(path);
 
         FTPFile file = getFTPFileInfo(path);
 
@@ -459,6 +477,6 @@ public class FtpFileSystem extends FileSystem {
 
     @Override
     public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
-        throw new UnsupportedOperationException(getAdaptorName(),"FTP does not support changing permissions.");
+        throw new UnsupportedOperationException(getAdaptorName(), "FTP does not support changing permissions.");
     }
 }

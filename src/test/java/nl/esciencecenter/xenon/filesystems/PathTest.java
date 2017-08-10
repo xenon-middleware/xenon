@@ -27,8 +27,19 @@ import java.util.List;
 
 import org.junit.Test;
 
-
 public class PathTest {
+
+    @Test
+    public void test_seperatorOnly() {
+        Path path = new Path("/");
+        assertTrue(path.isAbsolute());
+    }
+
+    @Test
+    public void test_empty() {
+        Path path = new Path("");
+        assertFalse(path.isAbsolute());
+    }
 
     @Test
     public void testStartsWithTrue() {
@@ -198,7 +209,6 @@ public class PathTest {
         assertEquals(path.toString(), "mydir@myfile");
     }
 
-
     @Test
     public void testRelativePathPathSeperator1b() {
         Path path = new Path('@', "mydir@myfile").toAbsolutePath();
@@ -303,7 +313,6 @@ public class PathTest {
         assertEquals(path.toString(), "@mydir@myfile");
     }
 
-
     @Test
     public void testGetFileName_WithFile_LastElement() {
         Path path = new Path("mydir/myfile");
@@ -335,6 +344,20 @@ public class PathTest {
     @Test
     public void testGetParent_EmptyPath_Null() {
         Path path = new Path();
+        Path parent = path.getParent();
+        assertNull(parent);
+    }
+
+    @Test
+    public void testGetParent_slash() {
+        Path path = new Path("/");
+        Path parent = path.getParent();
+        assertNull(parent);
+    }
+
+    @Test
+    public void testGetParent_empty() {
+        Path path = new Path("");
         Path parent = path.getParent();
         assertNull(parent);
     }
@@ -381,11 +404,10 @@ public class PathTest {
         }
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testSubpathFails() {
         doSubPath(new String[] { "a", "b", "c" }, 1, 1, new String[] { "a" });
     }
-
 
     @Test
     public void testSubpath_First() {
@@ -837,7 +859,6 @@ public class PathTest {
         assert (!v);
     }
 
-
     @Test
     public void testGetFileName() {
         Path p1 = new Path("/a/b/c");
@@ -864,7 +885,7 @@ public class PathTest {
 
     @Test
     public void test_copyNull() {
-        Path t = new Path((Path [])null);
+        Path t = new Path((Path[]) null);
         assertTrue(t.isEmpty());
     }
 
@@ -877,7 +898,7 @@ public class PathTest {
 
     @Test
     public void test_copyEmptyArray() {
-        Path [] p = new Path[0];
+        Path[] p = new Path[0];
         Path t = new Path(p);
         assertTrue(t.isEmpty());
     }
@@ -885,7 +906,7 @@ public class PathTest {
     @Test
     public void test_copyArrayWithEmpty() {
 
-        Path [] p = new Path[3];
+        Path[] p = new Path[3];
         p[0] = new Path("/aap");
         p[1] = null;
         p[2] = new Path("noot");
@@ -893,8 +914,6 @@ public class PathTest {
         Path t = new Path(p);
         assertEquals(new Path("/aap/noot"), t);
     }
-
-
 
     @Test
     public void test_hashcode() {
@@ -914,61 +933,58 @@ public class PathTest {
         assertEquals(result, p1.hashCode());
     }
 
-
-
     @Test
     public void testStartsRoundTripAbsolute() {
         String s = "/aap/noot/mies";
-        assertEquals(s,new Path(s).toString());
+        assertEquals(s, new Path(s).toString());
     }
 
     @Test
     public void testStartsRoundTripRelative() {
         String s = "aap/noot/mies";
-        assertEquals(s,new Path(s).toString());
+        assertEquals(s, new Path(s).toString());
     }
 
     @Test
     public void testStartsRoundTripRelativeParent() {
         String s = "aap/noot/mies";
         Path p = new Path(s);
-        assertEquals(p.getParent(),new Path("aap/noot"));
+        assertEquals(p.getParent(), new Path("aap/noot"));
     }
 
     @Test
     public void testStartsRoundTripAbsoluteParent() {
         String s = "/aap/noot/mies";
         Path p = new Path(s);
-        assertEquals(p.getParent(),new Path("/aap/noot"));
+        assertEquals(p.getParent(), new Path("/aap/noot"));
     }
 
     @Test
     public void testStartsIsAbsoluteSubString() {
         String s = "/aap/noot/mies";
         Path p = new Path(s);
-        assertEquals(p.subpath(0,2),new Path("/aap/noot"));
+        assertEquals(p.subpath(0, 2), new Path("/aap/noot"));
     }
 
     @Test
     public void testStartsNoMoreAbsoluteSubString() {
         String s = "/aap/noot/mies";
         Path p = new Path(s);
-        assertEquals(p.subpath(1,3),new Path("noot/mies"));
+        assertEquals(p.subpath(1, 3), new Path("noot/mies"));
     }
-
 
     @Test
     public void testStartResolveAbsolute() {
         String s = "/aap/noot";
         Path p = new Path(s);
-        assertEquals(p.resolve(new Path("mies")),new Path("/aap/noot/mies"));
+        assertEquals(p.resolve(new Path("mies")), new Path("/aap/noot/mies"));
     }
 
     @Test
     public void testStartResolveRelative() {
         String s = "aap/noot";
         Path p = new Path(s);
-        assertEquals(p.resolve(new Path("mies")),new Path("aap/noot/mies"));
+        assertEquals(p.resolve(new Path("mies")), new Path("aap/noot/mies"));
     }
 
     @Test
@@ -983,16 +999,13 @@ public class PathTest {
     public void testHome() {
         String s = "~xenon/bla/bla";
         Path q = new Path(s);
-        assertEquals(s,q.toString());
+        assertEquals(s, q.toString());
     }
-
 
     @Test
     public void testPathArrayNullAbsolute() {
-        Path q = new Path(new Path[]{null,null, new Path("/"), null, new Path("") , new Path("aap")});
-        assertEquals(q.toString(),"/aap");
+        Path q = new Path(new Path[] { null, null, new Path("/"), null, new Path(""), new Path("aap") });
+        assertEquals(q.toString(), "/aap");
     }
-
-
 
 }

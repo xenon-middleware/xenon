@@ -519,7 +519,7 @@ public abstract class FileSystemTestParent {
         Path file0 = createNewTestFileName(testDir);
         fileSystem.createFile(file0);
 
-        Path relFile0 = locationConfig.getExpectedEntryPath().relativize(file0);
+        Path relFile0 = locationConfig.getExpectedWorkingDirectory().relativize(file0);
 
         assertTrue(fileSystem.exists(relFile0));
     }
@@ -538,7 +538,7 @@ public abstract class FileSystemTestParent {
 
         createNewTestFileName(testDir);
 
-        Path relDir = locationConfig.getExpectedEntryPath().relativize(testDir);
+        Path relDir = locationConfig.getExpectedWorkingDirectory().relativize(testDir);
 
         assertTrue(fileSystem.exists(relDir));
     }
@@ -1779,11 +1779,11 @@ public abstract class FileSystemTestParent {
     }
 
     @Test
-    public void test_getEntryPath() {
-        Path expected = locationConfig.getExpectedEntryPath();
+    public void test_getWorkingDirectory() {
+        Path expected = locationConfig.getExpectedWorkingDirectory();
         assumeNotNull(expected);
 
-        Path result = fileSystem.getEntryPath();
+        Path result = fileSystem.getWorkingDirectory();
 
         assertEquals(expected, result);
     }

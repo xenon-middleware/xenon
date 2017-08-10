@@ -32,7 +32,8 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 
 /**
- * LocalFiles implements an Xenon <code>Jobs</code> adaptor for local job operations.
+ * LocalFiles implements an Xenon <code>Jobs</code> adaptor for local job
+ * operations.
  *
  * @see nl.esciencecenter.xenon.schedulers.Scheduler
  *
@@ -41,7 +42,7 @@ import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
  */
 public class LocalSchedulerAdaptor extends SchedulerAdaptor {
 
-     /** Name of the local adaptor is defined in the engine. */
+    /** Name of the local adaptor is defined in the engine. */
     public static final String ADAPTOR_NAME = "local";
 
     /** Local properties start with this prefix. */
@@ -63,7 +64,9 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
     /** Local multi queue properties start with this prefix. */
     public static final String MULTIQ = QUEUE + "multi.";
 
-    /** Property for the maximum number of concurrent jobs in the multi queue. */
+    /**
+     * Property for the maximum number of concurrent jobs in the multi queue.
+     */
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
     /** Local queue information start with this prefix. */
@@ -76,15 +79,14 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
     public static final String SUBMITTED = JOBS + "submitted";
 
     /** The locations supported by the adaptor */
-    public static final String [] ADAPTOR_LOCATIONS = new String [] { "(null)", "(empty string)", "local://" };
+    public static final String[] ADAPTOR_LOCATIONS = new String[] { "(null)", "(empty string)", "local://" };
 
     /** The properties supported by this adaptor */
-    public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {
-                    new XenonPropertyDescription(POLLING_DELAY, Type.INTEGER,
-                            "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
-                    new XenonPropertyDescription(MULTIQ_MAX_CONCURRENT, Type.INTEGER,
-                            "4", "The maximum number of concurrent jobs in the multiq.")
-    };
+    public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+            new XenonPropertyDescription(POLLING_DELAY, Type.INTEGER, "1000",
+                    "The polling delay for monitoring running jobs (in milliseconds)."),
+            new XenonPropertyDescription(MULTIQ_MAX_CONCURRENT, Type.INTEGER, "4",
+                    "The maximum number of concurrent jobs in the multiq.") };
 
     public LocalSchedulerAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
@@ -102,23 +104,23 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
         return true;
     }
 
-
     /**
      * Check if a location string is valid for the local scheduler.
      *
      * The only valid options are null, "" or "local://".
      *
      * @param location
-     *          the location to check.
+     *            the location to check.
      * @throws InvalidLocationException
-     *          if the location is invalid.
+     *             if the location is invalid.
      */
     private static void checkLocation(String location) throws InvalidLocationException {
         if (location == null || location.isEmpty() || location.equals("local://")) {
             return;
         }
 
-        throw new InvalidLocationException(ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
+        throw new InvalidLocationException(ADAPTOR_NAME,
+                "Location must only contain a file system root! (not " + location + ")");
     }
 
     @Override
@@ -135,6 +137,7 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
         }
 
         String filesystemlocation = "/";
+
         if (LocalFileSystemUtils.isWindows()) {
             filesystemlocation = "C:";
         }
@@ -146,6 +149,6 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
         int pollingDelay = xp.getIntegerProperty(POLLING_DELAY);
 
         return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, "local://", new LocalInteractiveProcessFactory(),
-                filesystem, filesystem.getEntryPath(), multiQThreads, pollingDelay, xp);
+                filesystem, filesystem.getWorkingDirectory(), multiQThreads, pollingDelay, xp);
     }
 }

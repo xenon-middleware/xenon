@@ -61,9 +61,9 @@ public class JCloudsFileSytem extends FileSystem {
 
     boolean open;
 
-    public JCloudsFileSytem(String uniqueID,String adaptorName, String endPoint, BlobStoreContext context,
+    public JCloudsFileSytem(String uniqueID, String adaptorName, String endPoint, BlobStoreContext context,
             String bucket, XenonProperties properties) {
-        super(uniqueID,adaptorName,endPoint,new Path(""),properties);
+        super(uniqueID, adaptorName, endPoint, new Path(""), properties);
         this.context = context;
         this.bucket = bucket;
         this.adaptorName = adaptorName;
@@ -85,65 +85,56 @@ public class JCloudsFileSytem extends FileSystem {
 
     @Override
     public void rename(Path source, Path target) throws XenonException {
-        throw new UnsupportedOperationException(adaptorName,"This adaptor does not support renaming.");
+        throw new UnsupportedOperationException(adaptorName, "This adaptor does not support renaming.");
     }
 
-    void checkClosed() throws XenonException{
+    void checkClosed() throws XenonException {
         if (!isOpen()) {
             throw new NotConnectedException(getAdaptorName(), "Already closed file system!");
         }
     }
 
     /*
-    @Override
-    protected void copyFile(Path source, FileSystem destinationFS, Path destination, CopyMode mode) throws XenonException{
-
-        if (destinationFS instanceof  JCloudsFileSytem) {
-            JCloudsFileSytem dest = (JCloudsFileSytem)destinationFS;
-            if ( dest.endPoint.equals(endPoint) && dest.adaptorName.equals(adaptorName)) {
-                if (exists(destination)) {
-                    switch (mode) {
-                        case CREATE:
-                            throw new PathAlreadyExistsException(getAdaptorName(), "Destination path already exists: " + destination);
-                        case IGNORE:
-                            return;
-                        case REPLACE:
-                            // continue
-                            break;
-                    }
-                }
-                context.getBlobStore().copyBlob(bucket,source.getRelativePath(),
-                        dest.bucket,destination.getRelativePath(),CopyOptions.NONE);
-                return;
-            }
-        }
-        // revert to default copy
-        super.copyFile(source,destinationFS,destination,mode);
-    }
+     * @Override protected void copyFile(Path source, FileSystem destinationFS,
+     * Path destination, CopyMode mode) throws XenonException{
+     * 
+     * if (destinationFS instanceof JCloudsFileSytem) { JCloudsFileSytem dest =
+     * (JCloudsFileSytem)destinationFS; if ( dest.endPoint.equals(endPoint) &&
+     * dest.adaptorName.equals(adaptorName)) { if (exists(destination)) { switch
+     * (mode) { case CREATE: throw new
+     * PathAlreadyExistsException(getAdaptorName(),
+     * "Destination path already exists: " + destination); case IGNORE: return;
+     * case REPLACE: // continue break; } }
+     * context.getBlobStore().copyBlob(bucket,source.getRelativePath(),
+     * dest.bucket,destination.getRelativePath(),CopyOptions.NONE); return; } }
+     * // revert to default copy
+     * super.copyFile(source,destinationFS,destination,mode); }
      */
 
     @Override
     public void createDirectory(Path dir) throws XenonException {
         checkClosed();
+
+        dir = toAbsolutePath(dir);
         assertPathNotExists(dir);
         assertParentDirectoryExists(dir);
         makeNonEmptyFile(dir);
     }
 
     private void makeNonEmptyFile(Path dir) {
-        String existsFile = dir +  "/" + NOT_EMPTY;
-        final Blob b = context.getBlobStore().blobBuilder(bucket).name(existsFile).payload(
-                new ByteArrayInputStream(new byte[]{})).contentLength(0).build();
+        String existsFile = dir + "/" + NOT_EMPTY;
+        final Blob b = context.getBlobStore().blobBuilder(bucket).name(existsFile)
+                .payload(new ByteArrayInputStream(new byte[] {})).contentLength(0).build();
 
-        context.getBlobStore().putBlob(bucket,b);
+        context.getBlobStore().putBlob(bucket, b);
     }
 
     private void removeNonEmptyFile(Path dir) {
         if (dir == null) {
-            return ;
+            return;
         }
-        String existsFile = dir +  "/" + NOT_EMPTY;
-        if (context.getBlobStore().blobExists(bucket,existsFile )) {
+        String existsFile = dir + "/" + NOT_EMPTY;
+        if (context.getBlobStore().blobExists(bucket, existsFile)) {
             context.getBlobStore().removeBlob(bucket, existsFile);
         }
     }
@@ -151,6 +142,7 @@ public class JCloudsFileSytem extends FileSystem {
     @Override
     public void createFile(Path file) throws XenonException {
         checkClosed();
+        file = toAbsolutePath(file);
         assertPathNotExists(file);
         assertParentDirectoryExists(file);
         removeNonEmptyFile(file.getParent());
@@ -161,7 +153,7 @@ public class JCloudsFileSytem extends FileSystem {
         String path = file.toString();
         InputStream emtpy = new org.apache.sshd.common.util.io.NullInputStream();
         final Blob b = context.getBlobStore().blobBuilder(bucket).name(path).payload(emtpy).contentLength(0).build();
-        context.getBlobStore().putBlob(bucket,b);
+        context.getBlobStore().putBlob(bucket, b);
     }
 
     @Override
@@ -169,11 +161,10 @@ public class JCloudsFileSytem extends FileSystem {
         throw new AttributeNotSupportedException(adaptorName, "Symbolic link  not supported by " + adaptorName);
     }
 
-
     @Override
-    public void deleteFile(Path file) throws XenonException{
+    public void deleteFile(Path file) throws XenonException {
         checkClosed();
-        context.getBlobStore().removeBlob(bucket,file.toString());
+        context.getBlobStore().removeBlob(bucket, file.toString());
         ensureDirectoryExists(file.getParent());
 
     }
@@ -183,7 +174,7 @@ public class JCloudsFileSytem extends FileSystem {
             return;
         }
         if (dir.equals(new Path(""))) {
-            return;             // do not put a not empty file at the root
+            return; // do not put a not empty file at the root
         }
         if (!dirExists(dir)) {
             makeNonEmptyFile(dir);
@@ -194,8 +185,10 @@ public class JCloudsFileSytem extends FileSystem {
     protected void deleteDirectory(Path dir) throws XenonException {
         checkClosed();
         // there are two options: the directory is empty or not.
-        // in the former case the __not_empty__ file is deleted and no exception is thrown (correct behaviour)
-        // in the latter case the __not_empty__ file is deleted and an exception is thrown (correct behaviour)
+        // in the former case the __not_empty__ file is deleted and no exception
+        // is thrown (correct behaviour)
+        // in the latter case the __not_empty__ file is deleted and an exception
+        // is thrown (correct behaviour)
 
         if (!dirExists(dir)) {
             // TODO: shouldn't this be a NoSuchPathException ?
@@ -213,20 +206,20 @@ public class JCloudsFileSytem extends FileSystem {
 
     @Override
     public boolean exists(Path path) throws XenonException {
-        assertNotNull(path);
         checkClosed();
-        return dirExists(path) || fileExists(path) ;
+        path = toAbsolutePath(path);
+        return dirExists(path) || fileExists(path);
     }
 
     private boolean dirExists(Path path) {
         String name = path + "/";
         ListContainerOptions options = new ListContainerOptions().prefix(name);
-        return context.getBlobStore().list(bucket,options).iterator().hasNext();
+        return context.getBlobStore().list(bucket, options).iterator().hasNext();
 
     }
 
     private boolean fileExists(Path path) {
-        return context.getBlobStore().blobExists(bucket,path.toString());
+        return context.getBlobStore().blobExists(bucket, path.toString());
     }
 
     PathAttributes makeDirAttributes(final StorageMetadata m, final BlobAccess access) {
@@ -257,9 +250,9 @@ public class JCloudsFileSytem extends FileSystem {
 
     PathAttributes toPathAttributes(final StorageMetadata m, final BlobAccess access) {
 
-        switch(m.getType()) {
+        switch (m.getType()) {
         case RELATIVE_PATH:
-            return makeDirAttributes(m,access);
+            return makeDirAttributes(m, access);
         case BLOB:
             return makeBlobAttributes(m.getName());
         default:
@@ -268,7 +261,7 @@ public class JCloudsFileSytem extends FileSystem {
     }
 
     private PathAttributes makeBlobAttributes(String name) {
-        BlobMetadata md = context.getBlobStore().blobMetadata(bucket,name);
+        BlobMetadata md = context.getBlobStore().blobMetadata(bucket, name);
         PathAttributesImplementation pa = new PathAttributesImplementation();
         pa.setPath(new Path(name));
         pa.setLastAccessTime(md.getLastModified().getTime());
@@ -302,7 +295,7 @@ public class JCloudsFileSytem extends FileSystem {
 
         void getNext() {
             if (!curIterator.hasNext() && curPageSet.getNextMarker() != null) {
-                curPageSet = context.getBlobStore().list(bucket,options.afterMarker(curPageSet.getNextMarker()));
+                curPageSet = context.getBlobStore().list(bucket, options.afterMarker(curPageSet.getNextMarker()));
                 curIterator = curPageSet.iterator();
             }
             if (curIterator.hasNext()) {
@@ -317,14 +310,14 @@ public class JCloudsFileSytem extends FileSystem {
 
         @Override
         public boolean hasNext() {
-            return  nxt != null;
+            return nxt != null;
         }
 
         @Override
         public PathAttributes next() {
 
             BlobAccess access = BlobAccess.PUBLIC_READ; // context.getBlobStore().getBlobAccess(bucket,nxt.getName());
-            PathAttributes res = toPathAttributes(nxt,access);
+            PathAttributes res = toPathAttributes(nxt, access);
             getNext();
             return res;
         }
@@ -332,26 +325,28 @@ public class JCloudsFileSytem extends FileSystem {
 
     public Iterator<PathAttributes> listNonRecursiveIterator(Path dir) {
         ListContainerOptions options = new ListContainerOptions().prefix(dir + "/");
-        // JClouds on S3 does not list directories if recursive is set :( Fixing it ourselves
-        //if (recursive) { options = options.recursive(); }
+        // JClouds on S3 does not list directories if recursive is set :( Fixing
+        // it ourselves
+        // if (recursive) { options = options.recursive(); }
         final ListContainerOptions optionsFinal = options;
-        return new ListingIterator(optionsFinal,   context.getBlobStore().list(bucket,optionsFinal));
+        return new ListingIterator(optionsFinal, context.getBlobStore().list(bucket, optionsFinal));
     }
 
     public Iterable<PathAttributes> list(Path dir, boolean recursive) throws XenonException {
         checkClosed();
 
         assertPathIsDirectory(dir);
-        ListContainerOptions options = new ListContainerOptions().prefix(dir +"/");
+        ListContainerOptions options = new ListContainerOptions().prefix(dir + "/");
 
-        // JClouds on S3 does not list directories if recursive is set :( Fixing it ourselves
-        //if (recursive) { options = options.recursive(); }
+        // JClouds on S3 does not list directories if recursive is set :( Fixing
+        // it ourselves
+        // if (recursive) { options = options.recursive(); }
         final ListContainerOptions optionsFinal = options;
-        final PageSet<? extends StorageMetadata> ps = context.getBlobStore().list(bucket,optionsFinal);
+        final PageSet<? extends StorageMetadata> ps = context.getBlobStore().list(bucket, optionsFinal);
         final Iterator<? extends StorageMetadata> curIt = ps.iterator();
 
         if (!curIt.hasNext()) {
-            if (context.getBlobStore().blobExists(bucket,dir.toString())) {
+            if (context.getBlobStore().blobExists(bucket, dir.toString())) {
                 throw new InvalidPathException(getAdaptorName(), "Not a directory: " + dir);
             } else {
                 throw new NoSuchPathException(adaptorName, "No such directory: " + dir);
@@ -387,17 +382,19 @@ public class JCloudsFileSytem extends FileSystem {
         return new Iterable<PathAttributes>() {
             @Override
             public Iterator<PathAttributes> iterator() {
-                return new ListingIterator(optionsFinal, context.getBlobStore().list(bucket,optionsFinal));
+                return new ListingIterator(optionsFinal, context.getBlobStore().list(bucket, optionsFinal));
             }
         };
     }
 
     @Override
     public InputStream readFromFile(Path path) throws XenonException {
+
+        path = toAbsolutePath(path);
         assertPathIsFile(path);
         String name = path.toString();
 
-        boolean exists = context.getBlobStore().blobExists(bucket,name);
+        boolean exists = context.getBlobStore().blobExists(bucket, name);
 
         if (exists) {
             Blob b = context.getBlobStore().getBlob(bucket, path.toString());
@@ -407,27 +404,29 @@ public class JCloudsFileSytem extends FileSystem {
                 throw new XenonException(adaptorName, e.getMessage());
             }
         } else {
-            throw new NoSuchPathException(adaptorName,"No such file: " + name);
+            throw new NoSuchPathException(adaptorName, "No such file: " + name);
         }
     }
 
     @Override
     public OutputStream writeToFile(Path path, long size) throws XenonException {
+        path = toAbsolutePath(path);
         assertPathNotExists(path);
         final PipedInputStream read = new PipedInputStream();
-        final Blob b = context.getBlobStore().blobBuilder(bucket).name(path.toString()).payload(read).contentLength(size).build();
+        final Blob b = context.getBlobStore().blobBuilder(bucket).name(path.toString()).payload(read)
+                .contentLength(size).build();
         try {
             final OutputStream out = new PipedOutputStream(read);
             new Thread(new Runnable() {
 
                 @Override
                 public void run() {
-                    context.getBlobStore().putBlob(bucket,b);
+                    context.getBlobStore().putBlob(bucket, b);
                 }
             }).start();
             return out;
-        } catch(IOException e) {
-            throw new XenonException(adaptorName,"IO error when trying to write: " + e.getMessage());
+        } catch (IOException e) {
+            throw new XenonException(adaptorName, "IO error when trying to write: " + e.getMessage());
         }
     }
 
@@ -443,10 +442,10 @@ public class JCloudsFileSytem extends FileSystem {
 
     @Override
     public PathAttributes getAttributes(Path path) throws XenonException {
-        assertNotNull(path);
+        path = toAbsolutePath(path);
         String name = path.toString();
         for (PathAttributes p : listPrefix(name, false)) {
-            if ( p.getPath().equals(path)) {
+            if (p.getPath().equals(path)) {
                 return p;
             }
         }
