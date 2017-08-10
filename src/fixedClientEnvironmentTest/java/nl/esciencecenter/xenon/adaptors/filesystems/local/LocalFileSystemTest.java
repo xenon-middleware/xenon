@@ -212,4 +212,18 @@ public class LocalFileSystemTest extends FileSystemTestParent {
 
         assertTrue("Listing contains hidden file", res.stream().anyMatch(PathAttributes::isHidden));
     }
+
+    @Test
+    public void test_exists_existingDot_returnTrue() throws Exception {
+        testDir = new Path(".");
+
+        assertTrue(fileSystem.exists(testDir));
+    }
+
+    @Test
+    public void test_exists_existingDoubleDot_returnTrue() throws Exception {
+        testDir = new Path("..");
+
+        assertTrue(fileSystem.exists(testDir));
+    }
 }

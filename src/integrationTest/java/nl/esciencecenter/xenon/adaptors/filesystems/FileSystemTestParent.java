@@ -508,19 +508,39 @@ public abstract class FileSystemTestParent {
     public void test_exists_existingFile_returnTrue() throws Exception {
         generateAndCreateTestDir();
 
-        // test with non-existing file
         Path file0 = createNewTestFileName(testDir);
         fileSystem.createFile(file0);
         assertTrue(fileSystem.exists(file0));
     }
 
     @Test
+    public void test_exists_existingRelativeFile_returnTrue() throws Exception {
+        generateAndCreateTestDir();
+        Path file0 = createNewTestFileName(testDir);
+        fileSystem.createFile(file0);
+
+        Path relFile0 = locationConfig.getExpectedEntryPath().relativize(file0);
+
+        assertTrue(fileSystem.exists(relFile0));
+    }
+
+    @Test
     public void test_exists_existingDir_returnTrue() throws Exception {
         generateAndCreateTestDir();
 
-        // test with non-existing file
-        Path file0 = createNewTestFileName(testDir);
+        createNewTestFileName(testDir);
         assertTrue(fileSystem.exists(testDir));
+    }
+
+    @Test
+    public void test_exists_existingRelativeDir_returnTrue() throws Exception {
+        generateAndCreateTestDir();
+
+        createNewTestFileName(testDir);
+
+        Path relDir = locationConfig.getExpectedEntryPath().relativize(testDir);
+
+        assertTrue(fileSystem.exists(relDir));
     }
 
     @Test
@@ -529,7 +549,6 @@ public abstract class FileSystemTestParent {
 
         generateAndCreateTestDir();
 
-        // test with non-existing file
         Path file0 = createNewTestFileName(testDir);
         Path link = createNewTestFileName(testDir);
         fileSystem.createFile(file0);
