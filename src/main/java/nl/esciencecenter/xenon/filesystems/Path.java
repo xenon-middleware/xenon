@@ -305,7 +305,8 @@ public class Path implements Iterable<Path> {
      *             elements in the path.
      */
     public Path getName(int index) {
-        return new Path(separator, elements.get(index));
+        boolean isAbs = index == 0 && isAbsolute;
+        return new Path(separator, isAbs, Collections.singletonList(elements.get(index)));
     }
 
     /**
@@ -618,7 +619,7 @@ public class Path implements Iterable<Path> {
             }
         }
 
-        return new Path(separator, stack);
+        return new Path(separator, isAbsolute, stack);
     }
 
     /* Generated */
