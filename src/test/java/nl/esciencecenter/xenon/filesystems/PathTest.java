@@ -31,31 +31,31 @@ import org.junit.Test;
 public class PathTest {
 
     @Test
-    public void testStartsWithTrue() {
+    public void testStartsWith_Absolute_True() {
         Path path = new Path("/aap/noot");
         assertTrue(path.startsWith("/aap"));
     }
 
     @Test
-    public void testStartsWithFalse() {
+    public void testStartsWith_Absolute_False() {
         Path path = new Path("/aap/noot");
         assertFalse(path.startsWith("/noot"));
     }
 
     @Test
-    public void testEndsWithTrue() {
+    public void testEndsWith_Absolute_True() {
         Path path = new Path("/aap/noot");
         assertTrue(path.endsWith("noot"));
     }
 
     @Test
-    public void testEndsWithFalse() {
+    public void testEndsWith_Absolute_False() {
         Path path = new Path("/aap/noot");
         assertFalse(path.endsWith("aap"));
     }
 
     @Test
-    public void testRelativePath1a() {
+    public void testToString_empty_empty() {
         Path path = new Path();
         assertEquals(path.toString(), "");
     }
@@ -364,6 +364,26 @@ public class PathTest {
         }
     }
 
+    @Test
+    public void testGetName_FirstElementOfRelativePath_Element() {
+        Path path = new Path("mydir/myfile");
+
+        Path name = path.getName(0);
+
+        Path expected = new Path("mydir");
+        assertEquals(name, expected);
+    }
+
+    @Test
+    public void testGetName_FirstElementOfAbsolutePath_SeperatorElement() {
+        Path path = new Path("/mydir/myfile");
+
+        Path name = path.getName(0);
+
+        Path expected = new Path("/mydir");
+        assertEquals(name, expected);
+    }
+
     public void doSubPath(String[] input_path, int beginIndex, int endIndex, String[] epath) {
         Path path = new Path(input_path);
         Path expected_path = new Path(epath);
@@ -438,20 +458,42 @@ public class PathTest {
     }
 
     @Test
-    public void testStartsWith_False() {
+    public void testStartsWith_Relative_False() {
         Path path = new Path("mydir/myfile");
         Path path2 = new Path("myfile");
         assertFalse(path.startsWith(path2));
     }
 
     @Test
-    public void testStartsWith_True() {
+    public void testStartsWith_AbsoluteEndsWithRelative_False() {
+        Path path = new Path("/mydir/myfile");
+        Path other = new Path("mydir/myfile");
+
+        assertFalse(path.startsWith(other));
+    }
+
+    @Test
+    public void testStartsWith_RelativeEndsWithAbsolute_false() {
+        Path path = new Path("mydir/myfile");
+        Path other = new Path("/mydir/myfile");
+
+        assertFalse(path.startsWith(other));
+    }
+
+    @Test
+    public void testStartsWith_RelativeSelf_True() {
         Path path = new Path("mydir/myfile");
         assertTrue(path.startsWith(path));
     }
 
     @Test
-    public void testEndsWith_False() {
+    public void testStartsWith_AbsoluteSelf_True() {
+        Path path = new Path("/mydir/myfile");
+        assertTrue(path.startsWith(path));
+    }
+
+    @Test
+    public void testEndsWith_Relative_False() {
         Path path = new Path("mydir/myfile");
         Path path2 = new Path("mydir");
 
@@ -459,9 +501,37 @@ public class PathTest {
     }
 
     @Test
-    public void testEndsWith_True() {
+    public void testEndsWith_Relative_True() {
         Path path = new Path("mydir/myfile");
         assertTrue(path.startsWith(path));
+    }
+
+    @Test
+    public void testEndsWith_RelativeSelf_True() {
+        Path path = new Path("mydir/myfile");
+        assertTrue(path.endsWith(path));
+    }
+
+    @Test
+    public void testEndsWith_AbsoluteSelf_True() {
+        Path path = new Path("/mydir/myfile");
+        assertTrue(path.endsWith(path));
+    }
+
+    @Test
+    public void testEndsWith_AbsoluteEndsWithRelative_True() {
+        Path path = new Path("/mydir/myfile");
+        Path other = new Path("mydir/myfile");
+
+        assertTrue(path.endsWith(other));
+    }
+
+    @Test
+    public void testEndsWith_RelativeEndsWithAbsolute_False() {
+        Path path = new Path("mydir/myfile");
+        Path other = new Path("/mydir/myfile");
+
+        assertFalse(path.endsWith(other));
     }
 
     @Test
@@ -698,6 +768,16 @@ public class PathTest {
     }
 
     @Test
+    public void testNormalize_AbsolutePath_SamePath() {
+        Path path = new Path("/mydir/myfile");
+
+        Path npath = path.normalize();
+
+        Path expected = new Path("/mydir/myfile");
+        assertEquals(expected, npath);
+    }
+
+    @Test
     public void testNormalize_SingleAndDoubleDotsAsFirstElement_SamePath() {
         Path path = new Path("./../mydir/myfile");
         Path epath = new Path("../mydir/myfile");
@@ -757,7 +837,7 @@ public class PathTest {
     }
 
     @Test
-    public void testStartsWith1() {
+    public void testStartsWith_RelativeStartsWithEmpty_True() {
         Path p1 = new Path("a/b");
         Path p2 = new Path("");
 
@@ -766,7 +846,7 @@ public class PathTest {
     }
 
     @Test
-    public void testStartsWith2() {
+    public void testStartsWith_EmptyStartsWithRelative_False() {
         Path p1 = new Path("a/b");
         Path p2 = new Path("");
 
@@ -775,7 +855,7 @@ public class PathTest {
     }
 
     @Test
-    public void testStartsWith3() {
+    public void testStartsWith_LongerRelative_False() {
         Path p1 = new Path("a/b");
         Path p2 = new Path("a");
 
@@ -784,7 +864,7 @@ public class PathTest {
     }
 
     @Test
-    public void testStartsWith4() {
+    public void testStartsWith_ShorterRelative_True() {
         Path p1 = new Path("a/b");
         Path p2 = new Path("a");
 
@@ -793,7 +873,7 @@ public class PathTest {
     }
 
     @Test
-    public void testEndsWith1() {
+    public void testEndsWith_RelativeEndsWithEmpty_True() {
         Path p1 = new Path("a/b");
         Path p2 = new Path("");
 
@@ -802,7 +882,7 @@ public class PathTest {
     }
 
     @Test
-    public void testEndsWith2() {
+    public void testEndsWith_EmptyEndsWithRelative_False() {
         Path p1 = new Path("a/b");
         Path p2 = new Path("");
 
@@ -811,7 +891,7 @@ public class PathTest {
     }
 
     @Test
-    public void testEndsWith3() {
+    public void testEndsWith_LongerRelative_False() {
         Path p1 = new Path("a/b");
         Path p2 = new Path("b");
 
@@ -820,23 +900,13 @@ public class PathTest {
     }
 
     @Test
-    public void testEndsWith4() {
+    public void testEndsWith_ShorterRelative_True() {
         Path p1 = new Path("a/b");
         Path p2 = new Path("b");
 
         boolean v = p1.endsWith(p2);
         assert (v);
     }
-
-    @Test
-    public void testEndsWith5() {
-        Path p1 = new Path("a/b/c");
-        Path p2 = new Path("c/c");
-
-        boolean v = p1.endsWith(p2);
-        assert (!v);
-    }
-
 
     @Test
     public void testGetFileName() {

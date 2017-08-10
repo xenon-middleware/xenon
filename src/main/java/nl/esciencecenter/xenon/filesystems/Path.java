@@ -287,7 +287,8 @@ public class Path implements Iterable<Path> {
      *             If the index is negative or greater or equal to the number of elements in the path.
      */
     public Path getName(int index) {
-        return new Path(separator, elements.get(index));
+        boolean isAbs = index == 0 && isAbsolute;
+        return new Path(separator, isAbs, Collections.singletonList(elements.get(index)));
     }
 
     /**
@@ -401,7 +402,7 @@ public class Path implements Iterable<Path> {
         ArrayList<String> tmp = new ArrayList<>(elements.size() + other.elements.size());
         tmp.addAll(elements);
         tmp.addAll(other.elements);
-        return new Path(separator,isAbsolute, tmp);
+        return new Path(separator, isAbsolute, tmp);
     }
 
     /**
@@ -583,7 +584,7 @@ public class Path implements Iterable<Path> {
             }
         }
 
-        return new Path(separator, stack);
+        return new Path(separator, isAbsolute, stack);
     }
 
     /* Generated */
