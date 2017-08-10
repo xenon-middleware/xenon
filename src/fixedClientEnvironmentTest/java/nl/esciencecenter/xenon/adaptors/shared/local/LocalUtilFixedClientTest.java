@@ -15,10 +15,12 @@
  */
 package nl.esciencecenter.xenon.adaptors.shared.local;
 
-
+import org.junit.Test;
 
 public class LocalUtilFixedClientTest {
 
+    @Test
+    public void test_move() {
 
-
+    }
 }

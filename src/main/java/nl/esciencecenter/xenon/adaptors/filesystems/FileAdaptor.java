@@ -26,9 +26,9 @@ import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
 
 public abstract class FileAdaptor extends Adaptor implements FileSystemAdaptorDescription {
 
-    public static final String ADAPTORS_PREFIX = "xenon.adaptors.file.";
+    public static final String ADAPTORS_PREFIX = "xenon.adaptors.filesystems.";
 
-    protected FileAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) {
+    protected FileAdaptor(String name, String description, String[] locations, XenonPropertyDescription[] properties) {
         super(name, description, locations, properties);
     }
 
@@ -81,5 +81,6 @@ public abstract class FileAdaptor extends Adaptor implements FileSystemAdaptorDe
         return false;
     }
 
-    public abstract FileSystem createFileSystem(String location, Credential credential, Map<String,String> properties) throws XenonException;
+    public abstract FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties)
+            throws XenonException;
 }

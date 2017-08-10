@@ -19,19 +19,21 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
+import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
-import nl.esciencecenter.xenon.adaptors.shared.local.LocalUtil;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 
 /**
- * LocalFiles implements an Xenon <code>Files</code> adaptor for local file operations.
+ * LocalFiles implements an Xenon <code>Files</code> adaptor for local file
+ * operations.
  *
  * @see Files
  *
@@ -40,7 +42,7 @@ import nl.esciencecenter.xenon.filesystems.Path;
  */
 public class LocalFileAdaptor extends FileAdaptor {
 
-     /** Name of the local adaptor is defined in the engine. */
+    /** Name of the local adaptor is defined in the engine. */
     public static final String ADAPTOR_NAME = "file";
 
     /** Local properties start with this prefix. */
@@ -51,10 +53,11 @@ public class LocalFileAdaptor extends FileAdaptor {
             + " file functionality for local access.";
 
     /** The locations supported by the adaptor */
-    public static final String [] ADAPTOR_LOCATIONS = new String [] { "(null)", "(empty string)", "/", "c:", "<drive letter>:" };
+    public static final String[] ADAPTOR_LOCATIONS = new String[] { "(null)", "(empty string)", "/", "c:",
+            "<drive letter>:" };
 
     /** The properties supported by this adaptor */
-    public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription[0];
+    public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[0];
 
     public LocalFileAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
@@ -64,47 +67,6 @@ public class LocalFileAdaptor extends FileAdaptor {
     public boolean canCreateSymboliclinks() {
         // Local can create symbolic links.
         return true;
-    }
-
-    /**
-     * Check if a location string is valid for the local filesystem.
-     *
-     * The location should -only- contain a file system root, such as "/" or "C:".
-     *
-     * @param location
-     *          the location to check.
-     * @throws InvalidLocationException
-     *          if the location is invalid.
-     */
-    private static void checkFileLocation(String location) throws InvalidLocationException {
-        if (location == null || location.isEmpty() || LocalFileSystemUtils.isLocalRoot(location)) {
-            return;
-        }
-
-        throw new InvalidLocationException(ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
-    }
-
-    @Override
-    public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
-
-        checkFileLocation(location);
-
-        if (location == null) {
-            if (LocalFileSystemUtils.isWindows()) {
-                location = "c:";
-            } else {
-                location = "/";
-            }
-        }
-
-        LocalUtil.checkCredential(ADAPTOR_NAME, credential);
-
-        XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
-
-        Path entry = new Path(File.separatorChar, System.getProperty("user.dir"));
-        // for Windows remove the drive letter from entry?
-
-        return new LocalFileSystem(getNewUniqueID(), location, entry, xp);
     }
 
     @Override
@@ -118,5 +80,55 @@ public class LocalFileAdaptor extends FileAdaptor {
     }
 
     @Override
-    public boolean isConnectionless() { return true; }
+    public boolean isConnectionless() {
+        return true;
+    }
+
+    /**
+     * Check if a location string is valid for the local filesystem.
+     *
+     * The location should -only- contain a file system root, such as "/" or
+     * "C:".
+     *
+     * @param location
+     *            the location to check.
+     * @throws InvalidLocationException
+     *             if the location is invalid.
+     */
+    private static void checkFileLocation(String location) throws InvalidLocationException {
+        if (location == null || location.isEmpty() || LocalFileSystemUtils.isLocalRoot(location)) {
+            return;
+        }
+
+        throw new InvalidLocationException(ADAPTOR_NAME,
+                "Location must only contain a file system root! (not " + location + ")");
+    }
+
+    @Override
+    public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties)
+            throws XenonException {
+
+        checkFileLocation(location);
+
+        if (location == null) {
+            if (LocalFileSystemUtils.isWindows()) {
+                location = "c:";
+            } else {
+                location = "/";
+            }
+        }
+
+        if (credential != null) {
+            if (!(credential instanceof DefaultCredential)) {
+                throw new InvalidCredentialException(ADAPTOR_NAME, "Adaptor does not support this credential!");
+            }
+        }
+
+        XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
+
+        Path entry = new Path(File.separatorChar, System.getProperty("user.dir"));
+        // for Windows remove the drive letter from entry?
+
+        return new LocalFileSystem(getNewUniqueID(), location, entry, xp);
+    }
 }

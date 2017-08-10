@@ -37,6 +37,8 @@ import org.apache.sshd.common.util.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.net.HostAndPort;
+
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
@@ -52,7 +54,7 @@ public class SSHUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SSHUtil.class);
 
-    private static final int DEFAULT_SSH_PORT = 22;
+    public static final int DEFAULT_SSH_PORT = 22;
 
     static class PasswordProvider implements FilePasswordProvider {
 
@@ -98,44 +100,40 @@ public class SSHUtil {
         return client;
     }
 
-    private static String getHost(String adaptorName, String location) throws InvalidLocationException {
-
-        // Parse locations of the format: hostname[:port]
-
-        if (location == null || location.trim().length() == 0) {
-            throw new InvalidLocationException(adaptorName, "Failed to parse location: " + location);
+    /**
+     * Weak validation of a host string containing either a hostame of IP adres.
+     *
+     * @param adaptorName
+     * @param host
+     * @return
+     * @throws InvalidLocationException
+     */
+    public static String validateHost(String adaptorName, String host) throws InvalidLocationException {
+        if (host == null || host.isEmpty()) {
+            throw new InvalidLocationException(adaptorName, "Failed to parse host: " + host);
         }
 
-        String hostname = null;
-
-        if (location.contains(":")) {
-            hostname = location.substring(0, location.indexOf(":"));
-        } else {
-            hostname = location;
-        }
-
-        // TODO: verify hostname here? -- could be name in ssh_config instead ?
-        return hostname;
+        return host;
     }
 
-    private static int getPort(String adaptorName, String location) throws InvalidLocationException {
-
-        // Parse locations of the format: hostname[:port]
-        if (location == null || location.trim().length() == 0) {
+    public static String getHost(String adaptorName, String location) throws InvalidLocationException {
+        // Parse locations of the format: hostname[:port] and return the host
+        try {
+            return validateHost(adaptorName, HostAndPort.fromString(location).getHostText().trim());
+        } catch (Exception e) {
+            // TODO: could be a name in ssh_config instead ??
             throw new InvalidLocationException(adaptorName, "Failed to parse location: " + location);
         }
+    }
 
-        int port = DEFAULT_SSH_PORT;
-
-        if (location.contains(":")) {
-            port = Integer.parseInt(location.substring(location.indexOf(":") + 1, location.length()));
+    public static int getPort(String adaptorName, String location) throws InvalidLocationException {
+        // Parse locations of the format: hostname[:port] and return the host
+        try {
+            return HostAndPort.fromString(location).getPortOrDefault(DEFAULT_SSH_PORT);
+        } catch (Exception e) {
+            // TODO: could be a name in ssh_config instead ??
+            throw new InvalidLocationException(adaptorName, "Failed to parse location: " + location);
         }
-
-        if (port <= 0 || port > 65535) {
-            throw new InvalidLocationException(adaptorName, "Invalid port number: " + port);
-        }
-
-        return port;
     }
 
     public static ClientSession connect(String adaptorName, SshClient client, String location, Credential credential,

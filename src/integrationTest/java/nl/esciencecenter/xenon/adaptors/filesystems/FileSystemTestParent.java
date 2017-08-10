@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -36,6 +35,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.Timeout;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.filesystems.CopyMode;
@@ -52,23 +59,15 @@ import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 import nl.esciencecenter.xenon.utils.OutputReader;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.Timeout;
-
 public abstract class FileSystemTestParent {
 
     public static final String TEST_DIR = "xenon_test";
 
-    private Path testRoot;
+    protected Path testRoot;
 
     protected FileSystem fileSystem;
-    private FileSystemAdaptorDescription description;
-    private LocationConfig locationConfig;
+    protected FileSystemAdaptorDescription description;
+    protected LocationConfig locationConfig;
     protected Path testDir;
 
     private static long counter = 0;
@@ -78,7 +77,8 @@ public abstract class FileSystemTestParent {
     }
 
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(10); // 60 seconds max per method tested
+    public Timeout globalTimeout = Timeout.seconds(10); // 60 seconds max per
+                                                        // method tested
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -91,7 +91,7 @@ public abstract class FileSystemTestParent {
 
         Path root = locationConfig.getWritableTestDir();
 
-        //System.out.println("ROOT=" + root);
+        // System.out.println("ROOT=" + root);
 
         assertNotNull(root);
 
@@ -99,7 +99,7 @@ public abstract class FileSystemTestParent {
 
         assertNotNull(testRoot);
 
-        //System.out.println("TEST_ROOT=" + testRoot);
+        // System.out.println("TEST_ROOT=" + testRoot);
 
         if (fileSystem.exists(testRoot)) {
             fileSystem.delete(testRoot, true);
@@ -153,17 +153,18 @@ public abstract class FileSystemTestParent {
         assertEquals(target, expectedTarget);
     }
 
-
     public Path resolve(String... path) throws XenonException {
         return testRoot.resolve(new Path(path));
     }
 
-    private void copySync(Path source, Path target, CopyMode mode, boolean recursive) throws Throwable{
-        String s = fileSystem.copy(source,fileSystem,target,mode,recursive);
+    private void copySync(Path source, Path target, CopyMode mode, boolean recursive) throws Throwable {
+        String s = fileSystem.copy(source, fileSystem, target, mode, recursive);
         CopyStatus status = fileSystem.waitUntilDone(s, 1000);
 
-        // For some adaptors (like webdav) it may take a few moments for the copy to fully arrive at the server.
-        // To prevent the next operation from overtaking this copy, we sleep for a second to let the target settle.
+        // For some adaptors (like webdav) it may take a few moments for the
+        // copy to fully arrive at the server.
+        // To prevent the next operation from overtaking this copy, we sleep for
+        // a second to let the target settle.
         Thread.sleep(1000);
 
         if (status.hasException()) {
@@ -188,23 +189,25 @@ public abstract class FileSystemTestParent {
     }
 
     // Depends on: Path.resolve, RelativePath, exists
-    //    private Path createNewTestDirName(Path root) throws XenonException {
-    //        Path dir = resolve("dir" + getNextCounter());
+    // private Path createNewTestDirName(Path root) throws XenonException {
+    // Path dir = resolve("dir" + getNextCounter());
     //
-    //        assertFalse("Generated test dir already exists! " + dir, fileSystem.exists(dir));
+    // assertFalse("Generated test dir already exists! " + dir,
+    // fileSystem.exists(dir));
     //
-    //        return dir;
-    //    }
+    // return dir;
+    // }
 
     // Depends on: [createNewTestDirName], createDirectory, exists
-    //    private Path createTestDir(Path root) throws Exception {
-    //        Path dir = createNewTestDirName(root);
-    //        fileSystem.createDirectory(dir);
+    // private Path createTestDir(Path root) throws Exception {
+    // Path dir = createNewTestDirName(root);
+    // fileSystem.createDirectory(dir);
     //
-    //        assertTrue("Failed to generate test dir! " + dir, fileSystem.exists(dir));
+    // assertTrue("Failed to generate test dir! " + dir,
+    // fileSystem.exists(dir));
     //
-    //        return dir;
-    //    }
+    // return dir;
+    // }
 
     // Depends on: [createTestDir]
     protected void prepareTestDir(String testName) throws XenonException {
@@ -216,7 +219,7 @@ public abstract class FileSystemTestParent {
 
     // Depends on: Path.resolve, exists
     private Path createNewTestFileName(Path root) throws Exception {
-        Path file = root.resolve( "file" + getNextCounter());
+        Path file = root.resolve("file" + getNextCounter());
 
         assertFalse("Generated NEW test file already exists! " + file, fileSystem.exists(file));
 
@@ -246,8 +249,8 @@ public abstract class FileSystemTestParent {
                 System.out.println("Wrong size " + att.getSize() + " != " + data.length);
 
                 if (System.currentTimeMillis() > deadline) {
-                    fail("Failed to ensure file " + testFile + " contains " + data.length + " bytes after "
-                            + maxTimeout + " ms. ");
+                    fail("Failed to ensure file " + testFile + " contains " + data.length + " bytes after " + maxTimeout
+                            + " ms. ");
                 }
 
                 Thread.sleep(500);
@@ -266,8 +269,10 @@ public abstract class FileSystemTestParent {
 
         out.close();
 
-        // Note: it may take some time for the data to become available on the server side. This may lead to problems
-        // if any subsequent commands (like exists or readFromFile) overtaking this write on the network. Therefore we
+        // Note: it may take some time for the data to become available on the
+        // server side. This may lead to problems
+        // if any subsequent commands (like exists or readFromFile) overtaking
+        // this write on the network. Therefore we
         // wait for the remote file to be updated.
         ensureUpToDate(testFile, data, 5000);
     }
@@ -275,7 +280,7 @@ public abstract class FileSystemTestParent {
     // Depends on: [createNewTestFileName], createFile, [writeData]
     protected Path createTestFile(Path root, byte[] data) throws Exception {
         Path file = createNewTestFileName(root);
-        return createNamedTestFile(file,data);
+        return createNamedTestFile(file, data);
     }
 
     private Path createNamedTestFile(Path file, byte[] data) throws Exception {
@@ -288,15 +293,16 @@ public abstract class FileSystemTestParent {
         return file;
     }
 
-    //    // Depends on: exists, isDirectory, delete
-    //    private void deleteTestFile(Path file) throws Exception {
-    //        assertTrue("Cannot delete non-existing file: " + file, fileSystem.exists(file));
+    // // Depends on: exists, isDirectory, delete
+    // private void deleteTestFile(Path file) throws Exception {
+    // assertTrue("Cannot delete non-existing file: " + file,
+    // fileSystem.exists(file));
     //
-    //        PathAttributes att = fileSystem.getAttributes(file);
-    //        assertFalse("Cannot delete directory: " + file, att.isDirectory());
+    // PathAttributes att = fileSystem.getAttributes(file);
+    // assertFalse("Cannot delete directory: " + file, att.isDirectory());
     //
-    //        fileSystem.delete(file,false);
-    //    }
+    // fileSystem.delete(file,false);
+    // }
 
     // Depends on: exists, isDirectory, delete
     protected void deleteTestDir(Path dir) throws Exception {
@@ -305,7 +311,7 @@ public abstract class FileSystemTestParent {
         PathAttributes att = fileSystem.getAttributes(dir);
         assertTrue("Cannot delete file: " + dir, att.isDirectory());
 
-        fileSystem.delete(dir,true);
+        fileSystem.delete(dir, true);
     }
 
     private void generateTestDir() throws XenonException {
@@ -327,7 +333,6 @@ public abstract class FileSystemTestParent {
         return testDir.resolve(new Path(generateTestDirName()));
     }
 
-
     // Tests to create directories
 
     @Test
@@ -345,7 +350,7 @@ public abstract class FileSystemTestParent {
         assertFalse(fileSystem.exists(new Path("/foobar")));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_createDirectory_null_throw() throws Exception {
         fileSystem.createDirectory(null);
     }
@@ -356,13 +361,13 @@ public abstract class FileSystemTestParent {
         assertTrue(fileSystem.exists(testDir));
     }
 
-    @Test(expected=PathAlreadyExistsException.class)
+    @Test(expected = PathAlreadyExistsException.class)
     public void createDirectory_existing_throw() throws Exception {
         generateAndCreateTestDir();
         fileSystem.createDirectory(testDir);
     }
 
-    @Test(expected=PathAlreadyExistsException.class)
+    @Test(expected = PathAlreadyExistsException.class)
     public void test_createDirectory_existingFile_throw() throws Exception {
         generateAndCreateTestDir();
 
@@ -375,21 +380,21 @@ public abstract class FileSystemTestParent {
         fileSystem.createDirectory(tmp);
     }
 
-    @Test(expected=NoSuchPathException.class)
+    @Test(expected = NoSuchPathException.class)
     public void test_createDirectory_nonExistingParent_throw() throws Exception {
         generateAndCreateTestDir();
         fileSystem.createDirectory(testDir.resolve(new Path("aap", "noot")));
     }
 
-    //    @Test(expected=XenonException.class)
-    //    public void createDirectory_closedFileSystemIfSupported_throw() throws Exception {
-    //        assumeFalse(description.isConnectionless());
-    //        fileSystem.close();
-    //        generateAndCreateTestDir();
-    //    }
+    // @Test(expected=XenonException.class)
+    // public void createDirectory_closedFileSystemIfSupported_throw() throws
+    // Exception {
+    // assumeFalse(description.isConnectionless());
+    // fileSystem.close();
+    // generateAndCreateTestDir();
+    // }
 
-
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_createFile_null_throwsException() throws Exception {
         fileSystem.createFile(null);
     }
@@ -401,7 +406,7 @@ public abstract class FileSystemTestParent {
         fileSystem.createFile(file);
     }
 
-    @Test(expected=PathAlreadyExistsException.class)
+    @Test(expected = PathAlreadyExistsException.class)
     public void test_createFile_existingFile_throwsException() throws Exception {
         generateAndCreateTestDir();
         Path file = testDir.resolve(generateTestFileName());
@@ -409,15 +414,13 @@ public abstract class FileSystemTestParent {
         fileSystem.createFile(file);
     }
 
-    @Test(expected=PathAlreadyExistsException.class)
+    @Test(expected = PathAlreadyExistsException.class)
     public void test_createFile_existingDir_throwsException() throws Exception {
         generateAndCreateTestDir();
         fileSystem.createFile(testDir);
     }
 
-
-
-    @Test(expected=NoSuchPathException.class)
+    @Test(expected = NoSuchPathException.class)
     public void test_createFile_nonExistingParent_throwsException() throws Exception {
         generateAndCreateTestDir();
         Path dir = testDir.resolve(generateTestDirName());
@@ -436,7 +439,7 @@ public abstract class FileSystemTestParent {
     @Test
     public void test_createFile_withData_sizeUnknown() throws Exception {
         assumeTrue(!description.needsSizeBeforehand());
-        byte [] data = "Hello World\n".getBytes();
+        byte[] data = "Hello World\n".getBytes();
 
         generateAndCreateTestDir();
         Path file = testDir.resolve(generateTestFileName());
@@ -451,7 +454,7 @@ public abstract class FileSystemTestParent {
     @Test
     public void test_createFile_withData_sizeKnown() throws Exception {
 
-        byte [] data = "Hello World\n".getBytes();
+        byte[] data = "Hello World\n".getBytes();
 
         generateAndCreateTestDir();
         Path file = testDir.resolve(generateTestFileName());
@@ -463,15 +466,14 @@ public abstract class FileSystemTestParent {
         ensureUpToDate(file, data, 5000);
     }
 
-    /* TODO: Fixme!
-    @Test(expected=XenonException.class)
-    public void test_createFile_closedFileSystem_throwsException() throws Exception {
-        assumeTrue(!description.isConnectionless());
-        generateAndCreateTestDir();
-        Path file0 = createNewTestFileName(testDir);
-        fileSystem.close();
-        fileSystem.createFile(file0);
-    }
+    /*
+     * TODO: Fixme!
+     *
+     * @Test(expected=XenonException.class) public void
+     * test_createFile_closedFileSystem_throwsException() throws Exception {
+     * assumeTrue(!description.isConnectionless()); generateAndCreateTestDir();
+     * Path file0 = createNewTestFileName(testDir); fileSystem.close();
+     * fileSystem.createFile(file0); }
      */
 
     @Test
@@ -488,9 +490,7 @@ public abstract class FileSystemTestParent {
         assertEquals("Hello World\n", reader.getResultAsString());
     }
 
-
-
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_exists_null_throwsException() throws Exception {
         fileSystem.exists(null);
     }
@@ -533,7 +533,7 @@ public abstract class FileSystemTestParent {
         Path file0 = createNewTestFileName(testDir);
         Path link = createNewTestFileName(testDir);
         fileSystem.createFile(file0);
-        fileSystem.createSymbolicLink(link,file0);
+        fileSystem.createSymbolicLink(link, file0);
         assertTrue(fileSystem.exists(link));
     }
 
@@ -543,18 +543,17 @@ public abstract class FileSystemTestParent {
 
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_delete_nonRec_null_throwsException() throws Exception {
-        fileSystem.delete(null,false);
+        fileSystem.delete(null, false);
     }
 
-
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_delete_rec_null_throwsException() throws Exception {
-        fileSystem.delete(null,true);
+        fileSystem.delete(null, true);
     }
 
-    @Test(expected=NoSuchPathException.class)
+    @Test(expected = NoSuchPathException.class)
     public void test_delete_nonExistentFile_throwsException() throws Exception {
         generateAndCreateTestDir();
         Path nonExistent = createNewTestFileName(testDir);
@@ -568,12 +567,11 @@ public abstract class FileSystemTestParent {
         Path file = createNewTestFileName(testDir);
         Path link = createNewTestFileName(testDir);
         fileSystem.createFile(file);
-        fileSystem.createSymbolicLink(link,file);
-        fileSystem.delete(link,false);
+        fileSystem.createSymbolicLink(link, file);
+        fileSystem.delete(link, false);
         assertTrue("Target not deleted", fileSystem.exists(file));
         assertFalse("Link deleted", fileSystem.exists(link));
     }
-
 
     @Test
     public void test_delete_dangling_symlink() throws Exception {
@@ -582,31 +580,32 @@ public abstract class FileSystemTestParent {
         Path file = createNewTestFileName(testDir);
         Path link = createNewTestFileName(testDir);
         fileSystem.createFile(file);
-        fileSystem.createSymbolicLink(link,file);
-        fileSystem.delete(file,false);
+        fileSystem.createSymbolicLink(link, file);
+        fileSystem.delete(file, false);
 
-        fileSystem.delete(link,false);
+        fileSystem.delete(link, false);
 
         assertFalse("Target deleted", fileSystem.exists(file));
         assertFalse("Link deleted", fileSystem.exists(link));
     }
+
     @Test
     public void test_delete_existingFile() throws Exception {
         generateAndCreateTestDir();
         Path file = createNewTestFileName(testDir);
         fileSystem.createFile(file);
-        fileSystem.delete(file,false);
+        fileSystem.delete(file, false);
         assertFalse(fileSystem.exists(file));
     }
 
     @Test
     public void test_delete_existingEmptyDir() throws Exception {
         generateAndCreateTestDir();
-        fileSystem.delete(testDir,false);
+        fileSystem.delete(testDir, false);
         assertFalse(fileSystem.exists(testDir));
     }
 
-    @Test(expected=DirectoryNotEmptyException.class)
+    @Test(expected = DirectoryNotEmptyException.class)
     public void test_delete_existingNonEmptyDir_throwsException() throws Exception {
         generateAndCreateTestDir();
         Path file = createNewTestFileName(testDir);
@@ -626,48 +625,46 @@ public abstract class FileSystemTestParent {
         fileSystem.delete(testDir, true);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_list_nullPath_throwsException() throws Exception {
         fileSystem.list(null, true);
     }
 
-
-    @Test(expected=NoSuchPathException.class)
+    @Test(expected = NoSuchPathException.class)
     public void test_list_nonExistentDir_throwsException() throws Exception {
         generateAndCreateTestDir();
         Path nonExistent = createNewTestFileName(testDir);
-        fileSystem.list(nonExistent,false);
+        fileSystem.list(nonExistent, false);
     }
 
-
-    @Test(expected=InvalidPathException.class)
+    @Test(expected = InvalidPathException.class)
     public void test_list_file_throwsException() throws Exception {
         generateAndCreateTestDir();
-        Path file = createTestFile(testDir,null);
-        fileSystem.list(file,false);
+        Path file = createTestFile(testDir, null);
+        fileSystem.list(file, false);
     }
 
-    @Test(expected=InvalidPathException.class)
+    @Test(expected = InvalidPathException.class)
     public void test_list_symlinkToFile_throwsException() throws Exception {
         assumeTrue(description.canCreateSymboliclinks());
         generateAndCreateTestDir();
-        Path file = createTestFile(testDir,null);
+        Path file = createTestFile(testDir, null);
         Path link = createNewTestFileName(testDir);
-        fileSystem.createSymbolicLink(link,file);
-        fileSystem.list(link,false);
+        fileSystem.createSymbolicLink(link, file);
+        fileSystem.list(link, false);
     }
 
-    @Test(expected=InvalidPathException.class)
+    @Test(expected = InvalidPathException.class)
     public void test_list_symlinkToDir_throwsException() throws Exception {
         assumeTrue(description.canCreateSymboliclinks());
         generateAndCreateTestDir();
         Path link = createNewTestFileName(testDir);
-        fileSystem.createSymbolicLink(link,testDir);
-        fileSystem.list(link,false);
+        fileSystem.createSymbolicLink(link, testDir);
+        fileSystem.list(link, false);
     }
 
     @Test
-    public void test_list_canIterateTwice() throws Exception{
+    public void test_list_canIterateTwice() throws Exception {
         generateAndCreateTestDir();
         byte[] data = "Hello World!".getBytes();
         byte[] data2 = "Party people!".getBytes();
@@ -679,14 +676,14 @@ public abstract class FileSystemTestParent {
 
         Path testSubDir = createTestSubDir(source);
         Path testSubDir2 = createTestSubDir(source);
-        createTestFile(testSubDir2,data2);
-        createTestFile(testSubDir,data3);
+        createTestFile(testSubDir2, data2);
+        createTestFile(testSubDir, data3);
 
         Path testSubSub = createTestSubDir(testSubDir);
-        createTestFile(testSubSub,data4);
+        createTestFile(testSubSub, data4);
         createTestSubDir(testDir);
 
-        Iterable<PathAttributes> pa = fileSystem.list(testDir,true);
+        Iterable<PathAttributes> pa = fileSystem.list(testDir, true);
         Iterator<PathAttributes> it1 = pa.iterator();
         Iterator<PathAttributes> it2 = pa.iterator();
         Set<PathAttributes> set1 = new HashSet<>();
@@ -697,14 +694,14 @@ public abstract class FileSystemTestParent {
         while (it2.hasNext()) {
             set2.add(it2.next());
         }
-        assertEquals(set1,set2);
+        assertEquals(set1, set2);
     }
 
-    protected Set<PathAttributes> listSet(Path dir, boolean recursive) throws XenonException{
+    protected Set<PathAttributes> listSet(Path dir, boolean recursive) throws XenonException {
         Set<PathAttributes> res = new HashSet<>();
-        for (PathAttributes p : fileSystem.list(dir,recursive)) {
+        for (PathAttributes p : fileSystem.list(dir, recursive)) {
             if (res.contains(p)) {
-                throw new XenonException(fileSystem.getAdaptorName(),"Duplicate element in listing!");
+                throw new XenonException(fileSystem.getAdaptorName(), "Duplicate element in listing!");
             } else {
                 System.out.println("ADDING TO LIST: " + p);
                 res.add(p);
@@ -743,13 +740,12 @@ public abstract class FileSystemTestParent {
         return superfluous;
     }
 
-
     @Test
     public void test_list_existingEmptyDir() throws Exception {
         generateAndCreateTestDir();
         Set<PathAttributes> emptySet = new HashSet<>();
         Set<PathAttributes> res = listSet(testDir, false);
-        assertListSetEqual(res,emptySet);
+        assertListSetEqual(res, emptySet);
     }
 
     @Test
@@ -760,7 +756,7 @@ public abstract class FileSystemTestParent {
         fileSystem.createFile(file);
         expected.add(fileSystem.getAttributes(file));
         Set<PathAttributes> res = listSet(testDir, false);
-        assertListSetEqual(res,expected);
+        assertListSetEqual(res, expected);
     }
 
     @Test
@@ -777,9 +773,8 @@ public abstract class FileSystemTestParent {
         expected.add(fileSystem.getAttributes(file3));
 
         Set<PathAttributes> res = listSet(testDir, false);
-        assertListSetEqual(res,expected);
+        assertListSetEqual(res, expected);
     }
-
 
     @Test
     public void test_list_withSubDirs_onlyListTopDirContents() throws Exception {
@@ -798,12 +793,9 @@ public abstract class FileSystemTestParent {
         expected.add(fileSystem.getAttributes(subDir));
 
         Set<PathAttributes> res = listSet(testDir, false);
-        assertListSetEqual(res,expected);
+        assertListSetEqual(res, expected);
 
     }
-
-
-
 
     @Test
     public void test_list_recursive_withSubDirs_listAll() throws Exception {
@@ -824,7 +816,7 @@ public abstract class FileSystemTestParent {
         expected.add(fileSystem.getAttributes(irrelevantFileInSubDir));
 
         Set<PathAttributes> res = listSet(testDir, true);
-        assertListSetEqual(res,expected);
+        assertListSetEqual(res, expected);
 
     }
 
@@ -851,31 +843,27 @@ public abstract class FileSystemTestParent {
         Path testSubDir2 = createTestSubDir(source);
         expected.add(fileSystem.getAttributes(testSubDir2));
 
-        Path file1 = createTestFile(testSubDir2,data2);
+        Path file1 = createTestFile(testSubDir2, data2);
         expected.add(fileSystem.getAttributes(file1));
 
-        Path file2 = createTestFile(testSubDir,data3);
+        Path file2 = createTestFile(testSubDir, data3);
         expected.add(fileSystem.getAttributes(file2));
 
         Path testSubSub = createTestSubDir(testSubDir);
         expected.add(fileSystem.getAttributes(testSubSub));
 
-        Path file3 = createTestFile(testSubSub,data4);
+        Path file3 = createTestFile(testSubSub, data4);
         expected.add(fileSystem.getAttributes(file3));
 
-
-        assertListSetEqual(listSet(testDir,true), expected);
+        assertListSetEqual(listSet(testDir, true), expected);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_getAttributes_nullPath_throwsException() throws Exception {
         fileSystem.getAttributes(null);
     }
 
-
-
-
-    @Test(expected=NoSuchPathException.class)
+    @Test(expected = NoSuchPathException.class)
     public void test_getAttributes_nonExistingFile_throwsException() throws Exception {
         generateAndCreateTestDir();
         // test with non-existing file
@@ -901,28 +889,35 @@ public abstract class FileSystemTestParent {
                     "lastModifiedTime=" + result.getLastModifiedTime());
 
         }
-        if (!isWithinMargin(currentTime, result.getCreationTime()) && result.getCreationTime() != result.getLastModifiedTime()) {
-            throwWrong("test_getfileAttributes", "creationTime=" + currentTime, "creationTime=" + result.getCreationTime());
+        if (!isWithinMargin(currentTime, result.getCreationTime())
+                && result.getCreationTime() != result.getLastModifiedTime()) {
+            throwWrong("test_getfileAttributes", "creationTime=" + currentTime,
+                    "creationTime=" + result.getCreationTime());
         }
 
-        if (!isWithinMargin(currentTime, result.getLastAccessTime()) && result.getLastAccessTime() != result.getLastModifiedTime()) {
-            throwWrong("test13_getfileAttributes", "lastAccessTime=" + currentTime, "lastAccessTime=" + result.getLastAccessTime());
+        if (!isWithinMargin(currentTime, result.getLastAccessTime())
+                && result.getLastAccessTime() != result.getLastModifiedTime()) {
+            throwWrong("test13_getfileAttributes", "lastAccessTime=" + currentTime,
+                    "lastAccessTime=" + result.getLastAccessTime());
         }
 
     }
 
     /*
-
-
-
-
-
-    /**
-     * Tests whether two times (in milliseconds) are within a mild margin of one another. The margin is large enough to be able to
-     * cope with servers in other timezones and similar, expected, sources of discrepancy between times.
+     *
+     *
+     *
+     *
+     *
+     * /** Tests whether two times (in milliseconds) are within a mild margin of
+     * one another. The margin is large enough to be able to cope with servers
+     * in other timezones and similar, expected, sources of discrepancy between
+     * times.
      *
      * @param time1
+     *
      * @param time2
+     *
      * @return
      */
     private boolean isWithinMargin(long time1, long time2) {
@@ -939,7 +934,7 @@ public abstract class FileSystemTestParent {
         // test with non-existing file
         Path file0 = createNewTestFileName(testDir);
         fileSystem.createFile(file0);
-        assertPathAttributesConsistent(file0,false,0,currentTime);
+        assertPathAttributesConsistent(file0, false, 0, currentTime);
     }
 
     @Test
@@ -959,26 +954,25 @@ public abstract class FileSystemTestParent {
         assertPathAttributesConsistent(testDir, true, -1, currentTime);
     }
 
-
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_setPosixFilePermissions_nullPath_throwsException() throws Exception {
         assumeTrue(description.supportsSettingPosixPermissions());
         fileSystem.setPosixFilePermissions(null, null);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_setPosixFilePermissions_existingFileNullSet_throwsException() throws Exception {
         assumeTrue(description.supportsSettingPosixPermissions());
         generateAndCreateTestDir();
-        Path existingFile = createTestFile(testDir,new byte[] { 1, 2, 3 });
-        fileSystem.setPosixFilePermissions(existingFile,null);
+        Path existingFile = createTestFile(testDir, new byte[] { 1, 2, 3 });
+        fileSystem.setPosixFilePermissions(existingFile, null);
     }
 
     @Test
     public void test_setPosixFilePermissions_existingFileZeroPermissions() throws Exception {
         assumeTrue(description.supportsSettingPosixPermissions());
         generateAndCreateTestDir();
-        Path existingFile = createTestFile(testDir,new byte[] { 1, 2, 3 });
+        Path existingFile = createTestFile(testDir, new byte[] { 1, 2, 3 });
         Set<PosixFilePermission> emptyPermissions = EnumSet.noneOf(PosixFilePermission.class);
         try {
             assertPermissionsSetIsGet(existingFile, emptyPermissions);
@@ -988,20 +982,20 @@ public abstract class FileSystemTestParent {
         }
     }
 
-    private void assertPermissionsSetIsGet(Path path, Set<PosixFilePermission> permissions) throws XenonException{
+    private void assertPermissionsSetIsGet(Path path, Set<PosixFilePermission> permissions) throws XenonException {
         assumeTrue(description.supportsSettingPosixPermissions());
-        fileSystem.setPosixFilePermissions(path,permissions);
+        fileSystem.setPosixFilePermissions(path, permissions);
         Set<PosixFilePermission> got = fileSystem.getAttributes(path).getPermissions();
-        assertEquals(permissions,got);
+        assertEquals(permissions, got);
     }
 
     @Test
     public void test_setPosixFilePermissions_existingFileFewPermissions() throws Exception {
         assumeTrue(description.supportsSettingPosixPermissions());
         generateAndCreateTestDir();
-        Path existingFile = createTestFile(testDir,new byte[] { 1, 2, 3 });
-        Set<PosixFilePermission> permissions = EnumSet.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ,
-                PosixFilePermission.OWNER_WRITE);
+        Path existingFile = createTestFile(testDir, new byte[] { 1, 2, 3 });
+        Set<PosixFilePermission> permissions = EnumSet.of(PosixFilePermission.OWNER_EXECUTE,
+                PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE);
         try {
             assertPermissionsSetIsGet(existingFile, permissions);
         } finally {
@@ -1015,7 +1009,7 @@ public abstract class FileSystemTestParent {
     public void test_setPosixFilePermissions_existingFileMorePermissions() throws Exception {
         assumeTrue(description.supportsSettingPosixPermissions());
         generateAndCreateTestDir();
-        Path existingFile = createTestFile(testDir,new byte[] { 1, 2, 3 });
+        Path existingFile = createTestFile(testDir, new byte[] { 1, 2, 3 });
         Set<PosixFilePermission> permissions = getVariousPosixPermissions();
         try {
             assertPermissionsSetIsGet(existingFile, permissions);
@@ -1025,13 +1019,13 @@ public abstract class FileSystemTestParent {
         }
     }
 
-    @Test(expected=NoSuchPathException.class)
+    @Test(expected = NoSuchPathException.class)
     public void test_setPosixFilePermissions_nonExistingFile_throwsException() throws Exception {
         assumeTrue(description.supportsSettingPosixPermissions());
         generateAndCreateTestDir();
         Path nonExistingFile = createNewTestFileName(testDir);
         Set<PosixFilePermission> permissions = getVariousPosixPermissions();
-        fileSystem.setPosixFilePermissions(nonExistingFile,permissions);
+        fileSystem.setPosixFilePermissions(nonExistingFile, permissions);
     }
 
     @Test
@@ -1042,19 +1036,24 @@ public abstract class FileSystemTestParent {
         assertPermissionsSetIsGet(testDir, permissions);
     }
 
-
-    private Set<PosixFilePermission> getVariousPosixPermissions() {
-        return EnumSet.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE,
-                PosixFilePermission.OTHERS_READ, PosixFilePermission.GROUP_READ);
+    @Test
+    public void test_readPosixFilePermissions_existingFile() throws Exception {
+        assumeTrue(description.supportsReadingPosixPermissions());
+        PathAttributes p = fileSystem.getAttributes(locationConfig.getExistingPath());
+        assertNotNull(p.getPermissions());
     }
 
+    private Set<PosixFilePermission> getVariousPosixPermissions() {
+        return EnumSet.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE, PosixFilePermission.OTHERS_READ, PosixFilePermission.GROUP_READ);
+    }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_readFromFile_null_throwsException() throws Exception {
         fileSystem.readFromFile(null);
     }
 
-    @Test(expected=NoSuchPathException.class)
+    @Test(expected = NoSuchPathException.class)
     public void test_readFromFile_nonExistingFile_throwsException() throws Exception {
         generateAndCreateTestDir();
         Path nonExistingFile = createNewTestFileName(testDir);
@@ -1066,7 +1065,8 @@ public abstract class FileSystemTestParent {
      *
      * A temporary buffer of size <code>100</code> is used.
      * <p>
-     * NOTE: <code>in</code> and <code>out</code> will NOT be explicitly closed once the end of the stream is reached.
+     * NOTE: <code>in</code> and <code>out</code> will NOT be explicitly closed
+     * once the end of the stream is reached.
      * </p>
      *
      * @param in
@@ -1093,11 +1093,11 @@ public abstract class FileSystemTestParent {
         return bytes;
     }
 
-
     /**
      * Read all bytes from the input stream and return them in a byte array.
      * <p>
-     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.
+     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the
+     * stream is reached.
      * </p>
      *
      * @param in
@@ -1114,12 +1114,9 @@ public abstract class FileSystemTestParent {
         return buffer.toByteArray();
     }
 
-
-
     private void assertReadsExpected(Path file, byte[] expected) throws Exception {
 
         InputStream in = fileSystem.readFromFile(file);
-
 
         byte[] data = readAllBytes(in);
         in.close();
@@ -1140,13 +1137,11 @@ public abstract class FileSystemTestParent {
         }
     }
 
-
-
     @Test
     public void test_readFromFile_existingEmptyFile() throws Exception {
         generateAndCreateTestDir();
         Path file1 = createTestFile(testDir, null);
-        assertReadsExpected(file1,null);
+        assertReadsExpected(file1, null);
     }
 
     @Test
@@ -1168,7 +1163,8 @@ public abstract class FileSystemTestParent {
     @Test
     public void test_readFromFile_DoubleClose() throws Exception {
 
-        // See what happens when we close an in input stream twice and then reopen the stream. This failed
+        // See what happens when we close an in input stream twice and then
+        // reopen the stream. This failed
         // on the SSH adaptor due to a bug in the sftp channel cache.
 
         byte[] data = "Hello World".getBytes();
@@ -1213,10 +1209,9 @@ public abstract class FileSystemTestParent {
 
     }
 
-
     // TODO: not connected exceptions test for every function
     // TODO: not test destination parent exception for every function
-    @Test (expected = NotConnectedException.class)
+    @Test(expected = NotConnectedException.class)
     public void test_readFromFile_closed_throwsException() throws Exception {
         assumeFalse(description.isConnectionless());
         fileSystem.close();
@@ -1225,74 +1220,70 @@ public abstract class FileSystemTestParent {
 
     @Test(expected = IllegalArgumentException.class)
     public void test_writeToFile_nullPath_throwsException() throws Exception {
-        fileSystem.writeToFile(null,0);
+        fileSystem.writeToFile(null, 0);
     }
 
     @Test(expected = PathAlreadyExistsException.class)
     public void test_writeToFile_existingFile_throwsException() throws Exception {
         generateAndCreateTestDir();
-        Path file = createTestFile(testDir,null);
+        Path file = createTestFile(testDir, null);
 
-        fileSystem.writeToFile(file,0);
+        fileSystem.writeToFile(file, 0);
     }
 
     @Test(expected = PathAlreadyExistsException.class)
     public void test_writeToFile_existingDir_throwsException() throws Exception {
         generateAndCreateTestDir();
-        fileSystem.writeToFile(testDir,0);
+        fileSystem.writeToFile(testDir, 0);
     }
 
     @Test(expected = PathAlreadyExistsException.class)
     public void test_writeToFile_symlinkToFile_throwsException() throws Exception {
         assumeTrue(description.canCreateSymboliclinks());
         generateAndCreateTestDir();
-        Path file = createTestFile(testDir,null);
+        Path file = createTestFile(testDir, null);
         Path link = createNewTestFileName(testDir);
-        fileSystem.createSymbolicLink(link,file);
-        fileSystem.writeToFile(link,0);
+        fileSystem.createSymbolicLink(link, file);
+        fileSystem.writeToFile(link, 0);
     }
 
-
-
-    // No need for more tests for write: we already check that data written = data read when testing read (data is written before
+    // No need for more tests for write: we already check that data written =
+    // data read when testing read (data is written before
     // using write)
 
     @Test(expected = IllegalArgumentException.class)
-    public void test_appendToFile_nullPath_throwsException() throws Exception{
+    public void test_appendToFile_nullPath_throwsException() throws Exception {
         assumeTrue(description.canAppend());
         fileSystem.appendToFile(null);
     }
 
-
-
-
     @Test
-    public void test_appendToFile_append_nothing() throws Exception{
+    public void test_appendToFile_append_nothing() throws Exception {
         assumeTrue(description.canAppend());
         generateAndCreateTestDir();
         byte[] data = "Hello world!".getBytes();
-        Path file = createTestFile(testDir,data);
+        Path file = createTestFile(testDir, data);
         OutputStream out = fileSystem.appendToFile(file);
         out.close();
-        assertContents(file,data);
+        assertContents(file, data);
     }
 
     @Test
-    public void test_appendToFile_append() throws Exception{
+    public void test_appendToFile_append() throws Exception {
         assumeTrue(description.canAppend());
         generateAndCreateTestDir();
         String a = "Hello world! ";
         String b = "Pary people!";
 
-        Path file = createTestFile(testDir,a.getBytes());
+        Path file = createTestFile(testDir, a.getBytes());
         OutputStream out = fileSystem.appendToFile(file);
         out.write(b.getBytes());
         out.close();
-        assertContents(file,(a+b).getBytes());
+        assertContents(file, (a + b).getBytes());
     }
 
     @Test(expected = NoSuchPathException.class)
-    public void test_appendToFile_fileDoesNotExist_throwsException() throws Exception{
+    public void test_appendToFile_fileDoesNotExist_throwsException() throws Exception {
         assumeTrue(description.canAppend());
         generateAndCreateTestDir();
 
@@ -1301,15 +1292,14 @@ public abstract class FileSystemTestParent {
     }
 
     @Test(expected = InvalidPathException.class)
-    public void test_appendToFile_isDirectory_throwsException() throws Exception{
+    public void test_appendToFile_isDirectory_throwsException() throws Exception {
         assumeTrue(description.canAppend());
         generateAndCreateTestDir();
         Path p = createTestSubDir(testDir);
         fileSystem.appendToFile(p);
     }
 
-
-    private void assertContents(Path file, byte[] data)throws Exception {
+    private void assertContents(Path file, byte[] data) throws Exception {
         InputStream a = fileSystem.readFromFile(file);
         byte[] abytes = readAllBytes(a);
         if (!Arrays.equals(abytes, data)) {
@@ -1331,7 +1321,7 @@ public abstract class FileSystemTestParent {
 
     @Test(expected = IllegalArgumentException.class)
     public void test_copy_null_throwsException() throws Exception {
-        fileSystem.copy(null,null,null,null,false);
+        fileSystem.copy(null, null, null, null, false);
 
     }
 
@@ -1339,34 +1329,31 @@ public abstract class FileSystemTestParent {
     public void test_copy_nullTarget_throwsException() throws Exception {
         generateAndCreateTestDir();
         Path file = createNewTestFileName(testDir);
-        fileSystem.copy(file,null,null,null,false);
+        fileSystem.copy(file, null, null, null, false);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void test_copy_nullTargetPath_throwsException() throws Exception {
         generateAndCreateTestDir();
         Path file = createNewTestFileName(testDir);
-        fileSystem.copy(file,fileSystem,null,null,false);
+        fileSystem.copy(file, fileSystem, null, null, false);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void test_copy_nullMode_throwsException() throws Exception {
         generateAndCreateTestDir();
-        Path file = createTestFile(testDir,"bla".getBytes());
+        Path file = createTestFile(testDir, "bla".getBytes());
         Path file2 = createNewTestFileName(testDir);
-        fileSystem.copy(new Path(file),fileSystem,new Path(file2),null,false);
+        fileSystem.copy(new Path(file), fileSystem, new Path(file2), null, false);
     }
-
 
     @Test(expected = NoSuchPathException.class)
     public void test_copy_nonExistingSource_throwsException() throws Throwable {
         generateAndCreateTestDir();
         Path nonExistingSource = createNewTestFileName(testDir);
         Path target = createNewTestFileName(testDir);
-        copySync(nonExistingSource,target,CopyMode.CREATE,true);
+        copySync(nonExistingSource, target, CopyMode.CREATE, true);
     }
-
-
 
     @Test(expected = InvalidPathException.class)
     public void test_copy_directoryAsSource_throwsException() throws Throwable {
@@ -1374,7 +1361,7 @@ public abstract class FileSystemTestParent {
         Path target = createNewTestFileName(testDir);
         Path dir0 = createTestSubDir(testDir);
 
-        copySync(dir0,target,CopyMode.CREATE,false);
+        copySync(dir0, target, CopyMode.CREATE, false);
     }
 
     @Test
@@ -1383,18 +1370,17 @@ public abstract class FileSystemTestParent {
         generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, data);
         Path file1 = createNewTestFileName(testDir);
-        copySync(file0,file1,CopyMode.CREATE,false);
-        assertSameContents(file0,file1);
+        copySync(file0, file1, CopyMode.CREATE, false);
+        assertSameContents(file0, file1);
     }
 
-
-    @Test (expected = PathAlreadyExistsException.class)
+    @Test(expected = PathAlreadyExistsException.class)
     public void test_copy_existingTarget_throwsException() throws Throwable {
         byte[] data = "Hello World!".getBytes();
         generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, data);
-        Path file1 = createTestFile(testDir,null);
-        copySync(file0,file1,CopyMode.CREATE,false);
+        Path file1 = createTestFile(testDir, null);
+        copySync(file0, file1, CopyMode.CREATE, false);
     }
 
     @Test
@@ -1403,9 +1389,9 @@ public abstract class FileSystemTestParent {
         byte[] data2 = "Something else!".getBytes();
         generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, data);
-        Path file1 = createTestFile(testDir,data2);
-        copySync(file0,file1,CopyMode.REPLACE,false);
-        assertSameContents(file0,file1);
+        Path file1 = createTestFile(testDir, data2);
+        copySync(file0, file1, CopyMode.REPLACE, false);
+        assertSameContents(file0, file1);
     }
 
     @Test
@@ -1414,9 +1400,9 @@ public abstract class FileSystemTestParent {
         byte[] data2 = "Something else!".getBytes();
         generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, data);
-        Path file1 = createTestFile(testDir,data2);
-        copySync(file0,file1,CopyMode.IGNORE,false);
-        assertContents(file1,data2);
+        Path file1 = createTestFile(testDir, data2);
+        copySync(file0, file1, CopyMode.IGNORE, false);
+        assertContents(file1, data2);
     }
 
     @Test
@@ -1425,8 +1411,8 @@ public abstract class FileSystemTestParent {
         generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, data);
         Path file1 = createNewTestFileName(testDir);
-        copySync(file0,file1,CopyMode.CREATE,false);
-        assertSameContents(file0,file1);
+        copySync(file0, file1, CopyMode.CREATE, false);
+        assertSameContents(file0, file1);
     }
 
     @Test
@@ -1442,18 +1428,18 @@ public abstract class FileSystemTestParent {
         Path testSubDir = createTestSubDir(source);
 
         Path testSubDir2 = createTestSubDir(source);
-        createTestFile(testSubDir2,data2);
-        createTestFile(testSubDir,data3);
+        createTestFile(testSubDir2, data2);
+        createTestFile(testSubDir, data3);
 
         Path testSubSub = createTestSubDir(testSubDir);
-        createTestFile(testSubSub,data4);
+        createTestFile(testSubSub, data4);
 
         Path target = createTestSubDir(testDir);
-        copySync(source,target,CopyMode.CREATE,true);
-        assertSameContentsDir(source,target);
+        copySync(source, target, CopyMode.CREATE, true);
+        assertSameContentsDir(source, target);
     }
 
-    @Test (expected = PathAlreadyExistsException.class)
+    @Test(expected = PathAlreadyExistsException.class)
     public void test_copy_rec_create() throws Throwable {
         byte[] data = "Hello World!".getBytes();
         byte[] data2 = "Party people!".getBytes();
@@ -1467,10 +1453,10 @@ public abstract class FileSystemTestParent {
         Path file3 = createTestFile(target, data3);
         Path file4 = createTestFile(target, data4);
 
-        Path srcFile = createNamedTestFile(source.resolve(file.getFileName()),data);
-        Path srcFile2 = createNamedTestFile(source.resolve(file2.getFileName()),data2);
+        Path srcFile = createNamedTestFile(source.resolve(file.getFileName()), data);
+        Path srcFile2 = createNamedTestFile(source.resolve(file2.getFileName()), data2);
 
-        copySync(source,target,CopyMode.CREATE,true);
+        copySync(source, target, CopyMode.CREATE, true);
     }
 
     @Test
@@ -1490,14 +1476,14 @@ public abstract class FileSystemTestParent {
         Path file3 = createTestFile(subtarget, data3);
         Path file4 = createTestFile(subtarget, data4);
 
-        Path srcFile = createNamedTestFile(subsource.resolve(file.getFileName()),data);
-        Path srcFile2 = createNamedTestFile(subsource.resolve(file2.getFileName()),data2);
+        Path srcFile = createNamedTestFile(subsource.resolve(file.getFileName()), data);
+        Path srcFile2 = createNamedTestFile(subsource.resolve(file2.getFileName()), data2);
 
-        copySync(source,target,CopyMode.REPLACE,true);
-        assertContents(file,data);
-        assertContents(file2,data2);
-        assertContents(file3,data3);
-        assertContents(file4,data4);
+        copySync(source, target, CopyMode.REPLACE, true);
+        assertContents(file, data);
+        assertContents(file2, data2);
+        assertContents(file3, data3);
+        assertContents(file4, data4);
     }
 
     @Test
@@ -1517,18 +1503,17 @@ public abstract class FileSystemTestParent {
         Path file3 = createTestFile(subtarget, data3);
         Path file4 = createTestFile(subtarget, data4);
 
-        Path srcFile = createNamedTestFile(subsource.resolve(file.getFileName()),data);
-        Path srcFile2 = createNamedTestFile(subsource.resolve(file2.getFileName()),data2);
+        Path srcFile = createNamedTestFile(subsource.resolve(file.getFileName()), data);
+        Path srcFile2 = createNamedTestFile(subsource.resolve(file2.getFileName()), data2);
 
-        copySync(source,target,CopyMode.IGNORE,true);
-        assertContents(file,data3);
-        assertContents(file2,data3);
-        assertContents(file3,data3);
-        assertContents(file4,data4);
+        copySync(source, target, CopyMode.IGNORE, true);
+        assertContents(file, data3);
+        assertContents(file2, data3);
+        assertContents(file3, data3);
+        assertContents(file4, data4);
     }
 
-
-    @Test (expected = PathAlreadyExistsException.class)
+    @Test(expected = PathAlreadyExistsException.class)
     public void test_copy_target_directory_source_file_create() throws Throwable {
         byte[] data = "Hello World!".getBytes();
         byte[] data2 = "Party people!".getBytes();
@@ -1542,13 +1527,11 @@ public abstract class FileSystemTestParent {
         Path file3 = createTestFile(subtarget, data3);
         Path file4 = createTestFile(subtarget, data4);
 
-        Path source = createTestFile(testDir,data);
+        Path source = createTestFile(testDir, data);
 
-        copySync(source,target,CopyMode.CREATE,true);
-
+        copySync(source, target, CopyMode.CREATE, true);
 
     }
-
 
     @Test
     public void test_copy_target_directory_source_file_replace() throws Throwable {
@@ -1559,7 +1542,7 @@ public abstract class FileSystemTestParent {
         generateAndCreateTestDir();
 
         // Create a source file
-        Path source = createTestFile(testDir,data);
+        Path source = createTestFile(testDir, data);
 
         // Create a target directory with contents
         Path target = createTestSubDir(testDir);
@@ -1570,12 +1553,11 @@ public abstract class FileSystemTestParent {
         Path file4 = createTestFile(subtarget, data4);
 
         // Copy source to target, replacing the directory with a file.
-        copySync(source,target,CopyMode.REPLACE,true);
+        copySync(source, target, CopyMode.REPLACE, true);
 
         // Check if target is now a file with correct content.
-        assertContents(target,data);
+        assertContents(target, data);
     }
-
 
     @Test
     public void test_copy_target_directory_source_file_ignore() throws Throwable {
@@ -1591,18 +1573,17 @@ public abstract class FileSystemTestParent {
         Path file3 = createTestFile(subtarget, data3);
         Path file4 = createTestFile(subtarget, data4);
 
-        Path source = createTestFile(testDir,data);
+        Path source = createTestFile(testDir, data);
 
-        copySync(source,target,CopyMode.IGNORE,true);
+        copySync(source, target, CopyMode.IGNORE, true);
 
-        assertContents(file,data);
-        assertContents(file2,data2);
-        assertContents(file3,data3);
-        assertContents(file4,data4);
+        assertContents(file, data);
+        assertContents(file2, data2);
+        assertContents(file3, data3);
+        assertContents(file4, data4);
     }
 
-
-    private void assertSameContentsDir(Path dir1, Path dir2) throws Exception{
+    private void assertSameContentsDir(Path dir1, Path dir2) throws Exception {
         for (PathAttributes p : fileSystem.list(dir1, true)) {
             Path sub = dir1.relativize(p.getPath());
             Path other = dir2.resolve(sub);
@@ -1610,16 +1591,15 @@ public abstract class FileSystemTestParent {
                 fail("Cannot find equivalent for " + p.getPath().toString() + " is not " + other.toString());
             }
             if (p.isRegular()) {
-                assertSameContents(p.getPath(),other);
+                assertSameContents(p.getPath(), other);
             } else if (p.isDirectory()) {
-                assert(fileSystem.getAttributes(other).isDirectory());
+                assert (fileSystem.getAttributes(other).isDirectory());
             }
         }
 
     }
 
-
-    @Test (expected = NoSuchCopyException.class)
+    @Test(expected = NoSuchCopyException.class)
     public void test_getStatus_noSuchCopy_throwsException() throws Exception {
         fileSystem.getStatus("it would be a huge coincidence if this string would be linked to a copy status");
     }
@@ -1630,10 +1610,10 @@ public abstract class FileSystemTestParent {
         generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, data);
         Path file1 = createNewTestFileName(testDir);
-        String copyId = fileSystem.copy(file0, fileSystem,file1, CopyMode.CREATE, false);
+        String copyId = fileSystem.copy(file0, fileSystem, file1, CopyMode.CREATE, false);
 
-        CopyStatus status = fileSystem.waitUntilDone(copyId,1000);
-        assert( status.isDone());
+        CopyStatus status = fileSystem.waitUntilDone(copyId, 1000);
+        assert (status.isDone());
 
     }
 
@@ -1643,16 +1623,15 @@ public abstract class FileSystemTestParent {
         generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, data);
         Path file1 = createNewTestFileName(testDir);
-        String copyId = fileSystem.copy(file0, fileSystem,file1, CopyMode.CREATE, false);
-        CopyStatus status =  fileSystem.waitUntilDone(copyId,1000);
-        assertEquals(status.bytesCopied(),data.length);
+        String copyId = fileSystem.copy(file0, fileSystem, file1, CopyMode.CREATE, false);
+        CopyStatus status = fileSystem.waitUntilDone(copyId, 1000);
+        assertEquals(status.bytesCopied(), data.length);
     }
-
 
     @Test(expected = IllegalArgumentException.class)
     public void test_rename_nullSource_throwsException() throws Exception {
         assumeTrue(description.supportsRename());
-        fileSystem.rename(null,null);
+        fileSystem.rename(null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -1660,21 +1639,21 @@ public abstract class FileSystemTestParent {
         assumeTrue(description.supportsRename());
         generateAndCreateTestDir();
         Path file0 = createTestFile(testDir, null);
-        fileSystem.rename(file0,null);
+        fileSystem.rename(file0, null);
     }
 
-    @Test (expected = NoSuchPathException.class)
+    @Test(expected = NoSuchPathException.class)
     public void test_rename_nonExistingSource() throws Exception {
         assumeTrue(description.supportsRename());
         generateAndCreateTestDir();
         Path nonExistingFile = createNewTestFileName(testDir);
         Path nonExistingFile2 = createNewTestFileName(testDir);
-        fileSystem.rename(nonExistingFile,nonExistingFile2);
+        fileSystem.rename(nonExistingFile, nonExistingFile2);
     }
 
-    private void assertRenameCorrect(Path a, Path b, byte[] data) throws Exception{
+    private void assertRenameCorrect(Path a, Path b, byte[] data) throws Exception {
         assertFalse(fileSystem.exists(a));
-        assertContents(b,data);
+        assertContents(b, data);
     }
 
     @Test
@@ -1683,28 +1662,28 @@ public abstract class FileSystemTestParent {
         generateAndCreateTestDir();
         Path nonExistingFile = createNewTestFileName(testDir);
         byte[] data = "Hello everybody!".getBytes();
-        Path existingFile = createTestFile(testDir, data );
-        fileSystem.rename(existingFile,nonExistingFile);
-        assertRenameCorrect(existingFile,nonExistingFile,data);
+        Path existingFile = createTestFile(testDir, data);
+        fileSystem.rename(existingFile, nonExistingFile);
+        assertRenameCorrect(existingFile, nonExistingFile, data);
     }
 
-    @Test (expected =  PathAlreadyExistsException.class)
+    @Test(expected = PathAlreadyExistsException.class)
     public void test_rename_existingSourceAndTarget_throw() throws Exception {
         assumeTrue(description.supportsRename());
         generateAndCreateTestDir();
         Path existingFile1 = createTestFile(testDir, null);
         Path existingFile2 = createTestFile(testDir, null);
-        fileSystem.rename(existingFile1,existingFile2);
+        fileSystem.rename(existingFile1, existingFile2);
     }
 
-    @Test (expected = NoSuchPathException.class)
+    @Test(expected = NoSuchPathException.class)
     public void test_rename_existingSourceNonExistingTargetParent_throw() throws Exception {
         assumeTrue(description.supportsRename());
         generateAndCreateTestDir();
         Path subDir = createTestSubDirName(testDir);
-        Path source = createTestFile(testDir,null);
+        Path source = createTestFile(testDir, null);
         Path target = createNewTestFileName(subDir);
-        fileSystem.rename(source,target);
+        fileSystem.rename(source, target);
     }
 
     @Test
@@ -1712,7 +1691,7 @@ public abstract class FileSystemTestParent {
         assumeTrue(description.supportsRename());
         generateAndCreateTestDir();
         Path existingFile = createTestFile(testDir, "test data".getBytes());
-        fileSystem.rename(existingFile,existingFile);
+        fileSystem.rename(existingFile, existingFile);
     }
 
     @Test
@@ -1724,38 +1703,36 @@ public abstract class FileSystemTestParent {
 
         byte[] adata = "data".getBytes();
         byte[] bdata = "content".getBytes();
-        Path a = createTestFile(subDir,adata);
-        Path b = createTestFile(subDir,bdata);
-
+        Path a = createTestFile(subDir, adata);
+        Path b = createTestFile(subDir, bdata);
 
         Path subDir2 = createTestSubDirName(testDir);
-        fileSystem.rename(subDir,subDir2);
+        fileSystem.rename(subDir, subDir2);
 
         Thread.sleep(1000);
 
         assertTrue(fileSystem.exists(subDir2));
         assertFalse(fileSystem.exists(subDir));
 
-        assertContents(subDir2.resolve(a.getFileName()),adata);
-        assertContents(subDir2.resolve(b.getFileName()),bdata);
+        assertContents(subDir2.resolve(a.getFileName()), adata);
+        assertContents(subDir2.resolve(b.getFileName()), bdata);
     }
 
-
-    @Test (expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_readSymbolicLink_null_throwsException() throws Exception {
         assumeTrue(description.canReadSymboliclinks());
         fileSystem.readSymbolicLink(null);
     }
 
-    @Test (expected = InvalidPathException.class)
+    @Test(expected = InvalidPathException.class)
     public void test_readSymbolicLink_noLink_throwsException() throws Exception {
         assumeTrue(description.canReadSymboliclinks());
         generateAndCreateTestDir();
-        Path p = createTestFile(testDir,"not a link".getBytes());
+        Path p = createTestFile(testDir, "not a link".getBytes());
         fileSystem.readSymbolicLink(p);
     }
 
-    @Test (expected = InvalidPathException.class)
+    @Test(expected = InvalidPathException.class)
     public void test_readSymbolicLink_noLinkDir_throwsException() throws Exception {
         assumeTrue(description.canReadSymboliclinks());
         generateAndCreateTestDir();
@@ -1765,11 +1742,10 @@ public abstract class FileSystemTestParent {
     @Test
     public void test29_readSymbolicLink() throws Exception {
         assumeTrue(description.canReadSymboliclinks());
-        Map.Entry<Path,Path> map = locationConfig.getSymbolicLinksToExistingFile();
+        Map.Entry<Path, Path> map = locationConfig.getSymbolicLinksToExistingFile();
         Path res = fileSystem.readSymbolicLink(map.getKey());
         assertEquals(res, map.getValue());
     }
-
 
     @Test
     public void test_multipleFileSystemsOpenSimultaneously() throws Exception {
@@ -1798,8 +1774,5 @@ public abstract class FileSystemTestParent {
     // TODO: Test create symbolic link
     // TODO: Cancel copy
     // TODO: WaitUntilDone
-
-
-
 
 }

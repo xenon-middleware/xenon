@@ -13,43 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.shared.local;
+package nl.esciencecenter.xenon.adaptors.filesystems.local;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import java.util.HashSet;
 
 import org.junit.Test;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.filesystems.Path;
 
-public class LocalUtilTest {
+public class LocalFileSystemSimpleTest {
 
-    @Test
-    public void test_constructor() {
-        new LocalUtil();
-    }
-
-    @Test(expected=XenonException.class)
+    @Test(expected = XenonException.class)
     public void test_getLocalRoot_fails() throws XenonException {
-        LocalUtil.getRelativePath("/usr/local", "C:/Users");
+        LocalFileSystem f = new LocalFileSystem("test", "/", new Path("/"), null);
+        f.getRelativePath("/usr/local", "C:/Users");
     }
 
     @Test
     public void test_getLocalRoot() throws XenonException {
-        Path tmp = LocalUtil.getRelativePath("/usr/local", "/usr");
+        LocalFileSystem f = new LocalFileSystem("test", "/", new Path("/"), null);
+        Path tmp = f.getRelativePath("/usr/local", "/usr");
         assertEquals("/local", tmp.toString());
     }
 
     @Test
     public void test_getLocalRoot_nothingLeft() throws XenonException {
-        Path tmp = LocalUtil.getRelativePath("/usr/local", "/usr/local");
+        LocalFileSystem f = new LocalFileSystem("test", "/", new Path("/"), null);
+        Path tmp = f.getRelativePath("/usr/local", "/usr/local");
         assertTrue(tmp.toString().isEmpty());
     }
 
     @Test
-    public void test_javaPath_() throws XenonException {
-        Path tmp = LocalUtil.getRelativePath("/usr/local", "/usr/local");
-        assertTrue(tmp.toString().isEmpty());
+    public void test_xenonPermissions_null() throws XenonException {
+        LocalFileSystem f = new LocalFileSystem("test", "/", new Path("/"), null);
+        assertNull(f.xenonPermissions(null));
+    }
+
+    @Test
+    public void test_javaPermissions_null() throws XenonException {
+        LocalFileSystem f = new LocalFileSystem("test", "/", new Path("/"), null);
+        assertEquals(new HashSet<java.nio.file.attribute.PosixFilePermission>(0), f.javaPermissions(null));
     }
 }

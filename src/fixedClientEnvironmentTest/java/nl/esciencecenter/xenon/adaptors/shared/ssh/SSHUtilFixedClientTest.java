@@ -13,23 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.filesystems.local;
+package nl.esciencecenter.xenon.adaptors.shared.ssh;
 
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import org.junit.Test;
 
-/**
- * Created by atze on 3-8-17.
- */
-public class JavaNIOTildeTest {
+public class SSHUtilFixedClientTest {
 
-    public static void main(String[] argv) {
-        Path p = FileSystems.getDefault().getPath("~/xenonbla");
-        try {
-            Files.createFile(p);
-        } catch (Exception e) {
-            e.printStackTrace();;
-        }
+    @Test
+    public void test_() {
     }
 }

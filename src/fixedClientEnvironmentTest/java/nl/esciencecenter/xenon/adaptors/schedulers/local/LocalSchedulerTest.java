@@ -15,13 +15,9 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers.local;
 
-
-
+import java.util.HashMap;
 
 import org.junit.Test;
-
-
-import java.util.HashMap;
 
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
@@ -47,7 +43,7 @@ public class LocalSchedulerTest extends SchedulerTestParent {
 
             @Override
             public String[] getQueueNames() {
-                return new String [] { "single", "multi", "unlimited" } ;
+                return new String[] { "single", "multi", "unlimited" };
             }
 
             @Override
@@ -87,7 +83,7 @@ public class LocalSchedulerTest extends SchedulerTestParent {
         Scheduler.create("local", "local://");
     }
 
-    @Test(expected=InvalidLocationException.class)
+    @Test(expected = InvalidLocationException.class)
     public void test_location_wrong() throws XenonException {
         Scheduler.create("local", "foobar");
     }
@@ -102,7 +98,7 @@ public class LocalSchedulerTest extends SchedulerTestParent {
         Scheduler.create("local", "local://", new DefaultCredential());
     }
 
-    @Test(expected=InvalidCredentialException.class)
+    @Test(expected = InvalidCredentialException.class)
     public void test_credential_wrong() throws XenonException {
         Scheduler.create("local", "local://", new PasswordCredential("user", "password".toCharArray()));
     }
@@ -114,10 +110,10 @@ public class LocalSchedulerTest extends SchedulerTestParent {
 
     @Test
     public void test_properties_empty() throws XenonException {
-        Scheduler.create("local", "local://", null, new HashMap<String,String>());
+        Scheduler.create("local", "local://", null, new HashMap<String, String>());
     }
 
-    @Test(expected=UnknownPropertyException.class)
+    @Test(expected = UnknownPropertyException.class)
     public void test_properties_unknownProperty_throwsException() throws XenonException {
         HashMap<String, String> map = new HashMap<>();
         map.put("key", "value");
