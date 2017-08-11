@@ -15,6 +15,13 @@
  */
 package nl.esciencecenter.xenon.filesystems;
 
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -23,6 +30,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.junit.Test;
+
 import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
@@ -30,11 +39,6 @@ import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
 import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
-
-import org.junit.Test;
-
-import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.*;
 
 public class FileSystemTest {
 
@@ -96,7 +100,7 @@ public class FileSystemTest {
                 len = (int) left;
             }
 
-            for (int i=0;i<len;i++) {
+            for (int i = 0; i < len; i++) {
                 b[i] = 42;
             }
 
@@ -117,8 +121,8 @@ public class FileSystemTest {
                 len = (int) left;
             }
 
-            for (int i=0;i<len;i++) {
-                b[off+i] = 42;
+            for (int i = 0; i < len; i++) {
+                b[off + i] = 42;
             }
 
             bytes += len;
@@ -132,7 +136,7 @@ public class FileSystemTest {
         long bytes = 0;
 
         public DelayInputStream(long delay) {
-            this.deadline= System.currentTimeMillis() + delay;
+            this.deadline = System.currentTimeMillis() + delay;
         }
 
         @Override
@@ -153,7 +157,7 @@ public class FileSystemTest {
                 return -1;
             }
 
-            for (int i=0;i<b.length;i++) {
+            for (int i = 0; i < b.length; i++) {
                 b[i] = 42;
             }
 
@@ -168,8 +172,8 @@ public class FileSystemTest {
                 return -1;
             }
 
-            for (int i=0;i<len;i++) {
-                b[off+i] = 42;
+            for (int i = 0; i < len; i++) {
+                b[off + i] = 42;
             }
 
             bytes += len;
@@ -181,8 +185,8 @@ public class FileSystemTest {
 
     @Test
     public void test_names() {
-        String [] tmp = FileSystem.getAdaptorNames();
-        String [] expected = new String [] { "file", "ftp", "sftp", "webdav", "s3" };
+        String[] tmp = FileSystem.getAdaptorNames();
+        String[] expected = new String[] { "file", "ftp", "sftp", "webdav", "s3" };
         assertTrue(Arrays.equals(expected, tmp));
     }
 
@@ -199,17 +203,17 @@ public class FileSystemTest {
         assertArrayEquals(LocalFileAdaptor.VALID_PROPERTIES, d.getSupportedProperties());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_adaptorDescriptionFailsNull() throws XenonException {
         FileSystem.getAdaptorDescription(null);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_adaptorDescriptionFailsEmpty() throws XenonException {
         FileSystem.getAdaptorDescription("");
     }
 
-    @Test(expected=UnknownAdaptorException.class)
+    @Test(expected = UnknownAdaptorException.class)
     public void test_adaptorDescriptionFailsUnknown() throws UnknownAdaptorException {
         FileSystem.getAdaptorDescription("aap");
     }
@@ -217,12 +221,12 @@ public class FileSystemTest {
     @Test
     public void test_adaptorDescriptions() throws UnknownAdaptorException {
 
-        String [] names = FileSystem.getAdaptorNames();
-        FileSystemAdaptorDescription [] desc = FileSystem.getAdaptorDescriptions();
+        String[] names = FileSystem.getAdaptorNames();
+        FileSystemAdaptorDescription[] desc = FileSystem.getAdaptorDescriptions();
 
         assertEquals(names.length, desc.length);
 
-        for (int i=0;i<names.length;i++) {
+        for (int i = 0; i < names.length; i++) {
             assertEquals(FileSystem.getAdaptorDescription(names[i]), desc[i]);
         }
     }
@@ -237,39 +241,39 @@ public class FileSystemTest {
         f.close();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_createFailsNull() throws XenonException {
         FileSystem.create(null);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_createFailsEmpty() throws XenonException {
         FileSystem.create("");
     }
 
-    @Test(expected=UnknownAdaptorException.class)
+    @Test(expected = UnknownAdaptorException.class)
     public void test_createFailsUnknown() throws XenonException {
         FileSystem.create("aap");
     }
 
     // Testing against Fake FileSystem
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_constructorIdNull() throws XenonException {
         new MockFileSystem(null, "TEST", "MEM", new Path("/test"));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_constructorAdaptorNull() throws XenonException {
         new MockFileSystem("0", null, "MEM", new Path("/test"));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_constructorLocationNull() throws XenonException {
         new MockFileSystem("0", "TEST", null, new Path("/test"));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_constructorPathNull() throws XenonException {
         new MockFileSystem("0", "TEST", "MEM", null);
     }
@@ -290,7 +294,7 @@ public class FileSystemTest {
     public void test_path() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
-        assertEquals(entry, f.getEntryPath());
+        assertEquals(entry, f.getWorkingDirectory());
     }
 
     @Test
@@ -305,7 +309,7 @@ public class FileSystemTest {
         assertTrue(f.exists(new Path("/test/aap/noot/mies")));
     }
 
-    @Test(expected=PathAlreadyExistsException.class)
+    @Test(expected = PathAlreadyExistsException.class)
     public void test_createDirectoriesDup() throws XenonException {
         Path entry = new Path("/test");
         MockFileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -327,7 +331,7 @@ public class FileSystemTest {
         assertFalse(f.exists(new Path("/test/aap")));
     }
 
-    @Test(expected=DirectoryNotEmptyException.class)
+    @Test(expected = DirectoryNotEmptyException.class)
     public void test_deleteNotEmpty() throws XenonException {
         Path entry = new Path("/test");
         MockFileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -368,20 +372,21 @@ public class FileSystemTest {
         assertFalse(f.exists(new Path("/test/aap/noot")));
     }
 
-
     @Test
     public void test_deleteWithDotDot() throws XenonException {
         Path entry = new Path("/test");
         MockFileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
 
-        f.createDirectories(new Path("/test/."));
-        f.createDirectories(new Path("/test/.."));
-        f.createDirectories(new Path("/test/aap"));
-        f.createDirectories(new Path("/test/aap/."));
-        f.createDirectories(new Path("/test/aap/.."));
-        f.createDirectories(new Path("/test/aap/noot"));
-        f.createDirectories(new Path("/test/aap/noot/."));
-        f.createDirectories(new Path("/test/aap/noot/.."));
+        // We cannot use the regular createDirectory, as it does not accept "."
+        // or ".."
+        f.forceCreateDirectory(new Path("/test/."));
+        f.forceCreateDirectory(new Path("/test/.."));
+        f.forceCreateDirectory(new Path("/test/aap"));
+        f.forceCreateDirectory(new Path("/test/aap/."));
+        f.forceCreateDirectory(new Path("/test/aap/.."));
+        f.forceCreateDirectory(new Path("/test/aap/noot"));
+        f.forceCreateDirectory(new Path("/test/aap/noot/."));
+        f.forceCreateDirectory(new Path("/test/aap/noot/.."));
 
         f.createFile(new Path("/test/aap/noot/file0"));
 
@@ -415,14 +420,16 @@ public class FileSystemTest {
         Path entry = new Path("/test");
         MockFileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
 
-        f.createDirectories(new Path("/test/."));
-        f.createDirectories(new Path("/test/.."));
-        f.createDirectories(new Path("/test/aap"));
-        f.createDirectories(new Path("/test/aap/."));
-        f.createDirectories(new Path("/test/aap/.."));
-        f.createDirectories(new Path("/test/aap/noot"));
-        f.createDirectories(new Path("/test/aap/noot/."));
-        f.createDirectories(new Path("/test/aap/noot/.."));
+        // We cannot use the regular createDirectory, as it does not accept "."
+        // or ".."
+        f.forceCreateDirectory(new Path("/test/."));
+        f.forceCreateDirectory(new Path("/test/.."));
+        f.forceCreateDirectory(new Path("/test/aap"));
+        f.forceCreateDirectory(new Path("/test/aap/."));
+        f.forceCreateDirectory(new Path("/test/aap/.."));
+        f.forceCreateDirectory(new Path("/test/aap/noot"));
+        f.forceCreateDirectory(new Path("/test/aap/noot/."));
+        f.forceCreateDirectory(new Path("/test/aap/noot/.."));
 
         f.createFile(new Path("/test/aap/noot/file0"));
 
@@ -462,7 +469,7 @@ public class FileSystemTest {
         f.assertPathExists(new Path("/test/aap"));
     }
 
-    @Test(expected=NoSuchPathException.class)
+    @Test(expected = NoSuchPathException.class)
     public void test_assertPathExistsFailsNoPath() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -470,7 +477,7 @@ public class FileSystemTest {
         f.assertPathExists(new Path("/test/aap"));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_assertPathExistsFailsNull() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -488,7 +495,7 @@ public class FileSystemTest {
         f.assertPathNotExists(new Path("/test/aap"));
     }
 
-    @Test(expected=PathAlreadyExistsException.class)
+    @Test(expected = PathAlreadyExistsException.class)
     public void test_assertPathNotExistsFailsExists() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -497,7 +504,7 @@ public class FileSystemTest {
         f.assertPathNotExists(new Path("/test/aap"));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_assertPathNotExistsFailsNull() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -517,7 +524,7 @@ public class FileSystemTest {
         f.assertPathIsFile(new Path("/test/aap/file0"));
     }
 
-    @Test(expected=NoSuchPathException.class)
+    @Test(expected = NoSuchPathException.class)
     public void test_assertPathIfFileFailsNotExists() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -526,7 +533,7 @@ public class FileSystemTest {
         f.assertPathIsFile(new Path("/test/aap/file0"));
     }
 
-    @Test(expected=InvalidPathException.class)
+    @Test(expected = InvalidPathException.class)
     public void test_assertPathIfFileFailsIsDir() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -535,7 +542,7 @@ public class FileSystemTest {
         f.assertPathIsFile(new Path("/test/aap"));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_assertPathIsFileFailsNull() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -554,7 +561,7 @@ public class FileSystemTest {
         f.assertPathIsDirectory(new Path("/test/aap"));
     }
 
-    @Test(expected=NoSuchPathException.class)
+    @Test(expected = NoSuchPathException.class)
     public void test_assertPathIsDirFailsNotExists() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -562,7 +569,7 @@ public class FileSystemTest {
         f.assertPathIsDirectory(new Path("/test/noot"));
     }
 
-    @Test(expected=InvalidPathException.class)
+    @Test(expected = InvalidPathException.class)
     public void test_assertPathIsDirFailesIsFile() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -572,7 +579,7 @@ public class FileSystemTest {
         f.assertPathIsDirectory(new Path("/test/aap/file0"));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_assertPathIsDirFailsNull() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -587,7 +594,6 @@ public class FileSystemTest {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
 
-
         f.createDirectories(new Path("/test/aap"));
         f.createFile(new Path("/test/aap/file0"));
 
@@ -595,7 +601,7 @@ public class FileSystemTest {
         f.assertFileExists(new Path("/test/aap/file0"));
     }
 
-    @Test(expected=NoSuchPathException.class)
+    @Test(expected = NoSuchPathException.class)
     public void test_assertFileExistsFailsNotExist() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -606,7 +612,7 @@ public class FileSystemTest {
         f.assertFileExists(new Path("/test/aap/file0"));
     }
 
-    @Test(expected=InvalidPathException.class)
+    @Test(expected = InvalidPathException.class)
     public void test_assertFileExistsFailsIsDir() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -617,7 +623,7 @@ public class FileSystemTest {
         f.assertFileExists(new Path("/test/aap"));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_assertFileExistsPathNull() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -636,7 +642,7 @@ public class FileSystemTest {
         f.assertDirectoryExists(new Path("/test/aap"));
     }
 
-    @Test(expected=NoSuchPathException.class)
+    @Test(expected = NoSuchPathException.class)
     public void test_assertDirExistsFailsNotExist() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -644,7 +650,7 @@ public class FileSystemTest {
         f.assertFileExists(new Path("/test/aap"));
     }
 
-    @Test(expected=InvalidPathException.class)
+    @Test(expected = InvalidPathException.class)
     public void test_assertDirExistsFailsIsFile() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -656,7 +662,7 @@ public class FileSystemTest {
         f.assertDirectoryExists(new Path("/test/aap/file0"));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_assertDirExistsPathNull() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -676,15 +682,16 @@ public class FileSystemTest {
         f.assertParentDirectoryExists(new Path("/test/aap/noot"));
     }
 
-//	@Test(expected=InvalidPathException.class)
-//	public void test_assertParentDirExistsPathFailsNoParent() throws XenonException {
-//		Path entry = new Path("/test");
-//		FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
-//		// should throw exception
-//		f.assertParentDirectoryExists(new Path(""));
-//	}
+    // @Test(expected=InvalidPathException.class)
+    // public void test_assertParentDirExistsPathFailsNoParent() throws
+    // XenonException {
+    // Path entry = new Path("/test");
+    // FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
+    // // should throw exception
+    // f.assertParentDirectoryExists(new Path(""));
+    // }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_assertParentDirExistsPathFailsNull() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -693,22 +700,6 @@ public class FileSystemTest {
     }
 
     // areSamePaths
-
-    @Test(expected=IllegalArgumentException.class)
-    public void test_areSamePathsFailsNullSource() throws XenonException {
-        Path entry = new Path("/test");
-        FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
-        // should throw exception
-        f.areSamePaths(null, new Path("/test"));
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void test_areSamePathsFailsNullTarget() throws XenonException {
-        Path entry = new Path("/test");
-        FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
-        // should throw exception
-        f.areSamePaths(new Path("/test"), null);
-    }
 
     @Test
     public void test_areSamePathsTrue() throws XenonException {
@@ -745,7 +736,7 @@ public class FileSystemTest {
         assertFalse(f.isDotDot(new Path("/test/..")));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_isDotDotFailsNull() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST", "MEM", entry);
@@ -754,7 +745,7 @@ public class FileSystemTest {
 
     // copyFile
 
-    @Test(expected=InvalidPathException.class)
+    @Test(expected = InvalidPathException.class)
     public void test_copyFileFailsSourceOther() throws XenonException {
         Path entry = new Path("/test");
 
@@ -773,7 +764,7 @@ public class FileSystemTest {
         f0.copyFile(f, f1, f, CopyMode.CREATE, f0.createCallback(1024));
     }
 
-    @Test(expected=InvalidPathException.class)
+    @Test(expected = InvalidPathException.class)
     public void test_copyFileFailsSourceDir() throws XenonException {
         Path entry = new Path("/test");
 
@@ -787,7 +778,7 @@ public class FileSystemTest {
         f0.copyFile(f, f1, f, CopyMode.CREATE, f0.createCallback(1024));
     }
 
-    @Test(expected=PathAlreadyExistsException.class)
+    @Test(expected = PathAlreadyExistsException.class)
     public void test_copyFileFailsDestExists() throws XenonException {
         Path entry = new Path("/test");
 
@@ -811,13 +802,13 @@ public class FileSystemTest {
 
         Path f = new Path("/test/aap");
 
-        byte [] data = new byte [] { 0, 1, 2, 3, 4, 5, 6, 7 };
+        byte[] data = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
 
         f0.createFile(f);
         f0.addData(f, data);
 
         f1.createFile(f);
-        byte [] data1 = new byte [] { 42,42 };
+        byte[] data1 = new byte[] { 42, 42 };
         f1.addData(f, data1);
 
         // should replace
@@ -835,13 +826,13 @@ public class FileSystemTest {
 
         Path f = new Path("/test/aap");
 
-        byte [] data = new byte [] { 0, 1, 2, 3, 4, 5, 6, 7 };
+        byte[] data = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
 
         f0.createFile(f);
         f0.addData(f, data);
 
         f1.createFile(f);
-        byte [] data1 = new byte [] { 42,42 };
+        byte[] data1 = new byte[] { 42, 42 };
         f1.addData(f, data1);
 
         // should replace
@@ -860,10 +851,10 @@ public class FileSystemTest {
         Path f = new Path("/test/aap");
 
         f0.createFile(f);
-        f0.addInputStream(f, new CountJunkInputStream(1024*1024));
+        f0.addInputStream(f, new CountJunkInputStream(1024 * 1024));
 
         // should cancel after 1 block ?
-        f0.copyFile(f, f1, f, CopyMode.CREATE, f0.createCallback(4*1024));
+        f0.copyFile(f, f1, f, CopyMode.CREATE, f0.createCallback(4 * 1024));
     }
 
     @Test(expected = XenonException.class)
@@ -876,7 +867,7 @@ public class FileSystemTest {
         Path f = new Path("/test/aap");
 
         f0.createFile(f);
-        f0.addInputStream(f, new CountJunkInputStream(1024*1024));
+        f0.addInputStream(f, new CountJunkInputStream(1024 * 1024));
 
         // should cancel after 1 block ?
         f0.copyFile(f, f1, f, CopyMode.CREATE, f0.createCallback(0));
@@ -884,7 +875,7 @@ public class FileSystemTest {
 
     // copy
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_copyFailsSourceNull() throws XenonException {
         Path entry = new Path("/test");
 
@@ -895,7 +886,7 @@ public class FileSystemTest {
         f0.copy(null, f1, new Path("/aap"), CopyMode.REPLACE, false);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_copyFailsDestFSNull() throws XenonException {
         Path entry = new Path("/test");
 
@@ -905,7 +896,7 @@ public class FileSystemTest {
         f0.copy(new Path("/aap"), null, new Path("/aap"), CopyMode.REPLACE, false);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_copyFailsDestNull() throws XenonException {
         Path entry = new Path("/test");
 
@@ -924,13 +915,13 @@ public class FileSystemTest {
         MockFileSystem f1 = new MockFileSystem("1", "TEST1", "MEM", entry);
 
         Path f = new Path("/test/aap");
-        byte [] data = new byte [] { 0, 1, 2, 3, 4, 5, 6, 7 };
+        byte[] data = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
 
         f0.createFile(f);
         f0.addData(f, data);
 
         String h = f0.copy(f, f1, f, CopyMode.CREATE, false);
-        CopyStatus s = f0.waitUntilDone(h, 5*1000);
+        CopyStatus s = f0.waitUntilDone(h, 5 * 1000);
 
         assertTrue(s.isDone());
         assertFalse(s.hasException());
@@ -939,40 +930,32 @@ public class FileSystemTest {
     }
 
     /*
-    @Test
-    public void test_copyLinkOK() throws XenonException {
-        Path entry = new Path("/test");
-
-        TestFileSystem f0 = new TestFileSystem("0", "TEST0", "MEM", entry);
-        TestFileSystem f1 = new TestFileSystem("1", "TEST1", "MEM", entry);
-
-        Path f = new Path("/test/aap");
-        byte [] data = new byte [] { 0, 1, 2, 3, 4, 5, 6, 7 };
-
-        f0.createFile(f);
-        Path l = new Path("/test/link");
-
-
-        f0.createSymbolicLink(l, p);
-        PathAttributes a = new PathAttributes();
-        a.setPath(f);
-        a.setSymbolicLink(true);
-
-        f0.addAttributes(f, a);
-        f0.addData(f, data);
-
-        String h = f0.copy(f, f1, f, CopyMode.CREATE, false);
-        f0.waitUntilDone(h, 5*1000);
-
-        CopyStatus s = f0.getStatus(h);
-        assertTrue(s.isDone());
-
-        System.out.println("Copy link " + s.getException());
-
-        assertFalse(s.hasException());
-        assertTrue(f1.exists(f));
-        assertTrue(Arrays.equals(data, f1.getData(f)));
-    }
+     * @Test public void test_copyLinkOK() throws XenonException { Path entry =
+     * new Path("/test");
+     *
+     * TestFileSystem f0 = new TestFileSystem("0", "TEST0", "MEM", entry);
+     * TestFileSystem f1 = new TestFileSystem("1", "TEST1", "MEM", entry);
+     *
+     * Path f = new Path("/test/aap"); byte [] data = new byte [] { 0, 1, 2, 3,
+     * 4, 5, 6, 7 };
+     *
+     * f0.createFile(f); Path l = new Path("/test/link");
+     *
+     *
+     * f0.createSymbolicLink(l, p); PathAttributes a = new PathAttributes();
+     * a.setPath(f); a.setSymbolicLink(true);
+     *
+     * f0.addAttributes(f, a); f0.addData(f, data);
+     *
+     * String h = f0.copy(f, f1, f, CopyMode.CREATE, false); f0.waitUntilDone(h,
+     * 5*1000);
+     *
+     * CopyStatus s = f0.getStatus(h); assertTrue(s.isDone());
+     *
+     * System.out.println("Copy link " + s.getException());
+     *
+     * assertFalse(s.hasException()); assertTrue(f1.exists(f));
+     * assertTrue(Arrays.equals(data, f1.getData(f))); }
      */
 
     @Test
@@ -983,7 +966,7 @@ public class FileSystemTest {
         MockFileSystem f1 = new MockFileSystem("1", "TEST1", "MEM", entry);
 
         Path f = new Path("/test/aap");
-        byte [] data = new byte [] { 0, 1, 2, 3, 4, 5, 6, 7 };
+        byte[] data = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
 
         f0.createFile(f);
         f0.addData(f, data);
@@ -991,7 +974,7 @@ public class FileSystemTest {
         f1.createFile(f);
 
         String h = f0.copy(f, f1, f, CopyMode.CREATE, false);
-        CopyStatus s = f0.waitUntilDone(h, 60*1000);
+        CopyStatus s = f0.waitUntilDone(h, 60 * 1000);
 
         assertTrue(s.isDone());
         assertTrue(s.hasException());
@@ -1006,18 +989,18 @@ public class FileSystemTest {
         MockFileSystem f1 = new MockFileSystem("1", "TEST1", "MEM", entry);
 
         Path f = new Path("/test/aap");
-        byte [] data = new byte [] { 0, 1, 2, 3, 4, 5, 6, 7 };
+        byte[] data = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
 
         f0.createFile(f);
         f0.addData(f, data);
 
-        byte [] data1 = new byte [] { 42, 42 };
+        byte[] data1 = new byte[] { 42, 42 };
 
         f1.createFile(f);
         f1.addData(f, data1);
 
         String h = f0.copy(f, f1, f, CopyMode.REPLACE, false);
-        CopyStatus s = f0.waitUntilDone(h, 60*1000);
+        CopyStatus s = f0.waitUntilDone(h, 60 * 1000);
 
         assertTrue(s.isDone());
         assertFalse(s.hasException());
@@ -1032,25 +1015,23 @@ public class FileSystemTest {
         MockFileSystem f1 = new MockFileSystem("1", "TEST1", "MEM", entry);
 
         Path f = new Path("/test/aap");
-        byte [] data = new byte [] { 0, 1, 2, 3, 4, 5, 6, 7 };
+        byte[] data = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
 
         f0.createFile(f);
         f0.addData(f, data);
 
-        byte [] data1 = new byte [] { 42, 42 };
+        byte[] data1 = new byte[] { 42, 42 };
 
         f1.createFile(f);
         f1.addData(f, data1);
 
         String h = f0.copy(f, f1, f, CopyMode.IGNORE, false);
-        CopyStatus s = f0.waitUntilDone(h, 60*1000);
+        CopyStatus s = f0.waitUntilDone(h, 60 * 1000);
 
         assertTrue(s.isDone());
         assertFalse(s.hasException());
         assertTrue(Arrays.equals(data1, f1.getData(f)));
     }
-
-
 
     @Test
     public void test_copyFailsSourceNotExists() throws XenonException {
@@ -1060,7 +1041,7 @@ public class FileSystemTest {
         MockFileSystem f1 = new MockFileSystem("1", "TEST1", "MEM", entry);
 
         String h = f0.copy(new Path("/test/aap"), f1, new Path("/test/aap"), CopyMode.CREATE, false);
-        CopyStatus s = f0.waitUntilDone(h, 60*1000);
+        CopyStatus s = f0.waitUntilDone(h, 60 * 1000);
 
         assertTrue(s.isDone());
         assertTrue(s.hasException());
@@ -1077,7 +1058,7 @@ public class FileSystemTest {
         f0.createDirectory(new Path("/test/aap"));
 
         String h = f0.copy(new Path("/test/aap"), f1, new Path("/test/aap"), CopyMode.CREATE, false);
-        CopyStatus s = f0.waitUntilDone(h, 60*1000);
+        CopyStatus s = f0.waitUntilDone(h, 60 * 1000);
 
         assertTrue(s.isDone());
         assertTrue(s.hasException());
@@ -1100,7 +1081,7 @@ public class FileSystemTest {
         f0.addAttributes(f, a);
 
         String h = f0.copy(new Path("/test/aap"), f1, new Path("/test/aap"), CopyMode.CREATE, false);
-        CopyStatus s = f0.waitUntilDone(h, 60*1000);
+        CopyStatus s = f0.waitUntilDone(h, 60 * 1000);
 
         assertTrue(s.isDone());
         assertTrue(s.hasException());
@@ -1119,14 +1100,14 @@ public class FileSystemTest {
         f0.createDirectory(new Path("/test/aap/noot"));
         f0.createFile(new Path("/test/aap/noot/file1"));
 
-        byte [] data0 = new byte [] { 42, 42 };
-        byte [] data1 = new byte [] { 0, 1, 2, 3, 4, 5, 6, 7 };
+        byte[] data0 = new byte[] { 42, 42 };
+        byte[] data1 = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
 
         f0.addData(new Path("/test/aap/file0"), data0);
         f0.addData(new Path("/test/aap/noot/file1"), data1);
 
         String h = f0.copy(new Path("/test/aap"), f1, new Path("/test/aap"), CopyMode.CREATE, true);
-        CopyStatus s = f0.waitUntilDone(h, 5*1000);
+        CopyStatus s = f0.waitUntilDone(h, 5 * 1000);
 
         assertTrue(s.isDone());
         assertFalse(s.hasException());
@@ -1142,14 +1123,14 @@ public class FileSystemTest {
     }
 
     // getStatus
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_getStatusFailsNull() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST0", "MEM", entry);
         f.getStatus(null);
     }
 
-    @Test(expected=NoSuchCopyException.class)
+    @Test(expected = NoSuchCopyException.class)
     public void test_getStatusFailsWrongType() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST0", "MEM", entry);
@@ -1158,14 +1139,14 @@ public class FileSystemTest {
 
     // cancel
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_cancelFailsNull() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST0", "MEM", entry);
         f.cancel(null);
     }
 
-    @Test(expected=NoSuchCopyException.class)
+    @Test(expected = NoSuchCopyException.class)
     public void test_cancelFailsWrongType() throws XenonException {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST0", "MEM", entry);
@@ -1173,43 +1154,36 @@ public class FileSystemTest {
     }
 
     /*
-    @Test
-    public void test_cancelImmediately() throws XenonException {
-        Path entry = new Path("/test");
-
-        MockFileSystem f0 = new MockFileSystem("0", "TEST0", "MEM", entry);
-        MockFileSystem f1 = new MockFileSystem("1", "TEST1", "MEM", entry);
-
-        Path file1 = new Path("/test/aap");
-        Path file2 = new Path("/test/noot");
-
-        f0.createFile(file1);
-        f0.createFile(file2);
-
-        f0.addInputStream(file1, new DelayInputStream(1000));
-        f0.addInputStream(file2, new DelayInputStream(1000));
-
-        f1.createFile(file1);
-        f1.createFile(file2);
-
-        f1.addOutputStream(file1, new CountIgnoreOutputStream());
-        f1.addOutputStream(file2, new CountIgnoreOutputStream());
-
-        String h1 = f0.copy(file1, f1, file1, CopyMode.REPLACE, false);
-        String h2 = f0.copy(file2, f1, file2, CopyMode.REPLACE, false);
-
-        // cancel h2 immediately -- the copy should not have a chance to start
-        CopyStatus s2 = f0.cancel(h2);
-
-        CopyStatus s1 = f0.waitUntilDone(h1, 5*1000);
-
-        assertTrue(s1.isDone());
-        assertFalse(s1.hasException());
-
-        assertTrue(s2.isDone());
-        assertTrue(s2.hasException());
-        assertThat(s2.getException(), instanceOf(XenonException.class));
-    }
+     * @Test public void test_cancelImmediately() throws XenonException { Path
+     * entry = new Path("/test");
+     *
+     * MockFileSystem f0 = new MockFileSystem("0", "TEST0", "MEM", entry);
+     * MockFileSystem f1 = new MockFileSystem("1", "TEST1", "MEM", entry);
+     *
+     * Path file1 = new Path("/test/aap"); Path file2 = new Path("/test/noot");
+     *
+     * f0.createFile(file1); f0.createFile(file2);
+     *
+     * f0.addInputStream(file1, new DelayInputStream(1000));
+     * f0.addInputStream(file2, new DelayInputStream(1000));
+     *
+     * f1.createFile(file1); f1.createFile(file2);
+     *
+     * f1.addOutputStream(file1, new CountIgnoreOutputStream());
+     * f1.addOutputStream(file2, new CountIgnoreOutputStream());
+     *
+     * String h1 = f0.copy(file1, f1, file1, CopyMode.REPLACE, false); String h2
+     * = f0.copy(file2, f1, file2, CopyMode.REPLACE, false);
+     *
+     * // cancel h2 immediately -- the copy should not have a chance to start
+     * CopyStatus s2 = f0.cancel(h2);
+     *
+     * CopyStatus s1 = f0.waitUntilDone(h1, 5*1000);
+     *
+     * assertTrue(s1.isDone()); assertFalse(s1.hasException());
+     *
+     * assertTrue(s2.isDone()); assertTrue(s2.hasException());
+     * assertThat(s2.getException(), instanceOf(XenonException.class)); }
      */
 
     private void sleep(long delay) {
@@ -1239,7 +1213,8 @@ public class FileSystemTest {
 
         sleep(1000);
 
-        // cancel -- the copy should have started already, but should need 9 seconds more
+        // cancel -- the copy should have started already, but should need 9
+        // seconds more
         CopyStatus s = f0.cancel(h);
 
         assertTrue(s.isDone());
@@ -1247,7 +1222,7 @@ public class FileSystemTest {
         assertTrue(s.getException() instanceof XenonException);
     }
 
-    @Test(expected=NoSuchCopyException.class)
+    @Test(expected = NoSuchCopyException.class)
     public void test_cancelAfterDone() throws XenonException {
         Path entry = new Path("/test");
 
@@ -1256,7 +1231,7 @@ public class FileSystemTest {
 
         Path f = new Path("/test/aap");
 
-        byte [] data = new byte [] { 0, 1,2, 3, 4, 5, 6, 7, 8, 9 };
+        byte[] data = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
         f0.createFile(f);
         f0.addData(f, data);
@@ -1274,44 +1249,42 @@ public class FileSystemTest {
         CopyStatus s2 = f0.cancel(h);
     }
 
-
     @Test
     public void test_properties() throws Exception {
-        HashMap<String,String> p = new HashMap<>();
+        HashMap<String, String> p = new HashMap<>();
         p.put("aap", "noot");
 
         XenonPropertyDescription d = new XenonPropertyDescription("aap", Type.STRING, "empty", "test");
-        XenonProperties prop = new XenonProperties(new XenonPropertyDescription [] { d }, p);
+        XenonProperties prop = new XenonProperties(new XenonPropertyDescription[] { d }, p);
 
         MockFileSystem f = new MockFileSystem("0", "TEST0", "MEM", new Path("/test"), prop);
         assertEquals(p, f.getProperties());
 
     }
 
+    @Test
+    public void test_equalsTrueSelf() throws Exception {
+        MockFileSystem f = new MockFileSystem("0", "TEST0", "MEM", new Path("/test"));
+        assertTrue(f.equals(f));
+    }
 
-      @Test
-      public void test_equalsTrueSelf() throws Exception {
-          MockFileSystem f = new MockFileSystem("0", "TEST0", "MEM", new Path("/test"));
-          assertTrue(f.equals(f));
-      }
+    @Test
+    public void test_equalsTrueSameID() throws Exception {
+        MockFileSystem f0 = new MockFileSystem("0", "TEST0", "MEM", new Path("/test"));
+        MockFileSystem f1 = new MockFileSystem("0", "TEST0", "MEM", new Path("/test"));
+        assertTrue(f0.equals(f1));
+    }
 
-      @Test
-      public void test_equalsTrueSameID() throws Exception {
-          MockFileSystem f0 = new MockFileSystem("0", "TEST0", "MEM", new Path("/test"));
-          MockFileSystem f1 = new MockFileSystem("0", "TEST0", "MEM", new Path("/test"));
-          assertTrue(f0.equals(f1));
-      }
+    @Test
+    public void test_equalsFalseNull() throws Exception {
+        MockFileSystem f = new MockFileSystem("0", "TEST0", "MEM", new Path("/test"));
+        assertFalse(f.equals(null));
+    }
 
-      @Test
-      public void test_equalsFalseNull() throws Exception {
-          MockFileSystem f = new MockFileSystem("0", "TEST0", "MEM", new Path("/test"));
-          assertFalse(f.equals(null));
-      }
-
-      @Test
-      public void test_equalsFalseWrongType() throws Exception {
-          MockFileSystem f = new MockFileSystem("0", "TEST0", "MEM", new Path("/test"));
-          assertFalse(f.equals("hello"));
-      }
+    @Test
+    public void test_equalsFalseWrongType() throws Exception {
+        MockFileSystem f = new MockFileSystem("0", "TEST0", "MEM", new Path("/test"));
+        assertFalse(f.equals("hello"));
+    }
 
 }

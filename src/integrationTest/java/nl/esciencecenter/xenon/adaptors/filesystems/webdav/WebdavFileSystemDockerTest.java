@@ -15,40 +15,46 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.webdav;
 
+import java.util.Map;
+
+import org.junit.ClassRule;
+
+import com.palantir.docker.compose.DockerComposeRule;
+import com.palantir.docker.compose.connection.waiting.HealthChecks;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.LocationConfig;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 
-import com.palantir.docker.compose.DockerComposeRule;
-import com.palantir.docker.compose.connection.waiting.HealthChecks;
-import org.junit.ClassRule;
-
 public class WebdavFileSystemDockerTest extends WebdavFileSystemTestParent {
 
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder()
-    .file("src/integrationTest/resources/docker-compose/webdav.yml")
-    .waitingForService("webdav", HealthChecks.toHaveAllPortsOpen()).saveLogsTo("/tmp/webdav.txt")
-    .build();
+    public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/webdav.yml")
+            .waitingForService("webdav", HealthChecks.toHaveAllPortsOpen()).saveLogsTo("/tmp/webdav.txt").build();
 
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
         return new LocationConfig() {
 
             @Override
+            public Map.Entry<Path, Path> getSymbolicLinksToExistingFile() {
+                throw new Error("Symlinks not supported on webdav");
+            }
+
+            @Override
             public Path getExistingPath() {
-                return new Path("~xenon/filesystem-test-fixture/links/file0");
+                return new Path("/~xenon/filesystem-test-fixture/links/file0");
             }
 
             @Override
             public Path getWritableTestDir() {
-                return fileSystem.getEntryPath().resolve("uploads");
+                return fileSystem.getWorkingDirectory().resolve("uploads");
             }
 
             @Override
-            public Path getExpectedEntryPath() {
+            public Path getExpectedWorkingDirectory() {
                 return new Path("/~xenon");
             }
         };

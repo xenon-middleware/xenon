@@ -22,25 +22,23 @@ import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.ClassRule;
+
+import com.palantir.docker.compose.DockerComposeRule;
+import com.palantir.docker.compose.connection.waiting.HealthChecks;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.LocationConfig;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
-
-import com.palantir.docker.compose.DockerComposeRule;
-import com.palantir.docker.compose.connection.waiting.HealthChecks;
 import nl.esciencecenter.xenon.filesystems.Path;
-import org.junit.ClassRule;
 
 public class SftpFileSystemDockerTest extends SftpFileSystemTestParent {
 
-
-
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder()
-        .file("src/integrationTest/resources/docker-compose/openssh.yml")
-        .waitingForService("ssh", HealthChecks.toHaveAllPortsOpen())
-        .build();
+            .file("src/integrationTest/resources/docker-compose/openssh.yml")
+            .waitingForService("ssh", HealthChecks.toHaveAllPortsOpen()).build();
 
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
@@ -53,19 +51,17 @@ public class SftpFileSystemDockerTest extends SftpFileSystemTestParent {
 
             @Override
             public Map.Entry<Path, Path> getSymbolicLinksToExistingFile() {
-                return new AbstractMap.SimpleEntry<>(
-                        new Path("/home/xenon/filesystem-test-fixture/links/link0"),
-                        new Path("/home/xenon/filesystem-test-fixture/links/file0")
-                        );
+                return new AbstractMap.SimpleEntry<>(new Path("/home/xenon/filesystem-test-fixture/links/link0"),
+                        new Path("/home/xenon/filesystem-test-fixture/links/file0"));
             }
 
             @Override
             public Path getWritableTestDir() {
-                return fileSystem.getEntryPath();
+                return fileSystem.getWorkingDirectory();
             }
 
             @Override
-            public Path getExpectedEntryPath() {
+            public Path getExpectedWorkingDirectory() {
                 return new Path("/home/xenon");
             }
         };

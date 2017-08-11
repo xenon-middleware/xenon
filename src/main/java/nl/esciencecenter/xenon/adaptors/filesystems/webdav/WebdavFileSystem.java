@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import nl.esciencecenter.xenon.filesystems.*;
-
 import org.apache.http.HttpStatus;
 //import org.apache.commons.httpclient.HttpClient;
 //import org.apache.commons.httpclient.HttpMethod;
@@ -63,6 +61,10 @@ import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PathAttributes;
+import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 
 public class WebdavFileSystem extends FileSystem {
 
@@ -101,10 +103,19 @@ public class WebdavFileSystem extends FileSystem {
 
     private String getFilePath(Path path) {
 
-        return server + (path.isAbsolute() ? "" : "/") +  path.toString();
+        if (!path.isAbsolute()) {
+            throw new IllegalArgumentException("Path must be absolute!");
+        }
+
+        return server + path.toString();
     }
 
     private String getDirectoryPath(Path path) {
+
+        if (!path.isAbsolute()) {
+            throw new IllegalArgumentException("Path must be absolute!");
+        }
+
         return server + path.toString() + "/";
     }
 
@@ -128,7 +139,7 @@ public class WebdavFileSystem extends FileSystem {
     }
 
     @Override
-    protected List<PathAttributes> listDirectory(Path path)  throws XenonException {
+    protected List<PathAttributes> listDirectory(Path path) throws XenonException {
 
         List<DavResource> list = null;
 
@@ -143,7 +154,8 @@ public class WebdavFileSystem extends FileSystem {
         String dirPath = path.toString() + "/";
 
         for (DavResource d : list) {
-            // The list also returns the directory itself, so ensure we don't return it!
+            // The list also returns the directory itself, so ensure we don't
+            // return it!
             if (!dirPath.equals(d.getPath())) {
                 String filename = d.getName();
                 result.add(getAttributes(path.resolve(filename), d));
@@ -162,6 +174,9 @@ public class WebdavFileSystem extends FileSystem {
     public void rename(Path source, Path target) throws XenonException {
 
         LOGGER.debug("move source = {} to target = {}", source, target);
+
+        source = toAbsolutePath(source);
+        target = toAbsolutePath(target);
 
         assertPathExists(source);
 
@@ -194,6 +209,7 @@ public class WebdavFileSystem extends FileSystem {
     public void createDirectory(Path dir) throws XenonException {
         LOGGER.debug("createDirectory dir = {}", dir);
 
+        dir = toAbsolutePath(dir);
         assertPathNotExists(dir);
         assertParentDirectoryExists(dir);
 
@@ -208,6 +224,7 @@ public class WebdavFileSystem extends FileSystem {
     public void createFile(Path file) throws XenonException {
         LOGGER.debug("createFile path = {}", file);
 
+        file = toAbsolutePath(file);
         assertPathNotExists(file);
         assertParentDirectoryExists(file);
 
@@ -244,7 +261,11 @@ public class WebdavFileSystem extends FileSystem {
     @Override
     public boolean exists(Path path) throws XenonException {
 
-        assertNotNull(path);
+        System.out.println("EXISTS: " + path);
+
+        path = toAbsolutePath(path);
+
+        System.out.println("EXISTS ABS: " + path);
 
         try {
             return client.exists(getDirectoryPath(path)) || client.exists(getFilePath(path));
@@ -256,6 +277,7 @@ public class WebdavFileSystem extends FileSystem {
     @Override
     public InputStream readFromFile(Path path) throws XenonException {
 
+        path = toAbsolutePath(path);
         assertFileExists(path);
 
         try {
@@ -268,8 +290,9 @@ public class WebdavFileSystem extends FileSystem {
     @Override
     public OutputStream writeToFile(Path file, long size) throws XenonException {
 
-        assertParentDirectoryExists(file);
+        file = toAbsolutePath(file);
         assertPathNotExists(file);
+        assertParentDirectoryExists(file);
 
         try {
             PipedInputStream in = new PipedInputStream(4096);
@@ -297,33 +320,15 @@ public class WebdavFileSystem extends FileSystem {
     @Override
     public PathAttributes getAttributes(Path path) throws XenonException {
 
+        path = toAbsolutePath(path);
         assertPathExists(path);
 
-//        if (directoryExist(path)) {
-//            try {
-//                List<DavResource> result = client.list(getFilePath(path), 1);
-//
-//                for (DavResource d : result) {
-//
-//                    String dirPath = path.getAbsolutePath() + "/";
-//
-//                    if (dirPath.equals(d.getPath())) {
-//                        return getAttributes(path, d);
-//                    }
-//                }
-//            } catch (Exception e) {
-//                throw new XenonException(ADAPTOR_NAME, "Failed to get attributes for directory: " + path, e);
-//            }
-//        } else if (fileExist(path)) {
-
-            try {
-                List<DavResource> result = client.list(getFilePath(path), 0);
-                return getAttributes(path, result.get(0));
-            } catch (Exception e) {
-                throw new XenonException(ADAPTOR_NAME, "Failed to get attributes for file: " + path, e);
-            }
-//        }
-//        throw new NoSuchPathException(ADAPTOR_NAME, "Path not found: " + path);
+        try {
+            List<DavResource> result = client.list(getFilePath(path), 0);
+            return getAttributes(path, result.get(0));
+        } catch (Exception e) {
+            throw new XenonException(ADAPTOR_NAME, "Failed to get attributes for file: " + path, e);
+        }
     }
 
     @Override

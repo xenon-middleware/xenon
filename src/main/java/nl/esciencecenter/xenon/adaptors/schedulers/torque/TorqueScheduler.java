@@ -309,7 +309,7 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         String output;
 
-        Path fsEntryPath = getFsEntryPath();
+        Path fsEntryPath = getWorkingDirectory();
 
         verifyJobDescription(description);
 

@@ -47,7 +47,7 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
     public static final String ADAPTOR_DESCRIPTION = "The SSH job adaptor implements all functionality to start jobs on ssh servers.";
 
     /** The locations supported by this adaptor */
-    public static final String [] ADAPTOR_LOCATIONS = new String [] { "host[:port]" };
+    public static final String[] ADAPTOR_LOCATIONS = new String[] { "host[:port]" };
 
     /** All our own properties start with this prefix. */
     public static final String PREFIX = SchedulerAdaptor.ADAPTORS_PREFIX + "ssh.";
@@ -91,7 +91,9 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
     /** Local multi queue properties start with this prefix. */
     public static final String MULTIQ = QUEUE + "multi.";
 
-    /** Property for the maximum number of concurrent jobs in the multi queue. */
+    /**
+     * Property for the maximum number of concurrent jobs in the multi queue.
+     */
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
     /** Ssh adaptor information start with this prefix. */
@@ -104,30 +106,25 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
     public static final String SUBMITTED = JOBS + "submitted";
 
     /** List of properties supported by this SSH adaptor */
-    public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {
-            new XenonPropertyDescription(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN,
-                    "true", "Automatically add unknown host keys to known_hosts."),
-            new XenonPropertyDescription(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN,
-                    "true", "Enable strict host key checking."),
-            new XenonPropertyDescription(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN,
-                    "true", "Load the standard known_hosts file."),
-            new XenonPropertyDescription(LOAD_SSH_CONFIG, Type.BOOLEAN,
-                    "true", "Load the OpenSSH config file."),
-            new XenonPropertyDescription(SSH_CONFIG_FILE, Type.STRING,
-                    null, "OpenSSH config filename."),
-            new XenonPropertyDescription(AGENT, Type.BOOLEAN,
-                    "false", "Use a (local) ssh-agent."),
-            new XenonPropertyDescription(AGENT_FORWARDING, Type.BOOLEAN,
-                    "false", "Use ssh-agent forwarding"),
-            new XenonPropertyDescription(TIMEOUT, Type.LONG,
-                    "10000", "The timeout for the connection setup and authetication (in milliseconds)."),
-            new XenonPropertyDescription(POLLING_DELAY, Type.LONG,
-                    "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
-            new XenonPropertyDescription(MULTIQ_MAX_CONCURRENT, Type.INTEGER,
-                    "4", "The maximum number of concurrent jobs in the multiq.."),
-            new XenonPropertyDescription(GATEWAY, Type.STRING,
-                    null, "The gateway machine used to create an SSH tunnel to the target.")
-    };
+    public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+            new XenonPropertyDescription(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, "true",
+                    "Automatically add unknown host keys to known_hosts."),
+            new XenonPropertyDescription(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, "true",
+                    "Enable strict host key checking."),
+            new XenonPropertyDescription(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, "true",
+                    "Load the standard known_hosts file."),
+            new XenonPropertyDescription(LOAD_SSH_CONFIG, Type.BOOLEAN, "true", "Load the OpenSSH config file."),
+            new XenonPropertyDescription(SSH_CONFIG_FILE, Type.STRING, null, "OpenSSH config filename."),
+            new XenonPropertyDescription(AGENT, Type.BOOLEAN, "false", "Use a (local) ssh-agent."),
+            new XenonPropertyDescription(AGENT_FORWARDING, Type.BOOLEAN, "false", "Use ssh-agent forwarding"),
+            new XenonPropertyDescription(TIMEOUT, Type.LONG, "10000",
+                    "The timeout for the connection setup and authetication (in milliseconds)."),
+            new XenonPropertyDescription(POLLING_DELAY, Type.LONG, "1000",
+                    "The polling delay for monitoring running jobs (in milliseconds)."),
+            new XenonPropertyDescription(MULTIQ_MAX_CONCURRENT, Type.INTEGER, "4",
+                    "The maximum number of concurrent jobs in the multiq.."),
+            new XenonPropertyDescription(GATEWAY, Type.STRING, null,
+                    "The gateway machine used to create an SSH tunnel to the target.") };
 
     public SshSchedulerAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
@@ -149,31 +146,34 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
     public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties)
             throws XenonException {
 
-          LOGGER.debug("new SSH scheduler location = {} credential = {} properties = {}", location, credential, properties);
+        LOGGER.debug("new SSH scheduler location = {} credential = {} properties = {}", location, credential,
+                properties);
 
-          XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
+        XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
-          boolean loadKnownHosts = xp.getBooleanProperty(LOAD_STANDARD_KNOWN_HOSTS);
-          boolean loadSSHConfig = xp.getBooleanProperty(LOAD_SSH_CONFIG);
-          boolean useSSHAgent = xp.getBooleanProperty(AGENT);
-          boolean useAgentForwarding = xp.getBooleanProperty(AGENT_FORWARDING);
+        boolean loadKnownHosts = xp.getBooleanProperty(LOAD_STANDARD_KNOWN_HOSTS);
+        boolean loadSSHConfig = xp.getBooleanProperty(LOAD_SSH_CONFIG);
+        boolean useSSHAgent = xp.getBooleanProperty(AGENT);
+        boolean useAgentForwarding = xp.getBooleanProperty(AGENT_FORWARDING);
 
-          SshClient client = SSHUtil.createSSHClient(loadKnownHosts, loadSSHConfig, useSSHAgent, useAgentForwarding);
+        SshClient client = SSHUtil.createSSHClient(loadKnownHosts, loadSSHConfig, useSSHAgent, useAgentForwarding);
 
-          long timeout = xp.getLongProperty(TIMEOUT);
+        long timeout = xp.getLongProperty(TIMEOUT);
 
-          ClientSession session = SSHUtil.connect(ADAPTOR_NAME, client, location, credential, timeout);
+        ClientSession session = SSHUtil.connect(ADAPTOR_NAME, client, location, credential, timeout);
 
-          // We must convert the relevant SSH properties to SFTP here.
-          Map<String, String> sftpProperties = SSHUtil.sshToSftpProperties(properties);
+        // We must convert the relevant SSH properties to SFTP here.
+        Map<String, String> sftpProperties = SSHUtil.sshToSftpProperties(properties);
 
-          // Create a file system that point to the same location as the scheduler.
-          FileSystem fs = FileSystem.create("sftp", location, credential, sftpProperties);
+        // Create a file system that point to the same location as the
+        // scheduler.
+        FileSystem fs = FileSystem.create("sftp", location, credential, sftpProperties);
 
-          long pollingDelay = xp.getLongProperty(POLLING_DELAY);
-          int multiQThreads = xp.getIntegerProperty(MULTIQ_MAX_CONCURRENT);
+        long pollingDelay = xp.getLongProperty(POLLING_DELAY);
+        int multiQThreads = xp.getIntegerProperty(MULTIQ_MAX_CONCURRENT);
 
-          return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, location, new SshInteractiveProcessFactory(session),
-                  fs, fs.getEntryPath(), multiQThreads, pollingDelay, xp);
+        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, location,
+                new SshInteractiveProcessFactory(session), fs, fs.getWorkingDirectory(), multiQThreads, pollingDelay,
+                xp);
     }
 }

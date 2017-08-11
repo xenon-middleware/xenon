@@ -62,15 +62,18 @@ public class LocalFileSystemTest extends FileSystemTestParent {
             }
 
             @Override
-            public Path getExpectedEntryPath() {
-                return new Path(System.getProperty("user.dir"));
+            public Path getExpectedWorkingDirectory() {
+                // return new Path(System.getProperty("user.dir"));
+                return new Path("/tmp");
             }
         };
     }
 
     @Override
     public FileSystem setupFileSystem() throws XenonException {
-        return FileSystem.create("file");
+        FileSystem f = FileSystem.create("file");
+        f.setWorkingDirectory(new Path("/tmp"));
+        return f;
     }
 
     @Test
@@ -211,5 +214,19 @@ public class LocalFileSystemTest extends FileSystemTestParent {
         Set<PathAttributes> res = listSet(testDir, false);
 
         assertTrue("Listing contains hidden file", res.stream().anyMatch(PathAttributes::isHidden));
+    }
+
+    @Test
+    public void test_exists_existingDot_returnTrue() throws Exception {
+        testDir = new Path(".");
+
+        assertTrue(fileSystem.exists(testDir));
+    }
+
+    @Test
+    public void test_exists_existingDoubleDot_returnTrue() throws Exception {
+        testDir = new Path("..");
+
+        assertTrue(fileSystem.exists(testDir));
     }
 }

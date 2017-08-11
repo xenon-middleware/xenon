@@ -28,14 +28,16 @@ public class LiveLocationConfig extends LocationConfig {
         super();
         this.fileSystem = fileSystem;
     }
+
     // TODO the paths should be relative to the filesystem.getEntryPath()
     private Path createPath(String path) {
         String baseDir = System.getProperty("xenon.basedir");
         if (baseDir == null) {
-            return fileSystem.getEntryPath().resolve(path);
+            return fileSystem.getWorkingDirectory().resolve(path);
         }
         return new Path(baseDir).resolve(new Path(path));
-       // return fileSystem.getEntryPath().resolve(new Path(baseDir).resolve(new Path(path)));
+        // return fileSystem.getEntryPath().resolve(new
+        // Path(baseDir).resolve(new Path(path)));
     }
 
     @Override
@@ -45,18 +47,27 @@ public class LiveLocationConfig extends LocationConfig {
 
     @Override
     public Map.Entry<Path, Path> getSymbolicLinksToExistingFile() {
-        return new AbstractMap.SimpleEntry<>(
-                createPath("filesystem-test-fixture/links/link0"),
-                createPath("filesystem-test-fixture/links/file0")
-        );
+        return new AbstractMap.SimpleEntry<>(createPath("filesystem-test-fixture/links/link0"),
+                createPath("filesystem-test-fixture/links/file0"));
     }
 
     @Override
     public Path getWritableTestDir() {
         String baseDir = System.getProperty("xenon.basedir");
         if (baseDir == null) {
-            return fileSystem.getEntryPath();
+            return fileSystem.getWorkingDirectory();
         }
+        return new Path(baseDir);
+    }
+
+    @Override
+    public Path getExpectedWorkingDirectory() {
+        String baseDir = System.getProperty("user.dir");
+
+        if (baseDir == null) {
+            throw new RuntimeException("User dir property not set so current working directory not known!");
+        }
+
         return new Path(baseDir);
     }
 }

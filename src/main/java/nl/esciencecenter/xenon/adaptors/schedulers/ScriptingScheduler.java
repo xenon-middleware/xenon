@@ -38,7 +38,8 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.Streams;
 
 /**
- * Connection to a remote scheduler, implemented by calling command line commands over a ssh connection.
+ * Connection to a remote scheduler, implemented by calling command line
+ * commands over a ssh connection.
  *
  */
 public abstract class ScriptingScheduler extends Scheduler {
@@ -51,7 +52,8 @@ public abstract class ScriptingScheduler extends Scheduler {
     protected final long pollDelay;
 
     protected ScriptingScheduler(String uniqueID, String adaptor, String location, Credential credential,
-           Map<String,String> prop, XenonPropertyDescription[] validProperties, String pollDelayProperty) throws XenonException {
+            Map<String, String> prop, XenonPropertyDescription[] validProperties, String pollDelayProperty)
+            throws XenonException {
 
         super(uniqueID, adaptor, location, ScriptingUtils.getProperties(validProperties, location, prop));
 
@@ -73,7 +75,8 @@ public abstract class ScriptingScheduler extends Scheduler {
             subLocation = location;
             subSchedulerProperties = properties.filter(SshSchedulerAdaptor.PREFIX).toMap();
 
-            //since we expect commands to be done almost instantaneously, we poll quite frequently (local operation anyway)
+            // since we expect commands to be done almost instantaneously, we
+            // poll quite frequently (local operation anyway)
             subSchedulerProperties.put(SshSchedulerAdaptor.POLLING_DELAY, "100");
         }
 
@@ -85,8 +88,8 @@ public abstract class ScriptingScheduler extends Scheduler {
         subFileSystem = FileSystem.create(subFileSystemAdaptor, subLocation, credential, null);
     }
 
-    protected Path getFsEntryPath() {
-        return subFileSystem.getEntryPath();
+    protected Path getWorkingDirectory() {
+        return subFileSystem.getWorkingDirectory();
     }
 
     protected QueueStatus[] getQueueStatusses(Map<String, Map<String, String>> all, String... queueNames) {
@@ -97,12 +100,12 @@ public abstract class ScriptingScheduler extends Scheduler {
             if (queueNames[i] == null) {
                 result[i] = null;
             } else {
-                //state for only the requested queuee
+                // state for only the requested queuee
                 Map<String, String> map = all.get(queueNames[i]);
 
                 if (map == null) {
-                    Exception exception = new NoSuchQueueException(getAdaptorName(),
-                            "Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
+                    Exception exception = new NoSuchQueueException(getAdaptorName(), "Cannot get status of queue \""
+                            + queueNames[i] + "\" from server, perhaps it does not exist?");
                     result[i] = new QueueStatusImplementation(this, queueNames[i], exception, null);
                 } else {
                     result[i] = new QueueStatusImplementation(this, queueNames[i], null, map);
@@ -117,45 +120,44 @@ public abstract class ScriptingScheduler extends Scheduler {
      * Run a command on the remote scheduler machine.
      *
      * @param stdin
-     *          the text to write to the input of the executable.
+     *            the text to write to the input of the executable.
      * @param executable
-     *          the executable to run
+     *            the executable to run
      * @param arguments
-     *          the arguments to the executable
-     * @return
-     *          a {@link RemoteCommandRunner} that can be used to monitor the running command
+     *            the arguments to the executable
+     * @return a {@link RemoteCommandRunner} that can be used to monitor the
+     *         running command
      * @throws XenonException
-     *          if an error occurs
+     *             if an error occurs
      */
     public RemoteCommandRunner runCommand(String stdin, String executable, String... arguments) throws XenonException {
         return new RemoteCommandRunner(subScheduler, stdin, executable, arguments);
     }
 
     // Subclasses can override this method to produce more specified exceptions
-    protected void translateError(RemoteCommandRunner runner, String stdin, String executable, String... arguments) throws XenonException {
+    protected void translateError(RemoteCommandRunner runner, String stdin, String executable, String... arguments)
+            throws XenonException {
         throw new XenonException(getAdaptorName(), "could not run command \"" + executable + "\" with stdin \"" + stdin
                 + "\" arguments \"" + Arrays.toString(arguments) + "\" at \"" + subScheduler + "\". Exit code = "
                 + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
     }
 
-
     /**
-     * Run a command until completion. Throw an exception if the command returns a non-zero exit code, or prints to stderr.
-      *
+     * Run a command until completion. Throw an exception if the command returns
+     * a non-zero exit code, or prints to stderr.
+     *
      * @param stdin
-     *          the text to write to the input of the executable.
+     *            the text to write to the input of the executable.
      * @param executable
-     *          the executable to run
+     *            the executable to run
      * @param arguments
-     *          the arguments to the executable
-     * @return
-     *          the text produced by the executable on the stdout stream.
+     *            the arguments to the executable
+     * @return the text produced by the executable on the stdout stream.
      * @throws XenonException
-     *          if an error occurred
+     *             if an error occurred
      */
     public String runCheckedCommand(String stdin, String executable, String... arguments) throws XenonException {
-        RemoteCommandRunner runner = new RemoteCommandRunner(subScheduler, stdin, executable,
-                arguments);
+        RemoteCommandRunner runner = new RemoteCommandRunner(subScheduler, stdin, executable, arguments);
 
         if (!runner.success()) {
             translateError(runner, stdin, executable, arguments);
@@ -168,13 +170,12 @@ public abstract class ScriptingScheduler extends Scheduler {
      * Start an interactive command on the remote machine (usually via ssh).
      *
      * @param executable
-     *          the executable to start
+     *            the executable to start
      * @param arguments
-     *          the arguments to pass to the executable
-     * @return
-     *          the job identifier that represents the interactive command
+     *            the arguments to pass to the executable
+     * @return the job identifier that represents the interactive command
      * @throws XenonException
-     *          if an error occurred
+     *             if an error occurred
      */
     public Streams startInteractiveCommand(String executable, String... arguments) throws XenonException {
         JobDescription description = new JobDescription();
@@ -185,25 +186,27 @@ public abstract class ScriptingScheduler extends Scheduler {
         return subScheduler.submitInteractiveJob(description);
     }
 
-
     /**
-     * Checks if the queue names given are valid, and throw an exception otherwise. Checks against the list of queues when the
-     * scheduler was created.
-      *
+     * Checks if the queue names given are valid, and throw an exception
+     * otherwise. Checks against the list of queues when the scheduler was
+     * created.
+     *
      * @param givenQueueNames
-     *          the queue names to check for validity
+     *            the queue names to check for validity
      * @throws NoSuchQueueException
-     *          if one or more of the queue names is not known in the scheduler
+     *             if one or more of the queue names is not known in the
+     *             scheduler
      */
     protected void checkQueueNames(String[] givenQueueNames) throws XenonException {
 
-        //create a hash set with all given queues
+        // create a hash set with all given queues
         HashSet<String> invalidQueues = new HashSet<>(Arrays.asList(givenQueueNames));
 
-        //remove all valid queues from the set
+        // remove all valid queues from the set
         invalidQueues.removeAll(Arrays.asList(getQueueNames()));
 
-        //if anything remains, these are invalid. throw an exception with the invalid queues
+        // if anything remains, these are invalid. throw an exception with the
+        // invalid queues
         if (!invalidQueues.isEmpty()) {
             throw new NoSuchQueueException(getAdaptorName(), "Invalid queues given: "
                     + Arrays.toString(invalidQueues.toArray(new String[invalidQueues.size()])));
@@ -211,20 +214,22 @@ public abstract class ScriptingScheduler extends Scheduler {
     }
 
     /**
-     * Wait until a Job is done, or until the give timeout expires (whichever comes first).
+     * Wait until a Job is done, or until the give timeout expires (whichever
+     * comes first).
      *
-     * A timeout of 0 will result in an infinite timeout, a negative timeout will result in an exception.
+     * A timeout of 0 will result in an infinite timeout, a negative timeout
+     * will result in an exception.
      *
      * @param jobIdentifier
-     *          the Job to wait for
+     *            the Job to wait for
      * @param timeout
-     *          the maximum number of milliseconds to wait, 0 to wait forever, or negative to return immediately.
-     * @return
-     *          the status of the job
+     *            the maximum number of milliseconds to wait, 0 to wait forever,
+     *            or negative to return immediately.
+     * @return the status of the job
      * @throws IllegalArgumentException
-     *          if the value to timeout is negative
+     *             if the value to timeout is negative
      * @throws XenonException
-     *          if an error occurs
+     *             if an error occurs
      */
     public JobStatus waitUntilDone(String jobIdentifier, long timeout) throws XenonException {
 
@@ -250,20 +255,22 @@ public abstract class ScriptingScheduler extends Scheduler {
     }
 
     /**
-     * Wait until a Job is running (or already done), or until the given timeout expires, whichever comes first.
+     * Wait until a Job is running (or already done), or until the given timeout
+     * expires, whichever comes first.
      *
-     * A timeout of 0 will result in an infinite timeout. A negative timeout will result in an exception.
+     * A timeout of 0 will result in an infinite timeout. A negative timeout
+     * will result in an exception.
      *
      * @param jobIdentifier
-     *          the Job to wait for
+     *            the Job to wait for
      * @param timeout
-     *          the maximum number of milliseconds to wait, 0 to wait forever, or negative to return immediately.
-     * @return
-     *          the status of the job
+     *            the maximum number of milliseconds to wait, 0 to wait forever,
+     *            or negative to return immediately.
+     * @return the status of the job
      * @throws IllegalArgumentException
-     *          if the value of timeout was negative
+     *             if the value of timeout was negative
      * @throws XenonException
-     *          if an error occurs
+     *             if an error occurs
      */
     public JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException {
 
@@ -289,12 +296,14 @@ public abstract class ScriptingScheduler extends Scheduler {
     }
 
     /**
-     * Check if the given working directory exists. Useful for schedulers that do not check this (like Slurm)
+     * Check if the given working directory exists. Useful for schedulers that
+     * do not check this (like Slurm)
      *
      * @param workingDirectory
-     *          the working directory (either absolute or relative) as given by the user.
+     *            the working directory (either absolute or relative) as given
+     *            by the user.
      * @throws XenonException
-     *          if workingDirectory does not exist, or an error occurred.
+     *             if workingDirectory does not exist, or an error occurred.
      */
     protected void checkWorkingDirectory(String workingDirectory) throws XenonException {
         if (workingDirectory == null) {
@@ -306,8 +315,8 @@ public abstract class ScriptingScheduler extends Scheduler {
         if (workingDirectory.startsWith("/")) {
             path = new Path(workingDirectory);
         } else {
-            //make relative path absolute
-            path = getFsEntryPath().resolve(workingDirectory);
+            // make relative path absolute
+            path = getWorkingDirectory().resolve(workingDirectory);
         }
         if (!subFileSystem.exists(path)) {
             throw new InvalidJobDescriptionException(getAdaptorName(), "Working directory does not exist: " + path);

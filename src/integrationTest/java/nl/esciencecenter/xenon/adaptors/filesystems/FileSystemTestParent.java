@@ -231,8 +231,6 @@ public abstract class FileSystemTestParent {
         long deadline = System.currentTimeMillis() + maxTimeout;
 
         while (!fileSystem.exists(testFile)) {
-            System.out.println("NOT EXISTS: " + testFile);
-
             if (System.currentTimeMillis() > deadline) {
                 fail("Failed to ensure file " + testFile + " exists after " + maxTimeout + " ms. ");
             }
@@ -245,12 +243,11 @@ public abstract class FileSystemTestParent {
             PathAttributes att = fileSystem.getAttributes(testFile);
 
             while (att.getSize() != data.length) {
-
-                System.out.println("Wrong size " + att.getSize() + " != " + data.length);
+                // System.out.println("Wrong size " + att.getSize() + " != " +
+                // data.length);
 
                 if (System.currentTimeMillis() > deadline) {
-                    fail("Failed to ensure file " + testFile + " contains " + data.length + " bytes after " + maxTimeout
-                            + " ms. ");
+                    fail("Failed to ensure file " + testFile + " contains " + data.length + " bytes after " + maxTimeout + " ms. ");
                 }
 
                 Thread.sleep(500);
@@ -469,10 +466,8 @@ public abstract class FileSystemTestParent {
     /*
      * TODO: Fixme!
      *
-     * @Test(expected=XenonException.class) public void
-     * test_createFile_closedFileSystem_throwsException() throws Exception {
-     * assumeTrue(!description.isConnectionless()); generateAndCreateTestDir();
-     * Path file0 = createNewTestFileName(testDir); fileSystem.close();
+     * @Test(expected=XenonException.class) public void test_createFile_closedFileSystem_throwsException() throws Exception {
+     * assumeTrue(!description.isConnectionless()); generateAndCreateTestDir(); Path file0 = createNewTestFileName(testDir); fileSystem.close();
      * fileSystem.createFile(file0); }
      */
 
@@ -508,19 +503,43 @@ public abstract class FileSystemTestParent {
     public void test_exists_existingFile_returnTrue() throws Exception {
         generateAndCreateTestDir();
 
-        // test with non-existing file
         Path file0 = createNewTestFileName(testDir);
         fileSystem.createFile(file0);
         assertTrue(fileSystem.exists(file0));
     }
 
     @Test
+    public void test_exists_existingRelativeFile_returnTrue() throws Exception {
+        generateAndCreateTestDir();
+        Path file0 = createNewTestFileName(testDir);
+        fileSystem.createFile(file0);
+
+        // System.out.println("FILE0 " + file0);
+        // System.out.println("CONFIG " + locationConfig);
+        // System.out.println("WORKDIR " + locationConfig.getExpectedWorkingDirectory());
+
+        Path relFile0 = locationConfig.getExpectedWorkingDirectory().relativize(file0);
+
+        assertTrue(fileSystem.exists(relFile0));
+    }
+
+    @Test
     public void test_exists_existingDir_returnTrue() throws Exception {
         generateAndCreateTestDir();
 
-        // test with non-existing file
-        Path file0 = createNewTestFileName(testDir);
+        createNewTestFileName(testDir);
         assertTrue(fileSystem.exists(testDir));
+    }
+
+    @Test
+    public void test_exists_existingRelativeDir_returnTrue() throws Exception {
+        generateAndCreateTestDir();
+
+        createNewTestFileName(testDir);
+
+        Path relDir = locationConfig.getExpectedWorkingDirectory().relativize(testDir);
+
+        assertTrue(fileSystem.exists(relDir));
     }
 
     @Test
@@ -529,7 +548,6 @@ public abstract class FileSystemTestParent {
 
         generateAndCreateTestDir();
 
-        // test with non-existing file
         Path file0 = createNewTestFileName(testDir);
         Path link = createNewTestFileName(testDir);
         fileSystem.createFile(file0);
@@ -703,7 +721,6 @@ public abstract class FileSystemTestParent {
             if (res.contains(p)) {
                 throw new XenonException(fileSystem.getAdaptorName(), "Duplicate element in listing!");
             } else {
-                System.out.println("ADDING TO LIST: " + p);
                 res.add(p);
             }
         }
@@ -871,8 +888,7 @@ public abstract class FileSystemTestParent {
         fileSystem.getAttributes(file0);
     }
 
-    private void assertPathAttributesConsistent(Path path, boolean isDirectory, long size, long currentTime)
-            throws Exception {
+    private void assertPathAttributesConsistent(Path path, boolean isDirectory, long size, long currentTime) throws Exception {
 
         PathAttributes result = fileSystem.getAttributes(path);
 
@@ -885,20 +901,15 @@ public abstract class FileSystemTestParent {
         }
 
         if (!isWithinMargin(currentTime, result.getLastModifiedTime()) && result.getLastModifiedTime() != 0) {
-            throwWrong("test_getfileAttributes", "lastModifiedTime=" + currentTime,
-                    "lastModifiedTime=" + result.getLastModifiedTime());
+            throwWrong("test_getfileAttributes", "lastModifiedTime=" + currentTime, "lastModifiedTime=" + result.getLastModifiedTime());
 
         }
-        if (!isWithinMargin(currentTime, result.getCreationTime())
-                && result.getCreationTime() != result.getLastModifiedTime()) {
-            throwWrong("test_getfileAttributes", "creationTime=" + currentTime,
-                    "creationTime=" + result.getCreationTime());
+        if (!isWithinMargin(currentTime, result.getCreationTime()) && result.getCreationTime() != result.getLastModifiedTime()) {
+            throwWrong("test_getfileAttributes", "creationTime=" + currentTime, "creationTime=" + result.getCreationTime());
         }
 
-        if (!isWithinMargin(currentTime, result.getLastAccessTime())
-                && result.getLastAccessTime() != result.getLastModifiedTime()) {
-            throwWrong("test13_getfileAttributes", "lastAccessTime=" + currentTime,
-                    "lastAccessTime=" + result.getLastAccessTime());
+        if (!isWithinMargin(currentTime, result.getLastAccessTime()) && result.getLastAccessTime() != result.getLastModifiedTime()) {
+            throwWrong("test13_getfileAttributes", "lastAccessTime=" + currentTime, "lastAccessTime=" + result.getLastAccessTime());
         }
 
     }
@@ -909,10 +920,8 @@ public abstract class FileSystemTestParent {
      *
      *
      *
-     * /** Tests whether two times (in milliseconds) are within a mild margin of
-     * one another. The margin is large enough to be able to cope with servers
-     * in other timezones and similar, expected, sources of discrepancy between
-     * times.
+     * /** Tests whether two times (in milliseconds) are within a mild margin of one another. The margin is large enough to be able to cope with servers in
+     * other timezones and similar, expected, sources of discrepancy between times.
      *
      * @param time1
      *
@@ -994,8 +1003,7 @@ public abstract class FileSystemTestParent {
         assumeTrue(description.supportsSettingPosixPermissions());
         generateAndCreateTestDir();
         Path existingFile = createTestFile(testDir, new byte[] { 1, 2, 3 });
-        Set<PosixFilePermission> permissions = EnumSet.of(PosixFilePermission.OWNER_EXECUTE,
-                PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE);
+        Set<PosixFilePermission> permissions = EnumSet.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE);
         try {
             assertPermissionsSetIsGet(existingFile, permissions);
         } finally {
@@ -1044,8 +1052,8 @@ public abstract class FileSystemTestParent {
     }
 
     private Set<PosixFilePermission> getVariousPosixPermissions() {
-        return EnumSet.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ,
-                PosixFilePermission.OWNER_WRITE, PosixFilePermission.OTHERS_READ, PosixFilePermission.GROUP_READ);
+        return EnumSet.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OTHERS_READ,
+                PosixFilePermission.GROUP_READ);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -1065,8 +1073,7 @@ public abstract class FileSystemTestParent {
      *
      * A temporary buffer of size <code>100</code> is used.
      * <p>
-     * NOTE: <code>in</code> and <code>out</code> will NOT be explicitly closed
-     * once the end of the stream is reached.
+     * NOTE: <code>in</code> and <code>out</code> will NOT be explicitly closed once the end of the stream is reached.
      * </p>
      *
      * @param in
@@ -1096,8 +1103,7 @@ public abstract class FileSystemTestParent {
     /**
      * Read all bytes from the input stream and return them in a byte array.
      * <p>
-     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the
-     * stream is reached.
+     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.
      * </p>
      *
      * @param in
@@ -1760,11 +1766,11 @@ public abstract class FileSystemTestParent {
     }
 
     @Test
-    public void test_getEntryPath() {
-        Path expected = locationConfig.getExpectedEntryPath();
+    public void test_getWorkingDirectory() {
+        Path expected = locationConfig.getExpectedWorkingDirectory();
         assumeNotNull(expected);
 
-        Path result = fileSystem.getEntryPath();
+        Path result = fileSystem.getWorkingDirectory();
 
         assertEquals(expected, result);
     }

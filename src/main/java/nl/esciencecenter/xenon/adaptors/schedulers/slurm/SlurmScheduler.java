@@ -135,7 +135,7 @@ public class SlurmScheduler extends ScriptingScheduler {
     public String submitBatchJob(JobDescription description) throws XenonException {
 
         String output;
-        Path fsEntryPath = getFsEntryPath();
+        Path fsEntryPath = getWorkingDirectory();
 
         verifyJobDescription(description, false);
 
@@ -202,7 +202,7 @@ public class SlurmScheduler extends ScriptingScheduler {
     @Override
     public Streams submitInteractiveJob(JobDescription description) throws XenonException {
 
-        Path fsEntryPath = getFsEntryPath();
+        Path fsEntryPath = getWorkingDirectory();
 
         verifyJobDescription(description, true);
 
