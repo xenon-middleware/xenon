@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.filesystems;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,10 +37,10 @@ public class Path implements Iterable<Path> {
     /** The default separator to use. */
     private static final char DEFAULT_SEPARATOR = '/';
 
-    /** The path elements in this relative path */
+    /** The path elements in this path */
     private final List<String> elements;
 
-    /** The separator used in this relative path */
+    /** The separator used in this path */
     private final char separator;
 
     /** Does path start with / ? **/
@@ -200,10 +201,9 @@ public class Path implements Iterable<Path> {
         String delim = String.valueOf(separator);
 
         this.isAbsolute = tmp.isEmpty() ? false : tmp.get(0).startsWith(delim);
-
         this.separator = separator;
-
         this.elements = new ArrayList<>(tmp.size());
+
         for (String elt : tmp) {
             StringTokenizer tok = new StringTokenizer(elt, delim);
 
@@ -417,8 +417,6 @@ public class Path implements Iterable<Path> {
     public Path resolve(Path other) {
         if (other == null || other.isEmpty()) {
             return this;
-        } else if (isEmpty()) {
-            return other;
         }
 
         ArrayList<String> tmp = new ArrayList<>(elements.size() + other.elements.size());

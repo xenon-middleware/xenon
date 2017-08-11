@@ -103,10 +103,19 @@ public class WebdavFileSystem extends FileSystem {
 
     private String getFilePath(Path path) {
 
-        return server + (path.isAbsolute() ? "" : "/") + path.toString();
+        if (!path.isAbsolute()) {
+            throw new IllegalArgumentException("Path must be absolute!");
+        }
+
+        return server + path.toString();
     }
 
     private String getDirectoryPath(Path path) {
+
+        if (!path.isAbsolute()) {
+            throw new IllegalArgumentException("Path must be absolute!");
+        }
+
         return server + path.toString() + "/";
     }
 
@@ -167,7 +176,7 @@ public class WebdavFileSystem extends FileSystem {
         LOGGER.debug("move source = {} to target = {}", source, target);
 
         source = toAbsolutePath(source);
-        target = toAbsolutePath(source);
+        target = toAbsolutePath(target);
 
         assertPathExists(source);
 
@@ -252,7 +261,11 @@ public class WebdavFileSystem extends FileSystem {
     @Override
     public boolean exists(Path path) throws XenonException {
 
+        System.out.println("EXISTS: " + path);
+
         path = toAbsolutePath(path);
+
+        System.out.println("EXISTS ABS: " + path);
 
         try {
             return client.exists(getDirectoryPath(path)) || client.exists(getFilePath(path));

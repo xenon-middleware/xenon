@@ -88,7 +88,7 @@ public class SftpFileSystem extends FileSystem {
         LOGGER.debug("move source = {} target = {}", source, target);
 
         source = toAbsolutePath(source);
-        target = toAbsolutePath(source);
+        target = toAbsolutePath(target);
 
         assertPathExists(source);
 

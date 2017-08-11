@@ -49,6 +49,11 @@ public class S3MinioFileSystemDockerTest extends S3FileSystemTestParent {
             public Path getWritableTestDir() {
                 return fileSystem.getWorkingDirectory();
             }
+
+            @Override
+            public Path getExpectedWorkingDirectory() {
+                return new Path("/");
+            }
         };
     }
 

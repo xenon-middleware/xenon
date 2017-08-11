@@ -63,14 +63,17 @@ public class LocalFileSystemTest extends FileSystemTestParent {
 
             @Override
             public Path getExpectedWorkingDirectory() {
-                return new Path(System.getProperty("user.dir"));
+                // return new Path(System.getProperty("user.dir"));
+                return new Path("/tmp");
             }
         };
     }
 
     @Override
     public FileSystem setupFileSystem() throws XenonException {
-        return FileSystem.create("file");
+        FileSystem f = FileSystem.create("file");
+        f.setWorkingDirectory(new Path("/tmp"));
+        return f;
     }
 
     @Test

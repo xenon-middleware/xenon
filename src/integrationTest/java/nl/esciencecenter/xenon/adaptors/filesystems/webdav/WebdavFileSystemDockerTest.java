@@ -39,7 +39,7 @@ public class WebdavFileSystemDockerTest extends WebdavFileSystemTestParent {
 
             @Override
             public Path getExistingPath() {
-                return new Path("~xenon/filesystem-test-fixture/links/file0");
+                return new Path("/~xenon/filesystem-test-fixture/links/file0");
             }
 
             @Override

@@ -189,8 +189,6 @@ public class MockFileSystem extends FileSystem {
                 throw new PathAlreadyExistsException("TEST", "Path already exists: " + name);
             }
 
-            System.err.println("Add file: " + attributes.getPath().toString() + " " + name);
-
             FileEntry e = new FileEntry(name, attributes);
             entries.put(name, e);
             return e;
@@ -200,8 +198,6 @@ public class MockFileSystem extends FileSystem {
             if (entries.containsKey(name)) {
                 throw new PathAlreadyExistsException("TEST", "Directory already exists: " + name);
             }
-
-            System.err.println("Add dir: " + attributes.getPath().toString() + " " + name);
 
             DirEntry e = new DirEntry(name, attributes);
             entries.put(name, e);
@@ -257,8 +253,6 @@ public class MockFileSystem extends FileSystem {
 
         void deleteDir(String name) throws XenonException {
 
-            System.err.println("deleting " + name);
-
             Entry e = entries.get(name);
 
             if (e == null) {
@@ -269,20 +263,13 @@ public class MockFileSystem extends FileSystem {
                 throw new InvalidPathException("TEST", "Path is not a directory: " + name);
             }
 
-            System.err.println("Checking " + name);
-
             DirEntry dir = (DirEntry) e;
 
             if (!dir.entries.isEmpty()) {
 
-                System.err.println("not empty " + name + " " + dir.entries.size());
-
                 // If we have exaclty 2 entries "." and ".." it is fine
                 if (dir.entries.size() == 2) {
                     for (Entry se : dir.entries.values()) {
-
-                        System.err.println("not empty " + name + " " + se.name);
-
                         if (!(se.name.equals(".") || se.name.equals(".."))) {
                             throw new DirectoryNotEmptyException("TEST",
                                     "Directory not empty: " + name + "/" + se.name);
@@ -306,8 +293,6 @@ public class MockFileSystem extends FileSystem {
                 }
             }
 
-            System.out.println("List of " + attributes.getPath().toString() + " " + result);
-
             return result;
         }
     }
@@ -318,9 +303,6 @@ public class MockFileSystem extends FileSystem {
             throws XenonException {
         super(uniqueID, name, location, entryPath, p);
         root = new DirEntry("", getDirAttributes(new Path("/")));
-
-        System.out.println("ENTRY " + entryPath + " " + entryPath.isAbsolute());
-
         ensureDirectories(entryPath);
     }
 
@@ -348,16 +330,12 @@ public class MockFileSystem extends FileSystem {
 
     public synchronized Entry getEntry(Path path) throws XenonException {
 
-        System.out.println("GET ENTRY " + path + " " + path.isAbsolute());
-
         if (path == null || path.isEmpty()) {
             // System.err.println("entry is root");
             return root;
         }
 
         path = toAbsolutePath(path);
-
-        System.out.println("GET ENTRY ABS " + path + " " + path.isAbsolute());
 
         if ("..".equals(path.getFileNameAsString())) {
             return (DirEntry) getEntry(path.getParent().getParent());
@@ -379,8 +357,6 @@ public class MockFileSystem extends FileSystem {
     }
 
     public synchronized DirEntry getDirEntry(Path path) throws XenonException {
-
-        path = toAbsolutePath(path);
 
         Entry e = getEntry(path);
 
@@ -483,16 +459,18 @@ public class MockFileSystem extends FileSystem {
         throw new XenonException("TEST", "Not implememnted");
     }
 
+    public synchronized void forceCreateDirectory(Path dir) throws XenonException {
+        getDirEntry(dir.getParent()).addDir(dir.getFileNameAsString(), getDirAttributes(dir));
+    }
+
     @Override
     public synchronized void createDirectory(Path dir) throws XenonException {
-        // System.err.println("Create dir: " + dir);
         dir = toAbsolutePath(dir);
         getDirEntry(dir.getParent()).addDir(dir.getFileNameAsString(), getDirAttributes(dir));
     }
 
     @Override
     public synchronized void createFile(Path file) throws XenonException {
-        // System.err.println("Create file: " + file);
         file = toAbsolutePath(file);
         getDirEntry(file.getParent()).addFile(file.getFileNameAsString(), getFileAttributes(file));
     }
