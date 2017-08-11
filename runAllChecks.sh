@@ -4,6 +4,16 @@ echo "| clean |"
 echo "+-------+"
 ./gradlew clean
 
+echo "+--------------------------+"
+echo "| checking license headers |"
+echo "+--------------------------+"
+./gradlew license
+
+echo "+---------------------+"
+echo "| checking code style |"
+echo "+---------------------+"
+./gradlew spotlessJavaCheck
+
 echo "+------------+"
 echo "| unit tests |"
 echo "+------------+"
@@ -24,12 +34,3 @@ echo "| generate merged test report |"
 echo "+-----------------------------+"
 ./gradlew jacocoMergedTestReport
 
-echo "+--------------------------+"
-echo "| checking license headers |"
-echo "+--------------------------+"
-./gradlew license
-
-echo "+---------------------+"
-echo "| checking code style |"
-echo "+---------------------+"
-./gradlew spotlessJavaCheck

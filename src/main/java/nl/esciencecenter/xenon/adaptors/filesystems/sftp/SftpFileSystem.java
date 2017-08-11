@@ -40,6 +40,7 @@ import nl.esciencecenter.xenon.adaptors.filesystems.NoSpaceException;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
 import nl.esciencecenter.xenon.adaptors.filesystems.PermissionDeniedException;
 import nl.esciencecenter.xenon.adaptors.filesystems.PosixFileUtils;
+import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
 import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
@@ -54,8 +55,7 @@ public class SftpFileSystem extends FileSystem {
 
     private final SftpClient client;
 
-    protected SftpFileSystem(String uniqueID, String name, String location, Path entryPath, SftpClient client,
-            XenonProperties properties) {
+    protected SftpFileSystem(String uniqueID, String name, String location, Path entryPath, SftpClient client, XenonProperties properties) {
         super(uniqueID, name, location, entryPath, properties);
         this.client = client;
     }
@@ -68,7 +68,7 @@ public class SftpFileSystem extends FileSystem {
         try {
             client.close();
         } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to close sftp client", e);
+            throw sftpExceptionToXenonException(e, "Failed to close sftp client");
         }
 
         // info.getSession().disconnect();
@@ -102,7 +102,7 @@ public class SftpFileSystem extends FileSystem {
         try {
             client.rename(source.toString(), target.toString());
         } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to rename path", e);
+            throw sftpExceptionToXenonException(e, "Failed to rename path");
         }
 
         LOGGER.debug("move OK");
@@ -120,7 +120,7 @@ public class SftpFileSystem extends FileSystem {
         try {
             client.mkdir(dir.toString());
         } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to mkdir", e);
+            throw sftpExceptionToXenonException(e, "Failed to mkdir");
         }
 
         LOGGER.debug("createDirectory OK");
@@ -161,7 +161,7 @@ public class SftpFileSystem extends FileSystem {
         try {
             client.symLink(link.toString(), path.toString());
         } catch (IOException e) {
-            sftpExceptionToXenonException(e, "Cannot create link: " + link + " -> " + path);
+            throw sftpExceptionToXenonException(e, "Cannot create link: " + link + " -> " + path);
         }
     }
 
@@ -170,7 +170,7 @@ public class SftpFileSystem extends FileSystem {
         try {
             client.remove(file.toString());
         } catch (IOException e) {
-            sftpExceptionToXenonException(e, "Cannot delete file: " + file);
+            throw sftpExceptionToXenonException(e, "Cannot delete file: " + file);
         }
     }
 
@@ -179,7 +179,7 @@ public class SftpFileSystem extends FileSystem {
         try {
             client.rmdir(dir.toString());
         } catch (IOException e) {
-            sftpExceptionToXenonException(e, "Cannot delete directory: " + dir);
+            throw sftpExceptionToXenonException(e, "Cannot delete directory: " + dir);
         }
     }
 
@@ -191,7 +191,6 @@ public class SftpFileSystem extends FileSystem {
 
         try {
             result = client.lstat(path.toString());
-
         } catch (IOException e) {
             throw sftpExceptionToXenonException(e, "Failed to retrieve attributes from: " + path);
         }
@@ -213,31 +212,6 @@ public class SftpFileSystem extends FileSystem {
         }
     }
 
-    // private PathAttributesPair convert(Path root, SftpClient.DirEntry e) {
-    // FileAttributes attributes = convertAttributes(e.getAttributes());
-    // return new PathAttributesPair(root.resolve(e.getFilename()), attributes);
-    // }
-    //
-    //
-    // private List<PathAttributesPair> listDirectory(Path path) throws
-    // XenonException {
-    //
-    // assertDirectoryExists(path);
-    //
-    // ArrayList<PathAttributesPair> result = new ArrayList<>();
-    //
-    // try {
-    // for (SftpClient.DirEntry e : client.readDir(path.getAbsolutePath())) {
-    // result.add(convert(path, e));
-    // }
-    // } catch (IOException e) {
-    // throw new XenonException(ADAPTOR_NAME,"Failed to retrieve directory
-    // listing of " + path);
-    // }
-    //
-    // return result;
-    // }
-
     @Override
     protected List<PathAttributes> listDirectory(Path path) throws XenonException {
 
@@ -245,6 +219,7 @@ public class SftpFileSystem extends FileSystem {
             assertDirectoryExists(path);
 
             ArrayList<PathAttributes> result = new ArrayList<>();
+
             for (SftpClient.DirEntry f : client.readDir(path.toString())) {
                 result.add(convertAttributes(path.resolve(f.getFilename()), f.getAttributes()));
             }
@@ -254,22 +229,6 @@ public class SftpFileSystem extends FileSystem {
             throw sftpExceptionToXenonException(e, "Failed to list directory " + path);
         }
     }
-
-    // @Override
-    // public DirectoryStream<Path> newDirectoryStream(Path dir, Filter filter)
-    // throws XenonException {
-    // LOGGER.debug("newDirectoryStream path = {} filter = <?>", dir);
-    // return new SftpDirectoryStream(dir, filter, listDirectory(dir, filter));
-    // }
-    //
-    // @Override
-    // public DirectoryStream<PathAttributesPair>
-    // newAttributesDirectoryStream(Path dir, Filter filter) throws
-    // XenonException {
-    // LOGGER.debug("newAttributesDirectoryStream path = {} filter = <?>", dir);
-    // return new SftpDirectoryAttributeStream(dir, filter, listDirectory(dir,
-    // filter));
-    // }
 
     @Override
     public InputStream readFromFile(Path path) throws XenonException {
@@ -300,8 +259,7 @@ public class SftpFileSystem extends FileSystem {
         assertParentDirectoryExists(path);
 
         try {
-            return client.write(path.toString(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Create,
-                    SftpClient.OpenMode.Truncate);
+            return client.write(path.toString(), SftpClient.OpenMode.Write, SftpClient.OpenMode.Create, SftpClient.OpenMode.Truncate);
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed open stream to write to: " + path, e);
         }
@@ -349,7 +307,7 @@ public class SftpFileSystem extends FileSystem {
                 result = new Path(target);
             }
         } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to read link: " + link, e);
+            throw sftpExceptionToXenonException(e, "Failed to read link: " + link);
         }
 
         LOGGER.debug("readSymbolicLink OK result = {}", result);
@@ -379,13 +337,12 @@ public class SftpFileSystem extends FileSystem {
             a.setPermissions(PosixFileUtils.permissionsToBits(permissions));
             client.setStat(path.toString(), a);
         } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to set permissions on: " + path, e);
+            throw sftpExceptionToXenonException(e, "Failed to set permissions on: " + path);
         }
         LOGGER.debug("setPosixFilePermissions OK");
     }
 
     private static long convertTime(FileTime time) {
-
         return time.toMillis();
     }
 
@@ -432,7 +389,7 @@ public class SftpFileSystem extends FileSystem {
         return result;
     }
 
-    private static XenonException sftpExceptionToXenonException(IOException e, String message) {
+    static XenonException sftpExceptionToXenonException(IOException e, String message) {
 
         if (e instanceof SftpException) {
             SftpException x = (SftpException) e;
@@ -480,7 +437,7 @@ public class SftpFileSystem extends FileSystem {
                 return new InvalidPathException(ADAPTOR_NAME, "File corrupt", e);
 
             case SftpConstants.SSH_FX_DIR_NOT_EMPTY:
-                return new InvalidPathException(ADAPTOR_NAME, "Directory not empty", e);
+                return new DirectoryNotEmptyException(ADAPTOR_NAME, "Directory not empty", e);
 
             case SftpConstants.SSH_FX_NOT_A_DIRECTORY:
                 return new InvalidPathException(ADAPTOR_NAME, "Not a directory", e);
@@ -519,11 +476,12 @@ public class SftpFileSystem extends FileSystem {
                 return new XenonException(ADAPTOR_NAME, "Malformed message", e);
 
             }
-
         }
+
         if (e.getMessage().contains("client is close")) {
             return new NotConnectedException(ADAPTOR_NAME, e.getMessage());
         }
+
         // Fall through if we do not know the error
         return new XenonException(ADAPTOR_NAME, message, e);
     }
