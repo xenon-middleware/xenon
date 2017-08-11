@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.webdav;
 
+import java.util.Map;
+
 import org.junit.ClassRule;
 
 import com.palantir.docker.compose.DockerComposeRule;
@@ -29,13 +31,17 @@ import nl.esciencecenter.xenon.filesystems.Path;
 public class WebdavFileSystemDockerTest extends WebdavFileSystemTestParent {
 
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder()
-            .file("src/integrationTest/resources/docker-compose/webdav.yml")
+    public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/webdav.yml")
             .waitingForService("webdav", HealthChecks.toHaveAllPortsOpen()).saveLogsTo("/tmp/webdav.txt").build();
 
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
         return new LocationConfig() {
+
+            @Override
+            public Map.Entry<Path, Path> getSymbolicLinksToExistingFile() {
+                throw new Error("Symlinks not supported on webdav");
+            }
 
             @Override
             public Path getExistingPath() {
@@ -56,8 +62,7 @@ public class WebdavFileSystemDockerTest extends WebdavFileSystemTestParent {
 
     @Override
     public FileSystem setupFileSystem() throws XenonException {
-        String location = docker.containers().container("webdav").port(80)
-                .inFormat("http://$HOST:$EXTERNAL_PORT/~xenon");
+        String location = docker.containers().container("webdav").port(80).inFormat("http://$HOST:$EXTERNAL_PORT/~xenon");
         PasswordCredential cred = new PasswordCredential("xenon", "javagat".toCharArray());
         return FileSystem.create("webdav", location, cred);
     }

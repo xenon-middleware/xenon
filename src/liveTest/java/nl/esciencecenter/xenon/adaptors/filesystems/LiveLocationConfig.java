@@ -59,4 +59,15 @@ public class LiveLocationConfig extends LocationConfig {
         }
         return new Path(baseDir);
     }
+
+    @Override
+    public Path getExpectedWorkingDirectory() {
+        String baseDir = System.getProperty("user.dir");
+      
+        if (baseDir == null) {
+            throw new RuntimeException("User dir property not set so current working directory not known!");
+        }
+      
+        return new Path(baseDir);
+    }
 }

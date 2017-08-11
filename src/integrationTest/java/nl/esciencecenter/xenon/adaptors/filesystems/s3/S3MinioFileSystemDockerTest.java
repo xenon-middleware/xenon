@@ -32,13 +32,17 @@ import nl.esciencecenter.xenon.filesystems.Path;
 public class S3MinioFileSystemDockerTest extends S3FileSystemTestParent {
 
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder()
-            .file("src/integrationTest/resources/docker-compose/minio.yml")
+    public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/minio.yml")
             .waitingForService("minio", HealthChecks.toHaveAllPortsOpen()).saveLogsTo("/var/tmp/bla").build();
 
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
         return new LocationConfig() {
+
+            @Override
+            public Map.Entry<Path, Path> getSymbolicLinksToExistingFile() {
+                throw new Error("Symlinks not supported on S3");
+            }
 
             @Override
             public Path getExistingPath() {
@@ -59,8 +63,7 @@ public class S3MinioFileSystemDockerTest extends S3FileSystemTestParent {
 
     @Override
     public FileSystem setupFileSystem() throws XenonException {
-        String location = docker.containers().container("minio").port(9000)
-                .inFormat("http://localhost:$EXTERNAL_PORT/filesystem-test-fixture");
+        String location = docker.containers().container("minio").port(9000).inFormat("http://localhost:$EXTERNAL_PORT/filesystem-test-fixture");
         PasswordCredential cred = new PasswordCredential("xenon", "javagat01".toCharArray());
         Map<String, String> props = new HashMap<>();
         return FileSystem.create("s3", location, cred, props);
