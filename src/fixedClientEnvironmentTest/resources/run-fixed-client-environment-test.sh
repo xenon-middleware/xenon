@@ -15,9 +15,11 @@
 # limitations under the License.
 #
 
+MYDOCKERGID=`cut -d: -f3 < <(getent group docker)`
 
 docker run \
 --env MYUID=$UID \
+--env DOCKERGID=$MYDOCKERGID \
 --network host \
 --volume $HOME/.gradle:/home/xenon/.gradle \
 --volume $HOME/.m2:/home/xenon/.m2 \
