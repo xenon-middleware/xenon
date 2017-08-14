@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.KeyPair;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +33,6 @@ import org.apache.sshd.client.config.hosts.DefaultConfigFileHostEntryResolver;
 import org.apache.sshd.client.keyverifier.AcceptAllServerKeyVerifier;
 import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.common.config.keys.FilePasswordProvider;
-import org.apache.sshd.common.util.io.IoUtils;
 import org.apache.sshd.common.util.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,17 +61,23 @@ public class SSHUtil {
         private final char[] password;
 
         public PasswordProvider(char[] password) {
-            this.password = password;
+            this.password = password.clone();
         }
 
         @Override
         public String getPassword(String resourceKey) throws IOException {
-            return new String(password);
+
+            String result = new String(password);
+
+            System.out.println("PASSWORD PROVIDER " + resourceKey + " returns " + result);
+
+            new Exception().printStackTrace(System.out);
+
+            return result;
         }
     }
 
-    public static SshClient createSSHClient(boolean loadKnownHosts, boolean loadSSHConfig, boolean useSSHAgent,
-            boolean useAgentForwarding) {
+    public static SshClient createSSHClient(boolean loadKnownHosts, boolean loadSSHConfig, boolean useSSHAgent, boolean useAgentForwarding) {
 
         SshClient client = SshClient.setUpDefaultClient();
 
@@ -136,8 +142,7 @@ public class SSHUtil {
         }
     }
 
-    public static ClientSession connect(String adaptorName, SshClient client, String location, Credential credential,
-            long timeout) throws XenonException {
+    public static ClientSession connect(String adaptorName, SshClient client, String location, Credential credential, long timeout) throws XenonException {
 
         // location should be hostname or hostname:port. If port unset it
         // defaults to port 22
@@ -178,42 +183,55 @@ public class SSHUtil {
         // Figure out which type of credential we are using
         if (credential instanceof DefaultCredential) {
             // do nothing
-        } else if (credential instanceof PasswordCredential) {
-            PasswordCredential c = (PasswordCredential) credential;
-            session.addPasswordIdentity(new String(c.getPassword()));
 
         } else if (credential instanceof CertificateCredential) {
+
+            System.out.println("CERT!");
+
             CertificateCredential c = (CertificateCredential) credential;
 
             String certfile = c.getCertificateFile();
 
             Path path = Paths.get(certfile).toAbsolutePath().normalize();
 
-            if (!Files.exists(path, IoUtils.EMPTY_LINK_OPTIONS)) {
+            if (!Files.exists(path)) {
                 throw new CertificateNotFoundException(adaptorName, "Certificate not found: " + path);
             }
 
             KeyPair pair = null;
 
             try {
-                InputStream inputStream = Files.newInputStream(path, IoUtils.EMPTY_OPEN_OPTIONS);
+                InputStream inputStream = Files.newInputStream(path, StandardOpenOption.READ);
 
                 char[] password = c.getPassword();
 
                 if (password.length == 0) {
                     pair = SecurityUtils.loadKeyPairIdentity(path.toString(), inputStream, null);
+
+                    System.out.println("CREATE PAIR " + path.toString() + " NO PASSWORD");
+
                 } else {
-                    pair = SecurityUtils.loadKeyPairIdentity(path.toString(), inputStream,
-                            new PasswordProvider(password));
+
+                    System.out.println("CREATE PAIR " + path.toString() + " " + new String(password));
+
+                    pair = SecurityUtils.loadKeyPairIdentity(path.toString(), inputStream, new PasswordProvider(password));
+
                 }
+
             } catch (Exception e) {
                 throw new XenonException(adaptorName, "Failed to load certificate: " + path, e);
             }
 
+            System.out.println("PAIR " + pair);
+
             session.addPublicKeyIdentity(pair);
+
+        } else if (credential instanceof PasswordCredential) {
+            PasswordCredential c = (PasswordCredential) credential;
+            session.addPasswordIdentity(new String(c.getPassword()));
+
         } else {
-            throw new InvalidCredentialException(adaptorName,
-                    "Unsupported credential type: " + credential.getClass().getName());
+            throw new InvalidCredentialException(adaptorName, "Unsupported credential type: " + credential.getClass().getName());
         }
 
         // Will throw exception on timeout
@@ -228,8 +246,7 @@ public class SSHUtil {
         return session;
     }
 
-    public static Map<String, String> translateProperties(Map<String, String> properties, Set<String> valid,
-            String orginalPrefix, String newPrefix) {
+    public static Map<String, String> translateProperties(Map<String, String> properties, Set<String> valid, String orginalPrefix, String newPrefix) {
 
         HashMap<String, String> result = new HashMap<>();
 
@@ -264,12 +281,10 @@ public class SSHUtil {
     }
 
     public static Map<String, String> sshToSftpProperties(Map<String, String> properties) {
-        return translateProperties(properties, validProperties(SftpFileAdaptor.VALID_PROPERTIES),
-                SshSchedulerAdaptor.PREFIX, SftpFileAdaptor.PREFIX);
+        return translateProperties(properties, validProperties(SftpFileAdaptor.VALID_PROPERTIES), SshSchedulerAdaptor.PREFIX, SftpFileAdaptor.PREFIX);
     }
 
     public static Map<String, String> sftpToSshProperties(Map<String, String> properties) {
-        return translateProperties(properties, validProperties(SshSchedulerAdaptor.VALID_PROPERTIES),
-                SftpFileAdaptor.PREFIX, SshSchedulerAdaptor.PREFIX);
+        return translateProperties(properties, validProperties(SshSchedulerAdaptor.VALID_PROPERTIES), SftpFileAdaptor.PREFIX, SshSchedulerAdaptor.PREFIX);
     }
 }
