@@ -15,19 +15,32 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems;
 
-import static org.junit.Assert.assertNotNull;
+import static nl.esciencecenter.xenon.adaptors.Utils.buildCredential;
+import static nl.esciencecenter.xenon.adaptors.Utils.buildProperties;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.credentials.DefaultCredential;
-import nl.esciencecenter.xenon.credentials.PasswordCredential;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.utils.OutputReader;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class FileSystemTest extends FileSystemTestParent {
+    @BeforeClass
+    static public void skipIfNotRequested() {
+        String name = System.getProperty("xenon.filesystem");
+        assumeFalse("Ignoring filesystem test, 'xenon.filesystem' system property not set", name == null);
+    }
+
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
         return new LiveLocationConfig(fileSystem);
@@ -36,40 +49,20 @@ public class FileSystemTest extends FileSystemTestParent {
     @Override
     public FileSystem setupFileSystem() throws XenonException {
         String name = System.getProperty("xenon.filesystem");
-        org.junit.Assume.assumeFalse("Ignoring filesystem test, 'xenon.filesystem' system property not set", name == null);
-        String location = System.getProperty("xenon.location");
-        assertNotNull("liveTest expects 'xenon.location' system property", location);
+        String location = System.getProperty("xenon.filesystem.location");
         Credential cred = buildCredential();
-        Map<String, String> props = buildProperties();
+        Map<String, String> props = buildProperties(FileAdaptor.ADAPTORS_PREFIX + System.getProperty("xenon.filesystem"));
         return FileSystem.create(name, location, cred, props);
     }
 
-    private Map<String,String> buildProperties() {
-        Map<String,String> properties = new HashMap<>();
-        String prefix = FileAdaptor.ADAPTORS_PREFIX + System.getProperty("xenon.filesystem");
-        for (String propName : System.getProperties().stringPropertyNames()) {
-            if (propName.startsWith(prefix)) {
-                properties.put(propName, System.getProperty(propName));
-            }
-        }
-        return properties;
-    }
-
-    private Credential buildCredential() {
-        String username = System.getProperty("xenon.username");
-        assertNotNull("liveTest expects 'xenon.username' system property", username);
-        String password = System.getProperty("xenon.password");
-        if (password != null) {
-            return new PasswordCredential(username, password.toCharArray());
-        }
-        String certfile = System.getProperty("xenon.certfile");
-        if (certfile != null) {
-            String passphrase = System.getProperty("xenon.passphrase");
-            if (passphrase == null) {
-                return new CertificateCredential(username, certfile, new char[0]);
-            }
-            return new CertificateCredential(username, certfile, passphrase.toCharArray());
-        }
-        return new DefaultCredential(username);
+    @Test
+    public void test_copy_existingTarget_replace_windows() throws Throwable {
+        byte[] data = "Hello World!".getBytes();
+        byte[] data2 = "Something else!".getBytes();
+        generateAndCreateTestDir();
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createTestFile(testDir, data2);
+        copySync(file0, file1, CopyMode.REPLACE, false);
+        assertSameContents(file0, file1);
     }
 }

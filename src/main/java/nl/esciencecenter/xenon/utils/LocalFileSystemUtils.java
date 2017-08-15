@@ -148,7 +148,6 @@ public class LocalFileSystemUtils {
      */
     public static boolean startWithWindowsRoot(String path) {
         return path != null && path.length() >= 2 && path.charAt(1) == ':' && Character.isLetter(path.charAt(0));
-
     }
 
     /**
@@ -172,10 +171,10 @@ public class LocalFileSystemUtils {
      * @param p
      *            The absolute path for which to determine the root element.
      * @return The locally valid root element.
-     * @throws XenonException
+     * @throws InvalidLocationException
      *             If the provided <code>path</code> is not absolute, or does not contain a locally valid root.
      */
-    public static String getLocalRoot(String p) throws XenonException {
+    public static String getLocalRoot(String p) throws InvalidLocationException {
 
         String path = p;
 
@@ -199,6 +198,21 @@ public class LocalFileSystemUtils {
         }
 
         throw new InvalidLocationException(ADAPTOR_NAME, "Path is not absolute! " + path);
+    }
+
+    /**
+     * Return the local root less path of an absolute path.
+     *
+     * @param path
+     *          The absolute path from which to remove the root element.
+     */
+    public static String getLocalRootlessPath(String path) throws InvalidLocationException {
+        if (path.charAt(0) == '/') {
+            return path.substring(1);
+        } else if (path.length() >= 2 && (path.charAt(1) == ':') && Character.isLetter(path.charAt(0))) {
+            return path.substring(2);
+        }
+        return path;
     }
 
     /**

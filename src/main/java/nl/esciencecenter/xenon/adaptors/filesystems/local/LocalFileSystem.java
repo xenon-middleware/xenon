@@ -16,6 +16,7 @@
 package nl.esciencecenter.xenon.adaptors.filesystems.local;
 
 import static nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.getLocalRootlessPath;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,7 +89,8 @@ public class LocalFileSystem extends FileSystem {
             }
         }
 
-        return FileSystems.getDefault().getPath(root, relPath.toString());
+        Path absPath = toAbsolutePath(relPath);
+        return FileSystems.getDefault().getPath(root, absPath.toString());
     }
 
     Set<PosixFilePermission> xenonPermissions(Set<java.nio.file.attribute.PosixFilePermission> permissions) {
@@ -366,10 +368,10 @@ public class LocalFileSystem extends FileSystem {
             Path parent = link.getParent();
 
             if (parent == null || target.isAbsolute()) {
-                return new Path(target.toString());
+                return new Path(link.getSeparator(), getLocalRootlessPath(target.toString()));
             }
 
-            return parent.resolve(new Path(target.toString()));
+            return parent.resolve(new Path(link.getSeparator(), getLocalRootlessPath(target.toString())));
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to read symbolic link.", e);
         }

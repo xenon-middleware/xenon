@@ -15,19 +15,14 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.isWindows;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.*;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -113,18 +108,21 @@ public abstract class FileSystemTestParent {
 
     @After
     public void cleanup() throws XenonException {
+        FileSystem cleanFileSystem = null;
         try {
-            if (!fileSystem.isOpen()) {
-                fileSystem = setupFileSystem();
-                return;
-            }
+            // close the file system under test, so any copy operations still running are killed, before we clean the test root
+            fileSystem.close();
 
-            if (testRoot != null && fileSystem.exists(testRoot)) {
-                fileSystem.delete(testRoot, true);
+            cleanFileSystem = setupFileSystem();
+
+            if (testRoot != null && cleanFileSystem.exists(testRoot)) {
+                cleanFileSystem.delete(testRoot, true);
             }
         } finally {
             try {
-                fileSystem.close();
+                if (cleanFileSystem != null) {
+                    cleanFileSystem.close();
+                }
             } catch (Exception ex) {
                 // that's fine
             }
@@ -150,14 +148,14 @@ public abstract class FileSystemTestParent {
         Map.Entry<Path, Path> linkTarget = locationConfig.getSymbolicLinksToExistingFile();
         Path target = fileSystem.readSymbolicLink(linkTarget.getKey());
         Path expectedTarget = linkTarget.getValue();
-        assertEquals(target, expectedTarget);
+        assertThat(target, is(expectedTarget));
     }
 
     public Path resolve(String... path) throws XenonException {
         return testRoot.resolve(new Path(path));
     }
 
-    private void copySync(Path source, Path target, CopyMode mode, boolean recursive) throws Throwable {
+    protected void copySync(Path source, Path target, CopyMode mode, boolean recursive) throws Throwable {
         String s = fileSystem.copy(source, fileSystem, target, mode, recursive);
         CopyStatus status = fileSystem.waitUntilDone(s, 1000);
 
@@ -1313,7 +1311,7 @@ public abstract class FileSystemTestParent {
         }
     }
 
-    private void assertSameContents(Path source, Path target) throws Exception {
+    protected void assertSameContents(Path source, Path target) throws Exception {
 
         InputStream a = fileSystem.readFromFile(source);
         InputStream b = fileSystem.readFromFile(target);
