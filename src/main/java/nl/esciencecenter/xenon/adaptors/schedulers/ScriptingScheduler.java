@@ -38,8 +38,7 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.Streams;
 
 /**
- * Connection to a remote scheduler, implemented by calling command line
- * commands over a ssh connection.
+ * Connection to a remote scheduler, implemented by calling command line commands over a ssh connection.
  *
  */
 public abstract class ScriptingScheduler extends Scheduler {
@@ -51,9 +50,8 @@ public abstract class ScriptingScheduler extends Scheduler {
 
     protected final long pollDelay;
 
-    protected ScriptingScheduler(String uniqueID, String adaptor, String location, Credential credential,
-            Map<String, String> prop, XenonPropertyDescription[] validProperties, String pollDelayProperty)
-            throws XenonException {
+    protected ScriptingScheduler(String uniqueID, String adaptor, String location, Credential credential, Map<String, String> prop,
+            XenonPropertyDescription[] validProperties, String pollDelayProperty) throws XenonException {
 
         super(uniqueID, adaptor, location, ScriptingUtils.getProperties(validProperties, location, prop));
 
@@ -67,7 +65,7 @@ public abstract class ScriptingScheduler extends Scheduler {
         if (ScriptingUtils.isLocal(location)) {
             subSchedulerAdaptor = "local";
             subFileSystemAdaptor = "file";
-            subLocation = "/";
+            subLocation = "";
             subSchedulerProperties = properties.filter(LocalSchedulerAdaptor.PREFIX).toMap();
         } else {
             subSchedulerAdaptor = "ssh";
@@ -104,8 +102,8 @@ public abstract class ScriptingScheduler extends Scheduler {
                 Map<String, String> map = all.get(queueNames[i]);
 
                 if (map == null) {
-                    Exception exception = new NoSuchQueueException(getAdaptorName(), "Cannot get status of queue \""
-                            + queueNames[i] + "\" from server, perhaps it does not exist?");
+                    Exception exception = new NoSuchQueueException(getAdaptorName(),
+                            "Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
                     result[i] = new QueueStatusImplementation(this, queueNames[i], exception, null);
                 } else {
                     result[i] = new QueueStatusImplementation(this, queueNames[i], null, map);
@@ -125,8 +123,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      *            the executable to run
      * @param arguments
      *            the arguments to the executable
-     * @return a {@link RemoteCommandRunner} that can be used to monitor the
-     *         running command
+     * @return a {@link RemoteCommandRunner} that can be used to monitor the running command
      * @throws XenonException
      *             if an error occurs
      */
@@ -135,16 +132,15 @@ public abstract class ScriptingScheduler extends Scheduler {
     }
 
     // Subclasses can override this method to produce more specified exceptions
-    protected void translateError(RemoteCommandRunner runner, String stdin, String executable, String... arguments)
-            throws XenonException {
-        throw new XenonException(getAdaptorName(), "could not run command \"" + executable + "\" with stdin \"" + stdin
-                + "\" arguments \"" + Arrays.toString(arguments) + "\" at \"" + subScheduler + "\". Exit code = "
-                + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
+    protected void translateError(RemoteCommandRunner runner, String stdin, String executable, String... arguments) throws XenonException {
+        throw new XenonException(getAdaptorName(),
+                "could not run command \"" + executable + "\" with stdin \"" + stdin + "\" arguments \"" + Arrays.toString(arguments) + "\" using scheduler \""
+                        + subScheduler.getAdaptorName() + "\". Exit code = " + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: "
+                        + runner.getStderr());
     }
 
     /**
-     * Run a command until completion. Throw an exception if the command returns
-     * a non-zero exit code, or prints to stderr.
+     * Run a command until completion. Throw an exception if the command returns a non-zero exit code, or prints to stderr.
      *
      * @param stdin
      *            the text to write to the input of the executable.
@@ -187,15 +183,12 @@ public abstract class ScriptingScheduler extends Scheduler {
     }
 
     /**
-     * Checks if the queue names given are valid, and throw an exception
-     * otherwise. Checks against the list of queues when the scheduler was
-     * created.
+     * Checks if the queue names given are valid, and throw an exception otherwise. Checks against the list of queues when the scheduler was created.
      *
      * @param givenQueueNames
      *            the queue names to check for validity
      * @throws NoSuchQueueException
-     *             if one or more of the queue names is not known in the
-     *             scheduler
+     *             if one or more of the queue names is not known in the scheduler
      */
     protected void checkQueueNames(String[] givenQueueNames) throws XenonException {
 
@@ -208,23 +201,30 @@ public abstract class ScriptingScheduler extends Scheduler {
         // if anything remains, these are invalid. throw an exception with the
         // invalid queues
         if (!invalidQueues.isEmpty()) {
-            throw new NoSuchQueueException(getAdaptorName(), "Invalid queues given: "
-                    + Arrays.toString(invalidQueues.toArray(new String[invalidQueues.size()])));
+            throw new NoSuchQueueException(getAdaptorName(),
+                    "Invalid queues given: " + Arrays.toString(invalidQueues.toArray(new String[invalidQueues.size()])));
+        }
+    }
+
+    protected boolean sleep(long pollDelay) {
+        try {
+            Thread.sleep(pollDelay);
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return true;
         }
     }
 
     /**
-     * Wait until a Job is done, or until the give timeout expires (whichever
-     * comes first).
+     * Wait until a Job is done, or until the give timeout expires (whichever comes first).
      *
-     * A timeout of 0 will result in an infinite timeout, a negative timeout
-     * will result in an exception.
+     * A timeout of 0 will result in an infinite timeout, a negative timeout will result in an exception.
      *
      * @param jobIdentifier
      *            the Job to wait for
      * @param timeout
-     *            the maximum number of milliseconds to wait, 0 to wait forever,
-     *            or negative to return immediately.
+     *            the maximum number of milliseconds to wait, 0 to wait forever, or negative to return immediately.
      * @return the status of the job
      * @throws IllegalArgumentException
      *             if the value to timeout is negative
@@ -241,10 +241,8 @@ public abstract class ScriptingScheduler extends Scheduler {
 
         // wait until we are done, or the timeout expires
         while (!status.isDone() && System.currentTimeMillis() < deadline) {
-            try {
-                Thread.sleep(pollDelay);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+
+            if (sleep(pollDelay)) {
                 return status;
             }
 
@@ -255,17 +253,14 @@ public abstract class ScriptingScheduler extends Scheduler {
     }
 
     /**
-     * Wait until a Job is running (or already done), or until the given timeout
-     * expires, whichever comes first.
+     * Wait until a Job is running (or already done), or until the given timeout expires, whichever comes first.
      *
-     * A timeout of 0 will result in an infinite timeout. A negative timeout
-     * will result in an exception.
+     * A timeout of 0 will result in an infinite timeout. A negative timeout will result in an exception.
      *
      * @param jobIdentifier
      *            the Job to wait for
      * @param timeout
-     *            the maximum number of milliseconds to wait, 0 to wait forever,
-     *            or negative to return immediately.
+     *            the maximum number of milliseconds to wait, 0 to wait forever, or negative to return immediately.
      * @return the status of the job
      * @throws IllegalArgumentException
      *             if the value of timeout was negative
@@ -282,10 +277,8 @@ public abstract class ScriptingScheduler extends Scheduler {
 
         // wait until we are done, or the timeout expires
         while (!(status.isRunning() || status.isDone()) && System.currentTimeMillis() < deadline) {
-            try {
-                Thread.sleep(pollDelay);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+
+            if (sleep(pollDelay)) {
                 return status;
             }
 
@@ -296,12 +289,10 @@ public abstract class ScriptingScheduler extends Scheduler {
     }
 
     /**
-     * Check if the given working directory exists. Useful for schedulers that
-     * do not check this (like Slurm)
+     * Check if the given working directory exists. Useful for schedulers that do not check this (like Slurm)
      *
      * @param workingDirectory
-     *            the working directory (either absolute or relative) as given
-     *            by the user.
+     *            the working directory (either absolute or relative) as given by the user.
      * @throws XenonException
      *             if workingDirectory does not exist, or an error occurred.
      */

@@ -32,8 +32,7 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 
 /**
- * LocalFiles implements an Xenon <code>Jobs</code> adaptor for local job
- * operations.
+ * LocalFiles implements an Xenon <code>Jobs</code> adaptor for local job operations.
  *
  * @see nl.esciencecenter.xenon.schedulers.Scheduler
  *
@@ -49,8 +48,7 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
     public static final String PREFIX = SchedulerAdaptor.ADAPTORS_PREFIX + "local.";
 
     /** Description of the adaptor */
-    public static final String ADAPTOR_DESCRIPTION = "The local jobs adaptor implements all functionality "
-            + " by emulating a local queue.";
+    public static final String ADAPTOR_DESCRIPTION = "The local jobs adaptor implements all functionality " + " by emulating a local queue.";
 
     /** Local queue properties start with this prefix. */
     public static final String QUEUE = PREFIX + "queue.";
@@ -83,10 +81,8 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
 
     /** The properties supported by this adaptor */
     public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
-            new XenonPropertyDescription(POLLING_DELAY, Type.INTEGER, "1000",
-                    "The polling delay for monitoring running jobs (in milliseconds)."),
-            new XenonPropertyDescription(MULTIQ_MAX_CONCURRENT, Type.INTEGER, "4",
-                    "The maximum number of concurrent jobs in the multiq.") };
+            new XenonPropertyDescription(POLLING_DELAY, Type.LONG, "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
+            new XenonPropertyDescription(MULTIQ_MAX_CONCURRENT, Type.INTEGER, "4", "The maximum number of concurrent jobs in the multiq.") };
 
     public LocalSchedulerAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
@@ -119,13 +115,11 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
             return;
         }
 
-        throw new InvalidLocationException(ADAPTOR_NAME,
-                "Location must only contain a file system root! (not " + location + ")");
+        throw new InvalidLocationException(ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
     }
 
     @Override
-    public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties)
-            throws XenonException {
+    public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) throws XenonException {
 
         // Location should be: null, empty, or local://
         checkLocation(location);
@@ -146,9 +140,9 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
 
         int processors = Runtime.getRuntime().availableProcessors();
         int multiQThreads = xp.getIntegerProperty(MULTIQ_MAX_CONCURRENT, processors);
-        int pollingDelay = xp.getIntegerProperty(POLLING_DELAY);
+        long pollingDelay = xp.getLongProperty(POLLING_DELAY);
 
-        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, "local://", new LocalInteractiveProcessFactory(),
-                filesystem, filesystem.getWorkingDirectory(), multiQThreads, pollingDelay, xp);
+        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, "local://", new LocalInteractiveProcessFactory(), filesystem,
+                filesystem.getWorkingDirectory(), multiQThreads, pollingDelay, xp);
     }
 }
