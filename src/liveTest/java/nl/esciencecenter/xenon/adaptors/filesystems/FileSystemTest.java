@@ -17,11 +17,7 @@ package nl.esciencecenter.xenon.adaptors.filesystems;
 
 import static nl.esciencecenter.xenon.adaptors.Utils.buildCredential;
 import static nl.esciencecenter.xenon.adaptors.Utils.buildProperties;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.Map;
 
@@ -30,7 +26,6 @@ import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.CopyMode;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
-import nl.esciencecenter.xenon.utils.OutputReader;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

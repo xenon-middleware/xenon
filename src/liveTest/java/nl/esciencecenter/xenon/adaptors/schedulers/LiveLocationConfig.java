@@ -23,4 +23,16 @@ public class LiveLocationConfig extends SchedulerLocationConfig {
         assumeNotNull(name);
         return name;
     }
+
+    @Override
+    public boolean supportsInteractive() {
+        String value = System.getProperty("xenon.scheduler.supportsInteractive");
+        return value != null;
+    }
+
+    @Override
+    public boolean isEmbedded() {
+        String value = System.getProperty("xenon.scheduler.isEmbedded");
+        return value != null;
+    }
 }

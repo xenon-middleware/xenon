@@ -207,9 +207,7 @@ public class LocalFileSystemUtils {
      *          The absolute path from which to remove the root element.
      */
     public static String getLocalRootlessPath(String path) throws InvalidLocationException {
-        if (path.charAt(0) == '/') {
-            return path.substring(1);
-        } else if (path.length() >= 2 && (path.charAt(1) == ':') && Character.isLetter(path.charAt(0))) {
+        if (path.length() >= 2 && (path.charAt(1) == ':') && Character.isLetter(path.charAt(0))) {
             return path.substring(2);
         }
         return path;

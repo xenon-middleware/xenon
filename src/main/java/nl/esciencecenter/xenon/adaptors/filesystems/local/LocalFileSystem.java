@@ -77,9 +77,8 @@ public class LocalFileSystem extends FileSystem {
         if (numElems != 0) {
             String firstPart = relPath.getName(0).toString();
             if ("~".equals(firstPart)) {
-                String tmp = System.getProperty("user.home");
-                root = LocalFileSystemUtils.getLocalRoot(tmp);
-                Path home = getRelativePath(tmp, root);
+                String tmp = getLocalRootlessPath(System.getProperty("user.home"));
+                Path home = new Path(LocalFileSystemUtils.getLocalSeparator(), tmp);
 
                 if (numElems == 1) {
                     relPath = home;
