@@ -491,8 +491,10 @@ public abstract class FileSystemTestParent {
         String expected;
 
         if (fileSystem.getAdaptorName().equals("file") && LocalFileSystemUtils.isWindows()) {
-            expected = "Hello World\r\n";
+            // We are testing locally on windows and therefore need to us a different newline.
+            expected = "Hello World \r\n";
         } else {
+            // We assume testing on linux or mac
             expected = "Hello World\n";
         }
 
