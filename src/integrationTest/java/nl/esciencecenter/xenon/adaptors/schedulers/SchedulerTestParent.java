@@ -672,14 +672,14 @@ public abstract class SchedulerTestParent {
 
         OutputStream stdin = streams.getStdin();
 
-        stdin.write("Hello World\n".getBytes());
-        stdin.write("Goodbye World\n".getBytes());
+        stdin.write("Hello World".getBytes());
+        stdin.write("Goodbye World".getBytes());
         stdin.close();
 
         out.waitUntilFinished();
         err.waitUntilFinished();
 
-        assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
+        assertEquals("Hello WorldGoodbye World", out.getResultAsString());
 
         cleanupJob(streams.getJobIdentifier());
     }
