@@ -42,6 +42,7 @@ import nl.esciencecenter.xenon.schedulers.QueueStatus;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
+import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 import nl.esciencecenter.xenon.utils.OutputReader;
 
 public abstract class SchedulerTestParent {
@@ -628,8 +629,41 @@ public abstract class SchedulerTestParent {
 
         assumeTrue(description.supportsInteractive());
 
+        // Do not run this test on windows, as /bin/cat does not exist
+        assumeFalse(scheduler.getAdaptorName().equals("local") && LocalFileSystemUtils.isWindows());
+
         JobDescription job = new JobDescription();
-        job.setExecutable("cat");
+        job.setExecutable("/bin/cat");
+
+        Streams streams = scheduler.submitInteractiveJob(job);
+
+        OutputReader out = new OutputReader(streams.getStdout());
+        OutputReader err = new OutputReader(streams.getStderr());
+
+        OutputStream stdin = streams.getStdin();
+
+        stdin.write("Hello World\n".getBytes());
+        stdin.write("Goodbye World\n".getBytes());
+        stdin.close();
+
+        out.waitUntilFinished();
+        err.waitUntilFinished();
+
+        assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
+
+        cleanupJob(streams.getJobIdentifier());
+    }
+
+    @Test
+    public void test_interactiveJob_windows() throws Exception {
+
+        assumeTrue(description.supportsInteractive());
+
+        // Only runthis test on windows and in the local adaptor
+        assumeTrue(scheduler.getAdaptorName().equals("local") && LocalFileSystemUtils.isWindows());
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("more");
 
         Streams streams = scheduler.submitInteractiveJob(job);
 
