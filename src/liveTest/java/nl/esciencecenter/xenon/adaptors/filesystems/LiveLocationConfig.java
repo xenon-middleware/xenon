@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems;
 
+import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.getLocalRootlessPath;
+
 import java.util.AbstractMap;
 import java.util.Map;
 
@@ -30,25 +32,31 @@ public class LiveLocationConfig extends LocationConfig {
     }
 
     // TODO the paths should be relative to the filesystem.getEntryPath()
-    private Path createPath(String path) {
+    private Path createPath(String... path) {
         String baseDir = System.getProperty("xenon.basedir");
-        if (baseDir == null) {
-            return fileSystem.getWorkingDirectory().resolve(path);
+        char sep = Path.DEFAULT_SEPARATOR;
+        if (System.getProperty("xenon.separator") != null) {
+            sep = System.getProperty("xenon.separator").charAt(0);
         }
-        return new Path(baseDir).resolve(new Path(path));
+        System.out.println(baseDir);
+        if (baseDir == null) {
+            return fileSystem.getWorkingDirectory().resolve(new Path(sep, path));
+        }
+        Path p = new Path(sep, baseDir).resolve(new Path(sep, path));
+        System.out.println(p);
+        return p;
         // return fileSystem.getEntryPath().resolve(new
         // Path(baseDir).resolve(new Path(path)));
     }
 
     @Override
     public Path getExistingPath() {
-        return createPath("filesystem-test-fixture/links/file0");
+        return createPath("filesystem-test-fixture", "links", "file0");
     }
 
     @Override
     public Map.Entry<Path, Path> getSymbolicLinksToExistingFile() {
-        return new AbstractMap.SimpleEntry<>(createPath("filesystem-test-fixture/links/link0"),
-                createPath("filesystem-test-fixture/links/file0"));
+        return new AbstractMap.SimpleEntry<>(createPath("filesystem-test-fixture", "links", "link0"), createPath("filesystem-test-fixture", "links", "file0"));
     }
 
     @Override
@@ -57,17 +65,25 @@ public class LiveLocationConfig extends LocationConfig {
         if (baseDir == null) {
             return fileSystem.getWorkingDirectory();
         }
-        return new Path(baseDir);
+        char sep = Path.DEFAULT_SEPARATOR;
+        if (System.getProperty("xenon.separator") != null) {
+            sep = System.getProperty("xenon.separator").charAt(0);
+        }
+        return new Path(sep, baseDir);
     }
 
     @Override
     public Path getExpectedWorkingDirectory() {
-        String baseDir = System.getProperty("user.dir");
+        String baseDir = getLocalRootlessPath(System.getProperty("user.dir"));
 
         if (baseDir == null) {
             throw new RuntimeException("User dir property not set so current working directory not known!");
         }
+        char sep = Path.DEFAULT_SEPARATOR;
+        if (System.getProperty("xenon.separator") != null) {
+            sep = System.getProperty("xenon.separator").charAt(0);
+        }
 
-        return new Path(baseDir);
+        return new Path(sep, baseDir);
     }
 }

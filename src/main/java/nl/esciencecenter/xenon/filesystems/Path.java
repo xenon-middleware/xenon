@@ -35,7 +35,7 @@ import java.util.StringTokenizer;
 public class Path implements Iterable<Path> {
 
     /** The default separator to use. */
-    private static final char DEFAULT_SEPARATOR = '/';
+    public static final char DEFAULT_SEPARATOR = '/';
 
     /** The path elements in this path */
     private final List<String> elements;

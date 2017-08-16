@@ -28,11 +28,14 @@ import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 
-public class WebdavFileSystemDockerTest extends WebdavFileSystemTestParent {
+public class WebdavFileSystemXenonUserDockerTest extends WebdavFileSystemTestParent {
 
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/webdav.yml")
-            .waitingForService("webdav", HealthChecks.toHaveAllPortsOpen()).saveLogsTo("/tmp/webdav.txt").build();
+    public static DockerComposeRule docker = DockerComposeRule.builder()
+    		.file("src/integrationTest/resources/docker-compose/webdav.yml")
+            .waitingForService("webdav", HealthChecks.toHaveAllPortsOpen())
+            .saveLogsTo("/tmp/webdav.txt")
+            .build();
 
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
@@ -62,7 +65,8 @@ public class WebdavFileSystemDockerTest extends WebdavFileSystemTestParent {
 
     @Override
     public FileSystem setupFileSystem() throws XenonException {
-        String location = docker.containers().container("webdav").port(80).inFormat("http://$HOST:$EXTERNAL_PORT/~xenon");
+      String location = docker.containers().container("webdav").port(80)
+		.inFormat("http://$HOST:$EXTERNAL_PORT/~xenon");
         PasswordCredential cred = new PasswordCredential("xenon", "javagat".toCharArray());
         return FileSystem.create("webdav", location, cred);
     }

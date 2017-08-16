@@ -261,11 +261,7 @@ public class WebdavFileSystem extends FileSystem {
     @Override
     public boolean exists(Path path) throws XenonException {
 
-        System.out.println("EXISTS: " + path);
-
         path = toAbsolutePath(path);
-
-        System.out.println("EXISTS ABS: " + path);
 
         try {
             return client.exists(getDirectoryPath(path)) || client.exists(getFilePath(path));

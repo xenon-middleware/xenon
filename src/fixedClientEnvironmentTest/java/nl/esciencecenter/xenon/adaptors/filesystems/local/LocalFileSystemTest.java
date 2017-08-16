@@ -136,9 +136,9 @@ public class LocalFileSystemTest extends FileSystemTestParent {
     }
 
     @Test
-    public void test_javaPath_empty() throws Exception {
+    public void test_javaPath_empty_workingDirectory() throws Exception {
         LocalFileSystem f = (LocalFileSystem) fileSystem;
-        assertEquals("/", f.javaPath(new Path("")).toString());
+        assertEquals("/tmp", f.javaPath(new Path("")).toString());
     }
 
     @Test(expected = XenonException.class)

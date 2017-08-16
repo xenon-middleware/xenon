@@ -15,9 +15,11 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
@@ -57,6 +59,7 @@ import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
+import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 import nl.esciencecenter.xenon.utils.OutputReader;
 
 public abstract class FileSystemTestParent {
@@ -113,18 +116,23 @@ public abstract class FileSystemTestParent {
 
     @After
     public void cleanup() throws XenonException {
+        FileSystem cleanFileSystem = null;
         try {
-            if (!fileSystem.isOpen()) {
-                fileSystem = setupFileSystem();
-                return;
+            // close the file system under test, so any copy operations still running are killed, before we clean the test root
+            if (fileSystem.isOpen()) {
+                fileSystem.close();
             }
 
-            if (testRoot != null && fileSystem.exists(testRoot)) {
-                fileSystem.delete(testRoot, true);
+            cleanFileSystem = setupFileSystem();
+
+            if (testRoot != null && cleanFileSystem.exists(testRoot)) {
+                cleanFileSystem.delete(testRoot, true);
             }
         } finally {
             try {
-                fileSystem.close();
+                if (cleanFileSystem != null) {
+                    cleanFileSystem.close();
+                }
             } catch (Exception ex) {
                 // that's fine
             }
@@ -150,14 +158,14 @@ public abstract class FileSystemTestParent {
         Map.Entry<Path, Path> linkTarget = locationConfig.getSymbolicLinksToExistingFile();
         Path target = fileSystem.readSymbolicLink(linkTarget.getKey());
         Path expectedTarget = linkTarget.getValue();
-        assertEquals(target, expectedTarget);
+        assertThat(target, is(expectedTarget));
     }
 
     public Path resolve(String... path) throws XenonException {
         return testRoot.resolve(new Path(path));
     }
 
-    private void copySync(Path source, Path target, CopyMode mode, boolean recursive) throws Throwable {
+    protected void copySync(Path source, Path target, CopyMode mode, boolean recursive) throws Throwable {
         String s = fileSystem.copy(source, fileSystem, target, mode, recursive);
         CopyStatus status = fileSystem.waitUntilDone(s, 1000);
 
@@ -482,7 +490,17 @@ public abstract class FileSystemTestParent {
 
         // System.out.println("READ: " + reader.getResultAsString());
 
-        assertEquals("Hello World\n", reader.getResultAsString());
+        String expected;
+
+        if (fileSystem.getAdaptorName().equals("file") && LocalFileSystemUtils.isWindows()) {
+            // We are testing locally on windows and therefore need to us a different newline.
+            expected = "Hello World \r\n";
+        } else {
+            // We assume testing on linux or mac
+            expected = "Hello World\n";
+        }
+
+        assertEquals(expected, reader.getResultAsString());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -1308,18 +1326,24 @@ public abstract class FileSystemTestParent {
     private void assertContents(Path file, byte[] data) throws Exception {
         InputStream a = fileSystem.readFromFile(file);
         byte[] abytes = readAllBytes(a);
+        a.close();
+
         if (!Arrays.equals(abytes, data)) {
             throwWrong("copy", Arrays.toString(abytes), Arrays.toString(data));
         }
     }
 
-    private void assertSameContents(Path source, Path target) throws Exception {
+    protected void assertSameContents(Path source, Path target) throws Exception {
 
         InputStream a = fileSystem.readFromFile(source);
         InputStream b = fileSystem.readFromFile(target);
 
         byte[] abytes = readAllBytes(a);
+        a.close();
+
         byte[] bbytes = readAllBytes(b);
+        b.close();
+
         if (!Arrays.equals(abytes, bbytes)) {
             throwWrong("copy", Arrays.toString(abytes), Arrays.toString(bbytes));
         }
