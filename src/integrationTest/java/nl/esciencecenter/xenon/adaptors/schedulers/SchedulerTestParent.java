@@ -663,7 +663,7 @@ public abstract class SchedulerTestParent {
         assumeTrue(scheduler.getAdaptorName().equals("local") && LocalFileSystemUtils.isWindows());
 
         JobDescription job = new JobDescription();
-        job.setExecutable("more");
+        job.setExecutable("C:\\Windows\\System32\\more.exe");
 
         Streams streams = scheduler.submitInteractiveJob(job);
 
