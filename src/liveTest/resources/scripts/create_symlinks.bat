@@ -1,6 +1,6 @@
 mkdir filesystem-test-fixture\links
-echo "Hello World" > filesystem-test-fixture\links\file0
-echo "" > filesystem-test-fixture\links\file1
+echo Hello World > filesystem-test-fixture\links\file0
+type nul > filesystem-test-fixture\links\file1
 
 mklink %CD%\filesystem-test-fixture\links\link0 %CD%\filesystem-test-fixture\links\file0
 mklink %CD%\filesystem-test-fixture\links\link1 %CD%\filesystem-test-fixture\links\file1

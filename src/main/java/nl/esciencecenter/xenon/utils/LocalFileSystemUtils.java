@@ -60,8 +60,8 @@ public class LocalFileSystemUtils {
     /**
      * Check if <code>root</code> only contains a valid Windows root element such as "C:".
      *
-     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
+     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned. If <code>root</code> contains more than just a root element,
+     * <code>false</code> will be returned.
      *
      * @param root
      *            The root to check.
@@ -82,8 +82,8 @@ public class LocalFileSystemUtils {
     /**
      * Check if <code>root</code> only contains a valid Linux root element, which is "/".
      *
-     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
+     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned. If <code>root</code> contains more than just a root element,
+     * <code>false</code> will be returned.
      *
      * @param root
      *            The root to check.
@@ -96,8 +96,8 @@ public class LocalFileSystemUtils {
     /**
      * Check if <code>root</code> contains a valid OSX root element, which is "/".
      *
-     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
+     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned. If <code>root</code> contains more than just a root element,
+     * <code>false</code> will be returned.
      *
      * @param root
      *            The root to check.
@@ -110,8 +110,8 @@ public class LocalFileSystemUtils {
     /**
      * Check if <code>root</code> contains a locally valid root element, such as "C:" on Windows or "/" on Linux and OSX.
      *
-     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
+     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned. If <code>root</code> contains more than just a root element,
+     * <code>false</code> will be returned.
      *
      * Note that the result of this method depends on the OS the application is running on.
      *
@@ -148,7 +148,6 @@ public class LocalFileSystemUtils {
      */
     public static boolean startWithWindowsRoot(String path) {
         return path != null && path.length() >= 2 && path.charAt(1) == ':' && Character.isLetter(path.charAt(0));
-
     }
 
     /**
@@ -165,17 +164,17 @@ public class LocalFileSystemUtils {
     /**
      * Return the locally valid root element of an <code>String</code> representation of an absolute path.
      *
-     * Examples of a root elements are "/" or "C:". If the provided path does not contain a locally valid root element, an
-     * exception will be thrown. For example, providing "/user/local" will return "/" on Linux or OSX, but throw an exception on
-     * Windows; providing "C:\test" will return "C:" on Windows but throw an exception on Linux or OSX.
+     * Examples of a root elements are "/" or "C:". If the provided path does not contain a locally valid root element, an exception will be thrown. For
+     * example, providing "/user/local" will return "/" on Linux or OSX, but throw an exception on Windows; providing "C:\test" will return "C:" on Windows but
+     * throw an exception on Linux or OSX.
      *
      * @param p
      *            The absolute path for which to determine the root element.
      * @return The locally valid root element.
-     * @throws XenonException
+     * @throws InvalidLocationException
      *             If the provided <code>path</code> is not absolute, or does not contain a locally valid root.
      */
-    public static String getLocalRoot(String p) throws XenonException {
+    public static String getLocalRoot(String p) throws InvalidLocationException {
 
         String path = p;
 
@@ -202,6 +201,20 @@ public class LocalFileSystemUtils {
     }
 
     /**
+     * Return the local root less path of an absolute path.
+     *
+     * @param path
+     *            The absolute path from which to remove the root element.
+     * @return The path without the root element.
+     */
+    public static String getLocalRootlessPath(String path) {
+        if (path.length() >= 2 && (path.charAt(1) == ':') && Character.isLetter(path.charAt(0))) {
+            return path.substring(2);
+        }
+        return path;
+    }
+
+    /**
      * Returns the local file system path separator character.
      *
      * @return The local file system path separator character.
@@ -213,9 +226,9 @@ public class LocalFileSystemUtils {
     /**
      * Return the locally valid root element of an <code>String</code> representation of an absolute path.
      *
-     * Examples of a root elements are "/" or "C:". If the provided path does not contain a locally valid root element, an
-     * exception will be thrown. For example, providing "/user/local" will return "/" on Linux or OSX, but throw an exception on
-     * Windows; providing "C:\test" will return "C:" on Windows but throw an exception on Linux or OSX.
+     * Examples of a root elements are "/" or "C:". If the provided path does not contain a locally valid root element, an exception will be thrown. For
+     * example, providing "/user/local" will return "/" on Linux or OSX, but throw an exception on Windows; providing "C:\test" will return "C:" on Windows but
+     * throw an exception on Linux or OSX.
      *
      * @param p
      *            The absolute path for which to determine the root element.
@@ -223,40 +236,39 @@ public class LocalFileSystemUtils {
      * @throws XenonException
      *             If the provided <code>path</code> is not absolute, or does not contain a locally valid root.
      */
-//    public static String getLocalRoot(String p) throws XenonException {
-//
-//        String path = p;
-//
-//        if (isWindows()) {
-//            if (path == null || path.isEmpty()) {
-//                return "";
-//            }
-//            if (!path.contains("/") && !path.contains("\\")) {
-//                // Windows URS, network drive
-//                return path;
-//            }
-//            if (path.charAt(0) == '/') {
-//                path = path.substring(1);
-//            }
-//            if (path.length() >= 2 && (path.charAt(1) == ':') && Character.isLetter(path.charAt(0))) {
-//                return path.substring(0, 2).toUpperCase();
-//            }
-//
-//            throw new InvalidLocationException(NAME, "Path does not include drive name! " + path);
-//        }
-//
-//        if (path == null || path.isEmpty() || (path.length() >= 1 && path.charAt(0) == '/')) {
-//            return "/";
-//        }
-//
-//        throw new InvalidLocationException(NAME, "Path is not absolute! " + path);
-//    }
+    // public static String getLocalRoot(String p) throws XenonException {
+    //
+    // String path = p;
+    //
+    // if (isWindows()) {
+    // if (path == null || path.isEmpty()) {
+    // return "";
+    // }
+    // if (!path.contains("/") && !path.contains("\\")) {
+    // // Windows URS, network drive
+    // return path;
+    // }
+    // if (path.charAt(0) == '/') {
+    // path = path.substring(1);
+    // }
+    // if (path.length() >= 2 && (path.charAt(1) == ':') && Character.isLetter(path.charAt(0))) {
+    // return path.substring(0, 2).toUpperCase();
+    // }
+    //
+    // throw new InvalidLocationException(NAME, "Path does not include drive name! " + path);
+    // }
+    //
+    // if (path == null || path.isEmpty() || (path.length() >= 1 && path.charAt(0) == '/')) {
+    // return "/";
+    // }
+    //
+    // throw new InvalidLocationException(NAME, "Path is not absolute! " + path);
+    // }
 
     /**
      * Returns all local FileSystems.
      *
-     * This method detects all local file system roots, and returns one or more <code>FileSystems</code> representing each of
-     * these roots.
+     * This method detects all local file system roots, and returns one or more <code>FileSystems</code> representing each of these roots.
      *
      * @return all local FileSystems.
      *

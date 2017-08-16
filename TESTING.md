@@ -77,25 +77,29 @@ exist, you need to create them yourself. If you want to run the tests against th
 Supported arguments (`-D<name>=<value>`):
 * `xenon.scheduler`, name of scheduler
 * `xenon.filesystem`, name of file system
-* `xenon.location`, location of scheduler or filesystem
+* `xenon.scheduler.location`, location of scheduler
+* `xenon.scheduler.isEmbedded`, whether scheduler is embedded, when set is true
+* `xenon.scheduler.supportsInteractive`, whether scheduler supports interactive jobs, when set is true
+* `xenon.filesystem.location`, location of filesystem
 * `xenon.username`, username for location
 * `xenon.password`, password for username
 * `xenon.certfile`, path to certificate file
 * `xenon.passphrase`, passphrase for certificate file
 * `xenon.basedir`, path at location where `create_symlinks` script was run, will get combined with filesystem.getEntryPath() to form absolute path
+* `xenon.separator`, overwrite the default OS path separator
 
 Run examples
 ```bash
 # slurm on das5 with default credentials
-./gradlew liveTest -Dxenon.scheduler=slurm -Dxenon.location=das5.vu.nl
+./gradlew liveTest -Dxenon.scheduler=slurm -Dxenon.scheduler.location=das5.vu.nl
 # slurm on das5 with username/password
-./gradlew liveTest -Dxenon.scheduler=slurm -Dxenon.location=das5.vu.nl -Dxenon.username=username -Dxenon.password=password
+./gradlew liveTest -Dxenon.scheduler=slurm -Dxenon.scheduler.location=das5.vu.nl -Dxenon.username=username -Dxenon.password=password
 # slurm on das5 with certificate file
-./gradlew liveTest -Dxenon.scheduler=slurm -Dxenon.location=das5.vu.nl -Dxenon.username=username -Dxenon.certfile=pathtocertfile [ -Dxenon.passphrase=passphrase ] 
+./gradlew liveTest -Dxenon.scheduler=slurm -Dxenon.scheduler.location=das5.vu.nl -Dxenon.username=username -Dxenon.certfile=pathtocertfile [ -Dxenon.passphrase=passphrase ]
 # slurm on das5 with default credentials and a custom property
-./gradlew liveTest -Dxenon.scheduler=slurm -Dxenon.location=das5.vu.nl -Dxenon.adaptors.slurm.strictHostKeyChecking=false
+./gradlew liveTest -Dxenon.scheduler=slurm -Dxenon.scheduler.location=das5.vu.nl -Dxenon.adaptors.slurm.strictHostKeyChecking=false
 # sftp on localhost:10022
-/gradlew liveTest -Dxenon.filesystem=sftp -Dxenon.location=localhost:10022  -Dxenon.username=xenon -Dxenon.password=javagat -Dxenon.adaptors.file.sftp.strictHostKeyChecking=false -Dxenon.adaptors.file.sftp.loadKnownHosts=false
+/gradlew liveTest -Dxenon.filesystem=sftp -Dxenon.filesystem.location=localhost:10022  -Dxenon.username=xenon -Dxenon.password=javagat -Dxenon.adaptors.file.sftp.strictHostKeyChecking=false -Dxenon.adaptors.file.sftp.loadKnownHosts=false
 # local filesystem and scheduler
-./gradlew liveTest -Dxenon.scheduler=local -Dxenon.filesystem=file -Dxenon.location=/ -Dxenon.username=$USERNAME -Dxenon.basedir=$PWD
+./gradlew liveTest -Dxenon.scheduler=local -Dxenon.filesystem=file -Dxenon.filesystem.location=/ -Dxenon.username=$USERNAME -Dxenon.basedir=$PWD -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
 ```

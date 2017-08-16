@@ -15,6 +15,9 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.local;
 
+import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.getLocalRootlessPath;
+import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.isWindows;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Map;
@@ -65,18 +68,19 @@ public class LocalFileAdaptor extends FileAdaptor {
 
     @Override
     public boolean canCreateSymboliclinks() {
-        // Local can create symbolic links.
-        return true;
+        // non-WIndows can
+        // TODO Also can on Windows when user has create symbolic link rights
+        return !isWindows();
     }
 
     @Override
     public boolean supportsReadingPosixPermissions() {
-        return true;
+        return !isWindows();
     }
 
     @Override
     public boolean supportsSettingPosixPermissions() {
-        return true;
+        return !isWindows();
     }
 
     @Override
@@ -111,8 +115,8 @@ public class LocalFileAdaptor extends FileAdaptor {
         checkFileLocation(location);
 
         if (location == null) {
-            if (LocalFileSystemUtils.isWindows()) {
-                location = "c:";
+            if (isWindows()) {
+                location = "C:";
             } else {
                 location = "/";
             }
@@ -126,7 +130,7 @@ public class LocalFileAdaptor extends FileAdaptor {
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
-        Path entry = new Path(File.separatorChar, System.getProperty("user.dir"));
+        Path entry = new Path(File.separatorChar, getLocalRootlessPath(System.getProperty("user.dir")));
         // for Windows remove the drive letter from entry?
 
         return new LocalFileSystem(getNewUniqueID(), location, entry, xp);
