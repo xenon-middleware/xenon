@@ -24,7 +24,6 @@ import com.palantir.docker.compose.connection.waiting.HealthChecks;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.LocationConfig;
-import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 
@@ -32,7 +31,7 @@ public class WebdavFileSystemAnonymousUserDockerTest extends WebdavFileSystemTes
 
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder()
-    		.file("src/integrationTest/resources/docker-compose/webdav.yml")
+            .file("src/integrationTest/resources/docker-compose/webdav.yml")
             .waitingForService("webdav", HealthChecks.toHaveAllPortsOpen())
             .saveLogsTo("/tmp/webdav.txt")
             .build();
@@ -66,7 +65,7 @@ public class WebdavFileSystemAnonymousUserDockerTest extends WebdavFileSystemTes
     @Override
     public FileSystem setupFileSystem() throws XenonException {
         String location = docker.containers().container("webdav").port(80)
-        		.inFormat("http://$HOST:$EXTERNAL_PORT/");
+                .inFormat("http://$HOST:$EXTERNAL_PORT/");
         return FileSystem.create("webdav", location);
     }
 
