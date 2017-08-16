@@ -59,6 +59,7 @@ import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
+import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 import nl.esciencecenter.xenon.utils.OutputReader;
 
 public abstract class FileSystemTestParent {
@@ -487,7 +488,15 @@ public abstract class FileSystemTestParent {
 
         // System.out.println("READ: " + reader.getResultAsString());
 
-        assertEquals("Hello World\n", reader.getResultAsString());
+        String expected;
+
+        if (fileSystem.getAdaptorName().equals("file") && LocalFileSystemUtils.isWindows()) {
+            expected = "Hello World\r\n";
+        } else {
+            expected = "Hello World\n";
+        }
+
+        assertEquals(expected, reader.getResultAsString());
     }
 
     @Test(expected = IllegalArgumentException.class)
