@@ -117,8 +117,6 @@ public class WebdavFileAdaptor extends FileAdaptor {
 
         String cwd = uri.getPath();
 
-        System.err.println("CWD = " + cwd);
-
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
         return new WebdavFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, server, new Path(cwd), sardine, xp);
