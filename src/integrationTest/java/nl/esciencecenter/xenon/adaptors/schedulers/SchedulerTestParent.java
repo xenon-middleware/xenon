@@ -255,7 +255,15 @@ public abstract class SchedulerTestParent {
     private JobDescription getSleepJob(String queue, int time) {
 
         JobDescription job = new JobDescription();
-        job.setExecutable("/bin/sleep");
+
+        if (scheduler.getAdaptorName().equals("local") && LocalFileSystemUtils.isWindows()) {
+            // We are testing on a local windows scheduler
+            job.setExecutable("C:\\Windows\\System32\\timeout.exe");
+        } else {
+            // Assume linux / mac target
+            job.setExecutable("/bin/sleep");
+        }
+
         job.setArguments("" + time);
 
         if (queue != null) {
