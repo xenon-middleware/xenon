@@ -687,6 +687,7 @@ public abstract class SchedulerTestParent {
         out.waitUntilFinished();
         err.waitUntilFinished();
 
+        // Note that more add an extra newlin on windows
         assertEquals("Hello World\r\nGoodbye World\r\n\r\n", out.getResultAsString());
 
         cleanupJob(streams.getJobIdentifier());
