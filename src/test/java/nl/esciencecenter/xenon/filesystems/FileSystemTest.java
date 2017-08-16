@@ -930,32 +930,26 @@ public class FileSystemTest {
     }
 
     /*
-     * @Test public void test_copyLinkOK() throws XenonException { Path entry =
-     * new Path("/test");
+     * @Test public void test_copyLinkOK() throws XenonException { Path entry = new Path("/test");
      *
-     * TestFileSystem f0 = new TestFileSystem("0", "TEST0", "MEM", entry);
-     * TestFileSystem f1 = new TestFileSystem("1", "TEST1", "MEM", entry);
+     * TestFileSystem f0 = new TestFileSystem("0", "TEST0", "MEM", entry); TestFileSystem f1 = new TestFileSystem("1", "TEST1", "MEM", entry);
      *
-     * Path f = new Path("/test/aap"); byte [] data = new byte [] { 0, 1, 2, 3,
-     * 4, 5, 6, 7 };
+     * Path f = new Path("/test/aap"); byte [] data = new byte [] { 0, 1, 2, 3, 4, 5, 6, 7 };
      *
      * f0.createFile(f); Path l = new Path("/test/link");
      *
      *
-     * f0.createSymbolicLink(l, p); PathAttributes a = new PathAttributes();
-     * a.setPath(f); a.setSymbolicLink(true);
+     * f0.createSymbolicLink(l, p); PathAttributes a = new PathAttributes(); a.setPath(f); a.setSymbolicLink(true);
      *
      * f0.addAttributes(f, a); f0.addData(f, data);
      *
-     * String h = f0.copy(f, f1, f, CopyMode.CREATE, false); f0.waitUntilDone(h,
-     * 5*1000);
+     * String h = f0.copy(f, f1, f, CopyMode.CREATE, false); f0.waitUntilDone(h, 5*1000);
      *
      * CopyStatus s = f0.getStatus(h); assertTrue(s.isDone());
      *
      * System.out.println("Copy link " + s.getException());
      *
-     * assertFalse(s.hasException()); assertTrue(f1.exists(f));
-     * assertTrue(Arrays.equals(data, f1.getData(f))); }
+     * assertFalse(s.hasException()); assertTrue(f1.exists(f)); assertTrue(Arrays.equals(data, f1.getData(f))); }
      */
 
     @Test
@@ -1154,36 +1148,29 @@ public class FileSystemTest {
     }
 
     /*
-     * @Test public void test_cancelImmediately() throws XenonException { Path
-     * entry = new Path("/test");
+     * @Test public void test_cancelImmediately() throws XenonException { Path entry = new Path("/test");
      *
-     * MockFileSystem f0 = new MockFileSystem("0", "TEST0", "MEM", entry);
-     * MockFileSystem f1 = new MockFileSystem("1", "TEST1", "MEM", entry);
+     * MockFileSystem f0 = new MockFileSystem("0", "TEST0", "MEM", entry); MockFileSystem f1 = new MockFileSystem("1", "TEST1", "MEM", entry);
      *
      * Path file1 = new Path("/test/aap"); Path file2 = new Path("/test/noot");
      *
      * f0.createFile(file1); f0.createFile(file2);
      *
-     * f0.addInputStream(file1, new DelayInputStream(1000));
-     * f0.addInputStream(file2, new DelayInputStream(1000));
+     * f0.addInputStream(file1, new DelayInputStream(1000)); f0.addInputStream(file2, new DelayInputStream(1000));
      *
      * f1.createFile(file1); f1.createFile(file2);
      *
-     * f1.addOutputStream(file1, new CountIgnoreOutputStream());
-     * f1.addOutputStream(file2, new CountIgnoreOutputStream());
+     * f1.addOutputStream(file1, new CountIgnoreOutputStream()); f1.addOutputStream(file2, new CountIgnoreOutputStream());
      *
-     * String h1 = f0.copy(file1, f1, file1, CopyMode.REPLACE, false); String h2
-     * = f0.copy(file2, f1, file2, CopyMode.REPLACE, false);
+     * String h1 = f0.copy(file1, f1, file1, CopyMode.REPLACE, false); String h2 = f0.copy(file2, f1, file2, CopyMode.REPLACE, false);
      *
-     * // cancel h2 immediately -- the copy should not have a chance to start
-     * CopyStatus s2 = f0.cancel(h2);
+     * // cancel h2 immediately -- the copy should not have a chance to start CopyStatus s2 = f0.cancel(h2);
      *
      * CopyStatus s1 = f0.waitUntilDone(h1, 5*1000);
      *
      * assertTrue(s1.isDone()); assertFalse(s1.hasException());
      *
-     * assertTrue(s2.isDone()); assertTrue(s2.hasException());
-     * assertThat(s2.getException(), instanceOf(XenonException.class)); }
+     * assertTrue(s2.isDone()); assertTrue(s2.hasException()); assertThat(s2.getException(), instanceOf(XenonException.class)); }
      */
 
     private void sleep(long delay) {
@@ -1240,7 +1227,7 @@ public class FileSystemTest {
 
         CopyStatus s = f0.waitUntilDone(h, 1000);
 
-        System.out.println("BLA " + s.hasException() + " " + s.getException());
+        // System.out.println("BLA " + s.hasException() + " " + s.getException());
 
         assertTrue(s.isDone());
         assertFalse(s.hasException());

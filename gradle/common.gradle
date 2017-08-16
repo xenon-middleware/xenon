@@ -52,7 +52,7 @@ apply from: 'gradle/docker.gradle'
 task wrapper(type: Wrapper) {
     description 'Generates gradle wrapper'
     group 'Build Setup'
-    gradleVersion = '4.0.1'
+    gradleVersion = '4.1'
 }
 
 cleanIdeaWorkspace.group = 'IDE'
