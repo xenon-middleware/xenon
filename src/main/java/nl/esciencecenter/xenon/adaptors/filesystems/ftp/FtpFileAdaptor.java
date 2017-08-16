@@ -49,13 +49,13 @@ public class FtpFileAdaptor extends FileAdaptor {
     private static final String ADAPTOR_DESCRIPTION = "The FTP adaptor implements file access on remote ftp servers.";
 
     /** The locations supported by this adaptor */
-    private static final String [] ADAPTOR_LOCATIONS = new String [] { "ftp://host[:port]" };
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "ftp://host[:port]" };
 
     /** All our own properties start with this prefix. */
     public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + "ftp.";
 
     /** List of properties supported by this FTP adaptor */
-    protected static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription[0];
+    protected static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[0];
 
     public FtpFileAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
@@ -71,7 +71,7 @@ public class FtpFileAdaptor extends FileAdaptor {
             throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
         }
 
-        //FtpLocation ftpLocation = FtpLocation.parse(location);
+        // FtpLocation ftpLocation = FtpLocation.parse(location);
 
         FTPClient ftpClient = new FTPClient();
         ftpClient.setListHiddenFiles(true);
@@ -96,9 +96,8 @@ public class FtpFileAdaptor extends FileAdaptor {
     }
 
     @Override
-    public FileSystem createFileSystem(String location, Credential credential, Map<String,String> properties) throws XenonException {
-        LOGGER.debug("newFileSystem ftp location = {} credential = {} properties = {}", location, credential,
-                properties);
+    public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
+        LOGGER.debug("newFileSystem ftp location = {} credential = {} properties = {}", location, credential, properties);
 
         if (credential == null) {
             throw new InvalidCredentialException(getName(), "Credentials was null.");
@@ -119,7 +118,6 @@ public class FtpFileAdaptor extends FileAdaptor {
         String wd;
         try {
             wd = ftpClient.printWorkingDirectory();
-            System.out.println(wd);
         } catch (IOException e) {
             throw new XenonException(getName(), "Could not retrieve current working directory", e);
         }
@@ -138,11 +136,7 @@ public class FtpFileAdaptor extends FileAdaptor {
         try {
             loginWithCredentialOrDefault(ftp, credential);
             int replyCode = ftp.getReplyCode();
-
-//            System.out.println("LOGIN REPLY: " + replyCode);
-
             verifyLoginSuccess(replyCode);
-
         } catch (XenonException | IOException e) {
             throw new XenonException(getName(), "Failed to login", e);
         }

@@ -66,14 +66,7 @@ public class SSHUtil {
 
         @Override
         public String getPassword(String resourceKey) throws IOException {
-
-            String result = new String(password);
-
-            System.out.println("PASSWORD PROVIDER " + resourceKey + " returns " + result);
-
-            new Exception().printStackTrace(System.out);
-
-            return result;
+            return new String(password);
         }
     }
 
@@ -186,8 +179,6 @@ public class SSHUtil {
 
         } else if (credential instanceof CertificateCredential) {
 
-            System.out.println("CERT!");
-
             CertificateCredential c = (CertificateCredential) credential;
 
             String certfile = c.getCertificateFile();
@@ -207,13 +198,7 @@ public class SSHUtil {
 
                 if (password.length == 0) {
                     pair = SecurityUtils.loadKeyPairIdentity(path.toString(), inputStream, null);
-
-                    System.out.println("CREATE PAIR " + path.toString() + " NO PASSWORD");
-
                 } else {
-
-                    System.out.println("CREATE PAIR " + path.toString() + " " + new String(password));
-
                     pair = SecurityUtils.loadKeyPairIdentity(path.toString(), inputStream, new PasswordProvider(password));
 
                 }
@@ -221,8 +206,6 @@ public class SSHUtil {
             } catch (Exception e) {
                 throw new XenonException(adaptorName, "Failed to load certificate: " + path, e);
             }
-
-            System.out.println("PAIR " + pair);
 
             session.addPublicKeyIdentity(pair);
 
@@ -240,8 +223,6 @@ public class SSHUtil {
         } catch (IOException e) {
             throw new XenonException(adaptorName, "Connection authentication timeout", e);
         }
-
-        // session.createSftpFileSystem();
 
         return session;
     }

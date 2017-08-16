@@ -22,6 +22,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
@@ -30,9 +33,6 @@ import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Generator for GridEngine job script.
@@ -65,17 +65,17 @@ final class TorqueUtils {
             throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Torque cannot process STDIN");
         }
 
-        //check for option that overrides job script completely.
+        // check for option that overrides job script completely.
         if (description.getJobOptions().containsKey(JOB_OPTION_JOB_SCRIPT)) {
             if (description.getJobOptions().containsKey(JOB_OPTION_JOB_CONTENTS)) {
                 throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Adaptor cannot process job script and job contents simultaneously.");
             }
 
-            //no remaining settings checked.
+            // no remaining settings checked.
             return;
         }
 
-        //perform standard checks.
+        // perform standard checks.
         ScriptingUtils.verifyJobDescription(description, ADAPTOR_NAME);
     }
 
@@ -87,10 +87,10 @@ final class TorqueUtils {
             return null;
         }
 
-        System.out.println("TORQUE STATUS: ");
-        System.out.println("--------------------------------");
-        System.out.println(info.toString());
-        System.out.println("--------------------------------");
+        // System.out.println("TORQUE STATUS: ");
+        // System.out.println("--------------------------------");
+        // System.out.println(info.toString());
+        // System.out.println("--------------------------------");
 
         ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "Job_Id", "job_state");
 
@@ -128,17 +128,17 @@ final class TorqueUtils {
 
         script.format("#!/bin/sh\n");
 
-        //set shell to sh
+        // set shell to sh
         script.format("#PBS -S /bin/sh\n");
 
-        //set name of job to xenon
+        // set name of job to xenon
         script.format("#PBS -N xenon\n");
 
-        //set working directory
+        // set working directory
         if (description.getWorkingDirectory() != null) {
             String workingDirectory = description.getWorkingDirectory();
             if (!workingDirectory.startsWith("/")) {
-                //make relative path absolute
+                // make relative path absolute
                 workingDirectory = fsEntryPath.resolve(workingDirectory).toString();
             }
             script.format("#PBS -w '%s'\n", workingDirectory);
@@ -153,13 +153,11 @@ final class TorqueUtils {
             script.format("#PBS -l %s\n", resources);
         }
 
-        //number of nodes and processes per node
+        // number of nodes and processes per node
         script.format("#PBS -l nodes=%d:ppn=%d\n", description.getNodeCount(), description.getProcessesPerNode());
 
-        //add maximum runtime in hour:minute:second format (converted from minutes in description)
-        script.format("#PBS -l walltime=%02d:%02d:00\n",
-                description.getMaxTime() / MINUTES_PER_HOUR,
-                description.getMaxTime() % MINUTES_PER_HOUR);
+        // add maximum runtime in hour:minute:second format (converted from minutes in description)
+        script.format("#PBS -l walltime=%02d:%02d:00\n", description.getMaxTime() / MINUTES_PER_HOUR, description.getMaxTime() % MINUTES_PER_HOUR);
 
         for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
             script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());
