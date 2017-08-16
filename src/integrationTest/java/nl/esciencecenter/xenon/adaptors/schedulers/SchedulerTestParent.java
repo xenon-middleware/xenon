@@ -104,7 +104,7 @@ public abstract class SchedulerTestParent {
         assertEquals(locationConfig.supportsInteractive(), description.supportsInteractive());
     }
 
-    private boolean contains(String [] options, String expected) {
+    private boolean contains(String[] options, String expected) {
 
         if (options == null || options.length == 0) {
             return false;
@@ -125,7 +125,7 @@ public abstract class SchedulerTestParent {
         return false;
     }
 
-    private boolean unorderedEquals(String [] expected, String [] actual) {
+    private boolean unorderedEquals(String[] expected, String[] actual) {
 
         if (expected.length != actual.length) {
             return false;
@@ -138,7 +138,7 @@ public abstract class SchedulerTestParent {
         }
 
         for (String s : actual) {
-             if (!contains(expected, s)) {
+            if (!contains(expected, s)) {
                 return false;
             }
         }
@@ -188,15 +188,15 @@ public abstract class SchedulerTestParent {
             return;
         }
 
-        JobStatus [] stats = new JobStatus[jobIDs.length];
+        JobStatus[] stats = new JobStatus[jobIDs.length];
 
-        for (int i=0;i<jobIDs.length;i++) {
+        for (int i = 0; i < jobIDs.length; i++) {
             if (jobIDs[i] != null) {
                 stats[i] = scheduler.cancelJob(jobIDs[i]);
             }
         }
 
-        for (int i=0;i<jobIDs.length;i++) {
+        for (int i = 0; i < jobIDs.length; i++) {
             if (stats[i] != null) {
                 if (!stats[i].isDone()) {
                     stats[i] = waitUntilDone(jobIDs[i]);
@@ -204,7 +204,7 @@ public abstract class SchedulerTestParent {
             }
         }
 
-        for (int i=0;i<jobIDs.length;i++) {
+        for (int i = 0; i < jobIDs.length; i++) {
             if (stats[i] != null && !stats[i].isDone()) {
                 throw new XenonException("TEST", "Job " + jobIDs[i] + " not done yet!");
             }
@@ -216,31 +216,30 @@ public abstract class SchedulerTestParent {
         JobStatus status = null;
 
         // Clean up the mess..
-        //try {
-            status = scheduler.cancelJob(jobID);
-//    	} catch (Exception e) {
-//    		LOGGER.warn("Failed to cancel job: " + jobID, e);
-//    		System.out.println("Failed to cancel job: " + jobID + " " + e);
-//    		e.printStackTrace();
-//    		return;
-//    	}
+        // try {
+        status = scheduler.cancelJob(jobID);
+        // } catch (Exception e) {
+        // LOGGER.warn("Failed to cancel job: " + jobID, e);
+        // System.out.println("Failed to cancel job: " + jobID + " " + e);
+        // e.printStackTrace();
+        // return;
+        // }
 
         if (!status.isDone()) {
 
-//    	try {
+            // try {
             status = waitUntilDone(jobID);
-//    	} catch (Exception e) {
-//    		LOGGER.warn("Failed to wait for job: " + jobID, e);
-//    		System.out.println("Failed to wait for job: " + jobID + " " + e);
-//    		e.printStackTrace();
-//    		return;
+            // } catch (Exception e) {
+            // LOGGER.warn("Failed to wait for job: " + jobID, e);
+            // System.out.println("Failed to wait for job: " + jobID + " " + e);
+            // e.printStackTrace();
+            // return;
         }
 
         if (!status.isDone()) {
             throw new XenonException("TEST", "Job " + jobID + " not done yet!");
         }
     }
-
 
     @Test
     public void test_getQueueNames() throws XenonException {
@@ -289,12 +288,12 @@ public abstract class SchedulerTestParent {
         assertFalse("Job is already done", status.isDone());
         assertTrue("Job is not running yet", status.isRunning());
 
-         status = scheduler.cancelJob(jobID);
+        status = scheduler.cancelJob(jobID);
 
-         if (!status.isDone()) {
-             // Wait up until the job is completely done
-             status = waitUntilDone(jobID);
-         }
+        if (!status.isDone()) {
+            // Wait up until the job is completely done
+            status = waitUntilDone(jobID);
+        }
 
         assertTrue(status.isDone());
     }
@@ -305,22 +304,22 @@ public abstract class SchedulerTestParent {
         assumeTrue(description.supportsBatch());
 
         // Get the available queues
-        String [] queueNames = locationConfig.getQueueNames();
+        String[] queueNames = locationConfig.getQueueNames();
 
         assumeTrue(queueNames != null);
         assumeTrue(queueNames.length > 0);
 
         // Submit job of 5 seconds to first queue
-         String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 5));
+        String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 5));
 
-         // Retrieve all jobs
-         String [] jobs = scheduler.getJobs();
+        // Retrieve all jobs
+        String[] jobs = scheduler.getJobs();
 
-         // Our job should be part of this
-         assertTrue(contains(jobs, jobID));
+        // Our job should be part of this
+        assertTrue(contains(jobs, jobID));
 
-         // Clean up the mess.
-         cleanupJob(jobID);
+        // Clean up the mess.
+        cleanupJob(jobID);
     }
 
     @Test
@@ -329,22 +328,22 @@ public abstract class SchedulerTestParent {
         assumeTrue(description.supportsBatch());
 
         // Get the available queues
-        String [] queueNames = locationConfig.getQueueNames();
+        String[] queueNames = locationConfig.getQueueNames();
 
         assumeTrue(queueNames != null);
         assumeTrue(queueNames.length > 0);
 
         // Submit job of 5 seconds to first queue
-         String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 5));
+        String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 5));
 
-         // Retrieve all jobs
-         String [] jobs = scheduler.getJobs(new String[0]);
+        // Retrieve all jobs
+        String[] jobs = scheduler.getJobs(new String[0]);
 
-         // Our job should be part of this
-         assertTrue(contains(jobs, jobID));
+        // Our job should be part of this
+        assertTrue(contains(jobs, jobID));
 
-         // Clean up the mess...
-           cleanupJob(jobID);
+        // Clean up the mess...
+        cleanupJob(jobID);
     }
 
     @Test
@@ -353,22 +352,22 @@ public abstract class SchedulerTestParent {
         assumeTrue(description.supportsBatch());
 
         // Get the available queues
-        String [] queueNames = locationConfig.getQueueNames();
+        String[] queueNames = locationConfig.getQueueNames();
 
         assumeTrue(queueNames != null);
         assumeTrue(queueNames.length > 0);
 
         // Submit it
-         String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 5));
+        String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 5));
 
-         // Retrieve all jobs
-         String [] jobs = scheduler.getJobs(queueNames[0]);
+        // Retrieve all jobs
+        String[] jobs = scheduler.getJobs(queueNames[0]);
 
-         // Our job should be part of this
-         assertTrue(contains(jobs, jobID));
+        // Our job should be part of this
+        assertTrue(contains(jobs, jobID));
 
-         // Clean up the mess...
-           cleanupJob(jobID);
+        // Clean up the mess...
+        cleanupJob(jobID);
     }
 
     @Test
@@ -377,35 +376,35 @@ public abstract class SchedulerTestParent {
         assumeTrue(description.supportsBatch());
 
         // Get the available queues
-        String [] queueNames = locationConfig.getQueueNames();
+        String[] queueNames = locationConfig.getQueueNames();
 
         assumeTrue(queueNames != null);
         assumeTrue(queueNames.length > 1);
 
         // Submit job to one queue
-         String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 5));
+        String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 5));
 
-         // Retrieve all jobs for other queue
-         String [] jobs = scheduler.getJobs(queueNames[1]);
+        // Retrieve all jobs for other queue
+        String[] jobs = scheduler.getJobs(queueNames[1]);
 
-         // Our job should NOT be part of this
-         assertFalse(contains(jobs, jobID));
+        // Our job should NOT be part of this
+        assertFalse(contains(jobs, jobID));
 
-         // Clean up the mess...
-           cleanupJob(jobID);
+        // Clean up the mess...
+        cleanupJob(jobID);
     }
 
-    @Test(expected=NoSuchQueueException.class)
+    @Test(expected = NoSuchQueueException.class)
     public void test_getJobsQueueNameInCorrect() throws XenonException {
         scheduler.getJobs("foobar");
     }
 
-    @Test(expected=NoSuchJobException.class)
+    @Test(expected = NoSuchJobException.class)
     public void test_getJobStatus_unknownJob() throws XenonException {
         scheduler.getJobStatus("aap");
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_getJobStatus_null() throws XenonException {
         scheduler.getJobStatus(null);
     }
@@ -416,29 +415,29 @@ public abstract class SchedulerTestParent {
         assumeTrue(description.supportsBatch());
 
         // Get the available queues
-        String [] queueNames = locationConfig.getQueueNames();
+        String[] queueNames = locationConfig.getQueueNames();
 
         assumeTrue(queueNames != null);
         assumeTrue(queueNames.length >= 1);
 
         // Submit job to one queue
-         String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 1));
+        String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 1));
 
-         JobStatus status = scheduler.getJobStatus(jobID);
+        JobStatus status = scheduler.getJobStatus(jobID);
 
-         assertNotNull(status);
-         assertEquals(jobID, status.getJobIdentifier());
-         assertFalse(status.isDone());
+        assertNotNull(status);
+        assertEquals(jobID, status.getJobIdentifier());
+        assertFalse(status.isDone());
 
-         // Clean up the mess...
-           cleanupJob(jobID);
+        // Clean up the mess...
+        cleanupJob(jobID);
     }
 
     @Test
     public void test_getJobStatusses_noJobs() throws XenonException {
 
         // Get the status of no jobs
-        JobStatus [] result = scheduler.getJobStatuses();
+        JobStatus[] result = scheduler.getJobStatuses();
         assertNotNull(result);
         assertTrue(result.length == 0);
     }
@@ -447,7 +446,7 @@ public abstract class SchedulerTestParent {
     public void test_getJobStatusses_nonExistingJobs() throws XenonException {
 
         // Get the status of no jobs
-        JobStatus [] result = scheduler.getJobStatuses("aap", "noot");
+        JobStatus[] result = scheduler.getJobStatuses("aap", "noot");
         assertNotNull(result);
         assertTrue(result.length == 2);
 
@@ -464,7 +463,7 @@ public abstract class SchedulerTestParent {
     public void test_getJobStatusses_nonExistingJobsWithNull() throws XenonException {
 
         // Get the status of no jobs
-        JobStatus [] result = scheduler.getJobStatuses("aap", null, "noot");
+        JobStatus[] result = scheduler.getJobStatuses("aap", null, "noot");
         assertNotNull(result);
         assertTrue(result.length == 3);
 
@@ -485,17 +484,17 @@ public abstract class SchedulerTestParent {
         assumeTrue(description.supportsBatch());
 
         // Get the available queues
-        String [] queueNames = locationConfig.getQueueNames();
+        String[] queueNames = locationConfig.getQueueNames();
 
         assumeTrue(queueNames != null);
         assumeTrue(queueNames.length >= 1);
 
         // Submit two jobs to queue
-         String jobID1 = scheduler.submitBatchJob(getSleepJob(queueNames[0], 5));
-         String jobID2 = scheduler.submitBatchJob(getSleepJob(queueNames[0], 5));
+        String jobID1 = scheduler.submitBatchJob(getSleepJob(queueNames[0], 5));
+        String jobID2 = scheduler.submitBatchJob(getSleepJob(queueNames[0], 5));
 
         // Get the status of no jobs
-        JobStatus [] result = scheduler.getJobStatuses(jobID1, jobID2);
+        JobStatus[] result = scheduler.getJobStatuses(jobID1, jobID2);
 
         assertNotNull(result);
         assertTrue(result.length == 2);
@@ -508,16 +507,16 @@ public abstract class SchedulerTestParent {
         assertEquals(jobID2, result[1].getJobIdentifier());
         assertFalse(result[1].isDone());
 
-         // Clean up the mess...
-           cleanupJobs(jobID1,jobID2);
+        // Clean up the mess...
+        cleanupJobs(jobID1, jobID2);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_getQueueStatus_null() throws XenonException {
         scheduler.getQueueStatus(null);
     }
 
-    @Test(expected=NoSuchQueueException.class)
+    @Test(expected = NoSuchQueueException.class)
     public void test_getQueueStatus_unknownQueue() throws XenonException {
         scheduler.getQueueStatus("aap");
     }
@@ -526,7 +525,7 @@ public abstract class SchedulerTestParent {
     public void test_getQueueStatus_knownQueue() throws XenonException {
 
         // Get the available queues
-        String [] queueNames = locationConfig.getQueueNames();
+        String[] queueNames = locationConfig.getQueueNames();
 
         assumeTrue(queueNames != null);
         assumeTrue(queueNames.length >= 1);
@@ -537,24 +536,24 @@ public abstract class SchedulerTestParent {
         assertEquals(queueNames[0], status.getQueueName());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_getQueueStatusses_null() throws XenonException {
-        scheduler.getQueueStatuses((String [])null);
+        scheduler.getQueueStatuses((String[]) null);
     }
 
     @Test
     public void test_getQueueStatusses_empty() throws XenonException {
-        String [] queueNames = locationConfig.getQueueNames();
+        String[] queueNames = locationConfig.getQueueNames();
 
         assumeTrue(queueNames != null);
         assumeTrue(queueNames.length >= 1);
 
-        QueueStatus [] result = scheduler.getQueueStatuses(new String [0]);
+        QueueStatus[] result = scheduler.getQueueStatuses(new String[0]);
 
         assertNotNull(result);
         assertTrue(queueNames.length == result.length);
 
-        for (int i=0;i<queueNames.length;i++) {
+        for (int i = 0; i < queueNames.length; i++) {
             assertNotNull(result[i]);
             assertEquals(queueNames[i], result[i].getQueueName());
             assertFalse(result[i].hasException());
@@ -563,17 +562,17 @@ public abstract class SchedulerTestParent {
 
     @Test
     public void test_getQueueStatusses_allQueues() throws XenonException {
-        String [] queueNames = locationConfig.getQueueNames();
+        String[] queueNames = locationConfig.getQueueNames();
 
         assumeTrue(queueNames != null);
         assumeTrue(queueNames.length >= 1);
 
-        QueueStatus [] result = scheduler.getQueueStatuses(queueNames);
+        QueueStatus[] result = scheduler.getQueueStatuses(queueNames);
 
         assertNotNull(result);
         assertTrue(queueNames.length == result.length);
 
-        for (int i=0;i<queueNames.length;i++) {
+        for (int i = 0; i < queueNames.length; i++) {
             assertNotNull(result[i]);
             assertEquals(queueNames[i], result[i].getQueueName());
             assertFalse(result[i].hasException());
@@ -582,21 +581,21 @@ public abstract class SchedulerTestParent {
 
     @Test
     public void test_getQueueStatusses_withNull() throws XenonException {
-        String [] queueNames = locationConfig.getQueueNames();
+        String[] queueNames = locationConfig.getQueueNames();
 
         assumeTrue(queueNames != null);
         assumeTrue(queueNames.length > 1);
 
-        String [] alt = new String[queueNames.length+1];
+        String[] alt = new String[queueNames.length + 1];
 
         alt[0] = queueNames[0];
         alt[1] = null;
 
-        for (int i=1;i<queueNames.length;i++) {
-            alt[i+1] = queueNames[i];
+        for (int i = 1; i < queueNames.length; i++) {
+            alt[i + 1] = queueNames[i];
         }
 
-        QueueStatus [] result = scheduler.getQueueStatuses(alt);
+        QueueStatus[] result = scheduler.getQueueStatuses(alt);
 
         assertNotNull(result);
         assertTrue(alt.length == result.length);
@@ -606,14 +605,14 @@ public abstract class SchedulerTestParent {
 
         assertNull(result[1]);
 
-        for (int i=1;i<queueNames.length;i++) {
-            assertNotNull(result[i+1]);
-            assertEquals(queueNames[i], result[i+1].getQueueName());
-            assertFalse(result[i+1].hasException());
+        for (int i = 1; i < queueNames.length; i++) {
+            assertNotNull(result[i + 1]);
+            assertEquals(queueNames[i], result[i + 1].getQueueName());
+            assertFalse(result[i + 1].hasException());
         }
     }
 
-    @Test(expected=UnsupportedOperationException.class)
+    @Test(expected = UnsupportedOperationException.class)
     public void test_interactiveJob_notSupported_throwsException() throws XenonException {
 
         assumeFalse(description.supportsInteractive());
@@ -624,14 +623,13 @@ public abstract class SchedulerTestParent {
         scheduler.submitInteractiveJob(job);
     }
 
-
     @Test
     public void test_interactiveJob() throws Exception {
 
         assumeTrue(description.supportsInteractive());
 
         JobDescription job = new JobDescription();
-        job.setExecutable("/bin/cat");
+        job.setExecutable("cat");
 
         Streams streams = scheduler.submitInteractiveJob(job);
 
@@ -649,69 +647,41 @@ public abstract class SchedulerTestParent {
 
         assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
 
-           cleanupJob(streams.getJobIdentifier());
+        cleanupJob(streams.getJobIdentifier());
     }
 
     /*
-    @Test(expected=XenonException.class)
-    public void test_waitUntilDone_unknownJobID_throwsException() throws XenonException {
-        scheduler.waitUntilDone("foobar", 5*1000);
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void test_waitUntilDone_nullJobID_throwsException() throws XenonException {
-        scheduler.waitUntilDone(null, 5*1000);
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void test_waitUntilDone_emptyJobID_throwsException() throws XenonException {
-        scheduler.waitUntilDone("", 5*1000);
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void test_waitUntilDone_invalidTimeout_throwsException() throws XenonException {
-        scheduler.waitUntilDone("foobar", -1000);
-    }
-
-    @Test(expected=XenonException.class)
-    public void test_waitUntilRunning_unknownJobID_throwsException() throws XenonException {
-        scheduler.waitUntilRunning("foobar", 5*1000);
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void test_waitUntilRunning_nullJobID_throwsException() throws XenonException {
-        scheduler.waitUntilRunning(null, 5*1000);
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void test_waitUntilRunning_emptyJobID_throwsException() throws XenonException {
-        scheduler.waitUntilRunning("", 5*1000);
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void test_waitUntilRunning_invalidTimeout_throwsException() throws XenonException {
-        scheduler.waitUntilRunning("foobar", -1000);
-    }
-
-    @Test(expected=XenonException.class)
-    public void test_cancel_unknownJobID_throwsException() throws XenonException {
-        scheduler.cancelJob("foobar");
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void test_cancel_nullJobID_throwsException() throws XenonException {
-        scheduler.cancelJob(null);
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void test_cancel_emptyJobID_throwsException() throws XenonException {
-        scheduler.cancelJob("");
-    }
-    */
-
+     * @Test(expected=XenonException.class) public void test_waitUntilDone_unknownJobID_throwsException() throws XenonException {
+     * scheduler.waitUntilDone("foobar", 5*1000); }
+     * 
+     * @Test(expected=IllegalArgumentException.class) public void test_waitUntilDone_nullJobID_throwsException() throws XenonException {
+     * scheduler.waitUntilDone(null, 5*1000); }
+     * 
+     * @Test(expected=IllegalArgumentException.class) public void test_waitUntilDone_emptyJobID_throwsException() throws XenonException {
+     * scheduler.waitUntilDone("", 5*1000); }
+     * 
+     * @Test(expected=IllegalArgumentException.class) public void test_waitUntilDone_invalidTimeout_throwsException() throws XenonException {
+     * scheduler.waitUntilDone("foobar", -1000); }
+     * 
+     * @Test(expected=XenonException.class) public void test_waitUntilRunning_unknownJobID_throwsException() throws XenonException {
+     * scheduler.waitUntilRunning("foobar", 5*1000); }
+     * 
+     * @Test(expected=IllegalArgumentException.class) public void test_waitUntilRunning_nullJobID_throwsException() throws XenonException {
+     * scheduler.waitUntilRunning(null, 5*1000); }
+     * 
+     * @Test(expected=IllegalArgumentException.class) public void test_waitUntilRunning_emptyJobID_throwsException() throws XenonException {
+     * scheduler.waitUntilRunning("", 5*1000); }
+     * 
+     * @Test(expected=IllegalArgumentException.class) public void test_waitUntilRunning_invalidTimeout_throwsException() throws XenonException {
+     * scheduler.waitUntilRunning("foobar", -1000); }
+     * 
+     * @Test(expected=XenonException.class) public void test_cancel_unknownJobID_throwsException() throws XenonException { scheduler.cancelJob("foobar"); }
+     * 
+     * @Test(expected=IllegalArgumentException.class) public void test_cancel_nullJobID_throwsException() throws XenonException { scheduler.cancelJob(null); }
+     * 
+     * @Test(expected=IllegalArgumentException.class) public void test_cancel_emptyJobID_throwsException() throws XenonException { scheduler.cancelJob(""); }
+     */
 
     // TODO: check illegalargument exceptions
-
-
 
 }
