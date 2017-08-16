@@ -15,14 +15,21 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems;
 
-import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.isWindows;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -1306,6 +1313,8 @@ public abstract class FileSystemTestParent {
     private void assertContents(Path file, byte[] data) throws Exception {
         InputStream a = fileSystem.readFromFile(file);
         byte[] abytes = readAllBytes(a);
+        a.close();
+
         if (!Arrays.equals(abytes, data)) {
             throwWrong("copy", Arrays.toString(abytes), Arrays.toString(data));
         }
@@ -1317,7 +1326,11 @@ public abstract class FileSystemTestParent {
         InputStream b = fileSystem.readFromFile(target);
 
         byte[] abytes = readAllBytes(a);
+        a.close();
+
         byte[] bbytes = readAllBytes(b);
+        b.close();
+
         if (!Arrays.equals(abytes, bbytes)) {
             throwWrong("copy", Arrays.toString(abytes), Arrays.toString(bbytes));
         }
