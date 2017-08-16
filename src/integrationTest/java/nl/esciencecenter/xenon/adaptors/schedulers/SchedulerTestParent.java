@@ -696,32 +696,32 @@ public abstract class SchedulerTestParent {
     /*
      * @Test(expected=XenonException.class) public void test_waitUntilDone_unknownJobID_throwsException() throws XenonException {
      * scheduler.waitUntilDone("foobar", 5*1000); }
-     * 
+     *
      * @Test(expected=IllegalArgumentException.class) public void test_waitUntilDone_nullJobID_throwsException() throws XenonException {
      * scheduler.waitUntilDone(null, 5*1000); }
-     * 
+     *
      * @Test(expected=IllegalArgumentException.class) public void test_waitUntilDone_emptyJobID_throwsException() throws XenonException {
      * scheduler.waitUntilDone("", 5*1000); }
-     * 
+     *
      * @Test(expected=IllegalArgumentException.class) public void test_waitUntilDone_invalidTimeout_throwsException() throws XenonException {
      * scheduler.waitUntilDone("foobar", -1000); }
-     * 
+     *
      * @Test(expected=XenonException.class) public void test_waitUntilRunning_unknownJobID_throwsException() throws XenonException {
      * scheduler.waitUntilRunning("foobar", 5*1000); }
-     * 
+     *
      * @Test(expected=IllegalArgumentException.class) public void test_waitUntilRunning_nullJobID_throwsException() throws XenonException {
      * scheduler.waitUntilRunning(null, 5*1000); }
-     * 
+     *
      * @Test(expected=IllegalArgumentException.class) public void test_waitUntilRunning_emptyJobID_throwsException() throws XenonException {
      * scheduler.waitUntilRunning("", 5*1000); }
-     * 
+     *
      * @Test(expected=IllegalArgumentException.class) public void test_waitUntilRunning_invalidTimeout_throwsException() throws XenonException {
      * scheduler.waitUntilRunning("foobar", -1000); }
-     * 
+     *
      * @Test(expected=XenonException.class) public void test_cancel_unknownJobID_throwsException() throws XenonException { scheduler.cancelJob("foobar"); }
-     * 
+     *
      * @Test(expected=IllegalArgumentException.class) public void test_cancel_nullJobID_throwsException() throws XenonException { scheduler.cancelJob(null); }
-     * 
+     *
      * @Test(expected=IllegalArgumentException.class) public void test_cancel_emptyJobID_throwsException() throws XenonException { scheduler.cancelJob(""); }
      */
 

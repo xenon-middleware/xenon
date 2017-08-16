@@ -119,7 +119,9 @@ public abstract class FileSystemTestParent {
         FileSystem cleanFileSystem = null;
         try {
             // close the file system under test, so any copy operations still running are killed, before we clean the test root
-            fileSystem.close();
+            if (fileSystem.isOpen()) {
+                fileSystem.close();
+            }
 
             cleanFileSystem = setupFileSystem();
 
