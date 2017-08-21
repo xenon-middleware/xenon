@@ -226,7 +226,7 @@ public abstract class FileSystem {
      * @param adaptor
      *            the type of file system to connect to (e.g. "sftp" or "webdav")
      * @param location
-     *            the location of the FileSystem.
+     *            the location of the FileSystem. Optionally, you can specify the working directory after a ':', i.e. "someserver:/var/scratch"
      * @param credential
      *            the Credentials to use to get access to the FileSystem.
      * @param properties
@@ -251,7 +251,26 @@ public abstract class FileSystem {
      *             If adaptor is null.
      */
     public static FileSystem create(String adaptor, String location, Credential credential, Map<String, String> properties) throws XenonException {
-        return getAdaptorByName(adaptor).createFileSystem(location, credential, properties);
+        String serverLocation;
+        String workingDir = null;
+
+        int splitIndex;
+        if(location != null) {
+            splitIndex = location.lastIndexOf(":");
+        } else {
+            splitIndex = -1;
+        }
+        if(splitIndex == -1) {
+            serverLocation = location;
+        } else {
+            serverLocation = location.substring(0,splitIndex);
+            workingDir = location.substring(splitIndex);
+        }
+        FileSystem fs =  getAdaptorByName(adaptor).createFileSystem(serverLocation, credential, properties);
+        if(fs != null &&  workingDir!=null) {
+            fs.setWorkingDirectory(new Path(workingDir));
+        }
+        return fs;
     }
 
     /**
@@ -264,7 +283,7 @@ public abstract class FileSystem {
      * @param adaptor
      *            the type of file system to connect to (e.g. "sftp" or "webdav")
      * @param location
-     *            the location of the FileSystem.
+     *            the location of the FileSystem. Optionally, you can specify the working directory after a ':', i.e. "someserver:/var/scratch"
      * @param credential
      *            the Credentials to use to get access to the FileSystem.
      *
@@ -299,7 +318,7 @@ public abstract class FileSystem {
      * @param adaptor
      *            the type of file system to connect to (e.g. "sftp" or "webdav")
      * @param location
-     *            the location of the FileSystem.
+     *            the location of the FileSystem. Optionally, you can specify the working directory after a ':', i.e. "someserver:/var/scratch"
      *
      * @return the new FileSystem.
      *
