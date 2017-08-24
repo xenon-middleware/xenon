@@ -219,7 +219,7 @@ final class GridEngineUtils {
     @SuppressWarnings("PMD.EmptyIfStmt")
     protected static JobStatus getJobStatusFromQacctInfo(Map<String, String> info, String jobIdentifier) throws XenonException {
         Integer exitcode;
-        Exception exception = null;
+        XenonException exception = null;
         String state = "done";
 
         if (info == null) {
@@ -263,7 +263,7 @@ final class GridEngineUtils {
         String longState = jobInfo.get("long_state");
         String stateCode = jobInfo.get("state");
 
-        Exception exception = null;
+        XenonException exception = null;
         if (stateCode.contains("E")) {
             exception = new XenonException(ADAPTOR_NAME, "Job reports error state: " + stateCode);
             done = true;

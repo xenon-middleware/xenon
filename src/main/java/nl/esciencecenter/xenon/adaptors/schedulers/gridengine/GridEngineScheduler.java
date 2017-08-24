@@ -346,7 +346,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
         //perhaps the job was killed while it was not running yet ("deleted", in sge speak). This will make it disappear from
         //qstat/qacct output completely
         if (status == null && jobWasDeleted(jobIdentifier)) {
-            Exception exception = new JobCanceledException(ADAPTOR_NAME, "Job " + jobIdentifier
+            XenonException exception = new JobCanceledException(ADAPTOR_NAME, "Job " + jobIdentifier
                     + " deleted by user while still pending");
             status = new JobStatusImplementation(jobIdentifier, "killed", null, exception, false, true, null);
         }
@@ -390,7 +390,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
                 //this job really does not exist. set it to an error state.
                 if (result[i] == null) {
-                    Exception exception = new NoSuchJobException(ADAPTOR_NAME, "Job " + jobs[i] + " not found on server");
+                    XenonException exception = new NoSuchJobException(ADAPTOR_NAME, "Job " + jobs[i] + " not found on server");
                     result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);
                 }
             }

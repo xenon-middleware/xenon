@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
+import nl.esciencecenter.xenon.XenonException;
 import org.junit.Test;
 
 import nl.esciencecenter.xenon.schedulers.MockScheduler;
@@ -56,7 +57,7 @@ public class QueueStatusImplementationTest {
     @Test
     public void test_exeption() throws Exception {
         MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
-        Exception e = new NullPointerException("aap");
+        XenonException e = new XenonException("adapter","EEP");
         QueueStatus stat = new QueueStatusImplementation(s, "Q", e, null);
         assertEquals(e,  stat.getException());
     }
@@ -67,7 +68,7 @@ public class QueueStatusImplementationTest {
         tmp.put("key", "value");
 
         MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
-        Exception e = new NullPointerException("aap");
+        XenonException e = new XenonException("adaptor","aap");
         QueueStatus stat = new QueueStatusImplementation(s, "Q", e, tmp);
         assertEquals(tmp,  stat.getSchedulerSpecficInformation());
     }
@@ -75,7 +76,7 @@ public class QueueStatusImplementationTest {
     @Test
     public void test_hasExeptionTrue() throws Exception {
         MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
-        Exception e = new NullPointerException("aap");
+       XenonException e = new XenonException("adapter","aap");
         QueueStatus stat = new QueueStatusImplementation(s, "Q", e, null);
         assertTrue(stat.hasException());
     }
@@ -92,7 +93,7 @@ public class QueueStatusImplementationTest {
         HashMap<String, String> tmp = new HashMap<>();
         tmp.put("key", "value");
         MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
-        Exception e = new NullPointerException("aap");
+        XenonException e = new XenonException("adaptor","aap");
         QueueStatus stat = new QueueStatusImplementation(s, "Q", e, tmp);
 
         String expected = "QueueStatus [scheduler=" + s + ", queueName=" + "Q" + ", exception=" + e

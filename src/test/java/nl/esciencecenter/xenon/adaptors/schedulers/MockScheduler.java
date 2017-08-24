@@ -133,7 +133,7 @@ public class MockScheduler extends Scheduler {
             jobs.remove(jobIdentifier);
 
             if (shouldFail) {
-                return new JobStatusImplementation(jobIdentifier, "ERROR", exitCode, new Exception("FAIL"), false, true, null);
+                return new JobStatusImplementation(jobIdentifier, "ERROR", exitCode, new XenonException(getAdaptorName(),"FAIL"), false, true, null);
             } else {
                 return new JobStatusImplementation(jobIdentifier, "DONE", exitCode, null, false, true, null);
             }

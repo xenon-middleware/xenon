@@ -96,7 +96,7 @@ final class TorqueUtils {
 
         String stateCode = jobInfo.get("job_state");
 
-        Exception exception = null;
+        XenonException exception = null;
         if (stateCode.equals("E")) {
             exception = new XenonException(ADAPTOR_NAME, "Job reports error state: " + stateCode);
             done = true;

@@ -102,7 +102,7 @@ public abstract class ScriptingScheduler extends Scheduler {
                 Map<String, String> map = all.get(queueNames[i]);
 
                 if (map == null) {
-                    Exception exception = new NoSuchQueueException(getAdaptorName(),
+                    XenonException exception = new NoSuchQueueException(getAdaptorName(),
                             "Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
                     result[i] = new QueueStatusImplementation(this, queueNames[i], exception, null);
                 } else {
