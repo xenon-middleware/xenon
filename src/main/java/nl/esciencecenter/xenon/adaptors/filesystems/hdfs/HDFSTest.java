@@ -13,10 +13,11 @@ public class HDFSTest {
     public static void main(String[] argv){
         try {
             FileSystem fs = new HDFSFileAdaptor().createFileSystem("localhost:8020", new DefaultCredential(), null);
-            fs.createDirectory(new Path("jada/bla"));
+
+            //fs.createDirectories(new Path("jada/bla"));
             System.out.println(fs.exists(new Path("jada")));
             OutputStream out = fs.writeToFile(new Path("jip.jpg"));
-            InputStream jip = new FileInputStream(new File("jip.jpg"));
+            InputStream jip = new FileInputStream(new File("/home/atze/jip.jpg"));
             int read ;
             byte[] data = new byte[1024];
             while ((read = jip.read(data)) != -1) {

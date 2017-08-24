@@ -75,11 +75,14 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
     public void createDirectory(Path dir) throws XenonException {
         checkClosed();
         try {
-            if(!exists(dir.getParent())){
-                throw new XenonException(getAdaptorName(), "createDirectory: parent does not exist: " + dir.toString());
-            }
-            if(exists(dir)){
-                throw new PathAlreadyExistsException(getAdaptorName(), "A directory or file already exists at: " + dir.toString());
+            Path parent = dir.getParent();
+            if(parent != null) {
+                if (!exists(dir.getParent())) {
+                    throw new XenonException(getAdaptorName(), "createDirectory: parent does not exist: " + dir.toString());
+                }
+                if (exists(dir)) {
+                    throw new PathAlreadyExistsException(getAdaptorName(), "A directory or file already exists at: " + dir.toString());
+                }
             }
             fs.mkdirs(toHDFSPath(dir));
         } catch(IOException e ){
