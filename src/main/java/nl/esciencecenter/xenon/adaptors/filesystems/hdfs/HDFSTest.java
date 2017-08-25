@@ -6,13 +6,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.*;
 
 
 public class HDFSTest {
     public static void main(String[] argv){
         try {
-            FileSystem fs = new HDFSFileAdaptor().createFileSystem("localhost:8020", new DefaultCredential(), null);
+            FileSystem fs = new HDFSFileAdaptor().createFileSystem("localhost:8020", new PasswordCredential("xenon","javagat".toCharArray()), null);
 
             //fs.createDirectories(new Path("jada/bla"));
             System.out.println(fs.exists(new Path("jada")));

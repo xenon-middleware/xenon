@@ -6,11 +6,16 @@ import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.security.auth.callback.*;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -56,5 +61,19 @@ public class HDFSFileAdaptor extends FileAdaptor{
             throw new XenonException("hdfs", "Failed to create HDFS connection: " + e.getMessage());
         }
 
+    }
+
+    private static LoginContext kinit(PasswordCredential pc) throws LoginException {
+        LoginContext lc = new LoginContext(HDFSFileAdaptor.class.getSimpleName(), new CallbackHandler() {
+            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                for(Callback c : callbacks){
+                    if(c instanceof NameCallback)
+                        ((NameCallback) c).setName(pc.getUsername());
+                    if(c instanceof PasswordCallback)
+                        ((PasswordCallback) c).setPassword(pc.getPassword());
+                }
+            }});
+        lc.login();
+        return lc;
     }
 }
