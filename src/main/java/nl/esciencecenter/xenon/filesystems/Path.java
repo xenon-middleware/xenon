@@ -197,10 +197,9 @@ public class Path implements Iterable<Path> {
      * @param separator
      *            the separator to use.
      */
-    public Path(char separator, List<String> elts) {
-        this(false,separator,elts);
-        this.isAbsolute = elements != null && elements.size() > 0
-                        && elements.get(0).startsWith(String.valueOf(separator));
+    public Path(boolean isAbsolute, char separator, List<String> elts) {
+        this(separator,elts);
+        this.isAbsolute = isAbsolute;
     }
 
 
@@ -214,14 +213,12 @@ public class Path implements Iterable<Path> {
      * them into elements wherever a separator is encountered. Elements that are
      * <code>null</code> or contain an empty String are ignored.
      *
-     * @param isAbsolute
-     *            is the path is an absolute or an relative path
      * @param elts
      *            the path elements to use.
      * @param separator
      *            the separator to use.
      */
-    public Path(boolean isAbsolute, char separator, List<String> elts) {
+    public Path(char separator, List<String> elts) {
 
         List<String> tmp = elts;
 
@@ -232,7 +229,7 @@ public class Path implements Iterable<Path> {
         }
         String delim = String.valueOf(separator);
 
-        this.isAbsolute = isAbsolute;
+        this.isAbsolute = tmp.isEmpty() ? false : tmp.get(0).startsWith(delim);
         this.separator = separator;
         this.elements = new ArrayList<>(tmp.size());
 
@@ -646,7 +643,7 @@ public class Path implements Iterable<Path> {
             }
         }
 
-        return new Path(separator, isAbsolute, stack);
+        return new Path(isAbsolute, separator, stack);
     }
 
     /* Generated */
@@ -688,10 +685,10 @@ public class Path implements Iterable<Path> {
     }
 
     public Path toRelativePath() {
-        return new Path(separator, false, elements);
+        return new Path(false, separator, elements);
     }
 
     public Path toAbsolutePath() {
-        return new Path(separator, true, elements);
+        return new Path(true, separator,  elements);
     }
 }
