@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon.schedulers;
 
+import nl.esciencecenter.xenon.XenonException;
+
 import java.util.Map;
 
 /**
@@ -46,9 +48,21 @@ public interface QueueStatus {
     /**
      * Get the exception produced by the queue, or <code>null</code> if <code>hasException()</code> returns <code>false</code>.
      *
+     * See {@link #maybeThrowException()} for the possible exceptions.
+     *
      * @return the exception.
      */
-    Exception getException();
+    XenonException getException();
+
+
+    /**
+     * Throws the exception produced by the queue if it exists. Otherwise continue.
+     *@throws NoSuchQueueException
+     *          if the requested queue does not exist
+     * @throws XenonException
+     *          if an I/O error occurred.
+     */
+    void maybeThrowException() throws XenonException;
 
     /**
      * Get scheduler specific information on the queue.

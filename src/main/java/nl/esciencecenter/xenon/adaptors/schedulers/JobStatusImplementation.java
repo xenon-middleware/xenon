@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
 import java.util.Map;
 import java.util.Objects;
 
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 
 /**
@@ -31,7 +32,7 @@ public class JobStatusImplementation implements JobStatus {
     private final String jobIdentifier;
     private final String state;
     private final Integer exitCode;
-    private final Exception exception;
+    private final XenonException exception;
     private final boolean running;
     private final boolean done;
     private final Map<String, String> schedulerSpecificInformation;
@@ -54,7 +55,7 @@ public class JobStatusImplementation implements JobStatus {
      * @param schedulerSpecificInformation
      * 		a map of scheduler implementation specific information on the job.
      */
-    public JobStatusImplementation(String jobIdentifier, String state, Integer exitCode, Exception exception, boolean running, boolean done,
+    public JobStatusImplementation(String jobIdentifier, String state, Integer exitCode, XenonException exception, boolean running, boolean done,
             Map<String, String> schedulerSpecificInformation) {
 
         if (jobIdentifier == null) {
@@ -103,8 +104,15 @@ public class JobStatusImplementation implements JobStatus {
      *
      * @return the exception.
      */
-    public Exception getException() {
+    public XenonException getException() {
         return exception;
+    }
+
+    @Override
+    public void maybeThrowException() throws XenonException {
+        if (hasException()) {
+            throw getException();
+        }
     }
 
     /**

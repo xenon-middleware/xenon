@@ -417,13 +417,13 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         if (status == null) {
             if (jobWasDeleted(job)) {
-                Exception exception = new JobCanceledException(ADAPTOR_NAME, "Job " + job + " deleted by user");
+                XenonException exception = new JobCanceledException(ADAPTOR_NAME, "Job " + job + " deleted by user");
                 status = new JobStatusImplementation(job, "killed", null, exception, false, true, null);
             } else if (haveRecentlySeen(job)) {
                 status = new JobStatusImplementation(job, "unknown", null, null, false, true, new HashMap<String, String>(0));
             }
         } else if (status.isDone() && jobWasDeleted(job)) {
-            Exception exception = new JobCanceledException(ADAPTOR_NAME, "Job " + job + " deleted by user");
+            XenonException exception = new JobCanceledException(ADAPTOR_NAME, "Job " + job + " deleted by user");
             status = new JobStatusImplementation(job, "killed", status.getExitCode(), exception, false, true, status.getSchedulerSpecficInformation());
         }
 
@@ -461,7 +461,7 @@ public class TorqueScheduler extends ScriptingScheduler {
 
                 //this job really does not exist. set it to an error state.
                 if (result[i] == null) {
-                    Exception exception = new NoSuchJobException(ADAPTOR_NAME, "Job " + jobs[i] + " not found on server");
+                    XenonException exception = new NoSuchJobException(ADAPTOR_NAME, "Job " + jobs[i] + " not found on server");
                     result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);
                 }
             }
