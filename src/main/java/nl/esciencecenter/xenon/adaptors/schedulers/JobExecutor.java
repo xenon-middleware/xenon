@@ -320,7 +320,7 @@ public class JobExecutor implements Runnable {
         } catch (XenonException e) {
             updateState(ERROR_STATE, -1, e);
             return;
-        } catch (IOException e){
+        } catch (IOException e) {
             updateState(ERROR_STATE, -1, new XenonException(adaptorName, "Error starting job.", e));
             return;
         }

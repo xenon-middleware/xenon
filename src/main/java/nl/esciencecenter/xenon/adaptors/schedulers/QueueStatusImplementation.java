@@ -98,7 +98,7 @@ public class QueueStatusImplementation implements QueueStatus {
 
     @Override
     public void maybeThrowException() throws XenonException {
-        if(hasException()){
+        if (hasException()) {
             throw getException();
         }
     }
