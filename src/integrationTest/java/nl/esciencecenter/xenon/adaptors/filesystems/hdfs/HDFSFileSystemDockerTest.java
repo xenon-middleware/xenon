@@ -5,22 +5,23 @@ import com.palantir.docker.compose.connection.waiting.HealthChecks;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileSystemTestParent;
 import nl.esciencecenter.xenon.adaptors.filesystems.LocationConfig;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 import org.junit.ClassRule;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by atze on 25-8-17.
- */
+
 public class HDFSFileSystemDockerTest extends FileSystemTestParent {
 
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/minio.yml")
-            .waitingForService("minio", HealthChecks.toHaveAllPortsOpen()).saveLogsTo("/var/tmp/bla").build();
+    public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/hdfs.yml")
+              .waitingForService("hdfs", HealthChecks.toHaveAllPortsOpen()).skipShutdown(true).build();
 
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
@@ -28,7 +29,8 @@ public class HDFSFileSystemDockerTest extends FileSystemTestParent {
 
             @Override
             public Map.Entry<Path, Path> getSymbolicLinksToExistingFile() {
-                throw new Error("Symlinks not supported on S3");
+                // TODO: fix me
+                throw new Error("Symlinks not yet supported on HDFS");
             }
 
             @Override
@@ -43,16 +45,18 @@ public class HDFSFileSystemDockerTest extends FileSystemTestParent {
 
             @Override
             public Path getExpectedWorkingDirectory() {
-                return new Path("/");
+                return new Path("/filesystem-test-fixture");
             }
         };
     }
 
     @Override
     public FileSystem setupFileSystem() throws XenonException {
-        String location = docker.containers().container("minio").port(9000).inFormat("http://localhost:$EXTERNAL_PORT/filesystem-test-fixture");
-        PasswordCredential cred = new PasswordCredential("xenon", "javagat01".toCharArray());
+        String location = docker.containers().container("hdfs").port(8020).inFormat("localhost");
+        Credential cred = new DefaultCredential();
         Map<String, String> props = new HashMap<>();
-        return FileSystem.create("s3", location, cred, props);
+        FileSystem fs =  FileSystem.create("hdfs", location, cred, props);
+        fs.setWorkingDirectory(new Path("/filesystem-test-fixture"));
+        return fs;
     }
 }

@@ -16,7 +16,8 @@
 
 version: '3'
 services:
-  minio:
+  hdfs:
     image: nlesc/xenon-hdfs
     ports:
-    - 22022 8020 50010 50020 50070 50075 
+    - 8020
+    - 50070

@@ -243,14 +243,13 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
     @Override
     public PathAttributes getAttributes(Path path) throws XenonException {
         checkClosed();
-        Iterator<PathAttributes> p = list(path, false).iterator();
-        while(p.hasNext()){
-            PathAttributes at = p.next();
-            if(at.getPath().equals(path)){
-                return at;
-            }
+        assertPathExists(path);
+        try {
+            return toPathAttributes(fs.getFileStatus(toHDFSPath(path)));
+        } catch(IOException e){
+            throw new XenonException(getAdaptorName(), "Cannot get file attributes", e);
         }
-        throw new NoSuchPathException("hdfs", "No such file: " + path.toString());
+
     }
 
     @Override
@@ -280,8 +279,9 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
 
 
 
-    private PathAttributes toPathAttributes(LocatedFileStatus s){
+    private PathAttributes toPathAttributes(FileStatus s){
         PathAttributesImplementation res = new PathAttributesImplementation();
+        res.setPath(fromHDFSPath(s.getPath()));
         res.setDirectory(s.isDirectory());
         res.setOther(false); // cannot happen in hdfs? not supported by API
         res.setRegular(s.isFile());
