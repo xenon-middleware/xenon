@@ -859,10 +859,4 @@ public class SlurmUtilsTest {
         assertEquals("AAP,NOOT", result);
     }
 
-    @Test
-    public void test_forCoverage() {
-        new SlurmUtils();
-    }
-
-
 }

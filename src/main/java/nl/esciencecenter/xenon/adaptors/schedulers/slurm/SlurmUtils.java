@@ -94,7 +94,11 @@ public final class SlurmUtils {
          return result;
      }
 
-     // Retrieve an exit code from the "ExitCode" output field of scontrol
+    private SlurmUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    // Retrieve an exit code from the "ExitCode" output field of scontrol
     protected static Integer exitcodeFromString(String value) throws XenonException {
         if (value == null) {
             return null;

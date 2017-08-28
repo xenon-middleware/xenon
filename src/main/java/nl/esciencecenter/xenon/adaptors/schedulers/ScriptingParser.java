@@ -39,6 +39,11 @@ public final class ScriptingParser {
 
     public static final Pattern HORIZONTAL_LINE_REGEX = Pattern.compile("^\\s*([=_-]{3,}\\s*)+$");
 
+    private ScriptingParser() {
+        throw new IllegalStateException("Utility class");
+    }
+
+
     /**
      * Parses a output with key=value pairs separated by whitespace, on one or more lines. This function fails if there is any
      * whitespace between the key and value, or whitespace inside the values.

@@ -25,6 +25,10 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
 
 public class LocalFileSystemUtils {
 
+    private LocalFileSystemUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static String NAME = "LocalFileSystemUtils";
 
     /**

@@ -23,6 +23,10 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
  */
 public final class CommandLineUtils {
 
+    private CommandLineUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * Concatinate a series of <code>String</code>s using a <code>StringBuilder</code>.
      *

@@ -107,6 +107,10 @@ final class GridEngineUtils {
         script.format("%n");
     }
 
+    private GridEngineUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     @SuppressWarnings("PMD.NPathComplexity")
     protected static String generate(JobDescription description, Path fsEntryPath, GridEngineSetup setup)
             throws XenonException {

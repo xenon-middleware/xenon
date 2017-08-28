@@ -70,6 +70,10 @@ public class SSHUtil {
         }
     }
 
+    private SSHUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static SshClient createSSHClient(boolean loadKnownHosts, boolean loadSSHConfig, boolean useSSHAgent, boolean useAgentForwarding) {
 
         SshClient client = SshClient.setUpDefaultClient();

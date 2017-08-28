@@ -52,6 +52,10 @@ final class TorqueUtils {
 
     private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_RESOURCES };
 
+    private TorqueUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static void verifyJobDescription(JobDescription description) throws XenonException {
         ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
 

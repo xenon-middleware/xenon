@@ -100,6 +100,11 @@ public class PosixFileUtils {
         return result;
     }
 
+    private PosixFileUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
+
     public static int permissionsToBits(Set<PosixFilePermission> permissions) {
 
         int bits = 0;
