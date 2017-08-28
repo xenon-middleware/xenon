@@ -31,29 +31,27 @@ public abstract class SshUtilTest {
 
     @Test
     public void test_connect() throws Exception {
-        SshClient client = SSHUtil.createSSHClient(false, false, false, false);
+        SshClient client = SSHUtil.createSSHClient(false, false, false);
         ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10*1000);
         session.close();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void test_connect_FailsNullCredential() throws Exception {
-        SshClient client = SSHUtil.createSSHClient(false, false, false, false);
+        SshClient client = SSHUtil.createSSHClient(false, false, false);
         SSHUtil.connect("test", client, getLocation(), null, 10*1000);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void test_connect_FailsInvalidTimeout() throws Exception {
-        SshClient client = SSHUtil.createSSHClient(false, false, false, false);
+        SshClient client = SSHUtil.createSSHClient(false, false, false);
         SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), -1);
     }
 
     @Test(expected=XenonException.class)
     public void test_connect_FailsUsernameNull() throws Exception {
-        SshClient client = SSHUtil.createSSHClient(false, false, false, false);
+        SshClient client = SSHUtil.createSSHClient(false, false, false);
         SSHUtil.connect("test", client, getLocation(), new PasswordCredential(null, "foobar".toCharArray()), 10*1000);
     }
-
-
 
 }

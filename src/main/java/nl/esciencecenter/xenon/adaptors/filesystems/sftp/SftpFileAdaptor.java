@@ -121,12 +121,11 @@ public class SftpFileAdaptor extends FileAdaptor {
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
-        boolean loadKnownHosts = xp.getBooleanProperty(LOAD_STANDARD_KNOWN_HOSTS);
         boolean loadSSHConfig = xp.getBooleanProperty(LOAD_SSH_CONFIG);
         boolean useSSHAgent = xp.getBooleanProperty(AGENT);
         boolean useAgentForwarding = xp.getBooleanProperty(AGENT_FORWARDING);
 
-        SshClient client = SSHUtil.createSSHClient(loadKnownHosts, loadSSHConfig, useSSHAgent, useAgentForwarding);
+        SshClient client = SSHUtil.createSSHClient(loadSSHConfig, useSSHAgent, useAgentForwarding);
 
         long timeout = xp.getNaturalProperty(CONNECTION_TIMEOUT);
 

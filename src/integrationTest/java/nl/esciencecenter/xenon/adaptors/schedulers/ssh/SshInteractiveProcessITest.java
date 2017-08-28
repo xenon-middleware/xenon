@@ -39,7 +39,7 @@ public abstract class SshInteractiveProcessITest {
 
     @Test
     public void test_run_hostname() throws Exception {
-        SshClient client = SSHUtil.createSSHClient(false, false, false, false);
+        SshClient client = SSHUtil.createSSHClient(false, false, false);
         ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10*1000);
 
         JobDescription desc = new JobDescription();
@@ -75,7 +75,7 @@ public abstract class SshInteractiveProcessITest {
 
     @Test
     public void test_run_cat() throws Exception {
-        SshClient client = SSHUtil.createSSHClient(false, false, false, false);
+        SshClient client = SSHUtil.createSSHClient(false, false, false);
         ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10*1000);
 
         JobDescription desc = new JobDescription();
@@ -112,7 +112,7 @@ public abstract class SshInteractiveProcessITest {
 
     @Test
     public void test_exitStatusBeforeFinish() throws Exception {
-        SshClient client = SSHUtil.createSSHClient(false, false, false, false);
+        SshClient client = SSHUtil.createSSHClient(false, false, false);
         ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10*1000);
 
         JobDescription desc = new JobDescription();
@@ -150,6 +150,5 @@ public abstract class SshInteractiveProcessITest {
         // Done yet, so exit returns 0
         assertEquals(0, p.getExitStatus());
     }
-//
 
 }
