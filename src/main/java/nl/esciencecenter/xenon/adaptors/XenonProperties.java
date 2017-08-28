@@ -45,7 +45,7 @@ public class XenonProperties {
 
     /** One giga is a kilo*kilo*kilo */
     private static final int GIGA = KILO * MEGA;
-    
+
 
     /**
      * Creates empty mutable Map with sufficient initial capacity.
@@ -519,7 +519,7 @@ public class XenonProperties {
     private XenonProperties filterUsingPredicate(Predicate<String> predicate) {
 
         // first determine the relevant subset of propertyDescriptions
-         Map<String, XenonPropertyDescription> remainingDescriptions = 
+         Map<String, XenonPropertyDescription> remainingDescriptions =
                  filterOnKey(propertyDescriptions, predicate);
 
          Map<String, String> remainingProperties = filterOnKey(properties, key -> remainingDescriptions.containsKey(key));
@@ -529,9 +529,9 @@ public class XenonProperties {
 
 
 
-    private <K, V> Map<K, V> filterOnKey(Map<K, V> map, Predicate<K> predicate){
-        Map<K, V> remaining = emptyMap(map.size()); 
-        
+    private <K, V> Map<K, V> filterOnKey(Map<K, V> map, Predicate<K> predicate) {
+        Map<K, V> remaining = emptyMap(map.size());
+
         for (Entry<K, V> entry : map.entrySet()) {
             K key = entry.getKey();
             V value = entry.getValue();
@@ -552,9 +552,9 @@ public class XenonProperties {
      */
     public XenonProperties clear(final String prefix) {
 
-        Map<String, XenonPropertyDescription> toInclude = filterOnKey(propertyDescriptions, 
+        Map<String, XenonPropertyDescription> toInclude = filterOnKey(propertyDescriptions,
                 propertyKey -> !propertyKey.startsWith(prefix));
-        
+
         Map<String,String> propertiesRemaining = filterOnKey(properties, key -> toInclude.containsKey(key));
 
         return new XenonProperties(propertyDescriptions, propertiesRemaining);
