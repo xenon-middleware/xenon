@@ -71,8 +71,6 @@ public class SftpFileSystem extends FileSystem {
             throw sftpExceptionToXenonException(e, "Failed to close sftp client");
         }
 
-        // info.getSession().disconnect();
-
         super.close();
         LOGGER.debug("close OK");
     }

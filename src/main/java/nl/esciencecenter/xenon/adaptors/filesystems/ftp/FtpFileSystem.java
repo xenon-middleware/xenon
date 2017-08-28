@@ -175,13 +175,10 @@ public class FtpFileSystem extends FileSystem {
         int replyCode = client.getReplyCode();
         String replyString = client.getReplyString();
 
-        // System.out.println("REPLY " + replyCode + " " + replyString);
-
         if (replyCode >= 100 && replyCode < 300) {
             return;
         }
 
-        // String replyString = ftpClient.getReplyString();
         throw new XenonException(ADAPTOR_NAME, message, new IOException(replyString));
     }
 
@@ -396,9 +393,7 @@ public class FtpFileSystem extends FileSystem {
         try {
             InputStream in = newClient.retrieveFileStream(path.toString());
 
-            // if (in == null) {
             checkClientReply(newClient, "Failed to read from path: " + path.toString());
-            // }
 
             return new FtpInputStream(in, newClient);
         } catch (IOException e) {

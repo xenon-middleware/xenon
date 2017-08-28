@@ -407,17 +407,11 @@ public class JCloudsFileSytem extends FileSystem {
 
         assertPathIsFile(path);
 
-        // boolean exists = context.getBlobStore().blobExists(bucket, name);
-
-        // if (exists) {
         try {
             return context.getBlobStore().getBlob(bucket, toBucketEntry(path)).getPayload().openStream();
         } catch (IOException e) {
             throw new XenonException(adaptorName, e.getMessage());
         }
-        // } else {
-        // throw new NoSuchPathException(adaptorName, "No such file: " + name);
-        // }
     }
 
     @Override
