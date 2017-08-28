@@ -59,9 +59,6 @@ public class PosixFileUtils {
     /** execute/search by others */
     public static final int EXEC_OTHERS = 00001;
 
-    /** Bit mask for bits used */
-    private static final int MASK = ~(READ_OWNER | WRITE_OWNER | EXEC_OWNER | READ_GROUP | WRITE_GROUP | EXEC_GROUP | READ_OTHERS | WRITE_OTHERS | EXEC_OTHERS);
-
     @SuppressWarnings("PMD.NPathComplexity")
     public static Set<PosixFilePermission> bitsToPermissions(int bit) {
 
