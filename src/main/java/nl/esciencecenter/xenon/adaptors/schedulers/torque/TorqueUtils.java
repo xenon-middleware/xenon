@@ -119,20 +119,20 @@ final class TorqueUtils {
         for (String argument : description.getArguments()) {
             script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
         }
-        script.format("\n");
+        script.format("%n");
     }
 
     public static String generate(JobDescription description, Path fsEntryPath) {
         StringBuilder stringBuilder = new StringBuilder(500);
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
-        script.format("#!/bin/sh\n");
+        script.format("#!/bin/sh%n");
 
         // set shell to sh
-        script.format("#PBS -S /bin/sh\n");
+        script.format("#PBS -S /bin/sh%n");
 
         // set name of job to xenon
-        script.format("#PBS -N xenon\n");
+        script.format("#PBS -N xenon%n");
 
         // set working directory
         if (description.getWorkingDirectory() != null) {
@@ -141,40 +141,40 @@ final class TorqueUtils {
                 // make relative path absolute
                 workingDirectory = fsEntryPath.resolve(workingDirectory).toString();
             }
-            script.format("#PBS -w '%s'\n", workingDirectory);
+            script.format("#PBS -w '%s'%n", workingDirectory);
         }
 
         if (description.getQueueName() != null) {
-            script.format("#PBS -q %s\n", description.getQueueName());
+            script.format("#PBS -q %s%n", description.getQueueName());
         }
 
         String resources = description.getJobOptions().get(JOB_OPTION_RESOURCES);
         if (resources != null) {
-            script.format("#PBS -l %s\n", resources);
+            script.format("#PBS -l %s%n", resources);
         }
 
         // number of nodes and processes per node
-        script.format("#PBS -l nodes=%d:ppn=%d\n", description.getNodeCount(), description.getProcessesPerNode());
+        script.format("#PBS -l nodes=%d:ppn=%d%n", description.getNodeCount(), description.getProcessesPerNode());
 
         // add maximum runtime in hour:minute:second format (converted from minutes in description)
-        script.format("#PBS -l walltime=%02d:%02d:00\n", description.getMaxTime() / MINUTES_PER_HOUR, description.getMaxTime() % MINUTES_PER_HOUR);
+        script.format("#PBS -l walltime=%02d:%02d:00%n", description.getMaxTime() / MINUTES_PER_HOUR, description.getMaxTime() % MINUTES_PER_HOUR);
 
         for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
-            script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());
+            script.format("export %s=\"%s\"%n", entry.getKey(), entry.getValue());
         }
 
-        script.format("\n");
+        script.format("%n");
 
         String customContents = description.getJobOptions().get(JOB_OPTION_JOB_CONTENTS);
         if (customContents == null) {
             generateScriptContent(description, script);
         } else {
-            script.format("%s\n", customContents);
+            script.format("%s%n", customContents);
         }
 
         script.close();
 
-        LOGGER.debug("Created job script:\n{}", stringBuilder);
+        LOGGER.debug("Created job script:%n{}", stringBuilder);
 
         return stringBuilder.toString();
     }

@@ -77,7 +77,7 @@ final class GridEngineUtils {
             }
         }
 
-        script.format("#$ -pe %s %d\n", pe, slots);
+        script.format("#$ -pe %s %d%n", pe, slots);
     }
 
     protected static void generateSerialScriptContent(JobDescription description, Formatter script) {
@@ -86,11 +86,11 @@ final class GridEngineUtils {
         for (String argument : description.getArguments()) {
             script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
         }
-        script.format("\n");
+        script.format("%n");
     }
 
     protected static void generateParallelScriptContent(JobDescription description, Formatter script) {
-        script.format("for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n");
+        script.format("for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do%n");
 
         for (int i = 0; i < description.getProcessesPerNode(); i++) {
             script.format("  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && ");
@@ -98,13 +98,13 @@ final class GridEngineUtils {
             for (String argument : description.getArguments()) {
                 script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
             }
-            script.format("\"&\n");
+            script.format("\"&%n");
         }
         //wait for all ssh connections to finish
-        script.format("done\n\n");
-        script.format("wait\n");
-        script.format("exit 0\n");
-        script.format("\n");
+        script.format("done%n%n");
+        script.format("wait%n");
+        script.format("exit 0%n");
+        script.format("%n");
     }
 
     @SuppressWarnings("PMD.NPathComplexity")
@@ -114,27 +114,27 @@ final class GridEngineUtils {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
-        script.format("#!/bin/sh\n");
+        script.format("#!/bin/sh%n");
 
         //set shell to sh
-        script.format("#$ -S /bin/sh\n");
+        script.format("#$ -S /bin/sh%n");
 
         //set name of job to xenon
-        script.format("#$ -N xenon\n");
+        script.format("#$ -N xenon%n");
 
         //set working directory
         if (description.getWorkingDirectory() != null) {
             if (description.getWorkingDirectory().startsWith("/")) {
-                script.format("#$ -wd '%s'\n", description.getWorkingDirectory());
+                script.format("#$ -wd '%s'%n", description.getWorkingDirectory());
             } else {
                 //make relative path absolute
                 Path workingDirectory = fsEntryPath.resolve(description.getWorkingDirectory());
-                script.format("#$ -wd '%s'\n", workingDirectory.toString());
+                script.format("#$ -wd '%s'%n", workingDirectory.toString());
             }
         }
 
         if (description.getQueueName() != null) {
-            script.format("#$ -q %s\n", description.getQueueName());
+            script.format("#$ -q %s%n", description.getQueueName());
         }
 
         //parallel environment and slot count (if needed)
@@ -143,36 +143,36 @@ final class GridEngineUtils {
         }
 
         //add maximum runtime in hour:minute:second format (converted from minutes in description)
-        script.format("#$ -l h_rt=%02d:%02d:00\n", description.getMaxTime() / MINUTES_PER_HOUR, description.getMaxTime()
+        script.format("#$ -l h_rt=%02d:%02d:00%n", description.getMaxTime() / MINUTES_PER_HOUR, description.getMaxTime()
                 % MINUTES_PER_HOUR);
 
         String resources = description.getJobOptions().get(JOB_OPTION_RESOURCES);
 
         if (resources != null) {
-            script.format("#$ -l %s\n", resources);
+            script.format("#$ -l %s%n", resources);
         }
 
         if (description.getStdin() != null) {
-            script.format("#$ -i '%s'\n", description.getStdin());
+            script.format("#$ -i '%s'%n", description.getStdin());
         }
 
         if (description.getStdout() == null) {
-            script.format("#$ -o /dev/null\n");
+            script.format("#$ -o /dev/null%n");
         } else {
-            script.format("#$ -o '%s'\n", description.getStdout());
+            script.format("#$ -o '%s'%n", description.getStdout());
         }
 
         if (description.getStderr() == null) {
-            script.format("#$ -e /dev/null\n");
+            script.format("#$ -e /dev/null%n");
         } else {
-            script.format("#$ -e '%s'\n", description.getStderr());
+            script.format("#$ -e '%s'%n", description.getStderr());
         }
 
         for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
-            script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());
+            script.format("export %s=\"%s\"%n", entry.getKey(), entry.getValue());
         }
 
-        script.format("\n");
+        script.format("%n");
 
         if (description.getNodeCount() == 1 && description.getProcessesPerNode() == 1) {
             generateSerialScriptContent(description, script);
@@ -182,7 +182,7 @@ final class GridEngineUtils {
 
         script.close();
 
-        LOGGER.debug("Created job script:\n{}", stringBuilder);
+        LOGGER.debug("Created job script:%n{}", stringBuilder);
 
         return stringBuilder.toString();
     }
