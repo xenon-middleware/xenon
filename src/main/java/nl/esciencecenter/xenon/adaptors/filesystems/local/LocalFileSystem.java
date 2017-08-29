@@ -63,7 +63,7 @@ public class LocalFileSystem extends FileSystem {
         return new Path(LocalFileSystemUtils.getLocalSeparator(), path.substring(root.length()));
     }
 
-    java.nio.file.Path javaPath(Path path) throws XenonException {
+    java.nio.file.Path javaPath(Path path) {
 
         if (path == null) {
             throw new IllegalArgumentException("Path may not be null");

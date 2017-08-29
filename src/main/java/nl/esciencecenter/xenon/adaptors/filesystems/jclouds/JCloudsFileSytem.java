@@ -158,7 +158,7 @@ public class JCloudsFileSytem extends FileSystem {
     }
 
     // Ensure that the specified directory exists by
-    private void ensureDirectoryExists(Path dir) throws XenonException {
+    private void ensureDirectoryExists(Path dir) {
         if (!dirExists(dir)) {
             makeDirectoryPlaceholder(dir);
         }
