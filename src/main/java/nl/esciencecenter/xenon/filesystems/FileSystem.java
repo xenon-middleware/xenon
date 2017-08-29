@@ -1230,8 +1230,6 @@ public abstract class FileSystem {
                 Path dst = destination.resolve(rel);
 
                 copyFile(p.getPath(), destinationFS, dst, mode, callback);
-                // bytesCopied += p.getSize();
-                // callback.setBytesCopied(bytesCopied);
             }
         }
     }
