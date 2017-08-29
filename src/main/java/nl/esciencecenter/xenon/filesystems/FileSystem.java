@@ -598,12 +598,9 @@ public abstract class FileSystem {
 
         Path parent = absolute.getParent();
 
-        if (parent != null) {
-
-            if (!exists(parent)) {
-                // Recursive call
-                createDirectories(parent);
-            }
+        if (parent != null && !exists(parent)) {
+            // Recursive call
+            createDirectories(parent);
         }
 
         createDirectory(absolute);
