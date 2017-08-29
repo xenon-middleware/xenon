@@ -32,6 +32,10 @@ import java.util.Map;
 
 public class ScriptingUtils {
 
+    private ScriptingUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static boolean isLocal(String location) {
         return (location == null || location.length() == 0 || location.equals("/"));
     }
