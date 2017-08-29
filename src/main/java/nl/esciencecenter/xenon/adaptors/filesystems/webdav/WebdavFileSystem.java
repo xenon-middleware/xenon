@@ -153,33 +153,33 @@ public class WebdavFileSystem extends FileSystem {
 
         LOGGER.debug("move source = {} to target = {}", source, target);
 
-        source = toAbsolutePath(source);
-        target = toAbsolutePath(target);
+        Path absSource = toAbsolutePath(source);
+        Path absTarget = toAbsolutePath(target);
 
-        assertPathExists(source);
+        assertPathExists(absSource);
 
-        if (areSamePaths(source, target)) {
+        if (areSamePaths(absSource, absTarget)) {
             return;
         }
 
-        assertParentDirectoryExists(target);
-        assertPathNotExists(target);
+        assertParentDirectoryExists(absTarget);
+        assertPathNotExists(absTarget);
 
-        PathAttributes a = getAttributes(source);
+        PathAttributes a = getAttributes(absSource);
 
         try {
             if (a.isDirectory()) {
-                client.move(getDirectoryPath(source), getDirectoryPath(target), false);
+                client.move(getDirectoryPath(absSource), getDirectoryPath(absTarget), false);
             } else {
-                client.move(getFilePath(source), getFilePath(target), false);
+                client.move(getFilePath(absSource), getFilePath(absTarget), false);
             }
         } catch (SardineException e) {
             if (e.getStatusCode() == HttpStatus.SC_MOVED_PERMANENTLY) {
                 return;
             }
-            throw new XenonException(ADAPTOR_NAME, "Failed to move from " + source + " to " + target, e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to move from " + absSource + " to " + absTarget, e);
         } catch (Exception e1) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to move from " + source + " to " + target, e1);
+            throw new XenonException(ADAPTOR_NAME, "Failed to move from " + absSource + " to " + absTarget, e1);
         }
     }
 
@@ -187,14 +187,14 @@ public class WebdavFileSystem extends FileSystem {
     public void createDirectory(Path dir) throws XenonException {
         LOGGER.debug("createDirectory dir = {}", dir);
 
-        dir = toAbsolutePath(dir);
-        assertPathNotExists(dir);
-        assertParentDirectoryExists(dir);
+        Path absDir = toAbsolutePath(dir);
+        assertPathNotExists(absDir);
+        assertParentDirectoryExists(absDir);
 
         try {
-            client.createDirectory(getDirectoryPath(dir));
+            client.createDirectory(getDirectoryPath(absDir));
         } catch (Exception e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to create directory: " + dir, e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to create directory: " + absDir, e);
         }
     }
 
@@ -202,14 +202,14 @@ public class WebdavFileSystem extends FileSystem {
     public void createFile(Path file) throws XenonException {
         LOGGER.debug("createFile path = {}", file);
 
-        file = toAbsolutePath(file);
-        assertPathNotExists(file);
-        assertParentDirectoryExists(file);
+        Path absFile = toAbsolutePath(file);
+        assertPathNotExists(absFile);
+        assertParentDirectoryExists(absFile);
 
         try {
-            client.put(getFilePath(file), new byte[0]);
+            client.put(getFilePath(absFile), new byte[0]);
         } catch (Exception e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to create file: " + file, e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to create file: " + absFile, e);
         }
     }
 
@@ -239,41 +239,41 @@ public class WebdavFileSystem extends FileSystem {
     @Override
     public boolean exists(Path path) throws XenonException {
 
-        path = toAbsolutePath(path);
+        Path absPath = toAbsolutePath(path);
 
         try {
-            return client.exists(getDirectoryPath(path)) || client.exists(getFilePath(path));
+            return client.exists(getDirectoryPath(absPath)) || client.exists(getFilePath(absPath));
         } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to check existence of directory: " + path);
+            throw new XenonException(ADAPTOR_NAME, "Failed to check existence of directory: " + absPath);
         }
     }
 
     @Override
     public InputStream readFromFile(Path path) throws XenonException {
 
-        path = toAbsolutePath(path);
-        assertFileExists(path);
+        Path absPath = toAbsolutePath(path);
+        assertFileExists(absPath);
 
         try {
-            return client.get(getFilePath(path));
+            return client.get(getFilePath(absPath));
         } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to access file: " + path);
+            throw new XenonException(ADAPTOR_NAME, "Failed to access file: " + absPath);
         }
     }
 
     @Override
     public OutputStream writeToFile(Path file, long size) throws XenonException {
 
-        file = toAbsolutePath(file);
-        assertPathNotExists(file);
-        assertParentDirectoryExists(file);
+        Path absFile = toAbsolutePath(file);
+        assertPathNotExists(absFile);
+        assertParentDirectoryExists(absFile);
 
         try {
             PipedInputStream in = new PipedInputStream(4096);
             PipedOutputStream out = new PipedOutputStream(in);
 
             // Create a separate thread here to handle the writing
-            new StreamToFileWriter(getFilePath(file), in).start();
+            new StreamToFileWriter(getFilePath(absFile), in).start();
 
             return out;
         } catch (Exception e) {
@@ -294,14 +294,14 @@ public class WebdavFileSystem extends FileSystem {
     @Override
     public PathAttributes getAttributes(Path path) throws XenonException {
 
-        path = toAbsolutePath(path);
-        assertPathExists(path);
+        Path absPath = toAbsolutePath(path);
+        assertPathExists(absPath);
 
         try {
-            List<DavResource> result = client.list(getFilePath(path), 0);
-            return getAttributes(path, result.get(0));
+            List<DavResource> result = client.list(getFilePath(absPath), 0);
+            return getAttributes(absPath, result.get(0));
         } catch (Exception e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to get attributes for file: " + path, e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to get attributes for file: " + absPath, e);
         }
     }
 

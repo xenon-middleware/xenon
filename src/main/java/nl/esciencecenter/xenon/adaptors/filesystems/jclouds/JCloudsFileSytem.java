@@ -108,12 +108,12 @@ public class JCloudsFileSytem extends FileSystem {
     public void createDirectory(Path dir) throws XenonException {
         checkClosed();
 
-        dir = toAbsolutePath(dir);
+        Path absDir = toAbsolutePath(dir);
 
-        assertPathNotExists(dir);
-        assertParentDirectoryExists(dir);
+        assertPathNotExists(absDir);
+        assertParentDirectoryExists(absDir);
 
-        makeDirectoryPlaceholder(dir);
+        makeDirectoryPlaceholder(absDir);
     }
 
     // Simulate creating an empty directory by creating a bucket entry with the name "dir/___not__empty___"
@@ -138,17 +138,17 @@ public class JCloudsFileSytem extends FileSystem {
     public void createFile(Path file) throws XenonException {
         checkClosed();
 
-        file = toAbsolutePath(file);
+        Path absFile = toAbsolutePath(file);
 
-        assertPathNotExists(file);
-        assertParentDirectoryExists(file);
+        assertPathNotExists(absFile);
+        assertParentDirectoryExists(absFile);
 
         // If needed, remove the empty directory placeholder
-        removeDirectoryPlaceholder(file.getParent());
+        removeDirectoryPlaceholder(absFile.getParent());
 
         // Create an empty file by adding an empty blob in the bucket.
         InputStream emtpy = new org.apache.sshd.common.util.io.NullInputStream();
-        final Blob b = context.getBlobStore().blobBuilder(bucket).name(toBucketEntry(file)).payload(emtpy).contentLength(0).build();
+        final Blob b = context.getBlobStore().blobBuilder(bucket).name(toBucketEntry(absFile)).payload(emtpy).contentLength(0).build();
         context.getBlobStore().putBlob(bucket, b);
     }
 
@@ -168,15 +168,15 @@ public class JCloudsFileSytem extends FileSystem {
     public void deleteFile(Path file) throws XenonException {
         checkClosed();
 
-        file = toAbsolutePath(file);
+        Path absFile = toAbsolutePath(file);
 
-        context.getBlobStore().removeBlob(bucket, toBucketEntry(file));
+        context.getBlobStore().removeBlob(bucket, toBucketEntry(absFile));
 
         // Ensure that the parent directory remains after the last file is deleted by inserting a placeholder.
-        Path parent = file.getParent();
+        Path parent = absFile.getParent();
 
         if (parent != null && !parent.isEmpty()) {
-            ensureDirectoryExists(file.getParent());
+            ensureDirectoryExists(absFile.getParent());
         }
     }
 
@@ -219,9 +219,9 @@ public class JCloudsFileSytem extends FileSystem {
     public boolean exists(Path path) throws XenonException {
         checkClosed();
 
-        path = toAbsolutePath(path);
+        Path absPath = toAbsolutePath(path);
 
-        return dirExists(path) || fileExists(path);
+        return dirExists(absPath) || fileExists(absPath);
     }
 
     PathAttributes makeDirAttributes(final StorageMetadata m, final BlobAccess access) {
@@ -404,12 +404,12 @@ public class JCloudsFileSytem extends FileSystem {
     @Override
     public InputStream readFromFile(Path path) throws XenonException {
 
-        path = toAbsolutePath(path);
+        Path absPath = toAbsolutePath(path);
 
-        assertPathIsFile(path);
+        assertPathIsFile(absPath);
 
         try {
-            return context.getBlobStore().getBlob(bucket, toBucketEntry(path)).getPayload().openStream();
+            return context.getBlobStore().getBlob(bucket, toBucketEntry(absPath)).getPayload().openStream();
         } catch (IOException e) {
             throw new XenonException(adaptorName, e.getMessage());
         }
@@ -418,11 +418,11 @@ public class JCloudsFileSytem extends FileSystem {
     @Override
     public OutputStream writeToFile(Path path, long size) throws XenonException {
 
-        path = toAbsolutePath(path);
-        assertPathNotExists(path);
+        Path absPath = toAbsolutePath(path);
+        assertPathNotExists(absPath);
 
         final PipedInputStream read = new PipedInputStream();
-        final Blob b = context.getBlobStore().blobBuilder(bucket).name(toBucketEntry(path)).payload(read).contentLength(size).build();
+        final Blob b = context.getBlobStore().blobBuilder(bucket).name(toBucketEntry(absPath)).payload(read).contentLength(size).build();
         try {
             final OutputStream out = new PipedOutputStream(read);
             new Thread(new Runnable() {
@@ -450,17 +450,18 @@ public class JCloudsFileSytem extends FileSystem {
 
     @Override
     public PathAttributes getAttributes(Path path) throws XenonException {
-        path = toAbsolutePath(path);
 
-        String name = toBucketEntry(path);
+        Path absPath = toAbsolutePath(path);
+
+        String name = toBucketEntry(absPath);
 
         for (PathAttributes p : listPrefix(name, false)) {
-            if (p.getPath().equals(path)) {
+            if (p.getPath().equals(absPath)) {
                 return p;
             }
         }
 
-        throw new NoSuchPathException(adaptorName, "File does not exist: " + path);
+        throw new NoSuchPathException(adaptorName, "File does not exist: " + absPath);
     }
 
     @Override
