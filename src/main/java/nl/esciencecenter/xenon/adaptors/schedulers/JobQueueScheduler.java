@@ -96,7 +96,7 @@ public class JobQueueScheduler extends Scheduler {
 
     private final AtomicLong jobID = new AtomicLong(0L);
 
-    private final ArrayList<List<JobExecutor>> queues = new ArrayList<List<JobExecutor>>();
+    private final ArrayList<List<JobExecutor>> queues = new ArrayList<>();
 
     public JobQueueScheduler(String uniqueID, String adaptorName, String location, InteractiveProcessFactory factory,
             FileSystem filesystem, Path workingDirectory, int multiQThreads, long pollingDelay, XenonProperties properties) throws BadParameterException {
