@@ -340,6 +340,7 @@ public class JCloudsFileSytem extends FileSystem {
         return new ListingIterator(optionsFinal, context.getBlobStore().list(bucket, optionsFinal));
     }
 
+    @Override
     public Iterable<PathAttributes> list(Path path, boolean recursive) throws XenonException {
         checkClosed();
 
