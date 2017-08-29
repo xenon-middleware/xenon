@@ -76,10 +76,6 @@ public class S3FileAdaptor extends FileAdaptor {
 
         PasswordCredential pwUser = (PasswordCredential) credential;
 
-        if (properties == null) {
-            properties = new HashMap<>();
-        }
-
         BlobStoreContext context = ContextBuilder.newBuilder("s3").endpoint(server)
                 .credentials(pwUser.getUsername(), new String(pwUser.getPassword())).buildView(BlobStoreContext.class);
 
