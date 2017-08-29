@@ -325,7 +325,7 @@ public class JCloudsFileSytem extends FileSystem {
         @Override
         public PathAttributes next() {
 
-            BlobAccess access = BlobAccess.PUBLIC_READ; // context.getBlobStore().getBlobAccess(bucket,nxt.getName());
+            BlobAccess access = BlobAccess.PUBLIC_READ;
             PathAttributes res = toPathAttributes(nxt, access);
             getNext();
             return res;

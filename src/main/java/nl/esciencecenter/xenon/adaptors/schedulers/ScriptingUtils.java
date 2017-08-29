@@ -53,12 +53,6 @@ public class ScriptingUtils {
         return tmp.toArray(new XenonPropertyDescription[tmp.size()]);
     }
 
-//    public static XenonPropertyDescription [] mergeValidProperties(XenonPropertyDescription[] a, XenonPropertyDescription[] b) {
-//        XenonPropertyDescription [] result = Arrays.copyOf(a, a.length + b.length);
-//        System.arraycopy(b, 0, result, a.length, b.length);
-//        return result;
-//    }
-
     public static XenonProperties getProperties(XenonPropertyDescription[] validProperties, String location, Map<String,String> properties) throws UnknownPropertyException, InvalidPropertyException {
         if (isLocal(location)) {
             return new XenonProperties(mergeValidProperties(validProperties, LocalSchedulerAdaptor.VALID_PROPERTIES), properties);

@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
-//import nl.esciencecenter.xenon.util.Utils;
-
 /**
  * Some simple utilities for handling and creating scripts and command lines.
  *

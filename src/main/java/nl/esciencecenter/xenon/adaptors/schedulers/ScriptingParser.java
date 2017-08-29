@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import nl.esciencecenter.xenon.XenonException;
-//import nl.esciencecenter.xenon.util.Utils;
 
 /**
  *

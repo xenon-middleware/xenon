@@ -16,8 +16,6 @@
 package nl.esciencecenter.xenon.adaptors.filesystems.webdav;
 
 import static nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor.ADAPTOR_NAME;
-//import static nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor.OK_CODE;
-//import static nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor.isOkish;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,27 +27,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.http.HttpStatus;
-//import org.apache.commons.httpclient.HttpClient;
-//import org.apache.commons.httpclient.HttpMethod;
-//import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
-//import org.apache.commons.httpclient.methods.GetMethod;
-//import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-//import org.apache.jackrabbit.webdav.DavConstants;
-//import org.apache.jackrabbit.webdav.DavException;
-//import org.apache.jackrabbit.webdav.MultiStatus;
-//import org.apache.jackrabbit.webdav.MultiStatusResponse;
-//import org.apache.jackrabbit.webdav.client.methods.DavMethod;
-//import org.apache.jackrabbit.webdav.client.methods.DeleteMethod;
-//import org.apache.jackrabbit.webdav.client.methods.MkColMethod;
-//import org.apache.jackrabbit.webdav.client.methods.MoveMethod;
-//import org.apache.jackrabbit.webdav.client.methods.PropFindMethod;
-//import org.apache.jackrabbit.webdav.client.methods.PutMethod;
-//import org.apache.jackrabbit.webdav.property.DavProperty;
-//import org.apache.jackrabbit.webdav.property.DavPropertyName;
-//import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
-//import org.apache.jackrabbit.webdav.property.DavPropertySet;
-//import org.joda.time.DateTime;
-//import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
