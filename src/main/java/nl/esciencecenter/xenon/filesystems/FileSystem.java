@@ -682,7 +682,7 @@ public abstract class FileSystem {
      * If the path is a directory and <code>recursive</code> is set to true, the contents of the directory will also be deleted. If <code>recursive</code> is
      * set to <code>false</code>, a directory will only be removed if it is empty.
      *
-     * @param absPath
+     * @param path
      *            the path to delete.
      * @param recursive
      *            if the delete must be done recursively
@@ -1341,10 +1341,6 @@ public abstract class FileSystem {
      *
      * @return a {@link String} that identifies this copy and be used to inspect its progress.
      *
-     * @throws NotConnectedException
-     *             If file system is closed.
-     * @throws XenonException
-     *             if an I/O error occurred.
      * @throws IllegalArgumentException
      *             If source, destinationFS, destination or mode is null.
      */
