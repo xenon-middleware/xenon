@@ -112,7 +112,7 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Create a new Path by appending the provided <code>paths</code>.
+     * Create a new Path by joining the provided <code>paths</code>.
      *
      * If the <code>paths</code> is <code>null</code> the resulting Path is
      * empty.
@@ -129,6 +129,8 @@ public class Path implements Iterable<Path> {
             boolean isAbsoluteSet = false;
             elements = new ArrayList<>(paths.length);
 
+            // sep is declared here, as opposed to inside the for loop below, because we
+            // determine one separator value from the provided 'paths'
             Character sep = null;
 
             for (Path path : paths) {
@@ -140,16 +142,20 @@ public class Path implements Iterable<Path> {
                     if (!path.isEmpty()) {
                         elements.addAll(path.elements);
                     }
+                    // if sep has not been determined yet, see if you can derive it
+                    // from the current 'path'
                     if (sep == null) {
-                        sep = new Character(path.separator);
+                        sep = path.separator;
                     }
                 }
             }
 
+            // If we were unable to determine the separator from any of the provided 'paths',
+            // use the default value, or else use whatever value was found.
             if (sep == null) {
                 separator = DEFAULT_SEPARATOR;
             } else {
-                separator = sep.charValue();
+                separator = sep;
             }
         }
 
