@@ -1348,8 +1348,7 @@ public abstract class FileSystem {
      * @throws IllegalArgumentException
      *             If source, destinationFS, destination or mode is null.
      */
-    public synchronized String copy(final Path source, final FileSystem destinationFS, final Path destination, final CopyMode mode, final boolean recursive)
-            throws XenonException {
+    public synchronized String copy(final Path source, final FileSystem destinationFS, final Path destination, final CopyMode mode, final boolean recursive) {
 
         if (source == null) {
             throw new IllegalArgumentException("Source path is null");
