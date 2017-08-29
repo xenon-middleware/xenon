@@ -682,7 +682,7 @@ public abstract class FileSystem {
      * If the path is a directory and <code>recursive</code> is set to true, the contents of the directory will also be deleted. If <code>recursive</code> is
      * set to <code>false</code>, a directory will only be removed if it is empty.
      *
-     * @param path
+     * @param absPath
      *            the path to delete.
      * @param recursive
      *            if the delete must be done recursively
@@ -699,13 +699,13 @@ public abstract class FileSystem {
      */
     public void delete(Path path, boolean recursive) throws XenonException {
 
-        path = toAbsolutePath(path);
+        Path absPath = toAbsolutePath(path);
 
-        assertPathExists(path);
+        assertPathExists(absPath);
 
-        if (getAttributes(path).isDirectory()) {
+        if (getAttributes(absPath).isDirectory()) {
 
-            Iterable<PathAttributes> itt = list(path, false);
+            Iterable<PathAttributes> itt = list(absPath, false);
 
             if (recursive) {
                 for (PathAttributes p : itt) {
@@ -713,13 +713,13 @@ public abstract class FileSystem {
                 }
             } else {
                 if (itt.iterator().hasNext()) {
-                    throw new DirectoryNotEmptyException(getAdaptorName(), "Directory not empty: " + path.toString());
+                    throw new DirectoryNotEmptyException(getAdaptorName(), "Directory not empty: " + absPath.toString());
                 }
             }
 
-            deleteDirectory(path);
+            deleteDirectory(absPath);
         } else {
-            deleteFile(path);
+            deleteFile(absPath);
         }
     }
 
