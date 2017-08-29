@@ -370,10 +370,10 @@ public final class SlurmUtils {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
-        script.format("#!/bin/sh%n");
+        script.format("%s%n", "#!/bin/sh");
 
         //set name of job to xenon
-        script.format("#SBATCH --job-name xenon%n");
+        script.format("%s%n", "#SBATCH --job-name xenon");
 
         //set working directory
         if (description.getWorkingDirectory() != null) {
@@ -405,7 +405,7 @@ public final class SlurmUtils {
         }
 
         if (description.getStderr() == null) {
-            script.format("#SBATCH --error=/dev/null%n");
+            script.format("%s%n", "#SBATCH --error=/dev/null");
         } else {
             script.format("#SBATCH --error='%s'%n", description.getStderr());
         }
@@ -418,7 +418,7 @@ public final class SlurmUtils {
 
         if (!description.isStartSingleProcess()) {
             //run commands through srun
-            script.format("srun ");
+            script.format("%s ", "srun");
         }
 
         script.format("%s", description.getExecutable());

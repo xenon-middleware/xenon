@@ -130,13 +130,13 @@ final class TorqueUtils {
         StringBuilder stringBuilder = new StringBuilder(500);
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
-        script.format("#!/bin/sh%n");
+        script.format("%s%n", "#!/bin/sh");
 
         // set shell to sh
-        script.format("#PBS -S /bin/sh%n");
+        script.format("%s%n", "#PBS -S /bin/sh");
 
         // set name of job to xenon
-        script.format("#PBS -N xenon%n");
+        script.format("%s%n", "#PBS -N xenon");
 
         // set working directory
         if (description.getWorkingDirectory() != null) {
