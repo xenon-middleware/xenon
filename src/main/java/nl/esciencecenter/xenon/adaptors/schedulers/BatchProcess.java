@@ -82,7 +82,7 @@ class BatchProcess implements Process {
         }
     }
 
-    private Path processPath(Path root, String path) throws XenonException {
+    private Path processPath(Path root, String path) {
         Path result;
 
         if (path == null) {

@@ -60,13 +60,12 @@ public class SlurmSetup {
         LOGGER.debug("Created new SlurmConfig. version = \"{}\", accounting available: {}", version, accountingAvailable);
     }
 
-    public boolean checkVersion() throws IncompatibleVersionException {
+    public boolean checkVersion() {
         for (String supportedVersion : SUPPORTED_VERSIONS) {
             if (version.startsWith(supportedVersion)) {
                 return true;
             }
         }
-
         return false;
     }
 
