@@ -797,7 +797,7 @@ public class JobQueueSchedulerTest {
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void test_getQueueStatusses_null() throws Exception {
+    public void test_getQueueStatuses_null() throws Exception {
 
         MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
@@ -815,7 +815,7 @@ public class JobQueueSchedulerTest {
     }
 
     @Test
-    public void test_getQueueStatusses_empty() throws Exception {
+    public void test_getQueueStatuses_empty() throws Exception {
 
         MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
@@ -835,7 +835,7 @@ public class JobQueueSchedulerTest {
     }
 
     @Test
-    public void test_getQueueStatusses() throws Exception {
+    public void test_getQueueStatuses() throws Exception {
 
         MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
@@ -855,7 +855,7 @@ public class JobQueueSchedulerTest {
     }
 
     @Test
-    public void test_getQueueStatusses_withNull() throws Exception {
+    public void test_getQueueStatuses_withNull() throws Exception {
 
         MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 

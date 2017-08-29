@@ -395,7 +395,7 @@ public abstract class Scheduler {
      * @return an array containing the resulting QueueStatus.
      *
      * @throws XenonException
-     *             If the Scheduler failed to get the statusses.
+     *             If the Scheduler failed to get the statuses.
      */
     public abstract QueueStatus[] getQueueStatuses(String... queueNames) throws XenonException;
 
@@ -464,7 +464,7 @@ public abstract class Scheduler {
      * @param jobIdentifiers
      *            the job identifiers for which to retrieve the status.
      *
-     * @return an array of the resulting JobStatusses.
+     * @return an array of the resulting JobStatuses.
      *
      * @throws XenonException
      *             If an I/O error occurred

@@ -199,7 +199,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
         Map<String, Map<String, String>> allMap = parser.parseQueueInfos(qstatOutput);
 
-        return getQueueStatusses(allMap, queueNames);
+        return getQueueStatuses(allMap, queueNames);
 //
 //
 //        for (int i = 0; i < queueNames.length; i++) {
