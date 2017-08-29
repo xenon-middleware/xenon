@@ -1366,7 +1366,7 @@ public abstract class FileSystem {
             throw new IllegalArgumentException("Copy mode is null!");
         }
 
-        String ID = getNextCopyID();
+        String copyID = getNextCopyID();
 
         final CopyCallback callback = new CopyCallback();
 
@@ -1380,8 +1380,8 @@ public abstract class FileSystem {
             return null;
         });
 
-        pendingCopies.put(ID, new PendingCopy(future, callback));
-        return ID;
+        pendingCopies.put(copyID, new PendingCopy(future, callback));
+        return copyID;
     }
 
     /**
