@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.s3;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.jclouds.ContextBuilder;
