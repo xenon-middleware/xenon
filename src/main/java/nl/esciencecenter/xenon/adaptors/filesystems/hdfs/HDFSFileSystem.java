@@ -4,6 +4,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
+import nl.esciencecenter.xenon.adaptors.filesystems.RecursiveListIterator;
 import nl.esciencecenter.xenon.filesystems.*;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
@@ -17,13 +18,14 @@ import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.Function;
 
 public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSystem{
     final org.apache.hadoop.fs.FileSystem fs;
     boolean closed;
 
     protected HDFSFileSystem(String uniqueID, String endPoint, org.apache.hadoop.fs.FileSystem fs, XenonProperties properties) {
-        super(uniqueID,"hdfs",endPoint,new nl.esciencecenter.xenon.filesystems.Path(""),properties);
+        super(uniqueID,"hdfs",endPoint,fromHDFSPath(fs.getWorkingDirectory()),properties);
         this.fs = fs;
         closed = false;
     }
@@ -40,7 +42,7 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
         checkClosed();
         try {
             fs.close();
-            closed = false;
+            closed = true;
         } catch (IOException e){
             throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
         }
@@ -54,13 +56,13 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
     @Override
     public void rename(Path source, Path target) throws XenonException {
         checkClosed();
+        assertPathExists(source);
+        if(source.equals(target)){
+            return;
+        }
+        assertPathNotExists(target);
+        assertParentDirectoryExists(target);
         try {
-            if (!exists(source)){
-                throw new NoSuchPathException(getAdaptorName(), source.toString());
-            }
-            if(exists(target)){
-                throw new PathAlreadyExistsException(getAdaptorName(), target.toString());
-            }
             fs.rename(toHDFSPath(source), toHDFSPath(target));
         } catch(IOException e ){
             throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
@@ -74,16 +76,10 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
     @Override
     public void createDirectory(Path dir) throws XenonException {
         checkClosed();
+        assertNotNull(dir);
+        assertParentDirectoryExists(dir);
+        assertPathNotExists(dir);
         try {
-            Path parent = dir.getParent();
-            if(parent != null) {
-                if (!exists(dir.getParent())) {
-                    throw new XenonException(getAdaptorName(), "createDirectory: parent does not exist: " + dir.toString());
-                }
-                if (exists(dir)) {
-                    throw new PathAlreadyExistsException(getAdaptorName(), "A directory or file already exists at: " + dir.toString());
-                }
-            }
             fs.mkdirs(toHDFSPath(dir));
         } catch(IOException e ){
             throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
@@ -95,10 +91,9 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
     @Override
     public void createFile(Path file) throws XenonException {
         checkClosed();
+        assertPathNotExists(file);
+        assertParentDirectoryExists(file);
         try {
-            if(exists(file)){
-                throw new PathAlreadyExistsException(getAdaptorName(), "A directory or file already exists at: " + file.toString());
-            }
             fs.createNewFile(toHDFSPath(file));
         } catch(IOException e ){
             throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
@@ -108,10 +103,9 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
     @Override
     public void createSymbolicLink(Path link, Path target) throws XenonException {
         checkClosed();
+        assertPathNotExists(link);
+        assertPathExists(target);
         try {
-            if(exists(link)){
-                throw new PathAlreadyExistsException(getAdaptorName(), "Cannot create symlink: A directory or file already exists at: " + link.toString());
-            }
             fs.createSymlink(toHDFSPath(target), toHDFSPath(link), false);
         } catch(IOException e ){
             throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
@@ -122,6 +116,13 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
     @Override
     public void delete(Path path, boolean recursive) throws XenonException {
         checkClosed();
+        assertPathExists(path);
+        if(!recursive){
+            PathAttributes pa = getAttributes(path);
+            if(pa.isDirectory() && list(path,false).iterator().hasNext()){
+                throw new DirectoryNotEmptyException(getAdaptorName(), "Cannot delete directory: not empty");
+            }
+        }
         try {
             fs.delete(toHDFSPath(path), recursive);
         } catch(IOException e ){
@@ -134,6 +135,7 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
     @Override
     public boolean exists(Path path) throws XenonException {
         checkClosed();
+        assertNotNull(path);
         try {
             return fs.exists(toHDFSPath(path));
         } catch(IOException e ){
@@ -141,32 +143,61 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
         }
     }
 
+
     public Iterable<PathAttributes> list(final Path dir,  boolean recursive) throws XenonException {
         checkClosed();
-        try {
-            if (!fs.isDirectory(toHDFSPath(dir))) {
-                throw new InvalidPathException(getAdaptorName(), "Cannot list: " + dir.toString() + " is not a directory!");
-            }
-        } catch (IOException e){
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+        assertDirectoryExists(dir);
+        if(!recursive) {
+            return new Iterable<PathAttributes>() {
+                @Override
+                public Iterator<PathAttributes> iterator() {
+                    return listIteratorNoException(dir);
+                }
+            };
+        } else {
+            return new Iterable<PathAttributes>() {
+                @Override
+                public Iterator<PathAttributes> iterator(){
+                    return new RecursiveListIterator(new Function<Path, Iterator<PathAttributes>>() {
+                        @Override
+                        public Iterator<PathAttributes> apply(Path path) {
+                            return listIteratorNoException(path);
+                        }
+                    }, dir);
+                }
+            };
+
         }
-        final Iterator<PathAttributes> it =  listIterator(dir,recursive);
-        return new Iterable<PathAttributes>() {
-            @Override
-            public Iterator<PathAttributes> iterator() {
-                return it;
-            }
-        };
     }
 
-    private Iterator<PathAttributes> listIterator(Path dir, boolean recursive) throws XenonException {
+    private Iterator<PathAttributes> listIteratorNoException(Path dir){
+        try {
+            return listIterator(dir);
+        } catch (XenonException e) {
+            throw new Error(e.getMessage());
+//            return new Iterator<PathAttributes>() {
+//                @Override
+//                public boolean hasNext() {
+//                    return false;
+//                }
+//
+//                @Override
+//                public PathAttributes next() {
+//                    return null;
+//                }
+//            };
+        }
+
+    }
+
+    private Iterator<PathAttributes> listIterator(Path dir) throws XenonException {
         checkClosed();
         final RemoteIterator<LocatedFileStatus> it;
         try {
-
-            it = fs.listFiles(toHDFSPath(dir), recursive);
+            it = fs.listLocatedStatus(toHDFSPath(dir));
         } catch(IOException e ){
             throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+
         }
         return new Iterator<PathAttributes>() {
             @Override
@@ -194,11 +225,9 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
     @Override
     public InputStream readFromFile(Path path) throws XenonException {
         checkClosed();
+        assertFileExists(path);
         try {
             org.apache.hadoop.fs.Path p = toHDFSPath(path);
-            if(!fs.exists(p)){
-                throw new NoSuchPathException(getAdaptorName(), "Cannot read from file " + path.toString() + ". File does not exist");
-            }
             if(!fs.isFile(p)){
                 throw new InvalidPathException(getAdaptorName(), "Cannot read from file " + path.toString() + ". Not a regular file");
             }
@@ -216,6 +245,9 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
     @Override
     public OutputStream writeToFile(Path path) throws XenonException {
         checkClosed();
+        assertNotNull(path);
+        assertPathNotExists(path);
+
         try {
             return fs.create(toHDFSPath(path));
         } catch (IOException e){
@@ -226,14 +258,9 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
     @Override
     public OutputStream appendToFile(Path path) throws XenonException {
         checkClosed();
+        assertPathIsFile(path);
         try {
             org.apache.hadoop.fs.Path p = toHDFSPath(path);
-            if(!fs.exists(p)){
-                throw new NoSuchPathException(getAdaptorName(), "Cannot read from file " + path.toString() + ". File does not exist");
-            }
-            if(!fs.isFile(p)){
-                throw new InvalidPathException(getAdaptorName(), "Cannot read from file " + path.toString() + ". Not a regular file");
-            }
             return fs.append(p);
         } catch (IOException e){
             throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
@@ -270,11 +297,11 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
     }
 
     org.apache.hadoop.fs.Path toHDFSPath(Path p){
-        return new org.apache.hadoop.fs.Path(p.toString());
+        return new org.apache.hadoop.fs.Path(toAbsolutePath(p).toString());
     }
 
-    Path fromHDFSPath(org.apache.hadoop.fs.Path p){
-        return new Path(p.toString());
+    static Path fromHDFSPath(org.apache.hadoop.fs.Path p){
+        return new Path(org.apache.hadoop.fs.Path.getPathWithoutSchemeAndAuthority(p).toString());
     }
 
 
@@ -286,8 +313,12 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
         res.setOther(false); // cannot happen in hdfs? not supported by API
         res.setRegular(s.isFile());
         res.setSymbolicLink(s.isSymlink());
-        res.setCreationTime(0);
-        res.setLastAccessTime(s.getAccessTime());
+        if(s.getAccessTime() == 0){
+            res.setLastAccessTime(s.getModificationTime());
+        } else {
+            res.setLastAccessTime(s.getAccessTime());
+        }
+        res.setCreationTime(s.getModificationTime());
         res.setLastModifiedTime(s.getModificationTime());
         res.setSize(s.getLen());
         res.setExecutable(s.getPermission().getUserAction().implies(FsAction.EXECUTE));
@@ -335,19 +366,10 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
         return p;
     }
 
-
-
-
-
-
-
-
-
-
-
     @Override
     public Path readSymbolicLink(Path link) throws XenonException {
         checkClosed();
+
         try {
             org.apache.hadoop.fs.Path p  = toHDFSPath(link);
             if(!fs.exists(p)){

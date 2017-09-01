@@ -8,6 +8,7 @@ import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import javax.security.auth.callback.*;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -38,7 +40,12 @@ public class HDFSFileAdaptor extends FileAdaptor{
     /** All our own properties start with this prefix. */
     public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + "hdfs.";
 
-    protected static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[0];
+    /** Hadoop property: dfs.client.block.write.replace-datanode-on-failure.policy  */
+    public static final String REPLACE_ON_FAILURE = PREFIX + "replaceOnFailure";
+
+    protected static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+            new XenonPropertyDescription(REPLACE_ON_FAILURE, XenonPropertyDescription.Type.STRING, "DEFAULT", "Corresponds to Hadoop property: dfs.client.block.write.replace-datanode-on-failure.policy ")
+    };
 
     public HDFSFileAdaptor() {
         super("hdfs", ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
@@ -49,6 +56,10 @@ public class HDFSFileAdaptor extends FileAdaptor{
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
         Configuration conf = new Configuration(false);
         conf.set("fs.defaultFS", location);
+        properties = properties == null ? new HashMap<>() : properties;
+        if(properties.containsKey(REPLACE_ON_FAILURE)){
+            conf.set("dfs.client.block.write.replace-datanode-on-failure.policy",properties.get(REPLACE_ON_FAILURE));
+        }
         // TODO: use authentication
         if(!(credential instanceof DefaultCredential)){
             throw new XenonException("hdfs", "Currently only default credentials supported on HDFS");
@@ -75,5 +86,15 @@ public class HDFSFileAdaptor extends FileAdaptor{
             }});
         lc.login();
         return lc;
+    }
+
+    @Override
+    public boolean canReadSymboliclinks() {
+        return false;
+    }
+
+    @Override
+    public boolean canCreateSymboliclinks() {
+        return false;
     }
 }

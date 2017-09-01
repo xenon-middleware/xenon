@@ -25,7 +25,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
+import java.util.function.Function;
 
+import nl.esciencecenter.xenon.adaptors.filesystems.RecursiveListIterator;
 import org.jclouds.blobstore.BlobStoreContext;
 import org.jclouds.blobstore.domain.Blob;
 import org.jclouds.blobstore.domain.BlobAccess;
@@ -189,7 +191,6 @@ public class JCloudsFileSytem extends FileSystem {
         // in the latter case the __not_empty__ file is deleted and an exception
         // is thrown (correct behaviour)
         if (!dirExists(dir)) {
-            // TODO: shouldn't this be a NoSuchPathException ?
             throw new NoSuchPathException(adaptorName, "Directory does not exist: " + dir);
         }
 
@@ -332,7 +333,8 @@ public class JCloudsFileSytem extends FileSystem {
         }
     }
 
-    Iterator<PathAttributes> listNonRecursiveIterator(String bucketEntry) {
+    Iterator<PathAttributes> listNonRecursiveIterator(Path p) {
+        String bucketEntry = toBucketEntry(p);
         ListContainerOptions options = new ListContainerOptions().prefix(bucketEntry + "/");
         // JClouds on S3 does not list directories if recursive is set :( Fixing it ourselves
         // if (recursive) { options = options.recursive(); }
@@ -370,14 +372,19 @@ public class JCloudsFileSytem extends FileSystem {
             return new Iterable<PathAttributes>() {
                 @Override
                 public Iterator<PathAttributes> iterator() {
-                    return listNonRecursiveIterator(bucketEntry);
+                    return listNonRecursiveIterator(path);
                 }
             };
         } else {
             return new Iterable<PathAttributes>() {
                 @Override
                 public Iterator<PathAttributes> iterator() {
-                    return new RecursiveListIterator(listNonRecursiveIterator(bucketEntry));
+                    return new RecursiveListIterator(new Function<Path, Iterator<PathAttributes>>() {
+                        @Override
+                        public Iterator<PathAttributes> apply(Path path) {
+                            return listNonRecursiveIterator(path);
+                        }
+                    }, path);
                 }
             };
         }
@@ -478,38 +485,4 @@ public class JCloudsFileSytem extends FileSystem {
         throw new UnsupportedOperationException(getAdaptorName(), "POSIX permissions not supported");
     }
 
-    private class RecursiveListIterator implements Iterator<PathAttributes> {
-        final Stack<Iterator<PathAttributes>> stack;
-
-        public RecursiveListIterator(Iterator<PathAttributes> root) {
-            stack = new Stack<>();
-            stack.push(root);
-        }
-
-        void popEmpties() {
-            while (!stack.empty()) {
-                if (!stack.peek().hasNext()) {
-                    stack.pop();
-                } else {
-                    return;
-                }
-            }
-        }
-
-        @Override
-        public boolean hasNext() {
-            popEmpties();
-            return !stack.isEmpty();
-        }
-
-        @Override
-        public PathAttributes next() {
-            PathAttributes nxt = stack.peek().next();
-            if (nxt.isDirectory()) {
-                stack.push(listNonRecursiveIterator(toBucketEntry(nxt.getPath())));
-            }
-            popEmpties();
-            return nxt;
-        }
-    }
 }

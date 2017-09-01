@@ -16,12 +16,14 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import static nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor.REPLACE_ON_FAILURE;
+
 
 public class HDFSFileSystemDockerTest extends FileSystemTestParent {
 
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/hdfs.yml")
-              .waitingForService("hdfs", HealthChecks.toHaveAllPortsOpen()).skipShutdown(true).build();
+              .waitingForService("hdfs", HealthChecks.toHaveAllPortsOpen()).build();
 
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
@@ -35,7 +37,7 @@ public class HDFSFileSystemDockerTest extends FileSystemTestParent {
 
             @Override
             public Path getExistingPath() {
-                return new Path("links/file0");
+                return new Path("/filesystem-test-fixture/links/file0");
             }
 
             @Override
@@ -52,9 +54,12 @@ public class HDFSFileSystemDockerTest extends FileSystemTestParent {
 
     @Override
     public FileSystem setupFileSystem() throws XenonException {
-        String location = docker.containers().container("hdfs").port(8020).inFormat("localhost");
+        String location = docker.containers().container("hdfs").port(8020).inFormat("localhost:$EXTERNAL_PORT");
+
         Credential cred = new DefaultCredential();
         Map<String, String> props = new HashMap<>();
+        // this is needed for a single data-node hadoop cluster
+        props.put(REPLACE_ON_FAILURE, "NEVER");
         FileSystem fs =  FileSystem.create("hdfs", location, cred, props);
         fs.setWorkingDirectory(new Path("/filesystem-test-fixture"));
         return fs;
