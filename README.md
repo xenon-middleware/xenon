@@ -31,48 +31,17 @@ those applications to be developed more rapidly. The experience
 gained during end-user application development is used to improve
 the Xenon API and implementation.
 
-The Latest Version
-------------------
+Adding Xenon as a dependency to your project
+--------------------------------------------
 
-Available in [JCenter](https://bintray.com/bintray/jcenter?filterByPkgName=xenon)
+Follow the instructions from [jitpack.io](https://jitpack.io/#NLeSC/Xenon/2.0.0-rc2) to include Xenon as a 
+dependency for Gradle, Maven, SBT, or Leiningen projects.
 
-Details of the latest official 1.2.2 release of Xenon can be found at:
+To compile Xenon from source, download the source distribution and type:
+```
+./gradlew installDist
+```
 
-<https://github.com/NLeSC/Xenon/releases>
-
-Alternatively, the latest development versions of Xenon can be found at:
-
-<https://github.com/NLeSC/Xenon>.
-
-Quick start
------------
-
-Add Xenon library as a dependency to your project. For a Maven project use
-```
-<dependency>
-  <groupId>nl.esciencecenter.xenon</groupId>
-  <artifactId>xenon</artifactId>
-  <version>1.2.3</version>
-</dependency>
-```
-For a gradle project make sure to include `jcenter` in the list of repositories, for example:
-```
-repositories {
-    mavenCentral()
-    jcenter()
-}
-```
-Then include Xenon as a compile dependency:
-```
-dependencies {
-    compile group: 'nl.esciencecenter.xenon', name: 'xenon', version: '1.2.2'
-    // other dependencies ...
-}
-``` 
-To compile Xenon from source, download the source distribution below and type:
-```
-gradlew installDist
-```
 This will create a binary distribution in `./build/install`
 
 Simple examples
