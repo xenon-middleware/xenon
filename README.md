@@ -37,13 +37,6 @@ Adding Xenon as a dependency to your project
 Follow the instructions from [jitpack.io](https://jitpack.io/#NLeSC/Xenon/2.0.0-rc2) to include Xenon as a 
 dependency for Gradle, Maven, SBT, or Leiningen projects.
 
-To compile Xenon from source, download the source distribution and type:
-```
-./gradlew installDist
-```
-
-This will create a binary distribution in `./build/install`
-
 Simple examples
 ---------------
 
