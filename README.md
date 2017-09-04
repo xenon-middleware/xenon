@@ -179,7 +179,7 @@ public class SlurmSubmitWordCountJob {
 }
 ```
 
-The output of the job will be written to ``/tmp/wc.stdout.txt`` file in the ``nlesc/slurm:17`` Docker container.
+The output of the job will be written to ``/tmp/wc.stdout.txt`` file in the ``nlesc/xenon-slurm`` Docker container.
 
 Supported middleware
 --------------------
