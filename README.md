@@ -82,9 +82,10 @@ public class CopyFileLocalToSftpAbsolutePaths {
         long timeoutMilliSecs = 1000;
         CopyStatus copyStatus = localFileSystem.waitUntilDone(copyId, timeoutMilliSecs);
 
-        // print any exceptions
-        if (copyStatus.getException() != null) {
-            System.out.println(copyStatus.getException().getMessage());
+        // throw any exceptions
+        XenonException copyException = copyStatus.getException();
+        if (copyException != null) {
+          throw copyException;
         }
     }
 }
