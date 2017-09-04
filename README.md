@@ -35,7 +35,48 @@ Adding Xenon as a dependency to your project
 --------------------------------------------
 
 Follow the instructions from [jitpack.io](https://jitpack.io/#NLeSC/Xenon/2.0.0-rc2) to include Xenon as a 
-dependency for Gradle, Maven, SBT, or Leiningen projects.
+dependency for Gradle, Maven, SBT, or Leiningen projects, e.g. Gradle:
+
+```gradle
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+
+and 
+
+```gradle
+	dependencies {
+	        compile 'com.github.NLeSC:Xenon:2.0.0-rc2'
+	}
+
+```
+
+Or for a Maven project,
+
+```maven
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+```
+
+and
+
+
+```maven
+	<dependency>
+	    <groupId>com.github.NLeSC</groupId>
+	    <artifactId>Xenon</artifactId>
+	    <version>2.0.0-rc2</version>
+	</dependency>
+```
+
 
 Simple examples
 ---------------
