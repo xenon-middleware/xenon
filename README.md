@@ -80,22 +80,52 @@ Simple examples
 
 Here are some examples of basic operations you can perform with Xenon: 
 
-#### Copy a file
+#### Copying a file from a local filesystem to a remote filesystem
 
-Following code copies local /etc/passwd file using ssh to /tmp/password on somemachine:
-```
-xenon = XenonFactory.newXenon(null);
-Files files = xenon.files();
-FileSystem sourceFS = files.newFileSystem("local", null, null, null);
-FileSystem targetFS = files.newFileSystem("ssh", "somemachine", null, null);
-Path sourcePath = files.newPath(sourceFS, new RelativePath("/etc/passwd"));
-Path targetPath = files.newPath(targetFS, new RelativePath("/tmp/passwd"));
+```java
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
+import nl.esciencecenter.xenon.filesystems.CopyStatus;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
 
-files.copy(sourcePath, targetPath, CopyOption.CREATE);
+public class CopyFileLocalToSftpAbsolutePaths {
 
-files.close(sourceFS);
-files.close(targetFS);
-XenonFactory.endXenon(xenon);
+    public static void main(String[] args) throws Exception {
+
+        // Use the file system adaptors to create file system representations; the remote file system
+        // requires credentials, so we need to create those too.
+        //
+        // Assume the remote system is actually just a Docker container (e.g.
+        // https://hub.docker.com/r/nlesc/xenon-ssh/), accessible via
+        // port 10022 on localhost
+        String location = "localhost:10022";
+        String username = "xenon";
+        char[] password = "javagat".toCharArray();
+        PasswordCredential credential = new PasswordCredential(username, password);
+        FileSystem localFileSystem = FileSystem.create("file");
+        FileSystem remoteFileSystem = FileSystem.create("sftp", location, credential);
+
+        // create Paths for the source and destination files, using absolute paths
+        Path sourceFile = new Path("/etc/passwd");
+        Path destFile = new Path("/tmp/password");
+
+        // create the destination file only if the destination path doesn't exist yet
+        CopyMode mode = CopyMode.CREATE;
+        boolean recursive = false;
+
+        // perform the copy and wait 1000 ms for the successful or otherwise
+        // completion of the operation
+        String copyId = localFileSystem.copy(sourceFile, remoteFileSystem, destFile, mode, recursive);
+        long timeoutMilliSecs = 1000;
+        CopyStatus copyStatus = localFileSystem.waitUntilDone(copyId, timeoutMilliSecs);
+
+        // print any exceptions
+        if (copyStatus.getException() != null) {
+            System.out.println(copyStatus.getException().getMessage());
+        }
+    }
+}
 ```
 
 #### Run a job
