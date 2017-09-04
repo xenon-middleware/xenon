@@ -121,21 +121,23 @@ Supported middleware
 --------------------
 
 Xenon currently supports the following file access mechanisms:
-- local
-- ssh
-- ftp
-- sftp 
-- WebDAV
-- S3
+
+- ``file`` (local file manipulation)
+- ``ftp``
+- ``sftp``
+- ``webdav``
+- ``s3``
 
 Xenon currently supports the following job submission mechanisms:
-- local (interactive jobs only)
-- ssh (interactive jobs only)
-- Slurm (interactive and batch jobs)
-- Torque (batch jobs only)  
-- GridEngine (batch jobs only)
+
+- ``local`` (interactive jobs only)
+- ``ssh`` (interactive jobs only)
+- ``gridengine`` (batch jobs only)
+- ``slurm`` (interactive and batch jobs)
+- ``torque`` (batch jobs only)  
 
 Planned extensions include: 
+
 - Swift
 - HDFS (almost done)
 - YARN
