@@ -370,51 +370,51 @@ public final class SlurmUtils {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
-        script.format("%s%n", "#!/bin/sh");
+        script.format("%s\n", "#!/bin/sh");
 
         //set name of job to xenon
-        script.format("%s%n", "#SBATCH --job-name xenon");
+        script.format("%s\n", "#SBATCH --job-name xenon");
 
         //set working directory
         if (description.getWorkingDirectory() != null) {
             String path = getWorkingDirPath(description, fsEntryPath);
-            script.format("#SBATCH --workdir='%s'%n", path);
+            script.format("#SBATCH --workdir='%s'\n", path);
         }
 
         if (description.getQueueName() != null) {
-            script.format("#SBATCH --partition=%s%n", description.getQueueName());
+            script.format("#SBATCH --partition=%s\n", description.getQueueName());
         }
 
         //number of nodes
-        script.format("#SBATCH --nodes=%d%n", description.getNodeCount());
+        script.format("#SBATCH --nodes=%d\n", description.getNodeCount());
 
         //number of processer per node
-        script.format("#SBATCH --ntasks-per-node=%d%n", description.getProcessesPerNode());
+        script.format("#SBATCH --ntasks-per-node=%d\n", description.getProcessesPerNode());
 
         //add maximum runtime
-        script.format("#SBATCH --time=%d%n", description.getMaxTime());
+        script.format("#SBATCH --time=%d\n", description.getMaxTime());
 
         if (description.getStdin() != null) {
-            script.format("#SBATCH --input='%s'%n", description.getStdin());
+            script.format("#SBATCH --input='%s'\n", description.getStdin());
         }
 
         if (description.getStdout() == null) {
-            script.format("#SBATCH --output=/dev/null%n");
+            script.format("#SBATCH --output=/dev/null\n");
         } else {
-            script.format("#SBATCH --output='%s'%n", description.getStdout());
+            script.format("#SBATCH --output='%s'\n", description.getStdout());
         }
 
         if (description.getStderr() == null) {
-            script.format("%s%n", "#SBATCH --error=/dev/null");
+            script.format("%s\n", "#SBATCH --error=/dev/null");
         } else {
-            script.format("#SBATCH --error='%s'%n", description.getStderr());
+            script.format("#SBATCH --error='%s'\n", description.getStderr());
         }
 
         for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
-            script.format("export %s=\"%s\"%n", entry.getKey(), entry.getValue());
+            script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());
         }
 
-        script.format("%n");
+        script.format("\n");
 
         if (!description.isStartSingleProcess()) {
             //run commands through srun
@@ -426,7 +426,7 @@ public final class SlurmUtils {
         for (String argument : description.getArguments()) {
             script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
         }
-        script.format("%n");
+        script.format("\n");
 
         script.close();
 
