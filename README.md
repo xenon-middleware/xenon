@@ -147,13 +147,7 @@ Planned extensions include:
 Documentation
 -------------
 
-See <https://github.com/NLeSC/Xenon-examples> for examples how to use the Xenon library.
-
-See <https://github.com/NLeSC/Xenon-examples/raw/master/doc/tutorial/xenon-tutorial.pdf> for a tutorial pdf targeting inexperienced users.
-
-The javadoc of Xenon library is available online at <http://nlesc.github.io/Xenon/versions/1.2.2/javadoc>.
-
-See the file <https://github.com/NLeSC/Xenon/blob/master/doc/README.md> for information for developers of the Xenon library.
+Xenon's JavaDoc is available online at <https://jitpack.io/com/github/NLeSC/Xenon/master-SNAPSHOT/javadoc/index.html>.
 
 Copyrights & Disclaimers
 ------------------------
