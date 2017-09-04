@@ -8,7 +8,7 @@ Xenon
 [![Codacy Badge](https://api.codacy.com/project/badge/457da68977d1406c9ea93d340720d340)](https://www.codacy.com/app/NLeSC/Xenon)
 [![SonarQube Coverage](https://sonarqube.com/api/badges/measure?key=nlesc%3AXenon&metric=coverage)](https://sonarqube.com/component_measures/domain/Coverage?id=nlesc%3AXenon)
 [![GitHub license](https://img.shields.io/badge/license-Apache--2.0%20-blue.svg)](https://github.com/NLeSC/Xenon/blob/master/LICENSE)
-[![Download](https://api.bintray.com/packages/nlesc/xenon/xenon/images/download.svg) ](https://bintray.com/nlesc/xenon/xenon/_latestVersion)
+[![Download](https://jitpack.io/v/NLeSC/Xenon.svg)](https://jitpack.io/#NLeSC/Xenon)
 [![DOI](https://zenodo.org/badge/9236864.svg)](https://zenodo.org/badge/latestdoi/9236864)
 
 Copyright 2013 The Netherlands eScience Center
@@ -31,111 +31,177 @@ those applications to be developed more rapidly. The experience
 gained during end-user application development is used to improve
 the Xenon API and implementation.
 
-The Latest Version
-------------------
+Adding Xenon as a dependency to your project
+--------------------------------------------
 
-Available in [JCenter](https://bintray.com/bintray/jcenter?filterByPkgName=xenon)
+Follow the instructions from [jitpack.io](https://jitpack.io/#NLeSC/Xenon/2.0.0-rc2) to include Xenon as a 
+dependency for Gradle, Maven, SBT, or Leiningen projects, e.g. Gradle:
 
-Details of the latest official 1.2.2 release of Xenon can be found at:
+```gradle
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
 
-<https://github.com/NLeSC/Xenon/releases>
+and 
 
-Alternatively, the latest development versions of Xenon can be found at:
+```gradle
+	dependencies {
+	        compile 'com.github.NLeSC:Xenon:2.0.0-rc2'
+	}
 
-<https://github.com/NLeSC/Xenon>.
+```
 
-Quick start
------------
+Or for a Maven project,
 
-Add Xenon library as a dependency to your project. For a Maven project use
+```maven
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 ```
-<dependency>
-  <groupId>nl.esciencecenter.xenon</groupId>
-  <artifactId>xenon</artifactId>
-  <version>1.2.3</version>
-</dependency>
+
+and
+
+
+```maven
+	<dependency>
+	    <groupId>com.github.NLeSC</groupId>
+	    <artifactId>Xenon</artifactId>
+	    <version>2.0.0-rc2</version>
+	</dependency>
 ```
-For a gradle project make sure to include `jcenter` in the list of repositories, for example:
-```
-repositories {
-    mavenCentral()
-    jcenter()
-}
-```
-Then include Xenon as a compile dependency:
-```
-dependencies {
-    compile group: 'nl.esciencecenter.xenon', name: 'xenon', version: '1.2.2'
-    // other dependencies ...
-}
-``` 
-To compile Xenon from source, download the source distribution below and type:
-```
-gradlew installDist
-```
-This will create a binary distribution in `./build/install`
+
 
 Simple examples
 ---------------
 
 Here are some examples of basic operations you can perform with Xenon: 
 
-#### Copy a file
+#### Copying a file from a local filesystem to a remote filesystem
 
-Following code copies local /etc/passwd file using ssh to /tmp/password on somemachine:
+```java
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
+import nl.esciencecenter.xenon.filesystems.CopyStatus;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
+
+public class CopyFileLocalToSftpAbsolutePaths {
+
+    public static void main(String[] args) throws Exception {
+
+        // Use the file system adaptors to create file system representations; the remote file system
+        // requires credentials, so we need to create those too.
+        //
+        // Assume the remote system is actually just a Docker container (e.g.
+        // https://hub.docker.com/r/nlesc/xenon-ssh/), accessible via
+        // port 10022 on localhost
+        String location = "localhost:10022";
+        String username = "xenon";
+        char[] password = "javagat".toCharArray();
+        PasswordCredential credential = new PasswordCredential(username, password);
+        FileSystem localFileSystem = FileSystem.create("file");
+        FileSystem remoteFileSystem = FileSystem.create("sftp", location, credential);
+
+        // create Paths for the source and destination files, using absolute paths
+        Path sourceFile = new Path("/etc/passwd");
+        Path destFile = new Path("/tmp/password");
+
+        // create the destination file only if the destination path doesn't exist yet
+        CopyMode mode = CopyMode.CREATE;
+        boolean recursive = false;
+
+        // perform the copy and wait 1000 ms for the successful or otherwise
+        // completion of the operation
+        String copyId = localFileSystem.copy(sourceFile, remoteFileSystem, destFile, mode, recursive);
+        long timeoutMilliSecs = 1000;
+        CopyStatus copyStatus = localFileSystem.waitUntilDone(copyId, timeoutMilliSecs);
+
+        // throw any exceptions
+        XenonException copyException = copyStatus.getException();
+        if (copyException != null) {
+          throw copyException;
+        }
+    }
+}
 ```
-xenon = XenonFactory.newXenon(null);
-Files files = xenon.files();
-FileSystem sourceFS = files.newFileSystem("local", null, null, null);
-FileSystem targetFS = files.newFileSystem("ssh", "somemachine", null, null);
-Path sourcePath = files.newPath(sourceFS, new RelativePath("/etc/passwd"));
-Path targetPath = files.newPath(targetFS, new RelativePath("/tmp/passwd"));
 
-files.copy(sourcePath, targetPath, CopyOption.CREATE);
+#### Submitting a job
 
-files.close(sourceFS);
-files.close(targetFS);
-XenonFactory.endXenon(xenon);
+The following code performs a wordcount of a file residing on a remote machine: 
+
+```java 
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
+
+public class SlurmSubmitWordCountJob {
+
+    public static void main(String[] args) throws Exception {
+
+        // Assume the remote system is actually just a Docker container (e.g.
+        // https://hub.docker.com/r/nlesc/xenon-slurm/), accessible to user 'xenon' via
+        // port 10022 on localhost, using password 'javagat'
+        String location = "localhost:10022";
+        String username = "xenon";
+        char[] password = "javagat".toCharArray();
+        PasswordCredential credential = new PasswordCredential(username, password);
+
+        // create the SLURM scheduler representation
+        Scheduler scheduler = Scheduler.create("slurm", location, credential);
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("/usr/bin/wc");
+        description.setArguments("-l", "/etc/passwd");
+        description.setStdout("/tmp/wc.stdout.txt");
+
+        // submit the job
+        String jobId = scheduler.submitBatchJob(description);
+
+        long WAIT_INDEFINITELY = 0;
+        JobStatus jobStatus = scheduler.waitUntilDone(jobId, WAIT_INDEFINITELY);
+
+        // print any exceptions
+        Exception jobException = jobStatus.getException();
+        if (jobException != null)  {
+          throw jobException;
+        }
+
+    }
+}
 ```
 
-#### Run a job
-
-Following code performs a wordcount of a file on somemachine using ssh:  
-```
-xenon = XenonFactory.newXenon(null);
-Jobs jobs = xenon.jobs();
-Scheduler scheduler = jobs.newScheduler("ssh", "somemachine", null, null);
-JobDescription description = new JobDescription();
-description.setExecutable("/bin/wc");
-description.setArguments("-l", "/tmp/passwd");
-description.setStdout("/tmp/stdout.txt");
-
-Job job = jobs.submitJob(scheduler, description);
-
-jobs.close(scheduler);
-XenonFactory.endXenon(xenon);
-```
-The output of the job will be written to /tmp/stdout.txt file on somemachine.
+The output of the job will be written to ``/tmp/wc.stdout.txt`` file in the ``nlesc/xenon-slurm`` Docker container.
 
 Supported middleware
 --------------------
 
 Xenon currently supports the following file access mechanisms:
-- local
-- ssh
-- ftp
-- sftp 
-- WebDAV
-- S3
+
+- ``file`` (local file manipulation)
+- ``ftp``
+- ``sftp``
+- ``webdav``
+- ``s3``
 
 Xenon currently supports the following job submission mechanisms:
-- local (interactive jobs only)
-- ssh (interactive jobs only)
-- Slurm (interactive and batch jobs)
-- Torque (batch jobs only)  
-- GridEngine (batch jobs only)
+
+- ``local``
+- ``ssh``
+- ``gridengine``
+- ``slurm``
+- ``torque``  
 
 Planned extensions include: 
+
 - Swift
 - HDFS (almost done)
 - YARN
@@ -147,13 +213,7 @@ Planned extensions include:
 Documentation
 -------------
 
-See <https://github.com/NLeSC/Xenon-examples> for examples how to use the Xenon library.
-
-See <https://github.com/NLeSC/Xenon-examples/raw/master/doc/tutorial/xenon-tutorial.pdf> for a tutorial pdf targeting inexperienced users.
-
-The javadoc of Xenon library is available online at <http://nlesc.github.io/Xenon/versions/1.2.2/javadoc>.
-
-See the file <https://github.com/NLeSC/Xenon/blob/master/doc/README.md> for information for developers of the Xenon library.
+Xenon's JavaDoc is available online at <https://jitpack.io/com/github/NLeSC/Xenon/master-SNAPSHOT/javadoc/index.html>.
 
 Copyrights & Disclaimers
 ------------------------
