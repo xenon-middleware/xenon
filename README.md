@@ -45,6 +45,7 @@ Here are some examples of basic operations you can perform with Xenon:
 #### Copying a file from a local filesystem to a remote filesystem
 
 ```java
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.CopyMode;
 import nl.esciencecenter.xenon.filesystems.CopyStatus;
