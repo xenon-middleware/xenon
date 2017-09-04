@@ -128,24 +128,52 @@ public class CopyFileLocalToSftpAbsolutePaths {
 }
 ```
 
-#### Run a job
+#### Submitting a job
 
-Following code performs a wordcount of a file on somemachine using ssh:  
+The following code performs a wordcount of a file residing on a remote machine: 
+
+```java 
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
+
+public class SlurmSubmitWordCountJob {
+
+    public static void main(String[] args) throws Exception {
+
+        // Assume the remote system is actually just a Docker container (e.g.
+        // https://hub.docker.com/r/nlesc/xenon-slurm/), accessible to user 'xenon' via
+        // port 10022 on localhost, using password 'javagat'
+        String location = "localhost:10022";
+        String username = "xenon";
+        char[] password = "javagat".toCharArray();
+        PasswordCredential credential = new PasswordCredential(username, password);
+
+        // create the SLURM scheduler representation
+        Scheduler scheduler = Scheduler.create("slurm", location, credential);
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("/usr/bin/wc");
+        description.setArguments("-l", "/etc/passwd");
+        description.setStdout("/tmp/wc.stdout.txt");
+
+        // submit the job
+        String jobId = scheduler.submitBatchJob(description);
+
+        long WAIT_INDEFINITELY = 0;
+        JobStatus jobStatus = scheduler.waitUntilDone(jobId, WAIT_INDEFINITELY);
+
+        // print any exceptions
+        if (jobStatus.getException() != null) {
+            System.out.println(jobStatus.getException().getMessage());
+        }
+
+    }
+}
 ```
-xenon = XenonFactory.newXenon(null);
-Jobs jobs = xenon.jobs();
-Scheduler scheduler = jobs.newScheduler("ssh", "somemachine", null, null);
-JobDescription description = new JobDescription();
-description.setExecutable("/bin/wc");
-description.setArguments("-l", "/tmp/passwd");
-description.setStdout("/tmp/stdout.txt");
 
-Job job = jobs.submitJob(scheduler, description);
-
-jobs.close(scheduler);
-XenonFactory.endXenon(xenon);
-```
-The output of the job will be written to /tmp/stdout.txt file on somemachine.
+The output of the job will be written to ``/tmp/wc.stdout.txt`` file in the ``nlesc/slurm:17`` Docker container.
 
 Supported middleware
 --------------------
