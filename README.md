@@ -194,11 +194,11 @@ Xenon currently supports the following file access mechanisms:
 
 Xenon currently supports the following job submission mechanisms:
 
-- ``local`` (interactive jobs only)
-- ``ssh`` (interactive jobs only)
-- ``gridengine`` (batch jobs only)
-- ``slurm`` (interactive and batch jobs)
-- ``torque`` (batch jobs only)  
+- ``local``
+- ``ssh``
+- ``gridengine``
+- ``slurm``
+- ``torque``  
 
 Planned extensions include: 
 
