@@ -128,8 +128,9 @@ public class SlurmSubmitWordCountJob {
         JobStatus jobStatus = scheduler.waitUntilDone(jobId, WAIT_INDEFINITELY);
 
         // print any exceptions
-        if (jobStatus.getException() != null) {
-            System.out.println(jobStatus.getException().getMessage());
+        Exception jobException = jobStatus.getException();
+        if (jobException != null)  {
+          throw jobException;
         }
 
     }
