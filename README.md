@@ -52,7 +52,7 @@ Add Xenon library as a dependency to your project. For a Maven project use
 <dependency>
   <groupId>nl.esciencecenter.xenon</groupId>
   <artifactId>xenon</artifactId>
-  <version>1.2.2</version>
+  <version>1.2.3</version>
 </dependency>
 ```
 For a gradle project make sure to include `jcenter` in the list of repositories, for example:
@@ -126,6 +126,7 @@ Xenon currently supports the following file access mechanisms:
 - ftp
 - sftp 
 - WebDAV
+- S3
 
 Xenon currently supports the following job submission mechanisms:
 - local (interactive jobs only)
@@ -135,9 +136,8 @@ Xenon currently supports the following job submission mechanisms:
 - GridEngine (batch jobs only)
 
 Planned extensions include: 
-- S3
 - Swift
-- HDFS 
+- HDFS (almost done)
 - YARN
 - GridFTP
 - glite
