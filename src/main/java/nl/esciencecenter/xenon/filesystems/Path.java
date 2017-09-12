@@ -72,11 +72,12 @@ public class Path implements Iterable<Path> {
         }
     }
 
+
     /**
      * Create a new empty Path using the default separator.
      */
     public Path() {
-        this(DEFAULT_SEPARATOR, new ArrayList<String>(0));
+        this(false, DEFAULT_SEPARATOR, new ArrayList<String>(0));
     }
 
     /**
@@ -151,9 +152,15 @@ public class Path implements Iterable<Path> {
             } else {
                 separator = sep.charValue();
             }
+            if(!isAbsoluteSet){
+                this.isAbsolute = false;
+            }
         }
 
     }
+
+
+
 
     /**
      * Create a new Path using the given path elements and the separator.
@@ -173,6 +180,28 @@ public class Path implements Iterable<Path> {
     public Path(char separator, String... elements) {
         this(separator, elements == null ? new ArrayList<String>(0) : Arrays.asList(elements));
     }
+
+
+    /**
+     * Create a new Path using the given path elements and the separator.
+     *
+     * If the <code>elements</code> is <code>null</code> or an empty String
+     * array, the resulting Path is empty.
+     *
+     * Otherwise, each of the elements will be parsed individually, splitting
+     * them into elements wherever a separator is encountered. Elements that are
+     * <code>null</code> or contain an empty String are ignored.
+     *
+     * @param elts
+     *            the path elements to use.
+     * @param separator
+     *            the separator to use.
+     */
+    public Path(boolean isAbsolute, char separator, List<String> elts) {
+        this(separator,elts);
+        this.isAbsolute = isAbsolute;
+    }
+
 
     /**
      * Create a new Path using the given path elements and the separator.
@@ -213,13 +242,8 @@ public class Path implements Iterable<Path> {
         }
     }
 
-    private Path(char separator, boolean isAbsolute, List<String> elements) {
-        this.separator = separator;
-        this.isAbsolute = isAbsolute;
-        this.elements = elements;
-    }
 
-    List<String> filterNonEmpty(List<String> elts) {
+    private static List<String> filterNonEmpty(List<String> elts) {
         List<String> res = new LinkedList<>();
         for (String s : elts) {
             if (s != null && !s.isEmpty()) {
@@ -228,6 +252,8 @@ public class Path implements Iterable<Path> {
         }
         return res;
     }
+
+
 
     /**
      * Get the file name, or <code>null</code> if the Path is empty.
@@ -280,7 +306,7 @@ public class Path implements Iterable<Path> {
             return null;
         }
 
-        return new Path(separator, isAbsolute, elements.subList(0, elements.size() - 1));
+        return new Path(isAbsolute, separator,  elements.subList(0, elements.size() - 1));
     }
 
     /**
@@ -306,7 +332,7 @@ public class Path implements Iterable<Path> {
      */
     public Path getName(int index) {
         boolean isAbs = index == 0 && isAbsolute;
-        return new Path(separator, isAbs, Collections.singletonList(elements.get(index)));
+        return new Path(isAbs, separator,  Collections.singletonList(elements.get(index)));
     }
 
     /**
@@ -330,7 +356,7 @@ public class Path implements Iterable<Path> {
             throw new IllegalArgumentException("beginIndex " + beginIndex + " equal to endIndex " + endIndex);
         }
         boolean alsoAbsolute = beginIndex == 0 && isAbsolute;
-        return new Path(separator, alsoAbsolute, elements.subList(beginIndex, endIndex));
+        return new Path( alsoAbsolute, separator, elements.subList(beginIndex, endIndex));
     }
 
     /**
@@ -422,7 +448,7 @@ public class Path implements Iterable<Path> {
         ArrayList<String> tmp = new ArrayList<>(elements.size() + other.elements.size());
         tmp.addAll(elements);
         tmp.addAll(other.elements);
-        return new Path(separator, isAbsolute, tmp);
+        return new Path(isAbsolute, separator, tmp);
     }
 
     /**
@@ -520,7 +546,7 @@ public class Path implements Iterable<Path> {
             throw new IllegalArgumentException("Cannot relativize " + other + " to " + this);
         }
 
-        return new Path(separator, false, normalizedOther.subList(normalized.size(), normalizedOther.size()));
+        return new Path( false, separator, normalizedOther.subList(normalized.size(), normalizedOther.size()));
     }
 
     /**
@@ -617,7 +643,7 @@ public class Path implements Iterable<Path> {
             }
         }
 
-        return new Path(separator, isAbsolute, stack);
+        return new Path(isAbsolute, separator, stack);
     }
 
     /* Generated */
@@ -659,10 +685,10 @@ public class Path implements Iterable<Path> {
     }
 
     public Path toRelativePath() {
-        return new Path(separator, false, elements);
+        return new Path(false, separator, elements);
     }
 
     public Path toAbsolutePath() {
-        return new Path(separator, true, elements);
+        return new Path(true, separator,  elements);
     }
 }
