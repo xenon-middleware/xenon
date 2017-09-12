@@ -1796,7 +1796,7 @@ public abstract class FileSystemTestParent {
 
         Path result = fileSystem.getWorkingDirectory();
 
-        assertEquals(expected, result);
+        assertEquals("Working dir not equal: " + expected + " != " + result, expected, result);
     }
 
     // TODO: Symbolic links in a cycle tests
