@@ -66,7 +66,7 @@ public class JobExecutor implements Runnable {
 
     private String state = PENDING_STATE;
 
-    private Exception error;
+    private XenonException error;
 
     public JobExecutor(String adaptorName, FileSystem filesystem, Path workingDirectory, InteractiveProcessFactory factory,
             JobDescription description, String jobIdentifier, boolean interactive, long pollingDelay) {
@@ -129,7 +129,7 @@ public class JobExecutor implements Runnable {
         return error;
     }
 
-    private synchronized void updateState(String state, int exitStatus, Exception e) {
+    private synchronized void updateState(String state, int exitStatus, XenonException e) {
 
         if (ERROR_STATE.equals(state) || KILLED_STATE.equals(state)) {
             error = e;
@@ -317,8 +317,11 @@ public class JobExecutor implements Runnable {
             } else {
                 process = new BatchProcess(filesystem, workingDirectory, description, jobIdentifier, factory);
             }
-        } catch (IOException | XenonException e) {
+        } catch (XenonException e) {
             updateState(ERROR_STATE, -1, e);
+            return;
+        } catch (IOException e) {
+            updateState(ERROR_STATE, -1, new XenonException(adaptorName, "Error starting job.", e));
             return;
         }
 

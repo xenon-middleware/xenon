@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
+import nl.esciencecenter.xenon.XenonException;
 import org.junit.Test;
 
 import nl.esciencecenter.xenon.schedulers.JobStatus;
@@ -56,7 +57,7 @@ public class JobStatusImplementationTest {
     @Test
     public void test_exception() throws Exception {
         String id = "JOB-42";
-        Exception e = new NullPointerException("EEP");
+        XenonException e = new XenonException("adapter","EEP");
         JobStatus s = new JobStatusImplementation(id, "STATE", 0, e, true, false, null);
         assertEquals(e, s.getException());
     }
@@ -64,7 +65,7 @@ public class JobStatusImplementationTest {
     @Test
     public void test_hasExceptionTrue() throws Exception {
         String id = "JOB-42";
-        Exception e = new NullPointerException("EEP");
+        XenonException e = new XenonException("adapter","EEP");
         JobStatus s = new JobStatusImplementation(id, "STATE", 0, e, true, false, null);
         assertTrue(s.hasException());
     }
@@ -121,7 +122,7 @@ public class JobStatusImplementationTest {
         tmp.put("key", "value");
 
         String id = "JOB-42";
-        Exception e = new NullPointerException("EEP");
+        XenonException e = new XenonException("adapter","EEP");
         JobStatus s = new JobStatusImplementation(id, "STATE", 0, e, false, false, tmp);
 
         String expected = "JobStatus [jobIdentifier=" + id + ", state=" + "STATE" + ", exitCode=" + 0 + ", exception=" + e

@@ -126,7 +126,7 @@ public final class SlurmUtils {
 
         Integer exitcode = exitcodeFromString(jobInfo.get("ExitCode"));
 
-        Exception exception;
+        XenonException exception;
         if (!isFailedState(state) || (state.equals("FAILED") && (exitcode != null && exitcode != 0))) {
             //Not a failed state (non zero exit code does not count either), no error.
             exception = null;
@@ -157,7 +157,7 @@ public final class SlurmUtils {
         Integer exitcode = exitcodeFromString(jobInfo.get("ExitCode"));
         String reason = jobInfo.get("Reason");
 
-        Exception exception;
+        XenonException exception;
         if (!isFailedState(state) || state.equals("FAILED") && reason.equals("NonZeroExitCode")) {
             //Not a failed state (non zero exit code does not count either), no error.
             exception = null;
