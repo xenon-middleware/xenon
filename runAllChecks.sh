@@ -14,6 +14,16 @@ echo "| checking code style |"
 echo "+---------------------+"
 ./gradlew spotlessJavaCheck
 
+echo "+------------------+"
+echo "| checking javadoc |"
+echo "+------------------+"
+./gradlew javadoc
+
+echo "+------------------------------+"
+echo "| checking development javadoc |"
+echo "+------------------------------+"
+./gradlew javadocDevel
+
 echo "+------------+"
 echo "| unit tests |"
 echo "+------------+"

@@ -98,6 +98,8 @@ public class Path implements Iterable<Path> {
      * If <code>path</code> is <code>null</code> or an empty String, the resulting Path is empty and relative. Otherwise it will be split into multiple elements
      * using the provided separator. If <code>path</code> starts with a separator, the resulting path will be absolute. Otherwise, it will be relative.
      *
+     * @param separator
+     *            the separator to use
      * @param path
      *            the path to parse
      */
@@ -239,7 +241,7 @@ public class Path implements Iterable<Path> {
      *            the separator to use.
      * @param isAbsolute
      *            should the resulting path should be absolute ?
-     * @param elts
+     * @param elements
      *            the path elements to use.
      */
     public Path(char separator, boolean isAbsolute, List<String> elements) {

@@ -104,9 +104,12 @@ public class SSHUtil {
      * Weak validation of a host string containing either a hostame of IP adres.
      *
      * @param adaptorName
+     *            the name of the adaptor using this method.
      * @param host
-     * @return
+     *            the hostname to validate
+     * @return the value of <code>host</code> if the validation succeeded.
      * @throws InvalidLocationException
+     *             if the validation failed
      */
     public static String validateHost(String adaptorName, String host) throws InvalidLocationException {
         if (host == null || host.isEmpty()) {
