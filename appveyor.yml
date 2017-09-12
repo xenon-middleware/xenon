@@ -3,7 +3,7 @@ build_script:
   - cmd: ./gradlew.bat assemble
 test_script:
   - mkdir build\integrationTest & cd build\integrationTest & ..\..\src\liveTest\resources\scripts\create_symlinks.bat & cd ..\..
-  - cmd: gradlew.bat liveTest -Dxenon.scheduler=local -Dxenon.filesystem=file -Dxenon.filesystem.location=%HomeDrive% -Dxenon.username=%USERNAME% -Dxenon.filesystem.basedir=projects/xenon/build/integrationTest -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
+  - cmd: gradlew.bat liveTest -Dxenon.scheduler=local -Dxenon.filesystem=file -Dxenon.filesystem.location=%HomeDrive% -Dxenon.username=%USERNAME% -Dxenon.filesystem.basedir=projects\xenon\build\integrationTest -Dxenon.filesystem.expected.workdir=%HomeDrive% -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
 on_finish:
   - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
   - "SET JDK=oraclejdk8"
