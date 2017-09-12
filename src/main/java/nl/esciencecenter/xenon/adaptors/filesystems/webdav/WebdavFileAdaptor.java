@@ -46,7 +46,7 @@ public class WebdavFileAdaptor extends FileAdaptor {
     public static final String ADAPTOR_DESCRIPTION = "The webdav file adaptor implements file access to remote webdav servers.";
 
     /** The locations supported by this adaptor */
-    public static final String[] ADAPTOR_LOCATIONS = new String[] { "http://host[:port]", "https://host[:port]" };
+    public static final String[] ADAPTOR_LOCATIONS = new String[] { "http://host[:port][/workdir]", "https://host[:port][/workdir]" };
 
     /** All our own properties start with this prefix. */
     public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + "webdav.";
@@ -55,8 +55,7 @@ public class WebdavFileAdaptor extends FileAdaptor {
     public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[0];
 
     /**
-     * The default buffer size for copy. Webdav doesn't use the standard copy
-     * engine.
+     * The default buffer size for copy. Webdav doesn't use the standard copy engine.
      */
     protected static final int BUFFER_SIZE = 4 * 1024;
 
@@ -85,8 +84,7 @@ public class WebdavFileAdaptor extends FileAdaptor {
     }
 
     @Override
-    public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties)
-            throws XenonException {
+    public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
 
         LOGGER.debug("newFileSystem location = {} credential = {} properties = {}", location, credential, properties);
 

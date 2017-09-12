@@ -31,7 +31,6 @@ import java.nio.file.attribute.PosixFileAttributeView;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import nl.esciencecenter.xenon.XenonException;
@@ -47,21 +46,24 @@ import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 
 public class LocalFileSystem extends FileSystem {
 
-    protected LocalFileSystem(String uniqueID, String location, Path entryPath, XenonProperties properties) {
+    private final String root;
+
+    protected LocalFileSystem(String uniqueID, String location, String root, Path entryPath, XenonProperties properties) {
         super(uniqueID, ADAPTOR_NAME, location, entryPath, properties);
+        this.root = root;
     }
 
-    Path getRelativePath(String path, String root) throws XenonException {
-        if (!path.toUpperCase(Locale.getDefault()).startsWith(root.toUpperCase(Locale.getDefault()))) {
-            throw new XenonException(ADAPTOR_NAME, "Path does not start with root: " + path + " " + root);
-        }
-
-        if (root.length() == path.length()) {
-            return new Path(LocalFileSystemUtils.getLocalSeparator());
-        }
-
-        return new Path(LocalFileSystemUtils.getLocalSeparator(), path.substring(root.length()));
-    }
+    // Path getRelativePath(String path, String root) throws XenonException {
+    // if (!path.toUpperCase(Locale.getDefault()).startsWith(root.toUpperCase(Locale.getDefault()))) {
+    // throw new XenonException(ADAPTOR_NAME, "Path does not start with root: " + path + " " + root);
+    // }
+    //
+    // if (root.length() == path.length()) {
+    // return new Path(LocalFileSystemUtils.getLocalSeparator(), "");
+    // }
+    //
+    // return new Path(LocalFileSystemUtils.getLocalSeparator(), path.substring(root.length()));
+    // }
 
     java.nio.file.Path javaPath(Path path) throws XenonException {
 
@@ -71,7 +73,6 @@ public class LocalFileSystem extends FileSystem {
 
         Path relPath = path.normalize();
         int numElems = relPath.getNameCount();
-        String root = getLocation();
 
         // replace tilde
         if (numElems != 0) {
@@ -171,8 +172,8 @@ public class LocalFileSystem extends FileSystem {
 
                 // Note: when in a posix environment, basicAttributes point to
                 // posixAttributes.
-                java.nio.file.attribute.PosixFileAttributes posixAttributes = Files.readAttributes(path,
-                        java.nio.file.attribute.PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+                java.nio.file.attribute.PosixFileAttributes posixAttributes = Files.readAttributes(path, java.nio.file.attribute.PosixFileAttributes.class,
+                        LinkOption.NOFOLLOW_LINKS);
 
                 basicAttributes = posixAttributes;
 
@@ -322,8 +323,7 @@ public class LocalFileSystem extends FileSystem {
         path = toAbsolutePath(path);
         assertPathNotExists(path);
         try {
-            return Files.newOutputStream(javaPath(path), StandardOpenOption.WRITE, StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING);
+            return Files.newOutputStream(javaPath(path), StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to create OutputStream.", e);
         }

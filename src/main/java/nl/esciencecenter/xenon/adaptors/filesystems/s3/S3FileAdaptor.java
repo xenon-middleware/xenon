@@ -44,7 +44,7 @@ public class S3FileAdaptor extends FileAdaptor {
     private static final String ADAPTOR_DESCRIPTION = "The JClouds adaptor uses Apache JClouds to talk to s3 and others";
 
     /** The locations supported by this adaptor */
-    private static final String[] ADAPTOR_LOCATIONS = new String[] { "s3://host[:port]" };
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "[host[:port]/]bucketname[/workdir]" };
 
     /** All our own properties start with this prefix. */
     public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + "s3.";
@@ -56,8 +56,7 @@ public class S3FileAdaptor extends FileAdaptor {
     }
 
     @Override
-    public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties)
-            throws XenonException {
+    public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
 
         int split = location.lastIndexOf("/");
 
@@ -80,8 +79,8 @@ public class S3FileAdaptor extends FileAdaptor {
             properties = new HashMap<>();
         }
 
-        BlobStoreContext context = ContextBuilder.newBuilder("s3").endpoint(server)
-                .credentials(pwUser.getUsername(), new String(pwUser.getPassword())).buildView(BlobStoreContext.class);
+        BlobStoreContext context = ContextBuilder.newBuilder("s3").endpoint(server).credentials(pwUser.getUsername(), new String(pwUser.getPassword()))
+                .buildView(BlobStoreContext.class);
 
         return new JCloudsFileSytem(getNewUniqueID(), "s3", server, context, bucket, xp);
     }

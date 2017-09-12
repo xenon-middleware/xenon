@@ -32,8 +32,7 @@ import nl.esciencecenter.xenon.filesystems.Path;
 public class FtpFileSystemDockerTest extends FtpFileSystemTestParent {
 
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder()
-            .file("src/integrationTest/resources/docker-compose/ftp.yml")
+    public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/ftp.yml")
             .waitingForService("ftp", HealthChecks.toHaveAllPortsOpen()).build();
 
     @Override
@@ -65,7 +64,7 @@ public class FtpFileSystemDockerTest extends FtpFileSystemTestParent {
 
     @Override
     public FileSystem setupFileSystem() throws XenonException {
-        String location = docker.containers().container("ftp").port(21).inFormat("ftp://$HOST:$EXTERNAL_PORT");
+        String location = docker.containers().container("ftp").port(21).inFormat("$HOST:$EXTERNAL_PORT");
         PasswordCredential cred = new PasswordCredential("xenon", "javagat".toCharArray());
         return FileSystem.create("ftp", location, cred);
     }

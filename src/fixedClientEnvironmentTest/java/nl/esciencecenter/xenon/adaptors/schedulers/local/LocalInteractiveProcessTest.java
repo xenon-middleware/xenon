@@ -71,7 +71,7 @@ public class LocalInteractiveProcessTest {
         assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
     }
 
-    @Test(expected=XenonException.class)
+    @Test(expected = XenonException.class)
     public void test_simpleJob_unknownWorkDir_throwsException() throws Exception {
 
         assumeFalse(LocalFileSystemUtils.isWindows());
@@ -136,8 +136,9 @@ public class LocalInteractiveProcessTest {
         // Should be kill the process
         p.destroy();
 
+        Thread.sleep(250);
+
         assertTrue(p.isDone());
     }
-
 
 }

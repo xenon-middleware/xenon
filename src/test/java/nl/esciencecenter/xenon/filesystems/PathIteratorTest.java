@@ -22,7 +22,6 @@ import java.util.NoSuchElementException;
 
 import org.junit.Test;
 
-
 /**
  *
  */
@@ -33,7 +32,7 @@ public class PathIteratorTest {
 
         String[] s = new String[] { "aap", "noot", "mies" };
 
-        Path path = new Path(s);
+        Path path = new Path(true, s);
 
         Iterator<Path> itt = path.iterator();
 
@@ -51,7 +50,7 @@ public class PathIteratorTest {
     @Test
     public void test_iterable() {
         String[] s = new String[] { "aap", "noot", "mies" };
-        Path path = new Path(s);
+        Path path = new Path(true, s);
         int i = 0;
 
         for (Path tmp : path) {
@@ -64,14 +63,14 @@ public class PathIteratorTest {
 
     @Test
     public void test_empy() {
-        Path path = new Path(new String[0]);
+        Path path = new Path(true, new String[0]);
         Iterator<Path> itt = path.iterator();
         assert (!itt.hasNext());
     }
 
     @Test
     public void test_ok2() {
-        Path path = new Path("aap", "noot", "mies");
+        Path path = new Path(true, "aap", "noot", "mies");
         Iterator<Path> itt = path.iterator();
         itt.next();
         itt.next();
@@ -80,14 +79,14 @@ public class PathIteratorTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void test_remove() {
-        Path path = new Path("aap", "noot", "mies");
+        Path path = new Path(true, "aap", "noot", "mies");
         Iterator<Path> itt = path.iterator();
         itt.remove();
     }
 
     @Test(expected = NoSuchElementException.class)
     public void test_one_next_too_many() {
-        Path path = new Path("aap", "noot", "mies");
+        Path path = new Path(true, "aap", "noot", "mies");
         Iterator<Path> itt = path.iterator();
         itt.next();
         itt.next();

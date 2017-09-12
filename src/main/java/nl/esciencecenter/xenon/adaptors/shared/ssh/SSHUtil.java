@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.adaptors.shared.ssh;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -160,8 +161,23 @@ public class SSHUtil {
             throw new XenonException(adaptorName, "Failed to retrieve username from credential");
         }
 
-        String host = getHost(adaptorName, location);
-        int port = getPort(adaptorName, location);
+        URI uri;
+
+        try {
+            uri = new URI("sftp://" + location);
+        } catch (Exception e) {
+            throw new InvalidLocationException(adaptorName, "Failed to parse location: " + location, e);
+        }
+
+        String host = uri.getHost();
+        int port = uri.getPort();
+
+        if (port == -1) {
+            port = DEFAULT_SSH_PORT;
+        }
+
+        // String host = getHost(adaptorName, location);
+        // int port = getPort(adaptorName, location);
 
         ClientSession session = null;
 
