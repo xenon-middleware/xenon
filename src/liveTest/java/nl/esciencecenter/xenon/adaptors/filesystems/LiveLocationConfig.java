@@ -15,14 +15,13 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems;
 
+import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.getLocalRootlessPath;
+
 import java.util.AbstractMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
-
-import static nl.esciencecenter.xenon.utils.LocalFileSystemUtils.getLocalRootlessPath;
 
 public class LiveLocationConfig extends LocationConfig {
     private final FileSystem fileSystem;
@@ -36,18 +35,20 @@ public class LiveLocationConfig extends LocationConfig {
     private Path createPath(String... path) {
         String baseDir = System.getProperty("xenon.basedir");
         char sep = Path.DEFAULT_SEPARATOR;
+
         if (System.getProperty("xenon.separator") != null) {
             sep = System.getProperty("xenon.separator").charAt(0);
         }
+
         System.out.println(baseDir);
+
         if (baseDir == null) {
-            return fileSystem.getWorkingDirectory().resolve(new Path(sep, path));
+            return fileSystem.getWorkingDirectory().resolve(new Path(sep, false, path));
         }
-        Path p = new Path(sep, baseDir).resolve(new Path(sep, path));
+
+        Path p = new Path(sep, baseDir).resolve(new Path(sep, false, path));
         System.out.println(p);
         return p;
-        // return fileSystem.getEntryPath().resolve(new
-        // Path(baseDir).resolve(new Path(path)));
     }
 
     @Override
@@ -57,8 +58,7 @@ public class LiveLocationConfig extends LocationConfig {
 
     @Override
     public Map.Entry<Path, Path> getSymbolicLinksToExistingFile() {
-        return new AbstractMap.SimpleEntry<>(createPath("filesystem-test-fixture", "links", "link0"),
-                createPath("filesystem-test-fixture", "links", "file0"));
+        return new AbstractMap.SimpleEntry<>(createPath("filesystem-test-fixture", "links", "link0"), createPath("filesystem-test-fixture", "links", "file0"));
     }
 
     @Override
@@ -76,16 +76,12 @@ public class LiveLocationConfig extends LocationConfig {
 
     @Override
     public Path getExpectedWorkingDirectory() {
-        String baseDir = null;
-        try {
-            baseDir = getLocalRootlessPath(System.getProperty("user.dir"));
-        } catch (InvalidLocationException e) {
-            e.printStackTrace();
-        }
+        String baseDir = getLocalRootlessPath(System.getProperty("user.dir"));
 
         if (baseDir == null) {
             throw new RuntimeException("User dir property not set so current working directory not known!");
         }
+
         char sep = Path.DEFAULT_SEPARATOR;
         if (System.getProperty("xenon.separator") != null) {
             sep = System.getProperty("xenon.separator").charAt(0);
