@@ -39,7 +39,7 @@ public class FileSystemTest extends FileSystemTestParent {
 
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
-        return new LiveLocationConfig();
+        return new LiveLocationConfig(fileSystem);
     }
 
     @Override
