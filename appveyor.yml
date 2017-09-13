@@ -1,6 +1,6 @@
 version: '{branch}-{build}'
 build_script:
-  - cmd: ./gradlew.bat assemble
+  - cmd: ./gradlew.bat clean assemble
 test_script:
   - mkdir build\integrationTest & cd build\integrationTest & ..\..\src\liveTest\resources\scripts\create_symlinks.bat & cd ..\..
   - cmd: gradlew.bat liveTest -Dxenon.scheduler=local -Dxenon.scheduler.location=local:// -Dxenon.filesystem=file -Dxenon.filesystem.location=%HomeDrive%\projects\xenon -Dxenon.username=%USERNAME% -Dxenon.filesystem.basedir=\projects\xenon\build\integrationTest -Dxenon.separator=\ -Dxenon.filesystem.expected.workdir=\projects\xenon -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
@@ -9,13 +9,13 @@ on_finish:
   - "SET JDK=oraclejdk8"
   - .\gradlew.bat jacocoTestReport jacocoLiveTestReport
   - pip install codecov
-  - codecov -e OS,JDK -F unit -f C:\projects\xenon\build\reports\jacoco\test\jacocoTestReport.xml
+  - codecov -e OS,JDK -F unit -f build/reports/jacoco/test/jacocoTestReport.xml
   - ps: |
       $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
       Get-ChildItem "build/test-results/test/" -Filter *.xml | Foreach-Object{
         (New-Object 'System.Net.WebClient').UploadFile($url, $_.FullName)
       }
-  - codecov -e OS,JDK,INTEGRATION_TEST -F livelocal -f C:\projects\xenon\build\reports\jacoco\jacocoLiveTestReport\jacocoLiveTestReport.xml
+  - codecov -e OS,JDK,INTEGRATION_TEST -F livelocal -f build/reports/jacoco/jacocoLiveTestReport/jacocoLiveTestReport.xml
   - ps: |
       $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
       Get-ChildItem "build/test-results/liveTest/" -Filter *.xml | Foreach-Object{
