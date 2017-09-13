@@ -57,7 +57,7 @@ public class JCloudsFileSytem extends FileSystem {
     final String bucket;
     final BlobStoreContext context;
     final String adaptorName;
-    final String endPoint;
+    // final String endPoint;
 
     boolean open;
 
@@ -67,7 +67,7 @@ public class JCloudsFileSytem extends FileSystem {
         this.bucket = bucket;
         this.adaptorName = adaptorName;
         this.open = true;
-        this.endPoint = endPoint;
+        // this.endPoint = endPoint;
     }
 
     String toBucketEntry(Path path) {

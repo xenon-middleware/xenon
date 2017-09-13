@@ -39,6 +39,8 @@ tasks.withType(Test) {
 jacocoTestReport {
     description 'Generate coverage report of unit tests'
     group 'Code coverage reporting'
+    executionData test
+    sourceSets sourceSets.main
     reports {
         xml.enabled = true // codecov depends on xml format report
     }

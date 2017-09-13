@@ -54,9 +54,6 @@ import nl.esciencecenter.xenon.credentials.DefaultCredential;
 
 /**
  * FileSystem represent a (possibly remote) file system that can be used to access data.
- *
- * @version 1.0
- * @since 1.0
  */
 public abstract class FileSystem {
 
@@ -488,6 +485,17 @@ public abstract class FileSystem {
      */
     public Path getWorkingDirectory() {
         return workingDirectory;
+    }
+
+    /**
+     * Get the path separator used by this file system.
+     *
+     * The path separator is set when a FileSystem is created.
+     *
+     * @return the path separator used by this file system.
+     */
+    public String getPathSeparator() {
+        return "" + workingDirectory.getSeparator();
     }
 
     /**

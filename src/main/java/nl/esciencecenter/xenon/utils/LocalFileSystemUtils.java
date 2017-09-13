@@ -172,6 +172,9 @@ public class LocalFileSystemUtils {
      * example, providing "/user/local" will return "/" on Linux or OSX, but throw an exception on Windows; providing "C:\test" will return "C:" on Windows but
      * throw an exception on Linux or OSX.
      *
+     * If the provided string is <code>null</code> or empty, the default root element for this OS will be returned, i.e,. "/" on Linux or OSX and "C:" on
+     * windows.
+     *
      * @param p
      *            The absolute path for which to determine the root element.
      * @return The locally valid root element.
@@ -184,7 +187,7 @@ public class LocalFileSystemUtils {
 
         if (isWindows()) {
             if (path == null || path.isEmpty()) {
-                return "";
+                return "C:";
             }
 
             if (path.charAt(0) == '/') {
@@ -226,48 +229,6 @@ public class LocalFileSystemUtils {
     public static char getLocalSeparator() {
         return File.separatorChar;
     }
-
-    /**
-     * Return the locally valid root element of an <code>String</code> representation of an absolute path.
-     *
-     * Examples of a root elements are "/" or "C:". If the provided path does not contain a locally valid root element, an exception will be thrown. For
-     * example, providing "/user/local" will return "/" on Linux or OSX, but throw an exception on Windows; providing "C:\test" will return "C:" on Windows but
-     * throw an exception on Linux or OSX.
-     *
-     * @param p
-     *            The absolute path for which to determine the root element.
-     * @return The locally valid root element.
-     * @throws XenonException
-     *             If the provided <code>path</code> is not absolute, or does not contain a locally valid root.
-     */
-    // public static String getLocalRoot(String p) throws XenonException {
-    //
-    // String path = p;
-    //
-    // if (isWindows()) {
-    // if (path == null || path.isEmpty()) {
-    // return "";
-    // }
-    // if (!path.contains("/") && !path.contains("\\")) {
-    // // Windows URS, network drive
-    // return path;
-    // }
-    // if (path.charAt(0) == '/') {
-    // path = path.substring(1);
-    // }
-    // if (path.length() >= 2 && (path.charAt(1) == ':') && Character.isLetter(path.charAt(0))) {
-    // return path.substring(0, 2).toUpperCase();
-    // }
-    //
-    // throw new InvalidLocationException(NAME, "Path does not include drive name! " + path);
-    // }
-    //
-    // if (path == null || path.isEmpty() || (path.length() >= 1 && path.charAt(0) == '/')) {
-    // return "/";
-    // }
-    //
-    // throw new InvalidLocationException(NAME, "Path is not absolute! " + path);
-    // }
 
     /**
      * Returns all local FileSystems.

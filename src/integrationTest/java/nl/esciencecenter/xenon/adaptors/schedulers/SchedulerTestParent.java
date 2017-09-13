@@ -90,16 +90,19 @@ public abstract class SchedulerTestParent {
         assertEquals(locationConfig.getLocation(), location);
     }
 
+    // TODO: should be unit tests
     @Test
     public void test_isEmbedded() throws XenonException {
         assertEquals(locationConfig.isEmbedded(), description.isEmbedded());
     }
 
+    // TODO: should be unit tests
     @Test
     public void test_supportsBatch() throws XenonException {
         assertEquals(locationConfig.supportsBatch(), description.supportsBatch());
     }
 
+    // TODO: should be unit tests
     @Test
     public void test_supportsInteractive() throws XenonException {
         assertEquals(locationConfig.supportsInteractive(), description.supportsInteractive());
