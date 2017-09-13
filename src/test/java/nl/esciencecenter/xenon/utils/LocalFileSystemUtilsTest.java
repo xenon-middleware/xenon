@@ -248,14 +248,14 @@ public class LocalFileSystemUtilsTest {
     public void test_getLocalRoot_windows_null() throws XenonException {
         System.setProperty("os.name", "Windows7");
         String tmp = LocalFileSystemUtils.getLocalRoot(null);
-        assertTrue(tmp.isEmpty());
+        assertEquals("C:", tmp);
     }
 
     @Test
     public void test_getLocalRoot_windows_empty() throws XenonException {
         System.setProperty("os.name", "Windows7");
         String tmp = LocalFileSystemUtils.getLocalRoot("");
-        assertTrue(tmp.isEmpty());
+        assertEquals("C:", tmp);
     }
 
     @Test
@@ -272,19 +272,19 @@ public class LocalFileSystemUtilsTest {
         assertEquals("C:", tmp);
     }
 
-    @Test(expected=InvalidLocationException.class)
+    @Test(expected = InvalidLocationException.class)
     public void test_getLocalRoot_windows_tooShort() throws XenonException {
         System.setProperty("os.name", "Windows7");
         LocalFileSystemUtils.getLocalRoot("C");
     }
 
-    @Test(expected=InvalidLocationException.class)
+    @Test(expected = InvalidLocationException.class)
     public void test_getLocalRoot_windows_noColon() throws XenonException {
         System.setProperty("os.name", "Windows7");
         LocalFileSystemUtils.getLocalRoot("C/Users");
     }
 
-    @Test(expected=InvalidLocationException.class)
+    @Test(expected = InvalidLocationException.class)
     public void test_getLocalRoot_windows_noDrive() throws XenonException {
         System.setProperty("os.name", "Windows7");
         LocalFileSystemUtils.getLocalRoot("1:/Users");
@@ -318,7 +318,7 @@ public class LocalFileSystemUtilsTest {
         assertEquals("/", tmp);
     }
 
-    @Test(expected=InvalidLocationException.class)
+    @Test(expected = InvalidLocationException.class)
     public void test_getLocalRoot_linux_wrong() throws XenonException {
         System.setProperty("os.name", "Linux");
         LocalFileSystemUtils.getLocalRoot("Hello World");

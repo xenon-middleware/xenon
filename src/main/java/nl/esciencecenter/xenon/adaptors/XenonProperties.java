@@ -24,11 +24,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 
+import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.PropertyTypeException;
+import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
-import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.UnknownPropertyException;
 
 /**
  * Read-only properties implementation. Also contains some utility functions for getting typed properties.
@@ -45,7 +45,6 @@ public class XenonProperties {
 
     /** One giga is a kilo*kilo*kilo */
     private static final int GIGA = KILO * MEGA;
-
 
     /**
      * Creates empty mutable Map with sufficient initial capacity.
@@ -69,8 +68,8 @@ public class XenonProperties {
     private final Map<String, String> properties;
 
     /**
-     * Private constructor for XenonProperties using in copying and filtering. The <code>properties</code> parameter is assumed
-     * to only contain valid supported properties and have values of the correct type.
+     * Private constructor for XenonProperties using in copying and filtering. The <code>properties</code> parameter is assumed to only contain valid supported
+     * properties and have values of the correct type.
      *
      * @param propertyDescriptions
      *            a map containing a description of all supported properties.
@@ -91,8 +90,8 @@ public class XenonProperties {
     }
 
     /**
-     * Create a new XenonProperties that will support the properties in <code>supportedProperties</code>. All properties in
-     * <code>properties</code> will be added.
+     * Create a new XenonProperties that will support the properties in <code>supportedProperties</code>. All properties in <code>properties</code> will be
+     * added.
      *
      * @param supportedProperties
      *            the properties to support
@@ -101,10 +100,9 @@ public class XenonProperties {
      * @throws UnknownPropertyException
      *             if key is found in <code>properties</code> that is not listed in <code>supportedProperties</code>
      * @throws InvalidPropertyException
-     *             if a key from <code>properties</code> has a value that does not match the type as listed in
-     *             <code>supportedProperties</code>
+     *             if a key from <code>properties</code> has a value that does not match the type as listed in <code>supportedProperties</code>
      */
-    public XenonProperties(XenonPropertyDescription [] propertyDescriptions, Map<String, String> properties)
+    public XenonProperties(XenonPropertyDescription[] propertyDescriptions, Map<String, String> properties)
             throws UnknownPropertyException, InvalidPropertyException {
 
         this.propertyDescriptions = new HashMap<>(propertyDescriptions.length);
@@ -123,9 +121,9 @@ public class XenonProperties {
      * @param properties
      *            the properties to add.
      * @throws UnknownPropertyException
-     *            if the property can not be fonud
+     *             if the property can not be fonud
      * @throws InvalidPropertyException
-     *            if the type of the value does not match the expected type
+     *             if the type of the value does not match the expected type
      */
     private void addProperties(Map<String, String> properties) throws UnknownPropertyException, InvalidPropertyException {
 
@@ -150,7 +148,6 @@ public class XenonProperties {
             this.properties.put(key, value);
         }
     }
-
 
     private void checkType(XenonPropertyDescription description, String key, String value) throws InvalidPropertyException {
         Type t = description.getType();
@@ -181,8 +178,7 @@ public class XenonProperties {
                 throw new InvalidPropertyException(NAME, "Unknown property \"" + key + "=" + value + " provided");
             }
         } catch (IllegalArgumentException | InvalidPropertyException e) {
-            throw new InvalidPropertyException(NAME, "Property \"" + key + "\" has invalid value: " + value + " (expected " + t
-                    + ")", e);
+            throw new InvalidPropertyException(NAME, "Property \"" + key + "\" has invalid value: " + value + " (expected " + t + ")", e);
         }
     }
 
@@ -218,8 +214,8 @@ public class XenonProperties {
     /**
      * Retrieves the value of a property with the given name without checking its type.
      *
-     * If the property is not set, its default value will be returned. That the type of the value is not checked. Instead its
-     * <code>String</code> representation is always returned.
+     * If the property is not set, its default value will be returned. That the type of the value is not checked. Instead its <code>String</code> representation
+     * is always returned.
      *
      * @param name
      *            the name of the property.
@@ -279,8 +275,7 @@ public class XenonProperties {
      * @throws InvalidPropertyException
      *             if the property value cannot be converted into a boolean.
      */
-    public boolean getBooleanProperty(String name) throws UnknownPropertyException, PropertyTypeException,
-            InvalidPropertyException {
+    public boolean getBooleanProperty(String name) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
 
         String value = getProperty(name, Type.BOOLEAN);
 
@@ -314,8 +309,7 @@ public class XenonProperties {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected INTEGER)",
-                    e);
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected INTEGER)", e);
         }
     }
 
@@ -334,8 +328,7 @@ public class XenonProperties {
      * @throws InvalidPropertyException
      *             if the property value cannot be converted into a integer.
      */
-    public int getIntegerProperty(String name, int defaultValue) throws UnknownPropertyException, PropertyTypeException,
-            InvalidPropertyException {
+    public int getIntegerProperty(String name, int defaultValue) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
 
         String value = getProperty(name, Type.INTEGER);
 
@@ -346,8 +339,7 @@ public class XenonProperties {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected INTEGER)",
-                    e);
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected INTEGER)", e);
         }
     }
 
@@ -377,7 +369,7 @@ public class XenonProperties {
     }
 
     /**
-     * Retrieves the value of an natural number property (e.g. a long with value >= 0) with the given name.
+     * Retrieves the value of an natural number property (e.g. a long with value &ge; 0) with the given name.
      *
      * @return the value of an natural number property with the given name.
      * @param name
@@ -407,8 +399,6 @@ public class XenonProperties {
         }
     }
 
-
-
     /**
      * Retrieves the value of an double property with the given name.
      *
@@ -430,8 +420,7 @@ public class XenonProperties {
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException e) {
-            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected DOUBLE)",
-                    e);
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected DOUBLE)", e);
         }
     }
 
@@ -475,8 +464,8 @@ public class XenonProperties {
     /**
      * Retrieves the value of a size property with the given name.
      *
-     * Valid values for the property are a long or a long a long followed by either a K, M or G. These size modifiers multiply the
-     * value by 1024, 1024^2 and 1024^3 respectively.
+     * Valid values for the property are a long or a long a long followed by either a K, M or G. These size modifiers multiply the value by 1024, 1024^2 and
+     * 1024^3 respectively.
      *
      * @return the value of an size property with the given name.
      * @param name
@@ -505,8 +494,8 @@ public class XenonProperties {
     }
 
     /**
-     * Returns a copy of this XenonProperties that contains all properties except the properties that start with the given
-     * prefix. Note that these properties are also removed from the supported properties set.
+     * Returns a copy of this XenonProperties that contains all properties except the properties that start with the given prefix. Note that these properties
+     * are also removed from the supported properties set.
      *
      * @param prefix
      *            the prefix of the properties to exclude
@@ -519,15 +508,12 @@ public class XenonProperties {
     private XenonProperties filterUsingPredicate(Predicate<String> predicate) {
 
         // first determine the relevant subset of propertyDescriptions
-         Map<String, XenonPropertyDescription> remainingDescriptions =
-                 filterOnKey(propertyDescriptions, predicate);
+        Map<String, XenonPropertyDescription> remainingDescriptions = filterOnKey(propertyDescriptions, predicate);
 
-         Map<String, String> remainingProperties = filterOnKey(properties, key -> remainingDescriptions.containsKey(key));
+        Map<String, String> remainingProperties = filterOnKey(properties, key -> remainingDescriptions.containsKey(key));
 
-         return new XenonProperties(remainingDescriptions, remainingProperties);
+        return new XenonProperties(remainingDescriptions, remainingProperties);
     }
-
-
 
     private <K, V> Map<K, V> filterOnKey(Map<K, V> map, Predicate<K> predicate) {
         Map<K, V> remaining = emptyMap(map.size());
@@ -543,8 +529,8 @@ public class XenonProperties {
     }
 
     /**
-     * Returns a copy of this XenonProperties that contains all properties but clears the properties that start with the given
-     * prefix. Note that these properties are not removed from the supported properties set.
+     * Returns a copy of this XenonProperties that contains all properties but clears the properties that start with the given prefix. Note that these
+     * properties are not removed from the supported properties set.
      *
      * @param prefix
      *            the prefix of the properties to exclude
@@ -552,10 +538,9 @@ public class XenonProperties {
      */
     public XenonProperties clear(final String prefix) {
 
-        Map<String, XenonPropertyDescription> toInclude = filterOnKey(propertyDescriptions,
-                propertyKey -> !propertyKey.startsWith(prefix));
+        Map<String, XenonPropertyDescription> toInclude = filterOnKey(propertyDescriptions, propertyKey -> !propertyKey.startsWith(prefix));
 
-        Map<String,String> propertiesRemaining = filterOnKey(properties, key -> toInclude.containsKey(key));
+        Map<String, String> propertiesRemaining = filterOnKey(properties, key -> toInclude.containsKey(key));
 
         return new XenonProperties(propertyDescriptions, propertiesRemaining);
     }

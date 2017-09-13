@@ -161,7 +161,7 @@ public abstract class FileSystemTestParent {
         assertThat(target, is(expectedTarget));
     }
 
-    public Path resolve(String... path) throws XenonException {
+    public Path resolve(String path) throws XenonException {
         return testRoot.resolve(new Path(path));
     }
 
@@ -388,7 +388,7 @@ public abstract class FileSystemTestParent {
     @Test(expected = NoSuchPathException.class)
     public void test_createDirectory_nonExistingParent_throw() throws Exception {
         generateAndCreateTestDir();
-        fileSystem.createDirectory(testDir.resolve(new Path("aap", "noot")));
+        fileSystem.createDirectory(testDir.resolve(new Path(true, "aap", "noot")));
     }
 
     // @Test(expected=XenonException.class)
@@ -1374,7 +1374,7 @@ public abstract class FileSystemTestParent {
         generateAndCreateTestDir();
         Path file = createTestFile(testDir, "bla".getBytes());
         Path file2 = createNewTestFileName(testDir);
-        fileSystem.copy(new Path(file), fileSystem, new Path(file2), null, false);
+        fileSystem.copy(file, fileSystem, file2, null, false);
     }
 
     @Test(expected = NoSuchPathException.class)
@@ -1796,7 +1796,7 @@ public abstract class FileSystemTestParent {
 
         Path result = fileSystem.getWorkingDirectory();
 
-        assertEquals(expected, result);
+        assertEquals("Working dir not equal: " + expected + " != " + result, expected, result);
     }
 
     // TODO: Symbolic links in a cycle tests
