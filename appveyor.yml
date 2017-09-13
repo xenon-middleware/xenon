@@ -1,14 +1,13 @@
 version: '{branch}-{build}'
 build_script:
-  - cmd: ./gradlew.bat -i clean assemble
+  - cmd: ./gradlew.bat clean assemble
 test_script:
   - mkdir build\integrationTest & cd build\integrationTest & ..\..\src\liveTest\resources\scripts\create_symlinks.bat & cd ..\..
   - cmd: gradlew.bat test liveTest -Dxenon.scheduler=local -Dxenon.scheduler.location=local:// -Dxenon.filesystem=file -Dxenon.filesystem.location=%HomeDrive%\projects\xenon -Dxenon.username=%USERNAME% -Dxenon.filesystem.basedir=\projects\xenon\build\integrationTest -Dxenon.separator=\ -Dxenon.filesystem.expected.workdir=\projects\xenon -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
 on_finish:
   - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
   - "SET JDK=oraclejdk8"
-  - .\gradlew.bat -i jacocoTestReport 
-  - .\gradlew.bat -i jacocoLiveTestReport
+  - .\gradlew.bat jacocoTestReport jacocoLiveTestReport
   - pip install codecov
   - codecov -e OS,JDK -F unit -f build/reports/jacoco/test/jacocoTestReport.xml
   - ps: |
