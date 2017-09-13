@@ -36,8 +36,6 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
  */
 public class S3FileAdaptor extends FileAdaptor {
 
-    /** The default SSH port */
-    protected static final int DEFAULT_PORT = 21;
 
     /** A description of this adaptor */
     private static final String ADAPTOR_DESCRIPTION = "The JClouds adaptor uses Apache JClouds to talk to s3 and others";
