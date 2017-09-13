@@ -73,8 +73,6 @@ public class FtpFileAdaptor extends FileAdaptor {
             throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
         }
 
-        // FtpLocation ftpLocation = FtpLocation.parse(location);
-
         FTPClient ftpClient = new FTPClient();
         ftpClient.setListHiddenFiles(true);
 

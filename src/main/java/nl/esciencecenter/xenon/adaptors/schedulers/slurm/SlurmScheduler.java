@@ -464,7 +464,7 @@ public class SlurmScheduler extends ScriptingScheduler {
 
         Map<String, Map<String, String>> info = getSinfoInfo(targetQueueNames);
 
-        return getQueueStatusses(info, targetQueueNames);
+        return getQueueStatuses(info, targetQueueNames);
     }
 
 //        QueueStatus[] result = new QueueStatus[targetQueueNames.length];

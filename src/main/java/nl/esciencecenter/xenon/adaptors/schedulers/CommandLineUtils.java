@@ -15,13 +15,15 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
-//import nl.esciencecenter.xenon.util.Utils;
-
 /**
  * Some simple utilities for handling and creating scripts and command lines.
  *
  */
 public final class CommandLineUtils {
+
+    private CommandLineUtils() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * Concatinate a series of <code>String</code>s using a <code>StringBuilder</code>.

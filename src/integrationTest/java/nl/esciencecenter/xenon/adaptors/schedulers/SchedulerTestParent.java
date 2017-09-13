@@ -446,7 +446,7 @@ public abstract class SchedulerTestParent {
     }
 
     @Test
-    public void test_getJobStatusses_noJobs() throws XenonException {
+    public void test_getJobStatuses_noJobs() throws XenonException {
 
         // Get the status of no jobs
         JobStatus[] result = scheduler.getJobStatuses();
@@ -455,7 +455,7 @@ public abstract class SchedulerTestParent {
     }
 
     @Test
-    public void test_getJobStatusses_nonExistingJobs() throws XenonException {
+    public void test_getJobStatuses_nonExistingJobs() throws XenonException {
 
         // Get the status of no jobs
         JobStatus[] result = scheduler.getJobStatuses("aap", "noot");
@@ -472,7 +472,7 @@ public abstract class SchedulerTestParent {
     }
 
     @Test
-    public void test_getJobStatusses_nonExistingJobsWithNull() throws XenonException {
+    public void test_getJobStatuses_nonExistingJobsWithNull() throws XenonException {
 
         // Get the status of no jobs
         JobStatus[] result = scheduler.getJobStatuses("aap", null, "noot");
@@ -491,7 +491,7 @@ public abstract class SchedulerTestParent {
     }
 
     @Test
-    public void test_getJobStatusses_existingJobs() throws XenonException {
+    public void test_getJobStatuses_existingJobs() throws XenonException {
 
         assumeTrue(description.supportsBatch());
 
@@ -549,12 +549,12 @@ public abstract class SchedulerTestParent {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void test_getQueueStatusses_null() throws XenonException {
+    public void test_getQueueStatuses_null() throws XenonException {
         scheduler.getQueueStatuses((String[]) null);
     }
 
     @Test
-    public void test_getQueueStatusses_empty() throws XenonException {
+    public void test_getQueueStatuses_empty() throws XenonException {
         String[] queueNames = locationConfig.getQueueNames();
 
         assumeTrue(queueNames != null);
@@ -573,7 +573,7 @@ public abstract class SchedulerTestParent {
     }
 
     @Test
-    public void test_getQueueStatusses_allQueues() throws XenonException {
+    public void test_getQueueStatuses_allQueues() throws XenonException {
         String[] queueNames = locationConfig.getQueueNames();
 
         assumeTrue(queueNames != null);
@@ -592,7 +592,7 @@ public abstract class SchedulerTestParent {
     }
 
     @Test
-    public void test_getQueueStatusses_withNull() throws XenonException {
+    public void test_getQueueStatuses_withNull() throws XenonException {
         String[] queueNames = locationConfig.getQueueNames();
 
         assumeTrue(queueNames != null);

@@ -32,12 +32,6 @@ import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil.PasswordProvider;
 public class SSHUtilTest {
 
     @Test
-    public void test_constuctor() throws IOException {
-        // For coverage only
-        new SSHUtil();
-    }
-
-    @Test
     public void test_passwordProvider() throws IOException {
         PasswordProvider p = new PasswordProvider("Hello World".toCharArray());
         assertEquals("Hello World", p.getPassword(null));

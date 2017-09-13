@@ -606,12 +606,9 @@ public abstract class FileSystem {
 
         Path parent = absolute.getParent();
 
-        if (parent != null) {
-
-            if (!exists(parent)) {
-                // Recursive call
-                createDirectories(parent);
-            }
+        if (parent != null && !exists(parent)) {
+            // Recursive call
+            createDirectories(parent);
         }
 
         createDirectory(absolute);
@@ -710,13 +707,13 @@ public abstract class FileSystem {
      */
     public void delete(Path path, boolean recursive) throws XenonException {
 
-        path = toAbsolutePath(path);
+        Path absPath = toAbsolutePath(path);
 
-        assertPathExists(path);
+        assertPathExists(absPath);
 
-        if (getAttributes(path).isDirectory()) {
+        if (getAttributes(absPath).isDirectory()) {
 
-            Iterable<PathAttributes> itt = list(path, false);
+            Iterable<PathAttributes> itt = list(absPath, false);
 
             if (recursive) {
                 for (PathAttributes p : itt) {
@@ -724,13 +721,13 @@ public abstract class FileSystem {
                 }
             } else {
                 if (itt.iterator().hasNext()) {
-                    throw new DirectoryNotEmptyException(getAdaptorName(), "Directory not empty: " + path.toString());
+                    throw new DirectoryNotEmptyException(getAdaptorName(), "Directory not empty: " + absPath.toString());
                 }
             }
 
-            deleteDirectory(path);
+            deleteDirectory(absPath);
         } else {
-            deleteFile(path);
+            deleteFile(absPath);
         }
     }
 
@@ -1241,8 +1238,6 @@ public abstract class FileSystem {
                 Path dst = destination.resolve(rel);
 
                 copyFile(p.getPath(), destinationFS, dst, mode, callback);
-                // bytesCopied += p.getSize();
-                // callback.setBytesCopied(bytesCopied);
             }
         }
     }
@@ -1354,15 +1349,10 @@ public abstract class FileSystem {
      *
      * @return a {@link String} that identifies this copy and be used to inspect its progress.
      *
-     * @throws NotConnectedException
-     *             If file system is closed.
-     * @throws XenonException
-     *             if an I/O error occurred.
      * @throws IllegalArgumentException
      *             If source, destinationFS, destination or mode is null.
      */
-    public synchronized String copy(final Path source, final FileSystem destinationFS, final Path destination, final CopyMode mode, final boolean recursive)
-            throws XenonException {
+    public synchronized String copy(final Path source, final FileSystem destinationFS, final Path destination, final CopyMode mode, final boolean recursive) {
 
         if (source == null) {
             throw new IllegalArgumentException("Source path is null");
@@ -1380,7 +1370,7 @@ public abstract class FileSystem {
             throw new IllegalArgumentException("Copy mode is null!");
         }
 
-        String ID = getNextCopyID();
+        String copyID = getNextCopyID();
 
         final CopyCallback callback = new CopyCallback();
 
@@ -1394,8 +1384,8 @@ public abstract class FileSystem {
             return null;
         });
 
-        pendingCopies.put(ID, new PendingCopy(future, callback));
-        return ID;
+        pendingCopies.put(copyID, new PendingCopy(future, callback));
+        return copyID;
     }
 
     /**

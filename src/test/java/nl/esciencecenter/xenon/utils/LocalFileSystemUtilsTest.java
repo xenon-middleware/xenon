@@ -30,12 +30,6 @@ import nl.esciencecenter.xenon.XenonException;
 public class LocalFileSystemUtilsTest {
 
     @Test
-    public void test_constructor() {
-        // For coverage
-        new LocalFileSystemUtils();
-    }
-
-    @Test
     public void test_osUnset() {
 
         Properties p = System.getProperties();

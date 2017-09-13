@@ -328,10 +328,6 @@ public class PathAttributesImplementation implements PathAttributes {
     }
 
 
-//    public String toString() {
-//        return path.getAbsolutePath();
-//    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

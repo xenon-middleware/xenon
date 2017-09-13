@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.IncompatibleVersionException;
 
 /**
  * @version 1.0
@@ -60,13 +59,12 @@ public class SlurmSetup {
         LOGGER.debug("Created new SlurmConfig. version = \"{}\", accounting available: {}", version, accountingAvailable);
     }
 
-    public boolean checkVersion() throws IncompatibleVersionException {
+    public boolean checkVersion() {
         for (String supportedVersion : SUPPORTED_VERSIONS) {
             if (version.startsWith(supportedVersion)) {
                 return true;
             }
         }
-
         return false;
     }
 

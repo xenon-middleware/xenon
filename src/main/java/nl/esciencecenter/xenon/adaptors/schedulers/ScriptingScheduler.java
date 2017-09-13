@@ -90,7 +90,7 @@ public abstract class ScriptingScheduler extends Scheduler {
         return subFileSystem.getWorkingDirectory();
     }
 
-    protected QueueStatus[] getQueueStatusses(Map<String, Map<String, String>> all, String... queueNames) {
+    protected QueueStatus[] getQueueStatuses(Map<String, Map<String, String>> all, String... queueNames) {
 
         QueueStatus[] result = new QueueStatus[queueNames.length];
 

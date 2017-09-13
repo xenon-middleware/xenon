@@ -214,7 +214,7 @@ public class TorqueScheduler extends ScriptingScheduler {
             queueNames = allMap.keySet().toArray(new String[allMap.size()]);
         }
 
-        return getQueueStatusses(allMap, queueNames);
+        return getQueueStatuses(allMap, queueNames);
 //
 //        QueueStatus[] result = new QueueStatus[queueNames.length];
 //

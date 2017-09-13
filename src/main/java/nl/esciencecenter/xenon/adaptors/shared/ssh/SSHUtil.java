@@ -71,16 +71,15 @@ public class SSHUtil {
         }
     }
 
-    public static SshClient createSSHClient(boolean loadKnownHosts, boolean loadSSHConfig, boolean useSSHAgent, boolean useAgentForwarding) {
+    private SSHUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    public static SshClient createSSHClient(boolean loadSSHConfig, boolean useSSHAgent, boolean useAgentForwarding) {
 
         SshClient client = SshClient.setUpDefaultClient();
 
         client.setServerKeyVerifier(AcceptAllServerKeyVerifier.INSTANCE);
-
-        // if (loadKnownHosts) {
-        // client.setServerKeyVerifier(new
-        // DefaultKnownHostsServerKeyVerifier(RejectAllServerKeyVerifier.INSTANCE));
-        // }
 
         if (loadSSHConfig) {
             client.setHostConfigEntryResolver(DefaultConfigFileHostEntryResolver.INSTANCE);

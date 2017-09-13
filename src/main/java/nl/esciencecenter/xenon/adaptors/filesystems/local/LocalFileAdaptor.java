@@ -113,10 +113,8 @@ public class LocalFileAdaptor extends FileAdaptor {
         String root = getLocalRoot(location);
         String path = getLocalRootlessPath(location);
 
-        if (credential != null) {
-            if (!(credential instanceof DefaultCredential)) {
-                throw new InvalidCredentialException(ADAPTOR_NAME, "Adaptor does not support this credential!");
-            }
+        if (credential != null && !(credential instanceof DefaultCredential)) {
+            throw new InvalidCredentialException(ADAPTOR_NAME, "Adaptor does not support this credential!");
         }
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);

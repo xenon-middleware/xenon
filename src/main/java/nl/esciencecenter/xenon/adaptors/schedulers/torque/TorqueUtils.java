@@ -52,6 +52,10 @@ final class TorqueUtils {
 
     private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_RESOURCES };
 
+    private TorqueUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static void verifyJobDescription(JobDescription description) throws XenonException {
         ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
 
@@ -126,13 +130,13 @@ final class TorqueUtils {
         StringBuilder stringBuilder = new StringBuilder(500);
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
-        script.format("#!/bin/sh\n");
+        script.format("%s\n", "#!/bin/sh");
 
         // set shell to sh
-        script.format("#PBS -S /bin/sh\n");
+        script.format("%s\n", "#PBS -S /bin/sh");
 
         // set name of job to xenon
-        script.format("#PBS -N xenon\n");
+        script.format("%s\n", "#PBS -N xenon");
 
         // set working directory
         if (description.getWorkingDirectory() != null) {
@@ -174,7 +178,7 @@ final class TorqueUtils {
 
         script.close();
 
-        LOGGER.debug("Created job script:\n{}", stringBuilder);
+        LOGGER.debug("Created job script:%n{}", stringBuilder);
 
         return stringBuilder.toString();
     }

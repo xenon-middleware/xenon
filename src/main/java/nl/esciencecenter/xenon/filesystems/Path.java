@@ -112,7 +112,6 @@ public class Path implements Iterable<Path> {
             this.elements = new ArrayList<>(0);
         } else {
             this.isAbsolute = (path.indexOf(separator) == 0);
-
             StringTokenizer tok = new StringTokenizer(path, "" + separator);
 
             this.elements = new ArrayList<>(tok.countTokens());
@@ -122,6 +121,49 @@ public class Path implements Iterable<Path> {
             }
         }
     }
+
+    /**
+     * Create a new Path by joining the provided <code>paths</code>.
+     *
+     * If the <code>paths</code> is <code>null</code> the resulting Path is empty.
+     *
+     * @param paths
+     *            the path elements to use.
+     */
+    // public Path(Path... paths) {
+    //
+    // // sep is declared here, as opposed to inside the for loop below, because we
+    // // determine one separator value from the provided 'paths'
+    // Character sep = null;
+    // boolean isAbsoluteSet = false;
+    //
+    // elements = new ArrayList<>();
+    //
+    // for (Path path : paths) {
+    // if (path != null) {
+    // if (!isAbsoluteSet) {
+    // isAbsolute = path.isAbsolute;
+    // isAbsoluteSet = true;
+    // }
+    // if (!path.isEmpty()) {
+    // elements.addAll(path.elements);
+    // }
+    // // if sep has not been determined yet, see if you can derive it
+    // // from the current 'path'
+    // if (sep == null) {
+    // sep = path.separator;
+    // }
+    // }
+    // }
+    //
+    // // If we were unable to determine the separator from any of the provided 'paths',
+    // // use the default value, or else use whatever value was found.
+    // if (sep == null) {
+    // separator = DEFAULT_SEPARATOR;
+    // } else {
+    // separator = sep;
+    // }
+    // }
 
     /**
      * Create a new Path using the given path elements and the default separator.

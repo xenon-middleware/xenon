@@ -193,34 +193,11 @@ public class GridEngineScheduler extends ScriptingScheduler {
             queueNames = getQueueNames();
         }
 
-//        QueueStatus[] result = new QueueStatus[queueNames.length];
-
         String qstatOutput = runCheckedCommand(null, "qstat", "-xml", "-g", "c");
 
         Map<String, Map<String, String>> allMap = parser.parseQueueInfos(qstatOutput);
 
-        return getQueueStatusses(allMap, queueNames);
-//
-//
-//        for (int i = 0; i < queueNames.length; i++) {
-//            if (queueNames[i] == null) {
-//                result[i] = null;
-//            } else {
-//                //state for only the requested queue
-//                Map<String, String> map = allMap.get(queueNames[i]);
-//
-//                if (map == null || map.isEmpty()) {
-//                    Exception exception = new NoSuchQueueException(ADAPTOR_NAME,
-//                            "Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
-//                    result[i] = new QueueStatusImplementation(this, queueNames[i], exception, null);
-//                } else {
-//                    result[i] = new QueueStatusImplementation(this, queueNames[i], null, map);
-//                }
-//            }
-//        }
-//
-//        return result;
-
+        return getQueueStatuses(allMap, queueNames);
     }
 
     @Override
@@ -397,11 +374,6 @@ public class GridEngineScheduler extends ScriptingScheduler {
         }
         return result;
     }
-
-//    @Override
-//    public Streams getStreams(JobHandle job) throws XenonException {
-//        throw new XenonException(ADAPTOR_NAME, "does not support interactive jobs");
-//    }
 
     @Override
     public boolean isOpen() throws XenonException {

@@ -96,7 +96,7 @@ public class JobQueueScheduler extends Scheduler {
 
     private final AtomicLong jobID = new AtomicLong(0L);
 
-    private final ArrayList<List<JobExecutor>> queues = new ArrayList<List<JobExecutor>>();
+    private final ArrayList<List<JobExecutor>> queues = new ArrayList<>();
 
     public JobQueueScheduler(String uniqueID, String adaptorName, String location, InteractiveProcessFactory factory,
             FileSystem filesystem, Path workingDirectory, int multiQThreads, long pollingDelay, XenonProperties properties) throws BadParameterException {
@@ -175,18 +175,6 @@ public class JobQueueScheduler extends Scheduler {
         return out.toArray(new String[out.size()]);
     }
 
-    //    private List<JobExecutor> findQueue(String queueName) throws XenonException {
-    //
-    //        if (queueName == null || SINGLE_QUEUE_NAME.equals(queueName)) {
-    //            return singleQ;
-    //        } else if (MULTI_QUEUE_NAME.equals(queueName)) {
-    //            return multiQ;
-    //        } else if (UNLIMITED_QUEUE_NAME.equals(queueName)) {
-    //            return unlimitedQ;
-    //        } else {
-    //            throw new XenonException(adaptorName, "Queue \"" + queueName + "\" does not exist!");
-    //        }
-    //    }
 
     private JobExecutor findJob(List<JobExecutor> queue, String jobIdentifier) throws XenonException {
 
@@ -260,26 +248,6 @@ public class JobQueueScheduler extends Scheduler {
         return status;
     }
 
-//	public JobStatus[] getJobStatuses(String... jobs) {
-//
-//		LOGGER.debug("{}: getJobStatuses for jobs {}", adaptorName, jobs);
-//
-//		JobStatus[] result = new JobStatus[jobs.length];
-//
-//		for (int i = 0; i < jobs.length; i++) {
-//			try {
-//				if (jobs[i] != null) {
-//					result[i] = getJobStatus(jobs[i]);
-//				} else {
-//					result[i] = null;
-//				}
-//			} catch (XenonException e) {
-//				result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, false, null);
-//			}
-//		}
-//
-//		return result;
-//	}
 
     public JobStatus waitUntilDone(String jobIdentifier, long timeout) throws XenonException {
         LOGGER.debug("{}: Waiting for job {} for {} ms.", adaptorName, jobIdentifier, timeout);
@@ -500,11 +468,6 @@ public class JobQueueScheduler extends Scheduler {
 
         return result;
     }
-
-    //    public Streams getStreams(JobHandle job) throws XenonException {
-    //        checkScheduler(job.getScheduler());
-    //        return findJob(job).getStreams();
-    //    }
 
     public void end() {
         singleExecutor.shutdownNow();

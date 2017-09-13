@@ -49,12 +49,6 @@ public class FtpInputStream extends InputStream {
         if (!completedPendingFtpCommand) {
             ftpClient.completePendingCommand();
             completedPendingFtpCommand = true;
-//
-//            int replyCode = ftpClient.getReplyCode();
-//            String replyString = ftpClient.getReplyString();
-//
-//            System.out.println("**REPLY " + replyCode + " " + replyString);
-//
             ftpClient.disconnect();
         }
     }
