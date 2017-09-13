@@ -9,13 +9,13 @@ on_finish:
   - "SET JDK=oraclejdk8"
   - .\gradlew.bat jacocoTestReport jacocoLiveTestReport
   - pip install codecov
-  - codecov -e OS,JDK -F unit -f build/reports/jacoco/test/jacocoTestReport.xml
+  - codecov -e OS,JDK -F unit -f C:\projects\xenon\build\reports\jacoco\test\jacocoTestReport.xml
   - ps: |
       $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
       Get-ChildItem "build/test-results/test/" -Filter *.xml | Foreach-Object{
         (New-Object 'System.Net.WebClient').UploadFile($url, $_.FullName)
       }
-  - codecov -e OS,JDK,INTEGRATION_TEST -F livelocal -f build/reports/jacoco/jacocoLiveTestReport/jacocoLiveTestReport.xml
+  - codecov -e OS,JDK,INTEGRATION_TEST -F livelocal -f C:\projects\xenon\build\reports\jacoco\jacocoLiveTestReport\jacocoLiveTestReport.xml
   - ps: |
       $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
       Get-ChildItem "build/test-results/liveTest/" -Filter *.xml | Foreach-Object{
