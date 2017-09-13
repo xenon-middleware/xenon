@@ -7,7 +7,8 @@ test_script:
 on_finish:
   - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
   - "SET JDK=oraclejdk8"
-  - .\gradlew.bat jacocoTestReport jacocoLiveTestReport
+  - .\gradlew.bat jacocoTestReport 
+  - .\gradlew.bat jacocoLiveTestReport
   - pip install codecov
   - codecov -e OS,JDK -F unit -f build/reports/jacoco/test/jacocoTestReport.xml
   - ps: |
