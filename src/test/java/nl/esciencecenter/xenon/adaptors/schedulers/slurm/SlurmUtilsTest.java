@@ -107,7 +107,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -128,7 +128,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertTrue(result.isRunning());
         assertFalse(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -150,7 +150,7 @@ public class SlurmUtilsTest {
         assertTrue(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -171,7 +171,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -194,7 +194,7 @@ public class SlurmUtilsTest {
         assertFalse(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -235,7 +235,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -255,7 +255,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertTrue(result.isRunning());
         assertFalse(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -276,7 +276,7 @@ public class SlurmUtilsTest {
         assertTrue(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -296,7 +296,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -318,7 +318,7 @@ public class SlurmUtilsTest {
         assertFalse(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -340,7 +340,7 @@ public class SlurmUtilsTest {
         assertFalse(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -378,7 +378,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertFalse(result.isRunning());
         assertFalse(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -398,7 +398,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertTrue(result.isRunning());
         assertFalse(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -441,7 +441,7 @@ public class SlurmUtilsTest {
 
         assertNotNull(result);
         assertEquals(queueName, result.getQueueName());
-        assertEquals(queueInfo, result.getSchedulerSpecficInformation());
+        assertEquals(queueInfo, result.getSchedulerSpecificInformation());
         assertEquals(scheduler, result.getScheduler());
     }
 

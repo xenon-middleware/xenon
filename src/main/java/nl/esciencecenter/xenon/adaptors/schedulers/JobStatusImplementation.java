@@ -147,7 +147,7 @@ public class JobStatusImplementation implements JobStatus {
      *
      * @return scheduler specific information on the Job.
      */
-    public Map<String, String> getSchedulerSpecficInformation() {
+    public Map<String, String> getSchedulerSpecificInformation() {
         return schedulerSpecificInformation;
     }
 

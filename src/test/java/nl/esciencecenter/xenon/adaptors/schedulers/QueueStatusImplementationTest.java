@@ -70,7 +70,7 @@ public class QueueStatusImplementationTest {
         MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
         XenonException e = new XenonException("adaptor","aap");
         QueueStatus stat = new QueueStatusImplementation(s, "Q", e, tmp);
-        assertEquals(tmp,  stat.getSchedulerSpecficInformation());
+        assertEquals(tmp,  stat.getSchedulerSpecificInformation());
     }
 
     @Test
