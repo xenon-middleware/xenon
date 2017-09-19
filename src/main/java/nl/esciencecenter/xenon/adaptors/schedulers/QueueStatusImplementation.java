@@ -108,7 +108,7 @@ public class QueueStatusImplementation implements QueueStatus {
      *
      * @return Scheduler specific information on the queue.
      */
-    public Map<String, String> getSchedulerSpecficInformation() {
+    public Map<String, String> getSchedulerSpecificInformation() {
         return schedulerSpecificInformation;
     }
 

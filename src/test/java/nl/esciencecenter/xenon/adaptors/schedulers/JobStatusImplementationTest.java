@@ -112,7 +112,7 @@ public class JobStatusImplementationTest {
 
         String id = "JOB-42";
         JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, false, false, tmp);
-        assertEquals(tmp, s.getSchedulerSpecficInformation());
+        assertEquals(tmp, s.getSchedulerSpecificInformation());
     }
 
     @Test

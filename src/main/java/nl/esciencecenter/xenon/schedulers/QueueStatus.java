@@ -69,5 +69,5 @@ public interface QueueStatus {
      *
      * @return Scheduler specific information on the queue.
      */
-    Map<String, String> getSchedulerSpecficInformation();
+    Map<String, String> getSchedulerSpecificInformation();
 }
