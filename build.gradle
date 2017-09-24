@@ -54,6 +54,7 @@ dependencies {
 //    compile group: 'org.apache.jclouds', name: 'jclouds-blobstore', version: '2.0.2'
     compile group: 'org.apache.jclouds.api', name: 's3', version: '2.0.2'
     compile group: 'org.apache.jclouds.provider', name: 'aws-s3', version: '2.0.2'
+    compile 'com.amazonaws:aws-java-sdk-batch:1.11.202'
 
     compile group: 'org.apache.sshd', name: 'sshd-core', version: '1.4.0'
     compile group: 'commons-net', name: 'commons-net', version: apacheCommonsNetVersion

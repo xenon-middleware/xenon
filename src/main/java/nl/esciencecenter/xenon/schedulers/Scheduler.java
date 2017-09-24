@@ -30,6 +30,7 @@ import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
+import nl.esciencecenter.xenon.adaptors.schedulers.awsbatch.AWSBatchSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor;
@@ -58,6 +59,7 @@ public abstract class Scheduler {
         addAdaptor(new GridEngineSchedulerAdaptor());
         addAdaptor(new SlurmSchedulerAdaptor());
         addAdaptor(new TorqueSchedulerAdaptor());
+        addAdaptor(new AWSBatchSchedulerAdaptor());
     }
 
     private static void addAdaptor(SchedulerAdaptor adaptor) {
