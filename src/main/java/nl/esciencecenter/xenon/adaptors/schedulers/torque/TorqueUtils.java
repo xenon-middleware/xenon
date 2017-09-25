@@ -161,7 +161,7 @@ final class TorqueUtils {
         script.format("#PBS -l nodes=%d:ppn=%d\n", description.getNodeCount(), description.getProcessesPerNode());
 
         // add maximum runtime in hour:minute:second format (converted from minutes in description)
-        script.format("#PBS -l walltime=%02d:%02d:00\n", description.getMaxTime() / MINUTES_PER_HOUR, description.getMaxTime() % MINUTES_PER_HOUR);
+        script.format("#PBS -l walltime=%02d:%02d:00\n", description.getMaxRuntime() / MINUTES_PER_HOUR, description.getMaxRuntime() % MINUTES_PER_HOUR);
 
         for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
             script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());

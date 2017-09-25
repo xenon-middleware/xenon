@@ -85,8 +85,8 @@ public class JobDescriptionTest {
         p = j.getNodeCount();
         assertTrue(p == 33);
 
-        j.setMaxTime(500);
-        p = j.getMaxTime();
+        j.setMaxRuntime(500);
+        p = j.getMaxRuntime();
         assertTrue(p == 500);
 
         j.setArguments("a", "b", "c");
@@ -303,9 +303,9 @@ public class JobDescriptionTest {
         JobDescription other = new JobDescription();
         assertTrue(j.equals(other));
 
-        other.setMaxTime(42);
+        other.setMaxRuntime(42);
         assertFalse(j.equals(other));
-        other.setMaxTime(15);
+        other.setMaxRuntime(15);
         assertTrue(j.equals(other));
 
         other.setNodeCount(2);

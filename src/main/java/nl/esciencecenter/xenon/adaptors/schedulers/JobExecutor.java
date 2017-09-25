@@ -303,7 +303,7 @@ public class JobExecutor implements Runnable {
         }
 
         long endTime = 0;
-        int maxTime = description.getMaxTime();
+        int maxTime = description.getMaxRuntime();
 
         if (maxTime > 0) {
             endTime = System.currentTimeMillis() + maxTime * MILLISECONDS_IN_MINUTE;

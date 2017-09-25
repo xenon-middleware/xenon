@@ -320,7 +320,7 @@ public class JobQueueScheduler extends Scheduler {
             throw new InvalidJobDescriptionException(adaptorName, "Illegal processes per node count: " + processesPerNode);
         }
 
-        int maxTime = description.getMaxTime();
+        int maxTime = description.getMaxRuntime();
 
         if (maxTime < 0) {
             throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);

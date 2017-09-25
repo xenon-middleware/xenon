@@ -357,7 +357,7 @@ public final class SlurmUtils {
         arguments.add("--ntasks-per-node=" +description.getProcessesPerNode());
 
         //add maximum runtime
-        arguments.add("--time=" +description.getMaxTime());
+        arguments.add("--time=" +description.getMaxRuntime());
 
         arguments.add(description.getExecutable());
         arguments.addAll(description.getArguments());
@@ -392,7 +392,7 @@ public final class SlurmUtils {
         script.format("#SBATCH --ntasks-per-node=%d\n", description.getProcessesPerNode());
 
         //add maximum runtime
-        script.format("#SBATCH --time=%d\n", description.getMaxTime());
+        script.format("#SBATCH --time=%d\n", description.getMaxRuntime());
 
         if (description.getStdin() != null) {
             script.format("#SBATCH --input='%s'\n", description.getStdin());

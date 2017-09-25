@@ -219,7 +219,7 @@ public class JobQueueSchedulerTest {
 
         JobDescription job = new JobDescription();
         job.setExecutable("/bin/aap");;
-        job.setMaxTime(-1);
+        job.setMaxRuntime(-1);
 
         try {
             s.submitBatchJob(job);

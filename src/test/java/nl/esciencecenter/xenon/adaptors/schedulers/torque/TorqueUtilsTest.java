@@ -65,7 +65,7 @@ public class TorqueUtilsTest {
         description.addEnvironment("some.more", "environment value with spaces");
         description.addJobOption(TorqueUtils.JOB_OPTION_RESOURCES, "list-of-resources");
         description.setExecutable("/bin/executable");
-        description.setMaxTime(100);
+        description.setMaxRuntime(100);
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
         description.setQueueName("the.queue");
@@ -99,7 +99,7 @@ public class TorqueUtilsTest {
         description.addEnvironment("some", "environment.value");
         description.addJobOption(TorqueUtils.JOB_OPTION_RESOURCES, "list-of-resources");
         description.setExecutable("/bin/executable");
-        description.setMaxTime(100);
+        description.setMaxRuntime(100);
         description.setNodeCount(4);
         description.setProcessesPerNode(10);
         description.setQueueName("the.queue");
@@ -164,7 +164,7 @@ public class TorqueUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //GridEngine specific info
 
         TorqueUtils.verifyJobDescription(description);
@@ -178,7 +178,7 @@ public class TorqueUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //GridEngine specific info
         description.addJobOption(TorqueUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
 
@@ -196,7 +196,7 @@ public class TorqueUtilsTest {
         description.setExecutable(null);
         description.setNodeCount(0);
         description.setProcessesPerNode(0);
-        description.setMaxTime(0);
+        description.setMaxRuntime(0);
         //GridEngine specific info
 
         TorqueUtils.verifyJobDescription(description);
@@ -218,7 +218,7 @@ public class TorqueUtilsTest {
 
         //verify the standard settings are also checked
         description.setExecutable("bin/bla");
-        description.setMaxTime(0);
+        description.setMaxRuntime(0);
 
         TorqueUtils.verifyJobDescription(description);
     }

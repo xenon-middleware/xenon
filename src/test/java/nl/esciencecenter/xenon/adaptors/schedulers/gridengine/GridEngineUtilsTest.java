@@ -62,7 +62,7 @@ public class GridEngineUtilsTest {
         description.addEnvironment("some.more", "environment value with spaces");
         description.addJobOption(GridEngineUtils.JOB_OPTION_RESOURCES, "list-of-resources");
         description.setExecutable("/bin/executable");
-        description.setMaxTime(100);
+        description.setMaxRuntime(100);
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
         description.setQueueName("the.queue");
@@ -92,7 +92,7 @@ public class GridEngineUtilsTest {
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/executable");
         description.setArguments("some", "arguments");
-        description.setMaxTime(100);
+        description.setMaxRuntime(100);
         description.setNodeCount(4);
         description.setProcessesPerNode(10);
         description.setQueueName("the.queue");
@@ -211,7 +211,7 @@ public class GridEngineUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //GridEngine specific info
 
         GridEngineUtils.verifyJobDescription(description);
@@ -225,7 +225,7 @@ public class GridEngineUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //GridEngine specific info
         description.addJobOption(GridEngineUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
 
@@ -243,7 +243,7 @@ public class GridEngineUtilsTest {
         description.setExecutable(null);
         description.setNodeCount(0);
         description.setProcessesPerNode(0);
-        description.setMaxTime(0);
+        description.setMaxRuntime(0);
         //GridEngine specific info
 
         GridEngineUtils.verifyJobDescription(description);
@@ -265,7 +265,7 @@ public class GridEngineUtilsTest {
 
         //verify the standard settings are also checked
         description.setExecutable("bin/bla");
-        description.setMaxTime(0);
+        description.setMaxRuntime(0);
 
         GridEngineUtils.verifyJobDescription(description);
     }
@@ -278,7 +278,7 @@ public class GridEngineUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(2);
         description.setProcessesPerNode(2);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //GridEngine specific info
         description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
         description.setQueueName("some.queue");
@@ -294,7 +294,7 @@ public class GridEngineUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(2);
         description.setProcessesPerNode(2);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //GridEngine specific info
         description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
         description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_SLOTS, "11");
@@ -310,7 +310,7 @@ public class GridEngineUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(2);
         description.setProcessesPerNode(2);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //GridEngine specific info
         description.setQueueName("some.queue");
 
@@ -325,7 +325,7 @@ public class GridEngineUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(2);
         description.setProcessesPerNode(2);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //GridEngine specific info
         description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
 
