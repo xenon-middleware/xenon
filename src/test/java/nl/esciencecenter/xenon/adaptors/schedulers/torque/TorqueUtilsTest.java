@@ -282,7 +282,7 @@ public class TorqueUtilsTest {
         assertFalse(result.hasException());
         assertFalse(result.isRunning());
         assertFalse(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -302,7 +302,7 @@ public class TorqueUtilsTest {
         assertFalse(result.hasException());
         assertTrue(result.isRunning());
         assertFalse(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -324,7 +324,7 @@ public class TorqueUtilsTest {
         assertFalse(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test

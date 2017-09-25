@@ -3,7 +3,7 @@ Xenon
 =====
 
 [![Build Status](https://travis-ci.org/NLeSC/Xenon.svg?branch=develop)](https://travis-ci.org/NLeSC/Xenon)
-[![Build status Windows](https://ci.appveyor.com/api/projects/status/h4l4wn158db23kuf?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon)
+[![Build status Windows](https://ci.appveyor.com/api/projects/status/h4l4wn158db23kuf?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon/branch/master)
 [![codecov.io](https://codecov.io/github/NLeSC/Xenon/coverage.svg?branch=master)](https://codecov.io/github/NLeSC/Xenon?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/457da68977d1406c9ea93d340720d340)](https://www.codacy.com/app/NLeSC/Xenon)
 [![SonarQube Coverage](https://sonarqube.com/api/badges/measure?key=nlesc%3AXenon&metric=coverage)](https://sonarqube.com/component_measures/domain/Coverage?id=nlesc%3AXenon)

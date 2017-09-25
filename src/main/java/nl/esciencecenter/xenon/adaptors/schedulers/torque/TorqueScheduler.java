@@ -424,7 +424,7 @@ public class TorqueScheduler extends ScriptingScheduler {
             }
         } else if (status.isDone() && jobWasDeleted(job)) {
             XenonException exception = new JobCanceledException(ADAPTOR_NAME, "Job " + job + " deleted by user");
-            status = new JobStatusImplementation(job, "killed", status.getExitCode(), exception, false, true, status.getSchedulerSpecficInformation());
+            status = new JobStatusImplementation(job, "killed", status.getExitCode(), exception, false, true, status.getSchedulerSpecificInformation());
         }
 
         return status;
