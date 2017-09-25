@@ -173,7 +173,7 @@ public class Path implements Iterable<Path> {
      *
      * If <code>elements</code> is <code>null</code> or empty, the resulting Path is empty. The <code>elements</code> list may not contain <code>null</code> or
      * empty Strings, or Strings that contain the separator character. If they do, an <code>IllegalArgumentException</code> will be thrown.
-     * 
+     *
      * @param separator
      *            the separator to use.
      * @param isAbsolute
@@ -331,10 +331,10 @@ public class Path implements Iterable<Path> {
      *
      * This method returns <code>true</code> if this Path starts with the same sequence of the name elements as the given Path. In addition, the absoluteness of
      * this Path should match the absoluteness of the given Path.
-     * 
+     *
      * False is returned if the given Path starts with a different sequence of elements, has more name elements than this path, or has a different absoluteness
      * than this path.
-     * 
+     *
      * @param other
      *            the Path to compare to.
      *

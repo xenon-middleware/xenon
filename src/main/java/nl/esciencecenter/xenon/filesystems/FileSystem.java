@@ -220,6 +220,8 @@ public abstract class FileSystem {
      * Make sure to always close {@code FileSystem} instances by calling {@code close(FileSystem)} when you no longer need them, otherwise their associated
      * resources remain allocated.
      *
+     * @see <a href="../../../../overview-summary.html#filesystems">Documentation on the supported adaptors and locations.</a>
+     *
      * @param adaptor
      *            the type of file system to connect to (e.g. "sftp" or "webdav")
      * @param location
@@ -258,6 +260,8 @@ public abstract class FileSystem {
      * Make sure to always close {@code FileSystem} instances by calling {@code close(FileSystem)} when you no longer need them, otherwise their associated
      * resources remain allocated.
      *
+     * @see <a href="../../../../overview-summary.html#filesystems">Documentation on the supported adaptors and locations.</a>
+     *
      * @param adaptor
      *            the type of file system to connect to (e.g. "sftp" or "webdav")
      * @param location
@@ -293,6 +297,8 @@ public abstract class FileSystem {
      * Make sure to always close {@code FileSystem} instances by calling {@code close(FileSystem)} when you no longer need them, otherwise their associated
      * resources remain allocated.
      *
+     * @see <a href="../../../../overview-summary.html#filesystems">Documentation on the supported adaptors and locations.</a>
+     *
      * @param adaptor
      *            the type of file system to connect to (e.g. "sftp" or "webdav")
      * @param location
@@ -327,6 +333,8 @@ public abstract class FileSystem {
      *
      * Make sure to always close {@code FileSystem} instances by calling {@code close(FileSystem)} when you no longer need them, otherwise their associated
      * resources remain allocated.
+     *
+     * @see <a href="overview-summary.html#filesystems">Documentation on the supported adaptors and locations.</a>
      *
      * @param adaptor
      *            the type of file system to connect to (e.g. "sftp" or "webdav")
