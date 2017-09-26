@@ -21,7 +21,7 @@ import nl.esciencecenter.xenon.filesystems.Path;
 public class MockSftpFileSystem extends SftpFileSystem {
 
     public MockSftpFileSystem() {
-        super("ID", "TEST", "localhost", new Path("/home/xenon"), new MockSftpClient(), null);
+        super("ID", "TEST", "localhost", new Path("/home/xenon"), 4096, new MockSftpClient(), null);
     }
 
     protected void assertNotNull(Path path) {

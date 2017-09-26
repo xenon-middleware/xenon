@@ -27,8 +27,10 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -54,10 +56,14 @@ public class FtpFileAdaptor extends FileAdaptor {
     private static final String[] ADAPTOR_LOCATIONS = new String[] { "host[:port][/workdir]" };
 
     /** All our own properties start with this prefix. */
-    public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + "ftp.";
+    public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
+
+    /** The buffer size to use when copying data. */
+    public static final String BUFFER_SIZE = PREFIX + "bufferSize";
 
     /** List of properties supported by this FTP adaptor */
-    protected static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[0];
+    protected static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+            new XenonPropertyDescription(BUFFER_SIZE, Type.SIZE, "64K", "The buffer size to use when copying files (in bytes).") };
 
     public FtpFileAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
@@ -105,6 +111,13 @@ public class FtpFileAdaptor extends FileAdaptor {
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
+        long bufferSize = xp.getSizeProperty(BUFFER_SIZE);
+
+        if (bufferSize <= 0 || bufferSize >= Integer.MAX_VALUE) {
+            throw new InvalidPropertyException(ADAPTOR_NAME,
+                    "Invalid value for " + BUFFER_SIZE + ": " + bufferSize + " (must be between 1 and " + Integer.MAX_VALUE + ")");
+        }
+
         FTPClient ftpClient = connect(location, credential);
 
         String cwd = null;
@@ -120,7 +133,7 @@ public class FtpFileAdaptor extends FileAdaptor {
             throw e;
         }
 
-        return new FtpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), ftpClient, credential, this, xp);
+        return new FtpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), (int) bufferSize, ftpClient, credential, this, xp);
     }
 
     private String getCurrentWorkingDirectory(FTPClient ftpClient, String location) throws XenonException {

@@ -55,8 +55,8 @@ public class SftpFileSystem extends FileSystem {
 
     private final SftpClient client;
 
-    protected SftpFileSystem(String uniqueID, String name, String location, Path entryPath, SftpClient client, XenonProperties properties) {
-        super(uniqueID, name, location, entryPath, properties);
+    protected SftpFileSystem(String uniqueID, String name, String location, Path entryPath, int bufferSize, SftpClient client, XenonProperties properties) {
+        super(uniqueID, name, location, entryPath, bufferSize, properties);
         this.client = client;
     }
 

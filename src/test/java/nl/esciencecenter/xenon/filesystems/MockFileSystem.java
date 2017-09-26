@@ -271,8 +271,7 @@ public class MockFileSystem extends FileSystem {
                 if (dir.entries.size() == 2) {
                     for (Entry se : dir.entries.values()) {
                         if (!(se.name.equals(".") || se.name.equals(".."))) {
-                            throw new DirectoryNotEmptyException("TEST",
-                                    "Directory not empty: " + name + "/" + se.name);
+                            throw new DirectoryNotEmptyException("TEST", "Directory not empty: " + name + "/" + se.name);
                         }
                     }
                 } else {
@@ -299,9 +298,8 @@ public class MockFileSystem extends FileSystem {
 
     private DirEntry root;
 
-    public MockFileSystem(String uniqueID, String name, String location, Path entryPath, XenonProperties p)
-            throws XenonException {
-        super(uniqueID, name, location, entryPath, p);
+    public MockFileSystem(String uniqueID, String name, String location, Path entryPath, XenonProperties p) throws XenonException {
+        super(uniqueID, name, location, entryPath, 4096, p);
         root = new DirEntry("", getDirAttributes(new Path("/")));
         ensureDirectories(entryPath);
     }

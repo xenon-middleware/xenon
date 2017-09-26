@@ -48,8 +48,8 @@ public class LocalFileSystem extends FileSystem {
 
     private final String root;
 
-    protected LocalFileSystem(String uniqueID, String location, String root, Path entryPath, XenonProperties properties) {
-        super(uniqueID, ADAPTOR_NAME, location, entryPath, properties);
+    protected LocalFileSystem(String uniqueID, String location, String root, Path entryPath, int bufferSize, XenonProperties properties) {
+        super(uniqueID, ADAPTOR_NAME, location, entryPath, bufferSize, properties);
         this.root = root;
     }
 

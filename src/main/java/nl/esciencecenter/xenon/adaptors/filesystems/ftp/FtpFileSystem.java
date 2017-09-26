@@ -49,8 +49,7 @@ public class FtpFileSystem extends FileSystem {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FtpFileSystem.class);
 
-    private static final int[] PERMISSION_TYPES = { FTPFile.READ_PERMISSION, FTPFile.WRITE_PERMISSION,
-            FTPFile.EXECUTE_PERMISSION };
+    private static final int[] PERMISSION_TYPES = { FTPFile.READ_PERMISSION, FTPFile.WRITE_PERMISSION, FTPFile.EXECUTE_PERMISSION };
 
     private static final int[] USER_TYPES = { FTPFile.USER_ACCESS, FTPFile.GROUP_ACCESS, FTPFile.WORLD_ACCESS };
 
@@ -58,9 +57,9 @@ public class FtpFileSystem extends FileSystem {
     private final Credential credential;
     private final FtpFileAdaptor adaptor;
 
-    protected FtpFileSystem(String uniqueID, String name, String location, Path entryPath, FTPClient ftpClient,
-            Credential credential, FtpFileAdaptor adaptor, XenonProperties properties) {
-        super(uniqueID, name, location, entryPath, properties);
+    protected FtpFileSystem(String uniqueID, String name, String location, Path entryPath, int bufferSize, FTPClient ftpClient, Credential credential,
+            FtpFileAdaptor adaptor, XenonProperties properties) {
+        super(uniqueID, name, location, entryPath, bufferSize, properties);
         this.ftpClient = ftpClient;
         this.credential = credential;
         this.adaptor = adaptor;
@@ -208,8 +207,7 @@ public class FtpFileSystem extends FileSystem {
         try {
             ftpClient.rename(absSource.toString(), absTarget.toString());
         } catch (Exception e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to rename " + absSource.toString() + " to " + absTarget.toString(),
-                    e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to rename " + absSource.toString() + " to " + absTarget.toString(), e);
         }
 
         checkClientReply("Failed to rename " + absSource.toString() + " to " + absTarget.toString());

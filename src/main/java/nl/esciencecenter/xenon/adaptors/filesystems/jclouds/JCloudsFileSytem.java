@@ -61,8 +61,9 @@ public class JCloudsFileSytem extends FileSystem {
 
     boolean open;
 
-    public JCloudsFileSytem(String uniqueID, String adaptorName, String endPoint, BlobStoreContext context, String bucket, XenonProperties properties) {
-        super(uniqueID, adaptorName, endPoint, new Path("/"), properties);
+    public JCloudsFileSytem(String uniqueID, String adaptorName, String endPoint, BlobStoreContext context, String bucket, int bufferSize,
+            XenonProperties properties) {
+        super(uniqueID, adaptorName, endPoint, new Path("/"), bufferSize, properties);
         this.context = context;
         this.bucket = bucket;
         this.adaptorName = adaptorName;

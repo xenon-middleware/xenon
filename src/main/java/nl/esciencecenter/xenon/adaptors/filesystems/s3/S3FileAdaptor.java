@@ -22,8 +22,10 @@ import org.jclouds.blobstore.BlobStoreContext;
 
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.jclouds.JCloudsFileSytem;
@@ -36,8 +38,8 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
  */
 public class S3FileAdaptor extends FileAdaptor {
 
-    /** The default SSH port */
-    protected static final int DEFAULT_PORT = 21;
+    /** The name of this adaptor */
+    public static final String ADAPTOR_NAME = "s3";
 
     /** A description of this adaptor */
     private static final String ADAPTOR_DESCRIPTION = "The JClouds adaptor uses Apache JClouds to talk to s3 and others";
@@ -46,9 +48,14 @@ public class S3FileAdaptor extends FileAdaptor {
     private static final String[] ADAPTOR_LOCATIONS = new String[] { "[host[:port]/]bucketname[/workdir]" };
 
     /** All our own properties start with this prefix. */
-    public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + "s3.";
+    public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
 
-    protected static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[0];
+    /** The buffer size to use when copying data. */
+    public static final String BUFFER_SIZE = PREFIX + "bufferSize";
+
+    /** List of properties supported by this FTP adaptor */
+    protected static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+            new XenonPropertyDescription(BUFFER_SIZE, Type.SIZE, "64K", "The buffer size to use when copying files (in bytes).") };
 
     public S3FileAdaptor() {
         super("s3", ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
@@ -68,6 +75,13 @@ public class S3FileAdaptor extends FileAdaptor {
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
+        long bufferSize = xp.getSizeProperty(BUFFER_SIZE);
+
+        if (bufferSize <= 0 || bufferSize >= Integer.MAX_VALUE) {
+            throw new InvalidPropertyException(ADAPTOR_NAME,
+                    "Invalid value for " + BUFFER_SIZE + ": " + bufferSize + " (must be between 1 and " + Integer.MAX_VALUE + ")");
+        }
+
         if (!(credential instanceof PasswordCredential)) {
             throw new InvalidCredentialException("s3", "No secret key given for s3 connection.");
         }
@@ -77,7 +91,7 @@ public class S3FileAdaptor extends FileAdaptor {
         BlobStoreContext context = ContextBuilder.newBuilder("s3").endpoint(server).credentials(pwUser.getUsername(), new String(pwUser.getPassword()))
                 .buildView(BlobStoreContext.class);
 
-        return new JCloudsFileSytem(getNewUniqueID(), "s3", server, context, bucket, xp);
+        return new JCloudsFileSytem(getNewUniqueID(), "s3", server, context, bucket, (int) bufferSize, xp);
     }
 
     @Override

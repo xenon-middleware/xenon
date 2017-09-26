@@ -60,9 +60,6 @@ public abstract class FileSystem {
     /** The name of this component, for use in exceptions */
     private static final String COMPONENT_NAME = "FileSystem";
 
-    /** The default buffer size */
-    private static final int BUFFER_SIZE = 4 * 1024;
-
     private static final HashMap<String, FileAdaptor> adaptors = new LinkedHashMap<>();
 
     static {
@@ -415,9 +412,11 @@ public abstract class FileSystem {
 
     private long nextCopyID = 0;
 
+    private int bufferSize;
+
     private final HashMap<String, PendingCopy> pendingCopies = new HashMap<>();
 
-    protected FileSystem(String uniqueID, String adaptor, String location, Path workDirectory, XenonProperties properties) {
+    protected FileSystem(String uniqueID, String adaptor, String location, Path workDirectory, int bufferSize, XenonProperties properties) {
 
         if (uniqueID == null) {
             throw new IllegalArgumentException("Identifier may not be null!");
@@ -435,11 +434,16 @@ public abstract class FileSystem {
             throw new IllegalArgumentException("EntryPath may not be null!");
         }
 
+        if (bufferSize <= 0) {
+            throw new IllegalArgumentException("Buffer size may not be 0 or smaller!");
+        }
+
         this.uniqueID = uniqueID;
         this.adaptor = adaptor;
         this.location = location;
         this.workingDirectory = workDirectory;
         this.properties = properties;
+        this.bufferSize = bufferSize;
 
         ThreadFactory f = r -> {
             Thread t = new Thread(r, "CopyThread-" + adaptor + "-" + uniqueID);
@@ -1137,7 +1141,7 @@ public abstract class FileSystem {
         }
 
         try (InputStream in = readFromFile(source); OutputStream out = destinationFS.writeToFile(destination, attributes.getSize())) {
-            streamCopy(in, out, BUFFER_SIZE, callback);
+            streamCopy(in, out, bufferSize, callback);
         } catch (Exception e) {
             throw new XenonException(getAdaptorName(), "Stream copy failed", e);
         }

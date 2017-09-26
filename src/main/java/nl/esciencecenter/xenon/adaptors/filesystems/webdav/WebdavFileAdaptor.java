@@ -25,8 +25,10 @@ import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
 
 import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -49,15 +51,14 @@ public class WebdavFileAdaptor extends FileAdaptor {
     public static final String[] ADAPTOR_LOCATIONS = new String[] { "http://host[:port][/workdir]", "https://host[:port][/workdir]" };
 
     /** All our own properties start with this prefix. */
-    public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + "webdav.";
+    public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
+
+    /** The buffer size to use when copying data. */
+    public static final String BUFFER_SIZE = PREFIX + "bufferSize";
 
     /** List of properties supported by this FTP adaptor */
-    public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[0];
-
-    /**
-     * The default buffer size for copy. Webdav doesn't use the standard copy engine.
-     */
-    protected static final int BUFFER_SIZE = 4 * 1024;
+    protected static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+            new XenonPropertyDescription(BUFFER_SIZE, Type.SIZE, "64K", "The buffer size to use when copying files (in bytes).") };
 
     public static final int OK_CODE = 200;
 
@@ -88,6 +89,15 @@ public class WebdavFileAdaptor extends FileAdaptor {
 
         LOGGER.debug("newFileSystem location = {} credential = {} properties = {}", location, credential, properties);
 
+        XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
+
+        long bufferSize = xp.getSizeProperty(BUFFER_SIZE);
+
+        if (bufferSize <= 0 || bufferSize >= Integer.MAX_VALUE) {
+            throw new InvalidPropertyException(ADAPTOR_NAME,
+                    "Invalid value for " + BUFFER_SIZE + ": " + bufferSize + " (must be between 1 and " + Integer.MAX_VALUE + ")");
+        }
+
         URI uri;
 
         try {
@@ -115,9 +125,7 @@ public class WebdavFileAdaptor extends FileAdaptor {
 
         String cwd = uri.getPath();
 
-        XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
-
-        return new WebdavFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, server, new Path(cwd), sardine, xp);
+        return new WebdavFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, server, new Path(cwd), (int) bufferSize, sardine, xp);
     }
 
     public void end() {

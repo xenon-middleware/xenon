@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
@@ -85,6 +86,9 @@ public class SftpFileAdaptor extends FileAdaptor {
     /** Property for maximum history length for finished jobs */
     public static final String CONNECTION_TIMEOUT = PREFIX + "connection.timeout";
 
+    /** The buffer size to use when copying data. */
+    public static final String BUFFER_SIZE = PREFIX + "bufferSize";
+
     /** List of properties supported by this SSH adaptor */
     public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
             new XenonPropertyDescription(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, "true", "Automatically add unknown host keys to known_hosts."),
@@ -93,8 +97,10 @@ public class SftpFileAdaptor extends FileAdaptor {
             new XenonPropertyDescription(LOAD_SSH_CONFIG, Type.BOOLEAN, "true", "Load the OpenSSH config file."),
             new XenonPropertyDescription(SSH_CONFIG_FILE, Type.STRING, null, "OpenSSH config filename."),
             new XenonPropertyDescription(AGENT, Type.BOOLEAN, "false", "Use a (local) ssh-agent."),
-            new XenonPropertyDescription(AGENT_FORWARDING, Type.BOOLEAN, "false", "Use ssh-agent forwarding"), new XenonPropertyDescription(CONNECTION_TIMEOUT,
-                    Type.NATURAL, "10000", "The timeout for creating and authenticating connections (in milliseconds).") };
+            new XenonPropertyDescription(AGENT_FORWARDING, Type.BOOLEAN, "false", "Use ssh-agent forwarding when setting up a connection."),
+            new XenonPropertyDescription(CONNECTION_TIMEOUT, Type.NATURAL, "10000",
+                    "The timeout for creating and authenticating connections (in milliseconds)."),
+            new XenonPropertyDescription(BUFFER_SIZE, Type.SIZE, "64K", "The buffer size to use when copying files (in bytes).") };
 
     public SftpFileAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
@@ -115,6 +121,13 @@ public class SftpFileAdaptor extends FileAdaptor {
         }
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
+
+        long bufferSize = xp.getSizeProperty(BUFFER_SIZE);
+
+        if (bufferSize <= 0 || bufferSize >= Integer.MAX_VALUE) {
+            throw new InvalidPropertyException(ADAPTOR_NAME,
+                    "Invalid value for " + BUFFER_SIZE + ": " + bufferSize + " (must be between 1 and " + Integer.MAX_VALUE + ")");
+        }
 
         boolean loadSSHConfig = xp.getBooleanProperty(LOAD_SSH_CONFIG);
         boolean useSSHAgent = xp.getBooleanProperty(AGENT);
@@ -144,7 +157,7 @@ public class SftpFileAdaptor extends FileAdaptor {
             throw e;
         }
 
-        return new SftpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), sftpClient, xp);
+        return new SftpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), (int) bufferSize, sftpClient, xp);
     }
 
     private String getCurrentWorkingDirectory(SftpClient sftpClient, String location) throws XenonException {

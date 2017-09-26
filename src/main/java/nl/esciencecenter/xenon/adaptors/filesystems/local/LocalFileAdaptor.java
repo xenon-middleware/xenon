@@ -24,8 +24,10 @@ import java.util.Map;
 
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -56,8 +58,12 @@ public class LocalFileAdaptor extends FileAdaptor {
     /** The locations supported by the adaptor */
     public static final String[] ADAPTOR_LOCATIONS = new String[] { "(null)", "(empty string)", "[/workdir]", "driveletter:[/workdir]" };
 
-    /** The properties supported by this adaptor */
-    public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[0];
+    /** The buffer size to use when copying data. */
+    public static final String BUFFER_SIZE = PREFIX + "bufferSize";
+
+    /** List of properties supported by this FTP adaptor */
+    public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+            new XenonPropertyDescription(BUFFER_SIZE, Type.SIZE, "64K", "The buffer size to use when copying files (in bytes).") };
 
     public LocalFileAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
@@ -119,9 +125,16 @@ public class LocalFileAdaptor extends FileAdaptor {
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
+        long bufferSize = xp.getSizeProperty(BUFFER_SIZE);
+
+        if (bufferSize <= 0 || bufferSize >= Integer.MAX_VALUE) {
+            throw new InvalidPropertyException(ADAPTOR_NAME,
+                    "Invalid value for " + BUFFER_SIZE + ": " + bufferSize + " (must be between 1 and " + Integer.MAX_VALUE + ")");
+        }
+
         Path entry = new Path(LocalFileSystemUtils.getLocalSeparator(), path);
         // for Windows remove the drive letter from entry?
 
-        return new LocalFileSystem(getNewUniqueID(), location, root, entry, xp);
+        return new LocalFileSystem(getNewUniqueID(), location, root, entry, (int) bufferSize, xp);
     }
 }
