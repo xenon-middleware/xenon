@@ -93,7 +93,7 @@ public class XenonProperties {
      * Create a new XenonProperties that will support the properties in <code>supportedProperties</code>. All properties in <code>properties</code> will be
      * added.
      *
-     * @param supportedProperties
+     * @param propertyDescriptions
      *            the properties to support
      * @param properties
      *            the set of properties to store
