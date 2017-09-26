@@ -66,20 +66,19 @@ public class TorqueScheduler extends ScriptingScheduler {
     private final long accountingGraceTime;
 
     /**
-     * Map with the last seen time of jobs. There is a delay between jobs disappearing from the qstat queue output.
-     * Instead of throwing an exception, we allow for a certain grace
-     * time. Jobs will report the status "pending" during this time. Typical delays are in the order of seconds.
+     * Map with the last seen time of jobs. There is a delay between jobs disappearing from the qstat queue output. Instead of throwing an exception, we allow
+     * for a certain grace time. Jobs will report the status "pending" during this time. Typical delays are in the order of seconds.
      */
     private final Map<String, Long> lastSeenMap;
 
-    //list of jobs we have killed before they even started. These will not end up in qstat, so we keep them here.
+    // list of jobs we have killed before they even started. These will not end up in qstat, so we keep them here.
     private final Set<String> deletedJobs;
 
     private final TorqueXmlParser parser;
 
     private final String[] queueNames;
 
-    TorqueScheduler(String uniqueID, String location, Credential credential, Map<String,String> prop) throws XenonException {
+    TorqueScheduler(String uniqueID, String location, Credential credential, Map<String, String> prop) throws XenonException {
 
         super(uniqueID, ADAPTOR_NAME, location, credential, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
 
@@ -170,13 +169,11 @@ public class TorqueScheduler extends ScriptingScheduler {
                 if (runner.success()) {
                     jobsFromStatus(runner.getStdout(), result);
                 } else if (runner.getExitCode() == 172) {
-                    //slurm returns "172" as the exit code if there is something wrong with the queue, ignore
+                    // slurm returns "172" as the exit code if there is something wrong with the queue, ignore
                     LOGGER.warn("Failed to get queue status for queue {}", runner);
-                    throw new NoSuchQueueException(ADAPTOR_NAME, "Failed to get queue status for queue \""
-                            + queueName + "\": " + runner);
+                    throw new NoSuchQueueException(ADAPTOR_NAME, "Failed to get queue status for queue \"" + queueName + "\": " + runner);
                 } else {
-                    throw new XenonException(ADAPTOR_NAME, "Failed to get queue status for queue \""
-                            + queueName + "\": " + runner);
+                    throw new XenonException(ADAPTOR_NAME, "Failed to get queue status for queue \"" + queueName + "\": " + runner);
                 }
             }
         }
@@ -189,13 +186,12 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         assertNonNullOrEmpty(queueName, "Queue name may not be null or empty");
 
-        Map<String, Map<String,String>> allMap = queryQueues(queueName);
+        Map<String, Map<String, String>> allMap = queryQueues(queueName);
 
         Map<String, String> map = allMap.get(queueName);
 
         if (map == null || map.isEmpty()) {
-            throw new NoSuchQueueException(ADAPTOR_NAME, "Cannot get status of queue \"" + queueName
-                    + "\" from server, perhaps it does not exist?");
+            throw new NoSuchQueueException(ADAPTOR_NAME, "Cannot get status of queue \"" + queueName + "\" from server, perhaps it does not exist?");
         }
 
         return new QueueStatusImplementation(this, queueName, null, map);
@@ -215,31 +211,9 @@ public class TorqueScheduler extends ScriptingScheduler {
         }
 
         return getQueueStatuses(allMap, queueNames);
-//
-//        QueueStatus[] result = new QueueStatus[queueNames.length];
-//
-//		for (int i = 0; i < queueNames.length; i++) {
-//			if (queueNames[i] == null) {
-//				result[i] = null;
-//			} else {
-//				//state for only the requested queuee
-//				Map<String, String> map = allMap.get(queueNames[i]);
-//
-//                if (map == null) {
-//					Exception exception = new NoSuchQueueException(ADAPTOR_NAME,
-//							"Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
-//					result[i] = new QueueStatusImplementation(this, queueNames[i], exception, null);
-//				} else {
-//					result[i] = new QueueStatusImplementation(this, queueNames[i], null, map);
-//				}
-//			}
-//		}
-//
-//        return result;
     }
 
-    protected Map<String, Map<String,String>> queryQueues(String... queueNames)
-            throws XenonException {
+    protected Map<String, Map<String, String>> queryQueues(String... queueNames) throws XenonException {
 
         if (queueNames == null) {
             throw new IllegalArgumentException("Queue names cannot be null");
@@ -258,16 +232,16 @@ public class TorqueScheduler extends ScriptingScheduler {
                     args.add(name);
                 }
             }
-//            String[] args = new String[1 + queueNames.length];
-//            args[0] = "-Qf";
-//            System.arraycopy(queueNames, 0, args, 1, queueNames.length);
+            // String[] args = new String[1 + queueNames.length];
+            // args[0] = "-Qf";
+            // System.arraycopy(queueNames, 0, args, 1, queueNames.length);
 
             RemoteCommandRunner runner = runCommand(null, "qstat", args.toArray(new String[args.size()]));
 
             if (runner.success()) {
                 output = runner.getStdout();
             } else {
-                Map<String, Map<String,String>> badResult = new HashMap<>(2);
+                Map<String, Map<String, String>> badResult = new HashMap<>(2);
                 for (String name : queueNames) {
                     badResult.put(name, null);
                 }
@@ -276,7 +250,7 @@ public class TorqueScheduler extends ScriptingScheduler {
         }
         String[] lines = ScriptingParser.NEWLINE_REGEX.split(output);
 
-        Map<String, Map<String,String>> result = new HashMap<>(10);
+        Map<String, Map<String, String>> result = new HashMap<>(10);
 
         Map<String, String> currentQueueMap = null;
         for (String line : lines) {
@@ -313,7 +287,7 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         verifyJobDescription(description);
 
-        //check for option that overrides job script completely.
+        // check for option that overrides job script completely.
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
 
         if (customScriptFile == null) {
@@ -322,9 +296,9 @@ public class TorqueScheduler extends ScriptingScheduler {
 
             output = runCheckedCommand(jobScript, "qsub");
         } else {
-            //the user gave us a job script. Pass it to qsub as-is
+            // the user gave us a job script. Pass it to qsub as-is
 
-            //convert to absolute path if needed
+            // convert to absolute path if needed
             if (!customScriptFile.startsWith("/")) {
                 Path scriptFile = fsEntryPath.resolve(customScriptFile);
                 customScriptFile = scriptFile.toString();
@@ -368,8 +342,8 @@ public class TorqueScheduler extends ScriptingScheduler {
         } else if (runner.getExitCode() == 170) {
             // job was already finished.
         } else {
-            throw new XenonException(ADAPTOR_NAME, "could not run command qdel for job \"" + jobIdentifier + "\". Exit code = "
-                    + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
+            throw new XenonException(ADAPTOR_NAME, "could not run command qdel for job \"" + jobIdentifier + "\". Exit code = " + runner.getExitCode()
+                    + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
         }
 
         return getJobStatus(jobIdentifier);
@@ -385,7 +359,7 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         Map<String, Map<String, String>> result = parser.parseJobInfos(runner.getStdout());
 
-        //mark jobs we found as seen, in case they disappear from the queue
+        // mark jobs we found as seen, in case they disappear from the queue
         updateJobsSeenMap(result.keySet());
 
         return result;
@@ -439,7 +413,7 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         JobStatus result = getJobStatus(info, jobIdentifier);
 
-        //this job really does not exist. throw an exception
+        // this job really does not exist. throw an exception
         if (result == null) {
             throw new NoSuchJobException(ADAPTOR_NAME, "Job " + jobIdentifier + " not found on server");
         }
@@ -459,7 +433,7 @@ public class TorqueScheduler extends ScriptingScheduler {
             } else {
                 result[i] = getJobStatus(info, jobs[i]);
 
-                //this job really does not exist. set it to an error state.
+                // this job really does not exist. set it to an error state.
                 if (result[i] == null) {
                     XenonException exception = new NoSuchJobException(ADAPTOR_NAME, "Job " + jobs[i] + " not found on server");
                     result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);
@@ -467,16 +441,5 @@ public class TorqueScheduler extends ScriptingScheduler {
             }
         }
         return result;
-    }
-
-//    @Override
-//    public Streams getStreams(JobHandle job) throws XenonException {
-//        throw new XenonException(ADAPTOR_NAME, "does not support interactive jobs");
-//    }
-
-    @Override
-    public boolean isOpen() throws XenonException {
-        // TODO Auto-generated method stub
-        return false;
     }
 }

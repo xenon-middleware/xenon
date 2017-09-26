@@ -231,6 +231,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      * @throws XenonException
      *             if an error occurs
      */
+    @Override
     public JobStatus waitUntilDone(String jobIdentifier, long timeout) throws XenonException {
 
         assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
@@ -267,6 +268,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      * @throws XenonException
      *             if an error occurs
      */
+    @Override
     public JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException {
 
         assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
@@ -314,6 +316,12 @@ public abstract class ScriptingScheduler extends Scheduler {
         }
     }
 
+    @Override
+    public boolean isOpen() throws XenonException {
+        return subScheduler.isOpen() && subFileSystem.isOpen();
+    }
+
+    @Override
     public void close() throws XenonException {
         subScheduler.close();
         subFileSystem.close();
