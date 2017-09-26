@@ -30,11 +30,8 @@ import nl.esciencecenter.xenon.filesystems.Path;
 public class WebdavFileSystemAnonymousUserDockerTest extends WebdavFileSystemTestParent {
 
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder()
-            .file("src/integrationTest/resources/docker-compose/webdav.yml")
-            .waitingForService("webdav", HealthChecks.toHaveAllPortsOpen())
-            .saveLogsTo("/tmp/webdav.txt")
-            .build();
+    public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/webdav.yml")
+            .waitingForService("webdav", HealthChecks.toHaveAllPortsOpen()).saveLogsTo("/tmp/webdav.txt").build();
 
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
@@ -52,7 +49,8 @@ public class WebdavFileSystemAnonymousUserDockerTest extends WebdavFileSystemTes
 
             @Override
             public Path getWritableTestDir() {
-                return fileSystem.getWorkingDirectory().resolve("uploads");
+                // return fileSystem.getWorkingDirectory().resolve("uploads");
+                return new Path("/uploads");
             }
 
             @Override
@@ -64,8 +62,7 @@ public class WebdavFileSystemAnonymousUserDockerTest extends WebdavFileSystemTes
 
     @Override
     public FileSystem setupFileSystem() throws XenonException {
-        String location = docker.containers().container("webdav").port(80)
-                .inFormat("http://$HOST:$EXTERNAL_PORT/");
+        String location = docker.containers().container("webdav").port(80).inFormat("http://$HOST:$EXTERNAL_PORT/");
         return FileSystem.create("webdav", location);
     }
 

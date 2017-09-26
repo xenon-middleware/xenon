@@ -15,20 +15,47 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers.gridengine;
 
-import nl.esciencecenter.xenon.UnsupportedOperationException;
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.*;
-import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.filesystems.Path;
-import nl.esciencecenter.xenon.schedulers.*;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.ACCOUNTING_GRACE_TIME_PROPERTY;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.IGNORE_VERSION_PROPERTY;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.POLL_DELAY_PROPERTY;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.VALID_PROPERTIES;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.JOB_OPTION_JOB_SCRIPT;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.QACCT_HEADER;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.generate;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.getJobStatusFromQacctInfo;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.getJobStatusFromQstatInfo;
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.verifyJobDescription;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.Map.Entry;
-
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.*;
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.*;
+import nl.esciencecenter.xenon.UnsupportedOperationException;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
+import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
+import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingScheduler;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.schedulers.NoSuchJobException;
+import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
+import nl.esciencecenter.xenon.schedulers.QueueStatus;
+import nl.esciencecenter.xenon.schedulers.Streams;
 
 /**
  * Interface to the GridEngine command line tools. Will run commands to submit/list/cancel jobs and get the status of queues.
@@ -41,21 +68,20 @@ public class GridEngineScheduler extends ScriptingScheduler {
     private final long accountingGraceTime;
 
     /**
-     * Map with the last seen time of jobs. There is a delay between jobs disappearing from the qstat queue output, and
-     * information about this job appearing in the qacct output. Instead of throwing an exception, we allow for a certain grace
-     * time. Jobs will report the status "pending" during this time. Typical delays are in the order of seconds.
+     * Map with the last seen time of jobs. There is a delay between jobs disappearing from the qstat queue output, and information about this job appearing in
+     * the qacct output. Instead of throwing an exception, we allow for a certain grace time. Jobs will report the status "pending" during this time. Typical
+     * delays are in the order of seconds.
      */
     private final Map<String, Long> lastSeenMap;
 
-    //list of jobs we have killed before they even started. These will not end up in qacct, so we keep them here.
+    // list of jobs we have killed before they even started. These will not end up in qacct, so we keep them here.
     private final Set<Long> deletedJobs;
 
     private final GridEngineXmlParser parser;
 
     private final GridEngineSetup setupInfo;
 
-    protected GridEngineScheduler(String uniqueID, String location, Credential credential, Map<String,String> prop)
-            throws XenonException {
+    protected GridEngineScheduler(String uniqueID, String location, Credential credential, Map<String, String> prop) throws XenonException {
 
         super(uniqueID, ADAPTOR_NAME, location, credential, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
 
@@ -118,7 +144,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
      * Note: Works exactly once per job.
      */
     private synchronized boolean jobWasDeleted(String jobIdentifier) {
-        //optimization of common case
+        // optimization of common case
         if (deletedJobs.isEmpty()) {
             return false;
         }
@@ -149,13 +175,11 @@ public class GridEngineScheduler extends ScriptingScheduler {
                 if (runner.success()) {
                     jobsFromStatus(runner.getStdout(), result);
                 } else if (runner.getExitCode() == 1) {
-                    //sge returns "1" as the exit code if there is something wrong with the queue, ignore
+                    // sge returns "1" as the exit code if there is something wrong with the queue, ignore
                     LOGGER.warn("Failed to get queue status for queue " + runner);
-                    throw new NoSuchQueueException(ADAPTOR_NAME, "Failed to get queue status for queue \""
-                            + queueName + "\": " + runner);
+                    throw new NoSuchQueueException(ADAPTOR_NAME, "Failed to get queue status for queue \"" + queueName + "\": " + runner);
                 } else {
-                    throw new XenonException(ADAPTOR_NAME, "Failed to get queue status for queue \""
-                            + queueName + "\": " + runner);
+                    throw new XenonException(ADAPTOR_NAME, "Failed to get queue status for queue \"" + queueName + "\": " + runner);
                 }
             }
         }
@@ -175,8 +199,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
         Map<String, String> map = allMap.get(queueName);
 
         if (map == null || map.isEmpty()) {
-            throw new NoSuchQueueException(ADAPTOR_NAME, "Cannot get status of queue \"" + queueName
-                    + "\" from server, perhaps it does not exist?");
+            throw new NoSuchQueueException(ADAPTOR_NAME, "Cannot get status of queue \"" + queueName + "\" from server, perhaps it does not exist?");
         }
 
         return new QueueStatusImplementation(this, queueName, null, map);
@@ -212,7 +235,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
         verifyJobDescription(description);
 
-        //check for option that overrides job script completely.
+        // check for option that overrides job script completely.
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
 
         if (customScriptFile == null) {
@@ -220,9 +243,9 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
             output = runCheckedCommand(jobScript, "qsub");
         } else {
-            //the user gave us a job script. Pass it to qsub as-is
+            // the user gave us a job script. Pass it to qsub as-is
 
-            //convert to absolute path if needed
+            // convert to absolute path if needed
             if (!customScriptFile.startsWith("/")) {
                 Path scriptFile = fsEntryPath.resolve(customScriptFile);
                 customScriptFile = scriptFile.toString();
@@ -250,11 +273,11 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
         int matched = ScriptingParser.checkIfContains(qdelOutput, ADAPTOR_NAME, killedOutput, deletedOutput);
 
-        //keep track of the deleted jobs.
+        // keep track of the deleted jobs.
         if (matched == 1) {
             addDeletedJob(jobIdentifier);
         } else {
-            //it will take a while to get this job to the accounting. Remember it existed for now
+            // it will take a while to get this job to the accounting. Remember it existed for now
             updateJobsSeenMap(Collections.singleton(jobIdentifier));
         }
 
@@ -271,7 +294,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
         Map<String, Map<String, String>> result = parser.parseJobInfos(runner.getStdout());
 
-        //mark jobs we found as seen, in case they disappear from the queue
+        // mark jobs we found as seen, in case they disappear from the queue
         updateJobsSeenMap(result.keySet());
 
         return result;
@@ -285,8 +308,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
             return null;
         }
 
-        return ScriptingParser.parseKeyValueLines(runner.getStdout(), ScriptingParser.WHITESPACE_REGEX,
-                ADAPTOR_NAME, QACCT_HEADER);
+        return ScriptingParser.parseKeyValueLines(runner.getStdout(), ScriptingParser.WHITESPACE_REGEX, ADAPTOR_NAME, QACCT_HEADER);
     }
 
     /**
@@ -320,15 +342,14 @@ public class GridEngineScheduler extends ScriptingScheduler {
             status = getJobStatusFromQacctInfo(qacctInfo, jobIdentifier);
         }
 
-        //perhaps the job was killed while it was not running yet ("deleted", in sge speak). This will make it disappear from
-        //qstat/qacct output completely
+        // perhaps the job was killed while it was not running yet ("deleted", in sge speak). This will make it disappear from
+        // qstat/qacct output completely
         if (status == null && jobWasDeleted(jobIdentifier)) {
-            XenonException exception = new JobCanceledException(ADAPTOR_NAME, "Job " + jobIdentifier
-                    + " deleted by user while still pending");
+            XenonException exception = new JobCanceledException(ADAPTOR_NAME, "Job " + jobIdentifier + " deleted by user while still pending");
             status = new JobStatusImplementation(jobIdentifier, "killed", null, exception, false, true, null);
         }
 
-        //this job is neither in qstat nor qacct output. we assume it is "in between" for a certain grace time.
+        // this job is neither in qstat nor qacct output. we assume it is "in between" for a certain grace time.
         if (status == null && haveRecentlySeen(jobIdentifier)) {
             status = new JobStatusImplementation(jobIdentifier, "unknown", null, null, false, false, new HashMap<String, String>());
         }
@@ -345,7 +366,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
         JobStatus result = getJobStatus(info, jobIdentifier);
 
-        //this job really does not exist. throw an exception
+        // this job really does not exist. throw an exception
         if (result == null) {
             throw new NoSuchJobException(ADAPTOR_NAME, "Job " + jobIdentifier + " not found on server");
         }
@@ -365,7 +386,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
             } else {
                 result[i] = getJobStatus(info, jobs[i]);
 
-                //this job really does not exist. set it to an error state.
+                // this job really does not exist. set it to an error state.
                 if (result[i] == null) {
                     XenonException exception = new NoSuchJobException(ADAPTOR_NAME, "Job " + jobs[i] + " not found on server");
                     result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);
@@ -373,12 +394,6 @@ public class GridEngineScheduler extends ScriptingScheduler {
             }
         }
         return result;
-    }
-
-    @Override
-    public boolean isOpen() throws XenonException {
-        // TODO Auto-generated method stub
-        return false;
     }
 
 }
