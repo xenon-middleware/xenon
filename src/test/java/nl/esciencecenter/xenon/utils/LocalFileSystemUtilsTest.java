@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -316,5 +317,40 @@ public class LocalFileSystemUtilsTest {
     public void test_getLocalRoot_linux_wrong() throws XenonException {
         System.setProperty("os.name", "Linux");
         LocalFileSystemUtils.getLocalRoot("Hello World");
+    }
+
+    @Test
+    public void test_expand_tilde_withPath() throws Exception {
+        System.setProperty("user.home", "/foo/bar");
+        String result = LocalFileSystemUtils.expandTilde("~/filesystem-test-fixture/links/file0");
+        assertEquals("/foo/bar/filesystem-test-fixture/links/file0", result);
+    }
+
+    @Test
+    public void test_expand_tilde() throws Exception {
+        System.setProperty("user.home", "/foo/bar");
+        String result = LocalFileSystemUtils.expandTilde("~");
+        assertEquals("/foo/bar", result);
+    }
+
+    @Test
+    public void test_expand_tilde_null() throws Exception {
+        System.setProperty("user.home", "/foo/bar");
+        String result = LocalFileSystemUtils.expandTilde(null);
+        assertNull(result);
+    }
+
+    @Test
+    public void test_expand_tilde_notilde() throws Exception {
+        System.setProperty("user.home", "/foo/bar");
+        String result = LocalFileSystemUtils.expandTilde("/aap/noot");
+        assertEquals("/aap/noot", result);
+    }
+
+    @Test
+    public void test_expand_tilde_wrongspot() throws Exception {
+        System.setProperty("user.home", "/foo/bar");
+        String result = LocalFileSystemUtils.expandTilde("/aap/noot/~/mies");
+        assertEquals("/aap/noot/~/mies", result);
     }
 }

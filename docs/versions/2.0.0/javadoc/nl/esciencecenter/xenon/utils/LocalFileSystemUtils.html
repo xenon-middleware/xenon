@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9};
+var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9,"i10":9,"i11":9,"i12":9,"i13":9,"i14":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -147,84 +147,90 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/LocalFileSystemUtils.html#expandTilde-java.lang.String-">expandTilde</a></span>(java.lang.String&nbsp;path)</code>
+<div class="block">Expand the tilde in a String representation of a path by the users home directory, as provided by the <code>user.home</code> property.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>static <a href="../../../../nl/esciencecenter/xenon/filesystems/FileSystem.html" title="class in nl.esciencecenter.xenon.filesystems">FileSystem</a>[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/LocalFileSystemUtils.html#getLocalFileSystems--">getLocalFileSystems</a></span>()</code>
 <div class="block">Returns all local FileSystems.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/LocalFileSystemUtils.html#getLocalRoot-java.lang.String-">getLocalRoot</a></span>(java.lang.String&nbsp;p)</code>
 <div class="block">Return the locally valid root element of an <code>String</code> representation of an absolute path.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/LocalFileSystemUtils.html#getLocalRootlessPath-java.lang.String-">getLocalRootlessPath</a></span>(java.lang.String&nbsp;path)</code>
 <div class="block">Return the local root less path of an absolute path.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>static char</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/LocalFileSystemUtils.html#getLocalSeparator--">getLocalSeparator</a></span>()</code>
 <div class="block">Returns the local file system path separator character.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/LocalFileSystemUtils.html#isLinux--">isLinux</a></span>()</code>
 <div class="block">Returns if we are currently running on Linux.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/LocalFileSystemUtils.html#isLinuxRoot-java.lang.String-">isLinuxRoot</a></span>(java.lang.String&nbsp;root)</code>
 <div class="block">Check if <code>root</code> only contains a valid Linux root element, which is "/".</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/LocalFileSystemUtils.html#isLocalRoot-java.lang.String-">isLocalRoot</a></span>(java.lang.String&nbsp;root)</code>
 <div class="block">Check if <code>root</code> contains a locally valid root element, such as "C:" on Windows or "/" on Linux and OSX.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/LocalFileSystemUtils.html#isOSX--">isOSX</a></span>()</code>
 <div class="block">Returns if we are currently running on OSX.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/LocalFileSystemUtils.html#isOSXRoot-java.lang.String-">isOSXRoot</a></span>(java.lang.String&nbsp;root)</code>
 <div class="block">Check if <code>root</code> contains a valid OSX root element, which is "/".</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/LocalFileSystemUtils.html#isWindows--">isWindows</a></span>()</code>
 <div class="block">Returns if we are currently running on Windows.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/LocalFileSystemUtils.html#isWindowsRoot-java.lang.String-">isWindowsRoot</a></span>(java.lang.String&nbsp;root)</code>
 <div class="block">Check if <code>root</code> only contains a valid Windows root element such as "C:".</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/LocalFileSystemUtils.html#startsWithLinuxRoot-java.lang.String-">startsWithLinuxRoot</a></span>(java.lang.String&nbsp;path)</code>
 <div class="block">Checks if the provide path starts with a valid Linux root, that is "/".</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/LocalFileSystemUtils.html#startWithRoot-java.lang.String-">startWithRoot</a></span>(java.lang.String&nbsp;path)</code>
 <div class="block">Checks if the provide path starts with a valid root, such as "/" or "C:".</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/LocalFileSystemUtils.html#startWithWindowsRoot-java.lang.String-">startWithWindowsRoot</a></span>(java.lang.String&nbsp;path)</code>
 <div class="block">Checks if the provide path starts with a valid Windows root, for example "C:".</div>
@@ -460,6 +466,25 @@ extends java.lang.Object</pre>
 <dd>The locally valid root element.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../nl/esciencecenter/xenon/InvalidLocationException.html" title="class in nl.esciencecenter.xenon">InvalidLocationException</a></code> - If the provided <code>path</code> is not absolute, or does not contain a locally valid root.</dd>
+</dl>
+</li>
+</ul>
+<a name="expandTilde-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>expandTilde</h4>
+<pre>public static&nbsp;java.lang.String&nbsp;expandTilde(java.lang.String&nbsp;path)</pre>
+<div class="block">Expand the tilde in a String representation of a path by the users home directory, as provided by the <code>user.home</code> property.
+ 
+ The tilde will only be replaced if it is the first character in the path, for example "~" or "~/foo". Otherwise, the provided path will be returned
+ unchanged (including a path that is <code>null</code>).</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>path</code> - the path in which to replace the tilde (is possible).</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the path with the tilde replaced by the user home property, or the unchanged path if it does not contain a tilde as first character.</dd>
 </dl>
 </li>
 </ul>

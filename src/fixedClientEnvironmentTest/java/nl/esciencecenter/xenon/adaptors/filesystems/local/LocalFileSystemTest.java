@@ -123,19 +123,6 @@ public class LocalFileSystemTest extends FileSystemTestParent {
     }
 
     @Test
-    public void test_javaPath_tilde_withPath() throws Exception {
-        LocalFileSystem f = (LocalFileSystem) fileSystem;
-        Path tilde = new Path("~/filesystem-test-fixture/links/file0");
-        assertEquals(locationConfig.getExistingPath().toString(), f.javaPath(tilde).toString());
-    }
-
-    @Test
-    public void test_javaPath_tilde() throws Exception {
-        LocalFileSystem f = (LocalFileSystem) fileSystem;
-        assertEquals("/home/xenon", f.javaPath(new Path("~")).toString());
-    }
-
-    @Test
     public void test_javaPath_empty_workingDirectory() throws Exception {
         LocalFileSystem f = (LocalFileSystem) fileSystem;
         assertEquals("/tmp", f.javaPath(new Path("")).toString());
