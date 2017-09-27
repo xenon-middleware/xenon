@@ -53,24 +53,13 @@ public class LocalFileSystem extends FileSystem {
         this.root = root;
     }
 
-    // Path getRelativePath(String path, String root) throws XenonException {
-    // if (!path.toUpperCase(Locale.getDefault()).startsWith(root.toUpperCase(Locale.getDefault()))) {
-    // throw new XenonException(ADAPTOR_NAME, "Path does not start with root: " + path + " " + root);
-    // }
-    //
-    // if (root.length() == path.length()) {
-    // return new Path(LocalFileSystemUtils.getLocalSeparator(), "");
-    // }
-    //
-    // return new Path(LocalFileSystemUtils.getLocalSeparator(), path.substring(root.length()));
-    // }
-
     java.nio.file.Path javaPath(Path path) {
 
         if (path == null) {
             throw new IllegalArgumentException("Path may not be null");
         }
 
+/*
         Path relPath = path.normalize();
         int numElems = relPath.getNameCount();
 
@@ -90,7 +79,8 @@ public class LocalFileSystem extends FileSystem {
         }
 
         Path absPath = toAbsolutePath(relPath);
-        return FileSystems.getDefault().getPath(root, absPath.toString());
+*/
+        return FileSystems.getDefault().getPath(root, toAbsolutePath(path.normalize()).toString());
     }
 
     Set<PosixFilePermission> xenonPermissions(Set<java.nio.file.attribute.PosixFilePermission> permissions) {
