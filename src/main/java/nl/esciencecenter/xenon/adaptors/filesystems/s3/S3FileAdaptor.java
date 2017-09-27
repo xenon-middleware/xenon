@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.s3;
 
+import java.net.URI;
 import java.util.Map;
 
 import org.jclouds.ContextBuilder;
@@ -32,6 +33,7 @@ import nl.esciencecenter.xenon.adaptors.filesystems.jclouds.JCloudsFileSytem;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
 
 /**
  * Created by atze on 29-6-17.
@@ -45,7 +47,7 @@ public class S3FileAdaptor extends FileAdaptor {
     private static final String ADAPTOR_DESCRIPTION = "The JClouds adaptor uses Apache JClouds to talk to s3 and others";
 
     /** The locations supported by this adaptor */
-    private static final String[] ADAPTOR_LOCATIONS = new String[] { "[host[:port]/]bucketname[/workdir]" };
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "[http://host[:port]]/bucketname[/workdir]" };
 
     /** All our own properties start with this prefix. */
     public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
@@ -64,14 +66,56 @@ public class S3FileAdaptor extends FileAdaptor {
     @Override
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
 
-        int split = location.lastIndexOf("/");
+        // An S3 URI has the form:
+        //
+        // [http://host[:port]]/bucketname[/workdir]
+        //
+        // Note that it may only contain a bucketname (in which case it connects to amazon AWS automatically), or it may contain a server adres and bucketname.
+        // In both cases, an optional workdir may be provided after the bucketname.
 
-        if (split < 0) {
-            throw new InvalidLocationException("s3", "No bucket found in url: " + location);
+        if (location == null || location.isEmpty()) {
+            throw new InvalidLocationException(ADAPTOR_NAME, "Location may not be empty");
         }
 
-        String server = location.substring(0, split);
-        String bucket = location.substring(split + 1);
+        String server = null;
+        String bucket = null;
+        String bucketPath = null;
+        Path path = null;
+
+        if (location.startsWith("http://")) {
+            URI uri;
+
+            try {
+                uri = new URI(location);
+            } catch (Exception e) {
+                throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
+            }
+
+            // Reconstruct the server address
+            server = uri.getScheme() + "://" + uri.getHost() + (uri.getPort() != -1 ? ":" + uri.getPort() : "");
+            bucketPath = uri.getPath();
+        } else {
+            bucketPath = location;
+        }
+
+        if (bucketPath == null || bucketPath.isEmpty() || bucketPath.equals("/")) {
+            throw new InvalidLocationException(ADAPTOR_NAME, "Location does not contain bucket: " + location);
+        }
+
+        if (bucketPath.startsWith("/")) {
+            bucketPath = bucketPath.substring(1);
+        }
+
+        int split = bucketPath.indexOf("/");
+
+        if (split < 0) {
+            bucket = bucketPath;
+            path = new Path('/', "/");
+        } else {
+            // Split the bucket and the working dir in path.
+            bucket = bucketPath.substring(0, split);
+            path = new Path('/', bucketPath.substring(split));
+        }
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
@@ -83,7 +127,7 @@ public class S3FileAdaptor extends FileAdaptor {
         }
 
         if (!(credential instanceof PasswordCredential)) {
-            throw new InvalidCredentialException("s3", "No secret key given for s3 connection.");
+            throw new InvalidCredentialException(ADAPTOR_NAME, "No secret key given for s3 connection.");
         }
 
         PasswordCredential pwUser = (PasswordCredential) credential;
@@ -91,7 +135,7 @@ public class S3FileAdaptor extends FileAdaptor {
         BlobStoreContext context = ContextBuilder.newBuilder("s3").endpoint(server).credentials(pwUser.getUsername(), new String(pwUser.getPassword()))
                 .buildView(BlobStoreContext.class);
 
-        return new JCloudsFileSytem(getNewUniqueID(), "s3", server, context, bucket, (int) bufferSize, xp);
+        return new JCloudsFileSytem(getNewUniqueID(), ADAPTOR_NAME, server, path, context, bucket, (int) bufferSize, xp);
     }
 
     @Override

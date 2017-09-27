@@ -107,6 +107,7 @@ public abstract class FileSystemTestParent {
         if (fileSystem.exists(testRoot)) {
             fileSystem.delete(testRoot, true);
         }
+
         fileSystem.createDirectory(testRoot);
 
         testDir = null;
