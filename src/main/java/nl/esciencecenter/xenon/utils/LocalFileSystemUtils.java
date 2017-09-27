@@ -209,10 +209,10 @@ public class LocalFileSystemUtils {
 
     /**
      * Expand the tilde in a String representation of a path by the users home directory, as provided by the <code>user.home</code> property.
-     * 
+     *
      * The tilde will only be replaced if it is the first character in the path, for example "~" or "~/foo". Otherwise, the provided path will be returned
      * unchanged (including a path that is <code>null</code>).
-     * 
+     *
      * @param path
      *            the path in which to replace the tilde (is possible).
      * @return the path with the tilde replaced by the user home property, or the unchanged path if it does not contain a tilde as first character.
