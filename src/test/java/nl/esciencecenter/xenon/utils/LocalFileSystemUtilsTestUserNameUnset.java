@@ -20,59 +20,56 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.ClearSystemProperties;
 import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 
-public class LocalFileSystemUtilsTestUserHome {
+public class LocalFileSystemUtilsTestUserNameUnset {
 
     @Rule
-    public final ProvideSystemProperty p3 = new ProvideSystemProperty("user.home", "/foo/bar").and("user.name", "stefan");
+    public final ProvideSystemProperty p3 = new ProvideSystemProperty("user.home", "/foo/bar");
+
+    @Rule
+    public final ClearSystemProperties p5 = new ClearSystemProperties("user.name");
 
     @Test
-    public void test_expand_tilde_withPath() throws Exception {
-        // System.setProperty("user.home", "/foo/bar");
+    public void test_noexpand_tilde_withPath() throws Exception {
         String result = LocalFileSystemUtils.expandTilde("~/filesystem-test-fixture/links/file0");
         assertEquals("/foo/bar/filesystem-test-fixture/links/file0", result);
     }
 
     @Test
     public void test_expand_tilde() throws Exception {
-        // System.setProperty("user.home", "/foo/bar");
         String result = LocalFileSystemUtils.expandTilde("~");
         assertEquals("/foo/bar", result);
     }
 
     @Test
     public void test_expand_tilde_null() throws Exception {
-        // System.setProperty("user.home", "/foo/bar");
         String result = LocalFileSystemUtils.expandTilde(null);
         assertNull(result);
     }
 
     @Test
     public void test_expand_tilde_notilde() throws Exception {
-        // System.setProperty("user.home", "/foo/bar");
         String result = LocalFileSystemUtils.expandTilde("/aap/noot");
         assertEquals("/aap/noot", result);
     }
 
     @Test
     public void test_expand_tilde_wrongspot() throws Exception {
-        // System.setProperty("user.home", "/foo/bar");
         String result = LocalFileSystemUtils.expandTilde("/aap/noot/~/mies");
         assertEquals("/aap/noot/~/mies", result);
     }
 
     @Test
-    public void test_expand_tilde_noSeparatorNoUserName() throws Exception {
-        // System.setProperty("user.home", "/foo/bar");
-        String result = LocalFileSystemUtils.expandTilde("~foo/bar");
-        assertEquals("~foo/bar", result);
+    public void test_expand_tilde_wrongUserName() throws Exception {
+        String result = LocalFileSystemUtils.expandTilde("~jason/dir");
+        assertEquals("~jason/dir", result);
     }
 
     @Test
-    public void test_expand_tilde_userName() throws Exception {
-        // System.setProperty("user.home", "/foo/bar");
+    public void test_cannot_expand_tilde_userName() throws Exception {
         String result = LocalFileSystemUtils.expandTilde("~stefan/dir");
-        assertEquals("/foo/bar/dir", result);
+        assertEquals("~stefan/dir", result);
     }
 }

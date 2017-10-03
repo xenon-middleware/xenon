@@ -210,12 +210,21 @@ public class LocalFileSystemUtils {
     /**
      * Expand the tilde in a String representation of a path by the users home directory, as provided by the <code>user.home</code> property.
      *
-     * The tilde will only be replaced if it is the first character in the path, for example "~" or "~/foo". Otherwise, the provided path will be returned
-     * unchanged (including a path that is <code>null</code>).
+     * The tilde will only be replaced if it is the first character in the path and either the only character in the path or directly followed by the local
+     * separator character or directly followed by the local user name (as provided by the <code>user.name</code> property).
+     * 
+     * For example, if <code>user.name</code> is set to "john" and <code>user.home</code> is set to "/home/john", then "~" will be expanded to "/home/john",
+     * "~/foo" or "~john/foo" will be expanded to "/home/john/foo".
+     * 
+     * However, in paths like "/foo/bar", "~matt/foo" or "/foo/~" the tilde will not be expanded, and the provided path is returned unchanged. This includes a
+     * path that is <code>null</code>.
+     * 
+     * If the <code>user.home</code> property is not set, the tilde will not be expanded and the provided path will be returned unchanged. If the
+     * <code>user.name</code> property is not set, the combined tilde-username expansion will not be performed.
      *
      * @param path
-     *            the path in which to replace the tilde (is possible).
-     * @return the path with the tilde replaced by the user home property, or the unchanged path if it does not contain a tilde as first character.
+     *            the path in which to replace the tilde (if possible).
+     * @return the path with the tilde replaced by the user home property, or the unchanged path if replacement was not triggered.
      */
     public static String expandTilde(String path) {
 
@@ -223,8 +232,30 @@ public class LocalFileSystemUtils {
             return null;
         }
 
-        if (path.startsWith("~")) {
-            return getLocalRootlessPath(System.getProperty("user.home")) + path.substring(1);
+        String home = System.getProperty("user.home");
+
+        if (home == null || home.isEmpty()) {
+            return path;
+        }
+
+        if (!path.startsWith("~")) {
+            return path;
+        }
+
+        if (path.length() == 1 || path.startsWith("~" + getLocalSeparator())) {
+            return getLocalRootlessPath(home) + path.substring(1);
+        }
+
+        String user = System.getProperty("user.name");
+
+        System.err.println(home + " " + user);
+
+        if (user == null || user.isEmpty()) {
+            return path;
+        }
+
+        if (path.startsWith("~" + user)) {
+            return getLocalRootlessPath(home) + path.substring(1 + user.length());
         }
 
         return path;
