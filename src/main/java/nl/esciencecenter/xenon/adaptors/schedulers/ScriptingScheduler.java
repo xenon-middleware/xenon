@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
+import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.ADAPTOR_NAME;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -288,6 +290,34 @@ public abstract class ScriptingScheduler extends Scheduler {
         }
 
         return status;
+    }
+
+    /**
+     * Check if the given <code>queueName</code> is presents in <code>queueNames</code>.
+     *
+     * If <code>queueName</code> is <code>null</code> or <code>queueName</code> is present in <code>queueNames</code> this method will return. Otherwise it will
+     * throw a <code>NoSuchQueueException</code>.
+     *
+     * @param queueNames
+     *            the valid queue names.
+     * @param queueName
+     *            the queueName to check.
+     * @throws NoSuchQueueException
+     *             if workingDirectory does not exist, or an error occurred.
+     */
+
+    protected void checkQueue(String[] queueNames, String queueName) throws NoSuchQueueException {
+        if (queueName == null) {
+            return;
+        }
+
+        for (String q : queueNames) {
+            if (queueName.equals(q)) {
+                return;
+            }
+        }
+
+        throw new NoSuchQueueException(ADAPTOR_NAME, "Queue does not exist: " + queueName);
     }
 
     /**

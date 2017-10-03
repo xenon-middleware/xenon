@@ -235,6 +235,8 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
         verifyJobDescription(description);
 
+        checkQueue(setupInfo.getQueueNames(), description.getQueueName());
+
         // check for option that overrides job script completely.
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
 

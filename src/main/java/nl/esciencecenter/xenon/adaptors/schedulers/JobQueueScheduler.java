@@ -24,6 +24,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
@@ -37,9 +40,6 @@ import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
 import nl.esciencecenter.xenon.schedulers.QueueStatus;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.Streams;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -98,13 +98,12 @@ public class JobQueueScheduler extends Scheduler {
 
     private final ArrayList<List<JobExecutor>> queues = new ArrayList<>();
 
-    public JobQueueScheduler(String uniqueID, String adaptorName, String location, InteractiveProcessFactory factory,
-            FileSystem filesystem, Path workingDirectory, int multiQThreads, long pollingDelay, XenonProperties properties) throws BadParameterException {
+    public JobQueueScheduler(String uniqueID, String adaptorName, String location, InteractiveProcessFactory factory, FileSystem filesystem,
+            Path workingDirectory, int multiQThreads, long pollingDelay, XenonProperties properties) throws BadParameterException {
 
         super(uniqueID, adaptorName, location, properties);
 
-        LOGGER.debug("Creating JobQueueScheduler for Adaptor {} with multiQThreads: {} and pollingDelay: {}", adaptorName, multiQThreads,
-                pollingDelay);
+        LOGGER.debug("Creating JobQueueScheduler for Adaptor {} with multiQThreads: {} and pollingDelay: {}", adaptorName, multiQThreads, pollingDelay);
 
         this.adaptorName = adaptorName;
         this.filesystem = filesystem;
@@ -121,8 +120,7 @@ public class JobQueueScheduler extends Scheduler {
         }
 
         if (pollingDelay < MIN_POLLING_DELAY || pollingDelay > MAX_POLLING_DELAY) {
-            throw new BadParameterException(adaptorName, "Polling delay must be between " + MIN_POLLING_DELAY + " and "
-                    + MAX_POLLING_DELAY + "!");
+            throw new BadParameterException(adaptorName, "Polling delay must be between " + MIN_POLLING_DELAY + " and " + MAX_POLLING_DELAY + "!");
         }
 
         ThreadFactory threadFactory = new DaemonThreadFactory();
@@ -174,7 +172,6 @@ public class JobQueueScheduler extends Scheduler {
 
         return out.toArray(new String[out.size()]);
     }
-
 
     private JobExecutor findJob(List<JobExecutor> queue, String jobIdentifier) throws XenonException {
 
@@ -235,7 +232,6 @@ public class JobQueueScheduler extends Scheduler {
         }
     }
 
-
     public JobStatus getJobStatus(String jobIdentifier) throws XenonException {
         LOGGER.debug("{}: getJobStatus for job {}", adaptorName, jobIdentifier);
 
@@ -247,7 +243,6 @@ public class JobQueueScheduler extends Scheduler {
 
         return status;
     }
-
 
     public JobStatus waitUntilDone(String jobIdentifier, long timeout) throws XenonException {
         LOGGER.debug("{}: Waiting for job {} for {} ms.", adaptorName, jobIdentifier, timeout);
@@ -299,7 +294,7 @@ public class JobQueueScheduler extends Scheduler {
         }
 
         if (!(SINGLE_QUEUE_NAME.equals(queue) || MULTI_QUEUE_NAME.equals(queue) || UNLIMITED_QUEUE_NAME.equals(queue))) {
-            throw new InvalidJobDescriptionException(adaptorName, "Queue " + queue + " not available locally!");
+            throw new NoSuchQueueException(adaptorName, "Queue " + queue + " not available locally!");
         }
 
         String executable = description.getExecutable();
@@ -352,8 +347,8 @@ public class JobQueueScheduler extends Scheduler {
 
         LOGGER.debug("{}: Created Job {}", adaptorName, jobIdentifier);
 
-        JobExecutor executor = new JobExecutor(adaptorName, filesystem, workingDirectory, factory,
-                new JobDescription(description), jobIdentifier, interactive, pollingDelay);
+        JobExecutor executor = new JobExecutor(adaptorName, filesystem, workingDirectory, factory, new JobDescription(description), jobIdentifier, interactive,
+                pollingDelay);
 
         String queueName = description.getQueueName();
 
@@ -393,7 +388,6 @@ public class JobQueueScheduler extends Scheduler {
 
         return executor.getStreams();
     }
-
 
     public JobStatus cancelJob(String jobIdentifier) throws XenonException {
         LOGGER.debug("{}: Cancel job {}", adaptorName, jobIdentifier);
@@ -436,7 +430,7 @@ public class JobQueueScheduler extends Scheduler {
         }
     }
 
-    public String [] getQueueNames() {
+    public String[] getQueueNames() {
         return new String[] { SINGLE_QUEUE_NAME, MULTI_QUEUE_NAME, UNLIMITED_QUEUE_NAME };
     }
 

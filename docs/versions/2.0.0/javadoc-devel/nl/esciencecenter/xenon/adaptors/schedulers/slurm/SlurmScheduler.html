@@ -217,14 +217,12 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>private java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/slurm/SlurmScheduler.html#findInteractiveJob-java.lang.String-java.lang.String-">findInteractiveJob</a></span>(java.lang.String&nbsp;tag,
-                  java.lang.String&nbsp;interactiveJob)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/slurm/SlurmScheduler.html#findInteractiveJob-java.lang.String-">findInteractiveJob</a></span>(java.lang.String&nbsp;tag)</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>private java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/slurm/SlurmScheduler.html#findInteractiveJobInMap-java.util.Map-java.lang.String-java.lang.String-">findInteractiveJobInMap</a></span>(java.util.Map&lt;java.lang.String,java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;&nbsp;queueInfo,
-                       java.lang.String&nbsp;tag,
-                       java.lang.String&nbsp;interactiveJobID)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/slurm/SlurmScheduler.html#findInteractiveJobInMap-java.util.Map-java.lang.String-">findInteractiveJobInMap</a></span>(java.util.Map&lt;java.lang.String,java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;&nbsp;queueInfo,
+                       java.lang.String&nbsp;tag)</code>&nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
@@ -303,7 +301,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;nl.esciencecenter.xenon.adaptors.schedulers.<a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers">ScriptingScheduler</a></h3>
-<code><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#checkQueueNames-java.lang.String:A-">checkQueueNames</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#checkWorkingDirectory-java.lang.String-">checkWorkingDirectory</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#close--">close</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#getQueueStatuses-java.util.Map-java.lang.String...-">getQueueStatuses</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#getWorkingDirectory--">getWorkingDirectory</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#isOpen--">isOpen</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#runCheckedCommand-java.lang.String-java.lang.String-java.lang.String...-">runCheckedCommand</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#runCommand-java.lang.String-java.lang.String-java.lang.String...-">runCommand</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#sleep-long-">sleep</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#startInteractiveCommand-java.lang.String-java.lang.String...-">startInteractiveCommand</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#waitUntilDone-java.lang.String-long-">waitUntilDone</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#waitUntilRunning-java.lang.String-long-">waitUntilRunning</a></code></li>
+<code><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#checkQueue-java.lang.String:A-java.lang.String-">checkQueue</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#checkQueueNames-java.lang.String:A-">checkQueueNames</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#checkWorkingDirectory-java.lang.String-">checkWorkingDirectory</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#close--">close</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#getQueueStatuses-java.util.Map-java.lang.String...-">getQueueStatuses</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#getWorkingDirectory--">getWorkingDirectory</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#isOpen--">isOpen</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#runCheckedCommand-java.lang.String-java.lang.String-java.lang.String...-">runCheckedCommand</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#runCommand-java.lang.String-java.lang.String-java.lang.String...-">runCommand</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#sleep-long-">sleep</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#startInteractiveCommand-java.lang.String-java.lang.String...-">startInteractiveCommand</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#waitUntilDone-java.lang.String-long-">waitUntilDone</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#waitUntilRunning-java.lang.String-long-">waitUntilRunning</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.nl.esciencecenter.xenon.schedulers.Scheduler">
@@ -480,25 +478,23 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 </dl>
 </li>
 </ul>
-<a name="findInteractiveJobInMap-java.util.Map-java.lang.String-java.lang.String-">
+<a name="findInteractiveJobInMap-java.util.Map-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>findInteractiveJobInMap</h4>
 <pre>private&nbsp;java.lang.String&nbsp;findInteractiveJobInMap(java.util.Map&lt;java.lang.String,java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;&nbsp;queueInfo,
-                                                 java.lang.String&nbsp;tag,
-                                                 java.lang.String&nbsp;interactiveJobID)</pre>
+                                                 java.lang.String&nbsp;tag)</pre>
 </li>
 </ul>
-<a name="findInteractiveJob-java.lang.String-java.lang.String-">
+<a name="findInteractiveJob-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>findInteractiveJob</h4>
-<pre>private&nbsp;java.lang.String&nbsp;findInteractiveJob(java.lang.String&nbsp;tag,
-                                            java.lang.String&nbsp;interactiveJob)
+<pre>private&nbsp;java.lang.String&nbsp;findInteractiveJob(java.lang.String&nbsp;tag)
                                      throws <a href="../../../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></pre>
 <dl>
 <dt><span class="throwsLabel">Throws:</span></dt>

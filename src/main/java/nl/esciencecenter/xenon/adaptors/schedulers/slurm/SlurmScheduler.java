@@ -138,6 +138,8 @@ public class SlurmScheduler extends ScriptingScheduler {
 
         verifyJobDescription(description, false);
 
+        checkQueue(queueNames, description.getQueueName());
+
         // check for option that overrides job script completely.
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
 
@@ -161,7 +163,7 @@ public class SlurmScheduler extends ScriptingScheduler {
         return ScriptingParser.parseJobIDFromLine(output, ADAPTOR_NAME, "Submitted batch job", "Granted job allocation");
     }
 
-    private String findInteractiveJobInMap(Map<String, Map<String, String>> queueInfo, String tag, String interactiveJobID) {
+    private String findInteractiveJobInMap(Map<String, Map<String, String>> queueInfo, String tag) {
 
         // find job with "tag" as a job name in the job info. NAME is produced by squeue, JobName by sacct
         for (Map.Entry<String, Map<String, String>> entry : queueInfo.entrySet()) {
@@ -184,17 +186,17 @@ public class SlurmScheduler extends ScriptingScheduler {
         return null;
     }
 
-    private String findInteractiveJob(String tag, String interactiveJob) throws XenonException {
+    private String findInteractiveJob(String tag) throws XenonException {
 
         // See if the job can be found in the queue.
-        String result = findInteractiveJobInMap(getSqueueInfo(), tag, interactiveJob);
+        String result = findInteractiveJobInMap(getSqueueInfo(), tag);
 
         if (result != null) {
             return result;
         }
 
         // See if the job can be found in the accounting.
-        return findInteractiveJobInMap(getSacctInfo(), tag, interactiveJob);
+        return findInteractiveJobInMap(getSacctInfo(), tag);
     }
 
     @Override
@@ -206,6 +208,8 @@ public class SlurmScheduler extends ScriptingScheduler {
 
         checkWorkingDirectory(description.getWorkingDirectory());
 
+        checkQueue(queueNames, description.getQueueName());
+
         UUID tag = UUID.randomUUID();
 
         String[] arguments = generateInteractiveArguments(description, fsEntryPath, tag);
@@ -214,10 +218,14 @@ public class SlurmScheduler extends ScriptingScheduler {
         // So the job we get back here is the local SSH job that connects to the remote machine running slurm.
         Streams interactiveJob = startInteractiveCommand("salloc", arguments);
 
+        // Note that it is hard to check if the salloc failed. If it fails it may return an error code of it's own, but it may also succeed and
+        // return an error code because the application fails.....
+
         // Next we try to find information on the remote slurm job. Note that this job may not be visible in the queue yet, or
         // if may already have finished.
-        String result = findInteractiveJob(tag.toString(), interactiveJob.getJobIdentifier());
+        String result = findInteractiveJob(tag.toString());
 
+        // If we cannot find the job, the salloc may have failed. We should also check for that!
         long end = System.currentTimeMillis() + SLURM_UPDATE_TIMEOUT;
 
         while (result == null && System.currentTimeMillis() < end) {
@@ -229,7 +237,7 @@ public class SlurmScheduler extends ScriptingScheduler {
                 Thread.currentThread().interrupt();
             }
 
-            result = findInteractiveJob(tag.toString(), interactiveJob.getJobIdentifier());
+            result = findInteractiveJob(tag.toString());
         }
 
         if (result != null) {

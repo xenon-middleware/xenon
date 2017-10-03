@@ -635,6 +635,37 @@ public abstract class SchedulerTestParent {
         scheduler.submitInteractiveJob(job);
     }
 
+    @Test(expected = NoSuchQueueException.class)
+    public void test_interactiveJobToNonExistantQueue() throws Exception {
+
+        assumeTrue(description.supportsInteractive());
+
+        // Do not run this test on the local adaptor, but only remote.
+        assumeFalse(scheduler.getAdaptorName().equals("local"));
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/cat");
+        job.setQueueName("noSuchQueue");
+
+        Streams streams = scheduler.submitInteractiveJob(job);
+
+        OutputReader out = new OutputReader(streams.getStdout());
+        OutputReader err = new OutputReader(streams.getStderr());
+
+        OutputStream stdin = streams.getStdin();
+
+        stdin.write("Hello World\n".getBytes());
+        stdin.write("Goodbye World\n".getBytes());
+        stdin.close();
+
+        out.waitUntilFinished();
+        err.waitUntilFinished();
+
+        assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
+
+        cleanupJob(streams.getJobIdentifier());
+    }
+
     @Test
     public void test_interactiveJob() throws Exception {
 
