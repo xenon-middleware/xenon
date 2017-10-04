@@ -145,8 +145,6 @@ public class SSHUtilTest {
 
         assertEquals(3, result.size());
 
-        System.out.println("RESULT " + result);
-
         assertTrue(result.containsKey("xenon.adaptors.filesystems.sftp.strictHostKeyChecking"));
         assertTrue(result.containsKey("xenon.adaptors.filesystems.sftp.agentForwarding"));
         assertTrue(result.containsKey("xenon.adaptors.filesystems.sftp.sshConfigFile"));

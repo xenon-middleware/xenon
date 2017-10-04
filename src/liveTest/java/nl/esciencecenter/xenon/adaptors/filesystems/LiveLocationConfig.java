@@ -40,15 +40,11 @@ public class LiveLocationConfig extends LocationConfig {
             sep = System.getProperty("xenon.separator").charAt(0);
         }
 
-        System.out.println(baseDir);
-
         if (baseDir == null) {
             return fileSystem.getWorkingDirectory().resolve(new Path(sep, false, path));
         }
 
-        Path p = new Path(sep, baseDir).resolve(new Path(sep, false, path));
-        System.out.println(p);
-        return p;
+        return new Path(sep, baseDir).resolve(new Path(sep, false, path));
     }
 
     @Override

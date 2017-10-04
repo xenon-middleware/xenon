@@ -92,6 +92,8 @@ public class JobQueueScheduler extends Scheduler {
 
     private final long pollingDelay;
 
+    private final long startupTimeout;
+
     private final InteractiveProcessFactory factory;
 
     private final AtomicLong jobID = new AtomicLong(0L);
@@ -99,7 +101,7 @@ public class JobQueueScheduler extends Scheduler {
     private final ArrayList<List<JobExecutor>> queues = new ArrayList<>();
 
     public JobQueueScheduler(String uniqueID, String adaptorName, String location, InteractiveProcessFactory factory, FileSystem filesystem,
-            Path workingDirectory, int multiQThreads, long pollingDelay, XenonProperties properties) throws BadParameterException {
+            Path workingDirectory, int multiQThreads, long pollingDelay, long startupTimeout, XenonProperties properties) throws BadParameterException {
 
         super(uniqueID, adaptorName, location, properties);
 
@@ -110,6 +112,7 @@ public class JobQueueScheduler extends Scheduler {
         this.workingDirectory = workingDirectory;
         this.factory = factory;
         this.pollingDelay = pollingDelay;
+        this.startupTimeout = startupTimeout;
 
         queues.add(singleQ);
         queues.add(multiQ);
@@ -348,7 +351,7 @@ public class JobQueueScheduler extends Scheduler {
         LOGGER.debug("{}: Created Job {}", adaptorName, jobIdentifier);
 
         JobExecutor executor = new JobExecutor(adaptorName, filesystem, workingDirectory, factory, new JobDescription(description), jobIdentifier, interactive,
-                pollingDelay);
+                pollingDelay, startupTimeout);
 
         String queueName = description.getQueueName();
 

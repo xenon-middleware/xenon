@@ -190,7 +190,6 @@ public class JCloudsFileSytem extends FileSystem {
         // in the latter case the __not_empty__ file is deleted and an exception
         // is thrown (correct behaviour)
         if (!dirExists(dir)) {
-            // TODO: shouldn't this be a NoSuchPathException ?
             throw new NoSuchPathException(adaptorName, "Directory does not exist: " + dir);
         }
 

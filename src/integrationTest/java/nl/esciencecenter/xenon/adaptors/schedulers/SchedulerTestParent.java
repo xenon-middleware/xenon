@@ -24,7 +24,6 @@ import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.OutputStream;
-import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Before;
@@ -90,19 +89,16 @@ public abstract class SchedulerTestParent {
         assertEquals(locationConfig.getLocation(), location);
     }
 
-    // TODO: should be unit tests
     @Test
     public void test_isEmbedded() throws XenonException {
         assertEquals(locationConfig.isEmbedded(), description.isEmbedded());
     }
 
-    // TODO: should be unit tests
     @Test
     public void test_supportsBatch() throws XenonException {
         assertEquals(locationConfig.supportsBatch(), description.supportsBatch());
     }
 
-    // TODO: should be unit tests
     @Test
     public void test_supportsInteractive() throws XenonException {
         assertEquals(locationConfig.supportsInteractive(), description.supportsInteractive());
@@ -161,7 +157,7 @@ public abstract class SchedulerTestParent {
         long deadline = System.currentTimeMillis() + maxTime;
 
         while (!status.isRunning() && !status.isDone() && System.currentTimeMillis() < deadline) {
-            System.out.println("Current jobs: " + Arrays.toString(scheduler.getJobs()));
+            // System.out.println("Current jobs: " + Arrays.toString(scheduler.getJobs()));
             status = scheduler.waitUntilRunning(jobID, 1000);
         }
 
@@ -179,7 +175,7 @@ public abstract class SchedulerTestParent {
         long deadline = System.currentTimeMillis() + maxTime;
 
         while (!status.isDone() && System.currentTimeMillis() < deadline) {
-            System.out.println("Current jobs: " + Arrays.toString(scheduler.getJobs()));
+            // System.out.println("Current jobs: " + Arrays.toString(scheduler.getJobs()));
             status = scheduler.waitUntilDone(jobID, 1000);
         }
 
@@ -220,24 +216,10 @@ public abstract class SchedulerTestParent {
         JobStatus status = null;
 
         // Clean up the mess..
-        // try {
         status = scheduler.cancelJob(jobID);
-        // } catch (Exception e) {
-        // LOGGER.warn("Failed to cancel job: " + jobID, e);
-        // System.out.println("Failed to cancel job: " + jobID + " " + e);
-        // e.printStackTrace();
-        // return;
-        // }
 
         if (!status.isDone()) {
-
-            // try {
             status = waitUntilDone(jobID);
-            // } catch (Exception e) {
-            // LOGGER.warn("Failed to wait for job: " + jobID, e);
-            // System.out.println("Failed to wait for job: " + jobID + " " + e);
-            // e.printStackTrace();
-            // return;
         }
 
         if (!status.isDone()) {
@@ -726,39 +708,4 @@ public abstract class SchedulerTestParent {
 
         cleanupJob(streams.getJobIdentifier());
     }
-
-    /*
-     * @Test(expected=XenonException.class) public void test_waitUntilDone_unknownJobID_throwsException() throws XenonException {
-     * scheduler.waitUntilDone("foobar", 5*1000); }
-     *
-     * @Test(expected=IllegalArgumentException.class) public void test_waitUntilDone_nullJobID_throwsException() throws XenonException {
-     * scheduler.waitUntilDone(null, 5*1000); }
-     *
-     * @Test(expected=IllegalArgumentException.class) public void test_waitUntilDone_emptyJobID_throwsException() throws XenonException {
-     * scheduler.waitUntilDone("", 5*1000); }
-     *
-     * @Test(expected=IllegalArgumentException.class) public void test_waitUntilDone_invalidTimeout_throwsException() throws XenonException {
-     * scheduler.waitUntilDone("foobar", -1000); }
-     *
-     * @Test(expected=XenonException.class) public void test_waitUntilRunning_unknownJobID_throwsException() throws XenonException {
-     * scheduler.waitUntilRunning("foobar", 5*1000); }
-     *
-     * @Test(expected=IllegalArgumentException.class) public void test_waitUntilRunning_nullJobID_throwsException() throws XenonException {
-     * scheduler.waitUntilRunning(null, 5*1000); }
-     *
-     * @Test(expected=IllegalArgumentException.class) public void test_waitUntilRunning_emptyJobID_throwsException() throws XenonException {
-     * scheduler.waitUntilRunning("", 5*1000); }
-     *
-     * @Test(expected=IllegalArgumentException.class) public void test_waitUntilRunning_invalidTimeout_throwsException() throws XenonException {
-     * scheduler.waitUntilRunning("foobar", -1000); }
-     *
-     * @Test(expected=XenonException.class) public void test_cancel_unknownJobID_throwsException() throws XenonException { scheduler.cancelJob("foobar"); }
-     *
-     * @Test(expected=IllegalArgumentException.class) public void test_cancel_nullJobID_throwsException() throws XenonException { scheduler.cancelJob(null); }
-     *
-     * @Test(expected=IllegalArgumentException.class) public void test_cancel_emptyJobID_throwsException() throws XenonException { scheduler.cancelJob(""); }
-     */
-
-    // TODO: check illegalargument exceptions
-
 }

@@ -54,7 +54,6 @@ public class MockChannelExec extends ChannelExec {
 
     @Override
     public boolean isClosed() {
-        System.out.println("CLOSED " + closed);
         return closed;
     }
 
@@ -106,7 +105,6 @@ public class MockChannelExec extends ChannelExec {
         };
 
     }
-
 
     @Override
     public InputStream getInvertedOut() {
@@ -185,7 +183,6 @@ public class MockChannelExec extends ChannelExec {
             public void cancel() {
             }
         };
-
 
     }
 

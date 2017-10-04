@@ -39,7 +39,7 @@ public class JobExecutor implements Runnable {
     private static final long POLLING_DELAY = 1000L;
 
     /** Number of ms. per min. */
-    private static final long MILLISECONDS_IN_MINUTE = 60L * 1000L;
+    private static final long MILLISECONDS_PER_MINUTE = 60L * 1000L;
 
     private final JobDescription description;
     private final String jobIdentifier;
@@ -48,6 +48,7 @@ public class JobExecutor implements Runnable {
     private final InteractiveProcessFactory factory;
 
     private final long pollingDelay;
+    private final long startupTimeout;
 
     private final String adaptorName;
 
@@ -68,8 +69,8 @@ public class JobExecutor implements Runnable {
 
     private XenonException error;
 
-    public JobExecutor(String adaptorName, FileSystem filesystem, Path workingDirectory, InteractiveProcessFactory factory,
-            JobDescription description, String jobIdentifier, boolean interactive, long pollingDelay) {
+    public JobExecutor(String adaptorName, FileSystem filesystem, Path workingDirectory, InteractiveProcessFactory factory, JobDescription description,
+            String jobIdentifier, boolean interactive, long pollingDelay, long startupTimeout) {
 
         this.adaptorName = adaptorName;
         this.filesystem = filesystem;
@@ -79,6 +80,7 @@ public class JobExecutor implements Runnable {
         this.interactive = interactive;
         this.factory = factory;
         this.pollingDelay = pollingDelay;
+        this.startupTimeout = startupTimeout;
     }
 
     public synchronized boolean hasRun() {
@@ -306,16 +308,16 @@ public class JobExecutor implements Runnable {
         int maxTime = description.getMaxRuntime();
 
         if (maxTime > 0) {
-            endTime = System.currentTimeMillis() + maxTime * MILLISECONDS_IN_MINUTE;
+            endTime = System.currentTimeMillis() + maxTime * MILLISECONDS_PER_MINUTE;
         }
 
         try {
             if (interactive) {
-                InteractiveProcess p = factory.createInteractiveProcess(description, jobIdentifier);
+                InteractiveProcess p = factory.createInteractiveProcess(description, jobIdentifier, startupTimeout);
                 setStreams(p.getStreams());
                 process = p;
             } else {
-                process = new BatchProcess(filesystem, workingDirectory, description, jobIdentifier, factory);
+                process = new BatchProcess(filesystem, workingDirectory, description, jobIdentifier, factory, startupTimeout);
             }
         } catch (XenonException e) {
             updateState(ERROR_STATE, -1, e);

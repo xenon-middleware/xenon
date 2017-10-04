@@ -28,7 +28,8 @@ public class LocalInteractiveProcessFactory implements InteractiveProcessFactory
     private boolean open = true;
 
     @Override
-    public synchronized InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier) throws XenonException {
+    public synchronized InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier, long timeoutInMillis)
+            throws XenonException {
         if (!open) {
             throw new SchedulerClosedException(ADAPTOR_NAME, "Scheduler is closed");
         }

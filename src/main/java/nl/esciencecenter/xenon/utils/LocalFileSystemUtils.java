@@ -248,8 +248,6 @@ public class LocalFileSystemUtils {
 
         String user = System.getProperty("user.name");
 
-        System.err.println(home + " " + user);
-
         if (user == null || user.isEmpty()) {
             return path;
         }

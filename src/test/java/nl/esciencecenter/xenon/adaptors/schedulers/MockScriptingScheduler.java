@@ -63,25 +63,25 @@ public class MockScriptingScheduler extends ScriptingScheduler {
 
     @Override
     public String submitBatchJob(JobDescription description) throws XenonException {
-        // TODO Auto-generated method stub
+
         return null;
     }
 
     @Override
     public Streams submitInteractiveJob(JobDescription description) throws XenonException {
-        // TODO Auto-generated method stub
+
         return null;
     }
 
     @Override
     public JobStatus getJobStatus(String jobIdentifier) throws XenonException {
-        // TODO Auto-generated method stub
+
         return null;
     }
 
     @Override
     public JobStatus cancelJob(String jobIdentifier) throws XenonException {
-        // TODO Auto-generated method stub
+
         return null;
     }
 

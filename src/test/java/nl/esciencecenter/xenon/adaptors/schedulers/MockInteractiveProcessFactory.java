@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 
-public class MockInteractiveProcessFactory implements InteractiveProcessFactory{
+public class MockInteractiveProcessFactory implements InteractiveProcessFactory {
 
     private long delay;
     private long killDelay;
@@ -36,7 +36,7 @@ public class MockInteractiveProcessFactory implements InteractiveProcessFactory{
         this.killDelay = killDelay;
     }
 
-    public InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier) throws XenonException {
+    public InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier, long timeoutInMillis) throws XenonException {
         return new MockInteractiveProcess(description, jobIdentifier, delay, killDelay);
     }
 

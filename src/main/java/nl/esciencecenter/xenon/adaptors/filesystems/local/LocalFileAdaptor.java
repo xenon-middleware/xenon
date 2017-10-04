@@ -71,8 +71,7 @@ public class LocalFileAdaptor extends FileAdaptor {
 
     @Override
     public boolean canCreateSymboliclinks() {
-        // non-WIndows can
-        // TODO Also can on Windows when user has create symbolic link rights
+        // TODO This may also work on windows, if the user has rights to create symbolic links. No clue how to check this...
         return !isWindows();
     }
 

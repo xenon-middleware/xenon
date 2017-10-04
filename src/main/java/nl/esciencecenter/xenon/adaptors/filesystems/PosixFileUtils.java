@@ -30,8 +30,6 @@ import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 @SuppressWarnings("OctalInteger")
 public class PosixFileUtils {
 
-    // FIXME: Are these correct ? Some seem to be missing ?
-
     /** read by owner */
     public static final int READ_OWNER = 00400;
 
@@ -100,7 +98,6 @@ public class PosixFileUtils {
     private PosixFileUtils() {
         throw new IllegalStateException("Utility class");
     }
-
 
     public static int permissionsToBits(Set<PosixFilePermission> permissions) {
 
