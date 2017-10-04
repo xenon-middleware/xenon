@@ -1409,4 +1409,11 @@ public class FileSystemTest {
         assertFalse(f.equals("hello"));
     }
 
+    @Test
+    public void test_autoclose() throws Exception {
+        try (MockFileSystem f = new MockFileSystem("0", "TEST0", "MEM", new Path("/test"))) {
+            String dummy = f.getAdaptorName();
+        }
+    }
+
 }

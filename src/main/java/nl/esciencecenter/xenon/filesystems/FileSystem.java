@@ -55,7 +55,7 @@ import nl.esciencecenter.xenon.credentials.DefaultCredential;
 /**
  * FileSystem represent a (possibly remote) file system that can be used to access data.
  */
-public abstract class FileSystem {
+public abstract class FileSystem implements AutoCloseable {
 
     /** The name of this component, for use in exceptions */
     private static final String COMPONENT_NAME = "FileSystem";
