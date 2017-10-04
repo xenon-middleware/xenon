@@ -25,46 +25,31 @@ For now, I limited the runtime libraries to the list of jars from
 
 [*Apache-2.0*](https://spdx.org/licenses/Apache-2.0.html#licenseText)
 
-1. aws-s3-2.0.2.jar
-   - notice: ...
-1. cglib-2.2.1-v20090111.jar
-   - notice: ...
-1. commons-codec-1.9.jar
-   - notice: ...
-1. commons-logging-1.2.jar
-   - notice: ...
-1. commons-net-3.3.jar
-   - notice: ...
-1. gson-2.5.jar
-   - notice: ...
+- item labeled _N_ has notice file in jar
+- item labeled _L_ has license file in jar
+
+    
+
+1. aws-s3-2.0.2.jar _N, L_
+1. cglib-2.2.1-v20090111.jar _N, L_
+1. commons-codec-1.9.jar _N, L_
+1. commons-logging-1.2.jar _N, L_
+1. commons-net-3.3.jar _N, L_
+1. gson-2.5.jar 
 1. guava-16.0.1.jar
-   - notice: ...
-1. guice-3.0.jar
-   - notice: ...
-1. guice-assistedinject-3.0.jar
-   - notice: ...
-1. httpclient-4.5.1.jar
-   - notice: ...
-1. httpcore-4.4.3.jar
-   - notice: ...
+1. guice-3.0.jar _N, L_
+1. guice-assistedinject-3.0.jar _N, L_
+1. httpclient-4.5.1.jar _N, L_
+1. httpcore-4.4.3.jar _N, L_
 1. javax.inject-1.jar
-   - notice: ...
 1. java-xmlbuilder-1.1.jar
-   - notice: ...
-1. jclouds-blobstore-2.0.2.jar
-   - notice: ...
-1. jclouds-core-2.0.2.jar
-   - notice: ...
-1. joda-time-2.8.1.jar
-   - notice: ...
-1. s3-2.0.2.jar
-   - notice: ...
+1. jclouds-blobstore-2.0.2.jar _N, L_
+1. jclouds-core-2.0.2.jar _N, L_
+1. joda-time-2.8.1.jar _N, L_
+1. s3-2.0.2.jar _N, L_
 1. sardine-5.7.jar
-   - notice: ...
-1. sshd-core-1.4.0.jar
-   - notice: ...
-1. sts-2.0.2.jar
-   - notice: ...
+1. sshd-core-1.4.0.jar _N, L_
+1. sts-2.0.2.jar _N, L_
 
 
 [*MIT*](https://spdx.org/licenses/MIT.html#licenseText)
