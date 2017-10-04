@@ -218,8 +218,8 @@ Legal
 ------------------------
 
 The Xenon library is copyrighted by the Netherlands eScience Center and released
-under the 
-[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+under the Apache License, Version 2.0. A copy of the license may be obtained
+from [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
 Xenon uses several third-party libraries that have their own (permissive, open 
 source) licenses. See the file [legal/README.md](legal/README.md) for an overview.
