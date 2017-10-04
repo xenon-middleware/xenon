@@ -40,10 +40,6 @@ repositories {
     }
 }
 
-ext.sshjVersion = '0.21.1'
-ext.jschVersion = '0.1.53'
-ext.jschAgentproxyVersion = '0.0.9'
-
 dependencies {
     // Xenon dependencies.
     // xenon/lib/**/*.jar to ./lib/
