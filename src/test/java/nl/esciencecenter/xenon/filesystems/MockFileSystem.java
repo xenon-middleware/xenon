@@ -339,7 +339,19 @@ public class MockFileSystem extends FileSystem {
             return (DirEntry) getEntry(path.getParent().getParent());
         }
 
-        DirEntry current = (DirEntry) getEntry(path.getParent());
+        Entry tmp = getEntry(path.getParent());
+
+        if (tmp == null) {
+            // We are looking for a parent dir, but it does not exist!
+            throw new NoSuchPathException("TEST", "Cannot retrieve path: " + path);
+        }
+
+        if (!(tmp instanceof DirEntry)) {
+            // We expected a parent dir, but got a file!
+            throw new NoSuchPathException("TEST", "Cannot retrieve path: " + path);
+        }
+
+        DirEntry current = (DirEntry) tmp;
 
         if (".".equals(path.getFileNameAsString())) {
             return current;

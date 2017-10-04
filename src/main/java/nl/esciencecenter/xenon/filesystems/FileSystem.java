@@ -55,7 +55,7 @@ import nl.esciencecenter.xenon.credentials.DefaultCredential;
 /**
  * FileSystem represent a (possibly remote) file system that can be used to access data.
  */
-public abstract class FileSystem {
+public abstract class FileSystem implements AutoCloseable {
 
     /** The name of this component, for use in exceptions */
     private static final String COMPONENT_NAME = "FileSystem";
@@ -1175,7 +1175,8 @@ public abstract class FileSystem {
 
         PathAttributes attributes = getAttributes(source);
 
-        if (attributes.isRegular() || attributes.isSymbolicLink()) {
+        // if (attributes.isRegular() || attributes.isSymbolicLink()) {
+        if (attributes.isRegular()) {
             copyFile(source, destinationFS, destination, mode, callback);
             return;
         }
@@ -1193,12 +1194,33 @@ public abstract class FileSystem {
             throw new InvalidPathException(getAdaptorName(), "Source path is a directory: " + source);
         }
 
-        if (!destinationFS.exists(destination)) {
+        // From here on we know the source is a directory. We should also check the destination type.
+        if (destinationFS.exists(destination)) {
+
+            switch (mode) {
+            case CREATE:
+                throw new PathAlreadyExistsException(getAdaptorName(), "Destination path already exists: " + destination);
+            case IGNORE:
+                return;
+            case REPLACE:
+                // continue
+                break;
+            }
+
+            attributes = destinationFS.getAttributes(destination);
+
+            if (attributes.isRegular() || attributes.isSymbolicLink()) {
+                destinationFS.delete(destination, false);
+                destinationFS.createDirectory(destination);
+            } else if (!attributes.isDirectory()) {
+                throw new InvalidPathException(getAdaptorName(), "Existing destination is not a file, link or directory: " + source);
+            }
+        } else {
             destinationFS.createDirectory(destination);
         }
 
+        // We are now sure the target directory exists.
         copyRecursive(source, destinationFS, destination, mode, callback);
-
     }
 
     private void copyRecursive(Path source, FileSystem destinationFS, Path destination, CopyMode mode, CopyCallback callback) throws XenonException {

@@ -44,7 +44,7 @@ import nl.esciencecenter.xenon.credentials.DefaultCredential;
  * @version 1.0
  * @since 1.0
  */
-public abstract class Scheduler {
+public abstract class Scheduler implements AutoCloseable {
 
     /** The name of this component, for use in exceptions */
     private static final String COMPONENT_NAME = "Scheduler";

@@ -105,10 +105,15 @@ var activeTableTab = "activeTableTab";
 <div class="description">
 <ul class="blockList">
 <li class="blockList">
+<dl>
+<dt>All Implemented Interfaces:</dt>
+<dd>java.lang.AutoCloseable</dd>
+</dl>
 <hr>
 <br>
 <pre>public abstract class <span class="typeNameLabel">Scheduler</span>
-extends java.lang.Object</pre>
+extends java.lang.Object
+implements java.lang.AutoCloseable</pre>
 <div class="block">Scheduler represents a (possibly remote) scheduler that can be used to submit jobs and retrieve queue information.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
@@ -562,6 +567,8 @@ extends java.lang.Object</pre>
                     throws <a href="../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></pre>
 <div class="block">Close this Scheduler.</div>
 <dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>close</code>&nbsp;in interface&nbsp;<code>java.lang.AutoCloseable</code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></code> - If the Scheduler failed to close.</dd>
 </dl>

@@ -106,13 +106,18 @@ var activeTableTab = "activeTableTab";
 <ul class="blockList">
 <li class="blockList">
 <dl>
+<dt>All Implemented Interfaces:</dt>
+<dd>java.lang.AutoCloseable</dd>
+</dl>
+<dl>
 <dt>Direct Known Subclasses:</dt>
 <dd><a href="../../../../nl/esciencecenter/xenon/adaptors/filesystems/ftp/FtpFileSystem.html" title="class in nl.esciencecenter.xenon.adaptors.filesystems.ftp">FtpFileSystem</a>, <a href="../../../../nl/esciencecenter/xenon/adaptors/filesystems/jclouds/JCloudsFileSytem.html" title="class in nl.esciencecenter.xenon.adaptors.filesystems.jclouds">JCloudsFileSytem</a>, <a href="../../../../nl/esciencecenter/xenon/adaptors/filesystems/local/LocalFileSystem.html" title="class in nl.esciencecenter.xenon.adaptors.filesystems.local">LocalFileSystem</a>, <a href="../../../../nl/esciencecenter/xenon/adaptors/filesystems/sftp/SftpFileSystem.html" title="class in nl.esciencecenter.xenon.adaptors.filesystems.sftp">SftpFileSystem</a>, <a href="../../../../nl/esciencecenter/xenon/adaptors/filesystems/webdav/WebdavFileSystem.html" title="class in nl.esciencecenter.xenon.adaptors.filesystems.webdav">WebdavFileSystem</a></dd>
 </dl>
 <hr>
 <br>
 <pre>public abstract class <span class="typeNameLabel">FileSystem</span>
-extends java.lang.Object</pre>
+extends java.lang.Object
+implements java.lang.AutoCloseable</pre>
 <div class="block">FileSystem represent a (possibly remote) file system that can be used to access data.</div>
 </li>
 </ul>
@@ -1106,6 +1111,8 @@ extends java.lang.Object</pre>
            throws <a href="../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></pre>
 <div class="block">Close this FileSystem. If the adaptor does not support closing this is a no-op.</div>
 <dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code>close</code>&nbsp;in interface&nbsp;<code>java.lang.AutoCloseable</code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></code> - If the FileSystem failed to close or if an I/O error occurred.</dd>
 </dl>

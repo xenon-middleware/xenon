@@ -1465,7 +1465,7 @@ public abstract class FileSystemTestParent {
         Path testSubSub = createTestSubDir(testSubDir);
         createTestFile(testSubSub, data4);
 
-        Path target = createTestSubDir(testDir);
+        Path target = createTestSubDirName(testDir);
         copySync(source, target, CopyMode.CREATE, true);
         assertSameContentsDir(source, target);
     }
