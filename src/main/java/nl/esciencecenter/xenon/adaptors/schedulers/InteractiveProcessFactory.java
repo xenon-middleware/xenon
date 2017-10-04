@@ -22,7 +22,7 @@ import nl.esciencecenter.xenon.schedulers.JobDescription;
  *
  */
 public interface InteractiveProcessFactory {
-    InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier) throws XenonException;
+    InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier, long timeoutInMillis) throws XenonException;
 
     void close() throws XenonException;
 

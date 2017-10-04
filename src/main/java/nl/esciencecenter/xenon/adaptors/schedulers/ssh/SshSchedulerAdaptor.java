@@ -107,24 +107,17 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
 
     /** List of properties supported by this SSH adaptor */
     public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
-            new XenonPropertyDescription(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, "true",
-                    "Automatically add unknown host keys to known_hosts."),
-            new XenonPropertyDescription(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, "true",
-                    "Enable strict host key checking."),
-            new XenonPropertyDescription(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, "true",
-                    "Load the standard known_hosts file."),
+            new XenonPropertyDescription(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, "true", "Automatically add unknown host keys to known_hosts."),
+            new XenonPropertyDescription(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, "true", "Enable strict host key checking."),
+            new XenonPropertyDescription(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, "true", "Load the standard known_hosts file."),
             new XenonPropertyDescription(LOAD_SSH_CONFIG, Type.BOOLEAN, "true", "Load the OpenSSH config file."),
             new XenonPropertyDescription(SSH_CONFIG_FILE, Type.STRING, null, "OpenSSH config filename."),
             new XenonPropertyDescription(AGENT, Type.BOOLEAN, "false", "Use a (local) ssh-agent."),
             new XenonPropertyDescription(AGENT_FORWARDING, Type.BOOLEAN, "false", "Use ssh-agent forwarding"),
-            new XenonPropertyDescription(TIMEOUT, Type.LONG, "10000",
-                    "The timeout for the connection setup and authetication (in milliseconds)."),
-            new XenonPropertyDescription(POLLING_DELAY, Type.LONG, "1000",
-                    "The polling delay for monitoring running jobs (in milliseconds)."),
-            new XenonPropertyDescription(MULTIQ_MAX_CONCURRENT, Type.INTEGER, "4",
-                    "The maximum number of concurrent jobs in the multiq.."),
-            new XenonPropertyDescription(GATEWAY, Type.STRING, null,
-                    "The gateway machine used to create an SSH tunnel to the target.") };
+            new XenonPropertyDescription(TIMEOUT, Type.LONG, "10000", "The timeout for the connection setup and authetication (in milliseconds)."),
+            new XenonPropertyDescription(POLLING_DELAY, Type.LONG, "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
+            new XenonPropertyDescription(MULTIQ_MAX_CONCURRENT, Type.INTEGER, "4", "The maximum number of concurrent jobs in the multiq.."),
+            new XenonPropertyDescription(GATEWAY, Type.STRING, null, "The gateway machine used to create an SSH tunnel to the target.") };
 
     public SshSchedulerAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
@@ -143,11 +136,9 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
     }
 
     @Override
-    public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties)
-            throws XenonException {
+    public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) throws XenonException {
 
-        LOGGER.debug("new SSH scheduler location = {} credential = {} properties = {}", location, credential,
-                properties);
+        LOGGER.debug("new SSH scheduler location = {} credential = {} properties = {}", location, credential, properties);
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
@@ -171,8 +162,7 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
         long pollingDelay = xp.getLongProperty(POLLING_DELAY);
         int multiQThreads = xp.getIntegerProperty(MULTIQ_MAX_CONCURRENT);
 
-        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, location,
-                new SshInteractiveProcessFactory(session), fs, fs.getWorkingDirectory(), multiQThreads, pollingDelay,
-                xp);
+        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, location, new SshInteractiveProcessFactory(session), fs, fs.getWorkingDirectory(),
+                multiQThreads, pollingDelay, timeout, xp);
     }
 }

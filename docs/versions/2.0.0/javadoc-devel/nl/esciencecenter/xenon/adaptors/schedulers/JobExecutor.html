@@ -194,7 +194,7 @@ implements java.lang.Runnable</pre>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>private static long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobExecutor.html#MILLISECONDS_IN_MINUTE">MILLISECONDS_IN_MINUTE</a></span></code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobExecutor.html#MILLISECONDS_PER_MINUTE">MILLISECONDS_PER_MINUTE</a></span></code>
 <div class="block">Number of ms.</div>
 </td>
 </tr>
@@ -217,18 +217,22 @@ implements java.lang.Runnable</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobExecutor.html#RUNNING_STATE">RUNNING_STATE</a></span></code>&nbsp;</td>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code>private long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobExecutor.html#startupTimeout">startupTimeout</a></span></code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><code>private java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobExecutor.html#state">state</a></span></code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>private <a href="../../../../../nl/esciencecenter/xenon/schedulers/Streams.html" title="interface in nl.esciencecenter.xenon.schedulers">Streams</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobExecutor.html#streams">streams</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>private boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobExecutor.html#updateSignal">updateSignal</a></span></code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>private <a href="../../../../../nl/esciencecenter/xenon/filesystems/Path.html" title="class in nl.esciencecenter.xenon.filesystems">Path</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobExecutor.html#workingDirectory">workingDirectory</a></span></code>&nbsp;</td>
 </tr>
@@ -247,14 +251,15 @@ implements java.lang.Runnable</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobExecutor.html#JobExecutor-java.lang.String-nl.esciencecenter.xenon.filesystems.FileSystem-nl.esciencecenter.xenon.filesystems.Path-nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcessFactory-nl.esciencecenter.xenon.schedulers.JobDescription-java.lang.String-boolean-long-">JobExecutor</a></span>(java.lang.String&nbsp;adaptorName,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobExecutor.html#JobExecutor-java.lang.String-nl.esciencecenter.xenon.filesystems.FileSystem-nl.esciencecenter.xenon.filesystems.Path-nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcessFactory-nl.esciencecenter.xenon.schedulers.JobDescription-java.lang.String-boolean-long-long-">JobExecutor</a></span>(java.lang.String&nbsp;adaptorName,
            <a href="../../../../../nl/esciencecenter/xenon/filesystems/FileSystem.html" title="class in nl.esciencecenter.xenon.filesystems">FileSystem</a>&nbsp;filesystem,
            <a href="../../../../../nl/esciencecenter/xenon/filesystems/Path.html" title="class in nl.esciencecenter.xenon.filesystems">Path</a>&nbsp;workingDirectory,
            <a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/InteractiveProcessFactory.html" title="interface in nl.esciencecenter.xenon.adaptors.schedulers">InteractiveProcessFactory</a>&nbsp;factory,
            <a href="../../../../../nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a>&nbsp;description,
            java.lang.String&nbsp;jobIdentifier,
            boolean&nbsp;interactive,
-           long&nbsp;pollingDelay)</code>&nbsp;</td>
+           long&nbsp;pollingDelay,
+           long&nbsp;startupTimeout)</code>&nbsp;</td>
 </tr>
 </table>
 </li>
@@ -458,17 +463,17 @@ implements java.lang.Runnable</pre>
 </dl>
 </li>
 </ul>
-<a name="MILLISECONDS_IN_MINUTE">
+<a name="MILLISECONDS_PER_MINUTE">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>MILLISECONDS_IN_MINUTE</h4>
-<pre>private static final&nbsp;long MILLISECONDS_IN_MINUTE</pre>
+<h4>MILLISECONDS_PER_MINUTE</h4>
+<pre>private static final&nbsp;long MILLISECONDS_PER_MINUTE</pre>
 <div class="block">Number of ms. per min.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../constant-values.html#nl.esciencecenter.xenon.adaptors.schedulers.JobExecutor.MILLISECONDS_IN_MINUTE">Constant Field Values</a></dd>
+<dd><a href="../../../../../constant-values.html#nl.esciencecenter.xenon.adaptors.schedulers.JobExecutor.MILLISECONDS_PER_MINUTE">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -515,6 +520,15 @@ implements java.lang.Runnable</pre>
 <li class="blockList">
 <h4>pollingDelay</h4>
 <pre>private final&nbsp;long pollingDelay</pre>
+</li>
+</ul>
+<a name="startupTimeout">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>startupTimeout</h4>
+<pre>private final&nbsp;long startupTimeout</pre>
 </li>
 </ul>
 <a name="adaptorName">
@@ -633,7 +647,7 @@ implements java.lang.Runnable</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobExecutor-java.lang.String-nl.esciencecenter.xenon.filesystems.FileSystem-nl.esciencecenter.xenon.filesystems.Path-nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcessFactory-nl.esciencecenter.xenon.schedulers.JobDescription-java.lang.String-boolean-long-">
+<a name="JobExecutor-java.lang.String-nl.esciencecenter.xenon.filesystems.FileSystem-nl.esciencecenter.xenon.filesystems.Path-nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcessFactory-nl.esciencecenter.xenon.schedulers.JobDescription-java.lang.String-boolean-long-long-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -646,7 +660,8 @@ implements java.lang.Runnable</pre>
                    <a href="../../../../../nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a>&nbsp;description,
                    java.lang.String&nbsp;jobIdentifier,
                    boolean&nbsp;interactive,
-                   long&nbsp;pollingDelay)</pre>
+                   long&nbsp;pollingDelay,
+                   long&nbsp;startupTimeout)</pre>
 </li>
 </ul>
 </li>

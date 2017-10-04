@@ -128,8 +128,9 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/InteractiveProcess.html" title="interface in nl.esciencecenter.xenon.adaptors.schedulers">InteractiveProcess</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/InteractiveProcessFactory.html#createInteractiveProcess-nl.esciencecenter.xenon.schedulers.JobDescription-java.lang.String-">createInteractiveProcess</a></span>(<a href="../../../../../nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a>&nbsp;description,
-                        java.lang.String&nbsp;jobIdentifier)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/InteractiveProcessFactory.html#createInteractiveProcess-nl.esciencecenter.xenon.schedulers.JobDescription-java.lang.String-long-">createInteractiveProcess</a></span>(<a href="../../../../../nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a>&nbsp;description,
+                        java.lang.String&nbsp;jobIdentifier,
+                        long&nbsp;timeoutInMillis)</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
@@ -150,14 +151,15 @@ var activeTableTab = "activeTableTab";
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="createInteractiveProcess-nl.esciencecenter.xenon.schedulers.JobDescription-java.lang.String-">
+<a name="createInteractiveProcess-nl.esciencecenter.xenon.schedulers.JobDescription-java.lang.String-long-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>createInteractiveProcess</h4>
 <pre><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/InteractiveProcess.html" title="interface in nl.esciencecenter.xenon.adaptors.schedulers">InteractiveProcess</a>&nbsp;createInteractiveProcess(<a href="../../../../../nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a>&nbsp;description,
-                                            java.lang.String&nbsp;jobIdentifier)
+                                            java.lang.String&nbsp;jobIdentifier,
+                                            long&nbsp;timeoutInMillis)
                                      throws <a href="../../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></pre>
 <dl>
 <dt><span class="throwsLabel">Throws:</span></dt>

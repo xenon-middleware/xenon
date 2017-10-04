@@ -20,17 +20,12 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.ParallelEnvironmentInfo.AllocationRule;
-
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-/**
- *
- *
- */
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.ParallelEnvironmentInfo.AllocationRule;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ParallelEnvironmentInfoTest {
@@ -47,8 +42,7 @@ public class ParallelEnvironmentInfoTest {
 
         assertEquals("parallel environment name incorrect", "some.pe", result.getName());
         assertEquals("parallel environment slots incorrect", 200, result.getSlots());
-        assertEquals("parallel environment allocation rule incorrect", ParallelEnvironmentInfo.AllocationRule.INTEGER,
-                result.getAllocationRule());
+        assertEquals("parallel environment allocation rule incorrect", ParallelEnvironmentInfo.AllocationRule.INTEGER, result.getAllocationRule());
         assertEquals("parallel environment allocation ppn incorrect", 2, result.getPpn());
     }
 
@@ -64,8 +58,7 @@ public class ParallelEnvironmentInfoTest {
 
         assertEquals("parallel environment name incorrect", "some.pe", result.getName());
         assertEquals("parallel environment slots incorrect", 200, result.getSlots());
-        assertEquals("parallel environment allocation rule incorrect", ParallelEnvironmentInfo.AllocationRule.PE_SLOTS,
-                result.getAllocationRule());
+        assertEquals("parallel environment allocation rule incorrect", ParallelEnvironmentInfo.AllocationRule.PE_SLOTS, result.getAllocationRule());
     }
 
     @Test
@@ -80,8 +73,7 @@ public class ParallelEnvironmentInfoTest {
 
         assertEquals("parallel environment name incorrect", "some.pe", result.getName());
         assertEquals("parallel environment slots incorrect", 200, result.getSlots());
-        assertEquals("parallel environment allocation rule incorrect", ParallelEnvironmentInfo.AllocationRule.ROUND_ROBIN,
-                result.getAllocationRule());
+        assertEquals("parallel environment allocation rule incorrect", ParallelEnvironmentInfo.AllocationRule.ROUND_ROBIN, result.getAllocationRule());
     }
 
     @Test
@@ -96,11 +88,10 @@ public class ParallelEnvironmentInfoTest {
 
         assertEquals("parallel environment name incorrect", "some.pe", result.getName());
         assertEquals("parallel environment slots incorrect", 200, result.getSlots());
-        assertEquals("parallel environment allocation rule incorrect", ParallelEnvironmentInfo.AllocationRule.FILL_UP,
-                result.getAllocationRule());
+        assertEquals("parallel environment allocation rule incorrect", ParallelEnvironmentInfo.AllocationRule.FILL_UP, result.getAllocationRule());
     }
 
-    @Test(expected=XenonException.class)
+    @Test(expected = XenonException.class)
     public void test01e_parallelEnvironmentInfoFromMap_IncorrectAllocationRule_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<>();
 
@@ -111,7 +102,7 @@ public class ParallelEnvironmentInfoTest {
         new ParallelEnvironmentInfo(input);
     }
 
-    @Test(expected=XenonException.class)
+    @Test(expected = XenonException.class)
     public void test01f_parallelEnvironmentInfoFromMap_NoName_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<>();
 
@@ -121,7 +112,7 @@ public class ParallelEnvironmentInfoTest {
         new ParallelEnvironmentInfo(input);
     }
 
-    @Test(expected=XenonException.class)
+    @Test(expected = XenonException.class)
     public void test01g_parallelEnvironmentInfoFromMap_NoSlots_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<>();
 
@@ -131,7 +122,7 @@ public class ParallelEnvironmentInfoTest {
         new ParallelEnvironmentInfo(input);
     }
 
-    @Test(expected=XenonException.class)
+    @Test(expected = XenonException.class)
     public void test01h_parallelEnvironmentInfoFromMap_IncorrectSlots_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<>();
 
@@ -142,7 +133,7 @@ public class ParallelEnvironmentInfoTest {
         new ParallelEnvironmentInfo(input);
     }
 
-    @Test(expected=XenonException.class)
+    @Test(expected = XenonException.class)
     public void test01i_parallelEnvironmentInfoFromMap_NoAllocationRule_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<>();
 
@@ -160,11 +151,7 @@ public class ParallelEnvironmentInfoTest {
 
         String expected = "ParallelEnvironmentInfo [name=some.name, slots=4, allocationRule=INTEGER, ppn=2]";
 
-        System.out.println(result);
-
         assertEquals(expected, result);
     }
-
-
 
 }

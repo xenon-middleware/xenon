@@ -36,19 +36,19 @@ public class SshInteractiveProcessTest {
         desc.setWorkingDirectory("workdir");
         desc.setExecutable("exec");
 
-        HashMap<String,String> env = new HashMap<>();
+        HashMap<String, String> env = new HashMap<>();
         env.put("key1", "value1");
         env.put("key2", "value2");
         desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
+        desc.setArguments(new String[] { "a", "b", "c" });
 
-        new SshInteractiveProcess(null, desc, "JOB-42");
+        new SshInteractiveProcess(null, desc, "JOB-42", 10000L);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void test_createFailsJobNull() throws XenonException {
         MockClientSession session = new MockClientSession(false);
-        new SshInteractiveProcess(session, null, "JOB-42");
+        new SshInteractiveProcess(session, null, "JOB-42", 10000L);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -58,30 +58,30 @@ public class SshInteractiveProcessTest {
         desc.setWorkingDirectory("workdir");
         desc.setExecutable("exec");
 
-        HashMap<String,String> env = new HashMap<>();
+        HashMap<String, String> env = new HashMap<>();
         env.put("key1", "value1");
         env.put("key2", "value2");
         desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
+        desc.setArguments(new String[] { "a", "b", "c" });
 
-        new SshInteractiveProcess(null, desc, null);
+        new SshInteractiveProcess(null, desc, null, 10000L);
     }
 
-    @Test(expected=XenonException.class)
+    @Test(expected = XenonException.class)
     public void test_createFails() throws XenonException {
 
         JobDescription desc = new JobDescription();
         desc.setWorkingDirectory("workdir");
         desc.setExecutable("exec");
 
-        HashMap<String,String> env = new HashMap<>();
+        HashMap<String, String> env = new HashMap<>();
         env.put("key1", "value1");
         env.put("key2", "value2");
         desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
+        desc.setArguments(new String[] { "a", "b", "c" });
 
         MockClientSession session = new MockClientSession(false, true);
-        new SshInteractiveProcess(session, desc, "JOB-42");
+        new SshInteractiveProcess(session, desc, "JOB-42", 10000L);
     }
 
     @Test
@@ -90,14 +90,14 @@ public class SshInteractiveProcessTest {
         desc.setWorkingDirectory("workdir");
         desc.setExecutable("exec");
 
-        HashMap<String,String> env = new HashMap<>();
+        HashMap<String, String> env = new HashMap<>();
         env.put("key1", "value1");
         env.put("key2", "value2");
         desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
+        desc.setArguments(new String[] { "a", "b", "c" });
 
         MockClientSession session = new MockClientSession(false);
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
+        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42", 10000L);
 
         MockChannelExec e = (MockChannelExec) session.exec;
 
@@ -113,14 +113,14 @@ public class SshInteractiveProcessTest {
         JobDescription desc = new JobDescription();
         desc.setExecutable("exec");
 
-        HashMap<String,String> env = new HashMap<>();
+        HashMap<String, String> env = new HashMap<>();
         env.put("key1", "value1");
         env.put("key2", "value2");
         desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
+        desc.setArguments(new String[] { "a", "b", "c" });
 
         MockClientSession session = new MockClientSession(false);
-        new SshInteractiveProcess(session, desc, "JOB-42");
+        new SshInteractiveProcess(session, desc, "JOB-42", 10000L);
 
         MockChannelExec e = (MockChannelExec) session.exec;
 
@@ -135,32 +135,31 @@ public class SshInteractiveProcessTest {
         JobDescription desc = new JobDescription();
         desc.setExecutable("exec");
 
-        HashMap<String,String> env = new HashMap<>();
+        HashMap<String, String> env = new HashMap<>();
         env.put("key1", "value1");
         env.put("key2", "value2");
         desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
+        desc.setArguments(new String[] { "a", "b", "c" });
 
         MockClientSession session = new MockClientSession(false);
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
+        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42", 10000L);
 
         assertFalse(p.isDone());
     }
-
 
     @Test
     public void test_isDoneTrue() throws XenonException {
         JobDescription desc = new JobDescription();
         desc.setExecutable("exec");
 
-        HashMap<String,String> env = new HashMap<>();
+        HashMap<String, String> env = new HashMap<>();
         env.put("key1", "value1");
         env.put("key2", "value2");
         desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
+        desc.setArguments(new String[] { "a", "b", "c" });
 
         MockClientSession session = new MockClientSession(false);
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
+        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42", 10000L);
 
         MockChannelExec e = (MockChannelExec) session.exec;
         e.closed = true;
@@ -173,14 +172,14 @@ public class SshInteractiveProcessTest {
         JobDescription desc = new JobDescription();
         desc.setExecutable("exec");
 
-        HashMap<String,String> env = new HashMap<>();
+        HashMap<String, String> env = new HashMap<>();
         env.put("key1", "value1");
         env.put("key2", "value2");
         desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
+        desc.setArguments(new String[] { "a", "b", "c" });
 
         MockClientSession session = new MockClientSession(false);
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
+        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42", 10000L);
 
         assertNotNull(session.exec);
 
@@ -197,14 +196,14 @@ public class SshInteractiveProcessTest {
         JobDescription desc = new JobDescription();
         desc.setExecutable("exec");
 
-        HashMap<String,String> env = new HashMap<>();
+        HashMap<String, String> env = new HashMap<>();
         env.put("key1", "value1");
         env.put("key2", "value2");
         desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
+        desc.setArguments(new String[] { "a", "b", "c" });
 
         MockClientSession session = new MockClientSession(false);
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
+        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42", 10000L);
         p.destroy();
 
         assertNotNull(session.exec);
@@ -217,14 +216,14 @@ public class SshInteractiveProcessTest {
         JobDescription desc = new JobDescription();
         desc.setExecutable("exec");
 
-        HashMap<String,String> env = new HashMap<>();
+        HashMap<String, String> env = new HashMap<>();
         env.put("key1", "value1");
         env.put("key2", "value2");
         desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
+        desc.setArguments(new String[] { "a", "b", "c" });
 
         MockClientSession session = new MockClientSession(false);
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
+        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42", 10000L);
 
         assertNotNull(session.exec);
         MockChannelExec e = (MockChannelExec) session.exec;
@@ -242,14 +241,14 @@ public class SshInteractiveProcessTest {
         JobDescription desc = new JobDescription();
         desc.setExecutable("exec");
 
-        HashMap<String,String> env = new HashMap<>();
+        HashMap<String, String> env = new HashMap<>();
         env.put("key1", "value1");
         env.put("key2", "value2");
         desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
+        desc.setArguments(new String[] { "a", "b", "c" });
 
         MockClientSession session = new MockClientSession(false);
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42");
+        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42", 10000L);
 
         assertNotNull(session.exec);
         MockChannelExec e = (MockChannelExec) session.exec;

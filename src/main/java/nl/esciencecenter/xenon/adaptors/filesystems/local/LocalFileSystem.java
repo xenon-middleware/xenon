@@ -59,27 +59,16 @@ public class LocalFileSystem extends FileSystem {
             throw new IllegalArgumentException("Path may not be null");
         }
 
-/*
-        Path relPath = path.normalize();
-        int numElems = relPath.getNameCount();
-
-        // replace tilde
-        if (numElems != 0) {
-            String firstPart = relPath.getName(0).toString();
-            if ("~".equals(firstPart)) {
-                String tmp = getLocalRootlessPath(System.getProperty("user.home"));
-                Path home = new Path(LocalFileSystemUtils.getLocalSeparator(), tmp);
-
-                if (numElems == 1) {
-                    relPath = home;
-                } else {
-                    relPath = home.resolve(relPath.subpath(1, numElems));
-                }
-            }
-        }
-
-        Path absPath = toAbsolutePath(relPath);
-*/
+        /*
+         * Path relPath = path.normalize(); int numElems = relPath.getNameCount();
+         *
+         * // replace tilde if (numElems != 0) { String firstPart = relPath.getName(0).toString(); if ("~".equals(firstPart)) { String tmp =
+         * getLocalRootlessPath(System.getProperty("user.home")); Path home = new Path(LocalFileSystemUtils.getLocalSeparator(), tmp);
+         *
+         * if (numElems == 1) { relPath = home; } else { relPath = home.resolve(relPath.subpath(1, numElems)); } } }
+         *
+         * Path absPath = toAbsolutePath(relPath);
+         */
         return FileSystems.getDefault().getPath(root, toAbsolutePath(path.normalize()).toString());
     }
 
@@ -145,17 +134,11 @@ public class LocalFileSystem extends FileSystem {
             BasicFileAttributes basicAttributes;
 
             if (isWindows) {
-                // TODO: Seems to fail in Windows ?
+                // The Files.isHidden seems to fail in Windows, so we directly set it to false.
                 result.setHidden(false);
 
                 // These should always work.
                 basicAttributes = Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
-
-                // // These are windows only.
-                // AclFileAttributeView aclAttributes =
-                // Files.getFileAttributeView(javaPath,
-                // AclFileAttributeView.class,
-                // LinkOption.NOFOLLOW_LINKS);
 
             } else {
                 result.setHidden(Files.isHidden(path));

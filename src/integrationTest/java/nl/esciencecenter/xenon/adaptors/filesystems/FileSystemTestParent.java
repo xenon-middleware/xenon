@@ -472,14 +472,6 @@ public abstract class FileSystemTestParent {
         ensureUpToDate(file, data, 5000);
     }
 
-    /*
-     * TODO: Fixme!
-     *
-     * @Test(expected=XenonException.class) public void test_createFile_closedFileSystem_throwsException() throws Exception {
-     * assumeTrue(!description.isConnectionless()); generateAndCreateTestDir(); Path file0 = createNewTestFileName(testDir); fileSystem.close();
-     * fileSystem.createFile(file0); }
-     */
-
     @Test
     public void test_readFromFile() throws Exception {
 

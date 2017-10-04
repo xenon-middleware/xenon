@@ -30,8 +30,7 @@ import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 public class SshInteractiveProcessFactoryTest {
 
-
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_creatNullFails() throws XenonException {
         new SshInteractiveProcessFactory(null);
     }
@@ -51,7 +50,7 @@ public class SshInteractiveProcessFactoryTest {
         assertFalse(p.isOpen());
     }
 
-    @Test(expected=SchedulerClosedException.class)
+    @Test(expected = SchedulerClosedException.class)
     public void test_doublecloseFails() throws XenonException {
         MockClientSession session = new MockClientSession(false);
         SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
@@ -59,14 +58,14 @@ public class SshInteractiveProcessFactoryTest {
         p.close();
     }
 
-    @Test(expected=XenonException.class)
+    @Test(expected = XenonException.class)
     public void test_closeSessionFails() throws XenonException {
         MockClientSession session = new MockClientSession(true);
         SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
         p.close();
     }
 
-    @Test(expected=SchedulerClosedException.class)
+    @Test(expected = SchedulerClosedException.class)
     public void test_createProcessFailsClosed() throws XenonException {
         MockClientSession session = new MockClientSession(false);
         SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
@@ -76,24 +75,24 @@ public class SshInteractiveProcessFactoryTest {
         desc.setWorkingDirectory("workdir");
         desc.setExecutable("exec");
 
-        p.createInteractiveProcess(desc, "JOB-42");
+        p.createInteractiveProcess(desc, "JOB-42", 10000L);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_createProcessFailsNullDescription() throws XenonException {
         MockClientSession session = new MockClientSession(false);
         SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
-        p.createInteractiveProcess(null, null);
+        p.createInteractiveProcess(null, null, 10000L);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_createProcessFailsNullID() throws XenonException {
         MockClientSession session = new MockClientSession(false);
         SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(session);
         JobDescription desc = new JobDescription();
         desc.setWorkingDirectory("workdir");
         desc.setExecutable("exec");
-        p.createInteractiveProcess(desc, null);
+        p.createInteractiveProcess(desc, null, 10000L);
     }
 
     @Test
@@ -105,12 +104,12 @@ public class SshInteractiveProcessFactoryTest {
         desc.setWorkingDirectory("workdir");
         desc.setExecutable("exec");
 
-        HashMap<String,String> env = new HashMap<>();
+        HashMap<String, String> env = new HashMap<>();
         env.put("key1", "value1");
         env.put("key2", "value2");
         desc.setEnvironment(env);
-        desc.setArguments(new String [] { "a", "b", "c" });
-        p.createInteractiveProcess(desc, "JOB-42");
+        desc.setArguments(new String[] { "a", "b", "c" });
+        p.createInteractiveProcess(desc, "JOB-42", 10000L);
 
         MockChannelExec e = (MockChannelExec) session.exec;
 

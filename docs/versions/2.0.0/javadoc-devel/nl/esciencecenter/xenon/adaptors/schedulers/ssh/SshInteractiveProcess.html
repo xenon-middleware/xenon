@@ -153,10 +153,6 @@ implements <a href="../../../../../../nl/esciencecenter/xenon/adaptors/scheduler
 <td class="colFirst"><code>private <a href="../../../../../../nl/esciencecenter/xenon/schedulers/Streams.html" title="interface in nl.esciencecenter.xenon.schedulers">Streams</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ssh/SshInteractiveProcess.html#streams">streams</a></span></code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
-<td class="colFirst"><code>private long</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ssh/SshInteractiveProcess.html#timeout">timeout</a></span></code>&nbsp;</td>
-</tr>
 </table>
 </li>
 </ul>
@@ -172,9 +168,10 @@ implements <a href="../../../../../../nl/esciencecenter/xenon/adaptors/scheduler
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ssh/SshInteractiveProcess.html#SshInteractiveProcess-org.apache.sshd.client.session.ClientSession-nl.esciencecenter.xenon.schedulers.JobDescription-java.lang.String-">SshInteractiveProcess</a></span>(org.apache.sshd.client.session.ClientSession&nbsp;session,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ssh/SshInteractiveProcess.html#SshInteractiveProcess-org.apache.sshd.client.session.ClientSession-nl.esciencecenter.xenon.schedulers.JobDescription-java.lang.String-long-">SshInteractiveProcess</a></span>(org.apache.sshd.client.session.ClientSession&nbsp;session,
                      <a href="../../../../../../nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a>&nbsp;description,
-                     java.lang.String&nbsp;jobIdentifier)</code>&nbsp;</td>
+                     java.lang.String&nbsp;jobIdentifier,
+                     long&nbsp;timeoutInMillis)</code>&nbsp;</td>
 </tr>
 </table>
 </li>
@@ -276,23 +273,10 @@ implements <a href="../../../../../../nl/esciencecenter/xenon/adaptors/scheduler
 <a name="done">
 <!--   -->
 </a>
-<ul class="blockList">
+<ul class="blockListLast">
 <li class="blockList">
 <h4>done</h4>
 <pre>private&nbsp;boolean done</pre>
-</li>
-</ul>
-<a name="timeout">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>timeout</h4>
-<pre>private final&nbsp;long timeout</pre>
-<dl>
-<dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshInteractiveProcess.timeout">Constant Field Values</a></dd>
-</dl>
 </li>
 </ul>
 </li>
@@ -303,7 +287,7 @@ implements <a href="../../../../../../nl/esciencecenter/xenon/adaptors/scheduler
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="SshInteractiveProcess-org.apache.sshd.client.session.ClientSession-nl.esciencecenter.xenon.schedulers.JobDescription-java.lang.String-">
+<a name="SshInteractiveProcess-org.apache.sshd.client.session.ClientSession-nl.esciencecenter.xenon.schedulers.JobDescription-java.lang.String-long-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -311,7 +295,8 @@ implements <a href="../../../../../../nl/esciencecenter/xenon/adaptors/scheduler
 <h4>SshInteractiveProcess</h4>
 <pre>SshInteractiveProcess(org.apache.sshd.client.session.ClientSession&nbsp;session,
                       <a href="../../../../../../nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a>&nbsp;description,
-                      java.lang.String&nbsp;jobIdentifier)
+                      java.lang.String&nbsp;jobIdentifier,
+                      long&nbsp;timeoutInMillis)
                throws <a href="../../../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></pre>
 <dl>
 <dt><span class="throwsLabel">Throws:</span></dt>

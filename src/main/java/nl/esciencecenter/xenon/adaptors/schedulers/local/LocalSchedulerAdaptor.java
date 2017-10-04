@@ -143,6 +143,6 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
         long pollingDelay = xp.getLongProperty(POLLING_DELAY);
 
         return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, "local://", new LocalInteractiveProcessFactory(), filesystem,
-                filesystem.getWorkingDirectory(), multiQThreads, pollingDelay, xp);
+                filesystem.getWorkingDirectory(), multiQThreads, pollingDelay, 0L, xp);
     }
 }

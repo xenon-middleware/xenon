@@ -222,18 +222,22 @@ extends <a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.htm
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobQueueScheduler.html#singleQ">singleQ</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code>private long</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobQueueScheduler.html#startupTimeout">startupTimeout</a></span></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>private static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobQueueScheduler.html#UNLIMITED_QUEUE_NAME">UNLIMITED_QUEUE_NAME</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>private java.util.concurrent.ExecutorService</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobQueueScheduler.html#unlimitedExecutor">unlimitedExecutor</a></span></code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>private java.util.List&lt;<a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobExecutor.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers">JobExecutor</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobQueueScheduler.html#unlimitedQ">unlimitedQ</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>private <a href="../../../../../nl/esciencecenter/xenon/filesystems/Path.html" title="class in nl.esciencecenter.xenon.filesystems">Path</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobQueueScheduler.html#workingDirectory">workingDirectory</a></span></code>&nbsp;</td>
 </tr>
@@ -259,7 +263,7 @@ extends <a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.htm
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobQueueScheduler.html#JobQueueScheduler-java.lang.String-java.lang.String-java.lang.String-nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcessFactory-nl.esciencecenter.xenon.filesystems.FileSystem-nl.esciencecenter.xenon.filesystems.Path-int-long-nl.esciencecenter.xenon.adaptors.XenonProperties-">JobQueueScheduler</a></span>(java.lang.String&nbsp;uniqueID,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/JobQueueScheduler.html#JobQueueScheduler-java.lang.String-java.lang.String-java.lang.String-nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcessFactory-nl.esciencecenter.xenon.filesystems.FileSystem-nl.esciencecenter.xenon.filesystems.Path-int-long-long-nl.esciencecenter.xenon.adaptors.XenonProperties-">JobQueueScheduler</a></span>(java.lang.String&nbsp;uniqueID,
                  java.lang.String&nbsp;adaptorName,
                  java.lang.String&nbsp;location,
                  <a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/InteractiveProcessFactory.html" title="interface in nl.esciencecenter.xenon.adaptors.schedulers">InteractiveProcessFactory</a>&nbsp;factory,
@@ -267,6 +271,7 @@ extends <a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.htm
                  <a href="../../../../../nl/esciencecenter/xenon/filesystems/Path.html" title="class in nl.esciencecenter.xenon.filesystems">Path</a>&nbsp;workingDirectory,
                  int&nbsp;multiQThreads,
                  long&nbsp;pollingDelay,
+                 long&nbsp;startupTimeout,
                  <a href="../../../../../nl/esciencecenter/xenon/adaptors/XenonProperties.html" title="class in nl.esciencecenter.xenon.adaptors">XenonProperties</a>&nbsp;properties)</code>&nbsp;</td>
 </tr>
 </table>
@@ -600,6 +605,15 @@ extends <a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.htm
 <pre>private final&nbsp;long pollingDelay</pre>
 </li>
 </ul>
+<a name="startupTimeout">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>startupTimeout</h4>
+<pre>private final&nbsp;long startupTimeout</pre>
+</li>
+</ul>
 <a name="factory">
 <!--   -->
 </a>
@@ -635,7 +649,7 @@ extends <a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.htm
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="JobQueueScheduler-java.lang.String-java.lang.String-java.lang.String-nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcessFactory-nl.esciencecenter.xenon.filesystems.FileSystem-nl.esciencecenter.xenon.filesystems.Path-int-long-nl.esciencecenter.xenon.adaptors.XenonProperties-">
+<a name="JobQueueScheduler-java.lang.String-java.lang.String-java.lang.String-nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcessFactory-nl.esciencecenter.xenon.filesystems.FileSystem-nl.esciencecenter.xenon.filesystems.Path-int-long-long-nl.esciencecenter.xenon.adaptors.XenonProperties-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -649,6 +663,7 @@ extends <a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.htm
                          <a href="../../../../../nl/esciencecenter/xenon/filesystems/Path.html" title="class in nl.esciencecenter.xenon.filesystems">Path</a>&nbsp;workingDirectory,
                          int&nbsp;multiQThreads,
                          long&nbsp;pollingDelay,
+                         long&nbsp;startupTimeout,
                          <a href="../../../../../nl/esciencecenter/xenon/adaptors/XenonProperties.html" title="class in nl.esciencecenter.xenon.adaptors">XenonProperties</a>&nbsp;properties)
                   throws <a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/BadParameterException.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers">BadParameterException</a></pre>
 <dl>

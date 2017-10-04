@@ -21,18 +21,17 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.sshd.client.channel.ChannelExec;
+import org.apache.sshd.client.session.ClientSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcess;
 import nl.esciencecenter.xenon.adaptors.schedulers.StreamsImplementation;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
-
-import org.apache.sshd.client.channel.ChannelExec;
-import org.apache.sshd.client.session.ClientSession;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * LocalBatchProcess implements a {@link InteractiveProcess} for local batch processes.
@@ -46,20 +45,17 @@ class SshInteractiveProcess implements InteractiveProcess {
     private final Streams streams;
     private boolean done = false;
 
-    // FIXME: should be property or parameter!
-    private final long timeout = 10*1000;
-
-    SshInteractiveProcess(ClientSession session, JobDescription description, String jobIdentifier) throws XenonException {
+    SshInteractiveProcess(ClientSession session, JobDescription description, String jobIdentifier, long timeoutInMillis) throws XenonException {
 
         if (session == null) {
             throw new IllegalArgumentException("Session is null");
         }
 
-           if (description == null) {
+        if (description == null) {
             throw new IllegalArgumentException("Job description is null");
         }
 
-           if (jobIdentifier == null) {
+        if (jobIdentifier == null) {
             throw new IllegalArgumentException("Job identifier is null");
         }
 
@@ -77,7 +73,7 @@ class SshInteractiveProcess implements InteractiveProcess {
             // TODO: Add agent FW
             // channel.setAgentForwarding(session.useAgentForwarding());
 
-            channel.open().verify(timeout);
+            channel.open().verify(timeoutInMillis);
 
             // set the streams first, then connect the channel.
             streams = new StreamsImplementation(jobIdentifier, channel.getInvertedOut(), channel.getInvertedIn(), channel.getInvertedErr());

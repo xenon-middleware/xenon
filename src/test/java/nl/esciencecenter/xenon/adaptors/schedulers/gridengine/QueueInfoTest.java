@@ -21,11 +21,11 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.XenonException;
-
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  *
@@ -57,7 +57,7 @@ public class QueueInfoTest {
     public void test01b_queueInfoFromMap_NoName_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<>();
 
-        //input.put("qname", "some.q");
+        // input.put("qname", "some.q");
         input.put("slots", "200");
         input.put("pe_list", "some.pe other.pe");
 
@@ -76,7 +76,7 @@ public class QueueInfoTest {
         Map<String, String> input = new HashMap<>();
 
         input.put("qname", "some.q");
-        //input.put("slots", "200");
+        // input.put("slots", "200");
         input.put("pe_list", "some.pe other.pe");
 
         QueueInfo result = new QueueInfo(input);
@@ -113,7 +113,7 @@ public class QueueInfoTest {
 
         input.put("qname", "some.q");
         input.put("slots", "200");
-        //input.put("pe_list", "some.pe other.pe");
+        // input.put("pe_list", "some.pe other.pe");
 
         QueueInfo result = new QueueInfo(input);
 
@@ -132,8 +132,6 @@ public class QueueInfoTest {
         String result = info.toString();
 
         String expected = "QueueInfo [name=some.name, slots=4, parallelEnvironments=[some.pe, other.pe]]";
-
-        System.out.println(result);
 
         assertEquals(expected, result);
     }
