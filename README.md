@@ -214,66 +214,13 @@ Documentation
 
 Xenon's JavaDoc is available online at <https://jitpack.io/com/github/NLeSC/Xenon/master-SNAPSHOT/javadoc/index.html>.
 
-Copyrights & Disclaimers
+Legal
 ------------------------
 
-Xenon is copyrighted by the Netherlands eScience Center and
-releases under the Apache License, Version 2.0.
+The Xenon library is copyrighted by the Netherlands eScience Center and released
+under the 
+[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
-See <http://www.esciencecenter.nl> for more information on the
-Netherlands eScience Center.
+Xenon uses several third-party libraries that have their own (permissive, open 
+source) licenses. See the file legal/README.md for an overview.
 
-See the "LICENSE" and "NOTICE" files for more information.
-
-Third party libraries
----------------------
-
-This product includes the SLF4J library, which is Copyright
-(c) 2004-2013 QOS.ch See "notices/LICENSE.slf4j.txt" for the licence
-information of the SLF4J library.
-
-This product includes the JSch library, which is Copyright
-(c) 2002-2012 Atsuhiko Yamanaka, JCraft,Inc.
-See "notices/LICENSE.jsch.txt" for the licence information of the
-JSch library.
-
-This product includes the Logback library, which is Copyright
-(c) 1999-2012, QOS.ch. See "notices/LICENSE.logback.txt" for the
-licence information of the Logback library.
-
-This product includes the JaCoCo library, which is Copyright
-(c) 2009, 2013 Mountainminds GmbH & Co. KG and Contributors. See
-"notices/LICENSE.jacoco.txt" for the licence information of the
-JaCoCo library.
-
-This project includes the JUnit library.
-See "notices/LICENSE.junit.txt" for the licence information of the
-JUnit library.
-
-This project includes the Mockito library, which is Copyright
-(c) 2007 Mockito contributors. See "notices/LICENSE.mockito.txt"
-for the licence information of the Mockito library.
-
-This project includes the Java CoG Kit, which is Copyright (c) 1999-2006
-University of Chicago. See "notices/LICENSE.cog-jglobus.txt" for the
-licence information of the Java CoG Kit.
-
-This project includes the Commons-logging library, which is Copyright (c)
-Apache Software Foundation. See "notices/LICENSE.commons-logging.txt"
-for the licence information of the Commons-logging library.
-
-This project includes the log4j library, which is Copyright (c) Apache
-Software Foundation. See "notices/LICENSE.log4j.txt" for the licence
-information of the log4j library.
-
-This project includes the Legion of the Bouncy Castle Java cryptography
-APIs, which are Copyright (c) 2000-2013 The Legion Of The Bouncy Castle.
-See "notices/LICENSE.bouncycastle.txt" for the licence information of this
-library.
-
-This project includes the pureTLS library, which is Copyright (c) Claymore
-Systems, Inc. See "notices/LICENSE.puretls.txt" for the licence information
-of the pureTLS library.
-
-This project includes libraries produced by the Cryptix Project. See
-"notices/LICENSE.cryptix.txt" for the licence information of these libraries.
