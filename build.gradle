@@ -43,7 +43,6 @@ repositories {
 ext.sshjVersion = '0.21.1'
 ext.jschVersion = '0.1.53'
 ext.jschAgentproxyVersion = '0.0.9'
-ext.apacheCommonsNetVersion = '3.3'
 
 dependencies {
     // Xenon dependencies.
@@ -56,7 +55,7 @@ dependencies {
     compile group: 'org.apache.jclouds.provider', name: 'aws-s3', version: '2.0.2'
 
     compile group: 'org.apache.sshd', name: 'sshd-core', version: '1.4.0'
-    compile group: 'commons-net', name: 'commons-net', version: apacheCommonsNetVersion
+    compile group: 'commons-net', name: 'commons-net', version: '3.3'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.5'
     compile group: 'com.github.lookfirst', name: 'sardine', version: '5.7'
     compile group: 'joda-time', name: 'joda-time', version: '2.8.1'
