@@ -212,13 +212,13 @@ public class LocalFileSystemUtils {
      *
      * The tilde will only be replaced if it is the first character in the path and either the only character in the path or directly followed by the local
      * separator character or directly followed by the local user name (as provided by the <code>user.name</code> property).
-     * 
+     *
      * For example, if <code>user.name</code> is set to "john" and <code>user.home</code> is set to "/home/john", then "~" will be expanded to "/home/john",
      * "~/foo" or "~john/foo" will be expanded to "/home/john/foo".
-     * 
+     *
      * However, in paths like "/foo/bar", "~matt/foo" or "/foo/~" the tilde will not be expanded, and the provided path is returned unchanged. This includes a
      * path that is <code>null</code>.
-     * 
+     *
      * If the <code>user.home</code> property is not set, the tilde will not be expanded and the provided path will be returned unchanged. If the
      * <code>user.name</code> property is not set, the combined tilde-username expansion will not be performed.
      *

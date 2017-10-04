@@ -1002,6 +1002,36 @@ public class FileSystemTest {
     }
 
     @Test
+    public void test_copyOKreplaceDir() throws XenonException {
+        Path entry = new Path("/test");
+
+        MockFileSystem f0 = new MockFileSystem("0", "TEST0", "MEM", entry);
+        MockFileSystem f1 = new MockFileSystem("1", "TEST1", "MEM", entry);
+
+        Path f = new Path("/test/aap");
+        byte[] data = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
+
+        f0.createFile(f);
+        f0.addData(f, data);
+
+        f1.createDirectory(f);
+        f1.createFile(new Path("/test/aap/file0"));
+        byte[] data1 = new byte[] { 42, 42 };
+        f1.addData(new Path("/test/aap/file0"), data1);
+
+        // This should repace the dir in destination by the file in source.
+        String h = f0.copy(f, f1, f, CopyMode.REPLACE, false);
+        CopyStatus s = f0.waitUntilDone(h, 60 * 1000);
+
+        assertTrue(s.isDone());
+        assertFalse(s.hasException());
+
+        assertFalse(f1.exists(new Path("/test/aap/file0")));
+        assertTrue(f1.exists(new Path("/test/aap")));
+        assertTrue(Arrays.equals(data, f1.getData(f)));
+    }
+
+    @Test
     public void test_copyOKignore() throws XenonException {
         Path entry = new Path("/test");
 
@@ -1025,6 +1055,34 @@ public class FileSystemTest {
         assertTrue(s.isDone());
         assertFalse(s.hasException());
         assertTrue(Arrays.equals(data1, f1.getData(f)));
+    }
+
+    @Test
+    public void test_copyOKignoreDir() throws XenonException {
+        Path entry = new Path("/test");
+
+        MockFileSystem f0 = new MockFileSystem("0", "TEST0", "MEM", entry);
+        MockFileSystem f1 = new MockFileSystem("1", "TEST1", "MEM", entry);
+
+        Path f = new Path("/test/aap");
+        byte[] data = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
+
+        f0.createFile(f);
+        f0.addData(f, data);
+
+        f1.createDirectory(f);
+        f1.createFile(new Path("/test/aap/mies"));
+
+        byte[] data1 = new byte[] { 42, 42 };
+        f1.addData(new Path("/test/aap/mies"), data1);
+
+        String h = f0.copy(f, f1, f, CopyMode.IGNORE, false);
+        CopyStatus s = f0.waitUntilDone(h, 60 * 1000);
+
+        assertTrue(s.isDone());
+        assertFalse(s.hasException());
+        assertTrue(f1.exists(new Path("/test/aap/mies")));
+        assertTrue(Arrays.equals(data1, f1.getData(new Path("/test/aap/mies"))));
     }
 
     @Test
@@ -1106,12 +1164,115 @@ public class FileSystemTest {
         assertTrue(s.isDone());
         assertFalse(s.hasException());
 
-        System.out.println("COPYDIR: " + s.getException());
+        assertTrue(f1.exists(new Path("/test/aap")));
+        assertTrue(f1.exists(new Path("/test/aap/file0")));
+        assertTrue(f1.exists(new Path("/test/aap/noot")));
+        assertTrue(f1.exists(new Path("/test/aap/noot/file1")));
+        assertTrue(Arrays.equals(data0, f1.getData(new Path("/test/aap/file0"))));
+        assertTrue(Arrays.equals(data1, f1.getData(new Path("/test/aap/noot/file1"))));
+    }
+
+    @Test
+    public void test_copyDirReplace() throws XenonException {
+        Path entry = new Path("/test");
+
+        MockFileSystem f0 = new MockFileSystem("0", "TEST0", "MEM", entry);
+        MockFileSystem f1 = new MockFileSystem("1", "TEST1", "MEM", entry);
+
+        f0.createDirectory(new Path("/test/aap"));
+        f0.createFile(new Path("/test/aap/file0"));
+        f0.createDirectory(new Path("/test/aap/noot"));
+        f0.createFile(new Path("/test/aap/noot/file1"));
+
+        byte[] data0 = new byte[] { 42, 42 };
+        byte[] data1 = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
+
+        f0.addData(new Path("/test/aap/file0"), data0);
+        f0.addData(new Path("/test/aap/noot/file1"), data1);
+
+        f1.createDirectory(new Path("/test/aap"));
+        f1.createFile(new Path("/test/aap/file0"));
+        f1.createDirectory(new Path("/test/aap/mies"));
+
+        byte[] data2 = new byte[] { 4, 5, 6, 7 };
+        f1.addData(new Path("/test/aap/file0"), data2);
+
+        String h = f0.copy(new Path("/test/aap"), f1, new Path("/test/aap"), CopyMode.REPLACE, true);
+        CopyStatus s = f0.waitUntilDone(h, 5 * 1000);
+
+        // We now expect the source dir to be merged with the target dir. That is, target contains the following:
+        //
+        // /test/aap (dir)
+        // /test/aap/file0 (file containing [42, 42]
+        // /test/aap/mies (dir)
+        // /test/aap/noot/dir
+        // /test/aap/noot/file1 (file containing [ 0, 1, ... 7 ]
+
+        assertTrue(s.isDone());
+        assertFalse(s.hasException());
 
         assertTrue(f1.exists(new Path("/test/aap")));
         assertTrue(f1.exists(new Path("/test/aap/file0")));
         assertTrue(f1.exists(new Path("/test/aap/noot")));
         assertTrue(f1.exists(new Path("/test/aap/noot/file1")));
+        assertTrue(f1.exists(new Path("/test/aap/mies")));
+
+        assertTrue(Arrays.equals(data0, f1.getData(new Path("/test/aap/file0"))));
+        assertTrue(Arrays.equals(data1, f1.getData(new Path("/test/aap/noot/file1"))));
+    }
+
+    @Test
+    public void test_copyDirReplaceFile() throws XenonException {
+        Path entry = new Path("/test");
+
+        MockFileSystem f0 = new MockFileSystem("0", "TEST0", "MEM", entry);
+        MockFileSystem f1 = new MockFileSystem("1", "TEST1", "MEM", entry);
+
+        f0.createDirectory(new Path("/test/aap"));
+        f0.createFile(new Path("/test/aap/file0"));
+        f0.createDirectory(new Path("/test/aap/noot"));
+        f0.createFile(new Path("/test/aap/noot/file1"));
+
+        byte[] data0 = new byte[] { 42, 42 };
+        byte[] data1 = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
+
+        f0.addData(new Path("/test/aap/file0"), data0);
+        f0.addData(new Path("/test/aap/noot/file1"), data1);
+
+        f1.createFile(new Path("/test/aap"));
+
+        byte[] data2 = new byte[] { 4, 5, 6, 7 };
+        f1.addData(new Path("/test/aap"), data2);
+
+        String h = f0.copy(new Path("/test/aap"), f1, new Path("/test/aap"), CopyMode.REPLACE, true);
+        CopyStatus s = f0.waitUntilDone(h, 5 * 1000);
+
+        // We now expect the source dir to replace the target file, resulting in:
+        //
+        // /test/aap (file removed)
+        //
+        // and replacing it with:
+        //
+        // /test/aap (dir)
+        // /test/aap/file0 (file containing [42, 42]
+        // /test/aap/mies (dir)
+        // /test/aap/noot/dir
+        // /test/aap/noot/file1 (file containing [ 0, 1, ... 7 ]
+
+        System.out.println("COPY DIR TO FILE: " + s.isDone() + " " + s.getException());
+
+        if (s.getException() != null) {
+            s.getException().printStackTrace();
+        }
+
+        assertTrue(s.isDone());
+        assertFalse(s.hasException());
+
+        assertTrue(f1.exists(new Path("/test/aap")));
+        assertTrue(f1.exists(new Path("/test/aap/file0")));
+        assertTrue(f1.exists(new Path("/test/aap/noot")));
+        assertTrue(f1.exists(new Path("/test/aap/noot/file1")));
+
         assertTrue(Arrays.equals(data0, f1.getData(new Path("/test/aap/file0"))));
         assertTrue(Arrays.equals(data1, f1.getData(new Path("/test/aap/noot/file1"))));
     }
@@ -1146,32 +1307,6 @@ public class FileSystemTest {
         FileSystem f = new MockFileSystem("0", "TEST0", "MEM", entry);
         f.cancel("AAP");
     }
-
-    /*
-     * @Test public void test_cancelImmediately() throws XenonException { Path entry = new Path("/test");
-     *
-     * MockFileSystem f0 = new MockFileSystem("0", "TEST0", "MEM", entry); MockFileSystem f1 = new MockFileSystem("1", "TEST1", "MEM", entry);
-     *
-     * Path file1 = new Path("/test/aap"); Path file2 = new Path("/test/noot");
-     *
-     * f0.createFile(file1); f0.createFile(file2);
-     *
-     * f0.addInputStream(file1, new DelayInputStream(1000)); f0.addInputStream(file2, new DelayInputStream(1000));
-     *
-     * f1.createFile(file1); f1.createFile(file2);
-     *
-     * f1.addOutputStream(file1, new CountIgnoreOutputStream()); f1.addOutputStream(file2, new CountIgnoreOutputStream());
-     *
-     * String h1 = f0.copy(file1, f1, file1, CopyMode.REPLACE, false); String h2 = f0.copy(file2, f1, file2, CopyMode.REPLACE, false);
-     *
-     * // cancel h2 immediately -- the copy should not have a chance to start CopyStatus s2 = f0.cancel(h2);
-     *
-     * CopyStatus s1 = f0.waitUntilDone(h1, 5*1000);
-     *
-     * assertTrue(s1.isDone()); assertFalse(s1.hasException());
-     *
-     * assertTrue(s2.isDone()); assertTrue(s2.hasException()); assertThat(s2.getException(), instanceOf(XenonException.class)); }
-     */
 
     private void sleep(long delay) {
         try {

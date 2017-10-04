@@ -120,8 +120,7 @@ var activeTableTab = "activeTableTab";
 extends java.lang.Enum&lt;<a href="../../../../nl/esciencecenter/xenon/filesystems/CopyMode.html" title="enum in nl.esciencecenter.xenon.filesystems">CopyMode</a>&gt;</pre>
 <div class="block">CopyOption is an enumeration containing all possible options for copying a file.
 
- Note that the <code>CREATE</code>, <code>REPLACE</code> and <code>IGNORE</code> options
- are mutually exclusive.</div>
+ Note that the <code>CREATE</code>, <code>REPLACE</code> and <code>IGNORE</code> options are mutually exclusive.</div>
 </li>
 </ul>
 </div>
@@ -151,7 +150,7 @@ extends java.lang.Enum&lt;<a href="../../../../nl/esciencecenter/xenon/filesyste
 </tr>
 <tr class="altColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/filesystems/CopyMode.html#REPLACE">REPLACE</a></span></code>
-<div class="block">If the destination is a regular file, the file will be replaced.</div>
+<div class="block">If the source and destination are a regular file, the destination file will be replaced.</div>
 </td>
 </tr>
 </table>
@@ -228,9 +227,9 @@ the order they are declared.</div>
 <li class="blockList">
 <h4>REPLACE</h4>
 <pre>public static final&nbsp;<a href="../../../../nl/esciencecenter/xenon/filesystems/CopyMode.html" title="enum in nl.esciencecenter.xenon.filesystems">CopyMode</a> REPLACE</pre>
-<div class="block">If the destination is a regular file, the file will be replaced.
+<div class="block">If the source and destination are a regular file, the destination file will be replaced. If the destination exists and is not a file and the source is a
+ file, then the destination will be (recursively) deleted before copying.
 
- If the destination exists and is not a file and the source is a file, then the destination will be (recursively) deleted before copying.
 
  If the source and destination are directories then additional files in the destination directory are <b>not</b> touched.</div>
 </li>
