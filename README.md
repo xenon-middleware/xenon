@@ -222,5 +222,5 @@ under the
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
 Xenon uses several third-party libraries that have their own (permissive, open 
-source) licenses. See the file legal/README.md for an overview.
+source) licenses. See the file [legal/README.md](legal/README.md) for an overview.
 
