@@ -1,6 +1,5 @@
 
-Xenon
-=====
+# Xenon
 
 [![Build Status](https://travis-ci.org/NLeSC/Xenon.svg?branch=develop)](https://travis-ci.org/NLeSC/Xenon)
 [![Build status Windows](https://ci.appveyor.com/api/projects/status/h4l4wn158db23kuf?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon/branch/master)
@@ -12,26 +11,32 @@ Xenon
 
 Copyright 2013 The Netherlands eScience Center
 
-What is it?
------------
+## What problem does Xenon solve?
 
-Xenon is a middleware abstraction library. It provides a simple
-programming interface to various pieces of software that can be used
-to access distributed compute and storage resources.
+Many applications use remote storage and compute resources. To do so, they need
+to include code to interact with the scheduling systems and file transfer
+protocols used on those remote machines.
 
-Why Xenon?
-----------
+Unfortunately, many different scheduler systems and file transfer protocols
+exist, often with completely different programming interfaces. This makes it
+hard for applications to switch to a different system or support multiple
+remote systems simultaneously. 
 
-Xenon is developed by the Netherlands eScience Center as a support
-library for our projects. Several projects develop end-user
-applications that require access to distributed compute and storage
-resources. Xenon provides a simple API to those resources, allowing
-those applications to be developed more rapidly. The experience
-gained during end-user application development is used to improve
-the Xenon API and implementation.
+Xenon solves this problem by providing a single programming interface to many
+different types of remote resources, allowing applications to switch without
+changing a single line of code.
 
-Adding Xenon as a dependency to your project
---------------------------------------------
+![Xenon abstraction](https://github.com/nlesc/xenon/raw/master/docs/images/readme-xenon-abstraction.svg.png "Xenon abstraction")
+
+## How does Xenon work?
+
+Xenon is an abstraction layer that sits between your application and the remote
+resource it uses. Xenon is written in Java, but is also accessible from other
+languages (e.g. Python) through its gRPC interface.
+
+![Xenon API](https://github.com/nlesc/xenon/raw/master/docs/images/readme-xenon-api.svg.png "Xenon API")
+
+## Adding Xenon as a dependency to your project
 
 Follow the instructions from [jitpack.io](https://jitpack.io/#NLeSC/Xenon/2.0.0-rc2) to include Xenon as a 
 dependency for Gradle, Maven, SBT, or Leiningen projects, e.g. Gradle:
