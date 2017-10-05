@@ -43,7 +43,7 @@ languages (e.g. Python) through its gRPC interface.
 | Xenon library | https://github.com/NLeSC/Xenon |
 | gRPC extension for Xenon | https://github.com/NLeSC/xenon-grpc |
 | command line interface to Xenon | https://github.com/NLeSC/xenon-cli |
-| Python API for Xenon | https://github.com/NLeSC/PyXenon |
+| Python API for Xenon | https://github.com/NLeSC/pyxenon |
 
 ## Supported middleware
 
