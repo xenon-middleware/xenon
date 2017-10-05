@@ -36,6 +36,35 @@ languages (e.g. Python) through its gRPC interface.
 
 ![Xenon API](/docs/images/readme-xenon-api.svg.png "Xenon API")
 
+### Overview of the Xenon ecosystem of tools
+
+| component | repository |
+|---|---|
+| Xenon library | https://github.com/NLeSC/Xenon |
+| gRPC extension for Xenon | https://github.com/NLeSC/xenon-grpc |
+| command line interface to Xenon | https://github.com/NLeSC/xenon-cli |
+| Python API for Xenon | https://github.com/NLeSC/PyXenon |
+
+## Supported middleware
+
+Xenon currently supports the following file access mechanisms:
+
+- ``file`` (local file manipulation)
+- ``ftp``
+- ``sftp``
+- ``webdav``
+- ``s3``
+
+Xenon currently supports the following job submission mechanisms:
+
+- ``local``
+- ``ssh``
+- ``gridengine``
+- ``slurm``
+- ``torque``  
+
+See the [roadmap](/ROADMAP.md) for the planned extensions.
+
 ## Adding Xenon as a dependency to your project
 
 Follow the instructions from [jitpack.io](https://jitpack.io/#NLeSC/Xenon/2.0.0-rc2) to include Xenon as a 
@@ -81,13 +110,11 @@ and
 	</dependency>
 ```
 
-
-Simple examples
----------------
+## Simple examples
 
 Here are some examples of basic operations you can perform with Xenon: 
 
-#### Copying a file from a local filesystem to a remote filesystem
+### Copying a file from a local filesystem to a remote filesystem
 
 ```java
 import nl.esciencecenter.xenon.XenonException;
@@ -137,7 +164,7 @@ public class CopyFileLocalToSftpAbsolutePaths {
 }
 ```
 
-#### Submitting a job
+### Submitting a job
 
 The following code performs a wordcount of a file residing on a remote machine: 
 
@@ -185,42 +212,13 @@ public class SlurmSubmitWordCountJob {
 
 The output of the job will be written to ``/tmp/wc.stdout.txt`` file in the ``nlesc/xenon-slurm`` Docker container.
 
-Supported middleware
---------------------
+For more examples, see the tutorial at [Read The Docs](http://xenonrse2017.readthedocs.io/).
 
-Xenon currently supports the following file access mechanisms:
-
-- ``file`` (local file manipulation)
-- ``ftp``
-- ``sftp``
-- ``webdav``
-- ``s3``
-
-Xenon currently supports the following job submission mechanisms:
-
-- ``local``
-- ``ssh``
-- ``gridengine``
-- ``slurm``
-- ``torque``  
-
-Planned extensions include: 
-
-- Swift
-- HDFS (almost done)
-- YARN
-- GridFTP
-- glite
-- Azure-Batch
-- Amazon-Batch
-
-Documentation
--------------
+## Documentation
 
 Xenon's JavaDoc is available online at <https://jitpack.io/com/github/NLeSC/Xenon/master-SNAPSHOT/javadoc/index.html>.
 
-Legal
-------------------------
+## Legal
 
 The Xenon library is copyrighted by the Netherlands eScience Center and released
 under the Apache License, Version 2.0. A copy of the license may be obtained

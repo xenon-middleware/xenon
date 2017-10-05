@@ -11,3 +11,14 @@
     - Azure-Batch (corporate [site](https://azure.microsoft.com/en-us/services/batch/), [docs](https://docs.microsoft.com/en-us/azure/batch/))
     - [Amazon-Batch](https://aws.amazon.com/batch/)
 1. Add interface to clouds (AWS, Azure, ...)
+
+
+Planned extensions include: 
+
+- Swift
+- HDFS (almost done)
+- YARN
+- GridFTP
+- glite
+- Azure-Batch
+- Amazon-Batch
