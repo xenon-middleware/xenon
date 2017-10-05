@@ -26,7 +26,7 @@ Xenon solves this problem by providing a single programming interface to many
 different types of remote resources, allowing applications to switch without
 changing a single line of code.
 
-![Xenon abstraction](https://github.com/nlesc/xenon/raw/master/docs/images/readme-xenon-abstraction.svg.png "Xenon abstraction")
+<img src="/docs/images/readme-xenon-abstraction.svg.png" alt="Xenon abstraction" style="width: 300px;"/>
 
 ## How does Xenon work?
 
@@ -34,7 +34,8 @@ Xenon is an abstraction layer that sits between your application and the remote
 resource it uses. Xenon is written in Java, but is also accessible from other
 languages (e.g. Python) through its gRPC interface.
 
-![Xenon API](https://github.com/nlesc/xenon/raw/master/docs/images/readme-xenon-api.svg.png "Xenon API")
+<img src="/docs/images/readme-xenon-api.svg.png" alt="Xenon API" style="width: 400px;"/>
+
 
 ## Adding Xenon as a dependency to your project
 
