@@ -20,13 +20,13 @@ protocols used on those remote machines.
 Unfortunately, many different scheduler systems and file transfer protocols
 exist, often with completely different programming interfaces. This makes it
 hard for applications to switch to a different system or support multiple
-remote systems simultaneously. 
+remote systems simultaneously.
 
 Xenon solves this problem by providing a single programming interface to many
 different types of remote resources, allowing applications to switch without
 changing a single line of code.
 
-<img src="/docs/images/readme-xenon-abstraction.svg.png" alt="Xenon abstraction" style="width: 300px;"/>
+![Xenon abstraction](/docs/images/readme-xenon-abstraction.svg.png "Xenon abstraction")
 
 ## How does Xenon work?
 
@@ -34,8 +34,7 @@ Xenon is an abstraction layer that sits between your application and the remote
 resource it uses. Xenon is written in Java, but is also accessible from other
 languages (e.g. Python) through its gRPC interface.
 
-<img src="/docs/images/readme-xenon-api.svg.png" alt="Xenon API" style="width: 400px;"/>
-
+![Xenon API](/docs/images/readme-xenon-api.svg.png "Xenon API")
 
 ## Adding Xenon as a dependency to your project
 
