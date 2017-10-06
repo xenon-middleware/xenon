@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9};
+var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -157,17 +157,21 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingUtils.html#isLocal-java.lang.String-">isLocal</a></span>(java.lang.String&nbsp;location)</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code>static boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingUtils.html#isSSH-java.lang.String-">isSSH</a></span>(java.lang.String&nbsp;location)</code>&nbsp;</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>static <a href="../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingUtils.html#mergeValidProperties-nl.esciencecenter.xenon.XenonPropertyDescription:A...-">mergeValidProperties</a></span>(<a href="../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[]...&nbsp;prop)</code>&nbsp;</td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingUtils.html#verifyJobDescription-nl.esciencecenter.xenon.schedulers.JobDescription-java.lang.String-">verifyJobDescription</a></span>(<a href="../../../../../nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a>&nbsp;description,
                     java.lang.String&nbsp;adaptorName)</code>
 <div class="block">Do some checks on a job description.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingUtils.html#verifyJobInfo-java.util.Map-java.lang.String-java.lang.String-java.lang.String-java.lang.String...-">verifyJobInfo</a></span>(java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;jobInfo,
              java.lang.String&nbsp;jobIdentifier,
@@ -177,7 +181,7 @@ extends java.lang.Object</pre>
 <div class="block">Check if the info map for a job exists, contains the expected job ID, and contains the given additional fields</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>static void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingUtils.html#verifyJobOptions-java.util.Map-java.lang.String:A-java.lang.String-">verifyJobOptions</a></span>(java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;options,
                 java.lang.String[]&nbsp;validOptions,
@@ -229,6 +233,15 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>isLocal</h4>
 <pre>public static&nbsp;boolean&nbsp;isLocal(java.lang.String&nbsp;location)</pre>
+</li>
+</ul>
+<a name="isSSH-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isSSH</h4>
+<pre>public static&nbsp;boolean&nbsp;isSSH(java.lang.String&nbsp;location)</pre>
 </li>
 </ul>
 <a name="mergeValidProperties-nl.esciencecenter.xenon.XenonPropertyDescription:A...-">

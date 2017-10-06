@@ -145,12 +145,10 @@
 </ul>
 <h2><a name="schedulers">Schedulers</a></h2>
 <h2><a name="local">local</a></h2>
-<p>The local jobs adaptor implements all functionality  by emulating a local queue.</p>
+<p>The local jobs adaptor implements all functionality by emulating a local queue.</p>
 <h4>Supported locations:</h4>
 Supported locations for <i>Scheduler.create(type, location, credential, properties)</i> method.<ul>
-<li>(null)</li>
-<li>(empty string)</li>
-<li>local://</li>
+<li>[/workdir]</li>
 </ul>
 <h4>Supported properties:</h4>
 Supported properties for <i>Scheduler.create(type, location, credential, properties)</i> method.
@@ -177,7 +175,7 @@ Supported properties for <i>Scheduler.create(type, location, credential, propert
 <p>The SSH job adaptor implements all functionality to start jobs on ssh servers.</p>
 <h4>Supported locations:</h4>
 Supported locations for <i>Scheduler.create(type, location, credential, properties)</i> method.<ul>
-<li>host[:port]</li>
+<li>host[:port][/workdir]</li>
 </ul>
 <h4>Supported properties:</h4>
 Supported properties for <i>Scheduler.create(type, location, credential, properties)</i> method.
@@ -255,11 +253,11 @@ Supported properties for <i>Scheduler.create(type, location, credential, propert
 <li>Embedded: true</li>
 </ul>
 <h2><a name="gridengine">gridengine</a></h2>
-<p>The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler. This adaptor uses either the local or the ssh adaptor to gain access to the scheduler machine.</p>
+<p>The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler. This adaptor uses either the local or the ssh scheduler adaptor to run commands on the machine running Grid Engine,  and the file or the stfp filesystem adaptor to gain access to the filesystem of that machine.</p>
 <h4>Supported locations:</h4>
 Supported locations for <i>Scheduler.create(type, location, credential, properties)</i> method.<ul>
-<li>(locations supported by local scheduler adaptor)</li>
-<li>(locations supported by ssh scheduler adaptor)</li>
+<li>local://[/workdir]</li>
+<li>ssh://host[:port][/workdir]</li>
 </ul>
 <h4>Supported properties:</h4>
 Supported properties for <i>Scheduler.create(type, location, credential, properties)</i> method.
@@ -367,11 +365,11 @@ Supported properties for <i>Scheduler.create(type, location, credential, propert
 <li>Embedded: false</li>
 </ul>
 <h2><a name="slurm">slurm</a></h2>
-<p>The Slurm Adaptor submits jobs to a Slurm scheduler. This adaptor uses either the local or the ssh adaptor to gain access to the scheduler machine.</p>
+<p>The Slurm Adaptor submits jobs to a Slurm scheduler.  This adaptor uses either the local or the ssh scheduler adaptor to run commands on the machine running Slurm,  and the file or the stfp filesystem adaptor to gain access to the filesystem of that machine.</p>
 <h4>Supported locations:</h4>
 Supported locations for <i>Scheduler.create(type, location, credential, properties)</i> method.<ul>
-<li>(locations supported by local scheduler adaptor)</li>
-<li>(locations supported by ssh scheduler adaptor)</li>
+<li>local://[/workdir]</li>
+<li>ssh://host[:port][/workdir]</li>
 </ul>
 <h4>Supported properties:</h4>
 Supported properties for <i>Scheduler.create(type, location, credential, properties)</i> method.
@@ -473,11 +471,11 @@ Supported properties for <i>Scheduler.create(type, location, credential, propert
 <li>Embedded: false</li>
 </ul>
 <h2><a name="torque">torque</a></h2>
-<p>The Torque Adaptor submits jobs to a TORQUE batch system. This adaptor uses either the local or the ssh adaptor to gain access to the scheduler machine.</p>
+<p>The Torque Adaptor submits jobs to a TORQUE batch system. This adaptor uses either the local or the ssh scheduler adaptor to run commands on the machine running TORQUE,  and the file or the stfp filesystem adaptor to gain access to the filesystem of that machine.</p>
 <h4>Supported locations:</h4>
 Supported locations for <i>Scheduler.create(type, location, credential, properties)</i> method.<ul>
-<li>(locations supported by local scheduler adaptor)</li>
-<li>(locations supported by ssh scheduler adaptor)</li>
+<li>local://[/workdir]</li>
+<li>ssh://host[:port][/workdir]</li>
 </ul>
 <h4>Supported properties:</h4>
 Supported properties for <i>Scheduler.create(type, location, credential, properties)</i> method.

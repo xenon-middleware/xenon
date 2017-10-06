@@ -109,7 +109,7 @@ public class WebdavFileSystem extends FileSystem {
         attributes.setLastAccessTime(attributes.getLastModifiedTime());
         attributes.setSize(p.getContentLength());
 
-        // Not sure is this is right ?
+        // Not sure if this is right ?
         attributes.setReadable(true);
         attributes.setWritable(false);
 

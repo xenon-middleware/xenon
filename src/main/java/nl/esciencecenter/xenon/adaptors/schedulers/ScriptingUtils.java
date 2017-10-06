@@ -37,7 +37,11 @@ public class ScriptingUtils {
     }
 
     public static boolean isLocal(String location) {
-        return (location == null || location.length() == 0 || location.equals("/"));
+        return (location == null || location.length() == 0 || location.startsWith("local://"));
+    }
+
+    public static boolean isSSH(String location) {
+        return (location != null && location.startsWith("ssh://"));
     }
 
     public static XenonPropertyDescription[] mergeValidProperties(XenonPropertyDescription[]... prop) {

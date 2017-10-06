@@ -24,6 +24,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
@@ -67,17 +68,24 @@ public abstract class ScriptingScheduler extends Scheduler {
         if (ScriptingUtils.isLocal(location)) {
             subSchedulerAdaptor = "local";
             subFileSystemAdaptor = "file";
-            subLocation = "";
+
+            if (location.startsWith("local://")) {
+                subLocation = location.substring("local://".length());
+            } else {
+                subLocation = "";
+            }
             subSchedulerProperties = properties.filter(LocalSchedulerAdaptor.PREFIX).toMap();
-        } else {
+        } else if (ScriptingUtils.isSSH(location)) {
             subSchedulerAdaptor = "ssh";
             subFileSystemAdaptor = "sftp";
-            subLocation = location;
+            subLocation = location.substring("ssh://".length());
             subSchedulerProperties = properties.filter(SshSchedulerAdaptor.PREFIX).toMap();
 
             // since we expect commands to be done almost instantaneously, we
             // poll quite frequently (local operation anyway)
             subSchedulerProperties.put(SshSchedulerAdaptor.POLLING_DELAY, "100");
+        } else {
+            throw new InvalidLocationException(getAdaptorName(), "Invalid location: " + location);
         }
 
         LOGGER.debug("creating sub scheduler for {} adaptor at {}://{}", adaptor, subSchedulerAdaptor, subLocation);
@@ -355,5 +363,13 @@ public abstract class ScriptingScheduler extends Scheduler {
     public void close() throws XenonException {
         subScheduler.close();
         subFileSystem.close();
+    }
+
+    public boolean usesFileSystem() {
+        return true;
+    }
+
+    public FileSystem getFileSystem() throws XenonException {
+        return subFileSystem;
     }
 }

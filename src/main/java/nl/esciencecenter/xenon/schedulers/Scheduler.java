@@ -37,6 +37,7 @@ import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
 
 /**
  * Scheduler represents a (possibly remote) scheduler that can be used to submit jobs and retrieve queue information.
@@ -564,6 +565,30 @@ public abstract class Scheduler implements AutoCloseable {
      *             If the status of the job could not be retrieved.
      */
     public abstract JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException;
+
+    /**
+     * Does this <code>Scheduler</code> use a <code>FileSystem</code> internally to access files and directories ?
+     * 
+     * @return If this <code>Scheduler</code> use a <code>FileSystem</code> internally ?
+     */
+    public abstract boolean usesFileSystem();
+
+    /**
+     * Retrieve the <code>FileSystem</code> used internally by this <code>Scheduler</code>.
+     * <p>
+     * Often, a <code>Scheduler</code> needs to access files or directories on the machine it will schedule jobs. For example, to ensure a working directory
+     * exists, or to redirect the stdin, stdout or stderr streams used by a job.
+     * </p>
+     * <p>
+     * This method returns this <code>FileSystem</code> so it can also be used by the application to prepare input files for the jobs, or retrieve the output
+     * files produced by the jobs.
+     * </p>
+     * 
+     * @return the <code>FileSystem</code> used by this Scheduler.
+     * @throws XenonException
+     *             if this Scheduler does not use a <code>FileSystem</code> internally.
+     */
+    public abstract FileSystem getFileSystem() throws XenonException;
 
     protected void assertNonNullOrEmpty(String s, String message) {
         if (s == null || s.isEmpty()) {

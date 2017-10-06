@@ -472,6 +472,14 @@ public class JobQueueScheduler extends Scheduler {
         unlimitedExecutor.shutdownNow();
     }
 
+    public boolean usesFileSystem() {
+        return true;
+    }
+
+    public FileSystem getFileSystem() throws XenonException {
+        return filesystem;
+    }
+
     @Override
     public void close() throws XenonException {
         factory.close();

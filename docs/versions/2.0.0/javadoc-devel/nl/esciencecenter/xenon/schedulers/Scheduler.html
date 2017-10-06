@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":10,"i2":10,"i3":6,"i4":6,"i5":9,"i6":9,"i7":9,"i8":9,"i9":10,"i10":9,"i11":9,"i12":9,"i13":10,"i14":9,"i15":6,"i16":6,"i17":6,"i18":10,"i19":10,"i20":10,"i21":6,"i22":6,"i23":6,"i24":10,"i25":6,"i26":6,"i27":6,"i28":6,"i29":6};
+var methods = {"i0":9,"i1":10,"i2":10,"i3":6,"i4":6,"i5":9,"i6":9,"i7":9,"i8":9,"i9":10,"i10":9,"i11":9,"i12":9,"i13":10,"i14":9,"i15":6,"i16":6,"i17":6,"i18":6,"i19":10,"i20":10,"i21":10,"i22":6,"i23":6,"i24":6,"i25":10,"i26":6,"i27":6,"i28":6,"i29":6,"i30":6,"i31":6};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -299,83 +299,95 @@ implements java.lang.AutoCloseable</pre>
 </td>
 </tr>
 <tr id="i16" class="altColor">
+<td class="colFirst"><code>abstract <a href="../../../../nl/esciencecenter/xenon/filesystems/FileSystem.html" title="class in nl.esciencecenter.xenon.filesystems">FileSystem</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#getFileSystem--">getFileSystem</a></span>()</code>
+<div class="block">Retrieve the <code>FileSystem</code> used internally by this <code>Scheduler</code>.</div>
+</td>
+</tr>
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code>abstract java.lang.String[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#getJobs-java.lang.String...-">getJobs</a></span>(java.lang.String...&nbsp;queueNames)</code>
 <div class="block">Get all job identifier of jobs currently in (one ore more) queues.</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code>abstract <a href="../../../../nl/esciencecenter/xenon/schedulers/JobStatus.html" title="interface in nl.esciencecenter.xenon.schedulers">JobStatus</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#getJobStatus-java.lang.String-">getJobStatus</a></span>(java.lang.String&nbsp;jobIdentifier)</code>
 <div class="block">Get the status of a Job.</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code><a href="../../../../nl/esciencecenter/xenon/schedulers/JobStatus.html" title="interface in nl.esciencecenter.xenon.schedulers">JobStatus</a>[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#getJobStatuses-java.lang.String...-">getJobStatuses</a></span>(java.lang.String...&nbsp;jobIdentifiers)</code>
 <div class="block">Get the status of all specified <code>jobs</code>.</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#getLocation--">getLocation</a></span>()</code>
 <div class="block">Get the location that this Scheduler is connected to.</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#getProperties--">getProperties</a></span>()</code>
 <div class="block">Get the properties used to create this Scheduler.</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code>abstract java.lang.String[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#getQueueNames--">getQueueNames</a></span>()</code>
 <div class="block">Get the queue names supported by this Scheduler.</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code>abstract <a href="../../../../nl/esciencecenter/xenon/schedulers/QueueStatus.html" title="interface in nl.esciencecenter.xenon.schedulers">QueueStatus</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#getQueueStatus-java.lang.String-">getQueueStatus</a></span>(java.lang.String&nbsp;queueName)</code>
 <div class="block">Get the status of the <code>queue</code>.</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
+<tr id="i24" class="altColor">
 <td class="colFirst"><code>abstract <a href="../../../../nl/esciencecenter/xenon/schedulers/QueueStatus.html" title="interface in nl.esciencecenter.xenon.schedulers">QueueStatus</a>[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#getQueueStatuses-java.lang.String...-">getQueueStatuses</a></span>(java.lang.String...&nbsp;queueNames)</code>
 <div class="block">Get the status of all <code>queues</code>.</div>
 </td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#hashCode--">hashCode</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>abstract boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#isOpen--">isOpen</a></span>()</code>
 <div class="block">Test if the connection of this Scheduler is open.</div>
 </td>
 </tr>
-<tr id="i26" class="altColor">
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code>abstract java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#submitBatchJob-nl.esciencecenter.xenon.schedulers.JobDescription-">submitBatchJob</a></span>(<a href="../../../../nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a>&nbsp;description)</code>
 <div class="block">Submit a batch job.</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i28" class="altColor">
 <td class="colFirst"><code>abstract <a href="../../../../nl/esciencecenter/xenon/schedulers/Streams.html" title="interface in nl.esciencecenter.xenon.schedulers">Streams</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#submitInteractiveJob-nl.esciencecenter.xenon.schedulers.JobDescription-">submitInteractiveJob</a></span>(<a href="../../../../nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a>&nbsp;description)</code>
 <div class="block">Submit an interactive job (optional operation).</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i29" class="rowColor">
+<td class="colFirst"><code>abstract boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#usesFileSystem--">usesFileSystem</a></span>()</code>
+<div class="block">Does this <code>Scheduler</code> use a <code>FileSystem</code> internally to access files and directories ?</div>
+</td>
+</tr>
+<tr id="i30" class="altColor">
 <td class="colFirst"><code>abstract <a href="../../../../nl/esciencecenter/xenon/schedulers/JobStatus.html" title="interface in nl.esciencecenter.xenon.schedulers">JobStatus</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#waitUntilDone-java.lang.String-long-">waitUntilDone</a></span>(java.lang.String&nbsp;jobIdentifier,
              long&nbsp;timeout)</code>
 <div class="block">Wait until a job is done or until a timeout expires.</div>
 </td>
 </tr>
-<tr id="i29" class="rowColor">
+<tr id="i31" class="rowColor">
 <td class="colFirst"><code>abstract <a href="../../../../nl/esciencecenter/xenon/schedulers/JobStatus.html" title="interface in nl.esciencecenter.xenon.schedulers">JobStatus</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#waitUntilRunning-java.lang.String-long-">waitUntilRunning</a></span>(java.lang.String&nbsp;jobIdentifier,
                 long&nbsp;timeout)</code>
@@ -1053,6 +1065,45 @@ implements java.lang.AutoCloseable</pre>
 <dd><code>java.lang.IllegalArgumentException</code> - If the value of timeout is negative</dd>
 <dd><code><a href="../../../../nl/esciencecenter/xenon/schedulers/NoSuchJobException.html" title="class in nl.esciencecenter.xenon.schedulers">NoSuchJobException</a></code> - If the job is not known.</dd>
 <dd><code><a href="../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></code> - If the status of the job could not be retrieved.</dd>
+</dl>
+</li>
+</ul>
+<a name="usesFileSystem--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>usesFileSystem</h4>
+<pre>public abstract&nbsp;boolean&nbsp;usesFileSystem()</pre>
+<div class="block">Does this <code>Scheduler</code> use a <code>FileSystem</code> internally to access files and directories ?</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>If this <code>Scheduler</code> use a <code>FileSystem</code> internally ?</dd>
+</dl>
+</li>
+</ul>
+<a name="getFileSystem--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getFileSystem</h4>
+<pre>public abstract&nbsp;<a href="../../../../nl/esciencecenter/xenon/filesystems/FileSystem.html" title="class in nl.esciencecenter.xenon.filesystems">FileSystem</a>&nbsp;getFileSystem()
+                                  throws <a href="../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></pre>
+<div class="block">Retrieve the <code>FileSystem</code> used internally by this <code>Scheduler</code>.
+ <p>
+ Often, a <code>Scheduler</code> needs to access files or directories on the machine it will schedule jobs. For example, to ensure a working directory
+ exists, or to redirect the stdin, stdout or stderr streams used by a job.
+ </p>
+ <p>
+ This method returns this <code>FileSystem</code> so it can also be used by the application to prepare input files for the jobs, or retrieve the output
+ files produced by the jobs.
+ </p></div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the <code>FileSystem</code> used by this Scheduler.</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></code> - if this Scheduler does not use a <code>FileSystem</code> internally.</dd>
 </dl>
 </li>
 </ul>

@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.schedulers;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
 
 public class MockDefaultScheduler extends Scheduler {
 
@@ -107,4 +108,11 @@ public class MockDefaultScheduler extends Scheduler {
         return null;
     }
 
+    public boolean usesFileSystem() {
+        return false;
+    }
+
+    public FileSystem getFileSystem() throws XenonException {
+        throw new XenonException("TEST", "No FileSystem used");
+    }
 }

@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -230,21 +230,27 @@ extends <a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.htm
 </td>
 </tr>
 <tr id="i4" class="altColor">
+<td class="colFirst"><code><a href="../../../../../nl/esciencecenter/xenon/filesystems/FileSystem.html" title="class in nl.esciencecenter.xenon.filesystems">FileSystem</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#getFileSystem--">getFileSystem</a></span>()</code>
+<div class="block">Retrieve the <code>FileSystem</code> used internally by this <code>Scheduler</code>.</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>protected <a href="../../../../../nl/esciencecenter/xenon/schedulers/QueueStatus.html" title="interface in nl.esciencecenter.xenon.schedulers">QueueStatus</a>[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#getQueueStatuses-java.util.Map-java.lang.String...-">getQueueStatuses</a></span>(java.util.Map&lt;java.lang.String,java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;&nbsp;all,
                 java.lang.String...&nbsp;queueNames)</code>&nbsp;</td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>protected <a href="../../../../../nl/esciencecenter/xenon/filesystems/Path.html" title="class in nl.esciencecenter.xenon.filesystems">Path</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#getWorkingDirectory--">getWorkingDirectory</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#isOpen--">isOpen</a></span>()</code>
 <div class="block">Test if the connection of this Scheduler is open.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#runCheckedCommand-java.lang.String-java.lang.String-java.lang.String...-">runCheckedCommand</a></span>(java.lang.String&nbsp;stdin,
                  java.lang.String&nbsp;executable,
@@ -252,7 +258,7 @@ extends <a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.htm
 <div class="block">Run a command until completion.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/RemoteCommandRunner.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers">RemoteCommandRunner</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#runCommand-java.lang.String-java.lang.String-java.lang.String...-">runCommand</a></span>(java.lang.String&nbsp;stdin,
           java.lang.String&nbsp;executable,
@@ -260,32 +266,38 @@ extends <a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.htm
 <div class="block">Run a command on the remote scheduler machine.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>protected boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#sleep-long-">sleep</a></span>(long&nbsp;pollDelay)</code>&nbsp;</td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../nl/esciencecenter/xenon/schedulers/Streams.html" title="interface in nl.esciencecenter.xenon.schedulers">Streams</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#startInteractiveCommand-java.lang.String-java.lang.String...-">startInteractiveCommand</a></span>(java.lang.String&nbsp;executable,
                        java.lang.String...&nbsp;arguments)</code>
 <div class="block">Start an interactive command on the remote machine (usually via ssh).</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#translateError-nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner-java.lang.String-java.lang.String-java.lang.String...-">translateError</a></span>(<a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/RemoteCommandRunner.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers">RemoteCommandRunner</a>&nbsp;runner,
               java.lang.String&nbsp;stdin,
               java.lang.String&nbsp;executable,
               java.lang.String...&nbsp;arguments)</code>&nbsp;</td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#usesFileSystem--">usesFileSystem</a></span>()</code>
+<div class="block">Does this <code>Scheduler</code> use a <code>FileSystem</code> internally to access files and directories ?</div>
+</td>
+</tr>
+<tr id="i14" class="altColor">
 <td class="colFirst"><code><a href="../../../../../nl/esciencecenter/xenon/schedulers/JobStatus.html" title="interface in nl.esciencecenter.xenon.schedulers">JobStatus</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#waitUntilDone-java.lang.String-long-">waitUntilDone</a></span>(java.lang.String&nbsp;jobIdentifier,
              long&nbsp;timeout)</code>
 <div class="block">Wait until a Job is done, or until the give timeout expires (whichever comes first).</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../nl/esciencecenter/xenon/schedulers/JobStatus.html" title="interface in nl.esciencecenter.xenon.schedulers">JobStatus</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#waitUntilRunning-java.lang.String-long-">waitUntilRunning</a></span>(java.lang.String&nbsp;jobIdentifier,
                 long&nbsp;timeout)</code>
@@ -637,7 +649,7 @@ extends <a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.htm
 <a name="close--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>close</h4>
 <pre>public&nbsp;void&nbsp;close()
@@ -651,6 +663,51 @@ extends <a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.htm
 <dd><code><a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#close--">close</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html" title="class in nl.esciencecenter.xenon.schedulers">Scheduler</a></code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></code> - If the Scheduler failed to close.</dd>
+</dl>
+</li>
+</ul>
+<a name="usesFileSystem--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>usesFileSystem</h4>
+<pre>public&nbsp;boolean&nbsp;usesFileSystem()</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#usesFileSystem--">Scheduler</a></code></span></div>
+<div class="block">Does this <code>Scheduler</code> use a <code>FileSystem</code> internally to access files and directories ?</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#usesFileSystem--">usesFileSystem</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html" title="class in nl.esciencecenter.xenon.schedulers">Scheduler</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>If this <code>Scheduler</code> use a <code>FileSystem</code> internally ?</dd>
+</dl>
+</li>
+</ul>
+<a name="getFileSystem--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getFileSystem</h4>
+<pre>public&nbsp;<a href="../../../../../nl/esciencecenter/xenon/filesystems/FileSystem.html" title="class in nl.esciencecenter.xenon.filesystems">FileSystem</a>&nbsp;getFileSystem()
+                         throws <a href="../../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#getFileSystem--">Scheduler</a></code></span></div>
+<div class="block">Retrieve the <code>FileSystem</code> used internally by this <code>Scheduler</code>.
+ <p>
+ Often, a <code>Scheduler</code> needs to access files or directories on the machine it will schedule jobs. For example, to ensure a working directory
+ exists, or to redirect the stdin, stdout or stderr streams used by a job.
+ </p>
+ <p>
+ This method returns this <code>FileSystem</code> so it can also be used by the application to prepare input files for the jobs, or retrieve the output
+ files produced by the jobs.
+ </p></div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#getFileSystem--">getFileSystem</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html" title="class in nl.esciencecenter.xenon.schedulers">Scheduler</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the <code>FileSystem</code> used by this Scheduler.</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></code> - if this Scheduler does not use a <code>FileSystem</code> internally.</dd>
 </dl>
 </li>
 </ul>

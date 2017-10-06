@@ -47,7 +47,7 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
     public static final String ADAPTOR_DESCRIPTION = "The SSH job adaptor implements all functionality to start jobs on ssh servers.";
 
     /** The locations supported by this adaptor */
-    public static final String[] ADAPTOR_LOCATIONS = new String[] { "host[:port]" };
+    public static final String[] ADAPTOR_LOCATIONS = new String[] { "host[:port][/workdir]" };
 
     /** All our own properties start with this prefix. */
     public static final String PREFIX = SchedulerAdaptor.ADAPTORS_PREFIX + "ssh.";

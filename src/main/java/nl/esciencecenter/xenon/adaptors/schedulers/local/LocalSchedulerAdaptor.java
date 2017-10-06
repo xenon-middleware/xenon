@@ -48,7 +48,7 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
     public static final String PREFIX = SchedulerAdaptor.ADAPTORS_PREFIX + "local.";
 
     /** Description of the adaptor */
-    public static final String ADAPTOR_DESCRIPTION = "The local jobs adaptor implements all functionality " + " by emulating a local queue.";
+    public static final String ADAPTOR_DESCRIPTION = "The local jobs adaptor implements all functionality by emulating a local queue.";
 
     /** Local queue properties start with this prefix. */
     public static final String QUEUE = PREFIX + "queue.";
@@ -77,7 +77,7 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
     public static final String SUBMITTED = JOBS + "submitted";
 
     /** The locations supported by the adaptor */
-    public static final String[] ADAPTOR_LOCATIONS = new String[] { "(null)", "(empty string)", "local://" };
+    public static final String[] ADAPTOR_LOCATIONS = new String[] { "[/workdir]" };
 
     /** The properties supported by this adaptor */
     public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {

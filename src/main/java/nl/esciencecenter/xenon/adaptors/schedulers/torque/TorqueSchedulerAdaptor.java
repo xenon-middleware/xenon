@@ -40,8 +40,7 @@ public class TorqueSchedulerAdaptor extends ScriptingSchedulerAdaptor {
     public static final String PREFIX = SchedulerAdaptor.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
 
     /** The locations supported by this adaptor */
-    public static final String [] ADAPTOR_LOCATIONS = new String [] { "(locations supported by local scheduler adaptor)",
-            "(locations supported by ssh scheduler adaptor)" };
+    public static final String[] ADAPTOR_LOCATIONS = new String[] { "local://[/workdir]", "ssh://host[:port][/workdir]" };
 
     /** Should the grid engine version on the target machine be ignored ? */
     public static final String IGNORE_VERSION_PROPERTY = PREFIX + "ignore.version";
@@ -54,18 +53,17 @@ public class TorqueSchedulerAdaptor extends ScriptingSchedulerAdaptor {
 
     /** Human readable description of this adaptor */
     public static final String ADAPTOR_DESCRIPTION = "The Torque Adaptor submits jobs to a TORQUE batch system."
-            + " This adaptor uses either the local or the ssh adaptor to gain access to the scheduler machine.";
+            + " This adaptor uses either the local or the ssh scheduler adaptor to run commands on the machine running TORQUE, "
+            + " and the file or the stfp filesystem adaptor to gain access to the filesystem of that machine.";
 
     /** List of all properties supported by this adaptor */
-    public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {
-        new XenonPropertyDescription(IGNORE_VERSION_PROPERTY, Type.BOOLEAN,
-                "false", "Skip version check is skipped when connecting to remote machines. "
-                        + "WARNING: it is not recommended to use this setting in production environments!"),
-        new XenonPropertyDescription(ACCOUNTING_GRACE_TIME_PROPERTY, Type.LONG,
-                "60000", "Number of milliseconds a job is allowed to take going from the queue to the accinfo output."),
-        new XenonPropertyDescription(POLL_DELAY_PROPERTY, Type.LONG,
-                "1000", "Number of milliseconds between polling the status of a job.")
-    };
+    public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+            new XenonPropertyDescription(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, "false",
+                    "Skip version check is skipped when connecting to remote machines. "
+                            + "WARNING: it is not recommended to use this setting in production environments!"),
+            new XenonPropertyDescription(ACCOUNTING_GRACE_TIME_PROPERTY, Type.LONG, "60000",
+                    "Number of milliseconds a job is allowed to take going from the queue to the accinfo output."),
+            new XenonPropertyDescription(POLL_DELAY_PROPERTY, Type.LONG, "1000", "Number of milliseconds between polling the status of a job.") };
 
     public TorqueSchedulerAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
