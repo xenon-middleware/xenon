@@ -9,7 +9,7 @@
 [![Download](https://jitpack.io/v/NLeSC/Xenon.svg)](https://jitpack.io/#NLeSC/Xenon)
 [![DOI](https://zenodo.org/badge/9236864.svg)](https://zenodo.org/badge/latestdoi/9236864)
 
-Copyright 2013 The Netherlands eScience Center
+Copyright 2013-2017 The Netherlands eScience Center
 
 ## What problem does Xenon solve?
 
