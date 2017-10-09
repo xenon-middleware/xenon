@@ -1,6 +1,5 @@
 
-Xenon
-=====
+# Xenon
 
 [![Build Status](https://travis-ci.org/NLeSC/Xenon.svg?branch=develop)](https://travis-ci.org/NLeSC/Xenon)
 [![Build status Windows](https://ci.appveyor.com/api/projects/status/h4l4wn158db23kuf?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon/branch/master)
@@ -10,28 +9,63 @@ Xenon
 [![Download](https://jitpack.io/v/NLeSC/Xenon.svg)](https://jitpack.io/#NLeSC/Xenon)
 [![DOI](https://zenodo.org/badge/9236864.svg)](https://zenodo.org/badge/latestdoi/9236864)
 
-Copyright 2013 The Netherlands eScience Center
+Copyright 2013-2017 The Netherlands eScience Center
 
-What is it?
------------
+## What problem does Xenon solve?
 
-Xenon is a middleware abstraction library. It provides a simple
-programming interface to various pieces of software that can be used
-to access distributed compute and storage resources.
+Many applications use remote storage and compute resources. To do so, they need
+to include code to interact with the scheduling systems and file transfer
+protocols used on those remote machines.
 
-Why Xenon?
-----------
+Unfortunately, many different scheduler systems and file transfer protocols
+exist, often with completely different programming interfaces. This makes it
+hard for applications to switch to a different system or support multiple
+remote systems simultaneously.
 
-Xenon is developed by the Netherlands eScience Center as a support
-library for our projects. Several projects develop end-user
-applications that require access to distributed compute and storage
-resources. Xenon provides a simple API to those resources, allowing
-those applications to be developed more rapidly. The experience
-gained during end-user application development is used to improve
-the Xenon API and implementation.
+Xenon solves this problem by providing a single programming interface to many
+different types of remote resources, allowing applications to switch without
+changing a single line of code.
 
-Adding Xenon as a dependency to your project
---------------------------------------------
+![Xenon abstraction](/docs/images/readme-xenon-abstraction.svg.png "Xenon abstraction")
+
+## How does Xenon work?
+
+Xenon is an abstraction layer that sits between your application and the remote
+resource it uses. Xenon is written in Java, but is also accessible from other
+languages (e.g. Python) through its gRPC interface.
+
+![Xenon API](/docs/images/readme-xenon-api.svg.png "Xenon API")
+
+### Overview of the Xenon ecosystem of tools
+
+| component | repository |
+|---|---|
+| Xenon library | https://github.com/NLeSC/Xenon |
+| gRPC extension for Xenon | https://github.com/NLeSC/xenon-grpc |
+| command line interface to Xenon | https://github.com/NLeSC/xenon-cli |
+| Python API for Xenon | https://github.com/NLeSC/pyxenon |
+
+## Supported middleware
+
+Xenon currently supports the following file access mechanisms:
+
+- ``file`` (local file manipulation)
+- ``ftp``
+- ``sftp``
+- ``webdav``
+- ``s3``
+
+Xenon currently supports the following job submission mechanisms:
+
+- ``local``
+- ``ssh``
+- ``gridengine``
+- ``slurm``
+- ``torque``  
+
+See the [roadmap](/ROADMAP.md) for the planned extensions.
+
+## Adding Xenon as a dependency to your project
 
 Follow the instructions from [jitpack.io](https://jitpack.io/#NLeSC/Xenon/2.0.0-rc2) to include Xenon as a 
 dependency for Gradle, Maven, SBT, or Leiningen projects, e.g. Gradle:
@@ -76,13 +110,11 @@ and
 	</dependency>
 ```
 
-
-Simple examples
----------------
+## Simple examples
 
 Here are some examples of basic operations you can perform with Xenon: 
 
-#### Copying a file from a local filesystem to a remote filesystem
+### Copying a file from a local filesystem to a remote filesystem
 
 ```java
 import nl.esciencecenter.xenon.XenonException;
@@ -132,7 +164,7 @@ public class CopyFileLocalToSftpAbsolutePaths {
 }
 ```
 
-#### Submitting a job
+### Submitting a job
 
 The following code performs a wordcount of a file residing on a remote machine: 
 
@@ -180,42 +212,13 @@ public class SlurmSubmitWordCountJob {
 
 The output of the job will be written to ``/tmp/wc.stdout.txt`` file in the ``nlesc/xenon-slurm`` Docker container.
 
-Supported middleware
---------------------
+For more examples, see the tutorial at [Read The Docs](http://xenonrse2017.readthedocs.io/).
 
-Xenon currently supports the following file access mechanisms:
-
-- ``file`` (local file manipulation)
-- ``ftp``
-- ``sftp``
-- ``webdav``
-- ``s3``
-
-Xenon currently supports the following job submission mechanisms:
-
-- ``local``
-- ``ssh``
-- ``gridengine``
-- ``slurm``
-- ``torque``  
-
-Planned extensions include: 
-
-- Swift
-- HDFS (almost done)
-- YARN
-- GridFTP
-- glite
-- Azure-Batch
-- Amazon-Batch
-
-Documentation
--------------
+## Documentation
 
 Xenon's JavaDoc is available online at <https://jitpack.io/com/github/NLeSC/Xenon/master-SNAPSHOT/javadoc/index.html>.
 
-Legal
-------------------------
+## Legal
 
 The Xenon library is copyrighted by the Netherlands eScience Center and released
 under the Apache License, Version 2.0. A copy of the license may be obtained
