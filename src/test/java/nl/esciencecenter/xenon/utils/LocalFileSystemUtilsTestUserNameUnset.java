@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assume.assumeFalse;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,6 +34,7 @@ public class LocalFileSystemUtilsTestUserNameUnset {
 
     @Test
     public void test_noexpand_tilde_withPath() throws Exception {
+        assumeFalse(LocalFileSystemUtils.isWindows());
         String result = LocalFileSystemUtils.expandTilde("~/filesystem-test-fixture/links/file0");
         assertEquals("/foo/bar/filesystem-test-fixture/links/file0", result);
     }
