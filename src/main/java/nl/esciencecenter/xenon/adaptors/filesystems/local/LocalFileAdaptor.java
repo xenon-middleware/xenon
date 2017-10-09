@@ -100,13 +100,13 @@ public class LocalFileAdaptor extends FileAdaptor {
      * @throws InvalidLocationException
      *             if the location is invalid.
      */
-    private static void checkFileLocation(String location) throws InvalidLocationException {
-        if (location == null || location.isEmpty() || LocalFileSystemUtils.isLocalRoot(location)) {
-            return;
-        }
-
-        throw new InvalidLocationException(ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
-    }
+    // private static void checkFileLocation(String location) throws InvalidLocationException {
+    // if (location == null || location.isEmpty() || LocalFileSystemUtils.isLocalRoot(location)) {
+    // return;
+    // }
+    //
+    // throw new InvalidLocationException(ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
+    // }
 
     @Override
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {

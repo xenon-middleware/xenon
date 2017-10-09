@@ -29,7 +29,6 @@ import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
-import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 
 /**
  * LocalFiles implements an Xenon <code>Jobs</code> adaptor for local job operations.
@@ -110,19 +109,19 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
      * @throws InvalidLocationException
      *             if the location is invalid.
      */
-    private static void checkLocation(String location) throws InvalidLocationException {
-        if (location == null || location.isEmpty() || location.equals("local://")) {
-            return;
-        }
-
-        throw new InvalidLocationException(ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
-    }
+    // private static void checkLocation(String location) throws InvalidLocationException {
+    // if (location == null || location.isEmpty() || location.equals("local://")) {
+    // return;
+    // }
+    //
+    // throw new InvalidLocationException(ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
+    // }
 
     @Override
     public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) throws XenonException {
 
         // Location should be: null, empty, or local://
-        checkLocation(location);
+        // checkLocation(location);
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
@@ -130,19 +129,19 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
             throw new InvalidCredentialException(ADAPTOR_NAME, "Local scheduler does not support this credential!");
         }
 
-        String filesystemlocation = "/";
+        // String filesystemlocation = "/";
+        //
+        // if (LocalFileSystemUtils.isWindows()) {
+        // filesystemlocation = "C:";
+        // }
 
-        if (LocalFileSystemUtils.isWindows()) {
-            filesystemlocation = "C:";
-        }
-
-        FileSystem filesystem = FileSystem.create("file", filesystemlocation, credential, properties);
+        FileSystem filesystem = FileSystem.create("file", location, credential, properties);
 
         int processors = Runtime.getRuntime().availableProcessors();
         int multiQThreads = xp.getIntegerProperty(MULTIQ_MAX_CONCURRENT, processors);
         long pollingDelay = xp.getLongProperty(POLLING_DELAY);
 
-        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, "local://", new LocalInteractiveProcessFactory(), filesystem,
+        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, location == null ? "" : location, new LocalInteractiveProcessFactory(), filesystem,
                 filesystem.getWorkingDirectory(), multiQThreads, pollingDelay, 0L, xp);
     }
 }

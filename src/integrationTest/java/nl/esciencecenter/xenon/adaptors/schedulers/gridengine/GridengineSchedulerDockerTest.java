@@ -39,7 +39,7 @@ public class GridengineSchedulerDockerTest extends GridengineSchedulerTestParent
 
     @Override
     protected SchedulerLocationConfig setupLocationConfig() {
-        return new GridengineLocationConfig(docker.containers().container("gridengine").port(22).inFormat("ssh://$HOST:$EXTERNAL_PORT"));
+        return new GridengineLocationConfig(docker.containers().container("gridengine").port(22).inFormat("ssh://$HOST:$EXTERNAL_PORT"), "/home/xenon");
     }
 
     @Override

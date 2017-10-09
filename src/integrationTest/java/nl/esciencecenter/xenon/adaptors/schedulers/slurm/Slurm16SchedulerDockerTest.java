@@ -39,7 +39,7 @@ public class Slurm16SchedulerDockerTest extends SlurmSchedulerTestParent {
 
     @Override
     protected SchedulerLocationConfig setupLocationConfig() {
-        return new SlurmLocationConfig(docker.containers().container("slurm").port(22).inFormat("ssh://$HOST:$EXTERNAL_PORT"));
+        return new SlurmLocationConfig(docker.containers().container("slurm").port(22).inFormat("ssh://$HOST:$EXTERNAL_PORT"), "/home/xenon");
     }
 
     @Override

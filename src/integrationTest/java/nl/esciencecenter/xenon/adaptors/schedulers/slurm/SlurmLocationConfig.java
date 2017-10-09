@@ -19,25 +19,8 @@ import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
 
 public class SlurmLocationConfig extends SchedulerLocationConfig {
 
-    private String location;
-
-    public SlurmLocationConfig(String location) {
-        this.location = location;
-    }
-
-    @Override
-    public String getLocation() {
-        return location;
-    }
-
-    @Override
-    public String[] getQueueNames() {
-        return new String[] { "mypartition", "otherpartition" };
-    }
-
-    @Override
-    public String getDefaultQueueName() {
-        return "mypartition";
+    public SlurmLocationConfig(String location, String workdir) {
+        super(location, workdir, new String[] { "mypartition", "otherpartition" }, "mypartition");
     }
 
     @Override

@@ -39,7 +39,7 @@ public class TorqueSchedulerDockerTest extends TorqueSchedulerTestParent {
 
     @Override
     protected SchedulerLocationConfig setupLocationConfig() {
-        return new TorqueLocationConfig(docker.containers().container("torque").port(22).inFormat("ssh://$HOST:$EXTERNAL_PORT"));
+        return new TorqueLocationConfig(docker.containers().container("torque").port(22).inFormat("ssh://$HOST:$EXTERNAL_PORT"), "/home/xenon");
     }
 
     @Override

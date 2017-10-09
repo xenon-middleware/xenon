@@ -48,51 +48,46 @@ public final class SlurmUtils {
     private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
 
     /**
-     * These are the states a job can be in when it has failed:
-     * FAILED:    the job terminated with non-zero exit code or other failure condition.
-     * CANCELLED: the job was explicitly cancelled by the user or system administrator.
-     * NODE_FAIL: the job terminated due to failure of one or more allocated nodes.
-     * TIMEOUT:   the job terminated upon reaching its time limit.
-     * PREEMPTED: the job terminated due to preemption (a more important job took its place).
-     * BOOT_FAIL: the job terminated due to a launch failure (typically a hardware failure).
+     * These are the states a job can be in when it has failed: FAILED: the job terminated with non-zero exit code or other failure condition. CANCELLED: the
+     * job was explicitly cancelled by the user or system administrator. NODE_FAIL: the job terminated due to failure of one or more allocated nodes. TIMEOUT:
+     * the job terminated upon reaching its time limit. PREEMPTED: the job terminated due to preemption (a more important job took its place). BOOT_FAIL: the
+     * job terminated due to a launch failure (typically a hardware failure).
      */
     private static final String[] FAILED_STATES = new String[] { "FAILED", "CANCELLED", "NODE_FAIL", "TIMEOUT", "PREEMPTED", "BOOT_FAIL" };
 
     /**
      * These are the states a job can be in when it is running:
      *
-     * CONFIGURING: the resources are available and being preparing to run the job (for example by booting).
-     * RUNNING:     the resources are running the job.
-     * COMPLETING:  the job is in process of completing. Some processes may have completed, others may still be running.
+     * CONFIGURING: the resources are available and being preparing to run the job (for example by booting). RUNNING: the resources are running the job.
+     * COMPLETING: the job is in process of completing. Some processes may have completed, others may still be running.
      */
     private static final String[] RUNNING_STATES = new String[] { "CONFIGURING", "RUNNING", "COMPLETING" };
 
     /**
      * These are the states a job can be in when it is pending:
      *
-     * PENDING:      the job is awaiting resource allocation.
-     * STOPPED:      the job has an allocation, but execution has been stopped with SIGSTOP signal (allocation is retained).
-     * SUSPENDED:    the job has an allocation, but execution has been suspended (resources have been released for other jobs).
-     * SPECIAL_EXIT: The job was requeued in a special state.
+     * PENDING: the job is awaiting resource allocation. STOPPED: the job has an allocation, but execution has been stopped with SIGSTOP signal (allocation is
+     * retained). SUSPENDED: the job has an allocation, but execution has been suspended (resources have been released for other jobs). SPECIAL_EXIT: The job
+     * was requeued in a special state.
      */
     private static final String[] PENDING_STATES = new String[] { "PENDING", "STOPPED", "SUSPENDED", "SPECIAL_EXIT" };
 
     /** In completed state, the job has terminated and all processes have returned exit code 0. */
     private static final String DONE_STATE = "COMPLETED";
 
-     protected static String identifiersAsCSList(String[] jobs) {
-         String result = null;
-         for (String job : jobs) {
-             if (job != null) {
-                 if (result == null) {
-                     result = job;
-                 } else {
-                     result = CommandLineUtils.concat(result, ",", job);
-                 }
-             }
-         }
-         return result;
-     }
+    protected static String identifiersAsCSList(String[] jobs) {
+        String result = null;
+        for (String job : jobs) {
+            if (job != null) {
+                if (result == null) {
+                    result = job;
+                } else {
+                    result = CommandLineUtils.concat(result, ",", job);
+                }
+            }
+        }
+        return result;
+    }
 
     private SlurmUtils() {
         throw new IllegalStateException("Utility class");
@@ -104,7 +99,7 @@ public final class SlurmUtils {
             return null;
         }
 
-        //the exit status may contain a ":" followed by the signal send to stop the job. Ignore
+        // the exit status may contain a ":" followed by the signal send to stop the job. Ignore
         String exitCodeString = value.split(":")[0];
 
         try {
@@ -123,7 +118,7 @@ public final class SlurmUtils {
             return null;
         }
 
-        //also checks if the job id is correct
+        // also checks if the job id is correct
         ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JobID", "State", "ExitCode");
 
         String state = jobInfo.get("State");
@@ -132,7 +127,7 @@ public final class SlurmUtils {
 
         XenonException exception;
         if (!isFailedState(state) || (state.equals("FAILED") && (exitcode != null && exitcode != 0))) {
-            //Not a failed state (non zero exit code does not count either), no error.
+            // Not a failed state (non zero exit code does not count either), no error.
             exception = null;
         } else if (state.startsWith("CANCELLED")) {
             exception = new JobCanceledException(ADAPTOR_NAME, "Job " + state.toLowerCase(Locale.getDefault()));
@@ -140,8 +135,7 @@ public final class SlurmUtils {
             exception = new XenonException(ADAPTOR_NAME, "Job failed for unknown reason");
         }
 
-        JobStatus result = new JobStatusImplementation(jobIdentifier, state, exitcode, exception, isRunningState(state),
-                isDoneOrFailedState(state), jobInfo);
+        JobStatus result = new JobStatusImplementation(jobIdentifier, state, exitcode, exception, isRunningState(state), isDoneOrFailedState(state), jobInfo);
 
         LOGGER.debug("Got job status from sacct output {}", result);
 
@@ -154,7 +148,7 @@ public final class SlurmUtils {
             return null;
         }
 
-        //also checks if the job id is correct
+        // also checks if the job id is correct
         ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JobId", "JobState", "ExitCode", "Reason");
 
         String state = jobInfo.get("JobState");
@@ -163,20 +157,17 @@ public final class SlurmUtils {
 
         XenonException exception;
         if (!isFailedState(state) || state.equals("FAILED") && reason.equals("NonZeroExitCode")) {
-            //Not a failed state (non zero exit code does not count either), no error.
+            // Not a failed state (non zero exit code does not count either), no error.
             exception = null;
         } else if (state.startsWith("CANCELLED")) {
             exception = new JobCanceledException(ADAPTOR_NAME, "Job " + state.toLowerCase(Locale.getDefault()));
         } else if (!reason.equals("None")) {
-            exception = new XenonException(ADAPTOR_NAME, "Job failed with state \"" + state + "\" and reason: "
-                    + reason);
+            exception = new XenonException(ADAPTOR_NAME, "Job failed with state \"" + state + "\" and reason: " + reason);
         } else {
-            exception = new XenonException(ADAPTOR_NAME, "Job failed with state \"" + state
-                    + "\" for unknown reason");
+            exception = new XenonException(ADAPTOR_NAME, "Job failed with state \"" + state + "\" for unknown reason");
         }
 
-        JobStatus result = new JobStatusImplementation(jobIdentifier, state, exitcode, exception, isRunningState(state),
-                isDoneOrFailedState(state), jobInfo);
+        JobStatus result = new JobStatusImplementation(jobIdentifier, state, exitcode, exception, isRunningState(state), isDoneOrFailedState(state), jobInfo);
 
         LOGGER.debug("Got job status from scontrol output {}", result);
 
@@ -192,7 +183,7 @@ public final class SlurmUtils {
             return null;
         }
 
-        //also checks if the job id is correct
+        // also checks if the job id is correct
         ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JOBID", "STATE");
 
         String state = jobInfo.get("STATE");
@@ -214,7 +205,8 @@ public final class SlurmUtils {
     /**
      * Is the given state a running state ?
      *
-     * @param state the state to check
+     * @param state
+     *            the state to check
      * @return if the state is a running state.
      */
     protected static boolean isRunningState(String state) {
@@ -229,7 +221,8 @@ public final class SlurmUtils {
     /**
      * Is the given state a pending state ?
      *
-     * @param state the state to check
+     * @param state
+     *            the state to check
      * @return if the state is a pending state.
      */
     protected static boolean isPendingState(String state) {
@@ -244,7 +237,8 @@ public final class SlurmUtils {
     /**
      * Is the given state a done or failed state ?
      *
-     * @param state the state to check
+     * @param state
+     *            the state to check
      * @return if the state is a done or failed state.
      */
     protected static boolean isDoneOrFailedState(String state) {
@@ -254,7 +248,8 @@ public final class SlurmUtils {
     /**
      * Is the given state a done state ?
      *
-     * @param state the state to check
+     * @param state
+     *            the state to check
      * @return if the state is a done state.
      */
     protected static boolean isDoneState(String state) {
@@ -264,7 +259,8 @@ public final class SlurmUtils {
     /**
      * Is the given state a failed state ?
      *
-     * @param state the state to check
+     * @param state
+     *            the state to check
      * @return if the state is failed state.
      */
     protected static boolean isFailedState(String state) {
@@ -276,19 +272,16 @@ public final class SlurmUtils {
         return false;
     }
 
-    @SuppressWarnings("PMD.NPathComplexity")
-    protected  static void verifyJobDescription(JobDescription description, boolean interactive) throws XenonException {
+    protected static void verifyJobDescription(JobDescription description, boolean interactive) throws XenonException {
         ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
 
         if (interactive) {
             if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
-                throw new InvalidJobDescriptionException(ADAPTOR_NAME,
-                        "Custom job script not supported in interactive mode");
+                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Custom job script not supported in interactive mode");
             }
 
             if (description.isStartSingleProcess()) {
-                throw new InvalidJobDescriptionException(ADAPTOR_NAME,
-                        "StartSingleProcess option not supported in interactive mode");
+                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "StartSingleProcess option not supported in interactive mode");
             }
 
             if (description.getStdin() != null) {
@@ -308,13 +301,13 @@ public final class SlurmUtils {
             }
         }
 
-        //check for option that overrides job script completely.
+        // check for option that overrides job script completely.
         if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
-            //no other settings checked.
+            // no other settings checked.
             return;
         }
 
-        //Perform standard checks.
+        // Perform standard checks.
         ScriptingUtils.verifyJobDescription(description, ADAPTOR_NAME);
     }
 
@@ -323,7 +316,7 @@ public final class SlurmUtils {
         if (description.getWorkingDirectory().startsWith("/")) {
             path = description.getWorkingDirectory();
         } else {
-            //make relative path absolute
+            // make relative path absolute
             Path workingDirectory = fsEntryPath.resolve(description.getWorkingDirectory());
             path = workingDirectory.toString();
         }
@@ -334,13 +327,13 @@ public final class SlurmUtils {
     public static String[] generateInteractiveArguments(JobDescription description, Path fsEntryPath, UUID tag) {
         ArrayList<String> arguments = new ArrayList<>();
 
-        //suppress printing of status messages
+        // suppress printing of status messages
         arguments.add("--quiet");
 
-        //add a tag so we can find the job back in the queue later
+        // add a tag so we can find the job back in the queue later
         arguments.add("--job-name=" + tag.toString());
 
-        //set working directory
+        // set working directory
         if (description.getWorkingDirectory() != null) {
             String path = getWorkingDirPath(description, fsEntryPath);
             arguments.add("--chdir=" + path);
@@ -350,14 +343,14 @@ public final class SlurmUtils {
             arguments.add("--partition=" + description.getQueueName());
         }
 
-        //number of nodes
+        // number of nodes
         arguments.add("--nodes=" + description.getNodeCount());
 
-        //number of processer per node
-        arguments.add("--ntasks-per-node=" +description.getProcessesPerNode());
+        // number of processer per node
+        arguments.add("--ntasks-per-node=" + description.getProcessesPerNode());
 
-        //add maximum runtime
-        arguments.add("--time=" +description.getMaxRuntime());
+        // add maximum runtime
+        arguments.add("--time=" + description.getMaxRuntime());
 
         arguments.add(description.getExecutable());
         arguments.addAll(description.getArguments());
@@ -365,17 +358,16 @@ public final class SlurmUtils {
         return arguments.toArray(new String[arguments.size()]);
     }
 
-    @SuppressWarnings("PMD.NPathComplexity")
     public static String generate(JobDescription description, Path fsEntryPath) {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
         script.format("%s\n", "#!/bin/sh");
 
-        //set name of job to xenon
+        // set name of job to xenon
         script.format("%s\n", "#SBATCH --job-name xenon");
 
-        //set working directory
+        // set working directory
         if (description.getWorkingDirectory() != null) {
             String path = getWorkingDirPath(description, fsEntryPath);
             script.format("#SBATCH --workdir='%s'\n", path);
@@ -385,13 +377,13 @@ public final class SlurmUtils {
             script.format("#SBATCH --partition=%s\n", description.getQueueName());
         }
 
-        //number of nodes
+        // number of nodes
         script.format("#SBATCH --nodes=%d\n", description.getNodeCount());
 
-        //number of processer per node
+        // number of processer per node
         script.format("#SBATCH --ntasks-per-node=%d\n", description.getProcessesPerNode());
 
-        //add maximum runtime
+        // add maximum runtime
         script.format("#SBATCH --time=%d\n", description.getMaxRuntime());
 
         if (description.getStdin() != null) {
@@ -417,7 +409,7 @@ public final class SlurmUtils {
         script.format("\n");
 
         if (!description.isStartSingleProcess()) {
-            //run commands through srun
+            // run commands through srun
             script.format("%s ", "srun");
         }
 
@@ -434,6 +426,5 @@ public final class SlurmUtils {
 
         return stringBuilder.toString();
     }
-
 
 }

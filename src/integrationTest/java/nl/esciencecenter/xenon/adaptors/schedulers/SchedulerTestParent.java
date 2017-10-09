@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.NoSuchJobException;
@@ -707,5 +709,17 @@ public abstract class SchedulerTestParent {
         assertEquals("Hello World\r\nGoodbye World\r\n\r\n", out.getResultAsString());
 
         cleanupJob(streams.getJobIdentifier());
+    }
+
+    @Test
+    public void test_workdir() throws Exception {
+
+        // We need a scheduler that actually has a filesystem underneath.
+        assumeTrue(scheduler.usesFileSystem());
+
+        FileSystem fs = scheduler.getFileSystem();
+        Path p = fs.getWorkingDirectory();
+
+        assertEquals(locationConfig.getWorkdir(), p.toString());
     }
 }
