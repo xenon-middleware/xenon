@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -164,7 +164,7 @@ public class JavaJobDescription extends JobDescription {
     }
 
     /**
-     * <b>This method should not be used</b>. This method will throw an runtime exception when used. The methods {@link #setJavaClasspath(String [])} ,
+     * <b>This method should not be used</b>. This method will throw an runtime exception when used. The methods {@link #setJavaClasspath(String...)}  ,
      * {@link #setJavaOptions(String[])}, {@link #setJavaSystemProperties(Map)}, {@link #setJavaMain(String)} and {@link #setJavaArguments(String[])} should be
      * used to construct the command line arguments.
      * 
