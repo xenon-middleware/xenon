@@ -28,9 +28,9 @@ import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 /**
  * A JobDescription specialized in Java applications.
- * 
+ *
  * A JavaJobDescription will use the Java specific information provided by the user to build the command line arguments of the JobDescription.
- * 
+ *
  * @version 1.0
  * @since 1.0
  */
@@ -47,7 +47,7 @@ public class JavaJobDescription extends JobDescription {
 
     /**
      * Returns the JVM options.
-     * 
+     *
      * @return the JVM options.
      */
     public List<String> getJavaOptions() {
@@ -56,7 +56,7 @@ public class JavaJobDescription extends JobDescription {
 
     /**
      * Sets the JVM options.
-     * 
+     *
      * @param options
      *            the JVM options.
      */
@@ -70,7 +70,7 @@ public class JavaJobDescription extends JobDescription {
 
     /**
      * Adds a JVM option.
-     * 
+     *
      * @param option
      *            the JVM option.
      */
@@ -84,7 +84,7 @@ public class JavaJobDescription extends JobDescription {
 
     /**
      * Returns the java system properties.
-     * 
+     *
      * @return the java system properties.
      */
     public Map<String, String> getJavaSystemProperties() {
@@ -94,7 +94,7 @@ public class JavaJobDescription extends JobDescription {
     /**
      * Sets the system properties. A system property should be passed as a key value pair &lt;"a", "b"&gt;, not as &lt;"-Da", "b"&gt;, Xenon will add the -D to
      * the property.
-     * 
+     *
      * @param systemProperties
      *            the system properties.
      */
@@ -106,7 +106,7 @@ public class JavaJobDescription extends JobDescription {
 
     /**
      * Adds a system property to the current set of system properties. The key of the system property should not start with "-D".
-     * 
+     *
      * @param key
      *            the key of the system property to be added
      * @param value
@@ -118,7 +118,7 @@ public class JavaJobDescription extends JobDescription {
 
     /**
      * Returns the main class of the java application.
-     * 
+     *
      * @return the main class.
      */
     public String getJavaMain() {
@@ -127,7 +127,7 @@ public class JavaJobDescription extends JobDescription {
 
     /**
      * Sets the main class.
-     * 
+     *
      * @param main
      *            the main class.
      */
@@ -137,7 +137,7 @@ public class JavaJobDescription extends JobDescription {
 
     /**
      * Returns the arguments for the main class.
-     * 
+     *
      * @return the arguments for the main class
      */
     public List<String> getJavaArguments() {
@@ -146,7 +146,7 @@ public class JavaJobDescription extends JobDescription {
 
     /**
      * Sets the arguments of the java main class.
-     * 
+     *
      * @param javaArguments
      *            the arguments of the java main class.
      */
@@ -167,7 +167,7 @@ public class JavaJobDescription extends JobDescription {
      * <b>This method should not be used</b>. This method will throw an runtime exception when used. The methods {@link #setJavaClasspath(String...)}  ,
      * {@link #setJavaOptions(String[])}, {@link #setJavaSystemProperties(Map)}, {@link #setJavaMain(String)} and {@link #setJavaArguments(String[])} should be
      * used to construct the command line arguments.
-     * 
+     *
      * @param arguments
      */
     public void setArguments(String... arguments) {
@@ -176,7 +176,7 @@ public class JavaJobDescription extends JobDescription {
 
     /**
      * Constructs the command line arguments from the class path, the JVM options, the system properties, the main and the java arguments.
-     * 
+     *
      * @return the command line arguments
      */
     @Override
@@ -186,10 +186,10 @@ public class JavaJobDescription extends JobDescription {
 
     /**
      * Constructs the command line arguments from the class path, the JVM options, the system properties, the main and the java arguments.
-     * 
+     *
      * @param pathSeparator
      *            the seperator to use in the classpath. Defaults to the unix path seperator ':'
-     * 
+     *
      * @return the command line arguments
      */
     public List<String> getArguments(char pathSeparator) {
@@ -225,7 +225,7 @@ public class JavaJobDescription extends JobDescription {
 
     /**
      * Returns the executable. If no executable is set the default executable will be "java".
-     * 
+     *
      * @return Returns the executable.
      */
     public String getExecutable() {
@@ -238,7 +238,7 @@ public class JavaJobDescription extends JobDescription {
 
     /**
      * Returns the java class path.
-     * 
+     *
      * @return the java class path.
      */
     public List<String> getJavaClasspath() {
@@ -247,7 +247,7 @@ public class JavaJobDescription extends JobDescription {
 
     /**
      * Sets the java class path. Will automatically add separators when multiple elements are given.
-     * 
+     *
      * @param javaClasspath
      *            the class path to be set.
      */

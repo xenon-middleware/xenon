@@ -568,7 +568,7 @@ public abstract class Scheduler implements AutoCloseable {
 
     /**
      * Does this <code>Scheduler</code> use a <code>FileSystem</code> internally to access files and directories ?
-     * 
+     *
      * @return If this <code>Scheduler</code> use a <code>FileSystem</code> internally ?
      */
     public abstract boolean usesFileSystem();
@@ -583,7 +583,7 @@ public abstract class Scheduler implements AutoCloseable {
      * This method returns this <code>FileSystem</code> so it can also be used by the application to prepare input files for the jobs, or retrieve the output
      * files produced by the jobs.
      * </p>
-     * 
+     *
      * @return the <code>FileSystem</code> used by this Scheduler.
      * @throws XenonException
      *             if this Scheduler does not use a <code>FileSystem</code> internally.
