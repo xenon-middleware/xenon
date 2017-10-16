@@ -29,29 +29,44 @@ public abstract class SshUtilTest {
 
     public abstract Credential getCorrectCredential();
 
+    // boolean loadSSHConfig, boolean stricHostCheck, boolean addHostKey, boolean useSSHAgent, boolean useAgentForwarding
     @Test
-    public void test_connect() throws Exception {
-        SshClient client = SSHUtil.createSSHClient(false, false, false);
-        ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10*1000);
+    public void test_connect_no_config_no_host_check() throws Exception {
+        SshClient client = SSHUtil.createSSHClient(false, false, false, false, false);
+        ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10 * 1000);
         session.close();
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void test_connect_FailsNullCredential() throws Exception {
-        SshClient client = SSHUtil.createSSHClient(false, false, false);
-        SSHUtil.connect("test", client, getLocation(), null, 10*1000);
+    // @Test
+    // public void test_connect_no_config_with_host_check() throws Exception {
+    // SshClient client = SSHUtil.createSSHClient(false, true, false, false, false);
+    // ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10 * 1000);
+    // session.close();
+    // }
+
+    @Test
+    public void test_connect_no_config_with_host_check_and_add() throws Exception {
+        SshClient client = SSHUtil.createSSHClient(false, true, true, false, false);
+        ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10 * 1000);
+        session.close();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
+    public void test_connect_FailsNullCredential() throws Exception {
+        SshClient client = SSHUtil.createSSHClient(false, false, false, false, false);
+        SSHUtil.connect("test", client, getLocation(), null, 10 * 1000);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void test_connect_FailsInvalidTimeout() throws Exception {
-        SshClient client = SSHUtil.createSSHClient(false, false, false);
+        SshClient client = SSHUtil.createSSHClient(false, false, false, false, false);
         SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), -1);
     }
 
-    @Test(expected=XenonException.class)
+    @Test(expected = XenonException.class)
     public void test_connect_FailsUsernameNull() throws Exception {
-        SshClient client = SSHUtil.createSSHClient(false, false, false);
-        SSHUtil.connect("test", client, getLocation(), new PasswordCredential(null, "foobar".toCharArray()), 10*1000);
+        SshClient client = SSHUtil.createSSHClient(false, false, false, false, false);
+        SSHUtil.connect("test", client, getLocation(), new PasswordCredential(null, "foobar".toCharArray()), 10 * 1000);
     }
 
 }

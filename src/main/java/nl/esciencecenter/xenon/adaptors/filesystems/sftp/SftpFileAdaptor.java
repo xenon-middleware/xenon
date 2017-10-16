@@ -130,10 +130,12 @@ public class SftpFileAdaptor extends FileAdaptor {
         }
 
         boolean loadSSHConfig = xp.getBooleanProperty(LOAD_SSH_CONFIG);
+        boolean strictHostCheck = xp.getBooleanProperty(STRICT_HOST_KEY_CHECKING);
+        boolean addHostKey = xp.getBooleanProperty(AUTOMATICALLY_ADD_HOST_KEY);
         boolean useSSHAgent = xp.getBooleanProperty(AGENT);
         boolean useAgentForwarding = xp.getBooleanProperty(AGENT_FORWARDING);
 
-        SshClient client = SSHUtil.createSSHClient(loadSSHConfig, useSSHAgent, useAgentForwarding);
+        SshClient client = SSHUtil.createSSHClient(loadSSHConfig, strictHostCheck, addHostKey, useSSHAgent, useAgentForwarding);
 
         long timeout = xp.getNaturalProperty(CONNECTION_TIMEOUT);
 

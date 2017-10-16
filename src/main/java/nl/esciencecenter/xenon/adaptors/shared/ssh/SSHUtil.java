@@ -32,6 +32,8 @@ import org.apache.sshd.agent.local.ProxyAgentFactory;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.config.hosts.DefaultConfigFileHostEntryResolver;
 import org.apache.sshd.client.keyverifier.AcceptAllServerKeyVerifier;
+import org.apache.sshd.client.keyverifier.DefaultKnownHostsServerKeyVerifier;
+import org.apache.sshd.client.keyverifier.RejectAllServerKeyVerifier;
 import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.common.config.keys.FilePasswordProvider;
 import org.apache.sshd.common.util.security.SecurityUtils;
@@ -75,11 +77,22 @@ public class SSHUtil {
         throw new IllegalStateException("Utility class");
     }
 
-    public static SshClient createSSHClient(boolean loadSSHConfig, boolean useSSHAgent, boolean useAgentForwarding) {
+    public static SshClient createSSHClient(boolean loadSSHConfig, boolean stricHostCheck, boolean addHostKey, boolean useSSHAgent,
+            boolean useAgentForwarding) {
 
         SshClient client = SshClient.setUpDefaultClient();
 
-        client.setServerKeyVerifier(AcceptAllServerKeyVerifier.INSTANCE);
+        if (stricHostCheck) {
+            if (addHostKey) {
+                client.setServerKeyVerifier(new DefaultKnownHostsServerKeyVerifier(AcceptAllServerKeyVerifier.INSTANCE, true));
+                // client.setServerKeyVerifier(new KnownHostsServerKeyVerifier(AcceptAllServerKeyVerifier.INSTANCE, null));
+            } else {
+                client.setServerKeyVerifier(new DefaultKnownHostsServerKeyVerifier(RejectAllServerKeyVerifier.INSTANCE, true));
+                // client.setServerKeyVerifier(new KnownHostsServerKeyVerifier(RejectAllServerKeyVerifier.INSTANCE, null));
+            }
+        } else {
+            client.setServerKeyVerifier(AcceptAllServerKeyVerifier.INSTANCE);
+        }
 
         if (loadSSHConfig) {
             client.setHostConfigEntryResolver(DefaultConfigFileHostEntryResolver.INSTANCE);
