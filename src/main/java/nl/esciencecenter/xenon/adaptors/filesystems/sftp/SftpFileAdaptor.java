@@ -164,26 +164,30 @@ public class SftpFileAdaptor extends FileAdaptor {
 
     private String getCurrentWorkingDirectory(SftpClient sftpClient, String location) throws XenonException {
 
-        try {
-            String pathFromURI = new URI("sftp://" + location).getPath();
+        String pathFromURI;
 
+        try {
+            pathFromURI = new URI("sftp://" + location).getPath();
+        } catch (URISyntaxException e) {
+            throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
+        }
+
+        try {
             if (pathFromURI == null || pathFromURI.isEmpty()) {
                 return sftpClient.canonicalPath(".");
             }
-
-            try {
-                sftpClient.lstat(pathFromURI);
-            } catch (IOException e) {
-                // Path does not exist!
-                throw new NoSuchPathException(ADAPTOR_NAME, "Specified working directory does not exist: " + pathFromURI);
-            }
-
-            return pathFromURI;
-        } catch (URISyntaxException e) {
-            throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
         } catch (IOException e) {
             throw new XenonException(getName(), "Could not retrieve current working directory", e);
         }
+
+        try {
+            sftpClient.lstat(pathFromURI);
+        } catch (IOException e) {
+            // Path does not exist!
+            throw new NoSuchPathException(ADAPTOR_NAME, "Specified working directory does not exist: " + pathFromURI);
+        }
+
+        return pathFromURI;
     }
 
     @Override

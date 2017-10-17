@@ -73,10 +73,6 @@ public class SSHUtil {
         }
     }
 
-    private SSHUtil() {
-        throw new IllegalStateException("Utility class");
-    }
-
     /**
      * Create a new {@link SshClient} with a default configuration similar to a stand-alone SSH client.
      * <p>
@@ -271,8 +267,7 @@ public class SSHUtil {
 
             KeyPair pair = null;
 
-            try {
-                InputStream inputStream = Files.newInputStream(path, StandardOpenOption.READ);
+            try (InputStream inputStream = Files.newInputStream(path, StandardOpenOption.READ)) {
 
                 char[] password = c.getPassword();
 

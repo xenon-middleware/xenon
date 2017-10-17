@@ -254,22 +254,21 @@ public class LocalFileSystem extends FileSystem {
 
     @Override
     public boolean exists(Path path) throws XenonException {
-        return Files.exists(javaPath(toAbsolutePath(path)), java.nio.file.LinkOption.NOFOLLOW_LINKS);
+        // This has poor performance in JDK8 according to sonarqube:
+        // Files.exists(javaPath(toAbsolutePath(path)), java.nio.file.LinkOption.NOFOLLOW_LINKS);
+        return javaPath(toAbsolutePath(path)).toFile().exists();
     }
 
     @Override
     protected List<PathAttributes> listDirectory(Path dir) throws XenonException {
 
-        try {
-            ArrayList<PathAttributes> result = new ArrayList<>();
+        try (DirectoryStream<java.nio.file.Path> s = Files.newDirectoryStream(javaPath(dir))) {
 
-            DirectoryStream<java.nio.file.Path> s = Files.newDirectoryStream(javaPath(dir));
+            ArrayList<PathAttributes> result = new ArrayList<>();
 
             for (java.nio.file.Path p : s) {
                 result.add(getLocalFileAttributes(dir.resolve(p.getFileName().toString()), p));
             }
-
-            s.close();
 
             return result;
         } catch (IOException e) {
