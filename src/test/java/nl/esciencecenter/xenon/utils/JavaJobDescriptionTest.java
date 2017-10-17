@@ -19,6 +19,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -91,22 +93,22 @@ public class JavaJobDescriptionTest {
         assertEquals(expected, args);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void addJavaArgument_emptyString_exception() {
         description.addJavaArgument("");
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void addJavaArgument_null_exception() {
         description.addJavaArgument(null);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void addJavaClasspathElement_emptyString_exception() {
         description.addJavaClasspathElement("");
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void addJavaClasspathElement_null_exception() {
         description.addJavaClasspathElement(null);
     }
@@ -125,12 +127,12 @@ public class JavaJobDescriptionTest {
         assertEquals(expected, args);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void addJavaOption_emptyString_exception() {
         description.addJavaOption("");
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void addJavaOption_null_exception() {
         description.addJavaOption(null);
     }
@@ -185,10 +187,21 @@ public class JavaJobDescriptionTest {
 
     @Test
     public void setJavaClasspathElement_jarFiles_inArguments() {
+        assumeFalse(LocalFileSystemUtils.isWindows());
         description.setJavaClasspath("/deps.jar", "/app.jar");
 
         List<String> args = description.getArguments();
         List<String> expected = Arrays.asList("-classpath", "/deps.jar:/app.jar");
+        assertEquals(expected, args);
+    }
+
+    @Test
+    public void setJavaClasspathElement_jarFiles_inArguments_windows() {
+        assumeTrue(LocalFileSystemUtils.isWindows());
+        description.setJavaClasspath("/deps.jar", "/app.jar");
+
+        List<String> args = description.getArguments();
+        List<String> expected = Arrays.asList("-classpath", "/deps.jar;/app.jar");
         assertEquals(expected, args);
     }
 
@@ -206,7 +219,7 @@ public class JavaJobDescriptionTest {
         description.setWorkingDirectory("/workdir");
         description.addEnvironment("CI", "1");
         // configure java description
-        description.setJavaClasspath("/opt/xenon.jar","/opt/xenon-cli.jar");
+        description.setJavaClasspath("/opt/xenon.jar", "/opt/xenon-cli.jar");
         description.setJavaMain("nl.esciencecenter.xenon.cli.Main");
         description.setJavaArguments("filesystem", "file", "list", "/etc");
         description.setJavaOptions("-server");
