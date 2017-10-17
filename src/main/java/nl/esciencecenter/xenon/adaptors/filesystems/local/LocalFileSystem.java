@@ -254,9 +254,7 @@ public class LocalFileSystem extends FileSystem {
 
     @Override
     public boolean exists(Path path) throws XenonException {
-        // This has poor performance in JDK8 according to sonarqube:
-        // Files.exists(javaPath(toAbsolutePath(path)), java.nio.file.LinkOption.NOFOLLOW_LINKS);
-        return javaPath(toAbsolutePath(path)).toFile().exists();
+        return Files.exists(javaPath(toAbsolutePath(path)), java.nio.file.LinkOption.NOFOLLOW_LINKS);
     }
 
     @Override
