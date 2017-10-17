@@ -51,6 +51,7 @@ distributions {
         }
     }
 }
+
 distZip.dependsOn javadoc
 distTar.dependsOn javadoc
 installDist.dependsOn javadoc

@@ -77,6 +77,38 @@ public class SSHUtil {
         throw new IllegalStateException("Utility class");
     }
 
+    /**
+     * Create a new {@link SshClient} with a default configuration similar to a stand-alone SSH client.
+     * <p>
+     * The default configuration loads the SSH config file, uses strict host key checking, and adds unseen hosts keys to the known_hosts file.
+     * </p>
+     *
+     * @return the configured {@link SshClient}
+     **/
+    public static SshClient createSSHClient() {
+        return createSSHClient(true, true, true, false, false);
+    }
+
+    /**
+     * Create a new {@link SshClient} with the desired configuration.
+     * <p>
+     * SSH clients have a significant number of options. This method will create a <code>SshClient</code> providing the most important settings.
+     * </p>
+     *
+     * @param loadSSHConfig
+     *            Load the SSH config file in the default location (for OpenSSH this is typically found in $HOME/.ssh/config).
+     * @param stricHostCheck
+     *            Perform a strict host key check. When setting up a connection, the key presented by the server is compared to the default known_hosts file
+     *            (for OpenSSH this is typically found in $HOME/.ssh/known_hosts).
+     * @param addHostKey
+     *            When setting up a connection, add a previously unknown server server key to the default known_hosts file (for OpenSSH this is typically found
+     *            in $HOME/.ssh/known_hosts).
+     * @param useSSHAgent
+     *            When setting up a connection, handoff authentication to a separate SSH agent process.
+     * @param useAgentForwarding
+     *            Support agent forwarding, allowing remote SSH servers to use the local SSH agent process to authenticate connections to other servers.
+     * @return the configured {@link SshClient}
+     */
     public static SshClient createSSHClient(boolean loadSSHConfig, boolean stricHostCheck, boolean addHostKey, boolean useSSHAgent,
             boolean useAgentForwarding) {
 
@@ -151,6 +183,23 @@ public class SSHUtil {
         }
     }
 
+    /**
+     * Connect an existing {@link SshClient} to the server at <code>location</code> and authenticate using the given <code>credential</code>.
+     *
+     * @param adaptorName
+     *            the adaptor where this method was called from.
+     * @param client
+     *            the client to connect.
+     * @param location
+     *            the server to connect to
+     * @param credential
+     *            the credential to authenticate with.
+     * @param timeout
+     *            the timeout to use in connection setup (in milliseconds).
+     * @return the connected {@link ClientSession}
+     * @throws XenonException
+     *             if the connection setup or authentication failed.
+     */
     public static ClientSession connect(String adaptorName, SshClient client, String location, Credential credential, long timeout) throws XenonException {
 
         // location should be hostname or hostname:port. If port unset it

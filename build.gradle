@@ -46,8 +46,6 @@ dependencies {
     compile group: 'org.apache.jclouds.provider', name: 'aws-s3', version: '2.0.2'
 
     compile group: 'org.apache.sshd', name: 'sshd-core', version: '1.6.0'
-//    compile group: 'org.bouncycastle', name: 'bcpg-jdk15on', version: '1.57'
-//    compile group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.57'
     compile group: 'net.i2p.crypto', name: 'eddsa', version: '0.2.0'
 
     compile group: 'commons-net', name: 'commons-net', version: '3.3'

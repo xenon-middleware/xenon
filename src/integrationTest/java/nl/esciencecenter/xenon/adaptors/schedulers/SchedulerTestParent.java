@@ -65,7 +65,7 @@ public abstract class SchedulerTestParent {
 
     @After
     public void cleanup() throws XenonException {
-        if (scheduler.isOpen()) {
+        if (scheduler != null && scheduler.isOpen()) {
             scheduler.close();
         }
     }

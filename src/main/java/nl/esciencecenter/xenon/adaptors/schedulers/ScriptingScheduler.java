@@ -61,13 +61,13 @@ public abstract class ScriptingScheduler extends Scheduler {
         this.pollDelay = properties.getLongProperty(pollDelayProperty);
 
         String subSchedulerAdaptor;
-        String subFileSystemAdaptor;
+        // String subFileSystemAdaptor;
         String subLocation;
         Map<String, String> subSchedulerProperties;
 
         if (ScriptingUtils.isLocal(location)) {
             subSchedulerAdaptor = "local";
-            subFileSystemAdaptor = "file";
+            // subFileSystemAdaptor = "file";
 
             if (location.startsWith("local://")) {
                 subLocation = location.substring("local://".length());
@@ -77,7 +77,7 @@ public abstract class ScriptingScheduler extends Scheduler {
             subSchedulerProperties = properties.filter(LocalSchedulerAdaptor.PREFIX).toMap();
         } else if (ScriptingUtils.isSSH(location)) {
             subSchedulerAdaptor = "ssh";
-            subFileSystemAdaptor = "sftp";
+            // subFileSystemAdaptor = "sftp";
             subLocation = location.substring("ssh://".length());
             subSchedulerProperties = properties.filter(SshSchedulerAdaptor.PREFIX).toMap();
 
@@ -92,8 +92,10 @@ public abstract class ScriptingScheduler extends Scheduler {
 
         subScheduler = Scheduler.create(subSchedulerAdaptor, subLocation, credential, subSchedulerProperties);
 
-        LOGGER.debug("creating file system for {} adaptor at {}://{}", adaptor, subFileSystemAdaptor, subLocation);
-        subFileSystem = FileSystem.create(subFileSystemAdaptor, subLocation, credential, null);
+        // LOGGER.debug("creating file system for {} adaptor at {}://{}", adaptor, subFileSystemAdaptor, subLocation);
+        subFileSystem = subScheduler.getFileSystem();
+
+        // FileSystem.create(subFileSystemAdaptor, subLocation, credential, null);
     }
 
     protected Path getWorkingDirectory() {

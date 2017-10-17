@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9};
+var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -194,49 +194,59 @@ extends java.lang.Object</pre>
        org.apache.sshd.client.SshClient&nbsp;client,
        java.lang.String&nbsp;location,
        <a href="../../../../../../nl/esciencecenter/xenon/credentials/Credential.html" title="interface in nl.esciencecenter.xenon.credentials">Credential</a>&nbsp;credential,
-       long&nbsp;timeout)</code>&nbsp;</td>
+       long&nbsp;timeout)</code>
+<div class="block">Connect an existing <code>SshClient</code> to the server at <code>location</code> and authenticate using the given <code>credential</code>.</div>
+</td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>static org.apache.sshd.client.SshClient</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/shared/ssh/SSHUtil.html#createSSHClient--">createSSHClient</a></span>()</code>
+<div class="block">Create a new <code>SshClient</code> with a default configuration similar to a stand-alone SSH client.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>static org.apache.sshd.client.SshClient</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/shared/ssh/SSHUtil.html#createSSHClient-boolean-boolean-boolean-boolean-boolean-">createSSHClient</a></span>(boolean&nbsp;loadSSHConfig,
                boolean&nbsp;stricHostCheck,
                boolean&nbsp;addHostKey,
                boolean&nbsp;useSSHAgent,
-               boolean&nbsp;useAgentForwarding)</code>&nbsp;</td>
+               boolean&nbsp;useAgentForwarding)</code>
+<div class="block">Create a new <code>SshClient</code> with the desired configuration.</div>
+</td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/shared/ssh/SSHUtil.html#getHost-java.lang.String-java.lang.String-">getHost</a></span>(java.lang.String&nbsp;adaptorName,
        java.lang.String&nbsp;location)</code>&nbsp;</td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>static int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/shared/ssh/SSHUtil.html#getPort-java.lang.String-java.lang.String-">getPort</a></span>(java.lang.String&nbsp;adaptorName,
        java.lang.String&nbsp;location)</code>&nbsp;</td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>static java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/shared/ssh/SSHUtil.html#sftpToSshProperties-java.util.Map-">sftpToSshProperties</a></span>(java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;properties)</code>&nbsp;</td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>static java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/shared/ssh/SSHUtil.html#sshToSftpProperties-java.util.Map-">sshToSftpProperties</a></span>(java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;properties)</code>&nbsp;</td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>static java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/shared/ssh/SSHUtil.html#translateProperties-java.util.Map-java.util.Set-java.lang.String-java.lang.String-">translateProperties</a></span>(java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;properties,
                    java.util.Set&lt;java.lang.String&gt;&nbsp;valid,
                    java.lang.String&nbsp;orginalPrefix,
                    java.lang.String&nbsp;newPrefix)</code>&nbsp;</td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/shared/ssh/SSHUtil.html#validateHost-java.lang.String-java.lang.String-">validateHost</a></span>(java.lang.String&nbsp;adaptorName,
             java.lang.String&nbsp;host)</code>
 <div class="block">Weak validation of a host string containing either a hostame of IP adres.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>static java.util.Set&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/shared/ssh/SSHUtil.html#validProperties-nl.esciencecenter.xenon.XenonPropertyDescription:A-">validProperties</a></span>(<a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[]&nbsp;properties)</code>&nbsp;</td>
 </tr>
@@ -309,6 +319,23 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="createSSHClient--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>createSSHClient</h4>
+<pre>public static&nbsp;org.apache.sshd.client.SshClient&nbsp;createSSHClient()</pre>
+<div class="block">Create a new <code>SshClient</code> with a default configuration similar to a stand-alone SSH client.
+ <p>
+ The default configuration loads the SSH config file, uses strict host key checking, and adds unseen hosts keys to the known_hosts file.
+ </p></div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the configured <code>SshClient</code></dd>
+</dl>
+</li>
+</ul>
 <a name="createSSHClient-boolean-boolean-boolean-boolean-boolean-">
 <!--   -->
 </a>
@@ -320,6 +347,22 @@ extends java.lang.Object</pre>
                                                                boolean&nbsp;addHostKey,
                                                                boolean&nbsp;useSSHAgent,
                                                                boolean&nbsp;useAgentForwarding)</pre>
+<div class="block">Create a new <code>SshClient</code> with the desired configuration.
+ <p>
+ SSH clients have a significant number of options. This method will create a <code>SshClient</code> providing the most important settings.
+ </p></div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>loadSSHConfig</code> - Load the SSH config file in the default location (for OpenSSH this is typically found in $HOME/.ssh/config).</dd>
+<dd><code>stricHostCheck</code> - Perform a strict host key check. When setting up a connection, the key presented by the server is compared to the default known_hosts file
+            (for OpenSSH this is typically found in $HOME/.ssh/known_hosts).</dd>
+<dd><code>addHostKey</code> - When setting up a connection, add a previously unknown server server key to the default known_hosts file (for OpenSSH this is typically found
+            in $HOME/.ssh/known_hosts).</dd>
+<dd><code>useSSHAgent</code> - When setting up a connection, handoff authentication to a separate SSH agent process.</dd>
+<dd><code>useAgentForwarding</code> - Support agent forwarding, allowing remote SSH servers to use the local SSH agent process to authenticate connections to other servers.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the configured <code>SshClient</code></dd>
+</dl>
 </li>
 </ul>
 <a name="validateHost-java.lang.String-java.lang.String-">
@@ -385,9 +428,18 @@ extends java.lang.Object</pre>
                                                                    <a href="../../../../../../nl/esciencecenter/xenon/credentials/Credential.html" title="interface in nl.esciencecenter.xenon.credentials">Credential</a>&nbsp;credential,
                                                                    long&nbsp;timeout)
                                                             throws <a href="../../../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></pre>
+<div class="block">Connect an existing <code>SshClient</code> to the server at <code>location</code> and authenticate using the given <code>credential</code>.</div>
 <dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>adaptorName</code> - the adaptor where this method was called from.</dd>
+<dd><code>client</code> - the client to connect.</dd>
+<dd><code>location</code> - the server to connect to</dd>
+<dd><code>credential</code> - the credential to authenticate with.</dd>
+<dd><code>timeout</code> - the timeout to use in connection setup (in milliseconds).</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>the connected <code>ClientSession</code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></code></dd>
+<dd><code><a href="../../../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></code> - if the connection setup or authentication failed.</dd>
 </dl>
 </li>
 </ul>
