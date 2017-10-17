@@ -49,7 +49,7 @@ import nl.esciencecenter.xenon.filesystems.PathAttributes;
 import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 
 // We emulate the presence of (empty) directories by a file ending in a /
-// this is the same behaviour as the official S3 console
+// this is the same behavior as the official S3 console
 
 public class JCloudsFileSytem extends FileSystem {
 
@@ -185,9 +185,9 @@ public class JCloudsFileSytem extends FileSystem {
         checkClosed();
         // there are two options: the directory is empty or not.
         // in the former case the __not_empty__ file is deleted and no exception
-        // is thrown (correct behaviour)
+        // is thrown (correct behavior)
         // in the latter case the __not_empty__ file is deleted and an exception
-        // is thrown (correct behaviour)
+        // is thrown (correct behavior)
         if (!dirExists(dir)) {
             throw new NoSuchPathException(adaptorName, "Directory does not exist: " + dir);
         }
@@ -364,20 +364,8 @@ public class JCloudsFileSytem extends FileSystem {
 
         if (!recursive) {
             return () -> listNonRecursiveIterator(bucketEntry);
-            // return new Iterable<PathAttributes>() {
-            // @Override
-            // public Iterator<PathAttributes> iterator() {
-            // return listNonRecursiveIterator(bucketEntry);
-            // }
-            // };
         } else {
             return () -> new RecursiveListIterator(listNonRecursiveIterator(bucketEntry));
-            // return new Iterable<PathAttributes>() {
-            // @Override
-            // public Iterator<PathAttributes> iterator() {
-            // return new RecursiveListIterator(listNonRecursiveIterator(bucketEntry));
-            // }
-            // };
         }
     }
 
@@ -391,13 +379,6 @@ public class JCloudsFileSytem extends FileSystem {
         final ListContainerOptions optionsFinal = options;
 
         return () -> new ListingIterator(optionsFinal, context.getBlobStore().list(bucket, optionsFinal));
-        //
-        // return new Iterable<PathAttributes>() {
-        // @Override
-        // public Iterator<PathAttributes> iterator() {
-        // return new ListingIterator(optionsFinal, context.getBlobStore().list(bucket, optionsFinal));
-        // }
-        // };
     }
 
     @Override
@@ -430,15 +411,6 @@ public class JCloudsFileSytem extends FileSystem {
         } catch (IOException e) {
             throw new XenonException(adaptorName, "IO error when trying to write: " + e.getMessage());
         }
-
-        // Start a thread to transfer data to the blob in the background.
-        // new Thread(new Runnable() {
-        //
-        // @Override
-        // public void run() {
-        // context.getBlobStore().putBlob(bucket, b);
-        // }
-        // }).start();
 
         new Thread(() -> context.getBlobStore().putBlob(bucket, b)).start();
 
@@ -482,7 +454,6 @@ public class JCloudsFileSytem extends FileSystem {
     }
 
     private class RecursiveListIterator implements Iterator<PathAttributes> {
-        // final Stack<Iterator<PathAttributes>> stack;
 
         final Deque<Iterator<PathAttributes>> stack;
 
