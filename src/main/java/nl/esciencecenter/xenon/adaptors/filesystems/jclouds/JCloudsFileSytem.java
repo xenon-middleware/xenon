@@ -21,10 +21,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.ArrayDeque;
 import java.util.Date;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.Stack;
 
 import org.jclouds.blobstore.BlobStoreContext;
 import org.jclouds.blobstore.domain.Blob;
@@ -57,7 +58,6 @@ public class JCloudsFileSytem extends FileSystem {
     final String bucket;
     final BlobStoreContext context;
     final String adaptorName;
-    // final String endPoint;
 
     boolean open;
 
@@ -68,7 +68,6 @@ public class JCloudsFileSytem extends FileSystem {
         this.bucket = bucket;
         this.adaptorName = adaptorName;
         this.open = true;
-        // this.endPoint = endPoint;
     }
 
     String toBucketEntry(Path path) {
@@ -335,7 +334,6 @@ public class JCloudsFileSytem extends FileSystem {
     Iterator<PathAttributes> listNonRecursiveIterator(String bucketEntry) {
         ListContainerOptions options = new ListContainerOptions().prefix(bucketEntry + "/");
         // JClouds on S3 does not list directories if recursive is set :( Fixing it ourselves
-        // if (recursive) { options = options.recursive(); }
         final ListContainerOptions optionsFinal = options;
         return new ListingIterator(optionsFinal, context.getBlobStore().list(bucket, optionsFinal));
     }
@@ -352,10 +350,7 @@ public class JCloudsFileSytem extends FileSystem {
 
         final ListContainerOptions options = new ListContainerOptions().prefix(bucketEntry + "/");
 
-        // JClouds on S3 does not list directories if recursive is set :( Fixing
-        // it ourselves
-        // if (recursive) { options = options.recursive(); }
-        // final ListContainerOptions optionsFinal = options;
+        // JClouds on S3 does not list directories if recursive is set :( Fixing it ourselves
         final PageSet<? extends StorageMetadata> ps = context.getBlobStore().list(bucket, options);
         final Iterator<? extends StorageMetadata> curIt = ps.iterator();
 
@@ -368,19 +363,21 @@ public class JCloudsFileSytem extends FileSystem {
         }
 
         if (!recursive) {
-            return new Iterable<PathAttributes>() {
-                @Override
-                public Iterator<PathAttributes> iterator() {
-                    return listNonRecursiveIterator(bucketEntry);
-                }
-            };
+            return () -> listNonRecursiveIterator(bucketEntry);
+            // return new Iterable<PathAttributes>() {
+            // @Override
+            // public Iterator<PathAttributes> iterator() {
+            // return listNonRecursiveIterator(bucketEntry);
+            // }
+            // };
         } else {
-            return new Iterable<PathAttributes>() {
-                @Override
-                public Iterator<PathAttributes> iterator() {
-                    return new RecursiveListIterator(listNonRecursiveIterator(bucketEntry));
-                }
-            };
+            return () -> new RecursiveListIterator(listNonRecursiveIterator(bucketEntry));
+            // return new Iterable<PathAttributes>() {
+            // @Override
+            // public Iterator<PathAttributes> iterator() {
+            // return new RecursiveListIterator(listNonRecursiveIterator(bucketEntry));
+            // }
+            // };
         }
     }
 
@@ -393,12 +390,14 @@ public class JCloudsFileSytem extends FileSystem {
 
         final ListContainerOptions optionsFinal = options;
 
-        return new Iterable<PathAttributes>() {
-            @Override
-            public Iterator<PathAttributes> iterator() {
-                return new ListingIterator(optionsFinal, context.getBlobStore().list(bucket, optionsFinal));
-            }
-        };
+        return () -> new ListingIterator(optionsFinal, context.getBlobStore().list(bucket, optionsFinal));
+        //
+        // return new Iterable<PathAttributes>() {
+        // @Override
+        // public Iterator<PathAttributes> iterator() {
+        // return new ListingIterator(optionsFinal, context.getBlobStore().list(bucket, optionsFinal));
+        // }
+        // };
     }
 
     @Override
@@ -421,21 +420,29 @@ public class JCloudsFileSytem extends FileSystem {
         Path absPath = toAbsolutePath(path);
         assertPathNotExists(absPath);
 
+        OutputStream out;
+
         final PipedInputStream read = new PipedInputStream();
         final Blob b = context.getBlobStore().blobBuilder(bucket).name(toBucketEntry(absPath)).payload(read).contentLength(size).build();
-        try {
-            final OutputStream out = new PipedOutputStream(read);
-            new Thread(new Runnable() {
 
-                @Override
-                public void run() {
-                    context.getBlobStore().putBlob(bucket, b);
-                }
-            }).start();
-            return out;
+        try {
+            out = new PipedOutputStream(read);
         } catch (IOException e) {
             throw new XenonException(adaptorName, "IO error when trying to write: " + e.getMessage());
         }
+
+        // Start a thread to transfer data to the blob in the background.
+        // new Thread(new Runnable() {
+        //
+        // @Override
+        // public void run() {
+        // context.getBlobStore().putBlob(bucket, b);
+        // }
+        // }).start();
+
+        new Thread(() -> context.getBlobStore().putBlob(bucket, b)).start();
+
+        return out;
     }
 
     @Override
@@ -475,15 +482,17 @@ public class JCloudsFileSytem extends FileSystem {
     }
 
     private class RecursiveListIterator implements Iterator<PathAttributes> {
-        final Stack<Iterator<PathAttributes>> stack;
+        // final Stack<Iterator<PathAttributes>> stack;
+
+        final Deque<Iterator<PathAttributes>> stack;
 
         public RecursiveListIterator(Iterator<PathAttributes> root) {
-            stack = new Stack<>();
+            stack = new ArrayDeque<>();
             stack.push(root);
         }
 
         void popEmpties() {
-            while (!stack.empty()) {
+            while (!stack.isEmpty()) {
                 if (!stack.peek().hasNext()) {
                     stack.pop();
                 } else {

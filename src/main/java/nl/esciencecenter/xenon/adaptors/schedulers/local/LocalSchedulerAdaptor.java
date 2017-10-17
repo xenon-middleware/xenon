@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors.schedulers.local;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.InvalidCredentialException;
-import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
@@ -99,41 +98,14 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
         return true;
     }
 
-    /**
-     * Check if a location string is valid for the local scheduler.
-     *
-     * The only valid options are null, "" or "local://".
-     *
-     * @param location
-     *            the location to check.
-     * @throws InvalidLocationException
-     *             if the location is invalid.
-     */
-    // private static void checkLocation(String location) throws InvalidLocationException {
-    // if (location == null || location.isEmpty() || location.equals("local://")) {
-    // return;
-    // }
-    //
-    // throw new InvalidLocationException(ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
-    // }
-
     @Override
     public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) throws XenonException {
-
-        // Location should be: null, empty, or local://
-        // checkLocation(location);
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
         if (credential != null && !(credential instanceof DefaultCredential)) {
             throw new InvalidCredentialException(ADAPTOR_NAME, "Local scheduler does not support this credential!");
         }
-
-        // String filesystemlocation = "/";
-        //
-        // if (LocalFileSystemUtils.isWindows()) {
-        // filesystemlocation = "C:";
-        // }
 
         FileSystem filesystem = FileSystem.create("file", location, credential, properties);
 
