@@ -29,7 +29,6 @@ import java.util.Set;
 
 import org.jclouds.blobstore.BlobStoreContext;
 import org.jclouds.blobstore.domain.Blob;
-import org.jclouds.blobstore.domain.BlobAccess;
 import org.jclouds.blobstore.domain.BlobMetadata;
 import org.jclouds.blobstore.domain.PageSet;
 import org.jclouds.blobstore.domain.StorageMetadata;
@@ -223,7 +222,7 @@ public class JCloudsFileSytem extends FileSystem {
         return dirExists(absPath) || fileExists(absPath);
     }
 
-    PathAttributes makeDirAttributes(final StorageMetadata m, final BlobAccess access) {
+    PathAttributes makeDirAttributes(final StorageMetadata m) {
 
         PathAttributesImplementation pa = new PathAttributesImplementation();
 
@@ -274,11 +273,11 @@ public class JCloudsFileSytem extends FileSystem {
         return pa;
     }
 
-    PathAttributes toPathAttributes(final StorageMetadata m, final BlobAccess access) {
+    PathAttributes toPathAttributes(final StorageMetadata m) {
 
         switch (m.getType()) {
         case RELATIVE_PATH:
-            return makeDirAttributes(m, access);
+            return makeDirAttributes(m);
         case BLOB:
             return makeBlobAttributes(m.getName());
         default:
@@ -323,9 +322,7 @@ public class JCloudsFileSytem extends FileSystem {
 
         @Override
         public PathAttributes next() {
-
-            BlobAccess access = BlobAccess.PUBLIC_READ;
-            PathAttributes res = toPathAttributes(nxt, access);
+            PathAttributes res = toPathAttributes(nxt);
             getNext();
             return res;
         }
