@@ -26,6 +26,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobQueueScheduler;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil;
@@ -155,7 +156,8 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
         ClientSession session = SSHUtil.connect(ADAPTOR_NAME, client, location, credential, timeout);
 
         // We must convert the relevant SSH properties to SFTP here.
-        Map<String, String> sftpProperties = SSHUtil.sshToSftpProperties(properties);
+        Map<String, String> sftpProperties = SSHUtil.translateProperties(properties, SshSchedulerAdaptor.PREFIX,
+                FileSystem.getAdaptorDescription("sftp").getSupportedProperties(), SftpFileAdaptor.PREFIX);
 
         // Create a file system that point to the same location as the
         // scheduler.

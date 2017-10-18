@@ -23,7 +23,6 @@ import java.nio.file.Files;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.InvalidCredentialException;
-import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
@@ -55,14 +54,14 @@ public class LocalFileAdaptor extends FileAdaptor {
     /** Description of the adaptor */
     public static final String ADAPTOR_DESCRIPTION = "This is the local file adaptor that implements" + " file functionality for local access.";
 
-    /** The locations supported by the adaptor */
-    public static final String[] ADAPTOR_LOCATIONS = new String[] { "(null)", "(empty string)", "[/workdir]", "driveletter:[/workdir]" };
-
     /** The buffer size to use when copying data. */
     public static final String BUFFER_SIZE = PREFIX + "bufferSize";
 
+    /** The locations supported by the adaptor */
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "(null)", "(empty string)", "[/workdir]", "driveletter:[/workdir]" };
+
     /** List of properties supported by this FTP adaptor */
-    public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+    private static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
             new XenonPropertyDescription(BUFFER_SIZE, Type.SIZE, "64K", "The buffer size to use when copying files (in bytes).") };
 
     public LocalFileAdaptor() {
@@ -89,24 +88,6 @@ public class LocalFileAdaptor extends FileAdaptor {
     public boolean isConnectionless() {
         return true;
     }
-
-    /**
-     * Check if a location string is valid for the local filesystem.
-     *
-     * The location should -only- contain a file system root, such as "/" or "C:".
-     *
-     * @param location
-     *            the location to check.
-     * @throws InvalidLocationException
-     *             if the location is invalid.
-     */
-    // private static void checkFileLocation(String location) throws InvalidLocationException {
-    // if (location == null || location.isEmpty() || LocalFileSystemUtils.isLocalRoot(location)) {
-    // return;
-    // }
-    //
-    // throw new InvalidLocationException(ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
-    // }
 
     @Override
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {

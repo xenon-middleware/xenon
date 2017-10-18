@@ -198,9 +198,9 @@ public class FileSystemTest {
         LocalFileAdaptor l = new LocalFileAdaptor();
 
         assertEquals("file", l.getName());
-        assertEquals(LocalFileAdaptor.ADAPTOR_DESCRIPTION, d.getDescription());
-        assertArrayEquals(LocalFileAdaptor.ADAPTOR_LOCATIONS, d.getSupportedLocations());
-        assertArrayEquals(LocalFileAdaptor.VALID_PROPERTIES, d.getSupportedProperties());
+        assertEquals(l.getDescription(), d.getDescription());
+        assertArrayEquals(l.getSupportedLocations(), d.getSupportedLocations());
+        assertArrayEquals(l.getSupportedProperties(), d.getSupportedProperties());
     }
 
     @Test(expected = IllegalArgumentException.class)

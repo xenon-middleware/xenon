@@ -32,6 +32,7 @@ import org.jclouds.blobstore.domain.Blob;
 import org.jclouds.blobstore.domain.BlobMetadata;
 import org.jclouds.blobstore.domain.PageSet;
 import org.jclouds.blobstore.domain.StorageMetadata;
+import org.jclouds.blobstore.domain.StorageType;
 import org.jclouds.blobstore.options.ListContainerOptions;
 
 import nl.esciencecenter.xenon.UnsupportedOperationException;
@@ -281,7 +282,8 @@ public class JCloudsFileSytem extends FileSystem {
         case BLOB:
             return makeBlobAttributes(m.getName());
         default:
-            throw new RuntimeException("Unknow file type" + m.getType());
+            // Should never occur, as we filter the types.
+            return null;
         }
     }
 
@@ -310,7 +312,8 @@ public class JCloudsFileSytem extends FileSystem {
             } else {
                 nxt = null;
             }
-            if (nxt != null && nxt.getName().endsWith(NOT_EMPTY)) {
+
+            if (nxt != null && (nxt.getName().endsWith(NOT_EMPTY) || nxt.getType() == StorageType.CONTAINER || nxt.getType() == StorageType.FOLDER)) {
                 getNext();
             }
         }

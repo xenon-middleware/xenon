@@ -20,14 +20,17 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Test;
 
 import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.UnknownAdaptorException;
+import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
+import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil.PasswordProvider;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 public class SSHUtilTest {
 
@@ -97,51 +100,17 @@ public class SSHUtilTest {
     }
 
     @Test
-    public void test_translateProperties() throws InvalidLocationException {
-
-        Map<String, String> prop = new HashMap<>();
-
-        // These are translated
-        prop.put("a.b.c.1", "1");
-        prop.put("a.b.c.2", "2");
-        prop.put("a.b.c.3", "3");
-
-        // These are skipped since they are not valid in target
-        prop.put("a.b.c.6", "6");
-        prop.put("a.b.c.7", "7");
-
-        // This on is skipped, as it starts with the wrong prefix
-        prop.put("c.b.a.8", "8");
-
-        Set<String> valid = new HashSet<>();
-        valid.add("p.q.r.1");
-        valid.add("p.q.r.2");
-        valid.add("p.q.r.3");
-        valid.add("p.q.r.4");
-        valid.add("p.q.r.5");
-
-        Map<String, String> result = SSHUtil.translateProperties(prop, valid, "a.b.c", "p.q.r");
-
-        assertEquals(3, result.size());
-
-        assertTrue(result.containsKey("p.q.r.1"));
-        assertTrue(result.containsKey("p.q.r.2"));
-        assertTrue(result.containsKey("p.q.r.3"));
-
-        assertEquals("1", result.get("p.q.r.1"));
-        assertEquals("2", result.get("p.q.r.2"));
-        assertEquals("3", result.get("p.q.r.3"));
-    }
-
-    @Test
-    public void test_translateProperties_ssh_sftp() throws InvalidLocationException {
+    public void test_translateProperties_ssh_sftp() throws InvalidLocationException, UnknownAdaptorException {
 
         Map<String, String> prop = new HashMap<>();
         prop.put("xenon.adaptors.schedulers.ssh.strictHostKeyChecking", "false");
         prop.put("xenon.adaptors.schedulers.ssh.agentForwarding", "true");
         prop.put("xenon.adaptors.schedulers.ssh.sshConfigFile", "/somewhere/config");
 
-        Map<String, String> result = SSHUtil.sshToSftpProperties(prop);
+        // Map<String, String> result = SSHUtil.sshToSftpProperties(prop);
+
+        Map<String, String> result = SSHUtil.translateProperties(prop, SshSchedulerAdaptor.PREFIX,
+                FileSystem.getAdaptorDescription("sftp").getSupportedProperties(), SftpFileAdaptor.PREFIX);
 
         assertEquals(3, result.size());
 
@@ -155,14 +124,15 @@ public class SSHUtilTest {
     }
 
     @Test
-    public void test_translateProperties_sftp_ssh() throws InvalidLocationException {
+    public void test_translateProperties_sftp_ssh() throws InvalidLocationException, UnknownAdaptorException {
 
         Map<String, String> prop = new HashMap<>();
         prop.put("xenon.adaptors.filesystems.sftp.strictHostKeyChecking", "false");
         prop.put("xenon.adaptors.filesystems.sftp.agentForwarding", "true");
         prop.put("xenon.adaptors.filesystems.sftp.sshConfigFile", "/somewhere/config");
 
-        Map<String, String> result = SSHUtil.sftpToSshProperties(prop);
+        Map<String, String> result = SSHUtil.translateProperties(prop, SftpFileAdaptor.PREFIX, Scheduler.getAdaptorDescription("ssh").getSupportedProperties(),
+                SshSchedulerAdaptor.PREFIX);
 
         assertEquals(3, result.size());
 

@@ -155,7 +155,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>static java.lang.String[]</code></td>
+<td class="colFirst"><code>private static java.lang.String[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/local/LocalFileAdaptor.html#ADAPTOR_LOCATIONS">ADAPTOR_LOCATIONS</a></span></code>
 <div class="block">The locations supported by the adaptor</div>
 </td>
@@ -179,7 +179,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>static <a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[]</code></td>
+<td class="colFirst"><code>private static <a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/local/LocalFileAdaptor.html#VALID_PROPERTIES">VALID_PROPERTIES</a></span></code>
 <div class="block">List of properties supported by this FTP adaptor</div>
 </td>
@@ -235,9 +235,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/
 <td class="colFirst"><code><a href="../../../../../../nl/esciencecenter/xenon/filesystems/FileSystem.html" title="class in nl.esciencecenter.xenon.filesystems">FileSystem</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/local/LocalFileAdaptor.html#createFileSystem-java.lang.String-nl.esciencecenter.xenon.credentials.Credential-java.util.Map-">createFileSystem</a></span>(java.lang.String&nbsp;location,
                 <a href="../../../../../../nl/esciencecenter/xenon/credentials/Credential.html" title="interface in nl.esciencecenter.xenon.credentials">Credential</a>&nbsp;credential,
-                java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;properties)</code>
-<div class="block">Check if a location string is valid for the local filesystem.</div>
-</td>
+                java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;properties)</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
@@ -336,16 +334,6 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/
 </dl>
 </li>
 </ul>
-<a name="ADAPTOR_LOCATIONS">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>ADAPTOR_LOCATIONS</h4>
-<pre>public static final&nbsp;java.lang.String[] ADAPTOR_LOCATIONS</pre>
-<div class="block">The locations supported by the adaptor</div>
-</li>
-</ul>
 <a name="BUFFER_SIZE">
 <!--   -->
 </a>
@@ -360,13 +348,23 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/
 </dl>
 </li>
 </ul>
+<a name="ADAPTOR_LOCATIONS">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>ADAPTOR_LOCATIONS</h4>
+<pre>private static final&nbsp;java.lang.String[] ADAPTOR_LOCATIONS</pre>
+<div class="block">The locations supported by the adaptor</div>
+</li>
+</ul>
 <a name="VALID_PROPERTIES">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>VALID_PROPERTIES</h4>
-<pre>public static final&nbsp;<a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[] VALID_PROPERTIES</pre>
+<pre>private static final&nbsp;<a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[] VALID_PROPERTIES</pre>
 <div class="block">List of properties supported by this FTP adaptor</div>
 </li>
 </ul>
@@ -471,16 +469,10 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/
                                    <a href="../../../../../../nl/esciencecenter/xenon/credentials/Credential.html" title="interface in nl.esciencecenter.xenon.credentials">Credential</a>&nbsp;credential,
                                    java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;properties)
                             throws <a href="../../../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></pre>
-<div class="block">Check if a location string is valid for the local filesystem.
-
- The location should -only- contain a file system root, such as "/" or "C:".</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/FileAdaptor.html#createFileSystem-java.lang.String-nl.esciencecenter.xenon.credentials.Credential-java.util.Map-">createFileSystem</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/FileAdaptor.html" title="class in nl.esciencecenter.xenon.adaptors.filesystems">FileAdaptor</a></code></dd>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>location</code> - the location to check.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../../../nl/esciencecenter/xenon/InvalidLocationException.html" title="class in nl.esciencecenter.xenon">InvalidLocationException</a></code> - if the location is invalid.</dd>
 <dd><code><a href="../../../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></code></dd>
 </dl>
 </li>

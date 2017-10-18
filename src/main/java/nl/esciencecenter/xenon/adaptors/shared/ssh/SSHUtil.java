@@ -46,8 +46,6 @@ import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
-import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
@@ -302,13 +300,16 @@ public class SSHUtil {
         return session;
     }
 
-    public static Map<String, String> translateProperties(Map<String, String> properties, Set<String> valid, String orginalPrefix, String newPrefix) {
+    public static Map<String, String> translateProperties(Map<String, String> providedProperties, String orginalPrefix,
+            XenonPropertyDescription[] supportedProperties, String newPrefix) {
+
+        Set<String> valid = validProperties(supportedProperties);
 
         HashMap<String, String> result = new HashMap<>();
 
         int start = orginalPrefix.length();
 
-        for (Map.Entry<String, String> e : properties.entrySet()) {
+        for (Map.Entry<String, String> e : providedProperties.entrySet()) {
 
             String key = e.getKey();
 
@@ -334,13 +335,5 @@ public class SSHUtil {
         }
 
         return result;
-    }
-
-    public static Map<String, String> sshToSftpProperties(Map<String, String> properties) {
-        return translateProperties(properties, validProperties(SftpFileAdaptor.VALID_PROPERTIES), SshSchedulerAdaptor.PREFIX, SftpFileAdaptor.PREFIX);
-    }
-
-    public static Map<String, String> sftpToSshProperties(Map<String, String> properties) {
-        return translateProperties(properties, validProperties(SshSchedulerAdaptor.VALID_PROPERTIES), SftpFileAdaptor.PREFIX, SshSchedulerAdaptor.PREFIX);
     }
 }
