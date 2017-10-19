@@ -55,7 +55,7 @@ public interface SchedulerAdaptorDescription extends AdaptorDescription {
 
     /**
      * Does this Scheduler create a FileSystem to support the submission of jobs ?
-     * 
+     *
      * Many scheduler implementations use a FileSystem internally to handle job submission, for example to store submission scripts or handle the standard I/O
      * streams of a process. This FileSystem can optionally be retrieved by the user to perform other tasks, such as staging in and output data of the job. To
      * do so use {@link nl.esciencecenter.xenon.schedulers.Scheduler#getFileSystem()} method.

@@ -60,9 +60,7 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
     /** Local multi queue properties start with this prefix. */
     public static final String MULTIQ = QUEUE + "multi.";
 
-    /**
-     * Property for the maximum number of concurrent jobs in the multi queue.
-     */
+    /** Property for the maximum number of concurrent jobs in the multi queue. */
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
     /** Local queue information start with this prefix. */
@@ -75,10 +73,10 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
     public static final String SUBMITTED = JOBS + "submitted";
 
     /** The locations supported by the adaptor */
-    public static final String[] ADAPTOR_LOCATIONS = new String[] { "[/workdir]" };
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "[/workdir]" };
 
     /** The properties supported by this adaptor */
-    public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+    private static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
             new XenonPropertyDescription(POLLING_DELAY, Type.LONG, "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
             new XenonPropertyDescription(MULTIQ_MAX_CONCURRENT, Type.INTEGER, "4", "The maximum number of concurrent jobs in the multiq.") };
 

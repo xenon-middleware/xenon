@@ -53,12 +53,16 @@ public abstract class Scheduler implements AutoCloseable {
     private static final HashMap<String, SchedulerAdaptor> adaptors = new LinkedHashMap<>();
 
     static {
-        // Load all supported file adaptors
-        addAdaptor(new LocalSchedulerAdaptor());
-        addAdaptor(new SshSchedulerAdaptor());
-        addAdaptor(new GridEngineSchedulerAdaptor());
-        addAdaptor(new SlurmSchedulerAdaptor());
-        addAdaptor(new TorqueSchedulerAdaptor());
+        // Load all supported file adaptors -- SHOULD be replaced with dynamic loading ?
+        try {
+            addAdaptor(new LocalSchedulerAdaptor());
+            addAdaptor(new SshSchedulerAdaptor());
+            addAdaptor(new GridEngineSchedulerAdaptor());
+            addAdaptor(new SlurmSchedulerAdaptor());
+            addAdaptor(new TorqueSchedulerAdaptor());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load all adaptors!", e);
+        }
     }
 
     private static void addAdaptor(SchedulerAdaptor adaptor) {

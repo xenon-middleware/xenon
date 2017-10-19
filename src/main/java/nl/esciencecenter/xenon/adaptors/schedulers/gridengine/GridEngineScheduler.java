@@ -19,7 +19,6 @@ import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineS
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.ADAPTOR_NAME;
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.IGNORE_VERSION_PROPERTY;
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.POLL_DELAY_PROPERTY;
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.VALID_PROPERTIES;
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.JOB_OPTION_JOB_SCRIPT;
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.QACCT_HEADER;
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.generate;
@@ -42,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
@@ -81,9 +81,10 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
     private final GridEngineSetup setupInfo;
 
-    protected GridEngineScheduler(String uniqueID, String location, Credential credential, Map<String, String> prop) throws XenonException {
+    protected GridEngineScheduler(String uniqueID, String location, Credential credential, XenonPropertyDescription[] valid, Map<String, String> prop)
+            throws XenonException {
 
-        super(uniqueID, ADAPTOR_NAME, location, credential, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
+        super(uniqueID, ADAPTOR_NAME, location, credential, prop, valid, POLL_DELAY_PROPERTY);
 
         boolean ignoreVersion = properties.getBooleanProperty(IGNORE_VERSION_PROPERTY);
         accountingGraceTime = properties.getLongProperty(ACCOUNTING_GRACE_TIME_PROPERTY);

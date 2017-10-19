@@ -2023,7 +2023,7 @@
 <dd>
 <div class="block">Interface to the GridEngine command line tools.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/adaptors/schedulers/gridengine/GridEngineScheduler.html#GridEngineScheduler-java.lang.String-java.lang.String-nl.esciencecenter.xenon.credentials.Credential-java.util.Map-">GridEngineScheduler(String, String, Credential, Map&lt;String, String&gt;)</a></span> - Constructor for class nl.esciencecenter.xenon.adaptors.schedulers.gridengine.<a href="nl/esciencecenter/xenon/adaptors/schedulers/gridengine/GridEngineScheduler.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers.gridengine">GridEngineScheduler</a></dt>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/adaptors/schedulers/gridengine/GridEngineScheduler.html#GridEngineScheduler-java.lang.String-java.lang.String-nl.esciencecenter.xenon.credentials.Credential-nl.esciencecenter.xenon.XenonPropertyDescription:A-java.util.Map-">GridEngineScheduler(String, String, Credential, XenonPropertyDescription[], Map&lt;String, String&gt;)</a></span> - Constructor for class nl.esciencecenter.xenon.adaptors.schedulers.gridengine.<a href="nl/esciencecenter/xenon/adaptors/schedulers/gridengine/GridEngineScheduler.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers.gridengine">GridEngineScheduler</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="nl/esciencecenter/xenon/adaptors/schedulers/gridengine/GridEngineSchedulerAdaptor.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers.gridengine"><span class="typeNameLink">GridEngineSchedulerAdaptor</span></a> - Class in <a href="nl/esciencecenter/xenon/adaptors/schedulers/gridengine/package-summary.html">nl.esciencecenter.xenon.adaptors.schedulers.gridengine</a></dt>
 <dd>&nbsp;</dd>
@@ -3902,7 +3902,7 @@
 <dd>
 <div class="block">Interface to the GridEngine command line tools.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/adaptors/schedulers/slurm/SlurmScheduler.html#SlurmScheduler-java.lang.String-java.lang.String-nl.esciencecenter.xenon.credentials.Credential-java.util.Map-">SlurmScheduler(String, String, Credential, Map&lt;String, String&gt;)</a></span> - Constructor for class nl.esciencecenter.xenon.adaptors.schedulers.slurm.<a href="nl/esciencecenter/xenon/adaptors/schedulers/slurm/SlurmScheduler.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers.slurm">SlurmScheduler</a></dt>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/adaptors/schedulers/slurm/SlurmScheduler.html#SlurmScheduler-java.lang.String-java.lang.String-nl.esciencecenter.xenon.credentials.Credential-nl.esciencecenter.xenon.XenonPropertyDescription:A-java.util.Map-">SlurmScheduler(String, String, Credential, XenonPropertyDescription[], Map&lt;String, String&gt;)</a></span> - Constructor for class nl.esciencecenter.xenon.adaptors.schedulers.slurm.<a href="nl/esciencecenter/xenon/adaptors/schedulers/slurm/SlurmScheduler.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers.slurm">SlurmScheduler</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="nl/esciencecenter/xenon/adaptors/schedulers/slurm/SlurmSchedulerAdaptor.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers.slurm"><span class="typeNameLink">SlurmSchedulerAdaptor</span></a> - Class in <a href="nl/esciencecenter/xenon/adaptors/schedulers/slurm/package-summary.html">nl.esciencecenter.xenon.adaptors.schedulers.slurm</a></dt>
 <dd>
@@ -4209,7 +4209,7 @@
 <dd>
 <div class="block">Interface to the TORQUE command line tools.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/adaptors/schedulers/torque/TorqueScheduler.html#TorqueScheduler-java.lang.String-java.lang.String-nl.esciencecenter.xenon.credentials.Credential-java.util.Map-">TorqueScheduler(String, String, Credential, Map&lt;String, String&gt;)</a></span> - Constructor for class nl.esciencecenter.xenon.adaptors.schedulers.torque.<a href="nl/esciencecenter/xenon/adaptors/schedulers/torque/TorqueScheduler.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers.torque">TorqueScheduler</a></dt>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/adaptors/schedulers/torque/TorqueScheduler.html#TorqueScheduler-java.lang.String-java.lang.String-nl.esciencecenter.xenon.credentials.Credential-nl.esciencecenter.xenon.XenonPropertyDescription:A-java.util.Map-">TorqueScheduler(String, String, Credential, XenonPropertyDescription[], Map&lt;String, String&gt;)</a></span> - Constructor for class nl.esciencecenter.xenon.adaptors.schedulers.torque.<a href="nl/esciencecenter/xenon/adaptors/schedulers/torque/TorqueScheduler.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers.torque">TorqueScheduler</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="nl/esciencecenter/xenon/adaptors/schedulers/torque/TorqueSchedulerAdaptor.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers.torque"><span class="typeNameLink">TorqueSchedulerAdaptor</span></a> - Class in <a href="nl/esciencecenter/xenon/adaptors/schedulers/torque/package-summary.html">nl.esciencecenter.xenon.adaptors.schedulers.torque</a></dt>
 <dd>
@@ -4341,13 +4341,14 @@
 <dd>
 <div class="block">The user name associated with the credential.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/adaptors/schedulers/JobQueueScheduler.html#usesFileSystem--">usesFileSystem()</a></span> - Method in class nl.esciencecenter.xenon.adaptors.schedulers.<a href="nl/esciencecenter/xenon/adaptors/schedulers/JobQueueScheduler.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers">JobQueueScheduler</a></dt>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html#usesFileSystem--">usesFileSystem()</a></span> - Method in class nl.esciencecenter.xenon.adaptors.schedulers.<a href="nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers">SchedulerAdaptor</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html#usesFileSystem--">usesFileSystem()</a></span> - Method in class nl.esciencecenter.xenon.adaptors.schedulers.<a href="nl/esciencecenter/xenon/adaptors/schedulers/ScriptingScheduler.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers">ScriptingScheduler</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/Scheduler.html#usesFileSystem--">usesFileSystem()</a></span> - Method in class nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/Scheduler.html" title="class in nl.esciencecenter.xenon.schedulers">Scheduler</a></dt>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/SchedulerAdaptorDescription.html#usesFileSystem--">usesFileSystem()</a></span> - Method in interface nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/SchedulerAdaptorDescription.html" title="interface in nl.esciencecenter.xenon.schedulers">SchedulerAdaptorDescription</a></dt>
 <dd>
-<div class="block">Does this <code>Scheduler</code> use a <code>FileSystem</code> internally to access files and directories ?</div>
+<div class="block">Does this Scheduler create a FileSystem to support the submission of jobs ?
+ 
+ Many scheduler implementations use a FileSystem internally to handle job submission, for example to store submission scripts or handle the standard I/O
+ streams of a process.</div>
 </dd>
 </dl>
 <a name="I:V">

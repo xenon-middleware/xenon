@@ -159,7 +159,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 </td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>static java.lang.String[]</code></td>
+<td class="colFirst"><code>private static java.lang.String[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/gridengine/GridEngineSchedulerAdaptor.html#ADAPTOR_LOCATIONS">ADAPTOR_LOCATIONS</a></span></code>
 <div class="block">The locations supported by this adaptor</div>
 </td>
@@ -189,7 +189,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>static <a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[]</code></td>
+<td class="colFirst"><code>private static <a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/gridengine/GridEngineSchedulerAdaptor.html#VALID_PROPERTIES">VALID_PROPERTIES</a></span></code>
 <div class="block">List of all properties supported by this adaptor</div>
 </td>
@@ -245,7 +245,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;nl.esciencecenter.xenon.adaptors.schedulers.<a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers">SchedulerAdaptor</a></h3>
-<code><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html#isEmbedded--">isEmbedded</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html#supportsBatch--">supportsBatch</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html#supportsInteractive--">supportsInteractive</a></code></li>
+<code><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html#isEmbedded--">isEmbedded</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html#supportsBatch--">supportsBatch</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html#supportsInteractive--">supportsInteractive</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html#usesFileSystem--">usesFileSystem</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.nl.esciencecenter.xenon.adaptors.Adaptor">
@@ -310,16 +310,6 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 </dl>
 </li>
 </ul>
-<a name="ADAPTOR_LOCATIONS">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>ADAPTOR_LOCATIONS</h4>
-<pre>public static final&nbsp;java.lang.String[] ADAPTOR_LOCATIONS</pre>
-<div class="block">The locations supported by this adaptor</div>
-</li>
-</ul>
 <a name="IGNORE_VERSION_PROPERTY">
 <!--   -->
 </a>
@@ -376,13 +366,23 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 </dl>
 </li>
 </ul>
+<a name="ADAPTOR_LOCATIONS">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>ADAPTOR_LOCATIONS</h4>
+<pre>private static final&nbsp;java.lang.String[] ADAPTOR_LOCATIONS</pre>
+<div class="block">The locations supported by this adaptor</div>
+</li>
+</ul>
 <a name="VALID_PROPERTIES">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>VALID_PROPERTIES</h4>
-<pre>public static final&nbsp;<a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[] VALID_PROPERTIES</pre>
+<pre>private static final&nbsp;<a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[] VALID_PROPERTIES</pre>
 <div class="block">List of all properties supported by this adaptor</div>
 </li>
 </ul>
@@ -400,7 +400,12 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 <ul class="blockListLast">
 <li class="blockList">
 <h4>GridEngineSchedulerAdaptor</h4>
-<pre>public&nbsp;GridEngineSchedulerAdaptor()</pre>
+<pre>public&nbsp;GridEngineSchedulerAdaptor()
+                           throws <a href="../../../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></pre>
+<dl>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></code></dd>
+</dl>
 </li>
 </ul>
 </li>

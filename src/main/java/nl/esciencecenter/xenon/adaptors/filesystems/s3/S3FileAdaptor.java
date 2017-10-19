@@ -46,17 +46,17 @@ public class S3FileAdaptor extends FileAdaptor {
     /** A description of this adaptor */
     private static final String ADAPTOR_DESCRIPTION = "The JClouds adaptor uses Apache JClouds to talk to s3 and others";
 
-    /** The locations supported by this adaptor */
-    private static final String[] ADAPTOR_LOCATIONS = new String[] { "[http://host[:port]]/bucketname[/workdir]" };
-
     /** All our own properties start with this prefix. */
     public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
 
     /** The buffer size to use when copying data. */
     public static final String BUFFER_SIZE = PREFIX + "bufferSize";
 
+    /** The locations supported by this adaptor */
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "[http://host[:port]]/bucketname[/workdir]" };
+
     /** List of properties supported by this FTP adaptor */
-    protected static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+    private static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
             new XenonPropertyDescription(BUFFER_SIZE, Type.SIZE, "64K", "The buffer size to use when copying files (in bytes).") };
 
     public S3FileAdaptor() {

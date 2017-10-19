@@ -47,17 +47,17 @@ public class WebdavFileAdaptor extends FileAdaptor {
     /** A description of this adaptor */
     public static final String ADAPTOR_DESCRIPTION = "The webdav file adaptor implements file access to remote webdav servers.";
 
-    /** The locations supported by this adaptor */
-    public static final String[] ADAPTOR_LOCATIONS = new String[] { "http://host[:port][/workdir]", "https://host[:port][/workdir]" };
-
     /** All our own properties start with this prefix. */
     public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
 
     /** The buffer size to use when copying data. */
     public static final String BUFFER_SIZE = PREFIX + "bufferSize";
 
+    /** The locations supported by this adaptor */
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "http://host[:port][/workdir]", "https://host[:port][/workdir]" };
+
     /** List of properties supported by this FTP adaptor */
-    protected static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+    private static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
             new XenonPropertyDescription(BUFFER_SIZE, Type.SIZE, "64K", "The buffer size to use when copying files (in bytes).") };
 
     public static final int OK_CODE = 200;

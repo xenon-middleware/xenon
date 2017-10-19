@@ -19,16 +19,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
-import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
-import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 public class ScriptingUtils {
 
@@ -62,12 +59,12 @@ public class ScriptingUtils {
     }
 
     public static XenonProperties getProperties(XenonPropertyDescription[] validProperties, String location, Map<String, String> properties)
-            throws UnknownPropertyException, InvalidPropertyException {
+            throws XenonException {
 
         if (isLocal(location)) {
-            return new XenonProperties(mergeValidProperties(validProperties, LocalSchedulerAdaptor.VALID_PROPERTIES), properties);
+            return new XenonProperties(mergeValidProperties(validProperties, Scheduler.getAdaptorDescription("local").getSupportedProperties()), properties);
         } else {
-            return new XenonProperties(mergeValidProperties(validProperties, SshSchedulerAdaptor.VALID_PROPERTIES), properties);
+            return new XenonProperties(mergeValidProperties(validProperties, Scheduler.getAdaptorDescription("ssh").getSupportedProperties()), properties);
         }
     }
 

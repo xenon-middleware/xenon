@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors.schedulers.torque;
 import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor.ACCOUNTING_GRACE_TIME_PROPERTY;
 import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor.ADAPTOR_NAME;
 import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor.POLL_DELAY_PROPERTY;
-import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor.VALID_PROPERTIES;
 import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueUtils.JOB_OPTION_JOB_SCRIPT;
 import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueUtils.QUEUE_INFO_NAME;
 import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueUtils.getJobStatusFromQstatInfo;
@@ -40,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
@@ -78,9 +78,9 @@ public class TorqueScheduler extends ScriptingScheduler {
 
     private final String[] queueNames;
 
-    TorqueScheduler(String uniqueID, String location, Credential credential, Map<String, String> prop) throws XenonException {
+    TorqueScheduler(String uniqueID, String location, Credential credential, XenonPropertyDescription[] valid, Map<String, String> prop) throws XenonException {
 
-        super(uniqueID, ADAPTOR_NAME, location, credential, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
+        super(uniqueID, ADAPTOR_NAME, location, credential, prop, valid, POLL_DELAY_PROPERTY);
 
         accountingGraceTime = properties.getLongProperty(ACCOUNTING_GRACE_TIME_PROPERTY);
 

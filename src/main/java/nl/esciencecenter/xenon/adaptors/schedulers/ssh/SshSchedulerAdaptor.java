@@ -47,9 +47,6 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
     /** A description of this adaptor */
     public static final String ADAPTOR_DESCRIPTION = "The SSH job adaptor implements all functionality to start jobs on ssh servers.";
 
-    /** The locations supported by this adaptor */
-    public static final String[] ADAPTOR_LOCATIONS = new String[] { "host[:port][/workdir]" };
-
     /** All our own properties start with this prefix. */
     public static final String PREFIX = SchedulerAdaptor.ADAPTORS_PREFIX + "ssh.";
 
@@ -106,8 +103,11 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
     /** How many jobs have been submitted using this adaptor. */
     public static final String SUBMITTED = JOBS + "submitted";
 
+    /** The locations supported by this adaptor */
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "host[:port][/workdir]" };
+
     /** List of properties supported by this SSH adaptor */
-    public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+    private static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
             new XenonPropertyDescription(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, "true", "Automatically add unknown host keys to known_hosts."),
             new XenonPropertyDescription(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, "true", "Enable strict host key checking."),
             new XenonPropertyDescription(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, "true", "Load the standard known_hosts file."),

@@ -1430,9 +1430,12 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/UnsupportedOperationException.html#UnsupportedOperationException-java.lang.String-java.lang.String-">UnsupportedOperationException(String, String)</a></span> - Constructor for exception nl.esciencecenter.xenon.<a href="nl/esciencecenter/xenon/UnsupportedOperationException.html" title="class in nl.esciencecenter.xenon">UnsupportedOperationException</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/Scheduler.html#usesFileSystem--">usesFileSystem()</a></span> - Method in class nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/Scheduler.html" title="class in nl.esciencecenter.xenon.schedulers">Scheduler</a></dt>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/SchedulerAdaptorDescription.html#usesFileSystem--">usesFileSystem()</a></span> - Method in interface nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/SchedulerAdaptorDescription.html" title="interface in nl.esciencecenter.xenon.schedulers">SchedulerAdaptorDescription</a></dt>
 <dd>
-<div class="block">Does this <code>Scheduler</code> use a <code>FileSystem</code> internally to access files and directories ?</div>
+<div class="block">Does this Scheduler create a FileSystem to support the submission of jobs ?
+ 
+ Many scheduler implementations use a FileSystem internally to handle job submission, for example to store submission scripts or handle the standard I/O
+ streams of a process.</div>
 </dd>
 </dl>
 <a name="I:V">

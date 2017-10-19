@@ -20,7 +20,6 @@ import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAd
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.POLL_DELAY_PROPERTY;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.SLURM_UPDATE_SLEEP;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.SLURM_UPDATE_TIMEOUT;
-import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.VALID_PROPERTIES;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmUtils.JOB_OPTION_JOB_SCRIPT;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmUtils.generate;
 import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmUtils.generateInteractiveArguments;
@@ -40,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
@@ -70,9 +70,10 @@ public class SlurmScheduler extends ScriptingScheduler {
 
     private final SlurmSetup setup;
 
-    protected SlurmScheduler(String uniqueID, String location, Credential credential, Map<String, String> prop) throws XenonException {
+    protected SlurmScheduler(String uniqueID, String location, Credential credential, XenonPropertyDescription[] valid, Map<String, String> prop)
+            throws XenonException {
 
-        super(uniqueID, ADAPTOR_NAME, location, credential, prop, VALID_PROPERTIES, POLL_DELAY_PROPERTY);
+        super(uniqueID, ADAPTOR_NAME, location, credential, prop, valid, POLL_DELAY_PROPERTY);
 
         boolean disableAccounting = properties.getBooleanProperty(DISABLE_ACCOUNTING_USAGE);
 
