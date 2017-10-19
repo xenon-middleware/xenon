@@ -571,7 +571,7 @@ public abstract class Scheduler implements AutoCloseable {
      *
      * @return If this <code>Scheduler</code> use a <code>FileSystem</code> internally ?
      */
-    public abstract boolean usesFileSystem();
+    // public abstract boolean usesFileSystem();
 
     /**
      * Retrieve the <code>FileSystem</code> used internally by this <code>Scheduler</code>.

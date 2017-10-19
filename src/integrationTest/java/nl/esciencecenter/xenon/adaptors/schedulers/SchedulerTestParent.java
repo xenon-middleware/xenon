@@ -715,7 +715,7 @@ public abstract class SchedulerTestParent {
     public void test_workdir() throws Exception {
 
         // We need a scheduler that actually has a filesystem underneath.
-        assumeTrue(scheduler.usesFileSystem());
+        assumeTrue(description.usesFileSystem());
 
         FileSystem fs = scheduler.getFileSystem();
         Path p = fs.getWorkingDirectory();

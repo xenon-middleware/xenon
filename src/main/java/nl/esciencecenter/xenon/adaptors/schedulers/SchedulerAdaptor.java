@@ -28,7 +28,7 @@ public abstract class SchedulerAdaptor extends Adaptor implements SchedulerAdapt
 
     public static final String ADAPTORS_PREFIX = "xenon.adaptors.schedulers.";
 
-    protected SchedulerAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) {
+    protected SchedulerAdaptor(String name, String description, String[] locations, XenonPropertyDescription[] properties) {
         super(name, description, locations, properties);
     }
 
@@ -50,6 +50,12 @@ public abstract class SchedulerAdaptor extends Adaptor implements SchedulerAdapt
         return false;
     }
 
-    public abstract Scheduler createScheduler(String location, Credential credential, Map<String,String> properties) throws XenonException;
+    @Override
+    public boolean usesFileSystem() {
+        // By default we assume the uses a FileSystem internally.
+        return true;
+    }
+
+    public abstract Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) throws XenonException;
 
 }

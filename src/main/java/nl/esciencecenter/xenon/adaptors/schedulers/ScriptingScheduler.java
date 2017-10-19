@@ -367,10 +367,6 @@ public abstract class ScriptingScheduler extends Scheduler {
         subFileSystem.close();
     }
 
-    public boolean usesFileSystem() {
-        return true;
-    }
-
     public FileSystem getFileSystem() throws XenonException {
         return subFileSystem;
     }
