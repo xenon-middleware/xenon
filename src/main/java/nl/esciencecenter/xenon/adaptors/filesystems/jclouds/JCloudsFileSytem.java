@@ -25,6 +25,7 @@ import java.util.ArrayDeque;
 import java.util.Date;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.jclouds.blobstore.BlobStoreContext;
@@ -324,7 +325,12 @@ public class JCloudsFileSytem extends FileSystem {
         }
 
         @Override
-        public PathAttributes next() {
+        public PathAttributes next() throws NoSuchElementException {
+
+            if (nxt == null) {
+                throw new NoSuchElementException("No more elements");
+            }
+
             PathAttributes res = toPathAttributes(nxt);
             getNext();
             return res;
@@ -479,8 +485,14 @@ public class JCloudsFileSytem extends FileSystem {
         }
 
         @Override
-        public PathAttributes next() {
+        public PathAttributes next() throws NoSuchElementException {
+
             PathAttributes nxt = stack.peek().next();
+
+            if (nxt == null) {
+                throw new NoSuchElementException("No more elements");
+            }
+
             if (nxt.isDirectory()) {
                 stack.push(listNonRecursiveIterator(toBucketEntry(nxt.getPath())));
             }
