@@ -1,220 +1,229 @@
 
-Xenon
-=====
+# Xenon
 
 [![Build Status](https://travis-ci.org/NLeSC/Xenon.svg?branch=develop)](https://travis-ci.org/NLeSC/Xenon)
-[![Build status Windows](https://ci.appveyor.com/api/projects/status/h4l4wn158db23kuf?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon)
+[![Build status Windows](https://ci.appveyor.com/api/projects/status/h4l4wn158db23kuf?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon/branch/master)
 [![codecov.io](https://codecov.io/github/NLeSC/Xenon/coverage.svg?branch=master)](https://codecov.io/github/NLeSC/Xenon?branch=master)
-[![Codacy Badge](https://api.codacy.com/project/badge/457da68977d1406c9ea93d340720d340)](https://www.codacy.com/app/NLeSC/Xenon)
 [![SonarQube Coverage](https://sonarqube.com/api/badges/measure?key=nlesc%3AXenon&metric=coverage)](https://sonarqube.com/component_measures/domain/Coverage?id=nlesc%3AXenon)
 [![GitHub license](https://img.shields.io/badge/license-Apache--2.0%20-blue.svg)](https://github.com/NLeSC/Xenon/blob/master/LICENSE)
-[![Download](https://api.bintray.com/packages/nlesc/xenon/xenon/images/download.svg) ](https://bintray.com/nlesc/xenon/xenon/_latestVersion)
+[![Download](https://jitpack.io/v/NLeSC/Xenon.svg)](https://jitpack.io/#NLeSC/Xenon)
 [![DOI](https://zenodo.org/badge/9236864.svg)](https://zenodo.org/badge/latestdoi/9236864)
 
-Copyright 2013 The Netherlands eScience Center
+Copyright 2013-2017 The Netherlands eScience Center
 
-What is it?
------------
+## What problem does Xenon solve?
 
-Xenon is a middleware abstraction library. It provides a simple
-programming interface to various pieces of software that can be used
-to access distributed compute and storage resources.
+Many applications use remote storage and compute resources. To do so, they need
+to include code to interact with the scheduling systems and file transfer
+protocols used on those remote machines.
 
-Why Xenon?
-----------
+Unfortunately, many different scheduler systems and file transfer protocols
+exist, often with completely different programming interfaces. This makes it
+hard for applications to switch to a different system or support multiple
+remote systems simultaneously.
 
-Xenon is developed by the Netherlands eScience Center as a support
-library for our projects. Several projects develop end-user
-applications that require access to distributed compute and storage
-resources. Xenon provides a simple API to those resources, allowing
-those applications to be developed more rapidly. The experience
-gained during end-user application development is used to improve
-the Xenon API and implementation.
+Xenon solves this problem by providing a single programming interface to many
+different types of remote resources, allowing applications to switch without
+changing a single line of code.
 
-The Latest Version
-------------------
+![Xenon abstraction](/docs/images/readme-xenon-abstraction.svg.png "Xenon abstraction")
 
-Available in [JCenter](https://bintray.com/bintray/jcenter?filterByPkgName=xenon)
+## How does Xenon work?
 
-Details of the latest official 1.2.2 release of Xenon can be found at:
+Xenon is an abstraction layer that sits between your application and the remote
+resource it uses. Xenon is written in Java, but is also accessible from other
+languages (e.g. Python) through its gRPC interface.
 
-<https://github.com/NLeSC/Xenon/releases>
+![Xenon API](/docs/images/readme-xenon-api.svg.png "Xenon API")
 
-Alternatively, the latest development versions of Xenon can be found at:
+### Overview of the Xenon ecosystem of tools
 
-<https://github.com/NLeSC/Xenon>.
+| component | repository |
+|---|---|
+| Xenon library | https://github.com/NLeSC/Xenon |
+| gRPC extension for Xenon | https://github.com/NLeSC/xenon-grpc |
+| command line interface to Xenon | https://github.com/NLeSC/xenon-cli |
+| Python API for Xenon | https://github.com/NLeSC/pyxenon |
 
-Quick start
------------
+## Supported middleware
 
-Add Xenon library as a dependency to your project. For a Maven project use
+Xenon currently supports the following file access mechanisms:
+
+- ``file`` (local file manipulation)
+- ``ftp``
+- ``sftp``
+- ``webdav``
+- ``s3``
+
+Xenon currently supports the following job submission mechanisms:
+
+- ``local``
+- ``ssh``
+- ``gridengine``
+- ``slurm``
+- ``torque``  
+
+See the [roadmap](/ROADMAP.md) for the planned extensions.
+
+## Adding Xenon as a dependency to your project
+
+Follow the instructions from [jitpack.io](https://jitpack.io/#NLeSC/Xenon/2.0.0-rc2) to include Xenon as a 
+dependency for Gradle, Maven, SBT, or Leiningen projects, e.g. Gradle:
+
+```gradle
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
 ```
-<dependency>
-  <groupId>nl.esciencecenter.xenon</groupId>
-  <artifactId>xenon</artifactId>
-  <version>1.2.2</version>
-</dependency>
-```
-For a gradle project make sure to include `jcenter` in the list of repositories, for example:
-```
-repositories {
-    mavenCentral()
-    jcenter()
-}
-```
-Then include Xenon as a compile dependency:
-```
-dependencies {
-    compile group: 'nl.esciencecenter.xenon', name: 'xenon', version: '1.2.2'
-    // other dependencies ...
-}
-``` 
-To compile Xenon from source, download the source distribution below and type:
-```
-gradlew installDist
-```
-This will create a binary distribution in `./build/install`
 
-Simple examples
----------------
+and 
+
+```gradle
+	dependencies {
+	        compile 'com.github.NLeSC:Xenon:2.0.0-rc2'
+	}
+
+```
+
+Or for a Maven project,
+
+```maven
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+```
+
+and
+
+
+```maven
+	<dependency>
+	    <groupId>com.github.NLeSC</groupId>
+	    <artifactId>Xenon</artifactId>
+	    <version>2.0.0-rc2</version>
+	</dependency>
+```
+
+## Simple examples
 
 Here are some examples of basic operations you can perform with Xenon: 
 
-#### Copy a file
+### Copying a file from a local filesystem to a remote filesystem
 
-Following code copies local /etc/passwd file using ssh to /tmp/password on somemachine:
+```java
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
+import nl.esciencecenter.xenon.filesystems.CopyStatus;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.Path;
+
+public class CopyFileLocalToSftpAbsolutePaths {
+
+    public static void main(String[] args) throws Exception {
+
+        // Use the file system adaptors to create file system representations; the remote file system
+        // requires credentials, so we need to create those too.
+        //
+        // Assume the remote system is actually just a Docker container (e.g.
+        // https://hub.docker.com/r/nlesc/xenon-ssh/), accessible via
+        // port 10022 on localhost
+        String location = "localhost:10022";
+        String username = "xenon";
+        char[] password = "javagat".toCharArray();
+        PasswordCredential credential = new PasswordCredential(username, password);
+        FileSystem localFileSystem = FileSystem.create("file");
+        FileSystem remoteFileSystem = FileSystem.create("sftp", location, credential);
+
+        // create Paths for the source and destination files, using absolute paths
+        Path sourceFile = new Path("/etc/passwd");
+        Path destFile = new Path("/tmp/password");
+
+        // create the destination file only if the destination path doesn't exist yet
+        CopyMode mode = CopyMode.CREATE;
+        boolean recursive = false;
+
+        // perform the copy and wait 1000 ms for the successful or otherwise
+        // completion of the operation
+        String copyId = localFileSystem.copy(sourceFile, remoteFileSystem, destFile, mode, recursive);
+        long timeoutMilliSecs = 1000;
+        CopyStatus copyStatus = localFileSystem.waitUntilDone(copyId, timeoutMilliSecs);
+
+        // throw any exceptions
+        XenonException copyException = copyStatus.getException();
+        if (copyException != null) {
+          throw copyException;
+        }
+    }
+}
 ```
-xenon = XenonFactory.newXenon(null);
-Files files = xenon.files();
-FileSystem sourceFS = files.newFileSystem("local", null, null, null);
-FileSystem targetFS = files.newFileSystem("ssh", "somemachine", null, null);
-Path sourcePath = files.newPath(sourceFS, new RelativePath("/etc/passwd"));
-Path targetPath = files.newPath(targetFS, new RelativePath("/tmp/passwd"));
 
-files.copy(sourcePath, targetPath, CopyOption.CREATE);
+### Submitting a job
 
-files.close(sourceFS);
-files.close(targetFS);
-XenonFactory.endXenon(xenon);
+The following code performs a wordcount of a file residing on a remote machine: 
+
+```java 
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
+
+public class SlurmSubmitWordCountJob {
+
+    public static void main(String[] args) throws Exception {
+
+        // Assume the remote system is actually just a Docker container (e.g.
+        // https://hub.docker.com/r/nlesc/xenon-slurm/), accessible to user 'xenon' via
+        // port 10022 on localhost, using password 'javagat'
+        String location = "localhost:10022";
+        String username = "xenon";
+        char[] password = "javagat".toCharArray();
+        PasswordCredential credential = new PasswordCredential(username, password);
+
+        // create the SLURM scheduler representation
+        Scheduler scheduler = Scheduler.create("slurm", location, credential);
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("/usr/bin/wc");
+        description.setArguments("-l", "/etc/passwd");
+        description.setStdout("/tmp/wc.stdout.txt");
+
+        // submit the job
+        String jobId = scheduler.submitBatchJob(description);
+
+        long WAIT_INDEFINITELY = 0;
+        JobStatus jobStatus = scheduler.waitUntilDone(jobId, WAIT_INDEFINITELY);
+
+        // print any exceptions
+        Exception jobException = jobStatus.getException();
+        if (jobException != null)  {
+          throw jobException;
+        }
+
+    }
+}
 ```
 
-#### Run a job
+The output of the job will be written to ``/tmp/wc.stdout.txt`` file in the ``nlesc/xenon-slurm`` Docker container.
 
-Following code performs a wordcount of a file on somemachine using ssh:  
-```
-xenon = XenonFactory.newXenon(null);
-Jobs jobs = xenon.jobs();
-Scheduler scheduler = jobs.newScheduler("ssh", "somemachine", null, null);
-JobDescription description = new JobDescription();
-description.setExecutable("/bin/wc");
-description.setArguments("-l", "/tmp/passwd");
-description.setStdout("/tmp/stdout.txt");
+For more examples, see the tutorial at [Read The Docs](http://xenonrse2017.readthedocs.io/).
 
-Job job = jobs.submitJob(scheduler, description);
+## Documentation
 
-jobs.close(scheduler);
-XenonFactory.endXenon(xenon);
-```
-The output of the job will be written to /tmp/stdout.txt file on somemachine.
+Xenon's JavaDoc is available online at <https://jitpack.io/com/github/NLeSC/Xenon/master-SNAPSHOT/javadoc/index.html>.
 
-Supported middleware
---------------------
+## Legal
 
-Xenon currently supports the following file access mechanisms:
-- local
-- ssh
-- ftp
-- sftp 
-- WebDAV
+The Xenon library is copyrighted by the Netherlands eScience Center and released
+under the Apache License, Version 2.0. A copy of the license may be obtained
+from [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
-Xenon currently supports the following job submission mechanisms:
-- local (interactive jobs only)
-- ssh (interactive jobs only)
-- Slurm (interactive and batch jobs)
-- Torque (batch jobs only)  
-- GridEngine (batch jobs only)
+Xenon uses several third-party libraries that have their own (permissive, open 
+source) licenses. See the file [legal/README.md](legal/README.md) for an overview.
 
-Planned extensions include: 
-- S3
-- Swift
-- HDFS 
-- YARN
-- GridFTP
-- glite
-- Azure-Batch
-- Amazon-Batch
-
-Documentation
--------------
-
-See <https://github.com/NLeSC/Xenon-examples> for examples how to use the Xenon library.
-
-See <https://github.com/NLeSC/Xenon-examples/raw/master/doc/tutorial/xenon-tutorial.pdf> for a tutorial pdf targeting inexperienced users.
-
-The javadoc of Xenon library is available online at <http://nlesc.github.io/Xenon/versions/1.2.2/javadoc>.
-
-See the file <https://github.com/NLeSC/Xenon/blob/master/doc/README.md> for information for developers of the Xenon library.
-
-Copyrights & Disclaimers
-------------------------
-
-Xenon is copyrighted by the Netherlands eScience Center and
-releases under the Apache License, Version 2.0.
-
-See <http://www.esciencecenter.nl> for more information on the
-Netherlands eScience Center.
-
-See the "LICENSE" and "NOTICE" files for more information.
-
-Third party libraries
----------------------
-
-This product includes the SLF4J library, which is Copyright
-(c) 2004-2013 QOS.ch See "notices/LICENSE.slf4j.txt" for the licence
-information of the SLF4J library.
-
-This product includes the JSch library, which is Copyright
-(c) 2002-2012 Atsuhiko Yamanaka, JCraft,Inc.
-See "notices/LICENSE.jsch.txt" for the licence information of the
-JSch library.
-
-This product includes the Logback library, which is Copyright
-(c) 1999-2012, QOS.ch. See "notices/LICENSE.logback.txt" for the
-licence information of the Logback library.
-
-This product includes the JaCoCo library, which is Copyright
-(c) 2009, 2013 Mountainminds GmbH & Co. KG and Contributors. See
-"notices/LICENSE.jacoco.txt" for the licence information of the
-JaCoCo library.
-
-This project includes the JUnit library.
-See "notices/LICENSE.junit.txt" for the licence information of the
-JUnit library.
-
-This project includes the Mockito library, which is Copyright
-(c) 2007 Mockito contributors. See "notices/LICENSE.mockito.txt"
-for the licence information of the Mockito library.
-
-This project includes the Java CoG Kit, which is Copyright (c) 1999-2006
-University of Chicago. See "notices/LICENSE.cog-jglobus.txt" for the
-licence information of the Java CoG Kit.
-
-This project includes the Commons-logging library, which is Copyright (c)
-Apache Software Foundation. See "notices/LICENSE.commons-logging.txt"
-for the licence information of the Commons-logging library.
-
-This project includes the log4j library, which is Copyright (c) Apache
-Software Foundation. See "notices/LICENSE.log4j.txt" for the licence
-information of the log4j library.
-
-This project includes the Legion of the Bouncy Castle Java cryptography
-APIs, which are Copyright (c) 2000-2013 The Legion Of The Bouncy Castle.
-See "notices/LICENSE.bouncycastle.txt" for the licence information of this
-library.
-
-This project includes the pureTLS library, which is Copyright (c) Claymore
-Systems, Inc. See "notices/LICENSE.puretls.txt" for the licence information
-of the pureTLS library.
-
-This project includes libraries produced by the Cryptix Project. See
-"notices/LICENSE.cryptix.txt" for the licence information of these libraries.

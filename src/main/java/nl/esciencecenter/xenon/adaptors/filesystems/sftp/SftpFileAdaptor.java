@@ -16,6 +16,8 @@
 package nl.esciencecenter.xenon.adaptors.filesystems.sftp;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.apache.sshd.client.SshClient;
@@ -25,6 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
@@ -33,6 +37,7 @@ import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.Path;
 
 public class SftpFileAdaptor extends FileAdaptor {
@@ -43,13 +48,10 @@ public class SftpFileAdaptor extends FileAdaptor {
     public static final String ADAPTOR_NAME = "sftp";
 
     /** The default SSH port */
-    protected static final int DEFAULT_PORT = 22;
+    public static final int DEFAULT_PORT = 22;
 
     /** A description of this adaptor */
     public static final String ADAPTOR_DESCRIPTION = "The SFTP adaptor implements all file access functionality to remote SFTP servers";
-
-    /** The locations supported by this adaptor */
-    public static final String [] ADAPTOR_LOCATIONS = new String [] { "host[:port]" };
 
     /** All our own properties start with this prefix. */
     public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
@@ -81,25 +83,24 @@ public class SftpFileAdaptor extends FileAdaptor {
     /** Property for maximum history length for finished jobs */
     public static final String CONNECTION_TIMEOUT = PREFIX + "connection.timeout";
 
+    /** The buffer size to use when copying data. */
+    public static final String BUFFER_SIZE = PREFIX + "bufferSize";
+
+    /** The locations supported by this adaptor */
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "host[:port][/workdir]" };
+
     /** List of properties supported by this SSH adaptor */
-    public static final XenonPropertyDescription [] VALID_PROPERTIES = new XenonPropertyDescription [] {
-            new XenonPropertyDescription(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN,
-                    "true", "Automatically add unknown host keys to known_hosts."),
-            new XenonPropertyDescription(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN,
-                    "true", "Enable strict host key checking."),
-            new XenonPropertyDescription(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN,
-                    "true", "Load the standard known_hosts file."),
-            new XenonPropertyDescription(LOAD_SSH_CONFIG, Type.BOOLEAN,
-                    "true", "Load the OpenSSH config file."),
-            new XenonPropertyDescription(SSH_CONFIG_FILE, Type.STRING,
-                    null, "OpenSSH config filename."),
-            new XenonPropertyDescription(AGENT, Type.BOOLEAN,
-                    "false", "Use a (local) ssh-agent."),
-            new XenonPropertyDescription(AGENT_FORWARDING, Type.BOOLEAN,
-                    "false", "Use ssh-agent forwarding"),
-            new XenonPropertyDescription(CONNECTION_TIMEOUT, Type.NATURAL,
-                    "10000", "The timeout for creating and authenticating connections (in milliseconds).")
-    };
+    private static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+            new XenonPropertyDescription(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, "true", "Automatically add unknown host keys to known_hosts."),
+            new XenonPropertyDescription(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, "true", "Enable strict host key checking."),
+            new XenonPropertyDescription(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, "true", "Load the standard known_hosts file."),
+            new XenonPropertyDescription(LOAD_SSH_CONFIG, Type.BOOLEAN, "true", "Load the OpenSSH config file."),
+            new XenonPropertyDescription(SSH_CONFIG_FILE, Type.STRING, null, "OpenSSH config filename."),
+            new XenonPropertyDescription(AGENT, Type.BOOLEAN, "false", "Use a (local) ssh-agent."),
+            new XenonPropertyDescription(AGENT_FORWARDING, Type.BOOLEAN, "false", "Use ssh-agent forwarding when setting up a connection."),
+            new XenonPropertyDescription(CONNECTION_TIMEOUT, Type.NATURAL, "10000",
+                    "The timeout for creating and authenticating connections (in milliseconds)."),
+            new XenonPropertyDescription(BUFFER_SIZE, Type.SIZE, "64K", "The buffer size to use when copying files (in bytes).") };
 
     public SftpFileAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
@@ -111,7 +112,7 @@ public class SftpFileAdaptor extends FileAdaptor {
         return true;
     }
 
-    public FileSystem createFileSystem(String location, Credential credential, Map<String,String> properties) throws XenonException {
+    public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
 
         LOGGER.debug("new SftpFileSystem location = {} credential = {} properties = {}", location, credential, properties);
 
@@ -121,12 +122,20 @@ public class SftpFileAdaptor extends FileAdaptor {
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
-        boolean loadKnownHosts = xp.getBooleanProperty(LOAD_STANDARD_KNOWN_HOSTS);
+        long bufferSize = xp.getSizeProperty(BUFFER_SIZE);
+
+        if (bufferSize <= 0 || bufferSize >= Integer.MAX_VALUE) {
+            throw new InvalidPropertyException(ADAPTOR_NAME,
+                    "Invalid value for " + BUFFER_SIZE + ": " + bufferSize + " (must be between 1 and " + Integer.MAX_VALUE + ")");
+        }
+
         boolean loadSSHConfig = xp.getBooleanProperty(LOAD_SSH_CONFIG);
+        boolean strictHostCheck = xp.getBooleanProperty(STRICT_HOST_KEY_CHECKING);
+        boolean addHostKey = xp.getBooleanProperty(AUTOMATICALLY_ADD_HOST_KEY);
         boolean useSSHAgent = xp.getBooleanProperty(AGENT);
         boolean useAgentForwarding = xp.getBooleanProperty(AGENT_FORWARDING);
 
-        SshClient client = SSHUtil.createSSHClient(loadKnownHosts, loadSSHConfig, useSSHAgent, useAgentForwarding);
+        SshClient client = SSHUtil.createSSHClient(loadSSHConfig, strictHostCheck, addHostKey, useSSHAgent, useAgentForwarding);
 
         long timeout = xp.getNaturalProperty(CONNECTION_TIMEOUT);
 
@@ -141,16 +150,44 @@ public class SftpFileAdaptor extends FileAdaptor {
             throw new XenonException(ADAPTOR_NAME, "Failed to create SFTP session", e);
         }
 
-        String wd = null;
+        String cwd = null;
 
         try {
-            wd = sftpClient.canonicalPath(".");
-        } catch (IOException e) {
+            cwd = getCurrentWorkingDirectory(sftpClient, location);
+        } catch (Exception e) {
             client.close(true);
-            throw new XenonException(ADAPTOR_NAME, "Failed to create retrieve working directory", e);
+            throw e;
         }
 
-        return new SftpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(wd), sftpClient, xp);
+        return new SftpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), (int) bufferSize, sftpClient, xp);
+    }
+
+    private String getCurrentWorkingDirectory(SftpClient sftpClient, String location) throws XenonException {
+
+        String pathFromURI;
+
+        try {
+            pathFromURI = new URI("sftp://" + location).getPath();
+        } catch (URISyntaxException e) {
+            throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
+        }
+
+        try {
+            if (pathFromURI == null || pathFromURI.isEmpty()) {
+                return sftpClient.canonicalPath(".");
+            }
+        } catch (IOException e) {
+            throw new XenonException(getName(), "Could not retrieve current working directory", e);
+        }
+
+        try {
+            sftpClient.lstat(pathFromURI);
+        } catch (IOException e) {
+            // Path does not exist!
+            throw new NoSuchPathException(ADAPTOR_NAME, "Specified working directory does not exist: " + pathFromURI);
+        }
+
+        return pathFromURI;
     }
 
     @Override

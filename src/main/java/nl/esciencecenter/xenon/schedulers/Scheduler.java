@@ -20,10 +20,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
+import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
@@ -37,6 +37,7 @@ import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
 
 /**
  * Scheduler represents a (possibly remote) scheduler that can be used to submit jobs and retrieve queue information.
@@ -44,7 +45,7 @@ import nl.esciencecenter.xenon.credentials.DefaultCredential;
  * @version 1.0
  * @since 1.0
  */
-public abstract class Scheduler {
+public abstract class Scheduler implements AutoCloseable {
 
     /** The name of this component, for use in exceptions */
     private static final String COMPONENT_NAME = "Scheduler";
@@ -52,12 +53,16 @@ public abstract class Scheduler {
     private static final HashMap<String, SchedulerAdaptor> adaptors = new LinkedHashMap<>();
 
     static {
-        // Load all supported file adaptors
-        addAdaptor(new LocalSchedulerAdaptor());
-        addAdaptor(new SshSchedulerAdaptor());
-        addAdaptor(new GridEngineSchedulerAdaptor());
-        addAdaptor(new SlurmSchedulerAdaptor());
-        addAdaptor(new TorqueSchedulerAdaptor());
+        // Load all supported file adaptors -- SHOULD be replaced with dynamic loading ?
+        try {
+            addAdaptor(new LocalSchedulerAdaptor());
+            addAdaptor(new SshSchedulerAdaptor());
+            addAdaptor(new GridEngineSchedulerAdaptor());
+            addAdaptor(new SlurmSchedulerAdaptor());
+            addAdaptor(new TorqueSchedulerAdaptor());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load all adaptors!", e);
+        }
     }
 
     private static void addAdaptor(SchedulerAdaptor adaptor) {
@@ -82,7 +87,7 @@ public abstract class Scheduler {
      *
      * @return the list
      */
-    public static String [] getAdaptorNames() {
+    public static String[] getAdaptorNames() {
         return adaptors.keySet().toArray(new String[adaptors.size()]);
     }
 
@@ -93,7 +98,7 @@ public abstract class Scheduler {
      *            the type of scheduler to connect to (e.g. "slurm" or "torque")
      * @return the description
      * @throws UnknownAdaptorException
-     *          If the adaptor name is absent in {@link #getAdaptorNames()}.
+     *             If the adaptor name is absent in {@link #getAdaptorNames()}.
      */
     public static SchedulerAdaptorDescription getAdaptorDescription(String adaptorName) throws UnknownAdaptorException {
         return getAdaptorByName(adaptorName);
@@ -104,18 +109,18 @@ public abstract class Scheduler {
      *
      * @return the list
      */
-    public static SchedulerAdaptorDescription [] getAdaptorDescriptions() {
+    public static SchedulerAdaptorDescription[] getAdaptorDescriptions() {
         return adaptors.values().toArray(new SchedulerAdaptorDescription[adaptors.size()]);
     }
 
     /**
-     * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code>
-     * using <code>credentials</code> to get access. Use <code>properties</code> to (optionally)
-     * configure the scheduler when it is created.
+     * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code> using <code>credentials</code> to get access. Use
+     * <code>properties</code> to (optionally) configure the scheduler when it is created.
      *
-     * Make sure to always close {@code Scheduler} instances
-     * by calling {@code Scheduler.close()} when you no longer need them,
-     * otherwise their associated resources may remain allocated.
+     * Make sure to always close {@code Scheduler} instances by calling {@code Scheduler.close()} when you no longer need them, otherwise their associated
+     * resources may remain allocated.
+     *
+     * @see <a href="../../../../overview-summary.html#schedulers">Documentation on the supported adaptors and locations.</a>
      *
      * @param adaptor
      *            the adaptor used to access the Scheduler.
@@ -142,18 +147,17 @@ public abstract class Scheduler {
      * @throws IllegalArgumentException
      *             If adaptor is null.
      */
-    public static Scheduler create(String adaptor, String location, Credential credential, Map<String, String> properties)
-            throws XenonException {
+    public static Scheduler create(String adaptor, String location, Credential credential, Map<String, String> properties) throws XenonException {
         return getAdaptorByName(adaptor).createScheduler(location, credential, properties);
     }
 
     /**
-     * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code>
-     * using <code>credentials</code> to get access.
+     * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code> using <code>credentials</code> to get access.
      *
-     * Make sure to always close {@code Scheduler} instances
-     * by calling {@code Scheduler.close()} when you no longer need them,
-     * otherwise their associated resources may remain allocated.
+     * Make sure to always close {@code Scheduler} instances by calling {@code Scheduler.close()} when you no longer need them, otherwise their associated
+     * resources may remain allocated.
+     *
+     * @see <a href="../../../../overview-summary.html#schedulers">Documentation on the supported adaptors and locations.</a>
      *
      * @param adaptor
      *            the adaptor used to access the Scheduler.
@@ -183,12 +187,12 @@ public abstract class Scheduler {
     }
 
     /**
-     * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code>
-     * using the default credentials to get access.
+     * Create a new Scheduler using the <code>adaptor</code> connecting to the <code>location</code> using the default credentials to get access.
      *
-     * Make sure to always close {@code Scheduler} instances
-     * by calling {@code Scheduler.close()} when you no longer need them,
-     * otherwise their associated resources may remain allocated.
+     * Make sure to always close {@code Scheduler} instances by calling {@code Scheduler.close()} when you no longer need them, otherwise their associated
+     * resources may remain allocated.
+     *
+     * @see <a href="../../../../overview-summary.html#schedulers">Documentation on the supported adaptors and locations.</a>
      *
      * @param adaptor
      *            the adaptor used to access the Scheduler.
@@ -216,15 +220,14 @@ public abstract class Scheduler {
     }
 
     /**
-     * Create a new Scheduler using the <code>adaptor</code> connecting to the default location
-     * and using the default credentials to get access.
+     * Create a new Scheduler using the <code>adaptor</code> connecting to the default location and using the default credentials to get access.
      *
-     * Note that there are very few adaptors that support a default scheduler location. The local
-     * scheduler adaptor is the prime example.
+     * Note that there are very few adaptors that support a default scheduler location. The local scheduler adaptor is the prime example.
      *
-     * Make sure to always close {@code Scheduler} instances
-     * by calling {@code Scheduler.close()} when you no longer need them,
-     * otherwise their associated resources may remain allocated.
+     * Make sure to always close {@code Scheduler} instances by calling {@code Scheduler.close()} when you no longer need them, otherwise their associated
+     * resources may remain allocated.
+     *
+     * @see <a href="../../../../overview-summary.html#schedulers">Documentation on the supported adaptors and locations.</a>
      *
      * @param adaptor
      *            the adaptor used to access the Scheduler.
@@ -309,7 +312,7 @@ public abstract class Scheduler {
      * @throws NotConnectedException
      *             If scheduler is closed.
      * @throws XenonException
-     * 		       If an I/O error occurred.
+     *             If an I/O error occurred.
      */
     public abstract String[] getQueueNames() throws XenonException;
 
@@ -326,8 +329,7 @@ public abstract class Scheduler {
      *
      * @throws XenonException
      *             If an I/O error occurred.
-     * @return
-     *          <code>true</code> if the connection of this Scheduler is still open, <code>false</code> otherwise.
+     * @return <code>true</code> if the connection of this Scheduler is still open, <code>false</code> otherwise.
      *
      */
     public abstract boolean isOpen() throws XenonException;
@@ -384,8 +386,8 @@ public abstract class Scheduler {
     /**
      * Get the status of all <code>queues</code>.
      *
-     * Note that this method will only throw an exception when this exception will influence all status requests. For example, if
-     * the scheduler is no longer connected.
+     * Note that this method will only throw an exception when this exception will influence all status requests. For example, if the scheduler is no longer
+     * connected.
      *
      * Exceptions that only refer to a single queue are returned in the QueueStatus returned for that queue.
      *
@@ -395,7 +397,7 @@ public abstract class Scheduler {
      * @return an array containing the resulting QueueStatus.
      *
      * @throws XenonException
-     *             If the Scheduler failed to get the statusses.
+     *             If the Scheduler failed to get the statuses.
      */
     public abstract QueueStatus[] getQueueStatuses(String... queueNames) throws XenonException;
 
@@ -455,16 +457,16 @@ public abstract class Scheduler {
     /**
      * Get the status of all specified <code>jobs</code>.
      * <p>
-     * The array of <code>JobStatus</code> contains one entry for each of the <code>jobs</code>. The order of the elements in the
-     * returned <code>JobStatus</code> array corresponds to the order in which the <code>jobs</code> are passed as parameters. If
-     * a <code>job</code> is <code>null</code>, the corresponding entry in the <code>JobStatus</code> array will also be
-     * <code>null</code>. If the retrieval of the <code>JobStatus</code> fails for a job, the exception will be stored in the
-     * corresponding <code>JobsStatus</code> entry.
+     * The array of <code>JobStatus</code> contains one entry for each of the <code>jobs</code>. The order of the elements in the returned
+     * <code>JobStatus</code> array corresponds to the order in which the <code>jobs</code> are passed as parameters. If a <code>job</code> is
+     * <code>null</code>, the corresponding entry in the <code>JobStatus</code> array will also be <code>null</code>. If the retrieval of the
+     * <code>JobStatus</code> fails for a job, the exception will be stored in the corresponding <code>JobsStatus</code> entry.
      * </p>
+     *
      * @param jobIdentifiers
      *            the job identifiers for which to retrieve the status.
      *
-     * @return an array of the resulting JobStatusses.
+     * @return an array of the resulting JobStatuses.
      *
      * @throws XenonException
      *             If an I/O error occurred
@@ -493,14 +495,13 @@ public abstract class Scheduler {
     /**
      * Cancel a job.
      * <p>
-     * A status is returned that indicates the state of the job after the cancel. If the job was already done it cannot be
-     * cancelled.
+     * A status is returned that indicates the state of the job after the cancel. If the job was already done it cannot be cancelled.
      * </p>
      * <p>
-     * A {@link JobStatus} is returned that can be used to determine the state of the job after cancelJob returns. Note that it
-     * may take some time before the job has actually terminated. The {@link #waitUntilDone(String, long) waitUntilDone} method can
-     * be used to wait until the job is terminated.
+     * A {@link JobStatus} is returned that can be used to determine the state of the job after cancelJob returns. Note that it may take some time before the
+     * job has actually terminated. The {@link #waitUntilDone(String, long) waitUntilDone} method can be used to wait until the job is terminated.
      * </p>
+     *
      * @param jobIdentifier
      *            the identifier of job to kill.
      * @return the status of the Job.
@@ -515,16 +516,16 @@ public abstract class Scheduler {
     /**
      * Wait until a job is done or until a timeout expires.
      * <p>
-     * This method will wait until a job is done (either gracefully or by being killed or producing an error), or until the
-     * timeout expires, whichever comes first. If the timeout expires, the job will continue to run.
+     * This method will wait until a job is done (either gracefully or by being killed or producing an error), or until the timeout expires, whichever comes
+     * first. If the timeout expires, the job will continue to run.
      * </p>
      * <p>
-     * The timeout is in milliseconds and must be &gt;= 0. When timeout is 0, it will be ignored and this method will wait until
-     * the jobs is done.
+     * The timeout is in milliseconds and must be &gt;= 0. When timeout is 0, it will be ignored and this method will wait until the jobs is done.
      * </p>
      * <p>
      * A JobStatus is returned that can be used to determine why the call returned.
      * </p>
+     *
      * @param jobIdentifier
      *            the identifier of the to wait for.
      * @param timeout
@@ -543,17 +544,17 @@ public abstract class Scheduler {
     /**
      * Wait until a job starts running, or until a timeout expires.
      * <p>
-     * This method will return as soon as the job is no longer waiting in the queue, or when the timeout expires, whichever comes
-     * first. If the job is no longer waiting in the queue, it may be running, but it may also be killed, finished or have produced
-     * an error. If the timeout expires, the job will continue to be queued normally.
+     * This method will return as soon as the job is no longer waiting in the queue, or when the timeout expires, whichever comes first. If the job is no longer
+     * waiting in the queue, it may be running, but it may also be killed, finished or have produced an error. If the timeout expires, the job will continue to
+     * be queued normally.
      * </p>
      * <p>
-     * The timeout is in milliseconds and must be &gt;= 0. When timeout is 0, it will be ignored and this method will wait until
-     * the job is no longer queued.
+     * The timeout is in milliseconds and must be &gt;= 0. When timeout is 0, it will be ignored and this method will wait until the job is no longer queued.
      * </p>
      * <p>
      * A JobStatus is returned that can be used to determine why the call returned.
      * </p>
+     *
      * @param jobIdentifier
      *            the identifier of the to wait for.
      * @param timeout
@@ -569,6 +570,30 @@ public abstract class Scheduler {
      */
     public abstract JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException;
 
+    /**
+     * Does this <code>Scheduler</code> use a <code>FileSystem</code> internally to access files and directories ?
+     *
+     * @return If this <code>Scheduler</code> use a <code>FileSystem</code> internally ?
+     */
+    // public abstract boolean usesFileSystem();
+
+    /**
+     * Retrieve the <code>FileSystem</code> used internally by this <code>Scheduler</code>.
+     * <p>
+     * Often, a <code>Scheduler</code> needs to access files or directories on the machine it will schedule jobs. For example, to ensure a working directory
+     * exists, or to redirect the stdin, stdout or stderr streams used by a job.
+     * </p>
+     * <p>
+     * This method returns this <code>FileSystem</code> so it can also be used by the application to prepare input files for the jobs, or retrieve the output
+     * files produced by the jobs.
+     * </p>
+     *
+     * @return the <code>FileSystem</code> used by this Scheduler.
+     * @throws XenonException
+     *             if this Scheduler does not use a <code>FileSystem</code> internally.
+     */
+    public abstract FileSystem getFileSystem() throws XenonException;
+
     protected void assertNonNullOrEmpty(String s, String message) {
         if (s == null || s.isEmpty()) {
             throw new IllegalArgumentException(message);
@@ -583,8 +608,10 @@ public abstract class Scheduler {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Scheduler scheduler = (Scheduler) o;
         return Objects.equals(uniqueID, scheduler.uniqueID);
     }

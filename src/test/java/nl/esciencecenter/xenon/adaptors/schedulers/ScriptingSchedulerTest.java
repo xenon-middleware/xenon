@@ -46,13 +46,13 @@ public class ScriptingSchedulerTest {
     }
 
     @Test
-    public void test_getQueueStatusses_noSuchQueue() throws XenonException {
+    public void test_getQueueStatuses_noSuchQueue() throws XenonException {
 
         MockScriptingScheduler ss = new MockScriptingScheduler();
 
         Map<String, Map<String, String>> map = new HashMap<>();
 
-        QueueStatus[] s = ss.getQueueStatusses(map, "queue");
+        QueueStatus[] s = ss.getQueueStatuses(map, "queue");
 
         assertTrue(s[0].hasException());
         assertTrue(s[0].getException() instanceof NoSuchQueueException);

@@ -15,8 +15,13 @@
  */
 package nl.esciencecenter.xenon.schedulers;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 /**
  * JobDescription contains a description of a job that can be submitted to a {@link Scheduler}.
@@ -27,7 +32,7 @@ import java.util.Map.Entry;
 public class JobDescription {
 
     /** The default maximum run time */
-    public static final int DEFAULT_MAX_RUN_TIME = 15;
+    public static final int DEFAULT_MAX_RUN_TIME_IN_MINUTES = 15;
 
     /** The queue to submit to. */
     private String queueName = null;
@@ -66,7 +71,7 @@ public class JobDescription {
     private boolean startSingleProcess = false;
 
     /** The maximum run time in minutes. */
-    private int maxTime = DEFAULT_MAX_RUN_TIME;
+    private int maxRuntime = DEFAULT_MAX_RUN_TIME_IN_MINUTES;
 
     /**
      * Create a JobDescription.
@@ -77,7 +82,9 @@ public class JobDescription {
 
     /**
      * Create a JobDescription by copying an existing one.
-     * @param original JobDescription to copy
+     *
+     * @param original
+     *            JobDescription to copy
      */
     public JobDescription(JobDescription original) {
         queueName = original.getQueueName();
@@ -92,7 +99,7 @@ public class JobDescription {
         nodeCount = original.getNodeCount();
         processesPerNode = original.getProcessesPerNode();
         startSingleProcess = original.isStartSingleProcess();
-        maxTime = original.getMaxTime();
+        maxRuntime = original.getMaxRuntime();
     }
 
     /**
@@ -143,8 +150,8 @@ public class JobDescription {
     }
 
     /**
-     * Set if only a single process is started, instead of nodeCount * processesPerNode. Resources are still reserved, but it is
-     * up to the user to start all the processes. Mainly useful for MPI.
+     * Set if only a single process is started, instead of nodeCount * processesPerNode. Resources are still reserved, but it is up to the user to start all the
+     * processes. Mainly useful for MPI.
      *
      * @param startSingleProcess
      *            if only a single process is started.
@@ -173,22 +180,22 @@ public class JobDescription {
     }
 
     /**
-     * Get the maximum job time (in minutes).
+     * Get the maximum job duration time in minutes.
      *
-     * @return the queue name;
+     * @return the maximum job duration.
      */
-    public int getMaxTime() {
-        return maxTime;
+    public int getMaxRuntime() {
+        return maxRuntime;
     }
 
     /**
-     * Set the maximum job time (in minutes).
+     * Set the maximum job duration in minutes.
      *
-     * @param maxTime
-     *            the maximum job time (in minutes).
+     * @param minutes
+     *            the maximum job duration in minutes.
      */
-    public void setMaxTime(int maxTime) {
-        this.maxTime = maxTime;
+    public void setMaxRuntime(int minutes) {
+        this.maxRuntime = minutes;
     }
 
     /**
@@ -253,8 +260,7 @@ public class JobDescription {
     /**
      * Get the environment of the executable.
      *
-     * The environment of the executable consists of a {@link Map} of environment variables with their values (for example:
-     * "JAVA_HOME", "/path/to/java").
+     * The environment of the executable consists of a {@link Map} of environment variables with their values (for example: "JAVA_HOME", "/path/to/java").
      *
      * @return the environment of the executable.
      */
@@ -265,8 +271,7 @@ public class JobDescription {
     /**
      * Sets the environment of the executable.
      *
-     * The environment of the executable consists of a {@link Map} of environment variables with their values (for example:
-     * "JAVA_HOME", "/path/to/java").
+     * The environment of the executable consists of a {@link Map} of environment variables with their values (for example: "JAVA_HOME", "/path/to/java").
      *
      * @param environment
      *            environment of the executable.
@@ -285,8 +290,7 @@ public class JobDescription {
     /**
      * Add a variable to the environment of the executable.
      *
-     * The environment of the executable consists of a {@link Map} of environment variables with their values (for example:
-     * "JAVA_HOME", "/path/to/java").
+     * The environment of the executable consists of a {@link Map} of environment variables with their values (for example: "JAVA_HOME", "/path/to/java").
      *
      * The key of an environment variable may not be <code>null</code> or empty.
      *
@@ -438,11 +442,10 @@ public class JobDescription {
     /* Generated */
     @Override
     public String toString() {
-        return "JobDescription [queueName=" + queueName + ", executable=" + executable + ", arguments=" + arguments + ", stdin="
-                + stdin + ", stdout=" + stdout + ", stderr=" + stderr + ", workingDirectory=" + workingDirectory
-                + ", environment=" + environment + ", jobOptions=" + jobOptions + ", nodeCount=" + nodeCount
-                + ", processesPerNode=" + processesPerNode + ", startSingleProcess=" + startSingleProcess + ", maxTime="
-                + maxTime + "]";
+        return "JobDescription [queueName=" + queueName + ", executable=" + executable + ", arguments=" + arguments + ", stdin=" + stdin + ", stdout=" + stdout
+                + ", stderr=" + stderr + ", workingDirectory=" + workingDirectory + ", environment=" + environment + ", jobOptions=" + jobOptions
+                + ", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode + ", startSingleProcess=" + startSingleProcess + ", maxTime="
+                + maxRuntime + "]";
     }
 
     /* Generated */
@@ -455,7 +458,7 @@ public class JobDescription {
         result = prime * result + environment.hashCode();
         result = prime * result + ((executable == null) ? 0 : executable.hashCode());
         result = prime * result + jobOptions.hashCode();
-        result = prime * result + maxTime;
+        result = prime * result + maxRuntime;
         result = prime * result + nodeCount;
         result = prime * result + processesPerNode;
         result = prime * result + ((queueName == null) ? 0 : queueName.hashCode());
@@ -479,18 +482,10 @@ public class JobDescription {
 
         JobDescription other = (JobDescription) obj;
 
-        return maxTime == other.maxTime
-                && nodeCount == other.nodeCount
-                && startSingleProcess == other.startSingleProcess
-                && processesPerNode == other.processesPerNode
-                && Objects.equals(executable, other.executable)
-                && Objects.equals(workingDirectory, other.workingDirectory)
-                && Objects.equals(queueName, other.queueName)
-                && Objects.equals(stdin, other.stdin)
-                && Objects.equals(stdout, other.stdout)
-                && Objects.equals(stderr, other.stderr)
-                && Objects.equals(arguments, other.arguments)
-                && Objects.equals(environment, other.environment)
-                && Objects.equals(jobOptions, other.jobOptions);
+        return maxRuntime == other.maxRuntime && nodeCount == other.nodeCount && startSingleProcess == other.startSingleProcess
+                && processesPerNode == other.processesPerNode && Objects.equals(executable, other.executable)
+                && Objects.equals(workingDirectory, other.workingDirectory) && Objects.equals(queueName, other.queueName) && Objects.equals(stdin, other.stdin)
+                && Objects.equals(stdout, other.stdout) && Objects.equals(stderr, other.stderr) && Objects.equals(arguments, other.arguments)
+                && Objects.equals(environment, other.environment) && Objects.equals(jobOptions, other.jobOptions);
     }
 }

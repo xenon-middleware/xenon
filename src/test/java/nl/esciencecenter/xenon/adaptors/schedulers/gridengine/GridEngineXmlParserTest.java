@@ -101,7 +101,7 @@ public class GridEngineXmlParserTest {
         assertArrayEquals(new Object[] { "all.q", "das3.q", "disabled.q", "fat.q", "gpu.q" }, queues);
     }
 
-    @Test(expected=XenonException.class)
+    @Test(expected = XenonException.class)
     public void test02b_parseQueueInfo_NoQueues_ExceptionThrown() throws Throwable {
 
         String input = readFile("/fixtures/gridengine/queues-no-queues.xml");
@@ -111,7 +111,7 @@ public class GridEngineXmlParserTest {
         parser.parseQueueInfos(input);
     }
 
-    @Test(expected=XenonException.class)
+    @Test(expected = XenonException.class)
     public void test02c_parseQueueInfo_NoQueues_ExceptionThrown() throws Throwable {
 
         String input = readFile("/fixtures/gridengine/queues-no-queues.xml");
@@ -125,38 +125,27 @@ public class GridEngineXmlParserTest {
     public void test02d_parseQueueInfo_queueEmptyName_exceptionThrown() throws Throwable {
         String input = readFile("/fixtures/gridengine/queues-queue-empty-name.xml");
 
-        System.err.println("parsing queue info from: " + input);
-
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
         parser.parseQueueInfos(input);
     }
-
 
     @Test(expected = XenonException.class)
     public void test02e_parseQueueInfo_queueWithoutName_exceptionThrown() throws Throwable {
         String input = readFile("/fixtures/gridengine/queues-queue-without-name.xml");
 
-        System.err.println("parsing queue  info from: " + input);
-
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
         parser.parseQueueInfos(input);
     }
 
-
-
-
     @Test
     public void test03a_parseJobInfo_SomeJobs_Result() throws Throwable {
         String input = readFile("/fixtures/gridengine/jobs.xml");
 
-        System.err.println("parsing queue info from: " + input);
-
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
-        String[] expectedJobIDs = new String[] { "583111", "583235", "583238", "583244", "583246", "583296", "583320", "583325",
-                "583302" };
+        String[] expectedJobIDs = new String[] { "583111", "583235", "583238", "583244", "583246", "583296", "583320", "583325", "583302" };
         Arrays.sort(expectedJobIDs);
 
         Map<String, Map<String, String>> result = parser.parseJobInfos(input);
@@ -168,24 +157,18 @@ public class GridEngineXmlParserTest {
         assertArrayEquals(expectedJobIDs, resultJobIDs);
     }
 
-
     @Test(expected = XenonException.class)
     public void test03b_parseJobInfo_jobEmptyJobNumber_exceptionThrown() throws Throwable {
         String input = readFile("/fixtures/gridengine/jobs-empty-jobnumber.xml");
-
-        System.err.println("parsing job info from: " + input);
 
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
         parser.parseJobInfos(input);
     }
 
-
     @Test(expected = XenonException.class)
     public void test03c_parseJobInfo_jobWithoutJobNumber_exceptionThrown() throws Throwable {
         String input = readFile("/fixtures/gridengine/jobs-without-jobnumber.xml");
-
-        System.err.println("parsing job info from: " + input);
 
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 

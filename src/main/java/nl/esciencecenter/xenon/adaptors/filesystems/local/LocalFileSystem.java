@@ -31,7 +31,6 @@ import java.nio.file.attribute.PosixFileAttributeView;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import nl.esciencecenter.xenon.XenonException;
@@ -47,49 +46,30 @@ import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 
 public class LocalFileSystem extends FileSystem {
 
-    protected LocalFileSystem(String uniqueID, String location, Path entryPath, XenonProperties properties) {
-        super(uniqueID, ADAPTOR_NAME, location, entryPath, properties);
+    private final String root;
+
+    protected LocalFileSystem(String uniqueID, String location, String root, Path entryPath, int bufferSize, XenonProperties properties) {
+        super(uniqueID, ADAPTOR_NAME, location, entryPath, bufferSize, properties);
+        this.root = root;
     }
 
-    Path getRelativePath(String path, String root) throws XenonException {
-        if (!path.toUpperCase(Locale.getDefault()).startsWith(root.toUpperCase(Locale.getDefault()))) {
-            throw new XenonException(ADAPTOR_NAME, "Path does not start with root: " + path + " " + root);
-        }
-
-        if (root.length() == path.length()) {
-            return new Path(LocalFileSystemUtils.getLocalSeparator());
-        }
-
-        return new Path(LocalFileSystemUtils.getLocalSeparator(), path.substring(root.length()));
-    }
-
-    java.nio.file.Path javaPath(Path path) throws XenonException {
+    java.nio.file.Path javaPath(Path path) {
 
         if (path == null) {
             throw new IllegalArgumentException("Path may not be null");
         }
 
-        Path relPath = path.normalize();
-        int numElems = relPath.getNameCount();
-        String root = getLocation();
-
-        // replace tilde
-        if (numElems != 0) {
-            String firstPart = relPath.getName(0).toString();
-            if ("~".equals(firstPart)) {
-                String tmp = getLocalRootlessPath(System.getProperty("user.home"));
-                Path home = new Path(LocalFileSystemUtils.getLocalSeparator(), tmp);
-
-                if (numElems == 1) {
-                    relPath = home;
-                } else {
-                    relPath = home.resolve(relPath.subpath(1, numElems));
-                }
-            }
-        }
-
-        Path absPath = toAbsolutePath(relPath);
-        return FileSystems.getDefault().getPath(root, absPath.toString());
+        /*
+         * Path relPath = path.normalize(); int numElems = relPath.getNameCount();
+         *
+         * // replace tilde if (numElems != 0) { String firstPart = relPath.getName(0).toString(); if ("~".equals(firstPart)) { String tmp =
+         * getLocalRootlessPath(System.getProperty("user.home")); Path home = new Path(LocalFileSystemUtils.getLocalSeparator(), tmp);
+         *
+         * if (numElems == 1) { relPath = home; } else { relPath = home.resolve(relPath.subpath(1, numElems)); } } }
+         *
+         * Path absPath = toAbsolutePath(relPath);
+         */
+        return FileSystems.getDefault().getPath(root, toAbsolutePath(path.normalize()).toString());
     }
 
     Set<PosixFilePermission> xenonPermissions(Set<java.nio.file.attribute.PosixFilePermission> permissions) {
@@ -154,25 +134,19 @@ public class LocalFileSystem extends FileSystem {
             BasicFileAttributes basicAttributes;
 
             if (isWindows) {
-                // TODO: Seems to fail in Windows ?
+                // The Files.isHidden seems to fail in Windows, so we directly set it to false.
                 result.setHidden(false);
 
                 // These should always work.
                 basicAttributes = Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
-
-                // // These are windows only.
-                // AclFileAttributeView aclAttributes =
-                // Files.getFileAttributeView(javaPath,
-                // AclFileAttributeView.class,
-                // LinkOption.NOFOLLOW_LINKS);
 
             } else {
                 result.setHidden(Files.isHidden(path));
 
                 // Note: when in a posix environment, basicAttributes point to
                 // posixAttributes.
-                java.nio.file.attribute.PosixFileAttributes posixAttributes = Files.readAttributes(path,
-                        java.nio.file.attribute.PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+                java.nio.file.attribute.PosixFileAttributes posixAttributes = Files.readAttributes(path, java.nio.file.attribute.PosixFileAttributes.class,
+                        LinkOption.NOFOLLOW_LINKS);
 
                 basicAttributes = posixAttributes;
 
@@ -208,33 +182,33 @@ public class LocalFileSystem extends FileSystem {
     @Override
     public void rename(Path source, Path target) throws XenonException {
 
-        source = toAbsolutePath(source);
-        target = toAbsolutePath(target);
+        Path absSource = toAbsolutePath(source);
+        Path absTarget = toAbsolutePath(target);
 
-        if (areSamePaths(source, target)) {
+        if (areSamePaths(absSource, absTarget)) {
             return;
         }
 
-        assertPathExists(source);
-        assertPathNotExists(target);
-        assertParentDirectoryExists(target);
+        assertPathExists(absSource);
+        assertPathNotExists(absTarget);
+        assertParentDirectoryExists(absTarget);
 
         try {
-            Files.move(javaPath(source), javaPath(target));
+            Files.move(javaPath(absSource), javaPath(absTarget));
         } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to move " + source + " to " + target, e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to move " + absSource + " to " + absTarget, e);
         }
     }
 
     @Override
     public void createDirectory(Path dir) throws XenonException {
 
-        dir = toAbsolutePath(dir);
-        assertPathNotExists(dir);
-        assertParentDirectoryExists(dir);
+        Path absdir = toAbsolutePath(dir);
+        assertPathNotExists(absdir);
+        assertParentDirectoryExists(absdir);
 
         try {
-            Files.createDirectory(javaPath(dir));
+            Files.createDirectory(javaPath(absdir));
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to create directory " + dir, e);
         }
@@ -243,28 +217,28 @@ public class LocalFileSystem extends FileSystem {
     @Override
     public void createFile(Path file) throws XenonException {
 
-        file = toAbsolutePath(file);
-        assertPathNotExists(file);
-        assertParentDirectoryExists(file);
+        Path absFile = toAbsolutePath(file);
+        assertPathNotExists(absFile);
+        assertParentDirectoryExists(absFile);
 
         try {
-            Files.createFile(javaPath(file));
+            Files.createFile(javaPath(absFile));
         } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to create file " + file, e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to create file " + absFile, e);
         }
     }
 
     @Override
     public void createSymbolicLink(Path link, Path path) throws XenonException {
 
-        link = toAbsolutePath(link);
-        assertPathNotExists(link);
-        assertParentDirectoryExists(link);
+        Path absLink = toAbsolutePath(link);
+        assertPathNotExists(absLink);
+        assertParentDirectoryExists(absLink);
 
         try {
-            Files.createSymbolicLink(javaPath(link), javaPath(path));
+            Files.createSymbolicLink(javaPath(absLink), javaPath(path));
         } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to create link " + link + " to " + path, e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to create link " + absLink + " to " + path, e);
         }
     }
 
@@ -286,16 +260,13 @@ public class LocalFileSystem extends FileSystem {
     @Override
     protected List<PathAttributes> listDirectory(Path dir) throws XenonException {
 
-        try {
-            ArrayList<PathAttributes> result = new ArrayList<>();
+        try (DirectoryStream<java.nio.file.Path> s = Files.newDirectoryStream(javaPath(dir))) {
 
-            DirectoryStream<java.nio.file.Path> s = Files.newDirectoryStream(javaPath(dir));
+            ArrayList<PathAttributes> result = new ArrayList<>();
 
             for (java.nio.file.Path p : s) {
                 result.add(getLocalFileAttributes(dir.resolve(p.getFileName().toString()), p));
             }
-
-            s.close();
 
             return result;
         } catch (IOException e) {
@@ -306,11 +277,11 @@ public class LocalFileSystem extends FileSystem {
     @Override
     public InputStream readFromFile(Path path) throws XenonException {
 
-        path = toAbsolutePath(path);
-        assertFileExists(path);
+        Path absPath = toAbsolutePath(path);
+        assertFileExists(absPath);
 
         try {
-            return Files.newInputStream(javaPath(path));
+            return Files.newInputStream(javaPath(absPath));
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to create InputStream.", e);
         }
@@ -319,11 +290,10 @@ public class LocalFileSystem extends FileSystem {
     @Override
     public OutputStream writeToFile(Path path, long size) throws XenonException {
 
-        path = toAbsolutePath(path);
-        assertPathNotExists(path);
+        Path absPath = toAbsolutePath(path);
+        assertPathNotExists(absPath);
         try {
-            return Files.newOutputStream(javaPath(path), StandardOpenOption.WRITE, StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING);
+            return Files.newOutputStream(javaPath(absPath), StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to create OutputStream.", e);
         }
@@ -337,11 +307,11 @@ public class LocalFileSystem extends FileSystem {
     @Override
     public OutputStream appendToFile(Path path) throws XenonException {
 
-        path = toAbsolutePath(path);
-        assertFileExists(path);
+        Path absPath = toAbsolutePath(path);
+        assertFileExists(absPath);
 
         try {
-            return Files.newOutputStream(javaPath(path), StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+            return Files.newOutputStream(javaPath(absPath), StandardOpenOption.WRITE, StandardOpenOption.APPEND);
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to create OutputStream.", e);
         }
@@ -349,28 +319,28 @@ public class LocalFileSystem extends FileSystem {
 
     @Override
     public PathAttributes getAttributes(Path path) throws XenonException {
-        path = toAbsolutePath(path);
-        assertPathExists(path);
-        return getLocalFileAttributes(path);
+        Path absPath = toAbsolutePath(path);
+        assertPathExists(absPath);
+        return getLocalFileAttributes(absPath);
     }
 
     @Override
     public Path readSymbolicLink(Path link) throws XenonException {
 
-        link = toAbsolutePath(link);
-        assertFileIsSymbolicLink(link);
+        Path absLink = toAbsolutePath(link);
+        assertFileIsSymbolicLink(absLink);
 
         try {
-            java.nio.file.Path path = javaPath(link);
+            java.nio.file.Path path = javaPath(absLink);
             java.nio.file.Path target = Files.readSymbolicLink(path);
 
-            Path parent = link.getParent();
+            Path parent = absLink.getParent();
 
             if (parent == null || target.isAbsolute()) {
-                return new Path(link.getSeparator(), getLocalRootlessPath(target.toString()));
+                return new Path(absLink.getSeparator(), getLocalRootlessPath(target.toString()));
             }
 
-            return parent.resolve(new Path(link.getSeparator(), getLocalRootlessPath(target.toString())));
+            return parent.resolve(new Path(absLink.getSeparator(), getLocalRootlessPath(target.toString())));
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to read symbolic link.", e);
         }
@@ -383,15 +353,15 @@ public class LocalFileSystem extends FileSystem {
             throw new IllegalArgumentException("Permissions is null!");
         }
 
-        path = toAbsolutePath(path);
+        Path absPath = toAbsolutePath(path);
 
-        assertPathExists(path);
+        assertPathExists(absPath);
 
         try {
-            PosixFileAttributeView view = Files.getFileAttributeView(javaPath(path), PosixFileAttributeView.class);
+            PosixFileAttributeView view = Files.getFileAttributeView(javaPath(absPath), PosixFileAttributeView.class);
             view.setPermissions(javaPermissions(permissions));
         } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to set permissions " + path, e);
+            throw new XenonException(ADAPTOR_NAME, "Failed to set permissions " + absPath, e);
         }
     }
 }

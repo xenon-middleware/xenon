@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import nl.esciencecenter.xenon.XenonException;
-//import nl.esciencecenter.xenon.util.Utils;
 
 /**
  *
@@ -38,6 +37,11 @@ public final class ScriptingParser {
     public static final Pattern EQUALS_REGEX = Pattern.compile("\\s*=\\s*");
 
     public static final Pattern HORIZONTAL_LINE_REGEX = Pattern.compile("^\\s*([=_-]{3,}\\s*)+$");
+
+    private ScriptingParser() {
+        throw new IllegalStateException("Utility class");
+    }
+
 
     /**
      * Parses a output with key=value pairs separated by whitespace, on one or more lines. This function fails if there is any

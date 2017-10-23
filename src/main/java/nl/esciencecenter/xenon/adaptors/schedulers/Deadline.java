@@ -17,6 +17,11 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
 
 public class Deadline {
 
+    private Deadline() {
+        throw new IllegalStateException("Utility class");
+    }
+
+
     /**
      * Calculate the epoch timestamp when a timeout will expire.
      *

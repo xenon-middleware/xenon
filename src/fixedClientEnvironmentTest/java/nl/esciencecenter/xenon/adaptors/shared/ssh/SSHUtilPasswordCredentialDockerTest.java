@@ -38,7 +38,21 @@ public class SSHUtilPasswordCredentialDockerTest {
 
         String location = docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT");
 
-        SshClient client = SSHUtil.createSSHClient(false, false, false, false);
+        SshClient client = SSHUtil.createSSHClient(false, false, false, false, false);
+
+        // Create a certificate credential that matches the (hard-coded) setup of the docker container.
+        Credential credential = new DefaultCredential();
+
+        ClientSession session = SSHUtil.connect("SSHTEST", client, location, credential, 10 * 1000);
+        session.close();
+    }
+
+    @Test
+    public void test_connect_default_with_username() throws Exception {
+
+        String location = docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT");
+
+        SshClient client = SSHUtil.createSSHClient(false, false, false, false, false);
 
         // Create a certificate credential that matches the (hard-coded) setup of the docker container.
         Credential credential = new DefaultCredential("xenon");
@@ -52,7 +66,7 @@ public class SSHUtilPasswordCredentialDockerTest {
 
         String location = docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT");
 
-        SshClient client = SSHUtil.createSSHClient(false, false, false, false);
+        SshClient client = SSHUtil.createSSHClient(false, false, false, false, false);
 
         // Create a certificate credential that matches the (hard-coded) setup of the docker container.
         Credential credential = new CertificateCredential("xenon", "/home/xenon/.ssh/id_rsa", null);
@@ -66,7 +80,7 @@ public class SSHUtilPasswordCredentialDockerTest {
 
         String location = docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT");
 
-        SshClient client = SSHUtil.createSSHClient(false, false, false, false);
+        SshClient client = SSHUtil.createSSHClient(false, false, false, false, false);
 
         // Create a certificate credential that matches the (hard-coded) setup of the docker container.
         Credential credential = new CertificateCredential("xenon2", "/home/xenon/.ssh/id_rsa_pw", "javagat2".toCharArray());
@@ -74,41 +88,5 @@ public class SSHUtilPasswordCredentialDockerTest {
         ClientSession session = SSHUtil.connect("SSHTEST", client, location, credential, 10 * 1000);
         session.close();
     }
-
-    // @Test
-    // public void test_connect_rsa() throws Exception {
-    //
-    // String location = docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT");
-    //
-    // SshClient client = SSHUtil.createSSHClient(false, false, false, false);
-    //
-    // // Create a certificate credential that matches the (hard-coded) setup of the docker container.
-    // Credential credential = new CertificateCredential("xenon", "/home/xenon/.ssh/id_rsa", null);
-    //
-    // ClientSession session = SSHUtil.connect("SSHTEST", client, location, credential, 10 * 1000);
-    // session.close();
-    // }
-
-    // @Test
-    // public void test_connect_ftp() throws Exception {
-    //
-    // String location = docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT");
-    //
-    // SshClient client = SSHUtil.createSSHClient(false, false, false, false);
-    //
-    // // Create a certificate credential that matches the (hard-coded) setup of the docker container.
-    // Credential credential = new CertificateCredential("xenon", "/home/xenon/.ssh/id_dsa", "javagat2".toCharArray());
-    //
-    // ClientSession session = SSHUtil.connect("SSHTEST", client, location, credential, 10 * 1000);
-    //
-    // SftpClient sftpClient = session.createSftpClient();
-    //
-    // String wd = sftpClient.canonicalPath(".");
-    //
-    // sftpClient.close();
-    // session.close();
-    //
-    // assertEquals("/home/xenon", wd);
-    // }
 
 }

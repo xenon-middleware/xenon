@@ -32,12 +32,6 @@ import nl.esciencecenter.xenon.adaptors.filesystems.PosixFileUtils;
 public class PosixFileUtilsTest {
 
     @Test
-    public void testConstructor() throws Exception {
-        // Dummy test for coverage
-        new PosixFileUtils();
-    }
-
-    @Test
     public void testAllBits() throws Exception {
 
         Set<PosixFilePermission> tmp = EnumSet.allOf(PosixFilePermission.class);

@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.NoSuchJobException;
@@ -133,7 +134,7 @@ public class MockScheduler extends Scheduler {
             jobs.remove(jobIdentifier);
 
             if (shouldFail) {
-                return new JobStatusImplementation(jobIdentifier, "ERROR", exitCode, new Exception("FAIL"), false, true, null);
+                return new JobStatusImplementation(jobIdentifier, "ERROR", exitCode, new XenonException(getAdaptorName(), "FAIL"), false, true, null);
             } else {
                 return new JobStatusImplementation(jobIdentifier, "DONE", exitCode, null, false, true, null);
             }
@@ -150,6 +151,14 @@ public class MockScheduler extends Scheduler {
         }
 
         throw new NoSuchJobException("TEST", "No such job " + jobIdentifier);
+    }
+
+    public boolean usesFileSystem() {
+        return false;
+    }
+
+    public FileSystem getFileSystem() throws XenonException {
+        throw new XenonException("TEST", "No FileSystem used");
     }
 
 }

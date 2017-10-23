@@ -25,6 +25,10 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
 
 public class LocalFileSystemUtils {
 
+    private LocalFileSystemUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static String NAME = "LocalFileSystemUtils";
 
     /**
@@ -168,6 +172,9 @@ public class LocalFileSystemUtils {
      * example, providing "/user/local" will return "/" on Linux or OSX, but throw an exception on Windows; providing "C:\test" will return "C:" on Windows but
      * throw an exception on Linux or OSX.
      *
+     * If the provided string is <code>null</code> or empty, the default root element for this OS will be returned, i.e,. "/" on Linux or OSX and "C:" on
+     * windows.
+     *
      * @param p
      *            The absolute path for which to determine the root element.
      * @return The locally valid root element.
@@ -180,7 +187,7 @@ public class LocalFileSystemUtils {
 
         if (isWindows()) {
             if (path == null || path.isEmpty()) {
-                return "";
+                return "C:";
             }
 
             if (path.charAt(0) == '/') {
@@ -198,6 +205,58 @@ public class LocalFileSystemUtils {
         }
 
         throw new InvalidLocationException(ADAPTOR_NAME, "Path is not absolute! " + path);
+    }
+
+    /**
+     * Expand the tilde in a String representation of a path by the users home directory, as provided by the <code>user.home</code> property.
+     *
+     * The tilde will only be replaced if it is the first character in the path and either the only character in the path or directly followed by the local
+     * separator character or directly followed by the local user name (as provided by the <code>user.name</code> property).
+     *
+     * For example, if <code>user.name</code> is set to "john" and <code>user.home</code> is set to "/home/john", then "~" will be expanded to "/home/john",
+     * "~/foo" or "~john/foo" will be expanded to "/home/john/foo".
+     *
+     * However, in paths like "/foo/bar", "~matt/foo" or "/foo/~" the tilde will not be expanded, and the provided path is returned unchanged. This includes a
+     * path that is <code>null</code>.
+     *
+     * If the <code>user.home</code> property is not set, the tilde will not be expanded and the provided path will be returned unchanged. If the
+     * <code>user.name</code> property is not set, the combined tilde-username expansion will not be performed.
+     *
+     * @param path
+     *            the path in which to replace the tilde (if possible).
+     * @return the path with the tilde replaced by the user home property, or the unchanged path if replacement was not triggered.
+     */
+    public static String expandTilde(String path) {
+
+        if (path == null) {
+            return null;
+        }
+
+        String home = System.getProperty("user.home");
+
+        if (home == null || home.isEmpty()) {
+            return path;
+        }
+
+        if (!path.startsWith("~")) {
+            return path;
+        }
+
+        if (path.length() == 1 || path.startsWith("~" + getLocalSeparator())) {
+            return getLocalRootlessPath(home) + path.substring(1);
+        }
+
+        String user = System.getProperty("user.name");
+
+        if (user == null || user.isEmpty()) {
+            return path;
+        }
+
+        if (path.startsWith("~" + user)) {
+            return getLocalRootlessPath(home) + path.substring(1 + user.length());
+        }
+
+        return path;
     }
 
     /**
@@ -222,48 +281,6 @@ public class LocalFileSystemUtils {
     public static char getLocalSeparator() {
         return File.separatorChar;
     }
-
-    /**
-     * Return the locally valid root element of an <code>String</code> representation of an absolute path.
-     *
-     * Examples of a root elements are "/" or "C:". If the provided path does not contain a locally valid root element, an exception will be thrown. For
-     * example, providing "/user/local" will return "/" on Linux or OSX, but throw an exception on Windows; providing "C:\test" will return "C:" on Windows but
-     * throw an exception on Linux or OSX.
-     *
-     * @param p
-     *            The absolute path for which to determine the root element.
-     * @return The locally valid root element.
-     * @throws XenonException
-     *             If the provided <code>path</code> is not absolute, or does not contain a locally valid root.
-     */
-    // public static String getLocalRoot(String p) throws XenonException {
-    //
-    // String path = p;
-    //
-    // if (isWindows()) {
-    // if (path == null || path.isEmpty()) {
-    // return "";
-    // }
-    // if (!path.contains("/") && !path.contains("\\")) {
-    // // Windows URS, network drive
-    // return path;
-    // }
-    // if (path.charAt(0) == '/') {
-    // path = path.substring(1);
-    // }
-    // if (path.length() >= 2 && (path.charAt(1) == ':') && Character.isLetter(path.charAt(0))) {
-    // return path.substring(0, 2).toUpperCase();
-    // }
-    //
-    // throw new InvalidLocationException(NAME, "Path does not include drive name! " + path);
-    // }
-    //
-    // if (path == null || path.isEmpty() || (path.length() >= 1 && path.charAt(0) == '/')) {
-    // return "/";
-    // }
-    //
-    // throw new InvalidLocationException(NAME, "Path is not absolute! " + path);
-    // }
 
     /**
      * Returns all local FileSystems.

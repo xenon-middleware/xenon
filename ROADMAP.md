@@ -5,9 +5,9 @@
     - job adaptors: local, ssh, SLURM, Torque, GridEngine
 1. Make it easier to inspect at runtime which adaptors are available and what properties they support.
 1. Add more adaptors, for example for:
-    - [S3](https://aws.amazon.com/s3/)
     - SWIFT
-    - [Hadoop](https://en.wikipedia.org/wiki/Apache_Hadoop) HDFS, YARN
+    - [Hadoop](https://en.wikipedia.org/wiki/Apache_Hadoop) HDFS (almost done), YARN
     - Azure-Batch (corporate [site](https://azure.microsoft.com/en-us/services/batch/), [docs](https://docs.microsoft.com/en-us/azure/batch/))
     - [Amazon-Batch](https://aws.amazon.com/batch/)
-1. Add interface to clouds (AWS, Azure, ...)
+    - GridFTP    
+    - glite    

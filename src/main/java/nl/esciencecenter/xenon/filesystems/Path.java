@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
@@ -76,136 +75,45 @@ public class Path implements Iterable<Path> {
      * Create a new empty Path using the default separator.
      */
     public Path() {
-        this(DEFAULT_SEPARATOR, new ArrayList<String>(0));
+        this(DEFAULT_SEPARATOR, false, new ArrayList<String>(0));
     }
 
     /**
-     * Create a new Path using the path and the default separator.
+     * Create a new Path by parsing <code>path</code> using the default separator.
      *
-     * If <code>path</code> is <code>null</code> or an empty String, the
-     * resulting Path is empty. If <code>path</code> contains the separator it
-     * will be split into multiple elements.
+     * If <code>path</code> is <code>null</code> or an empty String, the resulting Path is empty and relative. Otherwise it will be split into multiple elements
+     * using the default separator. If <code>path</code> starts with a separator, the resulting path will be absolute. Otherwise, it will be relative.
      *
      * @param path
-     *            the path to use.
+     *            the path to parse
      */
     public Path(String path) {
         this(DEFAULT_SEPARATOR, path);
     }
 
     /**
-     * Create a new Path using the given path elements and the default
-     * separator.
+     * Create a new Path by parsing <code>path</code> using the provided separator.
      *
-     * If <code>elements</code> is <code>null</code> or an empty String array,
-     * the resulting Path is empty.
+     * If <code>path</code> is <code>null</code> or an empty String, the resulting Path is empty and relative. Otherwise it will be split into multiple elements
+     * using the provided separator. If <code>path</code> starts with a separator, the resulting path will be absolute. Otherwise, it will be relative.
      *
-     * Any elements that are <code>null</code> or an empty String will be
-     * ignored. Any elements that contain the separator will be split into
-     * multiple elements.
-     *
-     * @param elements
-     *            the path elements to use.
-     */
-    public Path(String... elements) {
-        this(DEFAULT_SEPARATOR, elements);
-    }
-
-    /**
-     * Create a new Path by appending the provided <code>paths</code>.
-     *
-     * If the <code>paths</code> is <code>null</code> the resulting Path is
-     * empty.
-     *
-     * @param paths
-     *            the path elements to use.
-     */
-    public Path(Path... paths) {
-
-        if (paths == null || paths.length == 0) {
-            elements = new ArrayList<>(0);
-            separator = DEFAULT_SEPARATOR;
-        } else {
-            boolean isAbsoluteSet = false;
-            elements = new ArrayList<>(paths.length);
-
-            Character sep = null;
-
-            for (Path path : paths) {
-                if (path != null) {
-                    if (!isAbsoluteSet) {
-                        isAbsolute = path.isAbsolute;
-                        isAbsoluteSet = true;
-                    }
-                    if (!path.isEmpty()) {
-                        elements.addAll(path.elements);
-                    }
-                    if (sep == null) {
-                        sep = new Character(path.separator);
-                    }
-                }
-            }
-
-            if (sep == null) {
-                separator = DEFAULT_SEPARATOR;
-            } else {
-                separator = sep.charValue();
-            }
-        }
-
-    }
-
-    /**
-     * Create a new Path using the given path elements and the separator.
-     *
-     * If the <code>elements</code> is <code>null</code> or an empty String
-     * array, the resulting Path is empty.
-     *
-     * Otherwise, each of the elements will be parsed individually, splitting
-     * them into elements wherever a separator is encountered. Elements that are
-     * <code>null</code> or contain an empty String are ignored.
-     *
-     * @param elements
-     *            the path elements to use.
      * @param separator
-     *            the separator to use.
+     *            the separator to use
+     * @param path
+     *            the path to parse
      */
-    public Path(char separator, String... elements) {
-        this(separator, elements == null ? new ArrayList<String>(0) : Arrays.asList(elements));
-    }
+    public Path(char separator, String path) {
 
-    /**
-     * Create a new Path using the given path elements and the separator.
-     *
-     * If the <code>elements</code> is <code>null</code> or an empty String
-     * array, the resulting Path is empty.
-     *
-     * Otherwise, each of the elements will be parsed individually, splitting
-     * them into elements wherever a separator is encountered. Elements that are
-     * <code>null</code> or contain an empty String are ignored.
-     *
-     * @param elts
-     *            the path elements to use.
-     * @param separator
-     *            the separator to use.
-     */
-    public Path(char separator, List<String> elts) {
-
-        List<String> tmp = elts;
-
-        if (tmp == null) {
-            tmp = new ArrayList<>(0);
-        } else {
-            tmp = filterNonEmpty(tmp);
-        }
-        String delim = String.valueOf(separator);
-
-        this.isAbsolute = tmp.isEmpty() ? false : tmp.get(0).startsWith(delim);
         this.separator = separator;
-        this.elements = new ArrayList<>(tmp.size());
 
-        for (String elt : tmp) {
-            StringTokenizer tok = new StringTokenizer(elt, delim);
+        if (path == null || path.isEmpty()) {
+            this.isAbsolute = false;
+            this.elements = new ArrayList<>(0);
+        } else {
+            this.isAbsolute = (path.indexOf(separator) == 0);
+            StringTokenizer tok = new StringTokenizer(path, "" + separator);
+
+            this.elements = new ArrayList<>(tok.countTokens());
 
             while (tok.hasMoreTokens()) {
                 this.elements.add(tok.nextToken());
@@ -213,24 +121,111 @@ public class Path implements Iterable<Path> {
         }
     }
 
-    private Path(char separator, boolean isAbsolute, List<String> elements) {
-        this.separator = separator;
-        this.isAbsolute = isAbsolute;
-        this.elements = elements;
-    }
-
-    List<String> filterNonEmpty(List<String> elts) {
-        List<String> res = new LinkedList<>();
-        for (String s : elts) {
-            if (s != null && !s.isEmpty()) {
-                res.add(s);
-            }
-        }
-        return res;
+    /**
+     * Create a new Path using the given path elements and the default separator.
+     *
+     * If <code>elements</code> is <code>null</code> or empty, the resulting Path is empty. The <code>elements</code> may not contain <code>null</code> or empty
+     * Strings. The elements will not be parsed individually, and may not contain the separator character.
+     *
+     * @param isAbsolute
+     *            should the resulting path must be absolute?
+     * @param elements
+     *            the path elements to use.
+     */
+    public Path(boolean isAbsolute, String... elements) {
+        this(isAbsolute, elements == null ? new ArrayList<String>(0) : Arrays.asList(elements));
     }
 
     /**
-     * Get the file name, or <code>null</code> if the Path is empty.
+     * Create a new Path using the given path elements and the provided separator.
+     *
+     * If <code>elements</code> is <code>null</code> or empty, the resulting Path is empty. The <code>elements</code> may not contain <code>null</code> or empty
+     * Strings. The elements will not be parsed individually, and may not contain the separator character.
+     *
+     * @param separator
+     *            the separator to use.
+     * @param isAbsolute
+     *            should the resulting path must be absolute?
+     * @param elements
+     *            the path elements to use.
+     */
+    public Path(char separator, boolean isAbsolute, String... elements) {
+        this(separator, isAbsolute, elements == null ? new ArrayList<String>(0) : Arrays.asList(elements));
+    }
+
+    /**
+     * Create a new Path using the given path elements and the default separator.
+     *
+     * If <code>elements</code> is <code>null</code> or empty, the resulting Path is empty. The <code>elements</code> list may not contain <code>null</code> or
+     * empty Strings, or Strings that contain the separator character. If they do, an <code>IllegalArgumentException</code> will be thrown.
+     *
+     * @param isAbsolute
+     *            should the resulting path must be absolute?
+     * @param elements
+     *            the path elements to use.
+     */
+    public Path(boolean isAbsolute, List<String> elements) {
+        this(DEFAULT_SEPARATOR, isAbsolute, elements);
+    }
+
+    /**
+     * Create a new Path using the given path separator, absoluteness, and elements.
+     *
+     * If <code>elements</code> is <code>null</code> or empty, the resulting Path is empty. The <code>elements</code> list may not contain <code>null</code> or
+     * empty Strings, or Strings that contain the separator character. If they do, an <code>IllegalArgumentException</code> will be thrown.
+     *
+     * @param separator
+     *            the separator to use.
+     * @param isAbsolute
+     *            should the resulting path should be absolute ?
+     * @param elements
+     *            the path elements to use.
+     */
+    public Path(char separator, boolean isAbsolute, List<String> elements) {
+        this.separator = separator;
+        this.isAbsolute = isAbsolute;
+        this.elements = checkForNullAndSeparator(separator, elements);
+    }
+
+    protected static List<String> checkForNullAndSeparator(char separator, List<String> elements) {
+
+        ArrayList<String> result = new ArrayList<String>(0);
+
+        if (elements == null || elements.isEmpty()) {
+            return result;
+        }
+
+        for (String s : elements) {
+            if (s == null) {
+                throw new IllegalArgumentException("Path elements list contains null");
+            }
+
+            if (s.isEmpty()) {
+                throw new IllegalArgumentException("Path elements list contains an empty element");
+            }
+
+            if (s.indexOf(separator) != -1) {
+                throw new IllegalArgumentException("Path element " + s + " contains separator '" + separator + "'");
+            }
+
+            result.add(s);
+        }
+
+        return result;
+    }
+
+    // List<String> filterNonEmpty(List<String> elts) {
+    // List<String> res = new LinkedList<>();
+    // for (String s : elts) {
+    // if (s != null && !s.isEmpty()) {
+    // res.add(s);
+    // }
+    // }
+    // return res;
+    // }
+
+    /**
+     * Get the file name or <code>null</code> if the Path is empty.
      *
      * The file name is the last element of the Path.
      *
@@ -245,8 +240,7 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Get the file name as a <code>String</code>, or <code>null</code> if the
-     * Path is empty.
+     * Get the file name as a <code>String</code>, or <code>null</code> if the Path is empty.
      *
      * The file name is the last element of the Path.
      *
@@ -270,8 +264,9 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Get the parent Path, or <code>null</code> if this Path does not have a
-     * parent.
+     * Get the parent Path, or <code>null</code> if this Path does not have a parent.
+     *
+     * The parent path will contain all path elements in this pasth except the last one.
      *
      * @return a Path representing this Paths parent.
      */
@@ -284,41 +279,39 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Get the number of name elements in the Path.
+     * Get the number of elements in the Path.
      *
-     * @return the number of elements in the Path, or 0 if this is empty.
+     * @return the number of elements in the Path, or 0 if this path is empty.
      */
     public int getNameCount() {
         return elements.size();
     }
 
     /**
-     * Get a name element of this Path.
+     * Get an element of this Path. Path elements indices start at 0.
      *
      * @param index
      *            the index of the element
      *
-     * @return the name element
+     * @return the element at the specified index
      *
      * @throws IndexOutOfBoundsException
-     *             If the index is negative or greater or equal to the number of
-     *             elements in the path.
+     *             If the index is negative or greater or equal to the number of elements in the path.
      */
     public Path getName(int index) {
-        boolean isAbs = index == 0 && isAbsolute;
-        return new Path(separator, isAbs, Collections.singletonList(elements.get(index)));
+        boolean alsoAbsolute = (index == 0 && isAbsolute);
+        return new Path(separator, alsoAbsolute, Collections.singletonList(elements.get(index)));
     }
 
     /**
-     * Returns a Path that is a subsequence of the name elements of this path.
+     * Returns a Path that is a subsequence of the name elements of this path. Path elements indices start at 0.
      *
      * @param beginIndex
      *            the index of the first element, inclusive
      * @param endIndex
      *            the index of the last element, exclusive
      *
-     * @return a new Path that is a subsequence of the name elements in this
-     *         path.
+     * @return a new Path that is a subsequence of the name elements in this path.
      *
      * @throws IllegalArgumentException
      *             If beginIndex is larger than or equal to the endIndex.
@@ -336,26 +329,26 @@ public class Path implements Iterable<Path> {
     /**
      * Tests if this Path starts with the given Path.
      *
-     * This method returns <code>true</code> if this Path starts with the name
-     * elements in the given Path. If the given Path has more name elements than
-     * this path then false is returned.
+     * This method returns <code>true</code> if this Path starts with the same sequence of the name elements as the given Path. In addition, the absoluteness of
+     * this Path should match the absoluteness of the given Path.
+     *
+     * False is returned if the given Path starts with a different sequence of elements, has more name elements than this path, or has a different absoluteness
+     * than this path.
      *
      * @param other
      *            the Path to compare to.
      *
-     * @return If this Path start with the name elements in the other Path.
+     * @return If this Path start with the name elements in the other Path and has the same absoluteness.
      */
     public boolean startsWith(Path other) {
-        return other.isAbsolute == isAbsolute && other.elements.size() <= elements.size()
-                && elements.subList(0, other.elements.size()).equals(other.elements);
+        return other.isAbsolute == isAbsolute && other.elements.size() <= elements.size() && elements.subList(0, other.elements.size()).equals(other.elements);
     }
 
     /**
      * Tests if this Path ends with the given Path.
      *
-     * This method returns <code>true</code> if this Path end with the name
-     * elements in the given Path. If the given Path has more name elements than
-     * this Path then false is returned.
+     * This method returns <code>true</code> if this Path end with the name elements in the given Path. If the given Path has more name elements than this Path
+     * then false is returned.
      *
      * @param other
      *            the Path to compare to.
@@ -368,16 +361,14 @@ public class Path implements Iterable<Path> {
         }
         int offset = elements.size() - other.elements.size();
 
-        return other.elements.size() <= elements.size()
-                && this.elements.subList(offset, elements.size()).equals(other.elements);
+        return other.elements.size() <= elements.size() && this.elements.subList(offset, elements.size()).equals(other.elements);
     }
 
     /**
-     * Tests if this Path starts with the given Path.
+     * Tests if this Path starts with the given Path represented as a String.
      *
-     * This method converts <code>other</code> into a <code>Path</code> using
-     * {@link #Path(String)} and then uses {@link #startsWith(Path)} to compare
-     * the result to this Path.
+     * This method converts <code>other</code> into a <code>Path</code> using {@link #Path(String)} and then uses {@link #startsWith(Path)} to compare the
+     * result to this Path.
      *
      * @param other
      *            the path to test.
@@ -385,15 +376,14 @@ public class Path implements Iterable<Path> {
      * @return If this Path start with the name elements in <code>other</code>.
      */
     public boolean startsWith(String other) {
-        return startsWith(new Path(other));
+        return startsWith(new Path(separator, other));
     }
 
     /**
-     * Tests if this Path ends with the given Path.
+     * Tests if this Path ends with the given Path represented as a String.
      *
-     * This method converts the <code>other</code> into a <code>Path</code>
-     * using {@link #Path(String)} and then uses {@link #endsWith(Path)} to
-     * compare the result to this path.
+     * This method converts the <code>other</code> into a <code>Path</code> using {@link #Path(String)} and then uses {@link #endsWith(Path)} to compare the
+     * result to this path.
      *
      * @param other
      *            the path to test.
@@ -401,14 +391,14 @@ public class Path implements Iterable<Path> {
      * @return If this Path ends with the elements in <code>other</code>.
      */
     public boolean endsWith(String other) {
-        return endsWith(new Path(other));
+        return endsWith(new Path(separator, other));
     }
 
     /**
      * Resolve a Path against this Path.
      *
-     * Concatenates the path elements of this Path with the <code>other</code>
-     * Path.
+     * Returns a new Path that concatenates the path elements of this Path with <code>other</code>. The resulting path will use the separator and absoluteness
+     * of this path.
      *
      * @param other
      *            the Path to concatenate with.
@@ -426,14 +416,14 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Resolve a String containing a Path against this path.
+     * Resolve a Path represented as a String against this path.
      *
-     * Converts the <code>other</code> into a <code>Path</code> using
-     * {@link #Path(String)} and then uses {@link #resolve(Path)} to resolve the
-     * result against this path.
+     * Converts <code>other</code> into a <code>Path</code> using {@link #Path(char, String)} and the separator of the this path. Next, {@link #resolve(Path)}
+     * is used to resolve the result against this path.
      *
      * @param other
-     *            the String to concatenate with.
+     *            the path to concatenate with.
+     *
      * @return concatenation of this Path with the other
      */
     public Path resolve(String other) {
@@ -441,7 +431,7 @@ public class Path implements Iterable<Path> {
             return this;
         }
 
-        return resolve(new Path(other));
+        return resolve(new Path(separator, other));
     }
 
     /**
@@ -454,17 +444,13 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Resolves the given Path to this paths parent Path, thereby creating a
-     * sibling to this Path.
+     * Resolves the given Path to this paths parent Path, thereby creating a sibling to this Path.
      *
-     * If this Path is empty, <code>other</code> will be returned, unless other
-     * is <code>null</code> in which case an empty Path is returned.
+     * If this Path is empty, <code>other</code> will be returned, unless other is <code>null</code> in which case an empty Path is returned.
      *
-     * If this Path is not empty, but <code>other</code> is <code>null</code> or
-     * empty, the parent of this Path will be returned.
+     * If this Path is not empty, but <code>other</code> is <code>null</code> or empty, the parent of this Path will be returned.
      *
-     * If neither this Path and other are empty,
-     * <code>getParent.resolve(other)</code> will be returned.
+     * If neither this Path and other are empty, <code>getParent.resolve(other)</code> will be returned.
      *
      * @param other
      *            the Path to resolve as sibling.
@@ -489,15 +475,12 @@ public class Path implements Iterable<Path> {
     /**
      * Create a relative Path between the given Path and this Path.
      *
-     * Relativation is the inverse of resolving. This method returns a Path
-     * that, when resolved against this Path, results in the given Path
-     * <code>other</code>.
+     * Relativation is the inverse of resolving. This method returns a Path that, when resolved against this Path, results in the given Path <code>other</code>.
      *
      * @param other
      *            the Path to relativize.
      *
-     * @return a Path representing a relative path between the given path and
-     *         this path.
+     * @return a Path representing a relative path between the given path and this path.
      *
      * @throws IllegalArgumentException
      *             If the path can not be relativized to this path.
@@ -524,11 +507,9 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Create an {@link Iterator} that returns all possible sub Paths of this
-     * Path, in order of increasing length.
+     * Create an {@link Iterator} that returns all possible sub Paths of this Path, in order of increasing length.
      *
-     * For example, for the Path "/a/b/c/d" the iterator returns "/a", "/a/b",
-     * "/a/b/c", "/a/b/c/d".
+     * For example, for the Path "/a/b/c/d" the iterator returns "/a", "/a/b", "/a/b/c", "/a/b/c/d".
      *
      * @return the iterator.
      */
@@ -537,13 +518,11 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Return a <code>String</code> representation of this Path interpreted as a
-     * relative path.
+     * Return a <code>String</code> representation of this Path interpreted as a relative path.
      *
      * A relative path does not start with a separator.
      *
-     * @return a String representation of this Path interpreted as a relative
-     *         path.
+     * @return a String representation of this Path interpreted as a relative path.
      */
     private String getRelativePath() {
         StringBuilder tmp = new StringBuilder(elements.size() * PATH_ELEMENT_LENGTH);
@@ -560,27 +539,22 @@ public class Path implements Iterable<Path> {
     }
 
     /**
-     * Return a <code>String</code> representation of this Path interpreted as
-     * an absolute path.
+     * Return a <code>String</code> representation of this Path interpreted as an absolute path.
      *
      * An absolute path starts with a separator.
      *
-     * @return a String representation of this path interpreted as an absolute
-     *         path.
+     * @return a String representation of this path interpreted as an absolute path.
      */
     private String getAbsolutePath() {
         return separator + getRelativePath();
     }
 
     /**
-     * Normalize this Path by removing as many redundant path elements as
-     * possible.
+     * Normalize this Path by removing as many redundant path elements as possible.
      *
-     * Redundant path elements are <code>"."</code> (indicating the current
-     * directory) and <code>".."</code> (indicating the parent directory).
+     * Redundant path elements are <code>"."</code> (indicating the current directory) and <code>".."</code> (indicating the parent directory).
      *
-     * Note that the resulting normalized path does may still contain
-     * <code>".."</code> elements which are not redundant.
+     * Note that the resulting normalized path does may still contain <code>".."</code> elements which are not redundant.
      *
      * @return the normalize path.
      */

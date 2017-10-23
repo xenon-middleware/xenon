@@ -18,8 +18,7 @@ package nl.esciencecenter.xenon.filesystems;
 /**
  * CopyOption is an enumeration containing all possible options for copying a file.
  *
- * Note that the <code>CREATE</code>, <code>REPLACE</code> and <code>IGNORE</code> options
- * are mutually exclusive.
+ * Note that the <code>CREATE</code>, <code>REPLACE</code> and <code>IGNORE</code> options are mutually exclusive.
  */
 public enum CopyMode {
 
@@ -29,9 +28,9 @@ public enum CopyMode {
     CREATE,
 
     /**
-     * If the destination is a regular file, the file will be replaced.
+     * If the source and destination are a regular file, the destination file will be replaced. If the destination exists and is not a file and the source is a
+     * file, then the destination will be (recursively) deleted before copying.
      *
-     * If the destination exists and is not a file and the source is a file, then the destination will be (recursively) deleted before copying.
      *
      * If the source and destination are directories then additional files in the destination directory are <b>not</b> touched.
      *
@@ -42,4 +41,4 @@ public enum CopyMode {
      * Skip the copy if the destination file if it already exists.
      */
     IGNORE
- }
+}

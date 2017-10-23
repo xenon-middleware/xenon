@@ -49,17 +49,11 @@ import nl.esciencecenter.xenon.credentials.DefaultCredential;
 
 /**
  * FileSystem represent a (possibly remote) file system that can be used to access data.
- *
- * @version 1.0
- * @since 1.0
  */
-public abstract class FileSystem {
+public abstract class FileSystem implements AutoCloseable {
 
     /** The name of this component, for use in exceptions */
     private static final String COMPONENT_NAME = "FileSystem";
-
-    /** The default buffer size */
-    private static final int BUFFER_SIZE = 4 * 1024;
 
     private static final HashMap<String, FileAdaptor> adaptors = new LinkedHashMap<>();
 
@@ -219,6 +213,8 @@ public abstract class FileSystem {
      * Make sure to always close {@code FileSystem} instances by calling {@code close(FileSystem)} when you no longer need them, otherwise their associated
      * resources remain allocated.
      *
+     * @see <a href="../../../../overview-summary.html#filesystems">Documentation on the supported adaptors and locations.</a>
+     *
      * @param adaptor
      *            the type of file system to connect to (e.g. "sftp" or "webdav")
      * @param location
@@ -257,6 +253,8 @@ public abstract class FileSystem {
      * Make sure to always close {@code FileSystem} instances by calling {@code close(FileSystem)} when you no longer need them, otherwise their associated
      * resources remain allocated.
      *
+     * @see <a href="../../../../overview-summary.html#filesystems">Documentation on the supported adaptors and locations.</a>
+     *
      * @param adaptor
      *            the type of file system to connect to (e.g. "sftp" or "webdav")
      * @param location
@@ -292,6 +290,8 @@ public abstract class FileSystem {
      * Make sure to always close {@code FileSystem} instances by calling {@code close(FileSystem)} when you no longer need them, otherwise their associated
      * resources remain allocated.
      *
+     * @see <a href="../../../../overview-summary.html#filesystems">Documentation on the supported adaptors and locations.</a>
+     *
      * @param adaptor
      *            the type of file system to connect to (e.g. "sftp" or "webdav")
      * @param location
@@ -326,6 +326,8 @@ public abstract class FileSystem {
      *
      * Make sure to always close {@code FileSystem} instances by calling {@code close(FileSystem)} when you no longer need them, otherwise their associated
      * resources remain allocated.
+     *
+     * @see <a href="overview-summary.html#filesystems">Documentation on the supported adaptors and locations.</a>
      *
      * @param adaptor
      *            the type of file system to connect to (e.g. "sftp" or "webdav")
@@ -406,9 +408,11 @@ public abstract class FileSystem {
 
     private long nextCopyID = 0;
 
+    private int bufferSize;
+
     private final HashMap<String, PendingCopy> pendingCopies = new HashMap<>();
 
-    protected FileSystem(String uniqueID, String adaptor, String location, Path workDirectory, XenonProperties properties) {
+    protected FileSystem(String uniqueID, String adaptor, String location, Path workDirectory, int bufferSize, XenonProperties properties) {
 
         if (uniqueID == null) {
             throw new IllegalArgumentException("Identifier may not be null!");
@@ -426,11 +430,16 @@ public abstract class FileSystem {
             throw new IllegalArgumentException("EntryPath may not be null!");
         }
 
+        if (bufferSize <= 0) {
+            throw new IllegalArgumentException("Buffer size may not be 0 or smaller!");
+        }
+
         this.uniqueID = uniqueID;
         this.adaptor = adaptor;
         this.location = location;
         this.workingDirectory = workDirectory;
         this.properties = properties;
+        this.bufferSize = bufferSize;
 
         ThreadFactory f = r -> {
             Thread t = new Thread(r, "CopyThread-" + adaptor + "-" + uniqueID);
@@ -484,6 +493,17 @@ public abstract class FileSystem {
      */
     public Path getWorkingDirectory() {
         return workingDirectory;
+    }
+
+    /**
+     * Get the path separator used by this file system.
+     *
+     * The path separator is set when a FileSystem is created.
+     *
+     * @return the path separator used by this file system.
+     */
+    public String getPathSeparator() {
+        return "" + workingDirectory.getSeparator();
     }
 
     /**
@@ -594,12 +614,9 @@ public abstract class FileSystem {
 
         Path parent = absolute.getParent();
 
-        if (parent != null) {
-
-            if (!exists(parent)) {
-                // Recursive call
-                createDirectories(parent);
-            }
+        if (parent != null && !exists(parent)) {
+            // Recursive call
+            createDirectories(parent);
         }
 
         createDirectory(absolute);
@@ -698,13 +715,13 @@ public abstract class FileSystem {
      */
     public void delete(Path path, boolean recursive) throws XenonException {
 
-        path = toAbsolutePath(path);
+        Path absPath = toAbsolutePath(path);
 
-        assertPathExists(path);
+        assertPathExists(absPath);
 
-        if (getAttributes(path).isDirectory()) {
+        if (getAttributes(absPath).isDirectory()) {
 
-            Iterable<PathAttributes> itt = list(path, false);
+            Iterable<PathAttributes> itt = list(absPath, false);
 
             if (recursive) {
                 for (PathAttributes p : itt) {
@@ -712,13 +729,13 @@ public abstract class FileSystem {
                 }
             } else {
                 if (itt.iterator().hasNext()) {
-                    throw new DirectoryNotEmptyException(getAdaptorName(), "Directory not empty: " + path.toString());
+                    throw new DirectoryNotEmptyException(getAdaptorName(), "Directory not empty: " + absPath.toString());
                 }
             }
 
-            deleteDirectory(path);
+            deleteDirectory(absPath);
         } else {
-            deleteFile(path);
+            deleteFile(absPath);
         }
     }
 
@@ -1120,7 +1137,7 @@ public abstract class FileSystem {
         }
 
         try (InputStream in = readFromFile(source); OutputStream out = destinationFS.writeToFile(destination, attributes.getSize())) {
-            streamCopy(in, out, BUFFER_SIZE, callback);
+            streamCopy(in, out, bufferSize, callback);
         } catch (Exception e) {
             throw new XenonException(getAdaptorName(), "Stream copy failed", e);
         }
@@ -1154,7 +1171,8 @@ public abstract class FileSystem {
 
         PathAttributes attributes = getAttributes(source);
 
-        if (attributes.isRegular() || attributes.isSymbolicLink()) {
+        // if (attributes.isRegular() || attributes.isSymbolicLink()) {
+        if (attributes.isRegular()) {
             copyFile(source, destinationFS, destination, mode, callback);
             return;
         }
@@ -1172,12 +1190,33 @@ public abstract class FileSystem {
             throw new InvalidPathException(getAdaptorName(), "Source path is a directory: " + source);
         }
 
-        if (!destinationFS.exists(destination)) {
+        // From here on we know the source is a directory. We should also check the destination type.
+        if (destinationFS.exists(destination)) {
+
+            switch (mode) {
+            case CREATE:
+                throw new PathAlreadyExistsException(getAdaptorName(), "Destination path already exists: " + destination);
+            case IGNORE:
+                return;
+            case REPLACE:
+                // continue
+                break;
+            }
+
+            attributes = destinationFS.getAttributes(destination);
+
+            if (attributes.isRegular() || attributes.isSymbolicLink()) {
+                destinationFS.delete(destination, false);
+                destinationFS.createDirectory(destination);
+            } else if (!attributes.isDirectory()) {
+                throw new InvalidPathException(getAdaptorName(), "Existing destination is not a file, link or directory: " + source);
+            }
+        } else {
             destinationFS.createDirectory(destination);
         }
 
+        // We are now sure the target directory exists.
         copyRecursive(source, destinationFS, destination, mode, callback);
-
     }
 
     private void copyRecursive(Path source, FileSystem destinationFS, Path destination, CopyMode mode, CopyCallback callback) throws XenonException {
@@ -1229,8 +1268,6 @@ public abstract class FileSystem {
                 Path dst = destination.resolve(rel);
 
                 copyFile(p.getPath(), destinationFS, dst, mode, callback);
-                // bytesCopied += p.getSize();
-                // callback.setBytesCopied(bytesCopied);
             }
         }
     }
@@ -1342,15 +1379,10 @@ public abstract class FileSystem {
      *
      * @return a {@link String} that identifies this copy and be used to inspect its progress.
      *
-     * @throws NotConnectedException
-     *             If file system is closed.
-     * @throws XenonException
-     *             if an I/O error occurred.
      * @throws IllegalArgumentException
      *             If source, destinationFS, destination or mode is null.
      */
-    public synchronized String copy(final Path source, final FileSystem destinationFS, final Path destination, final CopyMode mode, final boolean recursive)
-            throws XenonException {
+    public synchronized String copy(final Path source, final FileSystem destinationFS, final Path destination, final CopyMode mode, final boolean recursive) {
 
         if (source == null) {
             throw new IllegalArgumentException("Source path is null");
@@ -1368,7 +1400,7 @@ public abstract class FileSystem {
             throw new IllegalArgumentException("Copy mode is null!");
         }
 
-        String ID = getNextCopyID();
+        String copyID = getNextCopyID();
 
         final CopyCallback callback = new CopyCallback();
 
@@ -1382,8 +1414,8 @@ public abstract class FileSystem {
             return null;
         });
 
-        pendingCopies.put(ID, new PendingCopy(future, callback));
-        return ID;
+        pendingCopies.put(copyID, new PendingCopy(future, callback));
+        return copyID;
     }
 
     /**

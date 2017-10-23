@@ -15,14 +15,14 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
-import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 public abstract class ScriptingSchedulerAdaptor extends SchedulerAdaptor {
 
-    protected ScriptingSchedulerAdaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) {
-        super(name, description, locations,
-                ScriptingUtils.mergeValidProperties(properties, SshSchedulerAdaptor.VALID_PROPERTIES, LocalSchedulerAdaptor.VALID_PROPERTIES));
+    protected ScriptingSchedulerAdaptor(String name, String description, String[] locations, XenonPropertyDescription[] properties) throws XenonException {
+        super(name, description, locations, ScriptingUtils.mergeValidProperties(properties, Scheduler.getAdaptorDescription("ssh").getSupportedProperties(),
+                Scheduler.getAdaptorDescription("local").getSupportedProperties()));
     }
 }

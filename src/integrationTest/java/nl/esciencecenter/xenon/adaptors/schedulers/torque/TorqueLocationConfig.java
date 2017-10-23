@@ -19,24 +19,7 @@ import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
 
 public class TorqueLocationConfig extends SchedulerLocationConfig {
 
-    private String location;
-
-    public TorqueLocationConfig(String location) {
-        this.location = location;
-    }
-
-    @Override
-    public String getLocation() {
-        return location;
-    }
-
-    @Override
-    public String[] getQueueNames() {
-        return new String[] { "debug", "batch" };
-    }
-
-    @Override
-    public String getDefaultQueueName() {
-        return null;
+    public TorqueLocationConfig(String location, String workdir) {
+        super(location, workdir, new String[] { "debug", "batch" }, null);
     }
 }

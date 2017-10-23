@@ -89,6 +89,7 @@ public final class InputWriter extends Thread {
     /**
      * Entry point for the Daemon thread.
      */
+    @Override
     public void run() {
         try {
             if (content != null) {

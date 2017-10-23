@@ -44,11 +44,11 @@ class BatchProcess implements Process {
     private StreamForwarder stdoutForwarder;
     private StreamForwarder stderrForwarder;
 
-    public BatchProcess(FileSystem filesystem, Path workingDirectory, JobDescription description, String jobIdentifier, InteractiveProcessFactory factory)
-            throws XenonException, IOException {
+    public BatchProcess(FileSystem filesystem, Path workingDirectory, JobDescription description, String jobIdentifier, InteractiveProcessFactory factory,
+            long startupTimeout) throws XenonException, IOException {
 
         // Retrieve the filesystem that goes with the scheduler.
-        Path workdir = processPath(filesystem, workingDirectory, description.getWorkingDirectory());
+        Path workdir = processPath(workingDirectory, description.getWorkingDirectory());
 
         if (!filesystem.exists(workdir)) {
             throw new IOException("Working directory " + workdir + " does not exist!");
@@ -58,7 +58,7 @@ class BatchProcess implements Process {
         Path stdin = null;
 
         if (description.getStdin() != null) {
-            stdin = processPath(filesystem, workdir, description.getStdin());
+            stdin = processPath(workdir, description.getStdin());
 
             if (!filesystem.exists(stdin)) {
                 throw new IOException("Stdin cannot be redirected from " + stdin + " (file does not exist!)");
@@ -68,7 +68,7 @@ class BatchProcess implements Process {
         OutputStream out = createOutputStream(filesystem, workdir, description.getStdout());
         OutputStream err = createOutputStream(filesystem, workdir, description.getStderr());
 
-        process = factory.createInteractiveProcess(description, jobIdentifier);
+        process = factory.createInteractiveProcess(description, jobIdentifier, startupTimeout);
         Streams streams = process.getStreams();
 
         stdoutForwarder = new StreamForwarder(streams.getStdout(), out);
@@ -82,7 +82,7 @@ class BatchProcess implements Process {
         }
     }
 
-    private Path processPath(FileSystem filesystem, Path root, String path) throws XenonException {
+    private Path processPath(Path root, String path) {
         Path result;
 
         if (path == null) {
@@ -102,7 +102,7 @@ class BatchProcess implements Process {
             return null;
         }
 
-        Path file = processPath(filesystem, workdir, filename);
+        Path file = processPath(workdir, filename);
 
         // Create the files for the output stream. Will fail if the files already exist!
         if (filesystem.exists(file)) {

@@ -15,28 +15,33 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
-import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.UnknownPropertyException;
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.adaptors.XenonProperties;
-import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
-import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
-import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
-import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
-import nl.esciencecenter.xenon.schedulers.JobDescription;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
+import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
+
 public class ScriptingUtils {
 
-    public static boolean isLocal(String location) {
-        return (location == null || location.length() == 0 || location.equals("/"));
+    private ScriptingUtils() {
+        throw new IllegalStateException("Utility class");
     }
 
-    public static XenonPropertyDescription [] mergeValidProperties(XenonPropertyDescription[] ... prop) {
+    public static boolean isLocal(String location) {
+        return (location == null || location.length() == 0 || location.startsWith("local://"));
+    }
+
+    public static boolean isSSH(String location) {
+        return (location != null && location.startsWith("ssh://"));
+    }
+
+    public static XenonPropertyDescription[] mergeValidProperties(XenonPropertyDescription[]... prop) {
 
         if (prop == null || prop.length == 0) {
             return new XenonPropertyDescription[0];
@@ -44,7 +49,7 @@ public class ScriptingUtils {
 
         ArrayList<XenonPropertyDescription> tmp = new ArrayList<>();
 
-        for (XenonPropertyDescription [] pa : prop) {
+        for (XenonPropertyDescription[] pa : prop) {
             if (pa != null) {
                 tmp.addAll(Arrays.asList(pa));
             }
@@ -53,17 +58,13 @@ public class ScriptingUtils {
         return tmp.toArray(new XenonPropertyDescription[tmp.size()]);
     }
 
-//    public static XenonPropertyDescription [] mergeValidProperties(XenonPropertyDescription[] a, XenonPropertyDescription[] b) {
-//        XenonPropertyDescription [] result = Arrays.copyOf(a, a.length + b.length);
-//        System.arraycopy(b, 0, result, a.length, b.length);
-//        return result;
-//    }
+    public static XenonProperties getProperties(XenonPropertyDescription[] validProperties, String location, Map<String, String> properties)
+            throws XenonException {
 
-    public static XenonProperties getProperties(XenonPropertyDescription[] validProperties, String location, Map<String,String> properties) throws UnknownPropertyException, InvalidPropertyException {
         if (isLocal(location)) {
-            return new XenonProperties(mergeValidProperties(validProperties, LocalSchedulerAdaptor.VALID_PROPERTIES), properties);
+            return new XenonProperties(mergeValidProperties(validProperties, Scheduler.getAdaptorDescription("local").getSupportedProperties()), properties);
         } else {
-            return new XenonProperties(mergeValidProperties(validProperties, SshSchedulerAdaptor.VALID_PROPERTIES), properties);
+            return new XenonProperties(mergeValidProperties(validProperties, Scheduler.getAdaptorDescription("ssh").getSupportedProperties()), properties);
         }
     }
 
@@ -98,17 +99,16 @@ public class ScriptingUtils {
             throw new InvalidJobDescriptionException(adaptorName, "Illegal processes per node count: " + processesPerNode);
         }
 
-        int maxTime = description.getMaxTime();
+        int maxTime = description.getMaxRuntime();
 
         if (maxTime <= 0) {
             throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);
         }
     }
 
-    public static void verifyJobOptions(Map<String, String> options, String[] validOptions, String adaptorName)
-            throws InvalidJobDescriptionException {
+    public static void verifyJobOptions(Map<String, String> options, String[] validOptions, String adaptorName) throws InvalidJobDescriptionException {
 
-        //check if all given job options are valid
+        // check if all given job options are valid
         for (String option : options.keySet()) {
             boolean found = false;
             for (String validOption : validOptions) {
@@ -126,7 +126,9 @@ public class ScriptingUtils {
      * Check if the info map for a job exists, contains the expected job ID, and contains the given additional fields
      *
      * @param jobInfo
-     *            the map the job info should be .
+     *            the info map to check.
+     * @param jobIdentifier
+     *            the unique identifier of the job.
      * @param adaptorName
      *            name of the current adaptor for error reporting.
      * @param jobIDField
@@ -136,10 +138,10 @@ public class ScriptingUtils {
      * @throws XenonException
      *             if any fields are missing or incorrect
      */
-    public static void verifyJobInfo(Map<String, String> jobInfo, String jobIdentifier, String adaptorName, String jobIDField,
-            String... additionalFields) throws XenonException {
+    public static void verifyJobInfo(Map<String, String> jobInfo, String jobIdentifier, String adaptorName, String jobIDField, String... additionalFields)
+            throws XenonException {
         if (jobInfo == null) {
-            //redundant check, calling functions usually already check for this and return null.
+            // redundant check, calling functions usually already check for this and return null.
             throw new XenonException(adaptorName, "Job " + jobIdentifier + " not found in job info");
         }
 
@@ -159,7 +161,5 @@ public class ScriptingUtils {
             }
         }
     }
-
-
 
 }

@@ -27,10 +27,6 @@ import java.util.Map;
 
 import org.junit.Test;
 
-
-/**
- *
- */
 public class JobDescriptionTest {
 
     @Test
@@ -46,8 +42,6 @@ public class JobDescriptionTest {
         JobDescription jd2 = new JobDescription(jd);
         assertEquals("aap", jd2.getExecutable());
     }
-
-    // TODO: split into seperate test
 
     @Test
     public void test_setters_getters() throws Exception {
@@ -85,8 +79,8 @@ public class JobDescriptionTest {
         p = j.getNodeCount();
         assertTrue(p == 33);
 
-        j.setMaxTime(500);
-        p = j.getMaxTime();
+        j.setMaxRuntime(500);
+        p = j.getMaxRuntime();
         assertTrue(p == 500);
 
         j.setArguments("a", "b", "c");
@@ -172,21 +166,21 @@ public class JobDescriptionTest {
         result = prime * result + new ArrayList<String>(0).hashCode();
         result = prime * result + new HashMap<String, String>(0).hashCode();
         result = prime * result + new HashMap<String, String>(0).hashCode();
-        //noinspection PointlessArithmeticExpression
+        // noinspection PointlessArithmeticExpression
         result = prime * result + 0;
         result = prime * result + 15;
         result = prime * result + 1;
         result = prime * result + 1;
-        //noinspection PointlessArithmeticExpression
+        // noinspection PointlessArithmeticExpression
         result = prime * result + 0;
         result = prime * result + 1237;
-        //noinspection PointlessArithmeticExpression
+        // noinspection PointlessArithmeticExpression
         result = prime * result + 0;
-        //noinspection PointlessArithmeticExpression
+        // noinspection PointlessArithmeticExpression
         result = prime * result + 0;
-        //noinspection PointlessArithmeticExpression
+        // noinspection PointlessArithmeticExpression
         result = prime * result + 0;
-        //noinspection PointlessArithmeticExpression
+        // noinspection PointlessArithmeticExpression
         result = prime * result + 0;
 
         assertEquals(result, hash);
@@ -231,10 +225,10 @@ public class JobDescriptionTest {
         result = prime * result + 1;
         result = prime * result + "noot".hashCode();
         result = prime * result + 1231;
-        //noinspection PointlessArithmeticExpression
+        // noinspection PointlessArithmeticExpression
         result = prime * result + 0;
         result = prime * result + "stdin".hashCode();
-        //noinspection PointlessArithmeticExpression
+        // noinspection PointlessArithmeticExpression
         result = prime * result + 0;
         result = prime * result + "aap".hashCode();
 
@@ -280,16 +274,15 @@ public class JobDescriptionTest {
         result = prime * result + 1;
         result = prime * result + "noot".hashCode();
         result = prime * result + 1231;
-        //noinspection PointlessArithmeticExpression
+        // noinspection PointlessArithmeticExpression
         result = prime * result + "stderr".hashCode();
         result = prime * result + "stdin".hashCode();
-        //noinspection PointlessArithmeticExpression
+        // noinspection PointlessArithmeticExpression
         result = prime * result + "stdout".hashCode();
         result = prime * result + "aap".hashCode();
 
         assertEquals(result, hash);
     }
-
 
     @Test
     public void test_equals() throws Exception {
@@ -303,9 +296,9 @@ public class JobDescriptionTest {
         JobDescription other = new JobDescription();
         assertTrue(j.equals(other));
 
-        other.setMaxTime(42);
+        other.setMaxRuntime(42);
         assertFalse(j.equals(other));
-        other.setMaxTime(15);
+        other.setMaxRuntime(15);
         assertTrue(j.equals(other));
 
         other.setNodeCount(2);
@@ -409,8 +402,6 @@ public class JobDescriptionTest {
         j.setJobOptions(opt);
 
         String tmp = j.toString();
-
-        System.out.println(tmp);
 
         assertEquals(expected, tmp);
     }

@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
+import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.ADAPTOR_NAME;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -22,6 +24,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
@@ -58,39 +61,48 @@ public abstract class ScriptingScheduler extends Scheduler {
         this.pollDelay = properties.getLongProperty(pollDelayProperty);
 
         String subSchedulerAdaptor;
-        String subFileSystemAdaptor;
+        // String subFileSystemAdaptor;
         String subLocation;
         Map<String, String> subSchedulerProperties;
 
         if (ScriptingUtils.isLocal(location)) {
             subSchedulerAdaptor = "local";
-            subFileSystemAdaptor = "file";
-            subLocation = "";
+            // subFileSystemAdaptor = "file";
+
+            if (location.startsWith("local://")) {
+                subLocation = location.substring("local://".length());
+            } else {
+                subLocation = "";
+            }
             subSchedulerProperties = properties.filter(LocalSchedulerAdaptor.PREFIX).toMap();
-        } else {
+        } else if (ScriptingUtils.isSSH(location)) {
             subSchedulerAdaptor = "ssh";
-            subFileSystemAdaptor = "sftp";
-            subLocation = location;
+            // subFileSystemAdaptor = "sftp";
+            subLocation = location.substring("ssh://".length());
             subSchedulerProperties = properties.filter(SshSchedulerAdaptor.PREFIX).toMap();
 
             // since we expect commands to be done almost instantaneously, we
             // poll quite frequently (local operation anyway)
             subSchedulerProperties.put(SshSchedulerAdaptor.POLLING_DELAY, "100");
+        } else {
+            throw new InvalidLocationException(getAdaptorName(), "Invalid location: " + location);
         }
 
         LOGGER.debug("creating sub scheduler for {} adaptor at {}://{}", adaptor, subSchedulerAdaptor, subLocation);
 
         subScheduler = Scheduler.create(subSchedulerAdaptor, subLocation, credential, subSchedulerProperties);
 
-        LOGGER.debug("creating file system for {} adaptor at {}://{}", adaptor, subFileSystemAdaptor, subLocation);
-        subFileSystem = FileSystem.create(subFileSystemAdaptor, subLocation, credential, null);
+        // LOGGER.debug("creating file system for {} adaptor at {}://{}", adaptor, subFileSystemAdaptor, subLocation);
+        subFileSystem = subScheduler.getFileSystem();
+
+        // FileSystem.create(subFileSystemAdaptor, subLocation, credential, null);
     }
 
     protected Path getWorkingDirectory() {
         return subFileSystem.getWorkingDirectory();
     }
 
-    protected QueueStatus[] getQueueStatusses(Map<String, Map<String, String>> all, String... queueNames) {
+    protected QueueStatus[] getQueueStatuses(Map<String, Map<String, String>> all, String... queueNames) {
 
         QueueStatus[] result = new QueueStatus[queueNames.length];
 
@@ -102,7 +114,7 @@ public abstract class ScriptingScheduler extends Scheduler {
                 Map<String, String> map = all.get(queueNames[i]);
 
                 if (map == null) {
-                    Exception exception = new NoSuchQueueException(getAdaptorName(),
+                    XenonException exception = new NoSuchQueueException(getAdaptorName(),
                             "Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
                     result[i] = new QueueStatusImplementation(this, queueNames[i], exception, null);
                 } else {
@@ -231,6 +243,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      * @throws XenonException
      *             if an error occurs
      */
+    @Override
     public JobStatus waitUntilDone(String jobIdentifier, long timeout) throws XenonException {
 
         assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
@@ -267,6 +280,7 @@ public abstract class ScriptingScheduler extends Scheduler {
      * @throws XenonException
      *             if an error occurs
      */
+    @Override
     public JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException {
 
         assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
@@ -286,6 +300,34 @@ public abstract class ScriptingScheduler extends Scheduler {
         }
 
         return status;
+    }
+
+    /**
+     * Check if the given <code>queueName</code> is presents in <code>queueNames</code>.
+     *
+     * If <code>queueName</code> is <code>null</code> or <code>queueName</code> is present in <code>queueNames</code> this method will return. Otherwise it will
+     * throw a <code>NoSuchQueueException</code>.
+     *
+     * @param queueNames
+     *            the valid queue names.
+     * @param queueName
+     *            the queueName to check.
+     * @throws NoSuchQueueException
+     *             if workingDirectory does not exist, or an error occurred.
+     */
+
+    protected void checkQueue(String[] queueNames, String queueName) throws NoSuchQueueException {
+        if (queueName == null) {
+            return;
+        }
+
+        for (String q : queueNames) {
+            if (queueName.equals(q)) {
+                return;
+            }
+        }
+
+        throw new NoSuchQueueException(ADAPTOR_NAME, "Queue does not exist: " + queueName);
     }
 
     /**
@@ -314,8 +356,18 @@ public abstract class ScriptingScheduler extends Scheduler {
         }
     }
 
+    @Override
+    public boolean isOpen() throws XenonException {
+        return subScheduler.isOpen() && subFileSystem.isOpen();
+    }
+
+    @Override
     public void close() throws XenonException {
         subScheduler.close();
         subFileSystem.close();
+    }
+
+    public FileSystem getFileSystem() throws XenonException {
+        return subFileSystem;
     }
 }

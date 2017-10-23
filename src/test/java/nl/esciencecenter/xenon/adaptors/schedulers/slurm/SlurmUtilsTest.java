@@ -107,7 +107,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -128,7 +128,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertTrue(result.isRunning());
         assertFalse(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -150,7 +150,7 @@ public class SlurmUtilsTest {
         assertTrue(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -171,7 +171,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -194,7 +194,7 @@ public class SlurmUtilsTest {
         assertFalse(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -235,7 +235,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -255,7 +255,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertTrue(result.isRunning());
         assertFalse(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -276,7 +276,7 @@ public class SlurmUtilsTest {
         assertTrue(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -296,7 +296,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -318,7 +318,7 @@ public class SlurmUtilsTest {
         assertFalse(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -340,7 +340,7 @@ public class SlurmUtilsTest {
         assertFalse(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -378,7 +378,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertFalse(result.isRunning());
         assertFalse(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -398,7 +398,7 @@ public class SlurmUtilsTest {
         assertFalse(result.hasException());
         assertTrue(result.isRunning());
         assertFalse(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
+        assertEquals(jobInfo, result.getSchedulerSpecificInformation());
     }
 
     @Test
@@ -441,7 +441,7 @@ public class SlurmUtilsTest {
 
         assertNotNull(result);
         assertEquals(queueName, result.getQueueName());
-        assertEquals(queueInfo, result.getSchedulerSpecficInformation());
+        assertEquals(queueInfo, result.getSchedulerSpecificInformation());
         assertEquals(scheduler, result.getScheduler());
     }
 
@@ -489,7 +489,7 @@ public class SlurmUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //slurm specific info
         SlurmUtils.verifyJobDescription(description, false);
     }
@@ -502,7 +502,7 @@ public class SlurmUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //slurm specific info
         description.addJobOption(SlurmUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
 
@@ -520,7 +520,7 @@ public class SlurmUtilsTest {
         description.setExecutable(null);
         description.setNodeCount(0);
         description.setProcessesPerNode(0);
-        description.setMaxTime(0);
+        description.setMaxRuntime(0);
 
         SlurmUtils.verifyJobDescription(description, false);
     }
@@ -550,7 +550,7 @@ public class SlurmUtilsTest {
 
         //verify the standard settings are also checked
         description.setExecutable("bin/bla");
-        description.setMaxTime(0);
+        description.setMaxRuntime(0);
 
         SlurmUtils.verifyJobDescription(description, false);
     }
@@ -563,7 +563,7 @@ public class SlurmUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //slurm specific info
         description.addJobOption(SlurmUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
 
@@ -578,7 +578,7 @@ public class SlurmUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //slurm specific info
         description.setStartSingleProcess(true);
 
@@ -593,7 +593,7 @@ public class SlurmUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //slurm specific info
         description.setStdin("stdin.txt");
 
@@ -608,7 +608,7 @@ public class SlurmUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //slurm specific info
         description.setStdout("stdout.txt");
 
@@ -623,7 +623,7 @@ public class SlurmUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //slurm specific info
         description.setStderr("stderr.txt");
 
@@ -638,7 +638,7 @@ public class SlurmUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //slurm specific info
         description.setStdout("foobar.txt");
 
@@ -653,7 +653,7 @@ public class SlurmUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //slurm specific info
         description.setStderr("foobar.txt");
 
@@ -668,7 +668,7 @@ public class SlurmUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
-        description.setMaxTime(1);
+        description.setMaxRuntime(1);
         //slurm specific info
 
         HashMap<String, String> env = new HashMap<>();
@@ -858,11 +858,5 @@ public class SlurmUtilsTest {
 
         assertEquals("AAP,NOOT", result);
     }
-
-    @Test
-    public void test_forCoverage() {
-        new SlurmUtils();
-    }
-
 
 }

@@ -90,21 +90,24 @@ final class GridEngineUtils {
     }
 
     protected static void generateParallelScriptContent(JobDescription description, Formatter script) {
-        script.format("for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n");
+        script.format("%s\n", "for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do");
 
         for (int i = 0; i < description.getProcessesPerNode(); i++) {
-            script.format("  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && ");
+            script.format("%s", "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && ");
             script.format("%s", description.getExecutable());
             for (String argument : description.getArguments()) {
                 script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
             }
-            script.format("\"&\n");
+            script.format("%c&\n",'"');
         }
         //wait for all ssh connections to finish
-        script.format("done\n\n");
-        script.format("wait\n");
-        script.format("exit 0\n");
-        script.format("\n");
+        script.format("%s\n\n", "done");
+        script.format("%s\n", "wait");
+        script.format("%s\n\n", "exit 0");
+    }
+
+    private GridEngineUtils() {
+        throw new IllegalStateException("Utility class");
     }
 
     @SuppressWarnings("PMD.NPathComplexity")
@@ -114,13 +117,13 @@ final class GridEngineUtils {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
-        script.format("#!/bin/sh\n");
+        script.format("%s\n", "#!/bin/sh");
 
         //set shell to sh
-        script.format("#$ -S /bin/sh\n");
+        script.format("%s\n", "#$ -S /bin/sh");
 
         //set name of job to xenon
-        script.format("#$ -N xenon\n");
+        script.format("%s\n", "#$ -N xenon");
 
         //set working directory
         if (description.getWorkingDirectory() != null) {
@@ -143,7 +146,7 @@ final class GridEngineUtils {
         }
 
         //add maximum runtime in hour:minute:second format (converted from minutes in description)
-        script.format("#$ -l h_rt=%02d:%02d:00\n", description.getMaxTime() / MINUTES_PER_HOUR, description.getMaxTime()
+        script.format("#$ -l h_rt=%02d:%02d:00\n", description.getMaxRuntime() / MINUTES_PER_HOUR, description.getMaxRuntime()
                 % MINUTES_PER_HOUR);
 
         String resources = description.getJobOptions().get(JOB_OPTION_RESOURCES);
@@ -182,7 +185,7 @@ final class GridEngineUtils {
 
         script.close();
 
-        LOGGER.debug("Created job script:\n{}", stringBuilder);
+        LOGGER.debug("Created job script:%n{}", stringBuilder);
 
         return stringBuilder.toString();
     }
@@ -219,7 +222,7 @@ final class GridEngineUtils {
     @SuppressWarnings("PMD.EmptyIfStmt")
     protected static JobStatus getJobStatusFromQacctInfo(Map<String, String> info, String jobIdentifier) throws XenonException {
         Integer exitcode;
-        Exception exception = null;
+        XenonException exception = null;
         String state = "done";
 
         if (info == null) {
@@ -263,7 +266,7 @@ final class GridEngineUtils {
         String longState = jobInfo.get("long_state");
         String stateCode = jobInfo.get("state");
 
-        Exception exception = null;
+        XenonException exception = null;
         if (stateCode.contains("E")) {
             exception = new XenonException(ADAPTOR_NAME, "Job reports error state: " + stateCode);
             done = true;

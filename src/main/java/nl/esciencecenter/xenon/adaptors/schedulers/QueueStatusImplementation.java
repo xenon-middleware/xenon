@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
 
 import java.util.Map;
 
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.schedulers.QueueStatus;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 
@@ -27,7 +28,7 @@ public class QueueStatusImplementation implements QueueStatus {
 
     private final Scheduler scheduler;
     private final String queueName;
-    private final Exception exception;
+    private final XenonException exception;
     private final Map<String, String> schedulerSpecificInformation;
 
     /**
@@ -42,7 +43,7 @@ public class QueueStatusImplementation implements QueueStatus {
      * @param schedulerSpecificInformation
      * 		scheduler implementation specific information on the status of the queue.
      */
-    public QueueStatusImplementation(Scheduler scheduler, String queueName, Exception exception,
+    public QueueStatusImplementation(Scheduler scheduler, String queueName, XenonException exception,
             Map<String, String> schedulerSpecificInformation) {
 
         if (scheduler == null) {
@@ -91,8 +92,15 @@ public class QueueStatusImplementation implements QueueStatus {
      *
      * @return the exception.
      */
-    public Exception getException() {
+    public XenonException getException() {
         return exception;
+    }
+
+    @Override
+    public void maybeThrowException() throws XenonException {
+        if (hasException()) {
+            throw getException();
+        }
     }
 
     /**
@@ -100,7 +108,7 @@ public class QueueStatusImplementation implements QueueStatus {
      *
      * @return Scheduler specific information on the queue.
      */
-    public Map<String, String> getSchedulerSpecficInformation() {
+    public Map<String, String> getSchedulerSpecificInformation() {
         return schedulerSpecificInformation;
     }
 

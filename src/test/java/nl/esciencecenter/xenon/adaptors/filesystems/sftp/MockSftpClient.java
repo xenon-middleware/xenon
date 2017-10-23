@@ -183,13 +183,13 @@ public class MockSftpClient implements SftpClient {
 
     @Override
     public <E extends SftpClientExtension> E getExtension(Class<? extends E> extensionType) {
-        // TODO Auto-generated method stub
+
         return null;
     }
 
     @Override
     public SftpClientExtension getExtension(String extensionName) {
-        // TODO Auto-generated method stub
+
         return null;
     }
 

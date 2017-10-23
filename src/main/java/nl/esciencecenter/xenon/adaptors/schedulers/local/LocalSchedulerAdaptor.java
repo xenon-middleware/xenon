@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors.schedulers.local;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.InvalidCredentialException;
-import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
@@ -29,7 +28,6 @@ import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
-import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 
 /**
  * LocalFiles implements an Xenon <code>Jobs</code> adaptor for local job operations.
@@ -48,7 +46,7 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
     public static final String PREFIX = SchedulerAdaptor.ADAPTORS_PREFIX + "local.";
 
     /** Description of the adaptor */
-    public static final String ADAPTOR_DESCRIPTION = "The local jobs adaptor implements all functionality " + " by emulating a local queue.";
+    public static final String ADAPTOR_DESCRIPTION = "The local jobs adaptor implements all functionality by emulating a local queue.";
 
     /** Local queue properties start with this prefix. */
     public static final String QUEUE = PREFIX + "queue.";
@@ -62,9 +60,7 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
     /** Local multi queue properties start with this prefix. */
     public static final String MULTIQ = QUEUE + "multi.";
 
-    /**
-     * Property for the maximum number of concurrent jobs in the multi queue.
-     */
+    /** Property for the maximum number of concurrent jobs in the multi queue. */
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
     /** Local queue information start with this prefix. */
@@ -77,10 +73,10 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
     public static final String SUBMITTED = JOBS + "submitted";
 
     /** The locations supported by the adaptor */
-    public static final String[] ADAPTOR_LOCATIONS = new String[] { "(null)", "(empty string)", "local://" };
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "[/workdir]" };
 
     /** The properties supported by this adaptor */
-    public static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+    private static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
             new XenonPropertyDescription(POLLING_DELAY, Type.LONG, "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
             new XenonPropertyDescription(MULTIQ_MAX_CONCURRENT, Type.INTEGER, "4", "The maximum number of concurrent jobs in the multiq.") };
 
@@ -100,29 +96,8 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
         return true;
     }
 
-    /**
-     * Check if a location string is valid for the local scheduler.
-     *
-     * The only valid options are null, "" or "local://".
-     *
-     * @param location
-     *            the location to check.
-     * @throws InvalidLocationException
-     *             if the location is invalid.
-     */
-    private static void checkLocation(String location) throws InvalidLocationException {
-        if (location == null || location.isEmpty() || location.equals("local://")) {
-            return;
-        }
-
-        throw new InvalidLocationException(ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
-    }
-
     @Override
     public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) throws XenonException {
-
-        // Location should be: null, empty, or local://
-        checkLocation(location);
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
@@ -130,19 +105,13 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
             throw new InvalidCredentialException(ADAPTOR_NAME, "Local scheduler does not support this credential!");
         }
 
-        String filesystemlocation = "/";
-
-        if (LocalFileSystemUtils.isWindows()) {
-            filesystemlocation = "C:";
-        }
-
-        FileSystem filesystem = FileSystem.create("file", filesystemlocation, credential, properties);
+        FileSystem filesystem = FileSystem.create("file", location, credential, properties);
 
         int processors = Runtime.getRuntime().availableProcessors();
         int multiQThreads = xp.getIntegerProperty(MULTIQ_MAX_CONCURRENT, processors);
         long pollingDelay = xp.getLongProperty(POLLING_DELAY);
 
-        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, "local://", new LocalInteractiveProcessFactory(), filesystem,
-                filesystem.getWorkingDirectory(), multiQThreads, pollingDelay, xp);
+        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, location == null ? "" : location, new LocalInteractiveProcessFactory(), filesystem,
+                filesystem.getWorkingDirectory(), multiQThreads, pollingDelay, 0L, xp);
     }
 }

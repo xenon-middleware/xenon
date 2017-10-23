@@ -1,9 +1,9 @@
 version: '{branch}-{build}'
 build_script:
-  - cmd: ./gradlew.bat assemble
+  - cmd: ./gradlew.bat clean assemble
 test_script:
   - mkdir build\integrationTest & cd build\integrationTest & ..\..\src\liveTest\resources\scripts\create_symlinks.bat & cd ..\..
-  - cmd: gradlew.bat liveTest -Dxenon.scheduler=local -Dxenon.filesystem=file -Dxenon.filesystem.location=%HomeDrive% -Dxenon.username=%USERNAME% -Dxenon.basedir=projects/xenon/build/integrationTest -Dxenon.separator=\ -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
+  - cmd: gradlew.bat test liveTest -Dxenon.scheduler=local -Dxenon.scheduler.location=%HomeDrive%\projects\xenon -Dxenon.filesystem=file -Dxenon.filesystem.location=%HomeDrive%\projects\xenon -Dxenon.username=%USERNAME% -Dxenon.filesystem.basedir=\projects\xenon\build\integrationTest -Dxenon.separator=\ -Dxenon.filesystem.expected.workdir=\projects\xenon -Dxenon.scheduler.workdir=\projects\xenon -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
 on_finish:
   - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
   - "SET JDK=oraclejdk8"
@@ -24,3 +24,6 @@ on_finish:
 artifacts:
   - path: build/distributions/*.zip
     name: Java archive
+
+
+

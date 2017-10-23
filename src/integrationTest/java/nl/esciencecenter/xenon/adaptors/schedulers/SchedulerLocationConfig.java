@@ -17,18 +17,41 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
 
 public abstract class SchedulerLocationConfig {
 
-    public abstract String getLocation();
+    protected String location;
+    protected String workdir;
 
-    public abstract String [] getQueueNames();
+    protected String[] queueNames;
+    protected String defaultQueue;
 
-    public abstract String getDefaultQueueName();
+    public SchedulerLocationConfig(String location, String workdir, String[] queueNames, String defaultQueue) {
+        this.location = location;
+        this.workdir = workdir;
+        this.queueNames = queueNames;
+        this.defaultQueue = defaultQueue;
+    }
+
+    public String getWorkdir() {
+        return workdir;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String[] getQueueNames() {
+        return queueNames;
+    }
+
+    public String getDefaultQueueName() {
+        return defaultQueue;
+    }
 
     public long getMaxWaitUntilRunning() {
-        return 10*1000;
+        return 10 * 1000;
     }
 
     public long getMaxWaintUntilDone() {
-        return 60*1000;
+        return 60 * 1000;
     }
 
     public boolean supportsBatch() {
@@ -43,5 +66,5 @@ public abstract class SchedulerLocationConfig {
         return false;
     }
 
-    //public abstract Map.Entry<Path,Path> getSymbolicLinksToExistingFile();
+    // public abstract Map.Entry<Path,Path> getSymbolicLinksToExistingFile();
 }

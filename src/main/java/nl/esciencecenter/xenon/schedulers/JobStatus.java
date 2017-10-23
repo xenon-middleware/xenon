@@ -17,6 +17,9 @@ package nl.esciencecenter.xenon.schedulers;
 
 import java.util.Map;
 
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+
 /**
  * JobStatus contains status information for a specific job.
  */
@@ -44,12 +47,27 @@ public interface JobStatus {
     Integer getExitCode();
 
     /**
-     * Get the exception produced by the Job or while retrieving the status. If a job was canceled, will return a
-     * JobCanceledException.
+     * Get the exception produced by the Job or while retrieving the status. If no exception occurred, <code>null</code> will be returned.
+     *
+     * See {@link #maybeThrowException()} for the possible exceptions.
+     *
      *
      * @return the exception.
      */
-    Exception getException();
+    XenonException getException();
+
+    /**
+     * Throws the exception produced by the Job or while retrieving the status, if it exists. Otherwise continue.
+     *
+     * @throws JobCanceledException
+     *          if the job was cancelled
+     * @throws NoSuchJobException
+     *          if the job of which the status was requested does not exist
+     * @throws XenonException
+     *          if an I/O error occurred.
+     */
+    void maybeThrowException() throws XenonException;
+
 
     /**
      * Is the Job running.
@@ -77,5 +95,5 @@ public interface JobStatus {
      *
      * @return scheduler specific information on the Job.
      */
-    public Map<String, String> getSchedulerSpecficInformation();
+    public Map<String, String> getSchedulerSpecificInformation();
 }

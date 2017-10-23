@@ -38,7 +38,9 @@ public interface CopyStatus {
     String getState();
 
     /**
-     * Get the exception produced by the Copy or while retrieving the status.
+     * Get the exception produced by the Copy or while retrieving the status. If there was no exception,  <code>null</code> will be returned.
+     *
+     * See {@link #maybeThrowException()} for the possible exceptions.
      *
      * @return the exception.
      */

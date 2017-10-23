@@ -33,20 +33,18 @@ public class LiveLocationConfig extends LocationConfig {
 
     // TODO the paths should be relative to the filesystem.getEntryPath()
     private Path createPath(String... path) {
-        String baseDir = System.getProperty("xenon.basedir");
+        String baseDir = System.getProperty("xenon.filesystem.basedir");
         char sep = Path.DEFAULT_SEPARATOR;
+
         if (System.getProperty("xenon.separator") != null) {
             sep = System.getProperty("xenon.separator").charAt(0);
         }
-        System.out.println(baseDir);
+
         if (baseDir == null) {
-            return fileSystem.getWorkingDirectory().resolve(new Path(sep, path));
+            return fileSystem.getWorkingDirectory().resolve(new Path(sep, false, path));
         }
-        Path p = new Path(sep, baseDir).resolve(new Path(sep, path));
-        System.out.println(p);
-        return p;
-        // return fileSystem.getEntryPath().resolve(new
-        // Path(baseDir).resolve(new Path(path)));
+
+        return new Path(sep, baseDir).resolve(new Path(sep, false, path));
     }
 
     @Override
@@ -61,7 +59,7 @@ public class LiveLocationConfig extends LocationConfig {
 
     @Override
     public Path getWritableTestDir() {
-        String baseDir = System.getProperty("xenon.basedir");
+        String baseDir = System.getProperty("xenon.filesystem.basedir");
         if (baseDir == null) {
             return fileSystem.getWorkingDirectory();
         }
@@ -74,11 +72,17 @@ public class LiveLocationConfig extends LocationConfig {
 
     @Override
     public Path getExpectedWorkingDirectory() {
-        String baseDir = getLocalRootlessPath(System.getProperty("user.dir"));
+
+        String baseDir = System.getProperty("xenon.filesystem.expected.workdir");
 
         if (baseDir == null) {
-            throw new RuntimeException("User dir property not set so current working directory not known!");
+            baseDir = getLocalRootlessPath(System.getProperty("user.dir"));
         }
+
+        if (baseDir == null) {
+            throw new RuntimeException("Workdir and user dir property not set. Current working directory not known!");
+        }
+
         char sep = Path.DEFAULT_SEPARATOR;
         if (System.getProperty("xenon.separator") != null) {
             sep = System.getProperty("xenon.separator").charAt(0);

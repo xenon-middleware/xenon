@@ -31,18 +31,15 @@ import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 
-
 public class SshSchedulerDockerTest extends SshSchedulerTestParent {
 
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder()
-        .file("src/integrationTest/resources/docker-compose/openssh.yml")
-        .waitingForService("ssh", HealthChecks.toHaveAllPortsOpen())
-        .build();
+    public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/openssh.yml")
+            .waitingForService("ssh", HealthChecks.toHaveAllPortsOpen()).build();
 
     @Override
     protected SchedulerLocationConfig setupLocationConfig() {
-        return new SshLocationConfig(docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT"));
+        return new SshLocationConfig(docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT"), "/home/xenon");
     }
 
     @Override
@@ -54,8 +51,5 @@ public class SshSchedulerDockerTest extends SshSchedulerTestParent {
         props.put(LOAD_STANDARD_KNOWN_HOSTS, "false");
         return Scheduler.create("ssh", location, cred, props);
     }
-
-
-
 
 }

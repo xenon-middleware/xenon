@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.adaptors.filesystems.ftp;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.Map;
 
@@ -26,13 +27,16 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.Path;
 
 public class FtpFileAdaptor extends FileAdaptor {
@@ -48,14 +52,18 @@ public class FtpFileAdaptor extends FileAdaptor {
     /** A description of this adaptor */
     private static final String ADAPTOR_DESCRIPTION = "The FTP adaptor implements file access on remote ftp servers.";
 
-    /** The locations supported by this adaptor */
-    private static final String[] ADAPTOR_LOCATIONS = new String[] { "ftp://host[:port]" };
-
     /** All our own properties start with this prefix. */
-    public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + "ftp.";
+    public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + ADAPTOR_NAME + ".";
+
+    /** The buffer size to use when copying data. */
+    public static final String BUFFER_SIZE = PREFIX + "bufferSize";
+
+    /** The locations supported by this adaptor */
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "host[:port][/workdir]" };
 
     /** List of properties supported by this FTP adaptor */
-    protected static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[0];
+    private static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+            new XenonPropertyDescription(BUFFER_SIZE, Type.SIZE, "64K", "The buffer size to use when copying files (in bytes).") };
 
     public FtpFileAdaptor() {
         super(ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_LOCATIONS, VALID_PROPERTIES);
@@ -66,12 +74,10 @@ public class FtpFileAdaptor extends FileAdaptor {
         URI uri;
 
         try {
-            uri = new URI(location);
+            uri = new URI("ftp://" + location);
         } catch (Exception e) {
             throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
         }
-
-        // FtpLocation ftpLocation = FtpLocation.parse(location);
 
         FTPClient ftpClient = new FTPClient();
         ftpClient.setListHiddenFiles(true);
@@ -105,23 +111,50 @@ public class FtpFileAdaptor extends FileAdaptor {
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
+        long bufferSize = xp.getSizeProperty(BUFFER_SIZE);
+
+        if (bufferSize <= 0 || bufferSize >= Integer.MAX_VALUE) {
+            throw new InvalidPropertyException(ADAPTOR_NAME,
+                    "Invalid value for " + BUFFER_SIZE + ": " + bufferSize + " (must be between 1 and " + Integer.MAX_VALUE + ")");
+        }
+
         FTPClient ftpClient = connect(location, credential);
 
-        ftpClient.enterLocalPassiveMode();
+        String cwd = null;
 
-        String cwd = getCurrentWorkingDirectory(ftpClient);
+        try {
+            cwd = getCurrentWorkingDirectory(ftpClient, location);
+        } catch (Exception e) {
+            try {
+                ftpClient.disconnect();
+            } catch (Exception ex) {
+                // ignored
+            }
+            throw e;
+        }
 
-        return new FtpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), ftpClient, credential, this, xp);
+        return new FtpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), (int) bufferSize, ftpClient, credential, this, xp);
     }
 
-    private String getCurrentWorkingDirectory(FTPClient ftpClient) throws XenonException {
-        String wd;
+    private String getCurrentWorkingDirectory(FTPClient ftpClient, String location) throws XenonException {
+
         try {
-            wd = ftpClient.printWorkingDirectory();
+            String pathFromURI = new URI("ftp://" + location).getPath();
+
+            if (pathFromURI == null || pathFromURI.isEmpty()) {
+                return ftpClient.printWorkingDirectory();
+            }
+
+            if (ftpClient.changeWorkingDirectory(pathFromURI)) {
+                return pathFromURI;
+            } else {
+                throw new NoSuchPathException(ADAPTOR_NAME, "Specified working directory does not exist: " + pathFromURI);
+            }
+        } catch (URISyntaxException e) {
+            throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
         } catch (IOException e) {
-            throw new XenonException(getName(), "Could not retrieve current working directory", e);
+            throw new XenonException(getName(), "Could not set current working directory", e);
         }
-        return wd;
     }
 
     private void connectToServer(String host, int port, FTPClient ftp) throws XenonException {

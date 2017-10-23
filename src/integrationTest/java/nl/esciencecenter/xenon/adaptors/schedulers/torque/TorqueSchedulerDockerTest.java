@@ -34,19 +34,17 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
 public class TorqueSchedulerDockerTest extends TorqueSchedulerTestParent {
 
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder()
-        .file("src/integrationTest/resources/docker-compose/torque-5.0.0.yml")
-        .waitingForService("torque", HealthChecks.toHaveAllPortsOpen())
-        .build();
+    public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/torque-5.0.0.yml")
+            .waitingForService("torque", HealthChecks.toHaveAllPortsOpen()).build();
 
     @Override
     protected SchedulerLocationConfig setupLocationConfig() {
-        return new TorqueLocationConfig(docker.containers().container("torque").port(22).inFormat("$HOST:$EXTERNAL_PORT"));
+        return new TorqueLocationConfig(docker.containers().container("torque").port(22).inFormat("ssh://$HOST:$EXTERNAL_PORT"), "/home/xenon");
     }
 
     @Override
     public Scheduler setupScheduler() throws XenonException {
-        String location = docker.containers().container("torque").port(22).inFormat("$HOST:$EXTERNAL_PORT");
+        String location = docker.containers().container("torque").port(22).inFormat("ssh://$HOST:$EXTERNAL_PORT");
         PasswordCredential cred = new PasswordCredential("xenon", "javagat".toCharArray());
         Map<String, String> props = new HashMap<>();
         props.put(STRICT_HOST_KEY_CHECKING, "false");

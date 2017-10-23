@@ -22,14 +22,14 @@ import nl.esciencecenter.xenon.AdaptorDescription;
  */
 public interface SchedulerAdaptorDescription extends AdaptorDescription {
 
-     /**
+    /**
      * Is this an embedded scheduler ?
      *
-     * Embedded schedulers are implemented inside the Xenon process itself. Therefore this process needs to remain active for its jobs
-     * to run. Ending an online scheduler will typically orphan or kill all jobs that were submitted to it.
+     * Embedded schedulers are implemented inside the Xenon process itself. Therefore this process needs to remain active for its jobs to run. Ending an online
+     * scheduler will typically orphan or kill all jobs that were submitted to it.
      *
-     * Non-embedded schedulers do not need to remain active for their jobs to run. A submitted job will typically be handed over to
-     * some external server that will manage the job for the rest of its lifetime.
+     * Non-embedded schedulers do not need to remain active for their jobs to run. A submitted job will typically be handed over to some external server that
+     * will manage the job for the rest of its lifetime.
      *
      * @return if this scheduler is embedded.
      */
@@ -47,10 +47,20 @@ public interface SchedulerAdaptorDescription extends AdaptorDescription {
     /**
      * Does this Scheduler supports the submission of interactive jobs ?
      *
-     * For interactive jobs the standard streams of the job must be handled by the submitting process. Failing to do so may cause
-     * the job to hang indefinitely.
+     * For interactive jobs the standard streams of the job must be handled by the submitting process. Failing to do so may cause the job to hang indefinitely.
      *
      * @return if this scheduler supports the submission of interactive jobs ?
      */
     boolean supportsInteractive();
+
+    /**
+     * Does this Scheduler create a FileSystem to support the submission of jobs ?
+     *
+     * Many scheduler implementations use a FileSystem internally to handle job submission, for example to store submission scripts or handle the standard I/O
+     * streams of a process. This FileSystem can optionally be retrieved by the user to perform other tasks, such as staging in and output data of the job. To
+     * do so use {@link nl.esciencecenter.xenon.schedulers.Scheduler#getFileSystem()} method.
+     *
+     * @return does this {@link Scheduler} create a FileSystem to support the submission of jobs ?
+     */
+    boolean usesFileSystem();
 }

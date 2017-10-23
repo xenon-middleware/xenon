@@ -18,9 +18,19 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
 import static org.junit.Assume.assumeNotNull;
 
 public class LiveLocationConfig extends SchedulerLocationConfig {
+
+    LiveLocationConfig() {
+        super(null, null, null, null);
+    }
+
     @Override
     public String getLocation() {
         return System.getProperty("xenon.scheduler.location");
+    }
+
+    @Override
+    public String getWorkdir() {
+        return System.getProperty("xenon.scheduler.workdir");
     }
 
     @Override
