@@ -61,11 +61,9 @@ task versionPost(type: Exec) {
 //    deleteExistingFiles = false
 //}
 
-task copyJavadoc {
-    copy {
-       from "build/docs"
-       into "docs/versions/${version}"
-    }
+task copyJavadoc(type: Copy) {
+    from "build/docs"
+    into "docs/versions/${version}"
 }
 
 //tasks.publish.dependsOn 'bintrayUpload', 'copyJavadoc'
