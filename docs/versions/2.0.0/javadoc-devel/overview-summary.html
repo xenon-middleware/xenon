@@ -230,6 +230,7 @@ Supported properties for <i>Scheduler.create(type, location, credential, propert
 <li>Batch: true</li>
 <li>Interactive: true</li>
 <li>Embedded: true</li>
+<li>Uses a <a href="#filesystems">filesystem</a>: true</li>
 </ul>
 <h2><a name="ssh">ssh</a></h2>
 <p>The SSH job adaptor implements all functionality to start jobs on ssh servers.</p>
@@ -311,6 +312,7 @@ Supported properties for <i>Scheduler.create(type, location, credential, propert
 <li>Batch: true</li>
 <li>Interactive: true</li>
 <li>Embedded: true</li>
+<li>Uses a <a href="#filesystems">filesystem</a>: true</li>
 </ul>
 <h2><a name="gridengine">gridengine</a></h2>
 <p>The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler. This adaptor uses either the local or the ssh scheduler adaptor to run commands on the machine running Grid Engine,  and the file or the stfp filesystem adaptor to gain access to the filesystem of that machine.</p>
@@ -423,6 +425,7 @@ Supported properties for <i>Scheduler.create(type, location, credential, propert
 <li>Batch: true</li>
 <li>Interactive: false</li>
 <li>Embedded: false</li>
+<li>Uses a <a href="#filesystems">filesystem</a>: true</li>
 </ul>
 <h2><a name="slurm">slurm</a></h2>
 <p>The Slurm Adaptor submits jobs to a Slurm scheduler.  This adaptor uses either the local or the ssh scheduler adaptor to run commands on the machine running Slurm,  and the file or the stfp filesystem adaptor to gain access to the filesystem of that machine.</p>
@@ -529,6 +532,7 @@ Supported properties for <i>Scheduler.create(type, location, credential, propert
 <li>Batch: true</li>
 <li>Interactive: true</li>
 <li>Embedded: false</li>
+<li>Uses a <a href="#filesystems">filesystem</a>: true</li>
 </ul>
 <h2><a name="torque">torque</a></h2>
 <p>The Torque Adaptor submits jobs to a TORQUE batch system. This adaptor uses either the local or the ssh scheduler adaptor to run commands on the machine running TORQUE,  and the file or the stfp filesystem adaptor to gain access to the filesystem of that machine.</p>
@@ -641,6 +645,7 @@ Supported properties for <i>Scheduler.create(type, location, credential, propert
 <li>Batch: true</li>
 <li>Interactive: false</li>
 <li>Embedded: false</li>
+<li>Uses a <a href="#filesystems">filesystem</a>: true</li>
 </ul>
 <h2><a name="filesystems">File systems<a/></h2>
 <h2><a name="file">file</a></h2>
