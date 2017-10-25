@@ -110,16 +110,21 @@ public class SSHUtil {
             }
         }
 
+        private void closeServer() {
+            try {
+                server.close();
+            } catch (Exception e) {
+                // ignored
+            }
+        }
+
+        @Override
         public void run() {
             try {
                 Socket s = server.accept();
                 s.setTcpNoDelay(true);
 
-                try {
-                    server.close();
-                } catch (Exception e) {
-                    // ignored
-                }
+                closeServer();
 
                 synchronized (this) {
                     socket = s;
@@ -245,7 +250,7 @@ public class SSHUtil {
         }
     }
 
-    public static UserCredential extractCredential(String adaptorName, SshdSocketAddress location, Credential credential) {
+    public static UserCredential extractCredential(SshdSocketAddress location, Credential credential) {
 
         // Figure out which type of credential we are using
         if (credential instanceof CredentialMap) {
@@ -271,7 +276,7 @@ public class SSHUtil {
         UserCredential[] result = new UserCredential[locations.length];
 
         for (int i = 0; i < locations.length; i++) {
-            result[i] = extractCredential(adaptorName, locations[i], credentials);
+            result[i] = extractCredential(locations[i], credentials);
 
             if (result[i] == null) {
                 throw new CredentialNotFoundException(adaptorName, "No credential provided for location: " + locations[i]);
@@ -327,8 +332,6 @@ public class SSHUtil {
         }
 
         result.add(extractSocketAddress(adaptorName, tmp.trim()));
-
-        System.out.println(result);
 
         return result.toArray(new SshdSocketAddress[result.size()]);
     }
@@ -483,7 +486,6 @@ public class SSHUtil {
 
                 connection.addHop(i - 1, session, tunnel);
 
-                session = null;
                 session = connectAndAuthenticate(adaptorName, client, "localhost", port, creds[i], timeout);
             }
 
@@ -491,12 +493,10 @@ public class SSHUtil {
             // Attempt to cleanup the mess
             connection.close();
 
-            if (session != null) {
-                try {
-                    session.close();
-                } catch (IOException e1) {
-                    // ignored
-                }
+            try {
+                session.close();
+            } catch (IOException e1) {
+                // ignored
             }
 
             throw new XenonException(adaptorName, "Failed to set up SSH forwarding", e);
