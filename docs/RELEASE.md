@@ -13,36 +13,16 @@ To create a release, version numbers should be updated in:
 Also, in `CHANGELOG.md` a section should be added with 
 notable changes in this version.
 
-## Update the documentation
+## Update the site
 
-Then generate the javadoc for this version by typing:
+To update Xenon version in `docs/_data/version.yml` and update Javadocs inside `docs/` directory run:
 
-   ./gradlew javadocDevel
+```bash
+./gradlew publishSite
+```
 
-Make sure the following directories exist afterwards 
+The site is a [Jekyll](https://jekyllrb.com/) powered site and hosted by GitHub pages at http://nlesc.github.io/Xenon/
 
-   docs/versions/<version>/javadoc-devel
-   docs/versions/<version>/javadoc
-
-as the `javadoc-devel` may not be generated if the `javadoc` already 
-exists (this is a bug in the gradle file). 
-
-## Add a version post file
-
-In the directory `docs/_posts` there should be a list of yml files 
-with the release numbers, like so:
-
-    2014-06-03-1.0.0.yml  
-    2015-12-16-1.1.0.yml  
-    2017-02-20-1.2.0.yml 
-
-Add a new yml file with `<date>-<version>.yml` as a filename, and 
-containing the new version like so:
-
-    ---
-    title: 1.2.2
-    ---
-   
 ## Commit the changes
 
 Next, commit all changes you have made to the master branch. If you check with  
@@ -58,20 +38,22 @@ you should get something like this:
 	modified:   CHANGELOG.md
 	modified:   README.md
 	modified:   gradle/common.gradle
+    modified:   docs/_config.yml
 
     Untracked files:
     (use "git add <file>..." to include in what will be committed)
 
-	docs/_posts/2017-05-08-1.2.2.yml
 	docs/versions/1.2.2/
 
 Add and commit these files using `git add` and `git commit` and `git push`.
 
-## Create a release
+## Create a GitHub release
 
-On github, go to the releases tab and add the release text. Typically this 
-will describe the bugfixes, changes and todo's. Also create a tag for this 
-release (the version number). 
+On GitHub, go to the releases tab and draft a new release.
+
+The tag and title should be set to the version.
+
+The release description should contain a small text to explain what Xenon is and the part of the CHANGELOG.md which pertains to this version.
 
 ## Check if DOI is created in Zenodo
 
@@ -79,7 +61,10 @@ Zenodo is linked to the Xenon github, so when a release is created, a DOI
 will be created automatically. Click the DOI badge on the github page to check 
 this.
 
-### Add jar to bintray
+Check that the authors and license of the Zenodo entry are correct.
+If not, then correct, save and publish the Zenodo entry.
+
+### Add jars to bintray
 
 To add the necessary jar and pom files to bintray, it is easiest to ensure you 
 have them locally first. By calling: 
@@ -102,10 +87,4 @@ ask for the 'Target Repository Path', which should be:
 
 Click on the `click to add files` button and add the files that where generated in 
 the .m2 repository. Click on `save` and then on `publish` to publish the version.
-
-
-
-
-
-
-    
+ 

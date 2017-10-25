@@ -11,10 +11,3 @@ markdown: kramdown
 keep_files:
 - versions
 timezone: UTC
-defaults:
-  -
-    scope:
-      path: ""
-      type: "posts"
-    values:
-      layout: "post"

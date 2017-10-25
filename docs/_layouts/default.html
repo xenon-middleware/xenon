@@ -1,33 +1,36 @@
 <!DOCTYPE html>
 <html>
 
-  {% include head.html %}
+{% include head.html %}
 
-  <body>
-    {% include header.html %}
+<body>
+  {% include header.html %}
 
-    <div class="page-content">
-      <div class="wrapper">
-        <header>
+  <div class="page-content">
+    <div class="wrapper">
+      <header>
         <h1>Xenon</h1>
 
         <h4>A middleware abstraction library that provides a simple programming interface to various compute and storage resources.</h4>
 
 
-        <p>Latest version is <b>{{ site.posts[0].title }}</b></p>
+        <p>Latest version is
+          <b>{{ site.data.version.current }}</b>
+        </p>
 
-        {% assign latestversion=site.posts[0].title %}
-        {% include version.html version=latestversion %}
+        {% include version.html version=site.data.version.current %}
 
-        <p><a href="{{ site.baseurl }}versions.html">Older versions</a></p>
-        </header>
-        <section>
+        <p>
+          <a href="https://github.com/NLeSC/Xenon/releases">Older versions</a>
+        </p>
+      </header>
+      <section>
         {{ content }}
-        </section>
-      </div>
+      </section>
     </div>
+  </div>
 
-    {% include footer.html %}
-  </body>
+  {% include footer.html %}
+</body>
 
 </html>
