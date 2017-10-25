@@ -3,7 +3,7 @@ Xenon 2.0.0
 
 This is release 2.0.0 of Xenon. 
 
-Notable changes compared to v1.2.2:
+Notable changes compared to v1.2.3:
 -----------------------------------
 
 - complete overhaul of public API, which should increase ease-of-use significantly. 
@@ -12,6 +12,11 @@ Notable changes compared to v1.2.2:
 - replaced Jsch with Apache SSHD in the SSH and SFTP adaptors
 - replaced Apache Jackrabbit with Sardine in the Webdav adaptor. 
 - added an S3 filesystem adaptor. 
+
+Notable changes compared to v1.2.2:
+-----------------------------------
+
+- fixed various issues flagged by sonarqube
 
 Notable changes compared to v1.2.1:
 -----------------------------------
