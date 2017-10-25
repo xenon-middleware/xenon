@@ -171,6 +171,7 @@ public class AdaptorDocGenerator {
         out.println(String.format("<li>Batch: %s</li>", description.supportsBatch()));
         out.println(String.format("<li>Interactive: %s</li>", description.supportsInteractive()));
         out.println(String.format("<li>Embedded: %s</li>", description.isEmbedded()));
+        out.println(String.format("<li>Uses a <a href=\"#filesystems\">filesystem</a>: %s</li>", description.usesFileSystem()));
         out.println("</ul>");
     }
 }
