@@ -172,6 +172,10 @@
 <dd>
 <div class="block">Check if a sequence of <code>PosixFilePermission</code>s contains a specific option.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/CredentialMap.html#containsCredential-java.lang.String-">containsCredential(String)</a></span> - Method in class nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/CredentialMap.html" title="class in nl.esciencecenter.xenon.credentials">CredentialMap</a></dt>
+<dd>
+<div class="block">Check if the <code>key</code> is stored in this CredentialMap.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/filesystems/FileSystem.html#copy-nl.esciencecenter.xenon.filesystems.Path-nl.esciencecenter.xenon.filesystems.FileSystem-nl.esciencecenter.xenon.filesystems.Path-nl.esciencecenter.xenon.filesystems.CopyMode-boolean-">copy(Path, FileSystem, Path, CopyMode, boolean)</a></span> - Method in class nl.esciencecenter.xenon.filesystems.<a href="nl/esciencecenter/xenon/filesystems/FileSystem.html" title="class in nl.esciencecenter.xenon.filesystems">FileSystem</a></dt>
 <dd>
 <div class="block">Asynchronously Copy an existing source path to a target path on a different file system.</div>
@@ -242,6 +246,18 @@
 <dt><a href="nl/esciencecenter/xenon/credentials/Credential.html" title="interface in nl.esciencecenter.xenon.credentials"><span class="typeNameLink">Credential</span></a> - Interface in <a href="nl/esciencecenter/xenon/credentials/package-summary.html">nl.esciencecenter.xenon.credentials</a></dt>
 <dd>
 <div class="block">Credential represents a user credential uses to gain access to a resource.</div>
+</dd>
+<dt><a href="nl/esciencecenter/xenon/credentials/CredentialMap.html" title="class in nl.esciencecenter.xenon.credentials"><span class="typeNameLink">CredentialMap</span></a> - Class in <a href="nl/esciencecenter/xenon/credentials/package-summary.html">nl.esciencecenter.xenon.credentials</a></dt>
+<dd>
+<div class="block">A <a href="nl/esciencecenter/xenon/credentials/Credential.html" title="interface in nl.esciencecenter.xenon.credentials"><code>Credential</code></a> consisting of a collection of Credentials each uniquely identified by a String (typically a host name or host alias).</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/CredentialMap.html#CredentialMap--">CredentialMap()</a></span> - Constructor for class nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/CredentialMap.html" title="class in nl.esciencecenter.xenon.credentials">CredentialMap</a></dt>
+<dd>
+<div class="block">Create a new CredentialMap using <code>null</code> as the default credential.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/CredentialMap.html#CredentialMap-nl.esciencecenter.xenon.credentials.UserCredential-">CredentialMap(UserCredential)</a></span> - Constructor for class nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/CredentialMap.html" title="class in nl.esciencecenter.xenon.credentials">CredentialMap</a></dt>
+<dd>
+<div class="block">Creates a new <code>CredentialMap</code> and set the default credential to <code>defaultCredential</code>.</div>
 </dd>
 </dl>
 <a name="I:D">
@@ -341,6 +357,10 @@
 </a>
 <h2 class="title">G</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/CredentialMap.html#get-java.lang.String-">get(String)</a></span> - Method in class nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/CredentialMap.html" title="class in nl.esciencecenter.xenon.credentials">CredentialMap</a></dt>
+<dd>
+<div class="block">Retrieve the <a href="nl/esciencecenter/xenon/credentials/UserCredential.html" title="interface in nl.esciencecenter.xenon.credentials"><code>UserCredential</code></a> stored using the <code>key</code>.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/filesystems/FileSystem.html#getAdaptorDescription-java.lang.String-">getAdaptorDescription(String)</a></span> - Static method in class nl.esciencecenter.xenon.filesystems.<a href="nl/esciencecenter/xenon/filesystems/FileSystem.html" title="class in nl.esciencecenter.xenon.filesystems">FileSystem</a></dt>
 <dd>
 <div class="block">Gives the description of the adaptor with the given name.</div>
@@ -697,14 +717,14 @@
 <dd>
 <div class="block">Returns the type of the property.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/Credential.html#getUsername--">getUsername()</a></span> - Method in interface nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/Credential.html" title="interface in nl.esciencecenter.xenon.credentials">Credential</a></dt>
-<dd>
-<div class="block">Get user name associated with this Credential.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/DefaultCredential.html#getUsername--">getUsername()</a></span> - Method in class nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/DefaultCredential.html" title="class in nl.esciencecenter.xenon.credentials">DefaultCredential</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/PasswordCredential.html#getUsername--">getUsername()</a></span> - Method in class nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/PasswordCredential.html" title="class in nl.esciencecenter.xenon.credentials">PasswordCredential</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/UserCredential.html#getUsername--">getUsername()</a></span> - Method in interface nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/UserCredential.html" title="interface in nl.esciencecenter.xenon.credentials">UserCredential</a></dt>
+<dd>
+<div class="block">Returns the user name associated with this credential.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/filesystems/FileSystem.html#getWorkingDirectory--">getWorkingDirectory()</a></span> - Method in class nl.esciencecenter.xenon.filesystems.<a href="nl/esciencecenter/xenon/filesystems/FileSystem.html" title="class in nl.esciencecenter.xenon.filesystems">FileSystem</a></dt>
 <dd>
 <div class="block">Get the current working directory of this file system.</div>
@@ -1145,6 +1165,10 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/PropertyTypeException.html#PropertyTypeException-java.lang.String-java.lang.String-">PropertyTypeException(String, String)</a></span> - Constructor for exception nl.esciencecenter.xenon.<a href="nl/esciencecenter/xenon/PropertyTypeException.html" title="class in nl.esciencecenter.xenon">PropertyTypeException</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/CredentialMap.html#put-java.lang.String-nl.esciencecenter.xenon.credentials.UserCredential-">put(String, UserCredential)</a></span> - Method in class nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/CredentialMap.html" title="class in nl.esciencecenter.xenon.credentials">CredentialMap</a></dt>
+<dd>
+<div class="block">Add a <a href="nl/esciencecenter/xenon/credentials/Credential.html" title="interface in nl.esciencecenter.xenon.credentials"><code>Credential</code></a> to the CredentialMap using <code>key</code> as a unique key.</div>
+</dd>
 </dl>
 <a name="I:Q">
 <!--   -->
@@ -1319,8 +1343,11 @@
 </dd>
 <dt><a href="nl/esciencecenter/xenon/utils/StreamForwarder.html" title="class in nl.esciencecenter.xenon.utils"><span class="typeNameLink">StreamForwarder</span></a> - Class in <a href="nl/esciencecenter/xenon/utils/package-summary.html">nl.esciencecenter.xenon.utils</a></dt>
 <dd>
-<div class="block">A simple stream forwarder that uses a daemon thread to read from an <code>InputStream</code> and write it to a
- <code>OutputStream</code>.</div>
+<div class="block">A simple stream forwarder that uses a daemon thread to read from an <code>InputStream</code> and write it to a <code>OutputStream</code>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/StreamForwarder.html#StreamForwarder-java.lang.String-java.io.InputStream-java.io.OutputStream-int-">StreamForwarder(String, InputStream, OutputStream, int)</a></span> - Constructor for class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/StreamForwarder.html" title="class in nl.esciencecenter.xenon.utils">StreamForwarder</a></dt>
+<dd>
+<div class="block">Create a new StreamForwarder and start it immediately.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/StreamForwarder.html#StreamForwarder-java.io.InputStream-java.io.OutputStream-">StreamForwarder(InputStream, OutputStream)</a></span> - Constructor for class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/StreamForwarder.html" title="class in nl.esciencecenter.xenon.utils">StreamForwarder</a></dt>
 <dd>
@@ -1430,10 +1457,12 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/UnsupportedOperationException.html#UnsupportedOperationException-java.lang.String-java.lang.String-">UnsupportedOperationException(String, String)</a></span> - Constructor for exception nl.esciencecenter.xenon.<a href="nl/esciencecenter/xenon/UnsupportedOperationException.html" title="class in nl.esciencecenter.xenon">UnsupportedOperationException</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="nl/esciencecenter/xenon/credentials/UserCredential.html" title="interface in nl.esciencecenter.xenon.credentials"><span class="typeNameLink">UserCredential</span></a> - Interface in <a href="nl/esciencecenter/xenon/credentials/package-summary.html">nl.esciencecenter.xenon.credentials</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/SchedulerAdaptorDescription.html#usesFileSystem--">usesFileSystem()</a></span> - Method in interface nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/SchedulerAdaptorDescription.html" title="interface in nl.esciencecenter.xenon.schedulers">SchedulerAdaptorDescription</a></dt>
 <dd>
 <div class="block">Does this Scheduler create a FileSystem to support the submission of jobs ?
- 
+
  Many scheduler implementations use a FileSystem internally to handle job submission, for example to store submission scripts or handle the standard I/O
  streams of a process.</div>
 </dd>

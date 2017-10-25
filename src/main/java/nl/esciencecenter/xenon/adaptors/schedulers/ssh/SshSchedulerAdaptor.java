@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors.schedulers.ssh;
 import java.util.Map;
 
 import org.apache.sshd.client.SshClient;
-import org.apache.sshd.client.session.ClientSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +28,7 @@ import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobQueueScheduler;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
+import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHConnection;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
@@ -104,7 +104,7 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
     public static final String SUBMITTED = JOBS + "submitted";
 
     /** The locations supported by this adaptor */
-    private static final String[] ADAPTOR_LOCATIONS = new String[] { "host[:port][/workdir]" };
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "host[:port][/workdir][ via:otherhost[:port]]" };
 
     /** List of properties supported by this SSH adaptor */
     private static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
@@ -143,17 +143,17 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
+        boolean loadKnownHosts = xp.getBooleanProperty(LOAD_STANDARD_KNOWN_HOSTS);
         boolean loadSSHConfig = xp.getBooleanProperty(LOAD_SSH_CONFIG);
         boolean strictHostCheck = xp.getBooleanProperty(STRICT_HOST_KEY_CHECKING);
-        boolean addHostKey = xp.getBooleanProperty(AUTOMATICALLY_ADD_HOST_KEY);
         boolean useSSHAgent = xp.getBooleanProperty(AGENT);
         boolean useAgentForwarding = xp.getBooleanProperty(AGENT_FORWARDING);
 
-        SshClient client = SSHUtil.createSSHClient(loadSSHConfig, strictHostCheck, addHostKey, useSSHAgent, useAgentForwarding);
+        SshClient client = SSHUtil.createSSHClient(loadKnownHosts, loadSSHConfig, strictHostCheck, useSSHAgent, useAgentForwarding);
 
         long timeout = xp.getLongProperty(TIMEOUT);
 
-        ClientSession session = SSHUtil.connect(ADAPTOR_NAME, client, location, credential, timeout);
+        SSHConnection connection = SSHUtil.connect(ADAPTOR_NAME, client, location, credential, 0, timeout);
 
         // We must convert the relevant SSH properties to SFTP here.
         Map<String, String> sftpProperties = SSHUtil.translateProperties(properties, SshSchedulerAdaptor.PREFIX,
@@ -166,7 +166,7 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
         long pollingDelay = xp.getLongProperty(POLLING_DELAY);
         int multiQThreads = xp.getIntegerProperty(MULTIQ_MAX_CONCURRENT);
 
-        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, location, new SshInteractiveProcessFactory(session), fs, fs.getWorkingDirectory(),
+        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, location, new SshInteractiveProcessFactory(connection), fs, fs.getWorkingDirectory(),
                 multiQThreads, pollingDelay, timeout, xp);
     }
 }

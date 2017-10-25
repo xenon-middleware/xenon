@@ -24,41 +24,78 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A simple stream forwarder that uses a daemon thread to read from an {@link java.io.InputStream} and write it to a
- * {@link java.io.OutputStream}.
- * A small buffer is used (typically 1 KB) to improve performance. Any exceptions will be ignored.
+ * A simple stream forwarder that uses a daemon thread to read from an {@link java.io.InputStream} and write it to a {@link java.io.OutputStream}. A small
+ * buffer is used (typically 1 KB) to improve performance. Any exceptions will be ignored.
  */
 public final class StreamForwarder extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StreamForwarder.class);
 
-    private static final int BUFFER_SIZE = 1024;
+    private static final int DEFAULT_BUFFER_SIZE = 1024;
 
     private final InputStream in;
     private final OutputStream out;
+
+    private final int bufferSize;
 
     private boolean done = false;
 
     /**
      * Create a new StreamForwarder and start it immediately.
      *
-     * @param in the {@link java.io.InputStream} to read from.
-     * @param out the {@link java.io.OutputStream} to write to.
+     * @param name
+     *            the name of the thread
+     * @param in
+     *            the {@link java.io.InputStream} to read from.
+     * @param out
+     *            the {@link java.io.OutputStream} to write to, or <code>null</code> to discard the output.
+     * @param bufferSize
+     *            the buffer size to use, or 0 to use the default.
      */
-    public StreamForwarder(InputStream in, OutputStream out) {
+    public StreamForwarder(String name, InputStream in, OutputStream out, int bufferSize) {
+
+        // NOTE: out is allowed to be null
+        if (in == null) {
+            throw new IllegalArgumentException("In stream may not be null");
+        }
+
+        if (bufferSize < 0) {
+            throw new IllegalArgumentException("BufferSize must be > 0");
+        }
+
+        if (bufferSize == 0) {
+            this.bufferSize = DEFAULT_BUFFER_SIZE;
+        } else {
+            this.bufferSize = bufferSize;
+        }
+
         this.in = in;
         this.out = out;
 
         setDaemon(true);
-        setName("Stream forwarder");
+        setName(name);
         start();
+    }
+
+    /**
+     * Create a new StreamForwarder and start it immediately.
+     *
+     * @param in
+     *            the {@link java.io.InputStream} to read from.
+     * @param out
+     *            the {@link java.io.OutputStream} to write to.
+     */
+    public StreamForwarder(InputStream in, OutputStream out) {
+        this("Stream forwarder", in, out, DEFAULT_BUFFER_SIZE);
     }
 
     /**
      * Closes the input stream, thereby stopping the stream forwarder, and closing the output stream.
      *
-     * @param c The {@link java.io.Closeable} to close (i.e., the {@link java.io.InputStream} or {@link java.io.OutputStream})
-     * @param error The error message to print if the close results in an Exception
+     * @param c
+     *            The {@link java.io.Closeable} to close (i.e., the {@link java.io.InputStream} or {@link java.io.OutputStream})
+     * @param error
+     *            The error message to print if the close results in an Exception
      */
     private void close(Closeable c, String error) {
         try {
@@ -79,11 +116,11 @@ public final class StreamForwarder extends Thread {
     }
 
     /**
-     * Wait for a given timeout for the StreamForwarder to terminate by reading an end-of-stream on the input. When the timeout
-     * expires both input and output streams will be closed, regardless of whether the input has reached end-of-line.
+     * Wait for a given timeout for the StreamForwarder to terminate by reading an end-of-stream on the input. When the timeout expires both input and output
+     * streams will be closed, regardless of whether the input has reached end-of-line.
      *
      * @param timeout
-     *          The number of milliseconds to wait for termination.
+     *            The number of milliseconds to wait for termination.
      */
     public synchronized void terminate(long timeout) {
 
@@ -123,7 +160,7 @@ public final class StreamForwarder extends Thread {
      */
     public void run() {
         try {
-            byte[] buffer = new byte[BUFFER_SIZE];
+            byte[] buffer = new byte[bufferSize];
 
             while (true) {
                 int read = in.read(buffer);
@@ -142,6 +179,7 @@ public final class StreamForwarder extends Thread {
 
                 if (out != null) {
                     out.write(buffer, 0, read);
+                    out.flush();
                 }
             }
         } catch (IOException e) {

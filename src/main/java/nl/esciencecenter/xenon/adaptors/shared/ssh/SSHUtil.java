@@ -17,12 +17,17 @@ package nl.esciencecenter.xenon.adaptors.shared.ssh;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.KeyPair;
+import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,12 +35,15 @@ import java.util.Set;
 
 import org.apache.sshd.agent.local.ProxyAgentFactory;
 import org.apache.sshd.client.SshClient;
+import org.apache.sshd.client.channel.ChannelDirectTcpip;
 import org.apache.sshd.client.config.hosts.DefaultConfigFileHostEntryResolver;
+import org.apache.sshd.client.config.hosts.KnownHostEntry;
 import org.apache.sshd.client.keyverifier.AcceptAllServerKeyVerifier;
 import org.apache.sshd.client.keyverifier.DefaultKnownHostsServerKeyVerifier;
 import org.apache.sshd.client.keyverifier.RejectAllServerKeyVerifier;
 import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.common.config.keys.FilePasswordProvider;
+import org.apache.sshd.common.util.net.SshdSocketAddress;
 import org.apache.sshd.common.util.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +56,11 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.CredentialMap;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
+import nl.esciencecenter.xenon.credentials.UserCredential;
+import nl.esciencecenter.xenon.utils.StreamForwarder;
 
 public class SSHUtil {
 
@@ -71,10 +82,64 @@ public class SSHUtil {
         }
     }
 
+    static class Tunnel extends Thread {
+
+        private final ServerSocket server;
+        private final ChannelDirectTcpip channel;
+
+        private final int bufferSize;
+
+        private Socket socket;
+        private Exception ex;
+
+        Tunnel(ServerSocket ss, ChannelDirectTcpip tmp, int bufferSize) {
+            this.server = ss;
+            this.channel = tmp;
+            this.bufferSize = bufferSize;
+        }
+
+        public synchronized Exception getException() {
+            return ex;
+        }
+
+        public synchronized void close() {
+            try {
+                socket.close();
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+
+        public void run() {
+            try {
+                Socket s = server.accept();
+                s.setTcpNoDelay(true);
+
+                try {
+                    server.close();
+                } catch (Exception e) {
+                    // ignored
+                }
+
+                synchronized (this) {
+                    socket = s;
+                }
+
+                new StreamForwarder("LOCAL TO REMOTE", s.getInputStream(), channel.getInvertedIn(), bufferSize);
+                new StreamForwarder("REMOTE TO LOCAL", channel.getInvertedOut(), s.getOutputStream(), bufferSize);
+
+            } catch (IOException e) {
+                synchronized (this) {
+                    ex = e;
+                }
+            }
+        }
+    }
+
     /**
      * Create a new {@link SshClient} with a default configuration similar to a stand-alone SSH client.
      * <p>
-     * The default configuration loads the SSH config file, uses strict host key checking, and adds unseen hosts keys to the known_hosts file.
+     * The default configuration loads the SSH known_hosts and config file and uses strict host key checking.
      * </p>
      *
      * @return the configured {@link SshClient}
@@ -89,33 +154,36 @@ public class SSHUtil {
      * SSH clients have a significant number of options. This method will create a <code>SshClient</code> providing the most important settings.
      * </p>
      *
+     * @param useKnownHosts
+     *            Load the SSH known_hosts file from the default location (for OpenSSH this is typically found in $HOME/.ssh/known_hosts).
      * @param loadSSHConfig
-     *            Load the SSH config file in the default location (for OpenSSH this is typically found in $HOME/.ssh/config).
+     *            Load the SSH config file from the default location (for OpenSSH this is typically found in $HOME/.ssh/config).
      * @param stricHostCheck
      *            Perform a strict host key check. When setting up a connection, the key presented by the server is compared to the default known_hosts file
      *            (for OpenSSH this is typically found in $HOME/.ssh/known_hosts).
-     * @param addHostKey
-     *            When setting up a connection, add a previously unknown server server key to the default known_hosts file (for OpenSSH this is typically found
-     *            in $HOME/.ssh/known_hosts).
      * @param useSSHAgent
      *            When setting up a connection, handoff authentication to a separate SSH agent process.
      * @param useAgentForwarding
      *            Support agent forwarding, allowing remote SSH servers to use the local SSH agent process to authenticate connections to other servers.
      * @return the configured {@link SshClient}
      */
-    public static SshClient createSSHClient(boolean loadSSHConfig, boolean stricHostCheck, boolean addHostKey, boolean useSSHAgent,
+    public static SshClient createSSHClient(boolean useKnownHosts, boolean loadSSHConfig, boolean stricHostCheck, boolean useSSHAgent,
             boolean useAgentForwarding) {
 
         SshClient client = SshClient.setUpDefaultClient();
 
-        if (stricHostCheck) {
-            if (addHostKey) {
-                client.setServerKeyVerifier(new DefaultKnownHostsServerKeyVerifier(AcceptAllServerKeyVerifier.INSTANCE, true));
-                // client.setServerKeyVerifier(new KnownHostsServerKeyVerifier(AcceptAllServerKeyVerifier.INSTANCE, null));
+        if (useKnownHosts) {
+            DefaultKnownHostsServerKeyVerifier tmp;
+
+            if (stricHostCheck) {
+                tmp = new DefaultKnownHostsServerKeyVerifier(RejectAllServerKeyVerifier.INSTANCE, true);
             } else {
-                client.setServerKeyVerifier(new DefaultKnownHostsServerKeyVerifier(RejectAllServerKeyVerifier.INSTANCE, true));
-                // client.setServerKeyVerifier(new KnownHostsServerKeyVerifier(RejectAllServerKeyVerifier.INSTANCE, null));
+                tmp = new DefaultKnownHostsServerKeyVerifier(AcceptAllServerKeyVerifier.INSTANCE, true);
+                tmp.setModifiedServerKeyAcceptor(
+                        (ClientSession clientSession, SocketAddress remoteAddress, KnownHostEntry entry, PublicKey expected, PublicKey actual) -> true);
             }
+
+            client.setServerKeyVerifier(tmp);
         } else {
             client.setServerKeyVerifier(AcceptAllServerKeyVerifier.INSTANCE);
         }
@@ -177,47 +245,95 @@ public class SSHUtil {
         }
     }
 
+    public static UserCredential extractCredential(String adaptorName, SshdSocketAddress location, Credential credential) {
+
+        // Figure out which type of credential we are using
+        if (credential instanceof CredentialMap) {
+
+            CredentialMap map = (CredentialMap) credential;
+
+            String key = location.toString();
+
+            if (map.containsCredential(key)) {
+                return map.get(key);
+            }
+
+            // May return null!
+            return map.get(location.getHostName());
+        }
+
+        return (UserCredential) credential;
+    }
+
+    public static UserCredential[] extractCredentials(String adaptorName, SshdSocketAddress[] locations, Credential credentials)
+            throws CredentialNotFoundException {
+
+        UserCredential[] result = new UserCredential[locations.length];
+
+        for (int i = 0; i < locations.length; i++) {
+            result[i] = extractCredential(adaptorName, locations[i], credentials);
+
+            if (result[i] == null) {
+                throw new CredentialNotFoundException(adaptorName, "No credential provided for location: " + locations[i]);
+            }
+        }
+
+        return result;
+    }
+
     /**
-     * Connect an existing {@link SshClient} to the server at <code>location</code> and authenticate using the given <code>credential</code>.
+     * Extract a series of locations from a location string.
+     *
+     * This method will split the location string into the destination and any number of intermediate hops. The accepted format is:
+     * <p>
+     * "host[:port][/workdir] [via:otherhost[:port]]*"
+     * </p>
+     * The locations will be returned in connection setup order, which is the reverse order in which they are listed in the location string.
      *
      * @param adaptorName
-     *            the adaptor where this method was called from.
-     * @param client
-     *            the client to connect.
+     *            the adaptor calling this method (used in exceptions).
      * @param location
-     *            the server to connect to
-     * @param credential
-     *            the credential to authenticate with.
-     * @param timeout
-     *            the timeout to use in connection setup (in milliseconds).
-     * @return the connected {@link ClientSession}
-     * @throws XenonException
-     *             if the connection setup or authentication failed.
+     *            the location to parse
+     * @return the location string split into its individual locations.
+     * @throws InvalidLocationException
+     *             if the provided location is could not be parsed.
      */
-    public static ClientSession connect(String adaptorName, SshClient client, String location, Credential credential, long timeout) throws XenonException {
+    public static SshdSocketAddress[] extractLocations(String adaptorName, String location) throws InvalidLocationException {
 
-        // location should be hostname or hostname:port. If port unset it
-        // defaults to port 22
-
-        // Credential may be DEFAULT with username, username/password or
-        // username / certificate / passphrase.
-
-        // TODO: Add option DEFAULT with password ?
-
-        if (credential == null) {
-            throw new IllegalArgumentException("Credential may not be null");
+        if (location == null) {
+            throw new IllegalArgumentException("Location may nor be null");
         }
 
-        if (timeout <= 0) {
-            throw new IllegalArgumentException("Invalid timeout: " + timeout);
+        ArrayList<SshdSocketAddress> result = new ArrayList<>();
+
+        String tmp = location;
+
+        int index = tmp.lastIndexOf(" via:");
+
+        while (index != -1) {
+
+            if (index == 0) {
+                throw new InvalidLocationException(adaptorName, "Could not parse location: " + location);
+            }
+
+            result.add(extractSocketAddress(adaptorName, tmp.substring(index + " via:".length()).trim()));
+            tmp = tmp.substring(0, index);
+
+            index = tmp.lastIndexOf(" via:");
         }
 
-        String username = credential.getUsername();
-
-        // TODO: Are there cases where we do not want a user name ?
-        if (username == null) {
-            throw new XenonException(adaptorName, "Failed to retrieve username from credential");
+        if (tmp.isEmpty()) {
+            throw new InvalidLocationException(adaptorName, "Could not parse location: " + location);
         }
+
+        result.add(extractSocketAddress(adaptorName, tmp.trim()));
+
+        System.out.println(result);
+
+        return result.toArray(new SshdSocketAddress[result.size()]);
+    }
+
+    private static SshdSocketAddress extractSocketAddress(String adaptorName, String location) throws InvalidLocationException {
 
         URI uri;
 
@@ -234,17 +350,28 @@ public class SSHUtil {
             port = DEFAULT_SSH_PORT;
         }
 
-        // String host = getHost(adaptorName, location);
-        // int port = getPort(adaptorName, location);
+        return new SshdSocketAddress(host, port);
+    }
+
+    private static ClientSession connectAndAuthenticate(String adaptorName, SshClient client, String host, int port, UserCredential credential, long timeout)
+            throws XenonException {
+
+        if (host == null) {
+            throw new IllegalArgumentException("Target host may not be null");
+        }
+
+        String username = credential.getUsername();
+
+        if (username == null) {
+            throw new InvalidCredentialException(adaptorName, "Failed to retrieve username from credential");
+        }
 
         ClientSession session = null;
 
-        try {
-            // Connect to remote machine and retrieve a session. Will throw
-            // exception on timeout
+        try { // Connect to remote machine and retrieve a session. Will throw exception on timeout
             session = client.connect(username, host, port).verify(timeout).getSession();
         } catch (IOException e) {
-            throw new XenonException(adaptorName, "Connection setup timeout: " + host + ":" + port, e);
+            throw new XenonException(adaptorName, "Connection setup to " + host + ":" + port + " failed!", e);
         }
 
         // Figure out which type of credential we are using
@@ -273,7 +400,6 @@ public class SSHUtil {
                     pair = SecurityUtils.loadKeyPairIdentity(path.toString(), inputStream, null);
                 } else {
                     pair = SecurityUtils.loadKeyPairIdentity(path.toString(), inputStream, new PasswordProvider(password));
-
                 }
 
             } catch (Exception e) {
@@ -283,6 +409,7 @@ public class SSHUtil {
             session.addPublicKeyIdentity(pair);
 
         } else if (credential instanceof PasswordCredential) {
+
             PasswordCredential c = (PasswordCredential) credential;
             session.addPasswordIdentity(new String(c.getPassword()));
 
@@ -294,10 +421,94 @@ public class SSHUtil {
         try {
             session.auth().verify(timeout);
         } catch (IOException e) {
-            throw new XenonException(adaptorName, "Connection authentication timeout", e);
+            throw new XenonException(adaptorName, "Connection authentication failed", e);
         }
 
         return session;
+    }
+
+    /**
+     * Connect an existing {@link SshClient} to the server at <code>location</code> and authenticate using the given <code>credential</code>.
+     *
+     * @param adaptorName
+     *            the adaptor where this method was called from.
+     * @param client
+     *            the client to connect.
+     * @param location
+     *            the server to connect to
+     * @param credential
+     *            the credential to authenticate with.
+     * @param bufferSize
+     *            the buffer size used for the (optional) SSH tunnels.
+     * @param timeout
+     *            the timeout to use in connection setup (in milliseconds).
+     * @return the connected {@link ClientSession}
+     * @throws XenonException
+     *             if the connection setup or authentication failed.
+     */
+    public static SSHConnection connect(String adaptorName, SshClient client, String location, Credential credential, int bufferSize, long timeout)
+            throws XenonException {
+
+        if (credential == null) {
+            throw new IllegalArgumentException("Credential may not be null");
+        }
+
+        if (timeout <= 0) {
+            throw new IllegalArgumentException("Invalid timeout: " + timeout);
+        }
+
+        if (location == null) {
+            throw new IllegalArgumentException("Location may not be null");
+        }
+
+        SshdSocketAddress[] locations = extractLocations(adaptorName, location);
+        UserCredential[] creds = extractCredentials(adaptorName, locations, credential);
+
+        SSHConnection connection = new SSHConnection(locations.length - 1);
+
+        // Connect to the last location. This is either the destination (without tunneling) or the first hop.
+        ClientSession session = connectAndAuthenticate(adaptorName, client, locations[0].getHostName(), locations[0].getPort(), creds[0], timeout);
+
+        try {
+            // If we have more that one location we need to tunnel via another location.
+            for (int i = 1; i < locations.length; i++) {
+                ChannelDirectTcpip channel = session.createDirectTcpipChannel(null, locations[i]);
+                channel.open().await(timeout);
+
+                ServerSocket server = new ServerSocket(0);
+                int port = server.getLocalPort();
+
+                Tunnel tunnel = new Tunnel(server, channel, bufferSize);
+                tunnel.start();
+
+                connection.addHop(i - 1, session, tunnel);
+
+                session = null;
+                session = connectAndAuthenticate(adaptorName, client, "localhost", port, creds[i], timeout);
+            }
+
+        } catch (IOException e) {
+            // Attempt to cleanup the mess
+            connection.close();
+
+            if (session != null) {
+                try {
+                    session.close();
+                } catch (IOException e1) {
+                    // ignored
+                }
+            }
+
+            throw new XenonException(adaptorName, "Failed to set up SSH forwarding", e);
+
+        } catch (XenonException xe) {
+            // Attempt to cleanup the mess
+            connection.close();
+            throw xe;
+        }
+
+        connection.setSession(session);
+        return connection;
     }
 
     public static Map<String, String> translateProperties(Map<String, String> providedProperties, String orginalPrefix,

@@ -118,9 +118,8 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public final class <span class="typeNameLabel">StreamForwarder</span>
 extends java.lang.Thread</pre>
-<div class="block">A simple stream forwarder that uses a daemon thread to read from an <code>InputStream</code> and write it to a
- <code>OutputStream</code>.
- A small buffer is used (typically 1 KB) to improve performance. Any exceptions will be ignored.</div>
+<div class="block">A simple stream forwarder that uses a daemon thread to read from an <code>InputStream</code> and write it to a <code>OutputStream</code>. A small
+ buffer is used (typically 1 KB) to improve performance. Any exceptions will be ignored.</div>
 </li>
 </ul>
 </div>
@@ -171,6 +170,14 @@ extends java.lang.Thread</pre>
 <tr class="altColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/StreamForwarder.html#StreamForwarder-java.io.InputStream-java.io.OutputStream-">StreamForwarder</a></span>(java.io.InputStream&nbsp;in,
                java.io.OutputStream&nbsp;out)</code>
+<div class="block">Create a new StreamForwarder and start it immediately.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/StreamForwarder.html#StreamForwarder-java.lang.String-java.io.InputStream-java.io.OutputStream-int-">StreamForwarder</a></span>(java.lang.String&nbsp;name,
+               java.io.InputStream&nbsp;in,
+               java.io.OutputStream&nbsp;out,
+               int&nbsp;bufferSize)</code>
 <div class="block">Create a new StreamForwarder and start it immediately.</div>
 </td>
 </tr>
@@ -230,6 +237,26 @@ extends java.lang.Thread</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
+<a name="StreamForwarder-java.lang.String-java.io.InputStream-java.io.OutputStream-int-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>StreamForwarder</h4>
+<pre>public&nbsp;StreamForwarder(java.lang.String&nbsp;name,
+                       java.io.InputStream&nbsp;in,
+                       java.io.OutputStream&nbsp;out,
+                       int&nbsp;bufferSize)</pre>
+<div class="block">Create a new StreamForwarder and start it immediately.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - the name of the thread</dd>
+<dd><code>in</code> - the <code>InputStream</code> to read from.</dd>
+<dd><code>out</code> - the <code>OutputStream</code> to write to, or <code>null</code> to discard the output.</dd>
+<dd><code>bufferSize</code> - the buffer size to use, or 0 to use the default.</dd>
+</dl>
+</li>
+</ul>
 <a name="StreamForwarder-java.io.InputStream-java.io.OutputStream-">
 <!--   -->
 </a>
@@ -261,8 +288,8 @@ extends java.lang.Thread</pre>
 <li class="blockList">
 <h4>terminate</h4>
 <pre>public&nbsp;void&nbsp;terminate(long&nbsp;timeout)</pre>
-<div class="block">Wait for a given timeout for the StreamForwarder to terminate by reading an end-of-stream on the input. When the timeout
- expires both input and output streams will be closed, regardless of whether the input has reached end-of-line.</div>
+<div class="block">Wait for a given timeout for the StreamForwarder to terminate by reading an end-of-stream on the input. When the timeout expires both input and output
+ streams will be closed, regardless of whether the input has reached end-of-line.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>timeout</code> - The number of milliseconds to wait for termination.</dd>

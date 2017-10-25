@@ -21,9 +21,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.sshd.client.SshClient;
-import org.apache.sshd.client.session.ClientSession;
 import org.junit.Test;
 
+import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHConnection;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
@@ -40,14 +40,14 @@ public abstract class SshInteractiveProcessITest {
     @Test
     public void test_run_hostname() throws Exception {
         SshClient client = SSHUtil.createSSHClient(false, false, false, false, false);
-        ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10 * 1000);
+        SSHConnection conn = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 0, 10 * 1000);
 
         JobDescription desc = new JobDescription();
         desc.setExecutable("/bin/hostname");
 
         String id = "TESTID";
 
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, id, 10000L);
+        SshInteractiveProcess p = new SshInteractiveProcess(conn.getSession(), desc, id, 10000L);
 
         Streams s = p.getStreams();
 
@@ -75,14 +75,14 @@ public abstract class SshInteractiveProcessITest {
     @Test
     public void test_run_cat() throws Exception {
         SshClient client = SSHUtil.createSSHClient(false, false, false, false, false);
-        ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10 * 1000);
+        SSHConnection conn = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 0, 10 * 1000);
 
         JobDescription desc = new JobDescription();
         desc.setExecutable("/bin/cat");
 
         String id = "TESTID";
 
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, id, 10000L);
+        SshInteractiveProcess p = new SshInteractiveProcess(conn.getSession(), desc, id, 10000L);
 
         Streams s = p.getStreams();
 
@@ -111,7 +111,7 @@ public abstract class SshInteractiveProcessITest {
     @Test
     public void test_exitStatusBeforeFinish() throws Exception {
         SshClient client = SSHUtil.createSSHClient(false, false, false, false, false);
-        ClientSession session = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 10 * 1000);
+        SSHConnection conn = SSHUtil.connect("test", client, getLocation(), getCorrectCredential(), 0, 10 * 1000);
 
         JobDescription desc = new JobDescription();
         desc.setExecutable("/bin/sleep");
@@ -119,7 +119,7 @@ public abstract class SshInteractiveProcessITest {
 
         String id = "TESTID";
 
-        SshInteractiveProcess p = new SshInteractiveProcess(session, desc, id, 10000L);
+        SshInteractiveProcess p = new SshInteractiveProcess(conn.getSession(), desc, id, 10000L);
 
         // Not done yet, so exit returns -1
         assertEquals(-1, p.getExitStatus());

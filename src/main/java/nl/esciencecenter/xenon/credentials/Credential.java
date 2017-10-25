@@ -19,11 +19,5 @@ package nl.esciencecenter.xenon.credentials;
  * Credential represents a user credential uses to gain access to a resource.
  */
 public interface Credential {
-
-    /**
-     * Get user name associated with this Credential.
-     *
-     * @return the name of the adaptor.
-     */
-    String getUsername();
+    // empty interface that servers as parent type.
 }
