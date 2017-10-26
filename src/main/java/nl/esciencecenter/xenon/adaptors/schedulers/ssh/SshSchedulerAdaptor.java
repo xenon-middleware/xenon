@@ -104,7 +104,7 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
     public static final String SUBMITTED = JOBS + "submitted";
 
     /** The locations supported by this adaptor */
-    private static final String[] ADAPTOR_LOCATIONS = new String[] { "host[:port][/workdir][ via:otherhost[:port]]" };
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "host[:port][/workdir][ via:otherhost[:port]]*" };
 
     /** List of properties supported by this SSH adaptor */
     private static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {

@@ -54,7 +54,7 @@ public class TorqueSchedulerAdaptor extends ScriptingSchedulerAdaptor {
             + " and the file or the stfp filesystem adaptor to gain access to the filesystem of that machine.";
 
     /** The locations supported by this adaptor */
-    private static final String[] ADAPTOR_LOCATIONS = new String[] { "local://[/workdir]", "ssh://host[:port][/workdir]" };
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "local://[/workdir]", "ssh://host[:port][/workdir][ via:otherhost[:port]]*" };
 
     /** List of all properties supported by this adaptor */
     private static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
