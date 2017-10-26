@@ -116,6 +116,10 @@ public class SftpFileAdaptor extends FileAdaptor {
 
         LOGGER.debug("new SftpFileSystem location = {} credential = {} properties = {}", location, credential, properties);
 
+        if (location == null || location.isEmpty()) {
+            throw new InvalidLocationException(ADAPTOR_NAME, "Location may not be empty");
+        }
+
         if (credential == null) {
             throw new InvalidCredentialException(ADAPTOR_NAME, "Credential may not be null");
         }
