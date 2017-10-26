@@ -93,4 +93,42 @@ public class CredentialMap implements Credential {
 
         return defaultCredential;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((defaultCredential == null) ? 0 : defaultCredential.hashCode());
+        result = prime * result + ((map == null) ? 0 : map.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+
+        CredentialMap other = (CredentialMap) obj;
+
+        if (defaultCredential == null) {
+            if (other.defaultCredential != null)
+                return false;
+
+        } else if (!defaultCredential.equals(other.defaultCredential))
+            return false;
+
+        if (map == null) {
+            if (other.map != null)
+                return false;
+        } else if (!map.equals(other.map))
+            return false;
+
+        return true;
+    }
+
 }
