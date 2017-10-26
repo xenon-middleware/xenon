@@ -19,7 +19,7 @@ matrix:
         - docker-compose --version
       script:
         - ./gradlew check
-        - travis_wait 30 /src/fixedClientEnvironmentTest/resources/run-fixed-client-environment-test.sh;
+        - travis_wait 30 ./src/fixedClientEnvironmentTest/resources/run-fixed-client-environment-test.sh;
       after_script:
         - ./gradlew jacocoIntegrationTestReport jacocoFixedClientEnvironmentTestReport;
         - bash <(curl -s https://codecov.io/bash) -e JDK,OS -F unit -f build/reports/jacoco/test/jacocoTestReport.xml;
