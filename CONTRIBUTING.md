@@ -31,7 +31,7 @@ The sections below outline the steps in each case.
 1. (**important**) wait until some kind of concensus is reached about your idea being a good idea;
 1. if needed, fork the repository to your own Github profile and create your own feature branch off of the latest master commit. While working on your feature branch, make sure to stay up to date with the master branch by pulling in changes, possibly from the 'upstream' repository (follow the instructions [here](https://help.github.com/articles/configuring-a-remote-for-a-fork/) and [here](https://help.github.com/articles/syncing-a-fork/));
 1. make sure the existing unit tests still work by running ``./gradlew test``;
-1. make sure that the existing integration tests still work by running ``./gradlew integrationTest``;
+1. make sure that the existing integration tests still work by running ``./gradlew check``; and ``./src/fixedClientEnvironmentTest/resources/run-fixed-client-environment-test.sh``;
 1. add your own unit tests and integration tests (if necessary);
 1. update or expand the documentation;
 1. [push](http://rogerdudler.github.io/git-guide/) your feature branch to (your fork of) the Xenon repository on GitHub;

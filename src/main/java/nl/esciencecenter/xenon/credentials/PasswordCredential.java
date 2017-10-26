@@ -18,15 +18,14 @@ package nl.esciencecenter.xenon.credentials;
 import java.util.Arrays;
 import java.util.Objects;
 
-
 /**
  * A Credential consisting of a username + password combination.
  *
  */
-public class PasswordCredential implements Credential {
+public class PasswordCredential implements UserCredential {
 
     /**
-     *  The user name associated with the credential.
+     * The user name associated with the credential.
      */
     private final String username;
 
@@ -60,7 +59,6 @@ public class PasswordCredential implements Credential {
         return password.clone();
     }
 
-    @Override
     public String getUsername() {
         return username;
     }
@@ -72,11 +70,12 @@ public class PasswordCredential implements Credential {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         PasswordCredential that = (PasswordCredential) o;
-        return Objects.equals(username, that.username) &&
-                Arrays.equals(password, that.password);
+        return Objects.equals(username, that.username) && Arrays.equals(password, that.password);
     }
 
     @Override

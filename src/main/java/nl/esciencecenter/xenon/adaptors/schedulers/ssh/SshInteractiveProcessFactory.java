@@ -17,46 +17,45 @@ package nl.esciencecenter.xenon.adaptors.schedulers.ssh;
 
 import static nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor.ADAPTOR_NAME;
 
-import org.apache.sshd.client.session.ClientSession;
-
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcess;
 import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcessFactory;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerClosedException;
+import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHConnection;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 public class SshInteractiveProcessFactory implements InteractiveProcessFactory {
 
-    private final ClientSession session;
+    private final SSHConnection connection;
 
-    protected SshInteractiveProcessFactory(ClientSession session) {
+    protected SshInteractiveProcessFactory(SSHConnection session) {
 
         if (session == null) {
             throw new IllegalArgumentException("Session may not be null");
         }
 
-        this.session = session;
+        this.connection = session;
     }
 
     @Override
     public InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier, long timeoutInMillis) throws XenonException {
 
-        if (session.isClosed()) {
+        if (connection.isClosed()) {
             throw new SchedulerClosedException(ADAPTOR_NAME, "Scheduler is closed");
         }
 
-        return new SshInteractiveProcess(session, description, jobIdentifier, timeoutInMillis);
+        return new SshInteractiveProcess(connection.getSession(), description, jobIdentifier, timeoutInMillis);
     }
 
     @Override
     public void close() throws XenonException {
 
-        if (session.isClosed()) {
+        if (connection.isClosed()) {
             throw new SchedulerClosedException(ADAPTOR_NAME, "Scheduler already closed");
         }
 
         try {
-            session.close();
+            connection.close();
         } catch (Exception e) {
             throw new XenonException(ADAPTOR_NAME, "Scheduler failed to close", e);
         }
@@ -64,6 +63,6 @@ public class SshInteractiveProcessFactory implements InteractiveProcessFactory {
 
     @Override
     public boolean isOpen() throws XenonException {
-        return session.isOpen();
+        return connection.isOpen();
     }
 }

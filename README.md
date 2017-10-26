@@ -4,10 +4,10 @@
 [![Build Status](https://travis-ci.org/NLeSC/Xenon.svg?branch=develop)](https://travis-ci.org/NLeSC/Xenon)
 [![Build status Windows](https://ci.appveyor.com/api/projects/status/h4l4wn158db23kuf?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon/branch/master)
 [![codecov.io](https://codecov.io/github/NLeSC/Xenon/coverage.svg?branch=master)](https://codecov.io/github/NLeSC/Xenon?branch=master)
-[![SonarQube Coverage](https://sonarqube.com/api/badges/measure?key=nlesc%3AXenon&metric=coverage)](https://sonarqube.com/component_measures/domain/Coverage?id=nlesc%3AXenon)
+[![SonarQube Gate](https://sonarqube.com/api/badges/gate?key=nlesc%3AXenon)](https://sonarqube.com/dashboard?id=nlesc%3AXenon)
 [![GitHub license](https://img.shields.io/badge/license-Apache--2.0%20-blue.svg)](https://github.com/NLeSC/Xenon/blob/master/LICENSE)
 [![Download](https://jitpack.io/v/NLeSC/Xenon.svg)](https://jitpack.io/#NLeSC/Xenon)
-[![DOI](https://zenodo.org/badge/9236864.svg)](https://zenodo.org/badge/latestdoi/9236864)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.597993.svg)](https://doi.org/10.5281/zenodo.597993)
 
 Copyright 2013-2017 The Netherlands eScience Center
 
@@ -67,14 +67,14 @@ See the [roadmap](/ROADMAP.md) for the planned extensions.
 
 ## Adding Xenon as a dependency to your project
 
-Follow the instructions from [jitpack.io](https://jitpack.io/#NLeSC/Xenon/2.0.0-rc2) to include Xenon as a 
+Follow the instructions from [bintray.com](https://bintray.com/nlesc/xenon/xenon) to include Xenon as a 
 dependency for Gradle, Maven, SBT, or Leiningen projects, e.g. Gradle:
 
 ```gradle
 	allprojects {
 		repositories {
 			...
-			maven { url 'https://jitpack.io' }
+			jcenter()
 		}
 	}
 ```
@@ -83,7 +83,7 @@ and
 
 ```gradle
 	dependencies {
-	        compile 'com.github.NLeSC:Xenon:2.0.0-rc2'
+	        compile 'nl.esciencecenter.xenon:xenon:2.0.0'
 	}
 
 ```
@@ -93,8 +93,8 @@ Or for a Maven project,
 ```maven
 	<repositories>
 		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
+		    <id>jcenter</id>
+		    <url>https://jcenter.bintray.com</url>
 		</repository>
 	</repositories>
 ```
@@ -104,9 +104,9 @@ and
 
 ```maven
 	<dependency>
-	    <groupId>com.github.NLeSC</groupId>
-	    <artifactId>Xenon</artifactId>
-	    <version>2.0.0-rc2</version>
+	    <groupId>nl.esciencecenter.xenon</groupId>
+	    <artifactId>xenon</artifactId>
+	    <version>2.0.0</version>
 	</dependency>
 ```
 
@@ -216,7 +216,7 @@ For more examples, see the tutorial at [Read The Docs](http://xenonrse2017.readt
 
 ## Documentation
 
-Xenon's JavaDoc is available online at <https://jitpack.io/com/github/NLeSC/Xenon/master-SNAPSHOT/javadoc/index.html>.
+Xenon's JavaDoc is available online at <http://nlesc.github.io/Xenon/versions/2.0.0/javadoc/>.
 
 ## Legal
 

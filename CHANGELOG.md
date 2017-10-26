@@ -1,9 +1,9 @@
-Xenon 2.0
+Xenon 2.0.0
 -----------
 
-This is release 2.0 of Xenon. 
+This is release 2.0.0 of Xenon. 
 
-Notable changes compared to v1.2.2:
+Notable changes compared to v1.2.3:
 -----------------------------------
 
 - complete overhaul of public API, which should increase ease-of-use significantly. 
@@ -11,6 +11,12 @@ Notable changes compared to v1.2.2:
 - complete overhaul of implementation, which should make implementing adaptors much more straightforward.
 - replaced Jsch with Apache SSHD in the SSH and SFTP adaptors
 - replaced Apache Jackrabbit with Sardine in the Webdav adaptor. 
+- added an S3 filesystem adaptor. 
+
+Notable changes compared to v1.2.2:
+-----------------------------------
+
+- fixed various issues flagged by sonarqube
 
 Notable changes compared to v1.2.1:
 -----------------------------------
@@ -65,9 +71,9 @@ There is no adaptor writing documentation at the moment, nor is the Javadoc comp
 
 It should be made easier to inspect at runtime which adaptors are available and what properties they support.
 
-We can always use more adaptors, e.g, for S3, SWIFT, HDFS, YARN, Azure-Batch, etc. These are planned for 1.3 or later.
+We can always use more adaptors, e.g, for SWIFT, HDFS, YARN, Azure-Batch, etc. These are planned for 2.1.0 or later.
 
-We can always use more interfaces, e.g. for clouds. This is planned for 2.0.
+We can always use more interfaces, e.g. for clouds (to start and stop VMs). This is planned for 3.0.0.
 
 
 

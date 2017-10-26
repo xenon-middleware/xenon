@@ -40,6 +40,7 @@ import nl.esciencecenter.xenon.adaptors.filesystems.NoSpaceException;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
 import nl.esciencecenter.xenon.adaptors.filesystems.PermissionDeniedException;
 import nl.esciencecenter.xenon.adaptors.filesystems.PosixFileUtils;
+import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHConnection;
 import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
@@ -54,10 +55,13 @@ public class SftpFileSystem extends FileSystem {
     private static final Logger LOGGER = LoggerFactory.getLogger(SftpFileSystem.class);
 
     private final SftpClient client;
+    private final SSHConnection connection;
 
-    protected SftpFileSystem(String uniqueID, String name, String location, Path entryPath, int bufferSize, SftpClient client, XenonProperties properties) {
+    protected SftpFileSystem(String uniqueID, String name, String location, Path entryPath, int bufferSize, SSHConnection connection, SftpClient client,
+            XenonProperties properties) {
         super(uniqueID, name, location, entryPath, bufferSize, properties);
         this.client = client;
+        this.connection = connection;
     }
 
     @Override
@@ -65,13 +69,21 @@ public class SftpFileSystem extends FileSystem {
 
         LOGGER.debug("close fileSystem = {}", this);
 
+        IOException ex = null;
+
         try {
             client.close();
         } catch (IOException e) {
-            throw sftpExceptionToXenonException(e, "Failed to close sftp client");
+            ex = e;
         }
 
+        connection.close();
         super.close();
+
+        if (ex != null) {
+            throw sftpExceptionToXenonException(ex, "Failed to close sftp client");
+        }
+
         LOGGER.debug("close OK");
     }
 

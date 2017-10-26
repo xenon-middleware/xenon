@@ -21,7 +21,6 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.apache.sshd.client.SshClient;
-import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.client.subsystem.sftp.SftpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +33,7 @@ import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
+import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHConnection;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
@@ -129,23 +129,24 @@ public class SftpFileAdaptor extends FileAdaptor {
                     "Invalid value for " + BUFFER_SIZE + ": " + bufferSize + " (must be between 1 and " + Integer.MAX_VALUE + ")");
         }
 
+        boolean loadKnownHosts = xp.getBooleanProperty(LOAD_STANDARD_KNOWN_HOSTS);
         boolean loadSSHConfig = xp.getBooleanProperty(LOAD_SSH_CONFIG);
         boolean strictHostCheck = xp.getBooleanProperty(STRICT_HOST_KEY_CHECKING);
-        boolean addHostKey = xp.getBooleanProperty(AUTOMATICALLY_ADD_HOST_KEY);
         boolean useSSHAgent = xp.getBooleanProperty(AGENT);
         boolean useAgentForwarding = xp.getBooleanProperty(AGENT_FORWARDING);
 
-        SshClient client = SSHUtil.createSSHClient(loadSSHConfig, strictHostCheck, addHostKey, useSSHAgent, useAgentForwarding);
+        SshClient client = SSHUtil.createSSHClient(loadKnownHosts, loadSSHConfig, strictHostCheck, useSSHAgent, useAgentForwarding);
 
         long timeout = xp.getNaturalProperty(CONNECTION_TIMEOUT);
 
-        ClientSession session = SSHUtil.connect(ADAPTOR_NAME, client, location, credential, timeout);
+        SSHConnection session = SSHUtil.connect(ADAPTOR_NAME, client, location, credential, (int) bufferSize, timeout);
 
         SftpClient sftpClient = null;
 
         try {
             sftpClient = session.createSftpClient();
         } catch (IOException e) {
+            session.close();
             client.close(true);
             throw new XenonException(ADAPTOR_NAME, "Failed to create SFTP session", e);
         }
@@ -155,11 +156,12 @@ public class SftpFileAdaptor extends FileAdaptor {
         try {
             cwd = getCurrentWorkingDirectory(sftpClient, location);
         } catch (Exception e) {
+            session.close();
             client.close(true);
             throw e;
         }
 
-        return new SftpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), (int) bufferSize, sftpClient, xp);
+        return new SftpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), (int) bufferSize, session, sftpClient, xp);
     }
 
     private String getCurrentWorkingDirectory(SftpClient sftpClient, String location) throws XenonException {

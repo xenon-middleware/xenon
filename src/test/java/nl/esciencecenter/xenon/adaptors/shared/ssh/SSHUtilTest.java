@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.shared.ssh;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.sshd.common.util.net.SshdSocketAddress;
 import org.junit.Test;
 
 import nl.esciencecenter.xenon.InvalidLocationException;
@@ -143,6 +145,50 @@ public class SSHUtilTest {
         assertEquals("false", result.get("xenon.adaptors.schedulers.ssh.strictHostKeyChecking"));
         assertEquals("true", result.get("xenon.adaptors.schedulers.ssh.agentForwarding"));
         assertEquals("/somewhere/config", result.get("xenon.adaptors.schedulers.ssh.sshConfigFile"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_extractLocations_null() throws InvalidLocationException {
+        SSHUtil.extractLocations("Test", null);
+    }
+
+    @Test
+    public void test_extractLocations_singleLocation() throws InvalidLocationException {
+        SshdSocketAddress[] expected = new SshdSocketAddress[] { new SshdSocketAddress("localhost", 22) };
+        SshdSocketAddress[] result = SSHUtil.extractLocations("Test", "localhost:22/tmp");
+
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
+    public void test_extractLocations_dualLocation() throws InvalidLocationException {
+        SshdSocketAddress[] expected = new SshdSocketAddress[] { new SshdSocketAddress("somehost", 33), new SshdSocketAddress("localhost", 22) };
+        SshdSocketAddress[] result = SSHUtil.extractLocations("Test", "localhost:22/tmp via:somehost:33");
+
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
+    public void test_extractLocations_quadLocation() throws InvalidLocationException {
+        SshdSocketAddress[] expected = new SshdSocketAddress[] { new SshdSocketAddress("cloudhost", 55), new SshdSocketAddress("myhost", 44),
+                new SshdSocketAddress("somehost", 33), new SshdSocketAddress("localhost", 22) };
+
+        SshdSocketAddress[] result = SSHUtil.extractLocations("Test", "localhost:22/tmp via:somehost:33 via:myhost:44 via:cloudhost:55");
+
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
+    public void test_extractLocations_dualLocationWhitespace() throws InvalidLocationException {
+        SshdSocketAddress[] expected = new SshdSocketAddress[] { new SshdSocketAddress("somehost", 33), new SshdSocketAddress("localhost", 22) };
+        SshdSocketAddress[] result = SSHUtil.extractLocations("Test", "localhost:22/tmp via:    somehost:33");
+
+        assertArrayEquals(expected, result);
+    }
+
+    @Test(expected = InvalidLocationException.class)
+    public void test_extractLocations_dualLocation_wrong() throws InvalidLocationException {
+        SSHUtil.extractLocations("Test", " via:localhost:22/tmp via:somehost:33");
     }
 
 }

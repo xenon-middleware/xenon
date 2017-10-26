@@ -22,7 +22,7 @@ import java.util.Objects;
  *
  * It mainly serves as a placeholder to indicate that the adaptor must revert to whatever default behavior it defines.
  */
-public class DefaultCredential implements Credential {
+public class DefaultCredential implements UserCredential {
 
     private final String username;
 
@@ -41,8 +41,10 @@ public class DefaultCredential implements Credential {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         DefaultCredential that = (DefaultCredential) o;
         return Objects.equals(username, that.username);
     }

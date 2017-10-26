@@ -141,6 +141,10 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/filesystems/FileSyste
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/sftp/SftpFileSystem.html#client">client</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code>private <a href="../../../../../../nl/esciencecenter/xenon/adaptors/shared/ssh/SSHConnection.html" title="class in nl.esciencecenter.xenon.adaptors.shared.ssh">SSHConnection</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/sftp/SftpFileSystem.html#connection">connection</a></span></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>private static org.slf4j.Logger</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/sftp/SftpFileSystem.html#LOGGER">LOGGER</a></span></code>&nbsp;</td>
 </tr>
@@ -161,11 +165,12 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/filesystems/FileSyste
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>protected </code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/sftp/SftpFileSystem.html#SftpFileSystem-java.lang.String-java.lang.String-java.lang.String-nl.esciencecenter.xenon.filesystems.Path-int-org.apache.sshd.client.subsystem.sftp.SftpClient-nl.esciencecenter.xenon.adaptors.XenonProperties-">SftpFileSystem</a></span>(java.lang.String&nbsp;uniqueID,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/sftp/SftpFileSystem.html#SftpFileSystem-java.lang.String-java.lang.String-java.lang.String-nl.esciencecenter.xenon.filesystems.Path-int-nl.esciencecenter.xenon.adaptors.shared.ssh.SSHConnection-org.apache.sshd.client.subsystem.sftp.SftpClient-nl.esciencecenter.xenon.adaptors.XenonProperties-">SftpFileSystem</a></span>(java.lang.String&nbsp;uniqueID,
               java.lang.String&nbsp;name,
               java.lang.String&nbsp;location,
               <a href="../../../../../../nl/esciencecenter/xenon/filesystems/Path.html" title="class in nl.esciencecenter.xenon.filesystems">Path</a>&nbsp;entryPath,
               int&nbsp;bufferSize,
+              <a href="../../../../../../nl/esciencecenter/xenon/adaptors/shared/ssh/SSHConnection.html" title="class in nl.esciencecenter.xenon.adaptors.shared.ssh">SSHConnection</a>&nbsp;connection,
               org.apache.sshd.client.subsystem.sftp.SftpClient&nbsp;client,
               <a href="../../../../../../nl/esciencecenter/xenon/adaptors/XenonProperties.html" title="class in nl.esciencecenter.xenon.adaptors">XenonProperties</a>&nbsp;properties)</code>&nbsp;</td>
 </tr>
@@ -349,10 +354,19 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/filesystems/FileSyste
 <a name="client">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>client</h4>
 <pre>private final&nbsp;org.apache.sshd.client.subsystem.sftp.SftpClient client</pre>
+</li>
+</ul>
+<a name="connection">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>connection</h4>
+<pre>private final&nbsp;<a href="../../../../../../nl/esciencecenter/xenon/adaptors/shared/ssh/SSHConnection.html" title="class in nl.esciencecenter.xenon.adaptors.shared.ssh">SSHConnection</a> connection</pre>
 </li>
 </ul>
 </li>
@@ -363,7 +377,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/filesystems/FileSyste
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="SftpFileSystem-java.lang.String-java.lang.String-java.lang.String-nl.esciencecenter.xenon.filesystems.Path-int-org.apache.sshd.client.subsystem.sftp.SftpClient-nl.esciencecenter.xenon.adaptors.XenonProperties-">
+<a name="SftpFileSystem-java.lang.String-java.lang.String-java.lang.String-nl.esciencecenter.xenon.filesystems.Path-int-nl.esciencecenter.xenon.adaptors.shared.ssh.SSHConnection-org.apache.sshd.client.subsystem.sftp.SftpClient-nl.esciencecenter.xenon.adaptors.XenonProperties-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -374,6 +388,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/filesystems/FileSyste
                          java.lang.String&nbsp;location,
                          <a href="../../../../../../nl/esciencecenter/xenon/filesystems/Path.html" title="class in nl.esciencecenter.xenon.filesystems">Path</a>&nbsp;entryPath,
                          int&nbsp;bufferSize,
+                         <a href="../../../../../../nl/esciencecenter/xenon/adaptors/shared/ssh/SSHConnection.html" title="class in nl.esciencecenter.xenon.adaptors.shared.ssh">SSHConnection</a>&nbsp;connection,
                          org.apache.sshd.client.subsystem.sftp.SftpClient&nbsp;client,
                          <a href="../../../../../../nl/esciencecenter/xenon/adaptors/XenonProperties.html" title="class in nl.esciencecenter.xenon.adaptors">XenonProperties</a>&nbsp;properties)</pre>
 </li>

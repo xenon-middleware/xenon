@@ -16,7 +16,6 @@
 package nl.esciencecenter.xenon.adaptors.shared.ssh;
 
 import org.apache.sshd.client.SshClient;
-import org.apache.sshd.client.session.ClientSession;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -43,7 +42,7 @@ public class SSHUtilPasswordCredentialDockerTest {
         // Create a certificate credential that matches the (hard-coded) setup of the docker container.
         Credential credential = new DefaultCredential();
 
-        ClientSession session = SSHUtil.connect("SSHTEST", client, location, credential, 10 * 1000);
+        SSHConnection session = SSHUtil.connect("SSHTEST", client, location, credential, 0, 10 * 1000);
         session.close();
     }
 
@@ -57,7 +56,7 @@ public class SSHUtilPasswordCredentialDockerTest {
         // Create a certificate credential that matches the (hard-coded) setup of the docker container.
         Credential credential = new DefaultCredential("xenon");
 
-        ClientSession session = SSHUtil.connect("SSHTEST", client, location, credential, 10 * 1000);
+        SSHConnection session = SSHUtil.connect("SSHTEST", client, location, credential, 0, 10 * 1000);
         session.close();
     }
 
@@ -71,7 +70,7 @@ public class SSHUtilPasswordCredentialDockerTest {
         // Create a certificate credential that matches the (hard-coded) setup of the docker container.
         Credential credential = new CertificateCredential("xenon", "/home/xenon/.ssh/id_rsa", null);
 
-        ClientSession session = SSHUtil.connect("SSHTEST", client, location, credential, 10 * 1000);
+        SSHConnection session = SSHUtil.connect("SSHTEST", client, location, credential, 0, 10 * 1000);
         session.close();
     }
 
@@ -85,7 +84,7 @@ public class SSHUtilPasswordCredentialDockerTest {
         // Create a certificate credential that matches the (hard-coded) setup of the docker container.
         Credential credential = new CertificateCredential("xenon2", "/home/xenon/.ssh/id_rsa_pw", "javagat2".toCharArray());
 
-        ClientSession session = SSHUtil.connect("SSHTEST", client, location, credential, 10 * 1000);
+        SSHConnection session = SSHUtil.connect("SSHTEST", client, location, credential, 0, 10 * 1000);
         session.close();
     }
 
