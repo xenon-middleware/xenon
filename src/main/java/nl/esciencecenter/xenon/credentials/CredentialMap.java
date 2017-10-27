@@ -24,7 +24,7 @@ import java.util.HashMap;
  */
 public class CredentialMap implements Credential {
 
-    private HashMap<String, UserCredential> map = new HashMap<>();
+    private final HashMap<String, UserCredential> map = new HashMap<>();
 
     private UserCredential defaultCredential;
 
@@ -122,10 +122,7 @@ public class CredentialMap implements Credential {
         } else if (!defaultCredential.equals(other.defaultCredential))
             return false;
 
-        if (map == null) {
-            if (other.map != null)
-                return false;
-        } else if (!map.equals(other.map))
+        if (!map.equals(other.map))
             return false;
 
         return true;

@@ -59,16 +59,6 @@ public class LocalFileSystem extends FileSystem {
             throw new IllegalArgumentException("Path may not be null");
         }
 
-        /*
-         * Path relPath = path.normalize(); int numElems = relPath.getNameCount();
-         *
-         * // replace tilde if (numElems != 0) { String firstPart = relPath.getName(0).toString(); if ("~".equals(firstPart)) { String tmp =
-         * getLocalRootlessPath(System.getProperty("user.home")); Path home = new Path(LocalFileSystemUtils.getLocalSeparator(), tmp);
-         *
-         * if (numElems == 1) { relPath = home; } else { relPath = home.resolve(relPath.subpath(1, numElems)); } } }
-         *
-         * Path absPath = toAbsolutePath(relPath);
-         */
         return FileSystems.getDefault().getPath(root, toAbsolutePath(path.normalize()).toString());
     }
 

@@ -140,9 +140,4 @@ public class WebdavFileAdaptor extends FileAdaptor {
 
         return new WebdavFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, server, new Path(cwd), (int) bufferSize, sardine, xp);
     }
-
-    public void end() {
-        LOGGER.debug("end OK");
-    }
-
 }

@@ -57,9 +57,52 @@ public class CredentialMapTest {
         assertEquals(p, m.get("key"));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void test_put() {
+        PasswordCredential p = new PasswordCredential("test", "foo".toCharArray());
+
+        CredentialMap m = new CredentialMap();
+        m.put(null, p);
+    }
+
     @Test
     public void test_equals_empty() {
         assertEquals(new CredentialMap(), new CredentialMap());
+    }
+
+    @Test
+    public void test_equals_same() {
+        CredentialMap c = new CredentialMap();
+        assertTrue(c.equals(c));
+    }
+
+    @Test
+    public void test_not_equals_null() {
+        CredentialMap c = new CredentialMap();
+        assertFalse(c.equals(null));
+    }
+
+    @Test
+    public void test_not_equals_different_type() {
+        CredentialMap c = new CredentialMap();
+        assertFalse(c.equals("Hello"));
+    }
+
+    @Test
+    public void test_not_equals_different_default_null() {
+        CredentialMap c1 = new CredentialMap();
+        CredentialMap c2 = new CredentialMap(new DefaultCredential());
+
+        assertFalse(c1.equals(c2));
+        assertFalse(c2.equals(c1));
+    }
+
+    @Test
+    public void test_not_equals_different_default_type() {
+        CredentialMap c1 = new CredentialMap(new PasswordCredential("aap", "noot".toCharArray()));
+        CredentialMap c2 = new CredentialMap(new DefaultCredential());
+
+        assertFalse(c1.equals(c2));
     }
 
     @Test

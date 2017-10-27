@@ -114,7 +114,7 @@ public class S3FileAdaptor extends FileAdaptor {
             bucketPath = bucketPath.substring(1);
         }
 
-        int split = bucketPath.indexOf("/");
+        int split = bucketPath.indexOf('/');
 
         if (split < 0) {
             bucket = bucketPath;
