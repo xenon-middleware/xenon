@@ -24,8 +24,8 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
     final org.apache.hadoop.fs.FileSystem fs;
     boolean closed;
 
-    protected HDFSFileSystem(String uniqueID, String endPoint, org.apache.hadoop.fs.FileSystem fs, XenonProperties properties) {
-        super(uniqueID,"hdfs",endPoint,fromHDFSPath(fs.getWorkingDirectory()),properties);
+    protected HDFSFileSystem(String uniqueID, String endPoint, org.apache.hadoop.fs.FileSystem fs,  int bufferSize, XenonProperties properties) {
+        super(uniqueID,"hdfs",endPoint,fromHDFSPath(fs.getWorkingDirectory()),bufferSize,properties);
         this.fs = fs;
         closed = false;
     }

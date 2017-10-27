@@ -28,8 +28,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-
-import nl.esciencecenter.xenon.adaptors.filesystems.RecursiveListIterator;
 import org.jclouds.blobstore.BlobStoreContext;
 import org.jclouds.blobstore.domain.Blob;
 import org.jclouds.blobstore.domain.BlobMetadata;
@@ -65,7 +63,7 @@ public class JCloudsFileSytem extends FileSystem {
     boolean open;
 
     public JCloudsFileSytem(String uniqueID, String adaptorName, String endPoint, Path workingDir, BlobStoreContext context, String bucket, int bufferSize,
-            XenonProperties properties) {
+                            XenonProperties properties) {
         super(uniqueID, adaptorName, endPoint, workingDir, bufferSize, properties);
         this.context = context;
         this.bucket = bucket;
@@ -280,13 +278,13 @@ public class JCloudsFileSytem extends FileSystem {
     PathAttributes toPathAttributes(final StorageMetadata m) {
 
         switch (m.getType()) {
-        case RELATIVE_PATH:
-            return makeDirAttributes(m);
-        case BLOB:
-            return makeBlobAttributes(m.getName());
-        default:
-            // Should never occur, as we filter the types.
-            return null;
+            case RELATIVE_PATH:
+                return makeDirAttributes(m);
+            case BLOB:
+                return makeBlobAttributes(m.getName());
+            default:
+                // Should never occur, as we filter the types.
+                return null;
         }
     }
 
@@ -339,8 +337,7 @@ public class JCloudsFileSytem extends FileSystem {
         }
     }
 
-    Iterator<PathAttributes> listNonRecursiveIterator(Path p) {
-        String bucketEntry = toBucketEntry(p);
+    Iterator<PathAttributes> listNonRecursiveIterator(String bucketEntry) {
         ListContainerOptions options = new ListContainerOptions().prefix(bucketEntry + "/");
         // JClouds on S3 does not list directories if recursive is set :( Fixing it ourselves
         final ListContainerOptions optionsFinal = options;
@@ -462,4 +459,45 @@ public class JCloudsFileSytem extends FileSystem {
         throw new UnsupportedOperationException(getAdaptorName(), "POSIX permissions not supported");
     }
 
+    private class RecursiveListIterator implements Iterator<PathAttributes> {
+
+        final Deque<Iterator<PathAttributes>> stack;
+
+        public RecursiveListIterator(Iterator<PathAttributes> root) {
+            stack = new ArrayDeque<>();
+            stack.push(root);
+        }
+
+        void popEmpties() {
+            while (!stack.isEmpty()) {
+                if (!stack.peek().hasNext()) {
+                    stack.pop();
+                } else {
+                    return;
+                }
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            popEmpties();
+            return !stack.isEmpty();
+        }
+
+        @Override
+        public PathAttributes next() throws NoSuchElementException {
+
+            PathAttributes nxt = stack.peek().next();
+
+            if (nxt == null) {
+                throw new NoSuchElementException("No more elements");
+            }
+
+            if (nxt.isDirectory()) {
+                stack.push(listNonRecursiveIterator(toBucketEntry(nxt.getPath())));
+            }
+            popEmpties();
+            return nxt;
+        }
+    }
 }

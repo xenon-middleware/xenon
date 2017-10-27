@@ -11,7 +11,6 @@ public class KeytabCredential implements Credential {
     }
 
 
-    @Override
     public String getUsername() {
         return username;
     }

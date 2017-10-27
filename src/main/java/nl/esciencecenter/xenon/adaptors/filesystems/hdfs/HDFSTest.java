@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.credentials.KeytabCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.*;
 import nl.esciencecenter.xenon.utils.OutputReader;
@@ -34,31 +35,44 @@ public class HDFSTest {
 
     public static void main(String[] argv){
 
+        System.setProperty("java.security.krb5.conf", "/home/atze/krb5.conf");
 
-
+//        conf.set("dfs.datanode.kerberos.principal",  "hdfs/localhost@esciencecenter.nl");
+//        conf.set("dfs.namenode.kerberos.http.principal","HTTP/localhost@esciencecenter.nl");
+//        conf.set("dfs.namenode.kerberos.principal", "hdfs/localhost@esciencecenter.nl");
+////        conf.set("dfs.namenode.kerberos.internal.spnego.principal","HTTP/localhost@esciencecenter.nl");
+////        conf.set("hadoop.http.authentication.kerberos.principal", "HTTP/localhost@esciencecenter.nl");
+//        conf.set("dfs.block.access.token.enable", "true");
+//        conf.set("dfs.data.transfer.protection","integrity");
         try {
             Map<String,String> properties = new HashMap();
-            //properties.put(HDFSFileAdaptor.DATA_NODE_ADRESS, "localhost:50016");
-            FileSystem fs = new HDFSFileAdaptor().createFileSystem("localhost:8020", new DefaultCredential(), properties);
+            properties.put(HDFSFileAdaptor.AUTHENTICATION,"kerberos");
+            properties.put(HDFSFileAdaptor.DFS_NAMENODE_KERBEROS_PRINCIPAL,"hdfs/localhost@esciencecenter.nl");
+            properties.put(HDFSFileAdaptor.BLOCK_ACCESS_TOKEN, "true");
+            properties.put(HDFSFileAdaptor.TRANSFER_PROTECTION, "integrity");
+//            properties.put(HDFSFileAdaptor.DATA_NODE_ADRESS, "localhost:50016");
+            KeytabCredential kt = new KeytabCredential("xenon@esciencecenter.nl","/home/atze/xenon.keytab");
+            FileSystem fs = new HDFSFileAdaptor().createFileSystem("localhost:8020", kt, properties);
             fs.setWorkingDirectory(new Path("/filesystem-test-fixture"));
 
-           // fs.createDirectory(new Path("jada"));
-
+//            fs.createDirectory(new Path("jada"));
+//
             byte[] data = "Hello World!".getBytes();
 
-            //fs.createFile(new Path("bla201"));
-//            String deep = "";
-//            for(int i = 0 ; i < 20; i++){
-//                deep += "blaab" + i + "/";
-//                for(int j = 0 ; j < 20 ; j++) {
-//                    OutputStream s = fs.writeToFile(new Path(deep + "jadaab" + j));
-//
-//                    s.write(data);
-//                    s.close();
-//                }
-//            }
+
+//            fs.createFile(new Path("bla201"));
+            String deep = "";
+            for(int i = 0 ; i < 20; i++){
+                deep += "blayasca" + i + "/";
+                for(int j = 0 ; j < 20 ; j++) {
+                    OutputStream s = fs.writeToFile(new Path(deep + "jadaab" + j));
+
+                    s.write(data);
+                    s.close();
+                }
+            }
             //String p = "jada/bla100";
-            Iterator<PathAttributes> ps = fs.list(new Path("/filesystem-test-fixture/blaab0/blaab1"),true).iterator();
+            Iterator<PathAttributes> ps = fs.list(new Path("/filesystem-test-fixture"),true).iterator();
             System.out.println(ps.hasNext());
             while(ps.hasNext()){
                 System.out.println(ps.next().getPath().toString());

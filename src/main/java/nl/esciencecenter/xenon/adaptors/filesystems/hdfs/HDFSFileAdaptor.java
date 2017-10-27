@@ -1,5 +1,6 @@
 package nl.esciencecenter.xenon.adaptors.filesystems.hdfs;
 
+import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
@@ -31,6 +32,9 @@ public class HDFSFileAdaptor extends FileAdaptor{
 
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(HDFSFileAdaptor.class);
 
+    /** The name of this adaptor */
+    public static final String ADAPTOR_NAME = "hdfs";
+
     /** The default SSH port */
     protected static final int DEFAULT_PORT = 21;
 
@@ -48,9 +52,22 @@ public class HDFSFileAdaptor extends FileAdaptor{
 
     public static final String AUTHENTICATION = PREFIX + "authentication";
 
+    public static final String DFS_NAMENODE_KERBEROS_PRINCIPAL = PREFIX + "dfs.namenode.kerberos.principal";
+
+    public static final String BLOCK_ACCESS_TOKEN = PREFIX + "dfs.block.access.token.enable";
+
+    public static final String TRANSFER_PROTECTION = PREFIX + "dfs.data.transfer.protection";
+
+    /** The buffer size to use when copying data. */
+    public static final String BUFFER_SIZE = PREFIX + "bufferSize";
+
     protected static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
+            new XenonPropertyDescription(BUFFER_SIZE, XenonPropertyDescription.Type.SIZE, "64K", "The buffer size to use when copying files (in bytes)."),
             new XenonPropertyDescription(REPLACE_ON_FAILURE, XenonPropertyDescription.Type.STRING, "DEFAULT", "Corresponds to Hadoop property: dfs.client.block.write.replace-datanode-on-failure.policy "),
-            new XenonPropertyDescription(AUTHENTICATION, XenonPropertyDescription.Type.STRING, "simple", "Corresponds to Hadoop property hadoop.security.authentication, possible values: simple and kerberos(default)")
+            new XenonPropertyDescription(AUTHENTICATION, XenonPropertyDescription.Type.STRING, "simple", "Corresponds to Hadoop property hadoop.security.authentication, possible values: simple and kerberos(default)"),
+            new XenonPropertyDescription(DFS_NAMENODE_KERBEROS_PRINCIPAL, XenonPropertyDescription.Type.STRING, "" , "Corresponds to Hadoop property dfs.namenode.kerberos.principal. For use when kerberos is enabled"),
+            new XenonPropertyDescription(BLOCK_ACCESS_TOKEN, XenonPropertyDescription.Type.STRING, "false" , "Corresponds to Hadoop property dfs.block.access.token.enable"),
+            new XenonPropertyDescription(TRANSFER_PROTECTION, XenonPropertyDescription.Type.STRING, "" , "Corresponds to Hadoop property dfs.data.transfer.protection")
     };
 
     public HDFSFileAdaptor() {
@@ -63,14 +80,26 @@ public class HDFSFileAdaptor extends FileAdaptor{
         Configuration conf = new Configuration(false);
         conf.set("fs.defaultFS", location);
         properties = properties == null ? new HashMap<>() : properties;
+        // Verbatim forward Hadoop properties starting with "dfs." and "hadoop."
         if(properties.containsKey(REPLACE_ON_FAILURE)){
             conf.set("dfs.client.block.write.replace-datanode-on-failure.policy",properties.get(REPLACE_ON_FAILURE));
         }
         if(properties.containsKey(AUTHENTICATION)){
             conf.set("hadoop.security.authentication", properties.get(AUTHENTICATION));
         }
+        if(properties.containsKey(DFS_NAMENODE_KERBEROS_PRINCIPAL)){
+            conf.set("dfs.namenode.kerberos.principal",properties.get(DFS_NAMENODE_KERBEROS_PRINCIPAL));
+        }
+        if(properties.containsKey(BLOCK_ACCESS_TOKEN)){
+            conf.set("dfs.block.access.token.enable",properties.get(BLOCK_ACCESS_TOKEN));
+        }
+        if(properties.containsKey(TRANSFER_PROTECTION)){
+            conf.set("dfs.data.transfer.protection", properties.get(TRANSFER_PROTECTION));
+        }
+
         try {
-            if (properties.get(AUTHENTICATION).equals("kerberos")) {
+
+            if (properties.containsKey(AUTHENTICATION) && properties.get(AUTHENTICATION).equals("kerberos")) {
                 UserGroupInformation.setConfiguration(conf);
                 if (credential instanceof DefaultCredential) {
 
@@ -99,15 +128,15 @@ public class HDFSFileAdaptor extends FileAdaptor{
                             return null;
                         }
                     });
-
+                    PasswordCredential pw = (PasswordCredential) credential;
                     LoginContext lc = new LoginContext("JaasSample", new CallbackHandler() {
                         @Override
                         public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
                             for (Callback c : callbacks) {
                                 if (c instanceof NameCallback)
-                                    ((NameCallback) c).setName("admin/admin@esciencecenter.nl");
+                                    ((NameCallback) c).setName(pw.getUsername());
                                 if (c instanceof PasswordCallback)
-                                    ((PasswordCallback) c).setPassword("javagat".toCharArray());
+                                    ((PasswordCallback) c).setPassword(pw.getPassword());
                             }
 
                         }});
@@ -119,9 +148,16 @@ public class HDFSFileAdaptor extends FileAdaptor{
         }
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
+        int bufferSize = (int) xp.getSizeProperty(BUFFER_SIZE);
+
+        if (bufferSize <= 0 || bufferSize >= Integer.MAX_VALUE) {
+            throw new InvalidPropertyException(ADAPTOR_NAME,
+                    "Invalid value for " + BUFFER_SIZE + ": " + bufferSize + " (must be between 1 and " + Integer.MAX_VALUE + ")");
+        }
+
         try {
             org.apache.hadoop.fs.FileSystem fs = org.apache.hadoop.fs.FileSystem.get(conf);
-            return new HDFSFileSystem(getNewUniqueID(),location, fs,xp);
+            return new HDFSFileSystem(getNewUniqueID(),location, fs,bufferSize, xp);
         } catch(IOException e){
             throw new XenonException("hdfs", "Failed to create HDFS connection: " + e.getMessage());
         }

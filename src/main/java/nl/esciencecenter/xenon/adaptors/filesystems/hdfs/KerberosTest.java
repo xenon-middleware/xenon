@@ -26,7 +26,7 @@ public class KerberosTest {
     }
 
     public static void main(String[] argv){
-        System.setProperty("java.security.krb5.conf", "krb.conf");
+        System.setProperty("java.security.krb5.conf", "/home/atze/krb5.conf");
         Configuration conf = new Configuration();
         conf.set("fs.defaultFS", "hdfs://one.hdp:8020");
         conf.set("hadoop.security.authentication", "kerberos");
