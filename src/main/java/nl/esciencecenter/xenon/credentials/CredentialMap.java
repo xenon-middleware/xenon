@@ -99,7 +99,7 @@ public class CredentialMap implements Credential {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((defaultCredential == null) ? 0 : defaultCredential.hashCode());
-        result = prime * result + ((map == null) ? 0 : map.hashCode());
+        result = prime * result + map.hashCode();
         return result;
     }
 
@@ -122,10 +122,7 @@ public class CredentialMap implements Credential {
         } else if (!defaultCredential.equals(other.defaultCredential))
             return false;
 
-        if (!map.equals(other.map))
-            return false;
-
-        return true;
+        return map.equals(other.map);
     }
 
 }
