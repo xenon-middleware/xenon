@@ -35,7 +35,7 @@ public class HDFSTest {
 
     public static void main(String[] argv){
 
-        System.setProperty("java.security.krb5.conf", "/home/atze/krb5.conf");
+        System.setProperty("java.security.krb5.conf", "src/integrationTest/resources/kerberos/krb5.conf");
 
 //        conf.set("dfs.datanode.kerberos.principal",  "hdfs/localhost@esciencecenter.nl");
 //        conf.set("dfs.namenode.kerberos.http.principal","HTTP/localhost@esciencecenter.nl");
@@ -51,7 +51,7 @@ public class HDFSTest {
             properties.put(HDFSFileAdaptor.BLOCK_ACCESS_TOKEN, "true");
             properties.put(HDFSFileAdaptor.TRANSFER_PROTECTION, "integrity");
 //            properties.put(HDFSFileAdaptor.DATA_NODE_ADRESS, "localhost:50016");
-            KeytabCredential kt = new KeytabCredential("xenon@esciencecenter.nl","/home/atze/xenon.keytab");
+            KeytabCredential kt = new KeytabCredential("xenon@esciencecenter.nl","src/integrationTest/resources/kerberos/xenon.keytab");
             FileSystem fs = new HDFSFileAdaptor().createFileSystem("localhost:8020", kt, properties);
             fs.setWorkingDirectory(new Path("/filesystem-test-fixture"));
 

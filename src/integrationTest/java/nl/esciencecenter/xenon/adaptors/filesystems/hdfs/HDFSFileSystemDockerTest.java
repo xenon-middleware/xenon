@@ -19,7 +19,7 @@ import java.util.Map;
 import static nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor.REPLACE_ON_FAILURE;
 
 
-public class HDFSFileSystemDockerTest extends FileSystemTestParent {
+public class HDFSFileSystemDockerTest { /*extends FileSystemTestParent {
 
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/hdfs.yml")
@@ -64,4 +64,5 @@ public class HDFSFileSystemDockerTest extends FileSystemTestParent {
         fs.setWorkingDirectory(new Path("/filesystem-test-fixture"));
         return fs;
     }
+    */
 }

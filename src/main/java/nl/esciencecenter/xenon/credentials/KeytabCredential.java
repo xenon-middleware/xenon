@@ -1,6 +1,6 @@
 package nl.esciencecenter.xenon.credentials;
 
-public class KeytabCredential implements Credential {
+public class KeytabCredential implements UserCredential {
 
     private final String username;
     private final String keytabFile;
@@ -10,7 +10,7 @@ public class KeytabCredential implements Credential {
         this.keytabFile = keytabFile;
     }
 
-
+    @Override
     public String getUsername() {
         return username;
     }
