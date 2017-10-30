@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
 
+import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.XenonException;
@@ -89,6 +90,18 @@ public class WebdavFileAdaptor extends FileAdaptor {
 
         LOGGER.debug("newFileSystem location = {} credential = {} properties = {}", location, credential, properties);
 
+        if (location == null || location.isEmpty()) {
+            throw new InvalidLocationException(ADAPTOR_NAME, "Location may not be empty");
+        }
+
+        if (credential == null) {
+            throw new InvalidCredentialException(getName(), "Credential may not be null.");
+        }
+
+        if (!(credential instanceof PasswordCredential || credential instanceof DefaultCredential)) {
+            throw new InvalidCredentialException(getName(), "Credential type not supported.");
+        }
+
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
 
         long bufferSize = xp.getSizeProperty(BUFFER_SIZE);
@@ -108,7 +121,7 @@ public class WebdavFileAdaptor extends FileAdaptor {
 
         Sardine sardine = null;
 
-        if (credential == null || credential instanceof DefaultCredential) {
+        if (credential instanceof DefaultCredential) {
             sardine = SardineFactory.begin();
         } else if (credential instanceof PasswordCredential) {
             PasswordCredential tmp = (PasswordCredential) credential;
@@ -127,9 +140,4 @@ public class WebdavFileAdaptor extends FileAdaptor {
 
         return new WebdavFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, server, new Path(cwd), (int) bufferSize, sardine, xp);
     }
-
-    public void end() {
-        LOGGER.debug("end OK");
-    }
-
 }

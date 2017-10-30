@@ -66,6 +66,8 @@ public class SSHUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SSHUtil.class);
 
+    private static final String VIA_TAG = " via:";
+
     public static final int DEFAULT_SSH_PORT = 22;
 
     static class PasswordProvider implements FilePasswordProvider {
@@ -139,6 +141,13 @@ public class SSHUtil {
                 }
             }
         }
+    }
+
+    /**
+     * This constructor is only needed for testing. Users should use the static methods instead.
+     */
+    public SSHUtil() {
+        // for coverage
     }
 
     /**
@@ -313,7 +322,7 @@ public class SSHUtil {
 
         String tmp = location;
 
-        int index = tmp.lastIndexOf(" via:");
+        int index = tmp.lastIndexOf(VIA_TAG);
 
         while (index != -1) {
 
@@ -321,10 +330,10 @@ public class SSHUtil {
                 throw new InvalidLocationException(adaptorName, "Could not parse location: " + location);
             }
 
-            result.add(extractSocketAddress(adaptorName, tmp.substring(index + " via:".length()).trim()));
+            result.add(extractSocketAddress(adaptorName, tmp.substring(index + VIA_TAG.length()).trim()));
             tmp = tmp.substring(0, index);
 
-            index = tmp.lastIndexOf(" via:");
+            index = tmp.lastIndexOf(VIA_TAG);
         }
 
         if (tmp.isEmpty()) {
@@ -389,7 +398,7 @@ public class SSHUtil {
 
             Path path = Paths.get(certfile).toAbsolutePath().normalize();
 
-            if (!Files.exists(path)) {
+            if (!path.toFile().exists()) {
                 throw new CertificateNotFoundException(adaptorName, "Certificate not found: " + path);
             }
 
@@ -411,7 +420,9 @@ public class SSHUtil {
 
             session.addPublicKeyIdentity(pair);
 
-        } else if (credential instanceof PasswordCredential) {
+        } else if (credential instanceof PasswordCredential)
+
+        {
 
             PasswordCredential c = (PasswordCredential) credential;
             session.addPasswordIdentity(new String(c.getPassword()));

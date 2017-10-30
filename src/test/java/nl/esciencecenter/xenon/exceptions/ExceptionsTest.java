@@ -18,10 +18,14 @@ package nl.esciencecenter.xenon.exceptions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import nl.esciencecenter.xenon.UnknownAdaptorException;
+import org.junit.Test;
+
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.PropertyTypeException;
+import nl.esciencecenter.xenon.UnknownAdaptorException;
+import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
@@ -35,6 +39,7 @@ import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerClosedException;
 import nl.esciencecenter.xenon.adaptors.schedulers.local.CommandNotFoundException;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.CertificateNotFoundException;
+import nl.esciencecenter.xenon.adaptors.shared.ssh.CredentialNotFoundException;
 import nl.esciencecenter.xenon.filesystems.AttributeNotSupportedException;
 import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.filesystems.FileSystemClosedException;
@@ -47,12 +52,8 @@ import nl.esciencecenter.xenon.filesystems.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.NoSuchJobException;
-import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
-import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.schedulers.UnsupportedJobDescriptionException;
-
-import org.junit.Test;
 
 /**
  *
@@ -199,7 +200,7 @@ public class ExceptionsTest {
     @Test
     public void testSchedulerClosedException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new EndOfFileException("name", "message", t), t);
+        testException(new SchedulerClosedException("name", "message", t), t);
     }
 
     @Test
@@ -466,7 +467,6 @@ public class ExceptionsTest {
         testException(new nl.esciencecenter.xenon.UnsupportedOperationException("name", "message", t), t);
     }
 
-
     @Test
     public void testNoSpaceException1() throws Exception {
         testException(new NoSpaceException("name", "message"));
@@ -478,6 +478,15 @@ public class ExceptionsTest {
         testException(new NoSpaceException("name", "message", t), t);
     }
 
+    @Test
+    public void testCredentialNotFoundException1() throws Exception {
+        testException(new CredentialNotFoundException("name", "message"));
+    }
 
+    @Test
+    public void testCredentialNotFoundException2() throws Exception {
+        Throwable t = new Throwable();
+        testException(new CredentialNotFoundException("name", "message", t), t);
+    }
 
 }

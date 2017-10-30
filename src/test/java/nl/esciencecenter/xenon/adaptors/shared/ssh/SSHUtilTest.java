@@ -37,6 +37,11 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
 public class SSHUtilTest {
 
     @Test
+    public void test_dummy_constructor() throws IOException {
+        new SSHUtil();
+    }
+
+    @Test
     public void test_passwordProvider() throws IOException {
         PasswordProvider p = new PasswordProvider("Hello World".toCharArray());
         assertEquals("Hello World", p.getPassword(null));

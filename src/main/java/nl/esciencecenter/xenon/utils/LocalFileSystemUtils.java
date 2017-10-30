@@ -25,11 +25,11 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
 
 public class LocalFileSystemUtils {
 
+    private static final String OS_PROPERTY = "os.name";
+
     private LocalFileSystemUtils() {
         throw new IllegalStateException("Utility class");
     }
-
-    public static String NAME = "LocalFileSystemUtils";
 
     /**
      * Returns if we are currently running on Windows.
@@ -37,7 +37,7 @@ public class LocalFileSystemUtils {
      * @return if we are currently running on Window.
      */
     public static boolean isWindows() {
-        String os = System.getProperty("os.name");
+        String os = System.getProperty(OS_PROPERTY);
         return (os != null && os.startsWith("Windows"));
     }
 
@@ -47,7 +47,7 @@ public class LocalFileSystemUtils {
      * @return if we are currently running on OSX.
      */
     public static boolean isOSX() {
-        String os = System.getProperty("os.name");
+        String os = System.getProperty(OS_PROPERTY);
         return (os != null && os.equals("MacOSX"));
     }
 
@@ -57,7 +57,7 @@ public class LocalFileSystemUtils {
      * @return if we are currently running on Linux.
      */
     public static boolean isLinux() {
-        String os = System.getProperty("os.name");
+        String os = System.getProperty(OS_PROPERTY);
         return (os != null && os.equals("Linux"));
     }
 

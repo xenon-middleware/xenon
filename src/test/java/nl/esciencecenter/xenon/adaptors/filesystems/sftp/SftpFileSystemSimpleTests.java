@@ -24,11 +24,14 @@ import org.apache.sshd.common.subsystem.sftp.SftpConstants;
 import org.apache.sshd.common.subsystem.sftp.SftpException;
 import org.junit.Test;
 
+import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.filesystems.EndOfFileException;
 import nl.esciencecenter.xenon.adaptors.filesystems.NoSpaceException;
 import nl.esciencecenter.xenon.adaptors.filesystems.PermissionDeniedException;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
 import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
@@ -40,6 +43,21 @@ public class SftpFileSystemSimpleTests {
 
     private IOException generateSftpException(int status) {
         return new SftpException(status, "This is a test");
+    }
+
+    @Test(expected = InvalidCredentialException.class)
+    public void test_credential_null() throws XenonException {
+        new SftpFileAdaptor().createFileSystem("localhost", null, null);
+    }
+
+    @Test(expected = InvalidLocationException.class)
+    public void test_location_null() throws XenonException {
+        new SftpFileAdaptor().createFileSystem(null, new PasswordCredential("aap", "noot".toCharArray()), null);
+    }
+
+    @Test(expected = InvalidLocationException.class)
+    public void test_location_empty() throws XenonException {
+        new SftpFileAdaptor().createFileSystem("", new PasswordCredential("aap", "noot".toCharArray()), null);
     }
 
     @Test

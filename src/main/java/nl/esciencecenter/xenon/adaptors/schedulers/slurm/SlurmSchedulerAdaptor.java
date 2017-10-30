@@ -52,7 +52,7 @@ public class SlurmSchedulerAdaptor extends ScriptingSchedulerAdaptor {
     public static final long SLURM_UPDATE_SLEEP = 1000L; // 1 second update sleep
 
     /** The locations supported by this adaptor */
-    private static final String[] ADAPTOR_LOCATIONS = new String[] { "local://[/workdir]", "ssh://host[:port][/workdir]" };
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "local://[/workdir]", "ssh://host[:port][/workdir][ via:otherhost[:port]]*" };
 
     /** List of all properties supported by this adaptor */
     private static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {

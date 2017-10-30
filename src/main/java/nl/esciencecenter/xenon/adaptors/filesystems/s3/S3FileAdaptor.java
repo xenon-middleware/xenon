@@ -77,6 +77,14 @@ public class S3FileAdaptor extends FileAdaptor {
             throw new InvalidLocationException(ADAPTOR_NAME, "Location may not be empty");
         }
 
+        if (credential == null) {
+            throw new InvalidCredentialException(ADAPTOR_NAME, "Credential may not be null.");
+        }
+
+        if (!(credential instanceof PasswordCredential)) {
+            throw new InvalidCredentialException(ADAPTOR_NAME, "Credential type not supported");
+        }
+
         String server = null;
         String bucket = null;
         String bucketPath = null;
@@ -106,7 +114,7 @@ public class S3FileAdaptor extends FileAdaptor {
             bucketPath = bucketPath.substring(1);
         }
 
-        int split = bucketPath.indexOf("/");
+        int split = bucketPath.indexOf('/');
 
         if (split < 0) {
             bucket = bucketPath;
@@ -124,10 +132,6 @@ public class S3FileAdaptor extends FileAdaptor {
         if (bufferSize <= 0 || bufferSize >= Integer.MAX_VALUE) {
             throw new InvalidPropertyException(ADAPTOR_NAME,
                     "Invalid value for " + BUFFER_SIZE + ": " + bufferSize + " (must be between 1 and " + Integer.MAX_VALUE + ")");
-        }
-
-        if (!(credential instanceof PasswordCredential)) {
-            throw new InvalidCredentialException(ADAPTOR_NAME, "No secret key given for s3 connection.");
         }
 
         PasswordCredential pwUser = (PasswordCredential) credential;

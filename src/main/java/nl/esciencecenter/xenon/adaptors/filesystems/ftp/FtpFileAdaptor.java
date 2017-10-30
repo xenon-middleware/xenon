@@ -34,6 +34,7 @@ import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
@@ -105,8 +106,16 @@ public class FtpFileAdaptor extends FileAdaptor {
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
         LOGGER.debug("newFileSystem ftp location = {} credential = {} properties = {}", location, credential, properties);
 
+        if (location == null || location.isEmpty()) {
+            throw new InvalidLocationException(ADAPTOR_NAME, "Location may not be empty");
+        }
+
         if (credential == null) {
-            throw new InvalidCredentialException(getName(), "Credentials was null.");
+            throw new InvalidCredentialException(getName(), "Credential may not be null.");
+        }
+
+        if (!(credential instanceof PasswordCredential || credential instanceof DefaultCredential)) {
+            throw new InvalidCredentialException(getName(), "Credential type not supported.");
         }
 
         XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
