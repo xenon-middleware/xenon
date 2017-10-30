@@ -19,7 +19,7 @@ import java.util.Map;
 
 import static nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor.REPLACE_ON_FAILURE;
 
-public class HDFSKerberosFileSystemDockerTestPassword extends FileSystemTestInfrastructure {
+public class HDFSKerberosFileSystemDockerTestPassword  extends FileSystemTestInfrastructure {
 
 
     @ClassRule
@@ -95,4 +95,5 @@ public class HDFSKerberosFileSystemDockerTestPassword extends FileSystemTestInfr
         fs.setWorkingDirectory(new Path("/filesystem-test-fixture"));
         return fs;
     }
+
 }

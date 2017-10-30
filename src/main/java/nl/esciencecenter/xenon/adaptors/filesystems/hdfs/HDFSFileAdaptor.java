@@ -64,7 +64,7 @@ public class HDFSFileAdaptor extends FileAdaptor{
     protected static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
             new XenonPropertyDescription(BUFFER_SIZE, XenonPropertyDescription.Type.SIZE, "64K", "The buffer size to use when copying files (in bytes)."),
             new XenonPropertyDescription(REPLACE_ON_FAILURE, XenonPropertyDescription.Type.STRING, "DEFAULT", "Corresponds to Hadoop property: dfs.client.block.write.replace-datanode-on-failure.policy "),
-            new XenonPropertyDescription(AUTHENTICATION, XenonPropertyDescription.Type.STRING, "simple", "Corresponds to Hadoop property hadoop.security.authentication, possible values: simple and kerberos(default)"),
+            new XenonPropertyDescription(AUTHENTICATION, XenonPropertyDescription.Type.STRING, "simple", "Corresponds to Hadoop property hadoop.security.authentication, possible values: simple(default) and kerberos"),
             new XenonPropertyDescription(DFS_NAMENODE_KERBEROS_PRINCIPAL, XenonPropertyDescription.Type.STRING, "" , "Corresponds to Hadoop property dfs.namenode.kerberos.principal. For use when kerberos is enabled"),
             new XenonPropertyDescription(BLOCK_ACCESS_TOKEN, XenonPropertyDescription.Type.STRING, "false" , "Corresponds to Hadoop property dfs.block.access.token.enable"),
             new XenonPropertyDescription(TRANSFER_PROTECTION, XenonPropertyDescription.Type.STRING, "" , "Corresponds to Hadoop property dfs.data.transfer.protection")
@@ -80,26 +80,20 @@ public class HDFSFileAdaptor extends FileAdaptor{
         Configuration conf = new Configuration(false);
         conf.set("fs.defaultFS", location);
         properties = properties == null ? new HashMap<>() : properties;
+        XenonProperties prop = new XenonProperties(VALID_PROPERTIES,properties);
+
         // Verbatim forward Hadoop properties starting with "dfs." and "hadoop."
-        if(properties.containsKey(REPLACE_ON_FAILURE)){
-            conf.set("dfs.client.block.write.replace-datanode-on-failure.policy",properties.get(REPLACE_ON_FAILURE));
-        }
-        if(properties.containsKey(AUTHENTICATION)){
-            conf.set("hadoop.security.authentication", properties.get(AUTHENTICATION));
-        }
-        if(properties.containsKey(DFS_NAMENODE_KERBEROS_PRINCIPAL)){
-            conf.set("dfs.namenode.kerberos.principal",properties.get(DFS_NAMENODE_KERBEROS_PRINCIPAL));
-        }
-        if(properties.containsKey(BLOCK_ACCESS_TOKEN)){
-            conf.set("dfs.block.access.token.enable",properties.get(BLOCK_ACCESS_TOKEN));
-        }
-        if(properties.containsKey(TRANSFER_PROTECTION)){
-            conf.set("dfs.data.transfer.protection", properties.get(TRANSFER_PROTECTION));
-        }
+        conf.set("dfs.client.block.write.replace-datanode-on-failure.policy",prop.getStringProperty(REPLACE_ON_FAILURE));
+
+        conf.set("hadoop.security.authentication", prop.getStringProperty(AUTHENTICATION));
+        conf.set("dfs.namenode.kerberos.principal",prop.getStringProperty(DFS_NAMENODE_KERBEROS_PRINCIPAL));
+        conf.set("dfs.block.access.token.enable",prop.getStringProperty(BLOCK_ACCESS_TOKEN));
+        conf.set("dfs.data.transfer.protection", prop.getStringProperty(TRANSFER_PROTECTION));
+
 
         try {
-
-            if (properties.containsKey(AUTHENTICATION) && properties.get(AUTHENTICATION).equals("kerberos")) {
+            UserGroupInformation.reset();
+            if (prop.getStringProperty(AUTHENTICATION).equals("kerberos")) {
                 UserGroupInformation.setConfiguration(conf);
                 if (credential instanceof DefaultCredential) {
 
