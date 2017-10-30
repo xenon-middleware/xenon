@@ -129,7 +129,7 @@ public class HDFSFileAdaptor extends FileAdaptor{
                         }
                     });
                     PasswordCredential pw = (PasswordCredential) credential;
-                    LoginContext lc = new LoginContext("JaasSample", new CallbackHandler() {
+                    LoginContext lc = new LoginContext("hdfs-kerb", new CallbackHandler() {
                         @Override
                         public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
                             for (Callback c : callbacks) {
@@ -140,6 +140,7 @@ public class HDFSFileAdaptor extends FileAdaptor{
                             }
 
                         }});
+                    lc.login();
                     UserGroupInformation.loginUserFromSubject(lc.getSubject());
                 }
             }

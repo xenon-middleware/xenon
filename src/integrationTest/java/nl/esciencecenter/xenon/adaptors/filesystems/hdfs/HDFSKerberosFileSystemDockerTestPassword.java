@@ -1,13 +1,13 @@
 package nl.esciencecenter.xenon.adaptors.filesystems.hdfs;
 
-
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileSystemTestInfrastructure;
-import nl.esciencecenter.xenon.adaptors.filesystems.FileSystemTestParent;
 import nl.esciencecenter.xenon.adaptors.filesystems.LocationConfig;
+import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.KeytabCredential;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.CopyMode;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
@@ -19,7 +19,8 @@ import java.util.Map;
 
 import static nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor.REPLACE_ON_FAILURE;
 
-public class HDFSKerberosFileSystemDockerTest extends FileSystemTestInfrastructure {
+public class HDFSKerberosFileSystemDockerTestPassword extends FileSystemTestInfrastructure {
+
 
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/hdfs-kerberos.yml")
@@ -88,10 +89,10 @@ public class HDFSKerberosFileSystemDockerTest extends FileSystemTestInfrastructu
         props.put(HDFSFileAdaptor.BLOCK_ACCESS_TOKEN, "true");
         props.put(HDFSFileAdaptor.TRANSFER_PROTECTION, "integrity");
 //            properties.put(HDFSFileAdaptor.DATA_NODE_ADRESS, "localhost:50016");
-        KeytabCredential kt = new KeytabCredential("xenon@esciencecenter.nl","src/integrationTest/resources/kerberos/xenon.keytab");
-        FileSystem fs =  FileSystem.create("hdfs", location, kt, props);
+        Credential c = new PasswordCredential("xenonpw@esciencecenter.nl","javagat".toCharArray());
+        //KeytabCredential kt = new KeytabCredential("xenonpw@esciencecenter.nl","src/integrationTest/resources/kerberos/xenon.keytab");
+        FileSystem fs =  FileSystem.create("hdfs", location, c, props);
         fs.setWorkingDirectory(new Path("/filesystem-test-fixture"));
         return fs;
     }
-
 }
