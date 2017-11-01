@@ -112,22 +112,20 @@ public class SSHUtilTest {
         Map<String, String> prop = new HashMap<>();
         prop.put("xenon.adaptors.schedulers.ssh.strictHostKeyChecking", "false");
         prop.put("xenon.adaptors.schedulers.ssh.agentForwarding", "true");
-        prop.put("xenon.adaptors.schedulers.ssh.sshConfigFile", "/somewhere/config");
-
-        // Map<String, String> result = SSHUtil.sshToSftpProperties(prop);
+        // prop.put("xenon.adaptors.schedulers.ssh.sshConfigFile", "/somewhere/config");
 
         Map<String, String> result = SSHUtil.translateProperties(prop, SshSchedulerAdaptor.PREFIX,
                 FileSystem.getAdaptorDescription("sftp").getSupportedProperties(), SftpFileAdaptor.PREFIX);
 
-        assertEquals(3, result.size());
+        assertEquals(2, result.size());
 
         assertTrue(result.containsKey("xenon.adaptors.filesystems.sftp.strictHostKeyChecking"));
         assertTrue(result.containsKey("xenon.adaptors.filesystems.sftp.agentForwarding"));
-        assertTrue(result.containsKey("xenon.adaptors.filesystems.sftp.sshConfigFile"));
+        // assertTrue(result.containsKey("xenon.adaptors.filesystems.sftp.sshConfigFile"));
 
         assertEquals("false", result.get("xenon.adaptors.filesystems.sftp.strictHostKeyChecking"));
         assertEquals("true", result.get("xenon.adaptors.filesystems.sftp.agentForwarding"));
-        assertEquals("/somewhere/config", result.get("xenon.adaptors.filesystems.sftp.sshConfigFile"));
+        // assertEquals("/somewhere/config", result.get("xenon.adaptors.filesystems.sftp.sshConfigFile"));
     }
 
     @Test
@@ -136,20 +134,20 @@ public class SSHUtilTest {
         Map<String, String> prop = new HashMap<>();
         prop.put("xenon.adaptors.filesystems.sftp.strictHostKeyChecking", "false");
         prop.put("xenon.adaptors.filesystems.sftp.agentForwarding", "true");
-        prop.put("xenon.adaptors.filesystems.sftp.sshConfigFile", "/somewhere/config");
+        // prop.put("xenon.adaptors.filesystems.sftp.sshConfigFile", "/somewhere/config");
 
         Map<String, String> result = SSHUtil.translateProperties(prop, SftpFileAdaptor.PREFIX, Scheduler.getAdaptorDescription("ssh").getSupportedProperties(),
                 SshSchedulerAdaptor.PREFIX);
 
-        assertEquals(3, result.size());
+        assertEquals(2, result.size());
 
         assertTrue(result.containsKey("xenon.adaptors.schedulers.ssh.strictHostKeyChecking"));
         assertTrue(result.containsKey("xenon.adaptors.schedulers.ssh.agentForwarding"));
-        assertTrue(result.containsKey("xenon.adaptors.schedulers.ssh.sshConfigFile"));
+        // assertTrue(result.containsKey("xenon.adaptors.schedulers.ssh.sshConfigFile"));
 
         assertEquals("false", result.get("xenon.adaptors.schedulers.ssh.strictHostKeyChecking"));
         assertEquals("true", result.get("xenon.adaptors.schedulers.ssh.agentForwarding"));
-        assertEquals("/somewhere/config", result.get("xenon.adaptors.schedulers.ssh.sshConfigFile"));
+        // assertEquals("/somewhere/config", result.get("xenon.adaptors.schedulers.ssh.sshConfigFile"));
     }
 
     @Test(expected = IllegalArgumentException.class)

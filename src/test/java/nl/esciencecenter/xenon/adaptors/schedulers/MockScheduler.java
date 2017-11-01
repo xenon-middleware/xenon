@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
@@ -39,7 +40,7 @@ public class MockScheduler extends Scheduler {
     private int exitCode;
 
     protected MockScheduler(boolean shouldFail, String toStderr, int exitCode) {
-        super("TEST0", "TEST", "location", null);
+        super("TEST0", "TEST", "location", new DefaultCredential(), null);
         this.shouldFail = shouldFail;
         this.toStderr = toStderr;
         this.exitCode = exitCode;

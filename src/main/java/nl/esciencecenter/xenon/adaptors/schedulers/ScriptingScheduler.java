@@ -56,7 +56,7 @@ public abstract class ScriptingScheduler extends Scheduler {
     protected ScriptingScheduler(String uniqueID, String adaptor, String location, Credential credential, Map<String, String> prop,
             XenonPropertyDescription[] validProperties, String pollDelayProperty) throws XenonException {
 
-        super(uniqueID, adaptor, location, ScriptingUtils.getProperties(validProperties, location, prop));
+        super(uniqueID, adaptor, location, credential, ScriptingUtils.getProperties(validProperties, location, prop));
 
         this.pollDelay = properties.getLongProperty(pollDelayProperty);
 

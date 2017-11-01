@@ -38,6 +38,7 @@ import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
+import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
@@ -72,9 +73,9 @@ public class WebdavFileSystem extends FileSystem {
     private final Sardine client;
     private final String server;
 
-    protected WebdavFileSystem(String uniqueID, String name, String location, String server, Path entryPath, int bufferSize, Sardine client,
-            XenonProperties properties) {
-        super(uniqueID, name, location, entryPath, bufferSize, properties);
+    protected WebdavFileSystem(String uniqueID, String name, String location, Credential credential, String server, Path entryPath, int bufferSize,
+            Sardine client, XenonProperties properties) {
+        super(uniqueID, name, location, credential, entryPath, bufferSize, properties);
         this.client = client;
         this.server = server;
     }

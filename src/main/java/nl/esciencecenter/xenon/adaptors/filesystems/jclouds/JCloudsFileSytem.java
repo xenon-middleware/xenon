@@ -41,6 +41,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
+import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.AttributeNotSupportedException;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
@@ -62,9 +63,9 @@ public class JCloudsFileSytem extends FileSystem {
 
     boolean open;
 
-    public JCloudsFileSytem(String uniqueID, String adaptorName, String endPoint, Path workingDir, BlobStoreContext context, String bucket, int bufferSize,
-            XenonProperties properties) {
-        super(uniqueID, adaptorName, endPoint, workingDir, bufferSize, properties);
+    public JCloudsFileSytem(String uniqueID, String adaptorName, String endPoint, Credential credential, Path workingDir, BlobStoreContext context,
+            String bucket, int bufferSize, XenonProperties properties) {
+        super(uniqueID, adaptorName, endPoint, credential, workingDir, bufferSize, properties);
         this.context = context;
         this.bucket = bucket;
         this.adaptorName = adaptorName;

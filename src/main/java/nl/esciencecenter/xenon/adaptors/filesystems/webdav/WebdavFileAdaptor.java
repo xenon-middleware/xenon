@@ -138,6 +138,6 @@ public class WebdavFileAdaptor extends FileAdaptor {
 
         String cwd = uri.getPath();
 
-        return new WebdavFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, server, new Path(cwd), (int) bufferSize, sardine, xp);
+        return new WebdavFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, credential, server, new Path(cwd), (int) bufferSize, sardine, xp);
     }
 }

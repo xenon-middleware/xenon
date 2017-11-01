@@ -29,6 +29,7 @@ import java.util.Set;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 
 public class MockFileSystem extends FileSystem {
 
@@ -299,7 +300,7 @@ public class MockFileSystem extends FileSystem {
     private DirEntry root;
 
     public MockFileSystem(String uniqueID, String name, String location, Path entryPath, XenonProperties p) throws XenonException {
-        super(uniqueID, name, location, entryPath, 4096, p);
+        super(uniqueID, name, location, new DefaultCredential(), entryPath, 4096, p);
         root = new DirEntry("", getDirAttributes(new Path("/")));
         ensureDirectories(entryPath);
     }

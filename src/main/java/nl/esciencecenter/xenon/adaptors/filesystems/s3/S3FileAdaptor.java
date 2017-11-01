@@ -139,7 +139,7 @@ public class S3FileAdaptor extends FileAdaptor {
         BlobStoreContext context = ContextBuilder.newBuilder("s3").endpoint(server).credentials(pwUser.getUsername(), new String(pwUser.getPassword()))
                 .buildView(BlobStoreContext.class);
 
-        return new JCloudsFileSytem(getNewUniqueID(), ADAPTOR_NAME, server, path, context, bucket, (int) bufferSize, xp);
+        return new JCloudsFileSytem(getNewUniqueID(), ADAPTOR_NAME, server, pwUser, path, context, bucket, (int) bufferSize, xp);
     }
 
     @Override

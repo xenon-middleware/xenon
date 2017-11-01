@@ -255,9 +255,10 @@ public abstract class Scheduler implements AutoCloseable {
     private final String uniqueID;
     private final String adaptor;
     private final String location;
+    private final Credential credential;
     protected final XenonProperties properties;
 
-    protected Scheduler(String uniqueID, String adaptor, String location, XenonProperties properties) {
+    protected Scheduler(String uniqueID, String adaptor, String location, Credential credential, XenonProperties properties) {
 
         if (uniqueID == null) {
             throw new IllegalArgumentException("Identifier may not be null!");
@@ -271,9 +272,14 @@ public abstract class Scheduler implements AutoCloseable {
             throw new IllegalArgumentException("Location may not be null!");
         }
 
+        if (credential == null) {
+            throw new IllegalArgumentException("Credential may not be null!");
+        }
+
         this.uniqueID = uniqueID;
         this.adaptor = adaptor;
         this.location = location;
+        this.credential = credential;
         this.properties = properties;
     }
 
@@ -293,6 +299,15 @@ public abstract class Scheduler implements AutoCloseable {
      */
     public String getLocation() {
         return location;
+    }
+
+    /**
+     * Get the credential that this Scheduler is using.
+     *
+     * @return the credential this Scheduler is using.
+     */
+    public Credential getCredential() {
+        return credential;
     }
 
     /**

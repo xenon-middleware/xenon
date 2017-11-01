@@ -111,7 +111,7 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
         int multiQThreads = xp.getIntegerProperty(MULTIQ_MAX_CONCURRENT, processors);
         long pollingDelay = xp.getLongProperty(POLLING_DELAY);
 
-        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, location == null ? "" : location, new LocalInteractiveProcessFactory(), filesystem,
-                filesystem.getWorkingDirectory(), multiQThreads, pollingDelay, 0L, xp);
+        return new JobQueueScheduler(getNewUniqueID(), ADAPTOR_NAME, location == null ? "" : location, new DefaultCredential(),
+                new LocalInteractiveProcessFactory(), filesystem, filesystem.getWorkingDirectory(), multiQThreads, pollingDelay, 0L, xp);
     }
 }

@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
@@ -100,10 +101,11 @@ public class JobQueueScheduler extends Scheduler {
 
     private final ArrayList<List<JobExecutor>> queues = new ArrayList<>();
 
-    public JobQueueScheduler(String uniqueID, String adaptorName, String location, InteractiveProcessFactory factory, FileSystem filesystem,
-            Path workingDirectory, int multiQThreads, long pollingDelay, long startupTimeout, XenonProperties properties) throws BadParameterException {
+    public JobQueueScheduler(String uniqueID, String adaptorName, String location, Credential credential, InteractiveProcessFactory factory,
+            FileSystem filesystem, Path workingDirectory, int multiQThreads, long pollingDelay, long startupTimeout, XenonProperties properties)
+            throws BadParameterException {
 
-        super(uniqueID, adaptorName, location, properties);
+        super(uniqueID, adaptorName, location, credential, properties);
 
         LOGGER.debug("Creating JobQueueScheduler for Adaptor {} with multiQThreads: {} and pollingDelay: {}", adaptorName, multiQThreads, pollingDelay);
 

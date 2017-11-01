@@ -16,12 +16,14 @@
 package nl.esciencecenter.xenon.adaptors.filesystems.sftp;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.Path;
 
 public class MockSftpFileSystem extends SftpFileSystem {
 
     public MockSftpFileSystem() {
-        super("ID", "TEST", "localhost", new Path("/home/xenon"), 4096, new MockSSHConnection(new MockSftpClient()), new MockSftpClient(), null);
+        super("ID", "TEST", "localhost", new DefaultCredential(), new Path("/home/xenon"), 4096, new MockSSHConnection(new MockSftpClient()),
+                new MockSftpClient(), null);
     }
 
     protected void assertNotNull(Path path) {
