@@ -113,7 +113,6 @@ public class SSHUtilTest {
         prop.put("xenon.adaptors.schedulers.ssh.strictHostKeyChecking", "false");
         prop.put("xenon.adaptors.schedulers.ssh.agentForwarding", "true");
         // prop.put("xenon.adaptors.schedulers.ssh.sshConfigFile", "/somewhere/config");
-
         Map<String, String> result = SSHUtil.translateProperties(prop, SshSchedulerAdaptor.PREFIX,
                 FileSystem.getAdaptorDescription("sftp").getSupportedProperties(), SftpFileAdaptor.PREFIX);
 

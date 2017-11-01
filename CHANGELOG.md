@@ -1,7 +1,15 @@
-Xenon 2.0.0
+Xenon 2.1.0
 -----------
 
-This is release 2.0.0 of Xenon. 
+This is release 2.1.0 of Xenon. 
+
+Notable changes compared to v2.1.0:
+-----------------------------------
+
+- added getCredential to Scheduler and FileSystem 
+- fixed a bug in equals of CredentialMap
+- added proper check of supported credential types in adaptors 
+- many small bugfixes, additional tests, etc.
 
 Notable changes compared to v1.2.3:
 -----------------------------------
