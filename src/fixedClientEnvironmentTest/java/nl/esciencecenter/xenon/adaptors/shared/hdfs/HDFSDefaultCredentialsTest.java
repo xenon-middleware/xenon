@@ -1,30 +1,34 @@
-package nl.esciencecenter.xenon.adaptors.filesystems.hdfs;
+package nl.esciencecenter.xenon.adaptors.shared.hdfs;
 
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.filesystems.FileSystemTestInfrastructure;
 import nl.esciencecenter.xenon.adaptors.filesystems.LocationConfig;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.KeytabCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.CopyMode;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import nl.esciencecenter.xenon.adaptors.filesystems.FileSystemTestInfrastructure;
 
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import static nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor.HADOOP_SETTINGS_FILE;
 
-public class HDFSKerberosFileSystemDockerTestPassword  extends FileSystemTestInfrastructure {
-
+public class HDFSDefaultCredentialsTest extends FileSystemTestInfrastructure {
 
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/hdfs-kerberos.yml")
             .waitingForService("hdfs", HealthChecks.toHaveAllPortsOpen()).build();
+
+
 
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
@@ -79,14 +83,25 @@ public class HDFSKerberosFileSystemDockerTestPassword  extends FileSystemTestInf
 
 
     public FileSystem setupFileSystem() throws XenonException {
+        try {
+
+            Process p = new ProcessBuilder("/usr/bin/kinit", "xenon").redirectError(ProcessBuilder.Redirect.INHERIT).redirectOutput(ProcessBuilder.Redirect.INHERIT).start();
+            OutputStream input = p.getOutputStream();
+            input.write("javagat\n".getBytes());
+            input.flush();
+            p.waitFor();
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
         String location = docker.containers().container("hdfs").port(8020).inFormat("localhost:$EXTERNAL_PORT");
-        System.setProperty("java.security.krb5.conf", "src/integrationTest/resources/kerberos/krb5.conf");
         Map<String, String> props = new HashMap<>();
         props.put(HADOOP_SETTINGS_FILE, "src/integrationTest/resources/core-site-kerberos.xml");
-        Credential c = new PasswordCredential("xenon@esciencecenter.nl","javagat".toCharArray());
-        FileSystem fs =  FileSystem.create("hdfs", location, c, props);
+        Credential kt = new DefaultCredential();
+        FileSystem fs =  FileSystem.create("hdfs", location, kt, props);
+
         fs.setWorkingDirectory(new Path("/filesystem-test-fixture"));
         return fs;
     }
-
 }

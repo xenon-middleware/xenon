@@ -14,6 +14,8 @@ import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.*;
 import nl.esciencecenter.xenon.utils.OutputReader;
 
+import static nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor.HADOOP_SETTINGS_FILE;
+
 
 public class HDFSTest {
 
@@ -35,7 +37,7 @@ public class HDFSTest {
 
     public static void main(String[] argv){
 
-        System.setProperty("java.security.krb5.conf", "src/integrationTest/resources/kerberos/krb5.conf");
+        //System.setProperty("java.security.krb5.conf", "src/integrationTest/resources/kerberos/krb5.conf");
 
 //        conf.set("dfs.datanode.kerberos.principal",  "hdfs/localhost@esciencecenter.nl");
 //        conf.set("dfs.namenode.kerberos.http.principal","HTTP/localhost@esciencecenter.nl");
@@ -44,14 +46,22 @@ public class HDFSTest {
 ////        conf.set("hadoop.http.authentication.kerberos.principal", "HTTP/localhost@esciencecenter.nl");
 //        conf.set("dfs.block.access.token.enable", "true");
 //        conf.set("dfs.data.transfer.protection","integrity");
+
+
         try {
             Map<String,String> properties = new HashMap();
-            properties.put(HDFSFileAdaptor.AUTHENTICATION,"kerberos");
-            properties.put(HDFSFileAdaptor.DFS_NAMENODE_KERBEROS_PRINCIPAL,"hdfs/localhost@esciencecenter.nl");
-            properties.put(HDFSFileAdaptor.BLOCK_ACCESS_TOKEN, "true");
-            properties.put(HDFSFileAdaptor.TRANSFER_PROTECTION, "integrity");
+            Process p = new ProcessBuilder("kadmin", "-p", "admin/admin", "-w", "javagat", "-q", "ktadd -k /home/atze/xenon.keytab xenon").inheritIO().start();
+            p.waitFor();
+//            System.setProperty("java.security.krb5.conf","C:/mongodb/UnixKeytab/krb5.conf");
+//            properties.put(HDFSFileAdaptor.AUTHENTICATION,"kerberos");
+//            properties.put(HDFSFileAdaptor.DFS_NAMENODE_KERBEROS_PRINCIPAL,"hdfs/localhost@esciencecenter.nl");
+//            properties.put(HDFSFileAdaptor.BLOCK_ACCESS_TOKEN, "true");
+//            properties.put(HDFSFileAdaptor.TRANSFER_PROTECTION, "integrity");
 //            properties.put(HDFSFileAdaptor.DATA_NODE_ADRESS, "localhost:50016");
-            KeytabCredential kt = new KeytabCredential("xenon@esciencecenter.nl","src/integrationTest/resources/kerberos/xenon.keytab");
+//            KeytabCredential kt = new KeytabCredential("xenon@esciencecenter.nl","src/integrationTest/resources/kerberos/xenon.keytab");
+//            System.setProperty("java.security.krb5.conf", "src/integrationTest/resources/kerberos/krb5.conf");
+            properties.put(HADOOP_SETTINGS_FILE, "src/integrationTest/resources/core-site-kerberos.xml");
+            KeytabCredential kt = new KeytabCredential("xenon@esciencecenter.nl","/home/atze/xenon.keytab");
             FileSystem fs = new HDFSFileAdaptor().createFileSystem("localhost:8020", kt, properties);
             fs.setWorkingDirectory(new Path("/filesystem-test-fixture"));
 
@@ -63,7 +73,7 @@ public class HDFSTest {
 //            fs.createFile(new Path("bla201"));
             String deep = "";
             for(int i = 0 ; i < 20; i++){
-                deep += "blayasca" + i + "/";
+                deep += "blayawsaca" + i + "/";
                 for(int j = 0 ; j < 20 ; j++) {
                     OutputStream s = fs.writeToFile(new Path(deep + "jadaab" + j));
 

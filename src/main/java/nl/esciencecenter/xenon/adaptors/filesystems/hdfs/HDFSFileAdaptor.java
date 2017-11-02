@@ -10,10 +10,8 @@ import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.KeytabCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
-import nl.esciencecenter.xenon.filesystems.Path;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.log4j.spi.LoggerFactory;
 import org.slf4j.Logger;
 
 
@@ -47,27 +45,26 @@ public class HDFSFileAdaptor extends FileAdaptor{
     /** All our own properties start with this prefix. */
     public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + "hdfs.";
 
+    public static final String HADOOP_SETTINGS_FILE = PREFIX + "hadoopSettingsFile";
     /** Hadoop property: dfs.client.block.write.replace-datanode-on-failure.policy  */
-    public static final String REPLACE_ON_FAILURE = PREFIX + "replaceOnFailure";
-
-    public static final String AUTHENTICATION = PREFIX + "authentication";
-
-    public static final String DFS_NAMENODE_KERBEROS_PRINCIPAL = PREFIX + "dfs.namenode.kerberos.principal";
-
-    public static final String BLOCK_ACCESS_TOKEN = PREFIX + "dfs.block.access.token.enable";
-
-    public static final String TRANSFER_PROTECTION = PREFIX + "dfs.data.transfer.protection";
+//    public static final String REPLACE_ON_FAILURE = PREFIX + "replaceOnFailure";
+//
+//    public static final String AUTHENTICATION = PREFIX + "authentication";
+//
+//    public static final String DFS_NAMENODE_KERBEROS_PRINCIPAL = PREFIX + "dfs.namenode.kerberos.principal";
+//
+//    public static final String BLOCK_ACCESS_TOKEN = PREFIX + "dfs.block.access.token.enable";
+//
+//    public static final String TRANSFER_PROTECTION = PREFIX + "dfs.data.transfer.protection";
 
     /** The buffer size to use when copying data. */
     public static final String BUFFER_SIZE = PREFIX + "bufferSize";
 
+
+
     protected static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
             new XenonPropertyDescription(BUFFER_SIZE, XenonPropertyDescription.Type.SIZE, "64K", "The buffer size to use when copying files (in bytes)."),
-            new XenonPropertyDescription(REPLACE_ON_FAILURE, XenonPropertyDescription.Type.STRING, "DEFAULT", "Corresponds to Hadoop property: dfs.client.block.write.replace-datanode-on-failure.policy "),
-            new XenonPropertyDescription(AUTHENTICATION, XenonPropertyDescription.Type.STRING, "simple", "Corresponds to Hadoop property hadoop.security.authentication, possible values: simple(default) and kerberos"),
-            new XenonPropertyDescription(DFS_NAMENODE_KERBEROS_PRINCIPAL, XenonPropertyDescription.Type.STRING, "" , "Corresponds to Hadoop property dfs.namenode.kerberos.principal. For use when kerberos is enabled"),
-            new XenonPropertyDescription(BLOCK_ACCESS_TOKEN, XenonPropertyDescription.Type.STRING, "false" , "Corresponds to Hadoop property dfs.block.access.token.enable"),
-            new XenonPropertyDescription(TRANSFER_PROTECTION, XenonPropertyDescription.Type.STRING, "" , "Corresponds to Hadoop property dfs.data.transfer.protection")
+            new XenonPropertyDescription(HADOOP_SETTINGS_FILE, XenonPropertyDescription.Type.STRING, "", "The path to the file with the hadoop settings, i.e. \"/home/xenon/core-site.xml\".")
     };
 
     public HDFSFileAdaptor() {
@@ -77,23 +74,25 @@ public class HDFSFileAdaptor extends FileAdaptor{
 
     @Override
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
-        Configuration conf = new Configuration(false);
+        Configuration conf = new Configuration(true);
+
+
         conf.set("fs.defaultFS", location);
         properties = properties == null ? new HashMap<>() : properties;
         XenonProperties prop = new XenonProperties(VALID_PROPERTIES,properties);
+        String file = prop.getStringProperty(HADOOP_SETTINGS_FILE);
+        try {
+            org.apache.hadoop.fs.Path p = new org.apache.hadoop.fs.Path(file);
+            conf.addResource(p);
+        } catch (IllegalArgumentException e){
 
-        // Verbatim forward Hadoop properties starting with "dfs." and "hadoop."
-        conf.set("dfs.client.block.write.replace-datanode-on-failure.policy",prop.getStringProperty(REPLACE_ON_FAILURE));
+        }
 
-        conf.set("hadoop.security.authentication", prop.getStringProperty(AUTHENTICATION));
-        conf.set("dfs.namenode.kerberos.principal",prop.getStringProperty(DFS_NAMENODE_KERBEROS_PRINCIPAL));
-        conf.set("dfs.block.access.token.enable",prop.getStringProperty(BLOCK_ACCESS_TOKEN));
-        conf.set("dfs.data.transfer.protection", prop.getStringProperty(TRANSFER_PROTECTION));
-
+        String authent = conf.get("hadoop.security.authentication");
 
         try {
             UserGroupInformation.reset();
-            if (prop.getStringProperty(AUTHENTICATION).equals("kerberos")) {
+            if (authent.equals("kerberos")) {
                 UserGroupInformation.setConfiguration(conf);
                 if (credential instanceof DefaultCredential) {
 
@@ -149,7 +148,7 @@ public class HDFSFileAdaptor extends FileAdaptor{
             throw new InvalidPropertyException(ADAPTOR_NAME,
                     "Invalid value for " + BUFFER_SIZE + ": " + bufferSize + " (must be between 1 and " + Integer.MAX_VALUE + ")");
         }
-
+        conf.set("dfs.client.block.write.replace-datanode-on-failure.policy", "NEVER");
         try {
             org.apache.hadoop.fs.FileSystem fs = org.apache.hadoop.fs.FileSystem.get(conf);
             return new HDFSFileSystem(getNewUniqueID(),location, fs,bufferSize, xp);

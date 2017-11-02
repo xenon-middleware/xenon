@@ -1,11 +1,11 @@
-package nl.esciencecenter.xenon.adaptors.filesystems.hdfs;
+package nl.esciencecenter.xenon.adaptors.shared.hdfs;
+
 
 
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileSystemTestInfrastructure;
-import nl.esciencecenter.xenon.adaptors.filesystems.FileSystemTestParent;
 import nl.esciencecenter.xenon.adaptors.filesystems.LocationConfig;
 import nl.esciencecenter.xenon.credentials.KeytabCredential;
 import nl.esciencecenter.xenon.filesystems.CopyMode;
@@ -17,9 +17,9 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor.REPLACE_ON_FAILURE;
+import static nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor.HADOOP_SETTINGS_FILE;
 
-public class HDFSKerberosFileSystemDockerTestKeytab extends FileSystemTestInfrastructure {
+public class HDFSKeytabCredentialsTest extends FileSystemTestInfrastructure {
 
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/hdfs-kerberos.yml")
@@ -78,17 +78,19 @@ public class HDFSKerberosFileSystemDockerTestKeytab extends FileSystemTestInfras
 
 
     public FileSystem setupFileSystem() throws XenonException {
+
+        try {
+            Process p = new ProcessBuilder("kadmin", "-p", "admin/admin", "-w", "javagat", "-q", "ktadd -k /home/xenon/xenon.keytab xenon").inheritIO().start();
+            p.waitFor();
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
         String location = docker.containers().container("hdfs").port(8020).inFormat("localhost:$EXTERNAL_PORT");
-        System.setProperty("java.security.krb5.conf", "src/integrationTest/resources/kerberos/krb5.conf");
         Map<String, String> props = new HashMap<>();
-        // this is needed for a single data-node hadoop cluster
-        props.put(REPLACE_ON_FAILURE, "NEVER");
-        props.put(HDFSFileAdaptor.AUTHENTICATION,"kerberos");
-        props.put(HDFSFileAdaptor.DFS_NAMENODE_KERBEROS_PRINCIPAL,"hdfs/localhost@esciencecenter.nl");
-        props.put(HDFSFileAdaptor.BLOCK_ACCESS_TOKEN, "true");
-        props.put(HDFSFileAdaptor.TRANSFER_PROTECTION, "integrity");
-//            properties.put(HDFSFileAdaptor.DATA_NODE_ADRESS, "localhost:50016");
-        KeytabCredential kt = new KeytabCredential("xenon@esciencecenter.nl","src/integrationTest/resources/kerberos/xenon.keytab");
+        props.put(HADOOP_SETTINGS_FILE, "src/integrationTest/resources/core-site-kerberos.xml");
+        KeytabCredential kt = new KeytabCredential("xenon@esciencecenter.nl","/home/xenon/xenon.keytab");
         FileSystem fs =  FileSystem.create("hdfs", location, kt, props);
         fs.setWorkingDirectory(new Path("/filesystem-test-fixture"));
         return fs;

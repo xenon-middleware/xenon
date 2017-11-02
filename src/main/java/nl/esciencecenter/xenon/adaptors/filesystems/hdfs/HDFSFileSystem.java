@@ -175,17 +175,6 @@ public class HDFSFileSystem extends nl.esciencecenter.xenon.filesystems.FileSyst
             return listIterator(dir);
         } catch (XenonException e) {
             throw new Error(e.getMessage());
-//            return new Iterator<PathAttributes>() {
-//                @Override
-//                public boolean hasNext() {
-//                    return false;
-//                }
-//
-//                @Override
-//                public PathAttributes next() {
-//                    return null;
-//                }
-//            };
         }
 
     }
