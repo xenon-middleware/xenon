@@ -91,11 +91,10 @@ public class SftpFileAdaptor extends FileAdaptor {
 
     /** List of properties supported by this SSH adaptor */
     private static final XenonPropertyDescription[] VALID_PROPERTIES = new XenonPropertyDescription[] {
-            new XenonPropertyDescription(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, "true", "Automatically add unknown host keys to known_hosts."),
             new XenonPropertyDescription(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, "true", "Enable strict host key checking."),
             new XenonPropertyDescription(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, "true", "Load the standard known_hosts file."),
             new XenonPropertyDescription(LOAD_SSH_CONFIG, Type.BOOLEAN, "true", "Load the OpenSSH config file."),
-            new XenonPropertyDescription(SSH_CONFIG_FILE, Type.STRING, null, "OpenSSH config filename."),
+            /* new XenonPropertyDescription(SSH_CONFIG_FILE, Type.STRING, null, "OpenSSH config filename."), */
             new XenonPropertyDescription(AGENT, Type.BOOLEAN, "false", "Use a (local) ssh-agent."),
             new XenonPropertyDescription(AGENT_FORWARDING, Type.BOOLEAN, "false", "Use ssh-agent forwarding when setting up a connection."),
             new XenonPropertyDescription(CONNECTION_TIMEOUT, Type.NATURAL, "10000",
@@ -165,7 +164,7 @@ public class SftpFileAdaptor extends FileAdaptor {
             throw e;
         }
 
-        return new SftpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), (int) bufferSize, session, sftpClient, xp);
+        return new SftpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, credential, new Path(cwd), (int) bufferSize, session, sftpClient, xp);
     }
 
     private String getCurrentWorkingDirectory(SftpClient sftpClient, String location) throws XenonException {

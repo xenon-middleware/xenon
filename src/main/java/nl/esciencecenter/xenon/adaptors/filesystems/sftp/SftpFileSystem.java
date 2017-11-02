@@ -41,6 +41,7 @@ import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation
 import nl.esciencecenter.xenon.adaptors.filesystems.PermissionDeniedException;
 import nl.esciencecenter.xenon.adaptors.filesystems.PosixFileUtils;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHConnection;
+import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
@@ -57,9 +58,9 @@ public class SftpFileSystem extends FileSystem {
     private final SftpClient client;
     private final SSHConnection connection;
 
-    protected SftpFileSystem(String uniqueID, String name, String location, Path entryPath, int bufferSize, SSHConnection connection, SftpClient client,
-            XenonProperties properties) {
-        super(uniqueID, name, location, entryPath, bufferSize, properties);
+    protected SftpFileSystem(String uniqueID, String name, String location, Credential credential, Path entryPath, int bufferSize, SSHConnection connection,
+            SftpClient client, XenonProperties properties) {
+        super(uniqueID, name, location, credential, entryPath, bufferSize, properties);
         this.client = client;
         this.connection = connection;
     }

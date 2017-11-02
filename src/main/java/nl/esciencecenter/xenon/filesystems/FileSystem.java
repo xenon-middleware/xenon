@@ -401,6 +401,7 @@ public abstract class FileSystem implements AutoCloseable {
     private final String uniqueID;
     private final String adaptor;
     private final String location;
+    private final Credential credential;
     private final XenonProperties properties;
     private final ExecutorService pool;
 
@@ -412,7 +413,8 @@ public abstract class FileSystem implements AutoCloseable {
 
     private final HashMap<String, PendingCopy> pendingCopies = new HashMap<>();
 
-    protected FileSystem(String uniqueID, String adaptor, String location, Path workDirectory, int bufferSize, XenonProperties properties) {
+    protected FileSystem(String uniqueID, String adaptor, String location, Credential credential, Path workDirectory, int bufferSize,
+            XenonProperties properties) {
 
         if (uniqueID == null) {
             throw new IllegalArgumentException("Identifier may not be null!");
@@ -426,6 +428,10 @@ public abstract class FileSystem implements AutoCloseable {
             throw new IllegalArgumentException("Location may not be null!");
         }
 
+        if (credential == null) {
+            throw new IllegalArgumentException("Credential may not be null!");
+        }
+
         if (workDirectory == null) {
             throw new IllegalArgumentException("EntryPath may not be null!");
         }
@@ -437,6 +443,7 @@ public abstract class FileSystem implements AutoCloseable {
         this.uniqueID = uniqueID;
         this.adaptor = adaptor;
         this.location = location;
+        this.credential = credential;
         this.workingDirectory = workDirectory;
         this.properties = properties;
         this.bufferSize = bufferSize;
@@ -470,6 +477,15 @@ public abstract class FileSystem implements AutoCloseable {
      */
     public String getLocation() {
         return location;
+    }
+
+    /**
+     * Get the credential that this FileSystem is using.
+     *
+     * @return the credential this FileSystem is using.
+     */
+    public Credential getCredential() {
+        return credential;
     }
 
     /**

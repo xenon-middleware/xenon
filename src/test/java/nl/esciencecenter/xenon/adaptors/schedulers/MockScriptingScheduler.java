@@ -20,6 +20,7 @@ import java.util.HashMap;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.QueueStatus;
@@ -48,7 +49,8 @@ public class MockScriptingScheduler extends ScriptingScheduler {
             new XenonPropertyDescription(MULTIQ_MAX_CONCURRENT, Type.INTEGER, "4", "The maximum number of concurrent jobs in the multiq.") };
 
     MockScriptingScheduler() throws XenonException {
-        super("test1", "TEST", "", null, new HashMap<String, String>(), VALID_PROPERTIES, "xenon.adaptors.schedulers.local.queue.pollingDelay");
+        super("test1", "TEST", "", new DefaultCredential(), new HashMap<String, String>(), VALID_PROPERTIES,
+                "xenon.adaptors.schedulers.local.queue.pollingDelay");
     }
 
     @Override

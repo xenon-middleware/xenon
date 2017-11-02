@@ -36,6 +36,7 @@ import java.util.Set;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
+import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
@@ -48,8 +49,9 @@ public class LocalFileSystem extends FileSystem {
 
     private final String root;
 
-    protected LocalFileSystem(String uniqueID, String location, String root, Path entryPath, int bufferSize, XenonProperties properties) {
-        super(uniqueID, ADAPTOR_NAME, location, entryPath, bufferSize, properties);
+    protected LocalFileSystem(String uniqueID, String location, Credential credential, String root, Path entryPath, int bufferSize,
+            XenonProperties properties) {
+        super(uniqueID, ADAPTOR_NAME, location, credential, entryPath, bufferSize, properties);
         this.root = root;
     }
 

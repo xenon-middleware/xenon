@@ -23,6 +23,7 @@ import java.util.HashSet;
 import org.junit.Test;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.Path;
 
 public class LocalFileSystemSimpleTest {
@@ -49,14 +50,14 @@ public class LocalFileSystemSimpleTest {
 
     @Test
     public void test_xenonPermissions_null() throws XenonException {
-        try (LocalFileSystem f = new LocalFileSystem("test", "/", "/", new Path("/"), 4096, null)) {
+        try (LocalFileSystem f = new LocalFileSystem("test", "/", new DefaultCredential(), "/", new Path("/"), 4096, null)) {
             assertNull(f.xenonPermissions(null));
         }
     }
 
     @Test
     public void test_javaPermissions_null() throws XenonException {
-        try (LocalFileSystem f = new LocalFileSystem("test", "/", "/", new Path("/"), 4096, null)) {
+        try (LocalFileSystem f = new LocalFileSystem("test", "/", new DefaultCredential(), "/", new Path("/"), 4096, null)) {
             assertEquals(new HashSet<java.nio.file.attribute.PosixFilePermission>(0), f.javaPermissions(null));
         }
     }

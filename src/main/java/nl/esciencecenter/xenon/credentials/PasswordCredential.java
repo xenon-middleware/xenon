@@ -34,6 +34,28 @@ public class PasswordCredential implements UserCredential {
      */
     private final char[] password;
 
+    /**
+     * Create a new PasswordCredential using a String as password.
+     *
+     * This String will immediately be converted into a char array internally.
+     *
+     * @param username
+     *            the user name of the credential.
+     * @param password
+     *            the password of the credential.
+     */
+    public PasswordCredential(String username, String password) {
+        this(username, password == null ? new char[0] : password.toCharArray());
+    }
+
+    /**
+     * Create a new PasswordCredential using a char array as password.
+     *
+     * @param username
+     *            the user name of the credential.
+     * @param password
+     *            the password of the credential.
+     */
     public PasswordCredential(String username, char[] password) {
 
         this.username = username;

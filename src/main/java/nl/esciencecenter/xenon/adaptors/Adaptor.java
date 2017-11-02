@@ -24,10 +24,10 @@ public abstract class Adaptor implements AdaptorDescription {
 
     private final String name;
     private final String description;
-    private final String [] supportedLocations;
-    private final XenonPropertyDescription [] supportedProperties;
+    private final String[] supportedLocations;
+    private final XenonPropertyDescription[] supportedProperties;
 
-    protected Adaptor(String name, String description, String [] locations, XenonPropertyDescription [] properties) {
+    protected Adaptor(String name, String description, String[] locations, XenonPropertyDescription[] properties) {
         this.name = name;
         this.description = description;
         this.supportedLocations = locations;

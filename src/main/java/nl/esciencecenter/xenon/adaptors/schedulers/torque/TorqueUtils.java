@@ -153,6 +153,9 @@ final class TorqueUtils {
         }
 
         String resources = description.getJobOptions().get(JOB_OPTION_RESOURCES);
+
+        // TODO: check if resources clash with nodes or walltime ?
+
         if (resources != null) {
             script.format("#PBS -l %s\n", resources);
         }

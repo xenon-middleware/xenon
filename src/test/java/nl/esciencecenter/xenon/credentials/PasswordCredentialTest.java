@@ -15,11 +15,14 @@
  */
 package nl.esciencecenter.xenon.credentials;
 
-import org.junit.Test;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class PasswordCredentialTest {
 
@@ -43,7 +46,13 @@ public class PasswordCredentialTest {
 
     @Test
     public void test_password_null() throws Exception {
-        PasswordCredential pwc = new PasswordCredential("username", null);
+        PasswordCredential pwc = new PasswordCredential("username", (String) null);
+        assertArrayEquals(new char[0], pwc.getPassword());
+    }
+
+    @Test
+    public void test_password_null2() throws Exception {
+        PasswordCredential pwc = new PasswordCredential("username", (char[]) null);
         assertArrayEquals(new char[0], pwc.getPassword());
     }
 

@@ -115,6 +115,6 @@ public class LocalFileAdaptor extends FileAdaptor {
         Path entry = new Path(LocalFileSystemUtils.getLocalSeparator(), path);
         // for Windows remove the drive letter from entry?
 
-        return new LocalFileSystem(getNewUniqueID(), location, root, entry, (int) bufferSize, xp);
+        return new LocalFileSystem(getNewUniqueID(), location, new DefaultCredential(), root, entry, (int) bufferSize, xp);
     }
 }
