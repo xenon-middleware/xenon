@@ -765,7 +765,11 @@ public abstract class SchedulerTestParent {
                     fs.exists(fs.getWorkingDirectory().resolve(new Path(false, "test_workdir_usage", "test_file"))));
 
         } finally {
-            fs.delete(testDir, true);
+            try {
+                fs.delete(testDir, true);
+            } catch (Exception e) {
+                // ignore
+            }
         }
     }
 }
