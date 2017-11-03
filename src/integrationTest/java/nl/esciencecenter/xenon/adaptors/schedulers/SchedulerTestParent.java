@@ -732,7 +732,8 @@ public abstract class SchedulerTestParent {
         FileSystem fs = scheduler.getFileSystem();
 
         // This test does not run on windows.
-        assumeFalse("Test not suited for windows", scheduler.getAdaptorName().equals("local") && LocalFileSystemUtils.isWindows());
+        assumeFalse("Test only suited for linux",
+                scheduler.getAdaptorName().equals("local") && (LocalFileSystemUtils.isWindows() || LocalFileSystemUtils.isOSX()));
 
         assertTrue("Working dir does not exist", fs.exists(fs.getWorkingDirectory()));
 
