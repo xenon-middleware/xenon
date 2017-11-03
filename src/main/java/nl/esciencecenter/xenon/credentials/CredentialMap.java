@@ -16,6 +16,7 @@
 package nl.esciencecenter.xenon.credentials;
 
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * A {@link Credential} consisting of a collection of Credentials each uniquely identified by a String (typically a host name or host alias).
@@ -93,6 +94,24 @@ public class CredentialMap implements Credential {
             return map.get(key);
         }
 
+        return defaultCredential;
+    }
+
+    /**
+     * Returns a {@link Set} view of the keys contained in this map.
+     *
+     * @return a set view of the keys contained in this map
+     */
+    public Set<String> keySet() {
+        return map.keySet();
+    }
+
+    /**
+     * Returns the default {@link UserCredential}.
+     *
+     * @return the default credential to return by <code>get</code> if a key is not found.
+     */
+    public UserCredential getDefault() {
         return defaultCredential;
     }
 

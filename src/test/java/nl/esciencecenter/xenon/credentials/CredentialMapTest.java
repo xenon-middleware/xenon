@@ -20,6 +20,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Test;
 
 public class CredentialMapTest {
@@ -153,4 +156,35 @@ public class CredentialMapTest {
         assertFalse(m.equals(m2));
     }
 
+    @Test
+    public void test_keySet() {
+        CredentialMap m = new CredentialMap();
+        PasswordCredential p = new PasswordCredential("test", "foo".toCharArray());
+        m.put("key", p);
+
+        Set<String>ks = m.keySet();
+
+        Set<String> expected = new HashSet<>();
+        expected.add("key");
+        assertEquals(expected, ks);
+    }
+
+    @Test
+    public void test_getDefault_noDefault_null() {
+        CredentialMap m = new CredentialMap();
+
+        UserCredential d = m.getDefault();
+
+        assertNull(d);
+    }
+
+    @Test
+    public void test_getDefault_Password() {
+        PasswordCredential p = new PasswordCredential("test", "foo".toCharArray());
+        CredentialMap m = new CredentialMap(p);
+
+        UserCredential d = m.getDefault();
+
+        assertEquals(p, d);
+    }
 }
