@@ -38,7 +38,8 @@ public class SshInteractiveProcessFactory implements InteractiveProcessFactory {
     }
 
     @Override
-    public InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier, long timeoutInMillis) throws XenonException {
+    public InteractiveProcess createInteractiveProcess(JobDescription description, String workdir, String jobIdentifier, long timeoutInMillis)
+            throws XenonException {
 
         if (connection.isClosed()) {
             throw new SchedulerClosedException(ADAPTOR_NAME, "Scheduler is closed");

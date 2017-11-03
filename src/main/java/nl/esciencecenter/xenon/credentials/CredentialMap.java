@@ -15,14 +15,17 @@
  */
 package nl.esciencecenter.xenon.credentials;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A {@link Credential} consisting of a collection of Credentials each uniquely identified by a String (typically a host name or host alias).
  *
  * A default Credential can be set that will be returned if by <code>get</code> if a key is not found.
  */
-public class CredentialMap implements Credential {
+public class CredentialMap implements Credential, Map<String, UserCredential> {
 
     private final HashMap<String, UserCredential> map = new HashMap<>();
 
@@ -54,14 +57,16 @@ public class CredentialMap implements Credential {
      *            the unique key used to store the credential.
      * @param credential
      *            the UserCredential to store.
+     * @return the {@link UserCredential} previously stored using the <code>key</code> or <code>null</code> if the key was not used before.
+     *
      */
-    public void put(String key, UserCredential credential) {
+    public UserCredential put(String key, UserCredential credential) {
 
         if (key == null) {
             throw new IllegalArgumentException("Key may not be null");
         }
 
-        map.put(key, credential);
+        return map.put(key, credential);
     }
 
     /**
@@ -95,6 +100,61 @@ public class CredentialMap implements Credential {
     }
 
     @Override
+    public int size() {
+        return map.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
+
+    @Override
+    public boolean containsKey(Object key) {
+        return map.containsKey(key);
+    }
+
+    @Override
+    public boolean containsValue(Object value) {
+        return map.containsValue(value);
+    }
+
+    @Override
+    public UserCredential get(Object key) {
+        return map.get(key);
+    }
+
+    @Override
+    public UserCredential remove(Object key) {
+        return map.remove(key);
+    }
+
+    @Override
+    public void putAll(Map<? extends String, ? extends UserCredential> m) {
+        map.putAll(m);
+    }
+
+    @Override
+    public void clear() {
+        map.clear();
+    }
+
+    @Override
+    public Set<String> keySet() {
+        return map.keySet();
+    }
+
+    @Override
+    public Collection<UserCredential> values() {
+        return map.values();
+    }
+
+    @Override
+    public Set<java.util.Map.Entry<String, UserCredential>> entrySet() {
+        return map.entrySet();
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -124,5 +184,4 @@ public class CredentialMap implements Credential {
 
         return map.equals(other.map);
     }
-
 }

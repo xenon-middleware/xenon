@@ -43,13 +43,7 @@ public class TorqueUtilsTest {
 
         String result = TorqueUtils.generate(description, null);
 
-        String expected =
-                  "#!/bin/sh\n"
-                + "#PBS -S /bin/sh\n"
-                + "#PBS -N xenon\n"
-                + "#PBS -l nodes=1:ppn=1\n"
-                + "#PBS -l walltime=00:15:00\n"
-                + "\nnull\n";
+        String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l walltime=00:15:00\n" + "\nnull\n";
 
         assertEquals(expected, result);
     }
@@ -57,6 +51,7 @@ public class TorqueUtilsTest {
     @Test
     /**
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
+     * 
      * @throws XenonException
      */
     public void test01b_generate__FilledDescription_Result() throws XenonException {
@@ -73,17 +68,9 @@ public class TorqueUtilsTest {
 
         String result = TorqueUtils.generate(description, null);
 
-        String expected =
-                  "#!/bin/sh\n"
-                + "#PBS -S /bin/sh\n"
-                + "#PBS -N xenon\n"
-                + "#PBS -w '/some/working/directory'\n"
-                + "#PBS -q the.queue\n"
-                + "#PBS -l list-of-resources\n"
-                + "#PBS -l nodes=1:ppn=1\n"
-                + "#PBS -l walltime=01:40:00\n"
-                + "export some.more=\"environment value with spaces\"\n\n"
-                + "/bin/executable 'some' 'arguments'\n";
+        String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -d /some/working/directory\n" + "#PBS -q the.queue\n"
+                + "#PBS -l list-of-resources\n" + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l walltime=01:40:00\n"
+                + "export some.more=\"environment value with spaces\"\n\n" + "/bin/executable 'some' 'arguments'\n";
 
         assertEquals(expected, result);
     }
@@ -91,6 +78,7 @@ public class TorqueUtilsTest {
     @Test
     /**
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
+     * 
      * @throws XenonException
      */
     public void test01c_generate__ParallelDescription_Result() throws XenonException {
@@ -107,16 +95,8 @@ public class TorqueUtilsTest {
 
         String result = TorqueUtils.generate(description, null);
 
-        String expected =
-                  "#!/bin/sh\n"
-                + "#PBS -S /bin/sh\n"
-                + "#PBS -N xenon\n"
-                + "#PBS -w '/some/working/directory'\n"
-                + "#PBS -q the.queue\n"
-                + "#PBS -l list-of-resources\n"
-                + "#PBS -l nodes=4:ppn=10\n"
-                + "#PBS -l walltime=01:40:00\n"
-                + "export some=\"environment.value\"\n\n"
+        String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -d /some/working/directory\n" + "#PBS -q the.queue\n"
+                + "#PBS -l list-of-resources\n" + "#PBS -l nodes=4:ppn=10\n" + "#PBS -l walltime=01:40:00\n" + "export some=\"environment.value\"\n\n"
                 + "/bin/executable 'some' 'arguments'\n";
 
         assertEquals(expected, result);
@@ -129,12 +109,7 @@ public class TorqueUtilsTest {
 
         String result = TorqueUtils.generate(description, null);
 
-        String expected =
-                  "#!/bin/sh\n"
-                + "#PBS -S /bin/sh\n"
-                + "#PBS -N xenon\n"
-                + "#PBS -l nodes=1:ppn=1\n"
-                + "#PBS -l walltime=00:15:00\n"
+        String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l walltime=00:15:00\n"
                 + "\n/myscript/or_other\n";
 
         assertEquals(expected, result);
@@ -155,17 +130,16 @@ public class TorqueUtilsTest {
         assertEquals("serial script content incorrect", expected, output.out().toString());
     }
 
-
     @Test
     public void test01a_verifyJobDescription_ValidJobDescription_NoException() throws Exception {
         JobDescription description = new JobDescription();
 
-        //all the settings the function checks for set exactly right
+        // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
         description.setMaxRuntime(1);
-        //GridEngine specific info
+        // GridEngine specific info
 
         TorqueUtils.verifyJobDescription(description);
     }
@@ -174,12 +148,12 @@ public class TorqueUtilsTest {
     public void test01b_verifyJobDescription_ScriptOptionSet_NoException() throws Exception {
         JobDescription description = new JobDescription();
 
-        //all the settings the function checks for set exactly right
+        // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
         description.setMaxRuntime(1);
-        //GridEngine specific info
+        // GridEngine specific info
         description.addJobOption(TorqueUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
 
         TorqueUtils.verifyJobDescription(description);
@@ -189,15 +163,15 @@ public class TorqueUtilsTest {
     public void test01c_verifyJobDescription_JobScriptSet_NoFurtherChecking() throws Exception {
         JobDescription description = new JobDescription();
 
-        //set a job option
+        // set a job option
         description.addJobOption(TorqueUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
 
-        //All these settings are wrong. This should not lead to an error
+        // All these settings are wrong. This should not lead to an error
         description.setExecutable(null);
         description.setNodeCount(0);
         description.setProcessesPerNode(0);
         description.setMaxRuntime(0);
-        //GridEngine specific info
+        // GridEngine specific info
 
         TorqueUtils.verifyJobDescription(description);
     }
@@ -206,7 +180,7 @@ public class TorqueUtilsTest {
     public void test01d_verifyJobDescription_InvalidOptions_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
-        //set a job option
+        // set a job option
         description.addJobOption("wrong.setting", "wrong.value");
 
         TorqueUtils.verifyJobDescription(description);
@@ -216,7 +190,7 @@ public class TorqueUtilsTest {
     public void test01f_verifyJobDescription_InvalidStandardSetting_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
-        //verify the standard settings are also checked
+        // verify the standard settings are also checked
         description.setExecutable("bin/bla");
         description.setMaxRuntime(0);
 
@@ -227,9 +201,10 @@ public class TorqueUtilsTest {
     public void test01f_verifyJobDescription_InvalidStdout_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
-        //verify the standard settings are also checked
+        // verify the standard settings are also checked
         description.setExecutable("bin/bla");
-        description.setStdout("foo");;
+        description.setStdout("foo");
+        ;
         TorqueUtils.verifyJobDescription(description);
     }
 
@@ -237,9 +212,10 @@ public class TorqueUtilsTest {
     public void test01f_verifyJobDescription_InvalidStderr_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
-        //verify the standard settings are also checked
+        // verify the standard settings are also checked
         description.setExecutable("bin/bla");
-        description.setStderr("foo");;
+        description.setStderr("foo");
+        ;
         TorqueUtils.verifyJobDescription(description);
     }
 
@@ -247,12 +223,12 @@ public class TorqueUtilsTest {
     public void test01f_verifyJobDescription_InvalidStdin_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
-        //verify the standard settings are also checked
+        // verify the standard settings are also checked
         description.setExecutable("bin/bla");
-        description.setStdin("foo");;
+        description.setStdin("foo");
+        ;
         TorqueUtils.verifyJobDescription(description);
     }
-
 
     @Test(expected = InvalidJobDescriptionException.class)
     public void test01l_verifyJobDescription_JobScriptAndContents_ExceptionThrown() throws Exception {
@@ -340,7 +316,7 @@ public class TorqueUtilsTest {
     public void test04e_getJobStatusFromQstatInfo_IncompleteJobInfo_ExceptionThrown() throws XenonException {
         String jobID = "555.localhost";
 
-        //very incomplete job info
+        // very incomplete job info
         Map<String, String> jobInfo = new HashMap<>(0);
 
         Map<String, Map<String, String>> input = new HashMap<>(2);

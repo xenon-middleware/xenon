@@ -81,7 +81,7 @@ public class SshInteractiveProcessFactoryTest {
         desc.setWorkingDirectory("workdir");
         desc.setExecutable("exec");
 
-        p.createInteractiveProcess(desc, "JOB-42", 10000L);
+        p.createInteractiveProcess(desc, "workdir", "JOB-42", 10000L);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -89,7 +89,7 @@ public class SshInteractiveProcessFactoryTest {
         MockSSHConnection conn = new MockSSHConnection();
         conn.setSession(new MockClientSession(false));
         SshInteractiveProcessFactory p = new SshInteractiveProcessFactory(conn);
-        p.createInteractiveProcess(null, null, 10000L);
+        p.createInteractiveProcess(null, "workdir", null, 10000L);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -100,7 +100,7 @@ public class SshInteractiveProcessFactoryTest {
         JobDescription desc = new JobDescription();
         desc.setWorkingDirectory("workdir");
         desc.setExecutable("exec");
-        p.createInteractiveProcess(desc, null, 10000L);
+        p.createInteractiveProcess(desc, "workdir", null, 10000L);
     }
 
     @Test
@@ -118,7 +118,7 @@ public class SshInteractiveProcessFactoryTest {
         env.put("key2", "value2");
         desc.setEnvironment(env);
         desc.setArguments(new String[] { "a", "b", "c" });
-        p.createInteractiveProcess(desc, "JOB-42", 10000L);
+        p.createInteractiveProcess(desc, "workdir", "JOB-42", 10000L);
 
         MockChannelExec e = (MockChannelExec) ((MockClientSession) conn.getSession()).exec;
 

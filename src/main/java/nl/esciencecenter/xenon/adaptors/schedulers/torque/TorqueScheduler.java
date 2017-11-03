@@ -283,7 +283,7 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         String output;
 
-        Path fsEntryPath = getWorkingDirectory();
+        Path workdir = getWorkingDirectory();
 
         verifyJobDescription(description);
 
@@ -294,7 +294,7 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         if (customScriptFile == null) {
             checkWorkingDirectory(description.getWorkingDirectory());
-            String jobScript = TorqueUtils.generate(description, fsEntryPath);
+            String jobScript = TorqueUtils.generate(description, workdir);
 
             output = runCheckedCommand(jobScript, "qsub");
         } else {
@@ -302,7 +302,7 @@ public class TorqueScheduler extends ScriptingScheduler {
 
             // convert to absolute path if needed
             if (!customScriptFile.startsWith("/")) {
-                Path scriptFile = fsEntryPath.resolve(customScriptFile);
+                Path scriptFile = workdir.resolve(customScriptFile);
                 customScriptFile = scriptFile.toString();
             }
 

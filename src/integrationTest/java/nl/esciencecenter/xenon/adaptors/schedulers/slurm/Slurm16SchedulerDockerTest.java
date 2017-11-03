@@ -43,13 +43,13 @@ public class Slurm16SchedulerDockerTest extends SlurmSchedulerTestParent {
     }
 
     @Override
-    public Scheduler setupScheduler() throws XenonException {
+    public Scheduler setupScheduler(SchedulerLocationConfig config) throws XenonException {
         String location = docker.containers().container("slurm").port(22).inFormat("ssh://$HOST:$EXTERNAL_PORT");
         PasswordCredential cred = new PasswordCredential("xenon", "javagat".toCharArray());
         Map<String, String> props = new HashMap<>();
         props.put(STRICT_HOST_KEY_CHECKING, "false");
         props.put(LOAD_STANDARD_KNOWN_HOSTS, "false");
-        return Scheduler.create("slurm", location, cred, props);
+        return Scheduler.create("slurm", config.getLocation(), cred, props);
     }
 
 }

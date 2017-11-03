@@ -43,13 +43,13 @@ public class TorqueSchedulerDockerTest extends TorqueSchedulerTestParent {
     }
 
     @Override
-    public Scheduler setupScheduler() throws XenonException {
-        String location = docker.containers().container("torque").port(22).inFormat("ssh://$HOST:$EXTERNAL_PORT");
+    public Scheduler setupScheduler(SchedulerLocationConfig config) throws XenonException {
+        // String location = docker.containers().container("torque").port(22).inFormat("ssh://$HOST:$EXTERNAL_PORT");
         PasswordCredential cred = new PasswordCredential("xenon", "javagat".toCharArray());
         Map<String, String> props = new HashMap<>();
         props.put(STRICT_HOST_KEY_CHECKING, "false");
         props.put(LOAD_STANDARD_KNOWN_HOSTS, "false");
-        return Scheduler.create("torque", location, cred, props);
+        return Scheduler.create("torque", config.getLocation(), cred, props);
     }
 
 }

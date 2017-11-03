@@ -36,7 +36,8 @@ public class MockInteractiveProcessFactory implements InteractiveProcessFactory 
         this.killDelay = killDelay;
     }
 
-    public InteractiveProcess createInteractiveProcess(JobDescription description, String jobIdentifier, long timeoutInMillis) throws XenonException {
+    public InteractiveProcess createInteractiveProcess(JobDescription description, String workdir, String jobIdentifier, long timeoutInMillis)
+            throws XenonException {
         return new MockInteractiveProcess(description, jobIdentifier, delay, killDelay);
     }
 
