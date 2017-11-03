@@ -51,7 +51,7 @@ public class TorqueUtilsTest {
     @Test
     /**
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
-     * 
+     *
      * @throws XenonException
      */
     public void test01b_generate__FilledDescription_Result() throws XenonException {
@@ -78,7 +78,7 @@ public class TorqueUtilsTest {
     @Test
     /**
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
-     * 
+     *
      * @throws XenonException
      */
     public void test01c_generate__ParallelDescription_Result() throws XenonException {
