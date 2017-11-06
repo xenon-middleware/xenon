@@ -1,9 +1,18 @@
-Xenon 2.1.0
+Xenon 2.2.0
 -----------
 
-This is release 2.1.0 of Xenon. 
+This is release 2.2.0 of Xenon. 
 
 Notable changes compared to v2.1.0:
+-----------------------------------
+
+- extended CredentialMap to retrieve all keys 
+- removed logback config from jar 
+- fixed bug in handling workdir of Local and TorqueSchedulers
+- many small bugfixes, additional tests, etc.
+
+
+Notable changes compared to v2.0.0:
 -----------------------------------
 
 - added getCredential to Scheduler and FileSystem 

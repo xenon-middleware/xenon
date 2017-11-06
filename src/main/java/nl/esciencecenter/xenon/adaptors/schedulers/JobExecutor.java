@@ -23,6 +23,7 @@ import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.Streams;
+import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 
 /**
  *
@@ -295,6 +296,20 @@ public class JobExecutor implements Runnable {
         }
     }
 
+    private Path processPath(Path root, String path) {
+        Path result;
+
+        if (path == null) {
+            result = root;
+        } else if (LocalFileSystemUtils.startWithRoot(path)) {
+            result = new Path(path);
+        } else {
+            result = root.resolve(path);
+        }
+
+        return result;
+    }
+
     @Override
     public void run() {
         Process process;
@@ -312,12 +327,19 @@ public class JobExecutor implements Runnable {
         }
 
         try {
+            // Retrieve the filesystem that goes with the scheduler and resolve the workdir if needed.
+            Path workdir = processPath(workingDirectory, description.getWorkingDirectory());
+
+            if (!filesystem.exists(workdir)) {
+                throw new IOException("Working directory " + workdir + " does not exist!");
+            }
+
             if (interactive) {
-                InteractiveProcess p = factory.createInteractiveProcess(description, jobIdentifier, startupTimeout);
+                InteractiveProcess p = factory.createInteractiveProcess(description, workdir.toString(), jobIdentifier, startupTimeout);
                 setStreams(p.getStreams());
                 process = p;
             } else {
-                process = new BatchProcess(filesystem, workingDirectory, description, jobIdentifier, factory, startupTimeout);
+                process = new BatchProcess(filesystem, workdir, description, jobIdentifier, factory, startupTimeout);
             }
         } catch (XenonException e) {
             updateState(ERROR_STATE, -1, e);

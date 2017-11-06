@@ -34,7 +34,7 @@ public class LocalSchedulerTest extends SchedulerTestParent {
     @Override
     protected SchedulerLocationConfig setupLocationConfig() {
 
-        return new SchedulerLocationConfig("", "/code", new String[] { "single", "multi", "unlimited" }, "single") {
+        return new SchedulerLocationConfig("", "/tmp", new String[] { "single", "multi", "unlimited" }, "single") {
 
             @Override
             public boolean supportsInteractive() {
@@ -49,8 +49,8 @@ public class LocalSchedulerTest extends SchedulerTestParent {
     }
 
     @Override
-    public Scheduler setupScheduler() throws XenonException {
-        return Scheduler.create("local");
+    public Scheduler setupScheduler(SchedulerLocationConfig config) throws XenonException {
+        return Scheduler.create("local", config.getLocation());
     }
 
     @Test

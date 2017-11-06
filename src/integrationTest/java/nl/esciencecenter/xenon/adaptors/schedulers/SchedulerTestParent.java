@@ -56,9 +56,9 @@ public abstract class SchedulerTestParent {
 
     @Before
     public void setup() throws XenonException {
-        scheduler = setupScheduler();
-        description = setupDescription();
         locationConfig = setupLocationConfig();
+        scheduler = setupScheduler(locationConfig);
+        description = setupDescription();
     }
 
     protected abstract SchedulerLocationConfig setupLocationConfig();
@@ -70,7 +70,7 @@ public abstract class SchedulerTestParent {
         }
     }
 
-    public abstract Scheduler setupScheduler() throws XenonException;
+    public abstract Scheduler setupScheduler(SchedulerLocationConfig config) throws XenonException;
 
     private SchedulerAdaptorDescription setupDescription() throws XenonException {
         String name = scheduler.getAdaptorName();
@@ -721,5 +721,62 @@ public abstract class SchedulerTestParent {
         Path p = fs.getWorkingDirectory();
 
         assertEquals(locationConfig.getWorkdir(), p.toString());
+    }
+
+    @Test
+    public void test_workdir_usage_linux() throws Exception {
+
+        // We need a scheduler that actually has a filesystem underneath.
+        assumeTrue("Scheduler does not use filesystem", description.usesFileSystem());
+
+        FileSystem fs = scheduler.getFileSystem();
+
+        // This test does not run on windows.
+        assumeFalse("Test only suited for linux", scheduler.getAdaptorName().equals("local") && (LocalFileSystemUtils.isWindows()));
+
+        String command = "/bin/touch";
+
+        if (LocalFileSystemUtils.isOSX() && scheduler.getAdaptorName().equals("local")) {
+            command = "/usr/bin/touch";
+        }
+
+        assertTrue("Working dir does not exist", fs.exists(fs.getWorkingDirectory()));
+
+        Path testDir = fs.getWorkingDirectory().resolve(new Path(false, "test_workdir_usage"));
+
+        assertFalse("Test dir already exists", fs.exists(testDir));
+
+        try {
+            fs.createDirectory(testDir);
+
+            assertTrue("Failed to create test directory", fs.exists(testDir));
+
+            JobDescription job = new JobDescription();
+            job.setExecutable(command);
+            job.setArguments("test_file");
+            job.setWorkingDirectory("test_workdir_usage");
+
+            String id = scheduler.submitBatchJob(job);
+
+            // Torque seems slow (occasionally) to update the status, so we need a long timeout for a short job...
+            JobStatus status = scheduler.waitUntilDone(id, 20 * 1000);
+
+            assertTrue("Job is not done after timeout", status.isDone());
+
+            if (status.hasException()) {
+                throw status.getException();
+            }
+
+            assertTrue("Exit code not 0 but " + status.getExitCode(), status.getExitCode() == 0);
+            assertTrue("Test output was not found in expected location",
+                    fs.exists(fs.getWorkingDirectory().resolve(new Path(false, "test_workdir_usage", "test_file"))));
+
+        } finally {
+            try {
+                fs.delete(testDir, true);
+            } catch (Exception e) {
+                // ignore
+            }
+        }
     }
 }

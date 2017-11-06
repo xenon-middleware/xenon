@@ -48,7 +48,7 @@ public class LocalFileSystemUtils {
      */
     public static boolean isOSX() {
         String os = System.getProperty(OS_PROPERTY);
-        return (os != null && os.equals("MacOSX"));
+        return (os != null && os.equals("Mac OS X"));
     }
 
     /**

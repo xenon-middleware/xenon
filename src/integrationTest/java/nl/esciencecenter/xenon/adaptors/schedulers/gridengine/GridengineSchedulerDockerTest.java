@@ -43,13 +43,13 @@ public class GridengineSchedulerDockerTest extends GridengineSchedulerTestParent
     }
 
     @Override
-    public Scheduler setupScheduler() throws XenonException {
-        String location = docker.containers().container("gridengine").port(22).inFormat("ssh://$HOST:$EXTERNAL_PORT");
+    public Scheduler setupScheduler(SchedulerLocationConfig config) throws XenonException {
+        // String location = docker.containers().container("gridengine").port(22).inFormat("ssh://$HOST:$EXTERNAL_PORT");
         PasswordCredential cred = new PasswordCredential("xenon", "javagat".toCharArray());
         Map<String, String> props = new HashMap<>();
         props.put(STRICT_HOST_KEY_CHECKING, "false");
         props.put(LOAD_STANDARD_KNOWN_HOSTS, "false");
-        return Scheduler.create("gridengine", location, cred, props);
+        return Scheduler.create("gridengine", config.getLocation(), cred, props);
     }
 
 }

@@ -55,14 +55,16 @@ public class CredentialMap implements Credential {
      *            the unique key used to store the credential.
      * @param credential
      *            the UserCredential to store.
+     * @return the {@link UserCredential} previously stored using the <code>key</code> or <code>null</code> if the key was not used before.
+     *
      */
-    public void put(String key, UserCredential credential) {
+    public UserCredential put(String key, UserCredential credential) {
 
         if (key == null) {
             throw new IllegalArgumentException("Key may not be null");
         }
 
-        map.put(key, credential);
+        return map.put(key, credential);
     }
 
     /**

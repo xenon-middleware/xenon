@@ -25,7 +25,7 @@ import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 public class LocalFileSystemUtilsTestOSX {
 
     @Rule
-    public final ProvideSystemProperty p3 = new ProvideSystemProperty("os.name", "MacOSX");
+    public final ProvideSystemProperty p3 = new ProvideSystemProperty("os.name", "Mac OS X");
 
     @Test
     public void test_osOSX() {

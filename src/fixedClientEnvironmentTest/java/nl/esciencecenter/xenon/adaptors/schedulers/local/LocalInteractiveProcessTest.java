@@ -40,7 +40,7 @@ public class LocalInteractiveProcessTest {
         JobDescription job = new JobDescription();
         job.setExecutable("/bin/cat");
 
-        LocalInteractiveProcess p = new LocalInteractiveProcess(job, "job42");
+        LocalInteractiveProcess p = new LocalInteractiveProcess(job, null, "job42");
 
         Streams streams = p.getStreams();
 
@@ -80,7 +80,7 @@ public class LocalInteractiveProcessTest {
         job.setExecutable("/bin/cat");
         job.setWorkingDirectory("/foo");
 
-        new LocalInteractiveProcess(job, "job42");
+        new LocalInteractiveProcess(job, "/foo", "job42");
     }
 
     @Test
@@ -91,7 +91,7 @@ public class LocalInteractiveProcessTest {
         JobDescription job = new JobDescription();
         job.setExecutable("/bin/cat");
 
-        LocalInteractiveProcess p = new LocalInteractiveProcess(job, "job42");
+        LocalInteractiveProcess p = new LocalInteractiveProcess(job, null, "job42");
 
         Streams streams = p.getStreams();
 
@@ -129,7 +129,7 @@ public class LocalInteractiveProcessTest {
         JobDescription job = new JobDescription();
         job.setExecutable("/bin/cat");
 
-        LocalInteractiveProcess p = new LocalInteractiveProcess(job, "job42");
+        LocalInteractiveProcess p = new LocalInteractiveProcess(job, null, "job42");
 
         assertFalse(p.isDone());
 

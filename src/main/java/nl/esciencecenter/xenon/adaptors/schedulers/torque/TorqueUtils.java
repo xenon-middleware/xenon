@@ -126,7 +126,7 @@ final class TorqueUtils {
         script.format("\n");
     }
 
-    public static String generate(JobDescription description, Path fsEntryPath) {
+    public static String generate(JobDescription description, Path workdir) {
         StringBuilder stringBuilder = new StringBuilder(500);
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
@@ -143,9 +143,9 @@ final class TorqueUtils {
             String workingDirectory = description.getWorkingDirectory();
             if (!workingDirectory.startsWith("/")) {
                 // make relative path absolute
-                workingDirectory = fsEntryPath.resolve(workingDirectory).toString();
+                workingDirectory = workdir.resolve(workingDirectory).toString();
             }
-            script.format("#PBS -w '%s'\n", workingDirectory);
+            script.format("#PBS -d %s\n", workingDirectory);
         }
 
         if (description.getQueueName() != null) {

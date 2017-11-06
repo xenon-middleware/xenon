@@ -35,7 +35,7 @@ public abstract class SchedulerLocationConfig {
     }
 
     public String getLocation() {
-        return location;
+        return location + (workdir != null ? workdir : "");
     }
 
     public String[] getQueueNames() {

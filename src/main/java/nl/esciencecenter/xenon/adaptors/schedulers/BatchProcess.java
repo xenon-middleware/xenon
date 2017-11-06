@@ -44,15 +44,8 @@ class BatchProcess implements Process {
     private StreamForwarder stdoutForwarder;
     private StreamForwarder stderrForwarder;
 
-    public BatchProcess(FileSystem filesystem, Path workingDirectory, JobDescription description, String jobIdentifier, InteractiveProcessFactory factory,
+    public BatchProcess(FileSystem filesystem, Path workdir, JobDescription description, String jobIdentifier, InteractiveProcessFactory factory,
             long startupTimeout) throws XenonException, IOException {
-
-        // Retrieve the filesystem that goes with the scheduler.
-        Path workdir = processPath(workingDirectory, description.getWorkingDirectory());
-
-        if (!filesystem.exists(workdir)) {
-            throw new IOException("Working directory " + workdir + " does not exist!");
-        }
 
         // If needed create a file for stdin, and make sure it exists!
         Path stdin = null;
@@ -68,7 +61,7 @@ class BatchProcess implements Process {
         OutputStream out = createOutputStream(filesystem, workdir, description.getStdout());
         OutputStream err = createOutputStream(filesystem, workdir, description.getStderr());
 
-        process = factory.createInteractiveProcess(description, jobIdentifier, startupTimeout);
+        process = factory.createInteractiveProcess(description, workdir.toString(), jobIdentifier, startupTimeout);
         Streams streams = process.getStreams();
 
         stdoutForwarder = new StreamForwarder(streams.getStdout(), out);

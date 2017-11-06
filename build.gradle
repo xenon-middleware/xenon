@@ -38,6 +38,9 @@ repositories {
     maven {
         url 'https://dl.bintray.com/palantir/releases' // docker-compose-rule is published on bintray
     }
+    maven { 
+        url 'https://jitpack.io' 
+    }
 }
 
 dependencies {
@@ -46,7 +49,8 @@ dependencies {
     compile group: 'org.apache.jclouds.provider', name: 'aws-s3', version: '2.0.2'
     compile group: 'org.apache.hadoop', name: 'hadoop-common', version: '2.8.0'
     compile group: 'org.apache.hadoop', name: 'hadoop-hdfs', version: '2.8.0'
-    compile group: 'org.apache.sshd', name: 'sshd-core', version: '1.6.0'
+    // compile group: 'org.apache.sshd', name: 'sshd-core', version: '1.6.0'
+    compile group: 'com.github.NLeSC.mina-sshd', name: 'sshd-core', version: 'known-host-hash-with-port-1.6.0-SNAPSHOT'
     compile group: 'org.apache.mina', name: 'mina-core', version: '2.0.7'
     compile group: 'net.i2p.crypto', name: 'eddsa', version: '0.2.0'
     compile group: 'commons-net', name: 'commons-net', version: '3.3'

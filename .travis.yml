@@ -35,7 +35,7 @@ matrix:
       osx_image: xcode9
       script:
         - ./src/liveTest/resources/scripts/create_symlinks;
-        - ./gradlew test liveTest -Dxenon.scheduler=local -Dxenon.filesystem=file -Dxenon.filesystem.location=/ -Dxenon.scheduler.location=/ -Dxenon.username=$USERNAME -Dxenon.filesystem.basedir=$PWD -Dxenon.filesystem.expected.workdir=/ -Dxenon.scheduler.workdir=/ -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
+        - ./gradlew test liveTest -Dxenon.scheduler=local -Dxenon.filesystem=file -Dxenon.filesystem.location=/ -Dxenon.scheduler.location=$PWD -Dxenon.username=$USERNAME -Dxenon.filesystem.basedir=$PWD -Dxenon.filesystem.expected.workdir=/ -Dxenon.scheduler.workdir=$PWD -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
       after_script:
        -  ./gradlew jacocoTestReport jacocoLiveTestReport
        - bash <(curl -s https://codecov.io/bash) -e JDK,OS -F unit -f build/reports/jacoco/test/jacocoTestReport.xml;

@@ -30,7 +30,6 @@ import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
 import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 
-
 /**
  * LocalInteractiveProcess implements a {@link InteractiveProcess} for local interactive processes.
  *
@@ -45,14 +44,14 @@ class LocalInteractiveProcess implements InteractiveProcess {
 
     private final Streams streams;
 
-    LocalInteractiveProcess(JobDescription description, String jobIdentifier) throws XenonException {
+    LocalInteractiveProcess(JobDescription description, String workdir, String jobIdentifier) throws XenonException {
         ProcessBuilder builder = new ProcessBuilder();
 
         builder.command().add(description.getExecutable());
         builder.command().addAll(description.getArguments());
         builder.environment().putAll(description.getEnvironment());
 
-        String workingDirectory = description.getWorkingDirectory();
+        String workingDirectory = workdir;
 
         if (workingDirectory == null) {
             workingDirectory = System.getProperty("user.dir");
@@ -92,9 +91,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
     }
 
     /**
-     * Destroy (stop) process.
-     * Does nothing if the process has already finished. Does not
-     * re-evaluate whether process has finished. Will run the kill command on
+     * Destroy (stop) process. Does nothing if the process has already finished. Does not re-evaluate whether process has finished. Will run the kill command on
      * Unix, and Process.destroy() if that does not work or does not apply.
      */
     public void destroy() {
