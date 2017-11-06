@@ -279,13 +279,13 @@ public class JCloudsFileSytem extends FileSystem {
     PathAttributes toPathAttributes(final StorageMetadata m) {
 
         switch (m.getType()) {
-        case RELATIVE_PATH:
-            return makeDirAttributes(m);
-        case BLOB:
-            return makeBlobAttributes(m.getName());
-        default:
-            // Should never occur, as we filter the types.
-            return null;
+            case RELATIVE_PATH:
+                return makeDirAttributes(m);
+            case BLOB:
+                return makeBlobAttributes(m.getName());
+            default:
+                // Should never occur, as we filter the types.
+                return null;
         }
     }
 

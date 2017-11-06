@@ -81,6 +81,8 @@ public class PathAttributesImplementation implements PathAttributes {
         // EMPTY
     }
 
+
+
     /**
      * Get the path these attributes belong to.
      *
