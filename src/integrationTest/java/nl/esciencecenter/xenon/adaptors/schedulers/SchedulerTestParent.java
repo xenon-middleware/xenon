@@ -732,8 +732,7 @@ public abstract class SchedulerTestParent {
         FileSystem fs = scheduler.getFileSystem();
 
         // This test does not run on windows.
-        assumeFalse("Test only suited for linux",
-                scheduler.getAdaptorName().equals("local") && (LocalFileSystemUtils.isWindows() || LocalFileSystemUtils.isOSX()));
+        assumeFalse("Test only suited for linux", scheduler.getAdaptorName().equals("local") && (LocalFileSystemUtils.isWindows()));
 
         assertTrue("Working dir does not exist", fs.exists(fs.getWorkingDirectory()));
 
@@ -747,7 +746,7 @@ public abstract class SchedulerTestParent {
             assertTrue("Failed to create test directory", fs.exists(testDir));
 
             JobDescription job = new JobDescription();
-            job.setExecutable("/bin/touch");
+            job.setExecutable("/usr/bin/touch");
             job.setArguments("test_file");
             job.setWorkingDirectory("test_workdir_usage");
 
