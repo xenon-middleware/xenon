@@ -734,6 +734,12 @@ public abstract class SchedulerTestParent {
         // This test does not run on windows.
         assumeFalse("Test only suited for linux", scheduler.getAdaptorName().equals("local") && (LocalFileSystemUtils.isWindows()));
 
+        String command = "/bin/touch";
+
+        if (LocalFileSystemUtils.isOSX() && scheduler.getAdaptorName().equals("local")) {
+            command = "/usr/bin/touch";
+        }
+
         assertTrue("Working dir does not exist", fs.exists(fs.getWorkingDirectory()));
 
         Path testDir = fs.getWorkingDirectory().resolve(new Path(false, "test_workdir_usage"));
@@ -746,7 +752,7 @@ public abstract class SchedulerTestParent {
             assertTrue("Failed to create test directory", fs.exists(testDir));
 
             JobDescription job = new JobDescription();
-            job.setExecutable("/usr/bin/touch");
+            job.setExecutable(command);
             job.setArguments("test_file");
             job.setWorkingDirectory("test_workdir_usage");
 
@@ -760,7 +766,7 @@ public abstract class SchedulerTestParent {
                 throw status.getException();
             }
 
-            assertTrue("Exit code not 0", status.getExitCode() == 0);
+            assertTrue("Exit code not 0 but " + status.getExitCode(), status.getExitCode() == 0);
             assertTrue("Test output was not found in expected location",
                     fs.exists(fs.getWorkingDirectory().resolve(new Path(false, "test_workdir_usage", "test_file"))));
 
