@@ -758,7 +758,8 @@ public abstract class SchedulerTestParent {
 
             String id = scheduler.submitBatchJob(job);
 
-            JobStatus status = scheduler.waitUntilDone(id, 10 * 1000);
+            // Torque seems slow (occasionally) to update the status, so we need a long timeout for a short job...
+            JobStatus status = scheduler.waitUntilDone(id, 20 * 1000);
 
             assertTrue("Job is not done after timeout", status.isDone());
 
