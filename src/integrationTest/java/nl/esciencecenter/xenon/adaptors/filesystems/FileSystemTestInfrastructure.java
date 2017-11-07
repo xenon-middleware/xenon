@@ -15,13 +15,10 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.filesystems.*;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.Timeout;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,11 +28,21 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertTrue;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.Timeout;
+
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.filesystems.CopyMode;
+import nl.esciencecenter.xenon.filesystems.CopyStatus;
+import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.filesystems.PathAttributes;
 
 public abstract class FileSystemTestInfrastructure {
-
 
     public static final String TEST_DIR = "xenon_test";
 
@@ -91,11 +98,12 @@ public abstract class FileSystemTestInfrastructure {
     @After
     public void cleanup() throws XenonException {
         FileSystem cleanFileSystem = null;
+
         try {
             // close the file system under test, so any copy operations still running are killed, before we clean the test root
-            //  if (fileSystem.isOpen()) {
-            // fileSystem.close();
-            // }
+            if (fileSystem.isOpen()) {
+                fileSystem.close();
+            }
 
             cleanFileSystem = setupFileSystem();
 
@@ -119,7 +127,6 @@ public abstract class FileSystemTestInfrastructure {
         String name = fileSystem.getAdaptorName();
         return FileSystem.getAdaptorDescription(name);
     }
-
 
     public Path resolve(String path) throws XenonException {
         return testRoot.resolve(new Path(path));
@@ -298,7 +305,6 @@ public abstract class FileSystemTestInfrastructure {
         return testDir.resolve(new Path(generateTestDirName()));
     }
 
-
     protected Set<PathAttributes> listSet(Path dir, boolean recursive) throws XenonException {
         Set<PathAttributes> res = new HashSet<>();
         for (PathAttributes p : fileSystem.list(dir, recursive)) {
@@ -340,7 +346,6 @@ public abstract class FileSystemTestInfrastructure {
         }
         return superfluous;
     }
-
 
     /**
      * Read all bytes from the input stream and return them in a byte array.
@@ -411,8 +416,6 @@ public abstract class FileSystemTestInfrastructure {
         }
     }
 
-
-
     protected void assertSameContentsDir(Path dir1, Path dir2) throws Exception {
         for (PathAttributes p : fileSystem.list(dir1, true)) {
             Path sub = dir1.relativize(p.getPath());
@@ -460,7 +463,5 @@ public abstract class FileSystemTestInfrastructure {
 
         return bytes;
     }
-
-
 
 }
