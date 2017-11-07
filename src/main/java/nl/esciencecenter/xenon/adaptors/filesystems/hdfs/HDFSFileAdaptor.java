@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.xenon.adaptors.filesystems.hdfs;
 
 import java.io.IOException;
@@ -79,11 +94,12 @@ public class HDFSFileAdaptor extends FileAdaptor {
         properties = properties == null ? new HashMap<>() : properties;
         XenonProperties prop = new XenonProperties(VALID_PROPERTIES, properties);
         String file = prop.getStringProperty(HADOOP_SETTINGS_FILE);
+
         try {
             org.apache.hadoop.fs.Path p = new org.apache.hadoop.fs.Path(file);
             conf.addResource(p);
         } catch (IllegalArgumentException e) {
-
+            throw new XenonException(ADAPTOR_NAME, "Failed to handle hadoop settings file " + file, e);
         }
 
         String authent = conf.get("hadoop.security.authentication");
@@ -94,12 +110,12 @@ public class HDFSFileAdaptor extends FileAdaptor {
                 UserGroupInformation.setConfiguration(conf);
                 if (credential instanceof DefaultCredential) {
                     UserGroupInformation.loginUserFromSubject(null);
-                }
-                if (credential instanceof KeytabCredential) {
+
+                } else if (credential instanceof KeytabCredential) {
                     KeytabCredential kt = (KeytabCredential) credential;
                     UserGroupInformation.loginUserFromKeytab(kt.getUsername(), kt.getKeytabFile());
-                }
-                if (credential instanceof PasswordCredential) {
+
+                } else if (credential instanceof PasswordCredential) {
                     // set JAAS to request password
                     javax.security.auth.login.Configuration.setConfiguration(new javax.security.auth.login.Configuration() {
                         @Override
@@ -132,20 +148,21 @@ public class HDFSFileAdaptor extends FileAdaptor {
                 }
             }
         } catch (IOException | LoginException e) {
-            throw new XenonException("hdfs", "Error when logging in to hdfs", e);
+            throw new XenonException(ADAPTOR_NAME, "Error when logging in to hdfs", e);
         }
 
-        XenonProperties xp = new XenonProperties(VALID_PROPERTIES, properties);
-        int bufferSize = (int) xp.getSizeProperty(BUFFER_SIZE);
+        int bufferSize = (int) prop.getSizeProperty(BUFFER_SIZE);
 
         if (bufferSize <= 0 || bufferSize >= Integer.MAX_VALUE) {
             throw new InvalidPropertyException(ADAPTOR_NAME,
                     "Invalid value for " + BUFFER_SIZE + ": " + bufferSize + " (must be between 1 and " + Integer.MAX_VALUE + ")");
         }
+
         conf.set("dfs.client.block.write.replace-datanode-on-failure.policy", "NEVER");
+
         try {
             org.apache.hadoop.fs.FileSystem fs = org.apache.hadoop.fs.FileSystem.get(conf);
-            return new HDFSFileSystem(getNewUniqueID(), location, credential, fs, bufferSize, xp);
+            return new HDFSFileSystem(getNewUniqueID(), location, credential, fs, bufferSize, prop);
         } catch (IOException e) {
             throw new XenonException("hdfs", "Failed to create HDFS connection: " + e.getMessage());
         }

@@ -21,26 +21,19 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.Timeout;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
@@ -48,7 +41,6 @@ import nl.esciencecenter.xenon.filesystems.CopyMode;
 import nl.esciencecenter.xenon.filesystems.CopyStatus;
 import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
-import nl.esciencecenter.xenon.filesystems.FileSystemAdaptorDescription;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
 import nl.esciencecenter.xenon.filesystems.NoSuchCopyException;
 import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
