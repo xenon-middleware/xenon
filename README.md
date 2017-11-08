@@ -54,6 +54,7 @@ Xenon currently supports the following file access mechanisms:
 - ``sftp``
 - ``webdav``
 - ``s3``
+- ``hdfs``
 
 Xenon currently supports the following job submission mechanisms:
 
