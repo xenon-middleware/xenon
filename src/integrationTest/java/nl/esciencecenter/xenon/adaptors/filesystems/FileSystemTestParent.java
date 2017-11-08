@@ -25,7 +25,8 @@ import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -51,8 +52,7 @@ import nl.esciencecenter.xenon.filesystems.PosixFilePermission;
 import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 import nl.esciencecenter.xenon.utils.OutputReader;
 
-public abstract class FileSystemTestParent extends FileSystemTestInfrastructure{
-
+public abstract class FileSystemTestParent extends FileSystemTestInfrastructure {
 
     @Test
     public void exists_fileDoesExist_fileExists() throws XenonException {
@@ -68,7 +68,6 @@ public abstract class FileSystemTestParent extends FileSystemTestInfrastructure{
         Path expectedTarget = linkTarget.getValue();
         assertThat(target, is(expectedTarget));
     }
-
 
     // Tests to create directories
 
@@ -457,7 +456,6 @@ public abstract class FileSystemTestParent extends FileSystemTestInfrastructure{
         assertEquals(set1, set2);
     }
 
-
     @Test
     public void test_list_existingEmptyDir() throws Exception {
         generateAndCreateTestDir();
@@ -769,7 +767,6 @@ public abstract class FileSystemTestParent extends FileSystemTestInfrastructure{
         fileSystem.readFromFile(nonExistingFile);
     }
 
-
     @Test
     public void test_readFromFile_existingEmptyFile() throws Exception {
         generateAndCreateTestDir();
@@ -931,7 +928,6 @@ public abstract class FileSystemTestParent extends FileSystemTestInfrastructure{
         Path p = createTestSubDir(testDir);
         fileSystem.appendToFile(p);
     }
-
 
     @Test(expected = IllegalArgumentException.class)
     public void test_copy_null_throwsException() throws Exception {
