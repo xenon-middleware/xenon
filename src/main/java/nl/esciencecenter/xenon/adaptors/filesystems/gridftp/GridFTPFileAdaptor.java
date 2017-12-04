@@ -2,6 +2,8 @@ package nl.esciencecenter.xenon.adaptors.filesystems.gridftp;
 
 import java.util.Map;
 
+import org.globus.ftp.GridFTPClient;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
@@ -43,6 +45,18 @@ public class GridFTPFileAdaptor extends FileAdaptor {
     @Override
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
         // TODO Auto-generated method stub
+
+        String host = null;
+        int port = 0;
+
+        GridFTPClient client = null;
+
+        try {
+            client = new GridFTPClient(host, port);
+        } catch (Exception e) {
+            throw new XenonException(ADAPTOR_NAME, "Failed to connect to " + location, e);
+        }
+
         return null;
     }
 

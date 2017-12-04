@@ -210,14 +210,6 @@ We can add our dependecy to this block:
 Be sure to include the specific version of the desired library. Otherwise, the latest version will be used, which may break your code unexpectedly.
 
 
-  
-
-
-
-
-
-
-
 
 
 ### The GridFTPFileSystem implementation
