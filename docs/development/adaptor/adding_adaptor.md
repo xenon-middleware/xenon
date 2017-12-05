@@ -52,7 +52,7 @@ It is good practise to declare several `final static` variables in the adaptor c
     private static final String ADAPTOR_DESCRIPTION = "Adaptor for the GridFTP file system";
 
     /** The locations supported by this adaptor */
-    private static final String[] ADAPTOR_LOCATIONS = new String[] { "hostname[:port]" };
+    private static final String[] ADAPTOR_LOCATIONS = new String[] { "gsiftp://hostname[:port]" };
 
     /** All our own properties start with this prefix. */
     public static final String PREFIX = FileAdaptor.ADAPTORS_PREFIX + "gridftp.";
@@ -164,9 +164,10 @@ In our case the gridftp protocol supports third party data tranfers, so we add t
 
 Next, we need to implement `createFileSystem` in the `GridFTPFileAdaptor` class. This method is called whenever the uses creates a new filesystem of this type. For example:
 
-   FileSystem.create("gridftp", "myserver.edu", credential, properties);
+   FileSystem.create("gridftp", "gsiftp://myserver.edu", credential, properties);
 
-Xenon will use the "gridftp" name to lookup the GridFTPFileAdaptor, and invoke the `createFileSystem` method using the provide location, credentials, and properties. It looks like this:
+Xenon will use the "gridftp" name to lookup the GridFTPFileAdaptor, and invoke the `createFileSystem` method using the provided location, credentials, and properties. The invoked method 
+looks like this:
 
     @Override
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
@@ -178,11 +179,10 @@ Xenon will use the "gridftp" name to lookup the GridFTPFileAdaptor, and invoke t
 
 The `FileSystem` implementation that is returned represents an actual filesystem or data store somewhere, usually on some remote server. Often, a network connection is required to communicate 
 with this server using some protocol, and some form of authentication is required to set up this connection. Creating such the connection and performing the authentication 
-is the task of `createFileSystem`. Once the connection is established, all relevant objects (data, network connections, etc) are be wrapped in a `GridFTPFileSystem` implementation (described below)
-and returned to the user.
+is the task of `createFileSystem`. Once the connection is established, all relevant objects (data, network connections, etc) are be wrapped in a `FileSystem` implementation (in this case a `GridFtpFileSystem`, 
+as described below) and returned to the user.
 
-
-Since we not want to implement the gridftp protocol ourselves, we use the JGlobus library to provide us with the necessary implementation. To use this library, we add it to our dependencies in 
+Since we not want to implement the gridftp protocol ourselves, we will use the JGlobus library to provide us with the necessary implementation. To use this library, we add it to our dependencies in 
 the 'build.gradle' file in the Xenon root directory. This file will contain an `dependency` block containing references to libraries needed for the various adaptors:
 
     dependencies {
@@ -202,15 +202,89 @@ the 'build.gradle' file in the Xenon root directory. This file will contain an `
         ... more ...
     }
 
-We can add our dependecy to this block:
+We can add our dependency to this block:
 
     // JGlobus (for gridftp)
     compile group: 'org.jglobus', name: 'gridftp', version: '2.1.0'
 
-Be sure to include the specific version of the desired library. Otherwise, the latest version will be used, which may break your code unexpectedly.
+Be sure to include the specific version of the desired library. Otherwise, the latest version will be used, which may break your code unexpectedly.  
+
+To ensure the dependencies are actually downloaded by gradle you may need to run one of the tasks, for example:   
+
+    ./gradlew assemble   
+
+To ensure the dependencies are included in your editor environment, you may need to run one of the following:  
+
+    ./gradlew eclipse   
+    ./gradlew intellij   
 
 
+## Creating the implemention of `createFileSystem`
 
+Implementing `createFileSystem` typically involves the following steps:   
+
+ - parsing the `location` to validate that it is correct and to extract any relevant information needed to create the connection
+ - checking the type of the provided credential to ensure it is supported and to determine how to autenticate
+ - handeling any properties provided by the user
+
+For the `GridFtpFileAdaptor` we use the `java.net.URI` class to parse the location. We then check that the scheme is set correctly and extract the 
+hostname and port number of the server to connect to. Once this is done, we use a `GridFTPClient` (from the jglobus library) to create a connection:
+
+    URI uri;
+
+    try {
+       uri = new URI(location);
+    } catch (Exception e) {
+       throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
+    }
+
+    String scheme = uri.getScheme();
+    String host = uri.getHost();
+    int port = uri.getPort();
+
+    if (!"gsiftp".equals(scheme)) {
+       throw new InvalidLocationException(ADAPTOR_NAME, "Scheme not supported: " + scheme);
+    }
+
+    if (port == -1) {
+       port = DEFAULT_PORT;
+    }
+
+    try {
+       client = new GridFTPClient(host, port);
+    } catch (Exception e) {
+       throw new XenonException(ADAPTOR_NAME, "Failed to connect to " + location, e);
+    }
+
+We now have a connection to the server, but we still need to authenticate ourselves to be able to use it. To do so, we need to figure out what type 
+of `Credential` was provided by the user, and convert this into something we can pass on the the `GridFTPClient`: 
+
+   GSSCredential cred = null;
+
+   if (credential instanceof DefaultCredential) {
+      cred = getDefaultCredential();
+   } else if (credential instanceof CertificateCredential) {
+      cred = loadCredential(((CertificateCredential) credential).getCertificateFile());
+   } else {
+      throw new InvalidCredentialException(ADAPTOR_NAME, "Credential type not supported");
+   }
+
+   try {
+      client.authenticate(cred);
+   } catch (ServerException e1) {
+      throw new InvalidCredentialException(ADAPTOR_NAME, "Failed to authenticate to server", e1);
+   } catch (IOException e2) {
+      throw new XenonException(ADAPTOR_NAME, "Error during authentication with server", e2);
+   }
+
+## TODO: set PWD and properties  
+  
+Now we have fully initialized the `GridFTPClient, we wrap it in a `GridFTPFileSystem` implementation. We pass the 
+`GridFTPClient` and all relevant information to this object which we then return to the user:
+
+   return new GridFTPFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, credential, new Path(cwd), (int) bufferSize, xp);
+
+## TODO finish this part
 
 ### The GridFTPFileSystem implementation
 
