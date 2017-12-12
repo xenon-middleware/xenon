@@ -60,8 +60,7 @@ public abstract class FileSystemTestInfrastructure {
     }
 
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(10); // 60 seconds max per
-    // method tested
+    public Timeout globalTimeout = Timeout.seconds(30); // 10 seconds max per method tested
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -74,15 +73,11 @@ public abstract class FileSystemTestInfrastructure {
 
         Path root = locationConfig.getWritableTestDir();
 
-        // System.out.println("ROOT=" + root);
-
         assertNotNull(root);
 
         testRoot = root.resolve(TEST_DIR);
 
         assertNotNull(testRoot);
-
-        // System.out.println("TEST_ROOT=" + testRoot);
 
         if (fileSystem.exists(testRoot)) {
             fileSystem.delete(testRoot, true);

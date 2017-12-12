@@ -15,6 +15,9 @@
  */
 package nl.esciencecenter.xenon.filesystems;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * PosixFilePermission is an enumeration containing all supported Posix file permissions.
  *
@@ -60,6 +63,18 @@ public enum PosixFilePermission {
      */
     OWNER_WRITE;
 
+    private static int OTHERS_EXECUTE_BIT = 0x1;
+    private static int OTHERS_WRITE_BIT = 0x2;
+    private static int OTHERS_READ_BIT = 0x4;
+
+    private static int GROUP_EXECUTE_BIT = 0x1 << 3;
+    private static int GROUP_WRITE_BIT = 0x2 << 3;
+    private static int GROUP_READ_BIT = 0x4 << 3;
+
+    private static int OWNER_EXECUTE_BIT = 0x1 << 6;
+    private static int OWNER_WRITE_BIT = 0x2 << 6;
+    private static int OWNER_READ_BIT = 0x4 << 6;
+
     /**
      * Check if a sequence of <code>PosixFilePermission</code>s contains a specific option.
      *
@@ -85,5 +100,54 @@ public enum PosixFilePermission {
             }
         }
         return false;
+    }
+
+    public static Set<PosixFilePermission> convertFromOctal(String octal) {
+
+        if (octal == null || octal.length() != 4) {
+            throw new IllegalArgumentException("Expected 4 digit octal file mode string");
+        }
+
+        Set<PosixFilePermission> result = new HashSet<>();
+
+        int mode = Integer.decode("0" + octal);
+
+        if ((mode & OTHERS_EXECUTE_BIT) != 0) {
+            result.add(OTHERS_EXECUTE);
+        }
+
+        if ((mode & OTHERS_WRITE_BIT) != 0) {
+            result.add(OTHERS_WRITE);
+        }
+
+        if ((mode & OTHERS_READ_BIT) != 0) {
+            result.add(OTHERS_READ);
+        }
+
+        if ((mode & GROUP_EXECUTE_BIT) != 0) {
+            result.add(GROUP_EXECUTE);
+        }
+
+        if ((mode & GROUP_WRITE_BIT) != 0) {
+            result.add(GROUP_WRITE);
+        }
+
+        if ((mode & GROUP_READ_BIT) != 0) {
+            result.add(GROUP_READ);
+        }
+
+        if ((mode & OWNER_EXECUTE_BIT) != 0) {
+            result.add(OWNER_EXECUTE);
+        }
+
+        if ((mode & OWNER_WRITE_BIT) != 0) {
+            result.add(OWNER_WRITE);
+        }
+
+        if ((mode & OWNER_READ_BIT) != 0) {
+            result.add(OWNER_READ);
+        }
+
+        return result;
     }
 }

@@ -18,7 +18,13 @@ package nl.esciencecenter.xenon.filesystems;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -39,6 +45,7 @@ import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor;
+import nl.esciencecenter.xenon.adaptors.filesystems.gridftp.GridFTPFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.s3.S3FileAdaptor;
@@ -65,6 +72,7 @@ public abstract class FileSystem implements AutoCloseable {
         addAdaptor(new WebdavFileAdaptor());
         addAdaptor(new S3FileAdaptor());
         addAdaptor(new HDFSFileAdaptor());
+        addAdaptor(new GridFTPFileAdaptor());
     }
 
     private static void addAdaptor(FileAdaptor adaptor) {
@@ -457,6 +465,10 @@ public abstract class FileSystem implements AutoCloseable {
         this.pool = Executors.newFixedThreadPool(1, f);
     }
 
+    protected int getBufferSize() {
+        return bufferSize;
+    }
+
     private synchronized String getNextCopyID() {
         return "COPY-" + getAdaptorName() + "-" + nextCopyID++;
     }
@@ -741,6 +753,9 @@ public abstract class FileSystem implements AutoCloseable {
 
             if (recursive) {
                 for (PathAttributes p : itt) {
+
+                    System.out.println("Deleting: " + p);
+
                     delete(p.getPath(), true);
                 }
             } else {
@@ -1727,6 +1742,5 @@ public abstract class FileSystem implements AutoCloseable {
     public int hashCode() {
         return Objects.hash(uniqueID);
     }
-
 
 }
