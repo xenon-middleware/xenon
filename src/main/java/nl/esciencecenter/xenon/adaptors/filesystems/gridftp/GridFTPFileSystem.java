@@ -13,7 +13,6 @@ import java.util.Vector;
 
 import org.globus.ftp.DataSourceStream;
 import org.globus.ftp.GridFTPClient;
-import org.globus.ftp.HostPort;
 import org.globus.ftp.InputStreamDataSink;
 import org.globus.ftp.MlsxEntry;
 import org.globus.ftp.OutputStreamDataSource;
@@ -27,6 +26,7 @@ import nl.esciencecenter.xenon.adaptors.filesystems.TransferClientInputStream;
 import nl.esciencecenter.xenon.adaptors.filesystems.TransferClientOutputStream;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
+import nl.esciencecenter.xenon.filesystems.InvalidPathException;
 import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.filesystems.PathAttributes;
@@ -83,17 +83,17 @@ public class GridFTPFileSystem extends FileSystem {
         this.adaptor = adaptor;
     }
 
-    private void setPassiveMode() throws XenonException {
-        try {
-            HostPort hp = client.setPassive();
-
-            System.out.println("HOSTPORT: " + hp.getHost() + ":" + hp.getPort());
-
-            client.setLocalActive();
-        } catch (Exception e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to set client to passive mode", e);
-        }
-    }
+    // private void setPassiveMode() throws XenonException {
+    // try {
+    // HostPort hp = client.setPassive();
+    //
+    // System.out.println("HOSTPORT: " + hp.getHost() + ":" + hp.getPort());
+    //
+    // client.setLocalActive();
+    // } catch (Exception e) {
+    // throw new XenonException(ADAPTOR_NAME, "Failed to set client to passive mode", e);
+    // }
+    // }
 
     @Override
     public boolean isOpen() throws XenonException {
@@ -161,20 +161,6 @@ public class GridFTPFileSystem extends FileSystem {
     @Override
     public void createFile(Path file) throws XenonException {
 
-        // try {
-        // System.out.println("OPEN FILE");
-        // OutputStream out = writeToFile(file, 0L, false);
-        // System.out.println("WRITE DATA");
-        // out.write("Hello".getBytes());
-        // System.out.println("FLUSH DATA");
-        // out.flush();
-        // System.out.println("CLOSE STREAM");
-        // out.close();
-        // System.out.println("DONE");
-        // } catch (Exception e) {
-        // throw new XenonException(ADAPTOR_NAME, "Failed to create file: " + file.toString(), e);
-        // }
-
         assertIsOpen();
 
         Path absPath = toAbsolutePath(file);
@@ -183,8 +169,8 @@ public class GridFTPFileSystem extends FileSystem {
 
         try {
             ByteArrayInputStream dummy = new ByteArrayInputStream(new byte[0]);
+            client.setPassiveMode(true);
             client.put(absPath.toString(), new DataSourceStream(dummy), null, false);
-            setPassiveMode();
         } catch (Exception e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to create file: " + absPath.toString(), e);
         }
@@ -192,8 +178,30 @@ public class GridFTPFileSystem extends FileSystem {
 
     @Override
     public void createSymbolicLink(Path link, Path target) throws XenonException {
-        // TODO Auto-generated method stub
 
+        assertIsOpen();
+
+        Path absLink = toAbsolutePath(link);
+
+        assertPathNotExists(absLink);
+        assertParentDirectoryExists(absLink);
+
+        // The implementation of SYMLINKS by GridFTP seems to be very confused. The site specific SYMLINK command that our GridFTP client wants to use does not
+        // seem to exist anymore. Instead we need a combination of SYMLINKFROM and SYMLINKTO commands, which seem to have reversed semantics. SYMLINKFROM
+        // expects the (existing) target, SYMLINKTO expects the (non-existing) link name. Also, the SYMLINKFROM returns a reply code that indicates that the
+        // SYMLINKTO should be the next command. The client does not recognize this and and interprets it as an error.
+        try {
+            try {
+                client.site("SYMLINKFROM " + target);
+            } catch (ServerException e) {
+                // ignore, as it may be a positive reply misinterpreted by the client.
+            }
+
+            client.site("SYMLINKTO " + absLink.toString());
+
+        } catch (Exception e) {
+            throw new XenonException(ADAPTOR_NAME, "Failed to create symlink " + absLink + " to " + target, e);
+        }
     }
 
     @Override
@@ -225,6 +233,7 @@ public class GridFTPFileSystem extends FileSystem {
 
         try {
             InputStreamDataSink sink = new InputStreamDataSink();
+            newClient.setPassiveMode(true);
             TransferState ts = newClient.asynchGet(absPath.toString(), sink, null);
             return new TransferClientInputStream(sink.getInputStream(), new CloseableClient(ts, newClient));
         } catch (Exception e) {
@@ -251,6 +260,7 @@ public class GridFTPFileSystem extends FileSystem {
             }
 
             OutputStreamDataSource osds = new OutputStreamDataSource(buffer);
+            newClient.setPassiveMode(true);
             TransferState ts = newClient.asynchPut(absPath.toString(), osds, null, append);
             return new TransferClientOutputStream(osds.getOutputStream(), new CloseableClient(ts, newClient));
         } catch (Exception e) {
@@ -340,8 +350,6 @@ public class GridFTPFileSystem extends FileSystem {
 
         Path absPath = toAbsolutePath(path);
 
-        // setPassiveMode();
-
         try {
             return convertAttributes(path, client.mlst(absPath.toString()));
         } catch (ServerException e1) {
@@ -353,14 +361,51 @@ public class GridFTPFileSystem extends FileSystem {
 
     @Override
     public Path readSymbolicLink(Path link) throws XenonException {
-        // TODO Auto-generated method stub
-        return null;
+
+        assertIsOpen();
+
+        Path absPath = toAbsolutePath(link);
+
+        assertPathExists(absPath);
+
+        try {
+            MlsxEntry entry = client.mlst(absPath.toString());
+
+            String type = entry.get(MlsxEntry.TYPE);
+
+            if (!MlsxEntry.TYPE_SLINK.equals(type)) {
+                throw new InvalidPathException(ADAPTOR_NAME, "Path is not a symbolic link: " + absPath);
+            }
+
+            String target = entry.get(MlsxEntry.UNIX_SLINK);
+
+            if (target == null || target.isEmpty()) {
+                throw new InvalidPathException(ADAPTOR_NAME, "Symbolic link has no target: " + absPath);
+            }
+
+            return new Path(target);
+
+        } catch (IOException | ServerException e) {
+            throw new XenonException(ADAPTOR_NAME, "Failed to read symbolic link: " + absPath);
+        }
     }
 
     @Override
     public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
-        // TODO Auto-generated method stub
 
+        assertIsOpen();
+
+        Path absPath = toAbsolutePath(path);
+
+        assertPathExists(absPath);
+
+        String octal = PosixFilePermission.convertToOctal(permissions);
+
+        try {
+            client.site("chmod " + octal + " " + absPath.toString());
+        } catch (Exception e) {
+            throw new XenonException(ADAPTOR_NAME, "Failed to chang permissions of " + absPath + " to " + octal);
+        }
     }
 
     @Override
@@ -408,9 +453,8 @@ public class GridFTPFileSystem extends FileSystem {
         Path absPath = toAbsolutePath(dir);
 
         try {
-            Vector v = client.mlsd(absPath.toString() + "/");
-            setPassiveMode();
-            return convertFileInfoVector(dir, v);
+            client.setPassiveMode(true);
+            return convertFileInfoVector(dir, client.mlsd(absPath.toString() + "/"));
         } catch (Exception e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to list directory: " + absPath.toString(), e);
         }

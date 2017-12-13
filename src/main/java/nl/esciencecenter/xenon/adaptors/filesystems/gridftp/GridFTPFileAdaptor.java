@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.globus.ftp.GridFTPClient;
 import org.globus.ftp.MlsxEntry;
-import org.globus.ftp.exception.ClientException;
 import org.globus.ftp.exception.ServerException;
 import org.globus.util.ConfigUtil;
 import org.gridforum.jgss.ExtendedGSSCredential;
@@ -63,6 +62,21 @@ public class GridFTPFileAdaptor extends FileAdaptor {
 
     @Override
     public boolean supportsThirdPartyCopy() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsReadingPosixPermissions() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsSettingPosixPermissions() {
+        return true;
+    }
+
+    @Override
+    public boolean canCreateSymboliclinks() {
         return true;
     }
 
@@ -194,16 +208,22 @@ public class GridFTPFileAdaptor extends FileAdaptor {
 
         authenticate(client, cred);
 
-        try {
-            client.setPassiveMode(true);
-            // client.setType(Session.TYPE_IMAGE);
-            // client.setLocalTCPBufferSize((int) bufferSize);
-            // client.setTCPBufferSize((int) bufferSize);
-        } catch (ClientException | ServerException | IOException e) {
-            forceClose(client);
-            throw new XenonException(ADAPTOR_NAME, "Failed to configure gridftp client", e);
-        }
+        // For the operations that uses a data channel, the client initiates this operation by sending a request over the control channel.
+        // A reply to this request will be returned over the control channel by the server (presumably after the data channel has been set up).
+        // The client waits for this reply to appear for a certain maximum amount of time, and polls the control channel in a certain interval.
+        // By default, this max time is set to 5 minutes (300 * 1000ms) which is a bit long. More seriously, the poll time is set to 2 second (2*1000s).
+        // As a result, all operations using a data channel (such as a "list") take at least 2 seconds!
+        // To fix this, we set the timeout to 30 seconds, and poll frequency to 10ms
+        client.setClientWaitParams(30 * 1000, 10);
 
+        /*
+         * try { // Like FTP which it is based on, GRIDFTP uses separate control and data channels. The control channel is initiated by the client. // The data
+         * channels are separate network connections created on demand, and they can either be initiated by the client (PASSIVE mode) or the // server (ACTIVE
+         * mode). Nowadays, the client is often behind a firewall of some kind, so ACTIVE mode typically does not work anymore. // So we set the client to
+         * PASSIVE mode here. // // NOTE: It seems we need to do this AGAIN after each operation that uses the data channel. They seem to be single use only.
+         * client.setPassiveMode(true); } catch (ClientException | ServerException | IOException e) { forceClose(client); throw new XenonException(ADAPTOR_NAME,
+         * "Failed to configure gridftp client", e); }
+         */
         return client;
     }
 

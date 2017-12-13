@@ -102,6 +102,53 @@ public enum PosixFilePermission {
         return false;
     }
 
+    public static String convertToOctal(Set<PosixFilePermission> permissions) {
+
+        int result = 0;
+
+        if (permissions == null) {
+            throw new IllegalArgumentException("Permissions may not be null");
+        }
+
+        if (permissions.contains(OTHERS_EXECUTE)) {
+            result |= OTHERS_EXECUTE_BIT;
+        }
+
+        if (permissions.contains(OTHERS_WRITE)) {
+            result |= OTHERS_WRITE_BIT;
+        }
+
+        if (permissions.contains(OTHERS_READ)) {
+            result |= OTHERS_READ_BIT;
+        }
+
+        if (permissions.contains(GROUP_EXECUTE)) {
+            result |= GROUP_EXECUTE_BIT;
+        }
+
+        if (permissions.contains(GROUP_WRITE)) {
+            result |= GROUP_WRITE_BIT;
+        }
+
+        if (permissions.contains(GROUP_READ)) {
+            result |= GROUP_READ_BIT;
+        }
+
+        if (permissions.contains(OWNER_EXECUTE)) {
+            result |= OWNER_EXECUTE_BIT;
+        }
+
+        if (permissions.contains(OWNER_WRITE)) {
+            result |= OWNER_WRITE_BIT;
+        }
+
+        if (permissions.contains(OWNER_READ)) {
+            result |= OWNER_READ_BIT;
+        }
+
+        return Integer.toOctalString(result);
+    }
+
     public static Set<PosixFilePermission> convertFromOctal(String octal) {
 
         if (octal == null || octal.length() != 4) {

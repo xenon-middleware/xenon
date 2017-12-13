@@ -60,7 +60,7 @@ public abstract class FileSystemTestInfrastructure {
     }
 
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(30); // 10 seconds max per method tested
+    public Timeout globalTimeout = Timeout.seconds(600); // 10 seconds max per method tested
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
