@@ -25,6 +25,7 @@ import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation
 import nl.esciencecenter.xenon.adaptors.filesystems.TransferClientInputStream;
 import nl.esciencecenter.xenon.adaptors.filesystems.TransferClientOutputStream;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
 import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
@@ -245,8 +246,13 @@ public class GridFTPFileSystem extends FileSystem {
 
         assertIsOpen();
         Path absPath = toAbsolutePath(file);
-        assertPathNotExists(absPath);
-        assertParentDirectoryExists(absPath);
+
+        if (!append) {
+            assertPathNotExists(absPath);
+            assertParentDirectoryExists(absPath);
+        } else {
+            assertFileExists(absPath);
+        }
 
         // GridFTP connections can only do a single thing a time. If we do stuff in parallel, the command channel gets confused.
         // Therefore we need a new GridFTPClient to handle the stream.
@@ -371,16 +377,12 @@ public class GridFTPFileSystem extends FileSystem {
         try {
             MlsxEntry entry = client.mlst(absPath.toString());
 
-            String type = entry.get(MlsxEntry.TYPE);
-
-            if (!MlsxEntry.TYPE_SLINK.equals(type)) {
-                throw new InvalidPathException(ADAPTOR_NAME, "Path is not a symbolic link: " + absPath);
-            }
-
+            // NOTE: If the path is a link, the entry type seems to reflect the type that the link points to, not MlsxEntry.TYPE_SLINK itself.
+            // So the only way to figure out if something is a link is to see if the "points to" field is set.
             String target = entry.get(MlsxEntry.UNIX_SLINK);
 
             if (target == null || target.isEmpty()) {
-                throw new InvalidPathException(ADAPTOR_NAME, "Symbolic link has no target: " + absPath);
+                throw new InvalidPathException(ADAPTOR_NAME, "Path is not a link: " + absPath);
             }
 
             return new Path(target);
@@ -405,6 +407,39 @@ public class GridFTPFileSystem extends FileSystem {
             client.site("chmod " + octal + " " + absPath.toString());
         } catch (Exception e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to chang permissions of " + absPath + " to " + octal);
+        }
+    }
+
+    @Override
+    public void delete(Path path, boolean recursive) throws XenonException {
+
+        // Since gridftp has a recursive delete command, we can use than when needed.
+
+        Path absPath = toAbsolutePath(path);
+
+        assertPathExists(absPath);
+
+        if (recursive) {
+            try {
+                client.site("RDEL " + absPath.toString());
+            } catch (Exception e) {
+                throw new XenonException(ADAPTOR_NAME, "Failed to delete path: " + path, e);
+            }
+
+            return;
+        }
+
+        if (getAttributes(absPath).isDirectory()) {
+
+            Iterable<PathAttributes> itt = list(absPath, false);
+
+            if (itt.iterator().hasNext()) {
+                throw new DirectoryNotEmptyException(getAdaptorName(), "Directory not empty: " + absPath.toString());
+            }
+
+            deleteDirectory(absPath);
+        } else {
+            deleteFile(absPath);
         }
     }
 
