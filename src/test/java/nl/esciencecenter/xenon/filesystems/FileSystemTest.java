@@ -186,7 +186,7 @@ public class FileSystemTest {
     @Test
     public void test_names() {
         String[] tmp = FileSystem.getAdaptorNames();
-        String[] expected = new String[] { "file", "ftp", "sftp", "webdav", "s3", "hdfs" };
+        String[] expected = new String[] { "file", "ftp", "sftp", "webdav", "s3", "hdfs", "gridftp" };
         assertTrue(Arrays.equals(expected, tmp));
     }
 

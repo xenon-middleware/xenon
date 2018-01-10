@@ -49,31 +49,31 @@ public interface FileSystemAdaptorDescription extends AdaptorDescription {
 
     /**
      * Is this adaptor connectionless ?
-     * 
+     *
      * A connectionless adaptor to not retain a connection to a resources between operations. Instead a new connection is created for each operation that is
      * performed. In contrast, connected adaptors typically perform a connection setup when they are created and reuse this connection for each operation.
-     * 
+     *
      * @return if this adaptor is connectionless.
      */
     boolean isConnectionless();
 
     /**
      * Does this adaptor support reading of posix style permissions?
-     * 
+     *
      * @return if this adaptor support reading of posix style permissions.
      */
     boolean supportsReadingPosixPermissions();
 
     /**
      * Does this adaptor support setting of posix style permissions?
-     * 
+     *
      * @return if this adaptor supports setting of posix style permissions.
      */
     boolean supportsSettingPosixPermissions();
 
     /**
      * Does this adaptor support renaming of files ?
-     * 
+     *
      * @return if this adaptor supports renaming of files.
      */
 
@@ -81,14 +81,14 @@ public interface FileSystemAdaptorDescription extends AdaptorDescription {
 
     /**
      * Can this adaptor append data to existing files ?
-     * 
+     *
      * @return if this adaptor can append data to existing files.
      */
     boolean canAppend();
 
     /**
      * When writing to a file, does this adaptor need to know the size of the data beforehand ?
-     * 
+     *
      * @return if this adaptor needs to know the size of the date written to a file beforehand.
      */
     boolean needsSizeBeforehand();
