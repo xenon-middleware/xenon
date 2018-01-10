@@ -1,0 +1,11 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>time   : %d{HH:mm:ss.SSS} \(+%relative{} ms\)%n{}thread : %thread%n{}level  : %level%n{}class  : %class{}:%L%n{}message: %msg%n%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="${loglevel:-WARN}">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
