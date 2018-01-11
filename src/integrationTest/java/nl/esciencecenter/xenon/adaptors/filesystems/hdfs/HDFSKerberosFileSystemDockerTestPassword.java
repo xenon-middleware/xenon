@@ -15,8 +15,17 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.hdfs;
 
+import static nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor.HADOOP_SETTINGS_FILE;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.ClassRule;
+import org.junit.Test;
+
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileSystemTestInfrastructure;
 import nl.esciencecenter.xenon.adaptors.filesystems.LocationConfig;
@@ -25,16 +34,8 @@ import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.CopyMode;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
-import org.junit.ClassRule;
-import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor.HADOOP_SETTINGS_FILE;
-
-public class HDFSKerberosFileSystemDockerTestPassword  extends FileSystemTestInfrastructure {
-
+public class HDFSKerberosFileSystemDockerTestPassword extends FileSystemTestInfrastructure {
 
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/hdfs-kerberos.yml")
@@ -91,14 +92,13 @@ public class HDFSKerberosFileSystemDockerTestPassword  extends FileSystemTestInf
         assertSameContentsDir(source, target);
     }
 
-
     public FileSystem setupFileSystem() throws XenonException {
         String location = docker.containers().container("hdfs").port(8020).inFormat("localhost:$EXTERNAL_PORT");
         System.setProperty("java.security.krb5.conf", "src/integrationTest/resources/kerberos/krb5.conf");
         Map<String, String> props = new HashMap<>();
         props.put(HADOOP_SETTINGS_FILE, "src/integrationTest/resources/core-site-kerberos.xml");
-        Credential c = new PasswordCredential("xenon@esciencecenter.nl","javagat".toCharArray());
-        FileSystem fs =  FileSystem.create("hdfs", location, c, props);
+        Credential c = new PasswordCredential("xenon@esciencecenter.nl", "javagat".toCharArray());
+        FileSystem fs = FileSystem.create("hdfs", location, c, props);
         fs.setWorkingDirectory(new Path("/filesystem-test-fixture"));
         return fs;
     }
