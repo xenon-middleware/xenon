@@ -69,6 +69,8 @@ public class GridFTPFileSystemDockerTest extends GridFTPFileSystemTestParent {
 
         Credential cred = new DefaultCredential();
 
-        return FileSystem.create("gridftp", location, cred);
+        FileSystem f = FileSystem.create("gridftp", location, cred);
+
+        return f;
     }
 }

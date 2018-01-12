@@ -184,6 +184,10 @@ public class SSHUtil {
     public static SshClient createSSHClient(boolean useKnownHosts, boolean loadSSHConfig, boolean stricHostCheck, boolean useSSHAgent,
             boolean useAgentForwarding) {
 
+        // We disable the BouncyCastle SecurityProvider, as is it sensitive to a performance issue with /dev/random. This causes the integration tests
+        // (and probably the applications) to slow down significantly, as a single connection setup can slow down to take minutes.
+        SecurityUtils.setAPrioriDisabledProvider("BC", true);
+
         SshClient client = SshClient.setUpDefaultClient();
 
         if (useKnownHosts) {
@@ -420,9 +424,7 @@ public class SSHUtil {
 
             session.addPublicKeyIdentity(pair);
 
-        } else if (credential instanceof PasswordCredential)
-
-        {
+        } else if (credential instanceof PasswordCredential) {
 
             PasswordCredential c = (PasswordCredential) credential;
             session.addPasswordIdentity(new String(c.getPassword()));

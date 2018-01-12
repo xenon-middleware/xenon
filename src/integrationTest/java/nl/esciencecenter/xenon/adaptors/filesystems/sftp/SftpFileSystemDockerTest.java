@@ -36,8 +36,7 @@ import nl.esciencecenter.xenon.filesystems.Path;
 public class SftpFileSystemDockerTest extends SftpFileSystemTestParent {
 
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder()
-            .file("src/integrationTest/resources/docker-compose/openssh.yml")
+    public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/openssh.yml")
             .waitingForService("ssh", HealthChecks.toHaveAllPortsOpen()).build();
 
     @Override
@@ -74,6 +73,7 @@ public class SftpFileSystemDockerTest extends SftpFileSystemTestParent {
         Map<String, String> props = new HashMap<>();
         props.put(STRICT_HOST_KEY_CHECKING, "false");
         props.put(LOAD_STANDARD_KNOWN_HOSTS, "false");
+
         return FileSystem.create("sftp", location, cred, props);
     }
 }
