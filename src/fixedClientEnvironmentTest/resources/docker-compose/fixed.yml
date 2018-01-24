@@ -1,0 +1,88 @@
+#
+# Copyright 2013 Netherlands eScience Center
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+version: '3.2'
+networks:
+   xenontest.nlesc.nl:
+     external:
+       name: xenontest.nlesc.nl
+
+services:
+  gridftp1:
+    image: nlesc/xenon-gridftp
+#    ports:
+#    - "2811:2811"
+    networks:
+      xenontest.nlesc.nl:
+    container_name: gridftp1
+    hostname: gridftp1.xenontest.nlesc.nl
+  hdfs:
+    image: nlesc/xenon-hdfs-kerberos
+#    ports:
+#    - "88:88"
+#    - "88:88/udp"
+#    - "464:464"
+#    - "749:749"
+#    - "8020:8020"
+#    - "50010:50010"
+#    - "50020:50020"
+#    - "50070:50070"
+#    - "50075:50075"
+#    - "50475:50475"
+#    - "50090:50090"
+    networks:
+      xenontest.nlesc.nl:
+#        aliases:
+#           - hdfs.xenontest.nlesc.nl
+    hostname: hdfs.xenontest.nlesc.nl
+    container_name: hdfs
+  ssh:
+    image: nlesc/xenon-ssh
+#    ports:
+#    - 22
+    networks:
+      xenontest.nlesc.nl:
+#        aliases:
+#           - ssh.xenontest.nlesc.nl
+    hostname: ssh.xenontest.nlesc.nl
+    container_name: ssh
+  fixed:
+    image: nlesc/xenon-fixed-client
+    hostname: fixed.xenontest.nlesc.nl
+    container_name: fixed
+    environment:
+        - MYUID
+        - DOCKERGID
+    volumes:
+        - type: bind
+          source: "${HOME}/.gradle"
+          target: "/home/xenon/.gradle"
+        - type: bind
+          source: "${HOME}/.m2"
+          target: "/home/xenon/.m2"
+        - type: bind
+          source: "/var/run/docker.sock"
+          target: "/var/run/docker.sock"
+        - type: bind
+          source: "${PWD}"
+          target: "/code"
+    tty: true
+    networks:
+      xenontest.nlesc.nl:
+    links: 
+       - gridftp1:gridftp1.xenontest.nlesc.nl
+       - ssh:ssh.xenontest.nlesc.nl
+       - hdfs:hdfs.xenontest.nlesc.nl

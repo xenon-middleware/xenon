@@ -20,11 +20,7 @@ import static nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor.
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.ClassRule;
 import org.junit.Test;
-
-import com.palantir.docker.compose.DockerComposeRule;
-import com.palantir.docker.compose.connection.waiting.HealthChecks;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileSystemTestInfrastructure;
@@ -35,11 +31,6 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 
 public class HDFSKeytabCredentialsTest extends FileSystemTestInfrastructure {
-
-    @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/hdfs-kerberos.yml")
-            .waitingForService("hdfs", HealthChecks.toHaveAllPortsOpen()).build();
-
     @Override
     protected LocationConfig setupLocationConfig(FileSystem fileSystem) {
         return new LocationConfig() {
@@ -106,7 +97,7 @@ public class HDFSKeytabCredentialsTest extends FileSystemTestInfrastructure {
             throw new XenonException("HDFSTEST", "Running kadmin returned non-zero exit code: " + exit);
         }
 
-        String location = docker.containers().container("hdfs").port(8020).inFormat("localhost:$EXTERNAL_PORT");
+        String location = "hdfs";
         Map<String, String> props = new HashMap<>();
         props.put(HADOOP_SETTINGS_FILE, "src/integrationTest/resources/core-site-kerberos.xml");
         KeytabCredential kt = new KeytabCredential("xenon@esciencecenter.nl", "/home/xenon/xenon.keytab");

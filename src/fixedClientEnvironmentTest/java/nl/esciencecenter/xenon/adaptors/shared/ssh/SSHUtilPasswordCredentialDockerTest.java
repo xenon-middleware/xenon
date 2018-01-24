@@ -16,11 +16,7 @@
 package nl.esciencecenter.xenon.adaptors.shared.ssh;
 
 import org.apache.sshd.client.SshClient;
-import org.junit.ClassRule;
 import org.junit.Test;
-
-import com.palantir.docker.compose.DockerComposeRule;
-import com.palantir.docker.compose.connection.waiting.HealthChecks;
 
 import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -28,15 +24,13 @@ import nl.esciencecenter.xenon.credentials.DefaultCredential;
 
 public class SSHUtilPasswordCredentialDockerTest {
 
-    @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/openssh.yml")
-            .waitingForService("ssh", HealthChecks.toHaveAllPortsOpen()).build();
+    // @ClassRule
+    // public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/openssh.yml")
+    // .waitingForService("ssh", HealthChecks.toHaveAllPortsOpen()).build();
+    private static String location = "ssh";
 
     @Test
     public void test_connect_default() throws Exception {
-
-        String location = docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT");
-
         SshClient client = SSHUtil.createSSHClient(false, false, false, false, false);
 
         // Create a certificate credential that matches the (hard-coded) setup of the docker container.
@@ -49,8 +43,6 @@ public class SSHUtilPasswordCredentialDockerTest {
     @Test
     public void test_connect_default_with_username() throws Exception {
 
-        String location = docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT");
-
         SshClient client = SSHUtil.createSSHClient(false, false, false, false, false);
 
         // Create a certificate credential that matches the (hard-coded) setup of the docker container.
@@ -62,9 +54,6 @@ public class SSHUtilPasswordCredentialDockerTest {
 
     @Test
     public void test_connect_rsa() throws Exception {
-
-        String location = docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT");
-
         SshClient client = SSHUtil.createSSHClient(false, false, false, false, false);
 
         // Create a certificate credential that matches the (hard-coded) setup of the docker container.
@@ -76,9 +65,6 @@ public class SSHUtilPasswordCredentialDockerTest {
 
     @Test
     public void test_connect_rsa_with_password() throws Exception {
-
-        String location = docker.containers().container("ssh").port(22).inFormat("$HOST:$EXTERNAL_PORT");
-
         SshClient client = SSHUtil.createSSHClient(false, false, false, false, false);
 
         // Create a certificate credential that matches the (hard-coded) setup of the docker container.

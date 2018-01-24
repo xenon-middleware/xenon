@@ -16,16 +16,22 @@
 #
 
 MYDOCKERGID=`cut -d: -f3 < <(getent group docker)`
+MYUID=$UID
+DOCKERGID=$MYDOCKERGID
 
-docker run \
---env MYUID=$UID \
---env DOCKERGID=$MYDOCKERGID \
---network host \
---volume $HOME/.gradle:/home/xenon/.gradle \
---volume $HOME/.m2:/home/xenon/.m2 \
---volume /var/run/docker.sock:/var/run/docker.sock \
---volume $PWD:/code \
---tty --interactive --rm \
---name=xenon-fixed-client \
-nlesc/xenon-fixed-client \
+docker network create xenontest.nlesc.nl
+
+docker-compose -f ./src/fixedClientEnvironmentTest/resources/docker-compose/fixed.yml \
+run \
+-e MYUID=$UID \
+-e DOCKERGID=$MYDOCKERGID \
+--rm fixed \
 ./gradlew --no-daemon fixedClientEnvironmentTest "$@"
+
+exit_code=$?
+docker-compose -f ./src/fixedClientEnvironmentTest/resources/docker-compose/fixed.yml down
+
+docker network rm xenontest.nlesc.nl
+
+exit $exit_code
+

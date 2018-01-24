@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.gridftp;
 
+import java.net.InetAddress;
 import java.util.AbstractMap;
 import java.util.Map;
 
@@ -62,6 +63,16 @@ public class GridFTPFileSystemDockerTest extends GridFTPFileSystemTestParent {
     public FileSystem setupFileSystem() throws XenonException {
         // String location = docker.containers().container("ftp").port(21).inFormat("$HOST:$EXTERNAL_PORT");
         // PasswordCredential cred = new PasswordCredential("xenon", "javagat".toCharArray());
+
+        String cname = "gridftp1.xenontest.nlesc.nl";
+
+        try {
+            System.out.println("HOST resolves to: " + InetAddress.getByName(cname));
+            System.out.println("HOST resolves to: " + InetAddress.getByName(cname).getHostName());
+            System.out.println("HOST resolves to: " + InetAddress.getByName(cname).getCanonicalHostName());
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
 
         System.out.println("CREATE FILESYSTEM");
 
