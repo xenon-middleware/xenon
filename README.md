@@ -8,6 +8,8 @@
 [![GitHub license](https://img.shields.io/badge/license-Apache--2.0%20-blue.svg)](https://github.com/NLeSC/Xenon/blob/master/LICENSE)
 [![Download](https://jitpack.io/v/NLeSC/Xenon.svg)](https://jitpack.io/#NLeSC/Xenon)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.597993.svg)](https://doi.org/10.5281/zenodo.597993)
+![Research Software Directory](https://img.shields.io/badge/rsd-xenon-00FFFF.svg?style=flat-square&colorA=101010&link=http://www.research-software.nl&link=http://www.research-software.nl/software/xenon)
+
 
 Copyright 2013-2017 The Netherlands eScience Center
 
