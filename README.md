@@ -12,7 +12,7 @@
 
 
 
-Copyright 2013-2017 The Netherlands eScience Center
+Copyright 2013-2018 The Netherlands eScience Center
 
 ## What problem does Xenon solve?
 
@@ -87,7 +87,7 @@ and
 
 ```gradle
 	dependencies {
-	        compile 'nl.esciencecenter.xenon:xenon:2.2.0'
+	        compile 'nl.esciencecenter.xenon:xenon:2.3.0'
 	}
 
 ```
@@ -110,7 +110,7 @@ and
 	<dependency>
 	    <groupId>nl.esciencecenter.xenon</groupId>
 	    <artifactId>xenon</artifactId>
-	    <version>2.2.0</version>
+	    <version>2.3.0</version>
 	</dependency>
 ```
 
@@ -220,7 +220,7 @@ For more examples, see the tutorial at [Read The Docs](http://xenonrse2017.readt
 
 ## Documentation
 
-Xenon's JavaDoc is available online at <http://nlesc.github.io/Xenon/versions/2.2.0/javadoc/>.
+Xenon's JavaDoc is available online at <http://nlesc.github.io/Xenon/versions/2.3.0/javadoc/>.
 
 ## Legal
 

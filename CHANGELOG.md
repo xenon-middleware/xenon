@@ -1,7 +1,14 @@
-Xenon 2.2.0
+Xenon 2.3.0
 -----------
 
-This is release 2.2.0 of Xenon. 
+This is release 2.3.0 of Xenon. 
+
+Notable changes compared to v2.2.0:
+-----------------------------------
+
+- added an HDFS filesystem adaptor 
+- fixed bug in GridEngineSchedulers for complex configurations of number of slots per node
+- various code cleanups, etc.
 
 Notable changes compared to v2.1.0:
 -----------------------------------
