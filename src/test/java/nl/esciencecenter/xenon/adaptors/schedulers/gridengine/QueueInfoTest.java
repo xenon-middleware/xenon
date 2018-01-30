@@ -53,6 +53,24 @@ public class QueueInfoTest {
         assertArrayEquals("queue pe list incorrect", expectedPeList, result.getParallelEnvironments());
     }
 
+    @Test
+    public void test_complex_slots() throws XenonException {
+        Map<String, String> input = new HashMap<>();
+
+        input.put("qname", "some.q");
+        input.put("slots", "12,[@cores_36=36],[@cores_12=12],[@cores_48=48],[@cores_24=24],[@cores_40=40]");
+        input.put("pe_list", "some.pe other.pe");
+
+        QueueInfo result = new QueueInfo(input);
+
+        String[] expectedPeList = new String[] { "some.pe", "other.pe" };
+
+        assertEquals("queue name incorrect", "some.q", result.getName());
+        assertEquals("queue slots incorrect", 12, result.getSlots());
+
+        assertArrayEquals("queue pe list incorrect", expectedPeList, result.getParallelEnvironments());
+    }
+
     @Test(expected = XenonException.class)
     public void test01b_queueInfoFromMap_NoName_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<>();
