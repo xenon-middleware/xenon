@@ -66,7 +66,28 @@ If not, then correct, save and publish the Zenodo entry.
 
 ### Add jars to bintray
 
-To add the necessary jar and pom files to bintray, it is easiest to ensure you 
+To add the release to bintray, do the following: 
+
+```bash
+export BINTRAY_USER=<your bintray username>
+export BINTRAY_KEY=<your bintray API key>
+./gradlew bintrayUpload
+```
+
+This should create the new release on bintray and upload all necessary data, jars, etc.
+
+Next, go to the bintray page: 
+
+https://bintray.com/nlesc/xenon/xenon#
+
+and click on 'publish' to publish the release. The latest verion tag usually takes a few minutes to update. 
+
+
+### Alternative manual bintray step
+
+Note: this step should not be needed if the automated bintray publishing works! It is only here for reference.
+
+To add the necessary jar and pom files to bintray manually, it is easiest to ensure you 
 have them locally first. By calling: 
 
     ./gradlew publishToMavenLocal
