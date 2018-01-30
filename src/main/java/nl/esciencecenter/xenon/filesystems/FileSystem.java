@@ -18,7 +18,14 @@ package nl.esciencecenter.xenon.filesystems;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.*;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -38,12 +45,6 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
-import nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor;
-import nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor;
-import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
-import nl.esciencecenter.xenon.adaptors.filesystems.s3.S3FileAdaptor;
-import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
-import nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 
@@ -57,19 +58,37 @@ public abstract class FileSystem implements AutoCloseable {
 
     private static final HashMap<String, FileAdaptor> adaptors = new LinkedHashMap<>();
 
+    /*
+     * static { // Load all supported file adaptors addAdaptor(new LocalFileAdaptor()); addAdaptor(new FtpFileAdaptor()); addAdaptor(new SftpFileAdaptor());
+     * addAdaptor(new WebdavFileAdaptor()); addAdaptor(new S3FileAdaptor()); addAdaptor(new HDFSFileAdaptor()); }
+     */
+
     static {
         // Load all supported file adaptors
-        addAdaptor(new LocalFileAdaptor());
-        addAdaptor(new FtpFileAdaptor());
-        addAdaptor(new SftpFileAdaptor());
-        addAdaptor(new WebdavFileAdaptor());
-        addAdaptor(new S3FileAdaptor());
-        addAdaptor(new HDFSFileAdaptor());
+        loadAdaptor("nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor");
+        loadAdaptor("nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor");
+        loadAdaptor("nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor");
+        loadAdaptor("nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor");
+        loadAdaptor("nl.esciencecenter.xenon.adaptors.filesystems.s3.S3FileAdaptor");
+        loadAdaptor("nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor");
     }
 
-    private static void addAdaptor(FileAdaptor adaptor) {
-        adaptors.put(adaptor.getName(), adaptor);
+    private static void loadAdaptor(String name) {
+
+        try {
+            ClassLoader parent = Thread.currentThread().getContextClassLoader();
+            ClassLoader cl = URLClassLoader.newInstance(((URLClassLoader) parent).getURLs());
+            Class<FileAdaptor> clazz = (Class<FileAdaptor>) cl.loadClass(name);
+            FileAdaptor adaptor = clazz.newInstance();
+            adaptors.put(adaptor.getName(), adaptor);
+        } catch (Exception e) {
+            System.err.println("Failed to load adaptor: " + name);
+        }
     }
+
+    // private static void addAdaptor(FileAdaptor adaptor) {
+    // adaptors.put(adaptor.getName(), adaptor);
+    // }
 
     private static FileAdaptor getAdaptorByName(String adaptorName) throws UnknownAdaptorException {
 
@@ -1727,6 +1746,5 @@ public abstract class FileSystem implements AutoCloseable {
     public int hashCode() {
         return Objects.hash(uniqueID);
     }
-
 
 }
