@@ -43,7 +43,7 @@ public class GridEngineSchedulerAdaptor extends ScriptingSchedulerAdaptor {
     public static final String POLL_DELAY_PROPERTY = PREFIX + "poll.delay";
 
     /** Human readable description of this adaptor */
-    public static final String ADAPTOR_DESCRIPTION = "The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler."
+    public static final String ADAPTOR_DESCRIPTION = "The SGE Adaptor submits jobs to a (Sun/Oracle/Univa) Grid Engine scheduler."
             + " This adaptor uses either the local or the ssh scheduler adaptor to run commands on the machine running Grid Engine, "
             + " and the file or the stfp filesystem adaptor to gain access to the filesystem of that machine.";
 
