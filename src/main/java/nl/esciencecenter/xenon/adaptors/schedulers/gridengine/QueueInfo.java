@@ -46,11 +46,30 @@ class QueueInfo {
             throw new XenonException(ADAPTOR_NAME, "Cannot find slots for queue \"" + name + "\"");
         }
 
+        // The slotsValue that is returned my contain multiple values, for example:
+        //
+        // 12,[@cores_36=36],[@cores_12=12],[@cores_48=48], [@cores_24=24],[@cores_40=40]
+        //
+        // This means that 12 slots is default, but for specific processor groups (like cores_36 or cores_24) they may be different.
+        // For now, we educate the parser to accept this string, but only use the number in the list.
+
+        String[] split = slotsValue.split(",");
+
+        if (split.length == 0) {
+            throw new XenonException(ADAPTOR_NAME, "Cannot parse slots for queue \"" + name + "\", got \"" + slotsValue + "\"");
+        }
+
+        for (int i = 0; i < split.length; i++) {
+            if (!split[i].contains("@")) {
+                slotsValue = split[i];
+                break;
+            }
+        }
+
         try {
             slots = Integer.parseInt(slotsValue);
         } catch (NumberFormatException e) {
-            throw new XenonException(ADAPTOR_NAME, "Cannot parse slots for queue \"" + name + "\", got \""
-                    + slotsValue + "\"", e);
+            throw new XenonException(ADAPTOR_NAME, "Cannot parse slots for queue \"" + name + "\", got \"" + slotsValue + "\"", e);
         }
 
         String peValue = info.get("pe_list");
@@ -91,7 +110,6 @@ class QueueInfo {
 
     @Override
     public String toString() {
-        return "QueueInfo [name=" + name + ", slots=" + slots + ", parallelEnvironments=" + Arrays.toString(parallelEnvironments)
-                + "]";
+        return "QueueInfo [name=" + name + ", slots=" + slots + ", parallelEnvironments=" + Arrays.toString(parallelEnvironments) + "]";
     }
 }
