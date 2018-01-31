@@ -16,7 +16,6 @@
 package nl.esciencecenter.xenon.schedulers;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -26,15 +25,11 @@ import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.AdaptorLoader;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
-import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor;
-import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
-import nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor;
-import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
-import nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
@@ -47,39 +42,52 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
  */
 public abstract class Scheduler implements AutoCloseable {
 
-    /** The name of this component, for use in exceptions */
-    private static final String COMPONENT_NAME = "Scheduler";
+    // /** The name of this component, for use in exceptions */
+    // private static final String COMPONENT_NAME = "Scheduler";
+    //
+    // private static final HashMap<String, SchedulerAdaptor> adaptors = new LinkedHashMap<>();
 
-    private static final HashMap<String, SchedulerAdaptor> adaptors = new LinkedHashMap<>();
+    // static {
+    // // Load all supported file adaptors -- SHOULD be replaced with dynamic loading ?
+    // try {
+    // addAdaptor(new LocalSchedulerAdaptor());
+    // addAdaptor(new SshSchedulerAdaptor());
+    // addAdaptor(new GridEngineSchedulerAdaptor());
+    // addAdaptor(new SlurmSchedulerAdaptor());
+    // addAdaptor(new TorqueSchedulerAdaptor());
+    // } catch (Exception e) {
+    // throw new RuntimeException("Failed to load all adaptors!", e);
+    // }
+    // }
 
-    static {
-        // Load all supported file adaptors -- SHOULD be replaced with dynamic loading ?
-        try {
-            addAdaptor(new LocalSchedulerAdaptor());
-            addAdaptor(new SshSchedulerAdaptor());
-            addAdaptor(new GridEngineSchedulerAdaptor());
-            addAdaptor(new SlurmSchedulerAdaptor());
-            addAdaptor(new TorqueSchedulerAdaptor());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load all adaptors!", e);
-        }
-    }
+    // static {
+    // // Load all supported file adaptors
+    // loadAdaptor("nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor");
+    // loadAdaptor("nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor");
+    // loadAdaptor("nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor");
+    // loadAdaptor("nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor");
+    // loadAdaptor("nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor");
+    // }
+    //
+    // private static void loadAdaptor(String name) {
+    //
+    // try {
+    // ClassLoader parent = Thread.currentThread().getContextClassLoader();
+    // ClassLoader cl = URLClassLoader.newInstance(((URLClassLoader) parent).getURLs());
+    // Class<SchedulerAdaptor> clazz = (Class<SchedulerAdaptor>) cl.loadClass(name);
+    // SchedulerAdaptor adaptor = clazz.newInstance();
+    // adaptors.put(adaptor.getName(), adaptor);
+    // } catch (Exception e) {
+    // System.err.println("Failed to load adaptor: " + name);
+    // }
+    // }
 
-    private static void addAdaptor(SchedulerAdaptor adaptor) {
-        adaptors.put(adaptor.getName(), adaptor);
-    }
+    // private static void addAdaptor(SchedulerAdaptor adaptor) {
+    // adaptors.put(adaptor.getName(), adaptor);
+    // }
 
     private static SchedulerAdaptor getAdaptorByName(String adaptorName) throws UnknownAdaptorException {
-
-        if (adaptorName == null || adaptorName.trim().isEmpty()) {
-            throw new UnknownAdaptorException(COMPONENT_NAME, "Adaptor name may not be null or empty");
-        }
-
-        if (!adaptors.containsKey(adaptorName)) {
-            throw new UnknownAdaptorException(COMPONENT_NAME, String.format("Adaptor '%s' not found", adaptorName));
-        }
-
-        return adaptors.get(adaptorName);
+        return AdaptorLoader.getSchedulerAdaptor(adaptorName);
     }
 
     /**
@@ -88,7 +96,7 @@ public abstract class Scheduler implements AutoCloseable {
      * @return the list
      */
     public static String[] getAdaptorNames() {
-        return adaptors.keySet().toArray(new String[adaptors.size()]);
+        return AdaptorLoader.getSchedulerAdaptorNames();
     }
 
     /**
@@ -110,7 +118,7 @@ public abstract class Scheduler implements AutoCloseable {
      * @return the list
      */
     public static SchedulerAdaptorDescription[] getAdaptorDescriptions() {
-        return adaptors.values().toArray(new SchedulerAdaptorDescription[adaptors.size()]);
+        return AdaptorLoader.getSchedulerAdaptorDescriptions();
     }
 
     /**

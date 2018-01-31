@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.xenon.utils;
 
-import static nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor.ADAPTOR_NAME;
-
 import java.io.File;
 
 import nl.esciencecenter.xenon.InvalidLocationException;
@@ -197,14 +195,14 @@ public class LocalFileSystemUtils {
                 return path.substring(0, 2).toUpperCase();
             }
 
-            throw new InvalidLocationException(ADAPTOR_NAME, "Path does not include drive name! " + path);
+            throw new InvalidLocationException("file", "Path does not include drive name! " + path);
         }
 
         if (path == null || path.isEmpty() || path.charAt(0) == '/') {
             return "/";
         }
 
-        throw new InvalidLocationException(ADAPTOR_NAME, "Path is not absolute! " + path);
+        throw new InvalidLocationException("file", "Path is not absolute! " + path);
     }
 
     /**
