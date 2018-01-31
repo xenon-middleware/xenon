@@ -16,7 +16,6 @@
 package nl.esciencecenter.xenon.filesystems;
 
 import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -38,7 +37,6 @@ import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
-import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
 
 public class FileSystemTest {
 
@@ -190,18 +188,18 @@ public class FileSystemTest {
         assertTrue(Arrays.equals(expected, tmp));
     }
 
-    @Test
-    public void test_adaptorDescription() throws UnknownAdaptorException {
-
-        FileSystemAdaptorDescription d = FileSystem.getAdaptorDescription("file");
-
-        LocalFileAdaptor l = new LocalFileAdaptor();
-
-        assertEquals("file", l.getName());
-        assertEquals(l.getDescription(), d.getDescription());
-        assertArrayEquals(l.getSupportedLocations(), d.getSupportedLocations());
-        assertArrayEquals(l.getSupportedProperties(), d.getSupportedProperties());
-    }
+    // @Test
+    // public void test_adaptorDescription() throws UnknownAdaptorException {
+    //
+    // FileSystemAdaptorDescription d = FileSystem.getAdaptorDescription("file");
+    //
+    // LocalFileAdaptor l = new LocalFileAdaptor();
+    //
+    // assertEquals("file", l.getName());
+    // assertEquals(l.getDescription(), d.getDescription());
+    // assertArrayEquals(l.getSupportedLocations(), d.getSupportedLocations());
+    // assertArrayEquals(l.getSupportedProperties(), d.getSupportedProperties());
+    // }
 
     @Test(expected = IllegalArgumentException.class)
     public void test_adaptorDescriptionFailsNull() throws XenonException {

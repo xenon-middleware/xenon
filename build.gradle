@@ -48,9 +48,9 @@ dependencies {
     // Xenon dependencies.
 //    compile files('../xenon-dummy-adaptor/build/libs/xenon-dummy-adaptor-all.jar')
 
-    compile 'nl.esciencecenter.xenon:xenon-dummy-adaptor:0.1.0'
+//    compile 'nl.esciencecenter.xenon:xenon-dummy-adaptor:0.1.0'
+    compile 'nl.esciencecenter.xenon:xenon-local-adaptor:3.0.0'
     compile 'nl.esciencecenter.xenon:xenon-ssh-adaptor:3.0.0'
-
 
 //     compile 'org.glassfish.jersey.core:jersey-client:2.22.2'
 
