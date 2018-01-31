@@ -80,7 +80,7 @@ public class AdaptorLoader {
             f.close();
 
             for (String adaptor : adaptorClasses) {
-                loadAdaptor(adaptor, classpath, url);
+                loadAdaptor(adaptor.trim(), classpath, url);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -121,16 +121,14 @@ public class AdaptorLoader {
 
         Adaptor adaptor = (Adaptor) clazz.newInstance();
 
-        System.out.println("Loaded adaptor " + adaptor.getName() + " from " + jarJar);
-
         if (adaptor instanceof FileAdaptor) {
-            System.out.println("Adding FileSystemAdaptor " + adaptor.getName());
+            System.out.println("Loaded FileSystemAdaptor " + adaptor.getName() + " from " + jarJar);
             fileAdaptors.put(adaptor.getName(), (FileAdaptor) adaptor);
         } else if (adaptor instanceof SchedulerAdaptor) {
-            System.out.println("Adding SchedulerAdaptor " + adaptor.getName());
+            System.out.println("Loaded SchedulerAdaptor " + adaptor.getName() + " from " + jarJar);
             schedulerAdaptors.put(adaptor.getName(), (SchedulerAdaptor) adaptor);
         } else {
-            System.out.println("Failed to load adaptor " + adaptor.getName());
+            System.out.println("Failed recognize adaptor " + adaptor.getName() + " from " + jarJar);
         }
     }
 
