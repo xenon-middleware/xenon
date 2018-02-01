@@ -10,7 +10,8 @@ fixedClientEnvironmentTest.description = 'Run the integration tests within and a
 
 dependencies {
     compileOnly project(':core')
-    compile group: 'com.github.lookfirst', name: 'sardine', version: '5.7'
+
+    compile group: 'commons-net', name: 'commons-net', version: '3.3'
 
     testCompile project(':core')
 
