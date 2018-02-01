@@ -149,7 +149,7 @@ public class JCloudsFileSytem extends FileSystem {
         removeDirectoryPlaceholder(absFile.getParent());
 
         // Create an empty file by adding an empty blob in the bucket.
-        InputStream emtpy = new org.apache.sshd.common.util.io.NullInputStream();
+        InputStream emtpy = new ByteArrayInputStream(new byte[0]);
         final Blob b = context.getBlobStore().blobBuilder(bucket).name(toBucketEntry(absFile)).payload(emtpy).contentLength(0).build();
         context.getBlobStore().putBlob(bucket, b);
     }
@@ -279,13 +279,13 @@ public class JCloudsFileSytem extends FileSystem {
     PathAttributes toPathAttributes(final StorageMetadata m) {
 
         switch (m.getType()) {
-            case RELATIVE_PATH:
-                return makeDirAttributes(m);
-            case BLOB:
-                return makeBlobAttributes(m.getName());
-            default:
-                // Should never occur, as we filter the types.
-                return null;
+        case RELATIVE_PATH:
+            return makeDirAttributes(m);
+        case BLOB:
+            return makeBlobAttributes(m.getName());
+        default:
+            // Should never occur, as we filter the types.
+            return null;
         }
     }
 

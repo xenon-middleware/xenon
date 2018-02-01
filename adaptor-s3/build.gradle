@@ -10,7 +10,9 @@ fixedClientEnvironmentTest.description = 'Run the integration tests within and a
 
 dependencies {
     compileOnly project(':core')
-    compile group: 'com.github.lookfirst', name: 'sardine', version: '5.7'
+
+    compile group: 'org.apache.jclouds.api', name: 's3', version: '2.0.2'
+    compile group: 'org.apache.jclouds.provider', name: 'aws-s3', version: '2.0.2'
 
     testCompile project(':core')
 

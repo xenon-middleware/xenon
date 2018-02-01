@@ -44,6 +44,7 @@ dependencies {
     compile project(':adaptor-ssh')
     compile project(':adaptor-ftp')
     compile project(':adaptor-webdav')
+    compile project(':adaptor-s3')
 
     liveTestCompile project(':test-utils')
     liveTestCompile group: 'junit', name: 'junit', version: '4.12'
