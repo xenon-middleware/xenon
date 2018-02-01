@@ -10,7 +10,6 @@ fixedClientEnvironmentTest.description = 'Run the integration tests within and a
 
 dependencies {
     compileOnly project(':core')
-    compile group: 'com.github.lookfirst', name: 'sardine', version: '5.7'
 
     testCompile project(':core')
 
@@ -27,7 +26,7 @@ integrationTest.mustRunAfter test
 jar {
     from configurations.runtime
     manifest {
-        attributes("Xenon-Adaptors": "nl.esciencecenter.xenon.adaptors.local.LocalFileSystem")
+        attributes("Xenon-Adaptors": "nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor, nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor")
     }
 }
 

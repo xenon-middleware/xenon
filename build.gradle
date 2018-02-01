@@ -39,7 +39,10 @@ testSets {
 
 dependencies {
     compile project(':core')
+
     compile project(':adaptor-local')
+    compile project(':adaptor-ssh')
+
     liveTestCompile project(':test-utils')
     liveTestCompile group: 'junit', name: 'junit', version: '4.12'
 }

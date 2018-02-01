@@ -76,7 +76,7 @@ public class AdaptorLoader {
         String[] adaptorClasses = adaptorlist.split(",");
 
         try {
-            List<URL> classpath = prepareJars(f);
+            List<URL> classpath = prepareJars(url, f);
             f.close();
 
             for (String adaptor : adaptorClasses) {
@@ -87,11 +87,12 @@ public class AdaptorLoader {
         }
     }
 
-    private static List<URL> prepareJars(JarFile jarJar) throws Exception {
+    private static List<URL> prepareJars(URL url, JarFile jarJar) throws Exception {
 
         Enumeration<JarEntry> entries = jarJar.entries();
 
         ArrayList<URL> urls = new ArrayList<>();
+        urls.add(url);
 
         while (entries.hasMoreElements()) {
             JarEntry entry = entries.nextElement();
