@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,15 +40,10 @@ import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.AdaptorLoader;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
-import nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor;
-import nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor;
-import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
-import nl.esciencecenter.xenon.adaptors.filesystems.s3.S3FileAdaptor;
-import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
-import nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 
@@ -58,36 +52,8 @@ import nl.esciencecenter.xenon.credentials.DefaultCredential;
  */
 public abstract class FileSystem implements AutoCloseable {
 
-    /** The name of this component, for use in exceptions */
-    private static final String COMPONENT_NAME = "FileSystem";
-
-    private static final HashMap<String, FileAdaptor> adaptors = new LinkedHashMap<>();
-
-    static {
-        // Load all supported file adaptors
-        addAdaptor(new LocalFileAdaptor());
-        addAdaptor(new FtpFileAdaptor());
-        addAdaptor(new SftpFileAdaptor());
-        addAdaptor(new WebdavFileAdaptor());
-        addAdaptor(new S3FileAdaptor());
-        addAdaptor(new HDFSFileAdaptor());
-    }
-
-    private static void addAdaptor(FileAdaptor adaptor) {
-        adaptors.put(adaptor.getName(), adaptor);
-    }
-
     private static FileAdaptor getAdaptorByName(String adaptorName) throws UnknownAdaptorException {
-
-        if (adaptorName == null || adaptorName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Adaptor name may not be null or empty");
-        }
-
-        if (!adaptors.containsKey(adaptorName)) {
-            throw new UnknownAdaptorException(COMPONENT_NAME, String.format("Adaptor '%s' not found", adaptorName));
-        }
-
-        return adaptors.get(adaptorName);
+        return AdaptorLoader.getFileAdaptor(adaptorName);
     }
 
     /**
@@ -96,7 +62,7 @@ public abstract class FileSystem implements AutoCloseable {
      * @return the list
      */
     public static String[] getAdaptorNames() {
-        return adaptors.keySet().toArray(new String[adaptors.size()]);
+        return AdaptorLoader.getFileAdaptorNames();
     }
 
     /**
@@ -118,7 +84,7 @@ public abstract class FileSystem implements AutoCloseable {
      * @return the list
      */
     public static FileSystemAdaptorDescription[] getAdaptorDescriptions() {
-        return adaptors.values().toArray(new FileSystemAdaptorDescription[adaptors.size()]);
+        return AdaptorLoader.getFileAdaptorDescriptions();
     }
 
     /**

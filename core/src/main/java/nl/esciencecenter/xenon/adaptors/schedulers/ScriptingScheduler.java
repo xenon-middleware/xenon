@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
-import static nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor.ADAPTOR_NAME;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,8 +25,6 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
-import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
@@ -74,16 +70,16 @@ public abstract class ScriptingScheduler extends Scheduler {
             } else {
                 subLocation = "";
             }
-            subSchedulerProperties = properties.filter(LocalSchedulerAdaptor.PREFIX).toMap();
+            subSchedulerProperties = properties.filter(SchedulerAdaptor.ADAPTORS_PREFIX + "local.").toMap();
         } else if (ScriptingUtils.isSSH(location)) {
             subSchedulerAdaptor = "ssh";
             // subFileSystemAdaptor = "sftp";
             subLocation = location.substring("ssh://".length());
-            subSchedulerProperties = properties.filter(SshSchedulerAdaptor.PREFIX).toMap();
+            subSchedulerProperties = properties.filter(SchedulerAdaptor.ADAPTORS_PREFIX + "ssh.").toMap();
 
             // since we expect commands to be done almost instantaneously, we
             // poll quite frequently (local operation anyway)
-            subSchedulerProperties.put(SshSchedulerAdaptor.POLLING_DELAY, "100");
+            subSchedulerProperties.put(SchedulerAdaptor.ADAPTORS_PREFIX + "ssh.queue.pollingDelay", "100");
         } else {
             throw new InvalidLocationException(getAdaptorName(), "Invalid location: " + location);
         }
@@ -327,7 +323,7 @@ public abstract class ScriptingScheduler extends Scheduler {
             }
         }
 
-        throw new NoSuchQueueException(ADAPTOR_NAME, "Queue does not exist: " + queueName);
+        throw new NoSuchQueueException(getAdaptorName(), "Queue does not exist: " + queueName);
     }
 
     /**

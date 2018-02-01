@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.xenon.utils;
 
-import static nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor.ADAPTOR_NAME;
-
 import java.io.File;
 
 import nl.esciencecenter.xenon.InvalidLocationException;
@@ -26,6 +24,7 @@ import nl.esciencecenter.xenon.filesystems.FileSystem;
 public class LocalFileSystemUtils {
 
     private static final String OS_PROPERTY = "os.name";
+    private static final String ADAPTOR_NAME = "local";
 
     private LocalFileSystemUtils() {
         throw new IllegalStateException("Utility class");
