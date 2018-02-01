@@ -45,6 +45,10 @@ dependencies {
     compile project(':adaptor-ftp')
     compile project(':adaptor-webdav')
     compile project(':adaptor-s3')
+//    compile project(':adaptor-hdfs')
+    compile project(':adaptor-slurm')
+    compile project(':adaptor-gridengine')
+    compile project(':adaptor-torque')
 
     liveTestCompile project(':test-utils')
     liveTestCompile group: 'junit', name: 'junit', version: '4.12'
