@@ -61,6 +61,10 @@ final class GridEngineUtils {
 
         String pe = options.get(JOB_OPTION_PARALLEL_ENVIRONMENT);
 
+        if (pe == null) {
+            return;
+        }
+
         // determine the number of slots we need. Can be overridden by the user
         int slots;
         String slotsString = options.get(JOB_OPTION_PARALLEL_SLOTS);
