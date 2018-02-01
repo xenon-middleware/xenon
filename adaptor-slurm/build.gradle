@@ -1,0 +1,65 @@
+apply plugin: 'org.unbroken-dome.test-sets'
+
+testSets {
+    integrationTest
+    fixedClientEnvironmentTest
+}
+
+integrationTest.description = 'Run the integration tests against docker containers'
+fixedClientEnvironmentTest.description = 'Run the integration tests within and against docker containers, should be run within `nlesc/xenon-fixed-client` docker container'
+
+dependencies {
+    compileOnly project(':core')
+    compile group: 'com.github.lookfirst', name: 'sardine', version: '5.7'
+
+    testCompile project(':core')
+
+    integrationTestCompile group: 'junit', name: 'junit', version: '4.12'
+    integrationTestCompile project(':test-utils')
+
+    fixedClientEnvironmentTestCompile group: 'junit', name: 'junit', version: '4.12'
+    fixedClientEnvironmentTestCompile project(':test-utils')
+}
+
+check.dependsOn integrationTest
+integrationTest.mustRunAfter test
+
+jar {
+    from configurations.runtime
+    manifest {
+        attributes("Xenon-Adaptors": "nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor")
+    }
+}
+
+task jacocoIntegrationTestReport(type: JacocoReport) {
+    description 'Generate coverage report of integration tests'
+    group 'Code coverage reporting'
+    executionData integrationTest
+    sourceSets sourceSets.main
+    reports {
+        xml.enabled = true // codecov depends on xml format report
+    }
+}
+
+task jacocoFixedClientEnvironmentTestReport(type: JacocoReport) {
+    description 'Generate coverage report of fixed client environment tests'
+    group 'Code coverage reporting'
+    executionData fixedClientEnvironmentTest
+    sourceSets sourceSets.main
+    reports {
+        xml.enabled = true // codecov depends on xml format report
+    }
+}
+
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            groupId 'nl.esciencecenter.xenon.adaptor'
+            artifactId 'xenon-adaptor-slurm'
+            version version
+            artifact javadocJar
+            artifact sourcesJar
+        }
+    }
+}

@@ -1,60 +1,111 @@
-// Common gradle configuration between offline and online build.
-// This file can not be run by itself either run build.gradle or build-offline.gradle .
+apply plugin: 'java'
+apply plugin: 'distribution'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'jacoco'
+apply plugin: 'com.diffplug.gradle.spotless'
+apply plugin: 'com.github.hierynomus.license'
 
 defaultTasks 'clean', 'assemble', 'test'
 
-//    METADATA
-// ==============
-version = '2.3.2'
-description = 'Xenon: a middleware abstraction library that provides a simple programming interface to various compute and storage resources.'
-
-// will generate a warning with JDK 8, since the runtime jar (rt.jar) of
-// Java 7 is not available. Could configure gradle wrapper for this
+version = '3.0.0'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
-// PROJECT DIRECTORIES
-// ==============
-ext.compileLibDir = file('lib')
-ext.runtimeLibDir = file('lib/runtime')
-ext.testLibDir = file('lib/test')
-ext.codestyleLibDir = file('lib/codestyle')
+repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+        url 'https://dl.bintray.com/palantir/releases' // docker-compose-rule is published on bintray
+    }
+    maven {
+        url 'https://jitpack.io'
+    }
+}
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
 
-sourceSets {
-    docGenerator {
-        java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
+// See progress of tests
+tasks.withType(Test) {
+    // only verbose logging on when CI environment var is set, because on CI we can't look at html test reports
+    if (System.getenv("CI")) {
+        testLogging {
+            events 'started', 'passed', 'skipped', 'failed'
+            exceptionFormat 'full'
+            showStackTraces true
         }
     }
 }
 
-configurations {
-    docGeneratorCompile.extendsFrom compile
-    docGeneratorRuntime.extendsFrom runtime
-}
+spotless {
+    java {
+        trimTrailingWhitespace()
+        indentWithSpaces(4)
+        endWithNewline()
+        removeUnusedImports()
 
-testSets {
-    integrationTest
-    liveTest {
-        options {
-            // Pass all -D arguments from gradlew to tests
-            systemProperties(System.getProperties())
-        }
+        replace      'Not enough space after if', 'if(', 'if ('
+        replaceRegex 'Too much space after if', 'if +\\(', 'if ('
+
+        replace      'Not enough space after for', 'for(', 'for ('
+        replaceRegex 'Too much space after for', 'for +\\(', 'for ('
+
+        replace      'Not enough space after while', 'while(', 'while ('
+        replaceRegex 'Too much space after while', 'while +\\(', 'while ('
+
+        replace      'Not enough space after try', 'try{', 'try {'
+        replaceRegex 'Too much space after try', 'try +\\{', 'try {'
+
+        replace      'Not enough space between brackets', '){', ') {'
     }
-    fixedClientEnvironmentTest
 }
 
-apply from: 'gradle/documentation.gradle'
-apply from: 'gradle/distribution.gradle'
-apply from: 'gradle/docker.gradle'
-
-task wrapper(type: Wrapper) {
-    description 'Generates gradle wrapper'
-    group 'Build Setup'
-    gradleVersion = '4.1'
+license {
+    ext.copyright_year = 2013
+    ext.copyright_owner = 'Netherlands eScience Center'
+    header rootProject.file('gradle/HEADER')
+    strictCheck true
+    excludes(["**/create_symlinks*", "**/fixtures/**", "**/logback.xml"])
+    mapping {
+        // IntelliJ IDEA gives "Dangling Javadoc comment." warning when default JAVADOC_STYLE is used,
+        // so switch to comment style
+        java = 'SLASHSTAR_STYLE'
+    }
 }
 
-cleanIdeaWorkspace.group = 'IDE'
-cleanIdeaWorkspace.description = 'Removes the IDEA workspace file'
+licenseFormat.description = "Applies the license found in the header file in files missing the header"
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    pkg {
+        repo = 'xenon'
+        userOrg = 'nlesc'
+        licenses = ['Apache-2.0']
+        websiteUrl = 'https://nlesc.github.io/Xenon'
+        vcsUrl = 'https://github.com/NLeSC/Xenon.git'
+        issueTrackerUrl = 'https://github.com/NLeSC/Xenon/issues'
+    }
+    publications = ['MyPublication']
+}
+tasks.publish.dependsOn 'bintrayUpload'
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    description "Creates jar file of javadoc"
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    description "Creates jar file of Java sources"
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
 

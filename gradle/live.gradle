@@ -1,0 +1,16 @@
+// Never up to date, can not verify same config/props/remote is used second time
+liveTest.outputs.upToDateWhen {
+    // TODO cache liveTest arguments for example `./gradlew liveTest -Dscheduler=slurm -Dlocation=das5.vu.nl -Dcredential=default DpropertiesFile=slurm-das5.props`
+    // then cache `-Dscheduler=slurm -Dlocation=das5.vu.nl -Dcredential=default DpropertiesFile=slurm-das5.props` when liveTest is run with same arguments return true.
+    false
+}
+
+task jacocoLiveTestReport(type: JacocoReport) {
+    description 'Generate coverage report of live integration tests'
+    group 'Code coverage reporting'
+    executionData liveTest
+    sourceSets sourceSets.main
+    reports {
+        xml.enabled = true // codecov depends on xml format report
+    }
+}
