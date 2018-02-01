@@ -1,0 +1,15 @@
+dependencies {
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.5'
+}
+
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            groupId 'nl.esciencecenter.xenon'
+            artifactId 'xenon-core'
+            version version
+            artifact sourcesJar
+        }
+    }
+}

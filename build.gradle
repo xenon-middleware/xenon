@@ -1,104 +1,69 @@
-// Build file which can only run when dependencies and plugins have been downloaded.
-
-//    PLUGINS
-// ==============
 plugins {
-    // Changes in the plugins section should be also be applied to build.offline.gradle
-    id 'java'
-    id 'distribution'
-    // publishing
-    id 'maven-publish'
-    id 'com.jfrog.bintray' version '1.7.3'
     // ide
     id 'idea'
     id 'eclipse'
+    // publishing
+    id 'com.jfrog.bintray' version '1.8.0' apply false
     // code style
-    id "com.diffplug.gradle.spotless" version "3.4.1"
-    // code coverage
-    id 'jacoco'
+    id 'com.diffplug.gradle.spotless' version '3.8.0' apply false
     // license
-    id 'com.github.hierynomus.license' version '0.14.0'
-    // test sets
+    id 'com.github.hierynomus.license' version '0.14.0' apply false
+
     id 'org.unbroken-dome.test-sets' version '1.4.2'
 }
 
-apply from: 'gradle/common.gradle'
-apply from: 'gradle/test.gradle'
-apply from: 'gradle/codestyle.gradle'
-apply from: 'gradle/release.gradle'
-apply from: 'gradle/license.gradle'
+description = 'Xenon: a middleware abstraction library that provides a simple programming interface to various compute and storage resources.'
 
-//  DEPENDENCIES
-// ==============
+allprojects {
+    apply from: "${rootProject.rootDir}/gradle/common.gradle"
+}
 
-// Online dependencies
-repositories {
-    mavenCentral()
-    jcenter()
-    maven {
-        url 'https://dl.bintray.com/palantir/releases' // docker-compose-rule is published on bintray
-    }
-    maven { 
-        url 'https://jitpack.io' 
+sourceSets {
+    docGenerator
+    liveTests
+}
+
+configurations {
+    docGeneratorCompile.extendsFrom compile
+    docGeneratorRuntime.extendsFrom runtime
+}
+
+testSets {
+    liveTest {
+        options {
+            // Pass all -D arguments from gradlew to tests
+            systemProperties(System.getProperties())
+        }
     }
 }
 
 dependencies {
-    // Xenon dependencies.
-    compile group: 'org.apache.jclouds.api', name: 's3', version: '2.0.2'
-    compile group: 'org.apache.jclouds.provider', name: 'aws-s3', version: '2.0.2'
-    compile group: 'org.apache.hadoop', name: 'hadoop-common', version: '2.8.1'
-    compile group: 'org.apache.hadoop', name: 'hadoop-hdfs', version: '2.8.1'
-    // compile group: 'org.apache.sshd', name: 'sshd-core', version: '1.6.0'
-    compile group: 'com.github.NLeSC.mina-sshd', name: 'sshd-core', version: 'known-host-hash-with-port-1.6.0-SNAPSHOT'
-    compile group: 'org.apache.mina', name: 'mina-core', version: '2.0.7'
-    compile group: 'net.i2p.crypto', name: 'eddsa', version: '0.2.0'
-    compile group: 'commons-net', name: 'commons-net', version: '3.3'
-
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.5'
-    compile group: 'com.github.lookfirst', name: 'sardine', version: '5.7'
-    compile group: 'joda-time', name: 'joda-time', version: '2.8.1'
-
-    // Runtime dependencies
-    runtime group: 'ch.qos.logback', name: 'logback-core', version: '1.0.11'
-    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.11'
-
-    // Testing dependencies
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'org.hamcrest', name: 'hamcrest-core', version: '1.3'
-    testCompile group: 'org.hamcrest', name: 'hamcrest-library', version: '1.3'
-    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
-    testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.16.0'
-
-    integrationTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.32.0'
-    // allow isolated and live tests to import from integration test,
-    // so abstract test classes and docker compose files can be extended and reused
-    fixedClientEnvironmentTestCompile sourceSets.integrationTest.output
-    liveTestCompile sourceSets.integrationTest.output
-    // TODO isolatedTest should have same dependencies as integrationTest,
-    // do no copy deps but append integrationTest.deps to fixedClientEnvironmentTest.deps
-    fixedClientEnvironmentTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.32.0'
+    compile project(':core')
+    compile project(':adaptor-local')
+    liveTestCompile project(':test-utils')
+    liveTestCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-task downloadCompileDependencies(type: Copy) {
-    from configurations.compile.files
-    into compileLibDir
+task wrapper(type: Wrapper) {
+    description 'Generates gradle wrapper'
+    group 'Build Setup'
+    gradleVersion = '4.5'
 }
 
-task downloadTestDependencies(type: Copy) {
-    from (configurations.testCompile.files - configurations.compile.files)
-    into testLibDir
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            groupId 'nl.esciencecenter.xenon'
+            artifactId 'xenon'
+            version version
+            artifact javadocJar
+        }
+    }
 }
 
-task downloadRuntimeDependencies(type: Copy) {
-    from (configurations.runtime.files - configurations.compile.files)
-    into runtimeLibDir
-}
+apply from: 'gradle/documentation.gradle'
 
-task downloadDependencies(dependsOn: [
-        downloadCompileDependencies,
-        downloadTestDependencies,
-        downloadRuntimeDependencies
-    ]) {
-    description "download all Java dependencies, as resolved by gradle, into the lib directory"
-}
+apply from: 'gradle/site.gradle'
+
+apply from: 'gradle/live.gradle'
