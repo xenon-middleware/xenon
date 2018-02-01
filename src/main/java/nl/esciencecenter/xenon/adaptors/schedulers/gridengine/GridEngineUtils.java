@@ -49,20 +49,19 @@ final class GridEngineUtils {
 
     public static final String JOB_OPTION_RESOURCES = "resources";
 
-    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_PARALLEL_ENVIRONMENT,
-            JOB_OPTION_PARALLEL_SLOTS, JOB_OPTION_RESOURCES };
+    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_PARALLEL_ENVIRONMENT, JOB_OPTION_PARALLEL_SLOTS,
+            JOB_OPTION_RESOURCES };
 
     public static final String QACCT_HEADER = "==============================================================";
 
     private static final int MINUTES_PER_HOUR = 60;
 
-    protected static void generateParallelEnvironmentSpecification(JobDescription description, GridEngineSetup setup,
-            Formatter script) throws XenonException {
+    protected static void generateParallelEnvironmentSpecification(JobDescription description, GridEngineSetup setup, Formatter script) throws XenonException {
         Map<String, String> options = description.getJobOptions();
 
         String pe = options.get(JOB_OPTION_PARALLEL_ENVIRONMENT);
 
-        //determine the number of slots we need. Can be overridden by the user
+        // determine the number of slots we need. Can be overridden by the user
         int slots;
         String slotsString = options.get(JOB_OPTION_PARALLEL_SLOTS);
 
@@ -72,8 +71,7 @@ final class GridEngineUtils {
             try {
                 slots = Integer.parseInt(slotsString);
             } catch (NumberFormatException e) {
-                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Error in parsing parallel slots option \"" + slotsString
-                        + "\"", e);
+                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Error in parsing parallel slots option \"" + slotsString + "\"", e);
             }
         }
 
@@ -98,9 +96,9 @@ final class GridEngineUtils {
             for (String argument : description.getArguments()) {
                 script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
             }
-            script.format("%c&\n",'"');
+            script.format("%c&\n", '"');
         }
-        //wait for all ssh connections to finish
+        // wait for all ssh connections to finish
         script.format("%s\n\n", "done");
         script.format("%s\n", "wait");
         script.format("%s\n\n", "exit 0");
@@ -111,26 +109,25 @@ final class GridEngineUtils {
     }
 
     @SuppressWarnings("PMD.NPathComplexity")
-    protected static String generate(JobDescription description, Path fsEntryPath, GridEngineSetup setup)
-            throws XenonException {
+    protected static String generate(JobDescription description, Path fsEntryPath, GridEngineSetup setup) throws XenonException {
 
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
         script.format("%s\n", "#!/bin/sh");
 
-        //set shell to sh
+        // set shell to sh
         script.format("%s\n", "#$ -S /bin/sh");
 
-        //set name of job to xenon
+        // set name of job to xenon
         script.format("%s\n", "#$ -N xenon");
 
-        //set working directory
+        // set working directory
         if (description.getWorkingDirectory() != null) {
             if (description.getWorkingDirectory().startsWith("/")) {
                 script.format("#$ -wd '%s'\n", description.getWorkingDirectory());
             } else {
-                //make relative path absolute
+                // make relative path absolute
                 Path workingDirectory = fsEntryPath.resolve(description.getWorkingDirectory());
                 script.format("#$ -wd '%s'\n", workingDirectory.toString());
             }
@@ -140,14 +137,11 @@ final class GridEngineUtils {
             script.format("#$ -q %s\n", description.getQueueName());
         }
 
-        //parallel environment and slot count (if needed)
-        if (description.getNodeCount() > 1) {
-            generateParallelEnvironmentSpecification(description, setup, script);
-        }
+        // parallel environment and slot count (if needed)
+        generateParallelEnvironmentSpecification(description, setup, script);
 
-        //add maximum runtime in hour:minute:second format (converted from minutes in description)
-        script.format("#$ -l h_rt=%02d:%02d:00\n", description.getMaxRuntime() / MINUTES_PER_HOUR, description.getMaxRuntime()
-                % MINUTES_PER_HOUR);
+        // add maximum runtime in hour:minute:second format (converted from minutes in description)
+        script.format("#$ -l h_rt=%02d:%02d:00\n", description.getMaxRuntime() / MINUTES_PER_HOUR, description.getMaxRuntime() % MINUTES_PER_HOUR);
 
         String resources = description.getJobOptions().get(JOB_OPTION_RESOURCES);
 
@@ -197,20 +191,19 @@ final class GridEngineUtils {
             throw new InvalidJobDescriptionException(ADAPTOR_NAME, "StartSingleProcess option not supported");
         }
 
-        //check for option that overrides job script completely.
+        // check for option that overrides job script completely.
         if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
-            //no remaining settings checked.
+            // no remaining settings checked.
             return;
         }
 
-        //perform standard checks.
+        // perform standard checks.
         ScriptingUtils.verifyJobDescription(description, ADAPTOR_NAME);
 
-        //check if the parallel environment and queue are specified.
+        // check if the parallel environment and queue are specified.
         if (description.getNodeCount() != 1) {
             if (!description.getJobOptions().containsKey(JOB_OPTION_PARALLEL_ENVIRONMENT)) {
-                throw new InvalidJobDescriptionException(ADAPTOR_NAME,
-                        "Parallel job requested but mandatory parallel.environment option not specificied.");
+                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Parallel job requested but mandatory parallel.environment option not specificied.");
             }
             if (description.getQueueName() == null && !description.getJobOptions().containsKey(JOB_OPTION_PARALLEL_SLOTS)) {
                 throw new InvalidJobDescriptionException(ADAPTOR_NAME,
@@ -241,12 +234,12 @@ final class GridEngineUtils {
         }
 
         if (failedString.equals("0")) {
-            //Success!
+            // Success!
         } else if (failedString.startsWith("100")) {
-            //error code for killed jobs
+            // error code for killed jobs
             exception = new JobCanceledException(ADAPTOR_NAME, "Job killed by signal");
         } else {
-            //unknown error code
+            // unknown error code
             exception = new XenonException(ADAPTOR_NAME, "Job reports error: " + failedString);
         }
 
