@@ -10,7 +10,7 @@ fixedClientEnvironmentTest.description = 'Run the integration tests within and a
 
 dependencies {
     compileOnly project(':core')
-    compile group: 'com.github.lookfirst', name: 'sardine', version: '5.7'
+    pack group: 'com.github.lookfirst', name: 'sardine', version: '5.7'
 
     testCompile project(':core')
 
@@ -25,7 +25,7 @@ check.dependsOn integrationTest
 integrationTest.mustRunAfter test
 
 jar {
-    from configurations.runtime
+    from configurations.pack
     manifest {
         attributes("Xenon-Adaptors": "nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor")
     }

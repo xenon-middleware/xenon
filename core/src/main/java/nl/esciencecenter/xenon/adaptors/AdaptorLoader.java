@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -44,7 +45,7 @@ public class AdaptorLoader {
 
         URL[] classpath = ((URLClassLoader) parent).getURLs();
 
-        // System.out.println("URL is " + Arrays.toString(classpath));
+        System.out.println("CLASSPATH is " + Arrays.toString(classpath));
 
         for (URL u : classpath) {
             if (u.getFile().endsWith(".jar")) {
@@ -71,7 +72,7 @@ public class AdaptorLoader {
             return;
         }
 
-        System.out.println("Found filesystem adaptors: \"" + adaptorlist + "\"");
+        // System.out.println("Found filesystem adaptors: \"" + adaptorlist + "\"");
 
         String[] adaptorClasses = adaptorlist.split(",");
 
@@ -97,7 +98,7 @@ public class AdaptorLoader {
         while (entries.hasMoreElements()) {
             JarEntry entry = entries.nextElement();
 
-            if (!entry.isDirectory() && entry.getName().endsWith(".jar")) {
+            if (!entry.isDirectory() && entry.getName().endsWith(".jar") && !entry.getName().startsWith("slf4j-api-")) {
                 File temp = File.createTempFile("xenon-tmp-", ".jar");
                 InputStream in = jarJar.getInputStream(entry);
                 OutputStream out = new FileOutputStream(temp);
@@ -123,10 +124,10 @@ public class AdaptorLoader {
         Adaptor adaptor = (Adaptor) clazz.newInstance();
 
         if (adaptor instanceof FileAdaptor) {
-            System.out.println("Loaded FileSystemAdaptor " + adaptor.getName() + " from " + jarJar);
+            System.out.println("Loaded \"" + adaptor.getName() + "\" FileSystemAdaptor from " + jarJar);
             fileAdaptors.put(adaptor.getName(), (FileAdaptor) adaptor);
         } else if (adaptor instanceof SchedulerAdaptor) {
-            System.out.println("Loaded SchedulerAdaptor " + adaptor.getName() + " from " + jarJar);
+            System.out.println("Loaded \"" + adaptor.getName() + "\" SchedulerAdaptor from " + jarJar);
             schedulerAdaptors.put(adaptor.getName(), (SchedulerAdaptor) adaptor);
         } else {
             System.out.println("Failed recognize adaptor " + adaptor.getName() + " from " + jarJar);

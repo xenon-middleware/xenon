@@ -11,8 +11,8 @@ fixedClientEnvironmentTest.description = 'Run the integration tests within and a
 dependencies {
     compileOnly project(':core')
 
-    compile group: 'org.apache.jclouds.api', name: 's3', version: '2.0.2'
-    compile group: 'org.apache.jclouds.provider', name: 'aws-s3', version: '2.0.2'
+    pack group: 'org.apache.jclouds.api', name: 's3', version: '2.0.2'
+    pack group: 'org.apache.jclouds.provider', name: 'aws-s3', version: '2.0.2'
 
     testCompile project(':core')
 
@@ -27,7 +27,7 @@ check.dependsOn integrationTest
 integrationTest.mustRunAfter test
 
 jar {
-    from configurations.runtime
+    from configurations.pack
     manifest {
         attributes("Xenon-Adaptors": "nl.esciencecenter.xenon.adaptors.filesystems.s3.S3FileAdaptor")
     }

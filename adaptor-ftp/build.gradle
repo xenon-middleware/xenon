@@ -11,7 +11,7 @@ fixedClientEnvironmentTest.description = 'Run the integration tests within and a
 dependencies {
     compileOnly project(':core')
 
-    compile group: 'commons-net', name: 'commons-net', version: '3.3'
+    pack group: 'commons-net', name: 'commons-net', version: '3.3'
 
     testCompile project(':core')
 
@@ -26,7 +26,7 @@ check.dependsOn integrationTest
 integrationTest.mustRunAfter test
 
 jar {
-    from configurations.runtime
+    from configurations.pack
     manifest {
         attributes("Xenon-Adaptors": "nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor")
     }
