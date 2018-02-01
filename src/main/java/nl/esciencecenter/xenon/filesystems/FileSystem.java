@@ -45,6 +45,7 @@ import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor;
+import nl.esciencecenter.xenon.adaptors.filesystems.hdfs.HDFSFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.s3.S3FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
@@ -69,7 +70,7 @@ public abstract class FileSystem implements AutoCloseable {
         addAdaptor(new SftpFileAdaptor());
         addAdaptor(new WebdavFileAdaptor());
         addAdaptor(new S3FileAdaptor());
-        // addAdaptor(new HDFSFileAdaptor());
+        addAdaptor(new HDFSFileAdaptor());
     }
 
     private static void addAdaptor(FileAdaptor adaptor) {
