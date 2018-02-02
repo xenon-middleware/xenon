@@ -24,7 +24,8 @@ dependencies {
 check.dependsOn integrationTest
 integrationTest.mustRunAfter test
 
-jar {
+task jarWithDeps(type: Jar) {
+    with jar
     from configurations.runtime
     manifest {
         attributes("Xenon-Adaptors": "nl.esciencecenter.xenon.adaptors.local.LocalFileSystem")
@@ -54,10 +55,10 @@ task jacocoFixedClientEnvironmentTestReport(type: JacocoReport) {
 publishing {
     publications {
         MyPublication(MavenPublication) {
-            from components.java
             groupId 'nl.esciencecenter.xenon.adaptor'
             artifactId 'xenon-local'
             version version
+            artifact jarWithDeps
             artifact javadocJar
             artifact sourcesJar
         }
