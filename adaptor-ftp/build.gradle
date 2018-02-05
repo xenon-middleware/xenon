@@ -15,8 +15,9 @@ dependencies {
 
     testCompile project(':core')
 
-    integrationTestCompile group: 'junit', name: 'junit', version: '4.12'
     integrationTestCompile project(':test-utils')
+    integrationTestCompile group: 'junit', name: 'junit', version: '4.12'
+    integrationTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.32.0'
 
     fixedClientEnvironmentTestCompile group: 'junit', name: 'junit', version: '4.12'
     fixedClientEnvironmentTestCompile project(':test-utils')
