@@ -37,9 +37,10 @@ import nl.esciencecenter.xenon.adaptors.schedulers.BadParameterException;
 import nl.esciencecenter.xenon.adaptors.schedulers.IncompatibleVersionException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerClosedException;
-import nl.esciencecenter.xenon.adaptors.schedulers.local.CommandNotFoundException;
-import nl.esciencecenter.xenon.adaptors.shared.ssh.CertificateNotFoundException;
-import nl.esciencecenter.xenon.adaptors.shared.ssh.CredentialNotFoundException;
+//import nl.esciencecenter.xenon.adaptors.shared.ssh.CertificateNotFoundException;
+//import nl.esciencecenter.xenon.adaptors.schedulers.local.CommandNotFoundException;
+//import nl.esciencecenter.xenon.adaptors.shared.ssh.CertificateNotFoundException;
+//import nl.esciencecenter.xenon.adaptors.shared.ssh.CredentialNotFoundException;
 import nl.esciencecenter.xenon.filesystems.AttributeNotSupportedException;
 import nl.esciencecenter.xenon.filesystems.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.filesystems.FileSystemClosedException;
@@ -148,16 +149,16 @@ public class ExceptionsTest {
         testException(new BadParameterException("name", "message", t), t);
     }
 
-    @Test
-    public void testCommandNotFoundException1() throws Exception {
-        testException(new CommandNotFoundException("name", "message"));
-    }
-
-    @Test
-    public void testCommandNotFoundException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new CommandNotFoundException("name", "message", t), t);
-    }
+    // @Test
+    // public void testCommandNotFoundException1() throws Exception {
+    // testException(new CommandNotFoundException("name", "message"));
+    // }
+    //
+    // @Test
+    // public void testCommandNotFoundException2() throws Exception {
+    // Throwable t = new Throwable();
+    // testException(new CommandNotFoundException("name", "message", t), t);
+    // }
 
     @Test
     public void testConnectionLostException1() throws Exception {
@@ -258,16 +259,16 @@ public class ExceptionsTest {
         testException(new InvalidCredentialException("name", "message", t), t);
     }
 
-    @Test
-    public void testCertificateNotFoundException1() throws Exception {
-        testException(new CertificateNotFoundException("name", "message"));
-    }
-
-    @Test
-    public void testCertificateNotFoundException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new CertificateNotFoundException("name", "message", t), t);
-    }
+    // @Test
+    // public void testCertificateNotFoundException1() throws Exception {
+    // testException(new CertificateNotFoundException("name", "message"));
+    // }
+    //
+    // @Test
+    // public void testCertificateNotFoundException2() throws Exception {
+    // Throwable t = new Throwable();
+    // testException(new CertificateNotFoundException("name", "message", t), t);
+    // }
 
     @Test
     public void testInvalidDataException1() throws Exception {
@@ -477,16 +478,16 @@ public class ExceptionsTest {
         Throwable t = new Throwable();
         testException(new NoSpaceException("name", "message", t), t);
     }
-
-    @Test
-    public void testCredentialNotFoundException1() throws Exception {
-        testException(new CredentialNotFoundException("name", "message"));
-    }
-
-    @Test
-    public void testCredentialNotFoundException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new CredentialNotFoundException("name", "message", t), t);
-    }
+    //
+    // @Test
+    // public void testCredentialNotFoundException1() throws Exception {
+    // testException(new CredentialNotFoundException("name", "message"));
+    // }
+    //
+    // @Test
+    // public void testCredentialNotFoundException2() throws Exception {
+    // Throwable t = new Throwable();
+    // testException(new CredentialNotFoundException("name", "message", t), t);
+    // }
 
 }

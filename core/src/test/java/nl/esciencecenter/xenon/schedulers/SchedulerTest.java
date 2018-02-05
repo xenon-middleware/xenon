@@ -19,7 +19,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 import org.junit.Test;
@@ -28,17 +27,18 @@ import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
-import nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor;
 
 public class SchedulerTest {
 
-    @Test
-    public void test_create() throws Exception {
-        Scheduler s = Scheduler.create("local");
-        assertEquals("local", s.getAdaptorName());
-    }
+    // This is an integrationTest?
+    //
+    // @Test
+    // public void test_create() throws Exception {
+    // Scheduler s = Scheduler.create("local");
+    // assertEquals("local", s.getAdaptorName());
+    // }
 
-    @Test(expected = UnknownAdaptorException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_createFailsNull() throws Exception {
         Scheduler.create(null);
     }
@@ -53,30 +53,30 @@ public class SchedulerTest {
         Scheduler.create("aap");
     }
 
-    @Test
-    public void test_names() {
-        String[] tmp = Scheduler.getAdaptorNames();
-        String[] expected = new String[] { "local", "ssh", "gridengine", "slurm", "torque" };
-        assertTrue(Arrays.equals(expected, tmp));
-    }
+    // This is an integrationTest?
+    //
+    // @Test
+    // public void test_names() {
+    // String[] tmp = Scheduler.getAdaptorNames();
+    // String[] expected = new String[] { "local", "ssh", "gridengine", "slurm", "torque" };
+    // assertTrue(Arrays.equals(expected, tmp));
+    // }
 
-    @Test
-    public void test_adaptorDescription() throws UnknownAdaptorException {
+    // @Test
+    // public void test_adaptorDescription() throws UnknownAdaptorException {
+    //
+    // SchedulerAdaptorDescription d = Scheduler.getAdaptorDescription("local");
+    //
+    // LocalSchedulerAdaptor l = new LocalSchedulerAdaptor();
+    //
+    // assertEquals("local", l.getName());
+    // assertTrue(d.isEmbedded());
+    // assertTrue(d.supportsBatch());
+    // assertTrue(d.supportsInteractive());
+    // assertEquals(LocalSchedulerAdaptor.ADAPTOR_DESCRIPTION, d.getDescription());
+    // }
 
-        SchedulerAdaptorDescription d = Scheduler.getAdaptorDescription("local");
-
-        LocalSchedulerAdaptor l = new LocalSchedulerAdaptor();
-
-        assertEquals("local", l.getName());
-        assertTrue(d.isEmbedded());
-        assertTrue(d.supportsBatch());
-        assertTrue(d.supportsInteractive());
-        assertEquals(LocalSchedulerAdaptor.ADAPTOR_DESCRIPTION, d.getDescription());
-        // assertArrayEquals(LocalSchedulerAdaptor.get ADAPTOR_LOCATIONS, d.getSupportedLocations());
-        // assertArrayEquals(LocalSchedulerAdaptor.VALID_PROPERTIES, d.getSupportedProperties());
-    }
-
-    @Test(expected = UnknownAdaptorException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_adaptorDescriptionFailsNull() throws UnknownAdaptorException {
         Scheduler.getAdaptorDescription(null);
     }

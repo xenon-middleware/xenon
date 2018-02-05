@@ -31,8 +31,6 @@ import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil.PasswordProvider;
-import nl.esciencecenter.xenon.filesystems.FileSystem;
-import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 public class SSHUtilTest {
 
@@ -113,8 +111,8 @@ public class SSHUtilTest {
         prop.put("xenon.adaptors.schedulers.ssh.strictHostKeyChecking", "false");
         prop.put("xenon.adaptors.schedulers.ssh.agentForwarding", "true");
         // prop.put("xenon.adaptors.schedulers.ssh.sshConfigFile", "/somewhere/config");
-        Map<String, String> result = SSHUtil.translateProperties(prop, SshSchedulerAdaptor.PREFIX,
-                FileSystem.getAdaptorDescription("sftp").getSupportedProperties(), SftpFileAdaptor.PREFIX);
+        Map<String, String> result = SSHUtil.translateProperties(prop, SshSchedulerAdaptor.PREFIX, new SftpFileAdaptor().getSupportedProperties(),
+                SftpFileAdaptor.PREFIX);
 
         assertEquals(2, result.size());
 
@@ -135,7 +133,7 @@ public class SSHUtilTest {
         prop.put("xenon.adaptors.filesystems.sftp.agentForwarding", "true");
         // prop.put("xenon.adaptors.filesystems.sftp.sshConfigFile", "/somewhere/config");
 
-        Map<String, String> result = SSHUtil.translateProperties(prop, SftpFileAdaptor.PREFIX, Scheduler.getAdaptorDescription("ssh").getSupportedProperties(),
+        Map<String, String> result = SSHUtil.translateProperties(prop, SftpFileAdaptor.PREFIX, new SshSchedulerAdaptor().getSupportedProperties(),
                 SshSchedulerAdaptor.PREFIX);
 
         assertEquals(2, result.size());

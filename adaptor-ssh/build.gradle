@@ -17,6 +17,10 @@ dependencies {
     pack group: 'com.google.guava', name: 'guava', version: '19.0'
 
     testCompile project(':core')
+    testCompile group: 'com.github.NLeSC.mina-sshd', name: 'sshd-core', version: 'known-host-hash-with-port-1.6.0-SNAPSHOT'
+    testCompile group: 'org.apache.mina', name: 'mina-core', version: '2.0.7'
+    testCompile group: 'net.i2p.crypto', name: 'eddsa', version: '0.2.0'
+    testCompile group: 'com.google.guava', name: 'guava', version: '19.0'
 
     integrationTestCompile group: 'junit', name: 'junit', version: '4.12'
     integrationTestCompile project(':test-utils')

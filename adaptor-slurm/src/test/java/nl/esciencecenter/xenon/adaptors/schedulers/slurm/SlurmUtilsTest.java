@@ -37,7 +37,6 @@ import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
-import nl.esciencecenter.xenon.schedulers.MockScheduler;
 import nl.esciencecenter.xenon.schedulers.QueueStatus;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 
@@ -87,7 +86,7 @@ public class SlurmUtilsTest {
         SlurmUtils.exitcodeFromString(input);
     }
 
-    //new JobStatusImplementation(inputJob, state, exitCode, error, running, done, jobInfo);
+    // new JobStatusImplementation(inputJob, state, exitCode, error, running, done, jobInfo);
 
     @Test
     public void test02a_getJobStatusFromSacctInfo_CompletedJob_JobStatus() throws XenonException {
@@ -209,7 +208,7 @@ public class SlurmUtilsTest {
     @Test(expected = XenonException.class)
     public void test02g_getJobStatusFromSacctInfo_InvalidJobInfo_ExceptionThrown() throws XenonException {
         String jobID = "555";
-        //very invalid info, no info at all
+        // very invalid info, no info at all
         Map<String, String> jobInfo = new HashMap<>();
 
         Map<String, Map<String, String>> input = new HashMap<>();
@@ -355,7 +354,7 @@ public class SlurmUtilsTest {
     @Test(expected = XenonException.class)
     public void test03h_getJobStatusFromScontrolInfo_IncompleteJobInfo_ExceptionThrown() throws XenonException {
         String jobID = "555";
-        //empty job info
+        // empty job info
         Map<String, String> jobInfo = new HashMap<>();
 
         SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
@@ -414,7 +413,7 @@ public class SlurmUtilsTest {
     public void test04d_getJobStatusFromSqueueInfo_IncompleteJobInfo_ExceptionThrown() throws XenonException {
         String jobID = "555";
 
-        //very incomplete job info
+        // very incomplete job info
         Map<String, String> jobInfo = new HashMap<>();
 
         Map<String, Map<String, String>> input = new HashMap<>();
@@ -458,7 +457,6 @@ public class SlurmUtilsTest {
         assertNull(result);
     }
 
-
     @Test
     public void test06_isDoneState() {
         assertTrue(SlurmUtils.isDoneOrFailedState("COMPLETED"));
@@ -485,12 +483,12 @@ public class SlurmUtilsTest {
     public void test08a_verifyJobDescription_ValidJobDescription_NoException() throws Exception {
         JobDescription description = new JobDescription();
 
-        //all the settings the function checks for set exactly right
+        // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
         description.setMaxRuntime(1);
-        //slurm specific info
+        // slurm specific info
         SlurmUtils.verifyJobDescription(description, false);
     }
 
@@ -498,12 +496,12 @@ public class SlurmUtilsTest {
     public void test08b_verifyJobDescription_ScriptOptionSet_NoException() throws Exception {
         JobDescription description = new JobDescription();
 
-        //all the settings the function checks for set exactly right
+        // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
         description.setMaxRuntime(1);
-        //slurm specific info
+        // slurm specific info
         description.addJobOption(SlurmUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
 
         SlurmUtils.verifyJobDescription(description, false);
@@ -513,10 +511,10 @@ public class SlurmUtilsTest {
     public void test08c_verifyJobDescription_JobScriptSet_NoFurtherChecking() throws Exception {
         JobDescription description = new JobDescription();
 
-        //set a job option
+        // set a job option
         description.addJobOption(SlurmUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
 
-        //All these settings are wrong. This should not lead to an error
+        // All these settings are wrong. This should not lead to an error
         description.setExecutable(null);
         description.setNodeCount(0);
         description.setProcessesPerNode(0);
@@ -529,26 +527,26 @@ public class SlurmUtilsTest {
     public void test08d_verifyJobDescription_InvalidOptions_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
-        //set a job option
+        // set a job option
         description.addJobOption("wrong.setting", "wrong.value");
 
         SlurmUtils.verifyJobDescription(description, false);
     }
 
-    //    @Test(expected = InvalidJobDescriptionException.class)
-    //    public void test08e_verifyJobDescription_InteractiveJob_ExceptionThrown() throws Exception {
-    //        JobDescription description = new JobDescription();
+    // @Test(expected = InvalidJobDescriptionException.class)
+    // public void test08e_verifyJobDescription_InteractiveJob_ExceptionThrown() throws Exception {
+    // JobDescription description = new JobDescription();
     //
-    //        description.setInteractive(true);
+    // description.setInteractive(true);
     //
-    //        SlurmSchedulerConnection.verifyJobDescription(description);
-    //    }
+    // SlurmSchedulerConnection.verifyJobDescription(description);
+    // }
 
     @Test(expected = InvalidJobDescriptionException.class)
     public void test08f_verifyJobDescription_InvalidStandardSetting_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
-        //verify the standard settings are also checked
+        // verify the standard settings are also checked
         description.setExecutable("bin/bla");
         description.setMaxRuntime(0);
 
@@ -559,12 +557,12 @@ public class SlurmUtilsTest {
     public void test_verifyJobDescriptionInteractive_FailsScriptOptionSet() throws Exception {
         JobDescription description = new JobDescription();
 
-        //all the settings the function checks for set exactly right
+        // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
         description.setMaxRuntime(1);
-        //slurm specific info
+        // slurm specific info
         description.addJobOption(SlurmUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
 
         SlurmUtils.verifyJobDescription(description, true);
@@ -574,12 +572,12 @@ public class SlurmUtilsTest {
     public void test_verifyJobDescriptionInteractive_FailsSingleProcess() throws Exception {
         JobDescription description = new JobDescription();
 
-        //all the settings the function checks for set exactly right
+        // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
         description.setMaxRuntime(1);
-        //slurm specific info
+        // slurm specific info
         description.setStartSingleProcess(true);
 
         SlurmUtils.verifyJobDescription(description, true);
@@ -589,12 +587,12 @@ public class SlurmUtilsTest {
     public void test_verifyJobDescriptionInteractive__FailsStdinSet() throws Exception {
         JobDescription description = new JobDescription();
 
-        //all the settings the function checks for set exactly right
+        // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
         description.setMaxRuntime(1);
-        //slurm specific info
+        // slurm specific info
         description.setStdin("stdin.txt");
 
         SlurmUtils.verifyJobDescription(description, true);
@@ -604,12 +602,12 @@ public class SlurmUtilsTest {
     public void test_verifyJobDescriptionInteractive__StdoutSet() throws Exception {
         JobDescription description = new JobDescription();
 
-        //all the settings the function checks for set exactly right
+        // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
         description.setMaxRuntime(1);
-        //slurm specific info
+        // slurm specific info
         description.setStdout("stdout.txt");
 
         SlurmUtils.verifyJobDescription(description, true);
@@ -619,12 +617,12 @@ public class SlurmUtilsTest {
     public void test_verifyJobDescriptionInteractive__StderrSet() throws Exception {
         JobDescription description = new JobDescription();
 
-        //all the settings the function checks for set exactly right
+        // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
         description.setMaxRuntime(1);
-        //slurm specific info
+        // slurm specific info
         description.setStderr("stderr.txt");
 
         SlurmUtils.verifyJobDescription(description, true);
@@ -634,12 +632,12 @@ public class SlurmUtilsTest {
     public void test_verifyJobDescriptionInteractive__FailsStdoutSet() throws Exception {
         JobDescription description = new JobDescription();
 
-        //all the settings the function checks for set exactly right
+        // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
         description.setMaxRuntime(1);
-        //slurm specific info
+        // slurm specific info
         description.setStdout("foobar.txt");
 
         SlurmUtils.verifyJobDescription(description, true);
@@ -649,12 +647,12 @@ public class SlurmUtilsTest {
     public void test_verifyJobDescriptionInteractive__FailsStderrSet() throws Exception {
         JobDescription description = new JobDescription();
 
-        //all the settings the function checks for set exactly right
+        // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
         description.setMaxRuntime(1);
-        //slurm specific info
+        // slurm specific info
         description.setStderr("foobar.txt");
 
         SlurmUtils.verifyJobDescription(description, true);
@@ -664,12 +662,12 @@ public class SlurmUtilsTest {
     public void test_verifyJobDescriptionInteractive__FailsEnvSet() throws Exception {
         JobDescription description = new JobDescription();
 
-        //all the settings the function checks for set exactly right
+        // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
         description.setMaxRuntime(1);
-        //slurm specific info
+        // slurm specific info
 
         HashMap<String, String> env = new HashMap<>();
         env.put("key", "value");
@@ -686,21 +684,11 @@ public class SlurmUtilsTest {
 
         JobDescription description = new JobDescription();
         description.setExecutable("exec");
-        description.setArguments(new String [] { "a", "b", "c" });
+        description.setArguments(new String[] { "a", "b", "c" });
 
-        String [] expected = new String [] {
-                "--quiet",
-                "--job-name=" + tag.toString(),
-                "--nodes=1",
-                "--ntasks-per-node=1",
-                "--time=15",
-                "exec",
-                "a",
-                "b",
-                "c"
-        };
+        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--nodes=1", "--ntasks-per-node=1", "--time=15", "exec", "a", "b", "c" };
 
-        String [] result = SlurmUtils.generateInteractiveArguments(description, entry, tag);
+        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag);
 
         assertArrayEquals(expected, result);
     }
@@ -712,25 +700,14 @@ public class SlurmUtilsTest {
 
         JobDescription description = new JobDescription();
         description.setExecutable("exec");
-        description.setArguments(new String [] { "a", "b", "c" });
+        description.setArguments(new String[] { "a", "b", "c" });
         description.setWorkingDirectory("workdir");
         description.setQueueName("queue");
 
-        String [] expected = new String [] {
-                "--quiet",
-                "--job-name=" + tag,
-                "--chdir=" + entry.resolve("workdir"),
-                "--partition=queue",
-                "--nodes=1",
-                "--ntasks-per-node=1",
-                "--time=15",
-                "exec",
-                "a",
-                "b",
-                "c"
-        };
+        String[] expected = new String[] { "--quiet", "--job-name=" + tag, "--chdir=" + entry.resolve("workdir"), "--partition=queue", "--nodes=1",
+                "--ntasks-per-node=1", "--time=15", "exec", "a", "b", "c" };
 
-        String [] result = SlurmUtils.generateInteractiveArguments(description, entry, tag);
+        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag);
 
         assertArrayEquals(expected, result);
     }
@@ -742,25 +719,14 @@ public class SlurmUtilsTest {
 
         JobDescription description = new JobDescription();
         description.setExecutable("exec");
-        description.setArguments(new String [] { "a", "b", "c" });
+        description.setArguments(new String[] { "a", "b", "c" });
         description.setWorkingDirectory("/workdir");
         description.setQueueName("queue");
 
-        String [] expected = new String [] {
-                "--quiet",
-                "--job-name=" + tag.toString(),
-                "--chdir=/workdir",
-                "--partition=queue",
-                "--nodes=1",
-                "--ntasks-per-node=1",
-                "--time=15",
-                "exec",
-                "a",
-                "b",
-                "c"
-        };
+        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--chdir=/workdir", "--partition=queue", "--nodes=1",
+                "--ntasks-per-node=1", "--time=15", "exec", "a", "b", "c" };
 
-        String [] result = SlurmUtils.generateInteractiveArguments(description, entry, tag);
+        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag);
 
         assertArrayEquals(expected, result);
     }
@@ -771,17 +737,10 @@ public class SlurmUtilsTest {
 
         JobDescription description = new JobDescription();
         description.setExecutable("exec");
-        description.setArguments(new String [] { "a", "b", "c" });
+        description.setArguments(new String[] { "a", "b", "c" });
 
-        String expected = "#!/bin/sh\n" +
-            "#SBATCH --job-name xenon\n" +
-            "#SBATCH --nodes=1\n" +
-            "#SBATCH --ntasks-per-node=1\n" +
-            "#SBATCH --time=15\n" +
-            "#SBATCH --output=/dev/null\n" +
-            "#SBATCH --error=/dev/null\n" +
-            "\n" +
-            "srun exec 'a' 'b' 'c'\n";
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name xenon\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n"
+                + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "srun exec 'a' 'b' 'c'\n";
 
         String result = SlurmUtils.generate(description, entry);
 
@@ -794,7 +753,7 @@ public class SlurmUtilsTest {
 
         JobDescription description = new JobDescription();
         description.setExecutable("exec");
-        description.setArguments(new String [] { "a", "b", "c" });
+        description.setArguments(new String[] { "a", "b", "c" });
         description.setWorkingDirectory("workdir");
         description.setStdin("in.txt");
         description.setStdout("out.txt");
@@ -808,20 +767,10 @@ public class SlurmUtilsTest {
         description.setEnvironment(env);
         description.setStartSingleProcess(true);
 
-        String expected = "#!/bin/sh\n" +
-            "#SBATCH --job-name xenon\n" +
-            "#SBATCH --workdir='" + entry.resolve("workdir").toString() + "'\n" +
-            "#SBATCH --partition=queue\n" +
-            "#SBATCH --nodes=1\n" +
-            "#SBATCH --ntasks-per-node=1\n" +
-            "#SBATCH --time=15\n" +
-            "#SBATCH --input='in.txt'\n" +
-            "#SBATCH --output='out.txt'\n" +
-            "#SBATCH --error='err.txt'\n" +
-            "export key1=\"value1\"\n" +
-            "export key2=\"value2\"\n" +
-            "\n" +
-            "exec 'a' 'b' 'c'\n";
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name xenon\n" + "#SBATCH --workdir='" + entry.resolve("workdir").toString() + "'\n"
+                + "#SBATCH --partition=queue\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n" + "#SBATCH --input='in.txt'\n"
+                + "#SBATCH --output='out.txt'\n" + "#SBATCH --error='err.txt'\n" + "export key1=\"value1\"\n" + "export key2=\"value2\"\n" + "\n"
+                + "exec 'a' 'b' 'c'\n";
 
         String result = SlurmUtils.generate(description, entry);
 
@@ -841,7 +790,7 @@ public class SlurmUtilsTest {
     @Test
     public void test_identifiersAsCSList() {
 
-        String [] array = new String [] { "AAP", "NOOT" };
+        String[] array = new String[] { "AAP", "NOOT" };
 
         String result = SlurmUtils.identifiersAsCSList(array);
 
@@ -851,8 +800,7 @@ public class SlurmUtilsTest {
     @Test
     public void test_identifiersAsCSListWithNull() {
 
-
-        String [] array = new String [] { "AAP", "NOOT" };
+        String[] array = new String[] { "AAP", "NOOT" };
 
         String result = SlurmUtils.identifiersAsCSList(array);
 

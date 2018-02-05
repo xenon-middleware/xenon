@@ -135,8 +135,12 @@ public class AdaptorLoader {
     }
 
     private static void checkAdaptorName(String adaptorName) throws UnknownAdaptorException {
-        if (adaptorName == null || adaptorName.trim().isEmpty()) {
-            throw new UnknownAdaptorException(COMPONENT_NAME, "Adaptor name may not be null or empty");
+        if (adaptorName == null) {
+            throw new IllegalArgumentException("Adaptor name may not be null");
+        }
+
+        if (adaptorName.trim().isEmpty()) {
+            throw new UnknownAdaptorException(COMPONENT_NAME, "Adaptor name may not be empty");
         }
     }
 
