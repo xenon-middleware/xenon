@@ -6,11 +6,13 @@
 # intellij
 /.idea
 /*.iml
+/*/*.iml
 /*.ipr
 /*.iws
 
 # gradle
 /build
+/*/build
 /.gradle
 
 # integration tests
