@@ -10,6 +10,8 @@ plugins {
     id 'com.github.hierynomus.license' version '0.14.0' apply false
 
     id 'org.unbroken-dome.test-sets' version '1.4.2'
+
+    id 'com.github.johnrengelman.plugin-shadow' version '2.0.2' apply false
 }
 
 description = 'Xenon: a middleware abstraction library that provides a simple programming interface to various compute and storage resources.'
@@ -40,15 +42,15 @@ testSets {
 dependencies {
     compile project(':core')
 
-    compile project(':adaptor-local')
-    compile project(':adaptor-ssh')
-    compile project(':adaptor-ftp')
-    compile project(':adaptor-webdav')
-    compile project(':adaptor-s3')
-    compile project(':adaptor-hdfs')
-    compile project(':adaptor-slurm')
-    compile project(':adaptor-gridengine')
-    compile project(':adaptor-torque')
+    compile project(path: 'adaptor-local', configuration: 'shadow')
+    compile project(path: 'adaptor-ssh', configuration: 'shadow')
+    compile project(path: 'adaptor-ftp', configuration: 'shadow')
+    compile project(path: 'adaptor-webdav', configuration: 'shadow')
+    compile project(path: 'adaptor-s3', configuration: 'shadow')
+    compile project(path: 'adaptor-hdfs', configuration: 'shadow')
+    compile project(path: 'adaptor-slurm', configuration: 'shadow')
+    compile project(path: 'adaptor-gridengine', configuration: 'shadow')
+    compile project(path: 'adaptor-torque', configuration: 'shadow')
 
     // Runtime dependencies
     runtime group: 'ch.qos.logback', name: 'logback-core', version: '1.0.11'

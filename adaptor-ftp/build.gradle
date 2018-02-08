@@ -1,4 +1,5 @@
 apply plugin: 'org.unbroken-dome.test-sets'
+apply plugin: 'com.github.johnrengelman.plugin-shadow'
 
 testSets {
     integrationTest
@@ -11,7 +12,7 @@ fixedClientEnvironmentTest.description = 'Run the integration tests within and a
 dependencies {
     compileOnly project(':core')
 
-    pack group: 'commons-net', name: 'commons-net', version: '3.3'
+    compile group: 'commons-net', name: 'commons-net', version: '3.3'
 
     testCompile project(':core')
 
@@ -27,7 +28,6 @@ check.dependsOn integrationTest
 integrationTest.mustRunAfter test
 
 jar {
-    from configurations.pack
     manifest {
         attributes("Xenon-Adaptors": "nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor")
     }
@@ -56,10 +56,10 @@ task jacocoFixedClientEnvironmentTestReport(type: JacocoReport) {
 publishing {
     publications {
         MyPublication(MavenPublication) {
-            from components.java
             groupId 'nl.esciencecenter.xenon.adaptor'
             artifactId 'xenon-adaptor-ftp'
             version version
+            artifact shadowJar
             artifact javadocJar
             artifact sourcesJar
         }

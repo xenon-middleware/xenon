@@ -1,4 +1,5 @@
 apply plugin: 'org.unbroken-dome.test-sets'
+apply plugin: 'com.github.johnrengelman.plugin-shadow'
 
 testSets {
     integrationTest
@@ -11,10 +12,10 @@ fixedClientEnvironmentTest.description = 'Run the integration tests within and a
 dependencies {
     compileOnly project(':core')
 
-    pack group: 'com.github.NLeSC.mina-sshd', name: 'sshd-core', version: 'known-host-hash-with-port-1.6.0-SNAPSHOT'
-    pack group: 'org.apache.mina', name: 'mina-core', version: '2.0.7'
-    pack group: 'net.i2p.crypto', name: 'eddsa', version: '0.2.0'
-    pack group: 'com.google.guava', name: 'guava', version: '19.0'
+    compile group: 'com.github.NLeSC.mina-sshd', name: 'sshd-core', version: 'known-host-hash-with-port-1.6.0-SNAPSHOT'
+    compile group: 'org.apache.mina', name: 'mina-core', version: '2.0.7'
+    compile group: 'net.i2p.crypto', name: 'eddsa', version: '0.2.0'
+    compile group: 'com.google.guava', name: 'guava', version: '19.0'
 
     testCompile project(':core')
     testCompile group: 'com.github.NLeSC.mina-sshd', name: 'sshd-core', version: 'known-host-hash-with-port-1.6.0-SNAPSHOT'
@@ -33,7 +34,6 @@ check.dependsOn integrationTest
 integrationTest.mustRunAfter test
 
 jar {
-    from configurations.pack
     manifest {
         attributes("Xenon-Adaptors": "nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor, nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor")
     }
@@ -62,10 +62,10 @@ task jacocoFixedClientEnvironmentTestReport(type: JacocoReport) {
 publishing {
     publications {
         MyPublication(MavenPublication) {
-            from components.java
             groupId 'nl.esciencecenter.xenon.adaptor'
-            artifactId 'xenon-ssh'
+            artifactId 'xenon-adaptor-ssh'
             version version
+            artifact shadowJar
             artifact javadocJar
             artifact sourcesJar
         }

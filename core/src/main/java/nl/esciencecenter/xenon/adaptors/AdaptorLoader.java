@@ -112,7 +112,8 @@ public class AdaptorLoader {
 
     private static void loadAdaptor(String name, List<URL> classpath, URL jarJar) throws Exception {
 
-        AdaptorClassLoader loader = new AdaptorClassLoader(classpath);
+//        AdaptorClassLoader loader = new AdaptorClassLoader(classpath);
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
         Class<?> clazz = loader.loadClass(name);
 

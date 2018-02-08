@@ -1,4 +1,5 @@
 apply plugin: 'org.unbroken-dome.test-sets'
+apply plugin: 'com.github.johnrengelman.plugin-shadow'
 
 testSets {
     integrationTest
@@ -11,8 +12,8 @@ fixedClientEnvironmentTest.description = 'Run the integration tests within and a
 dependencies {
     compileOnly project(':core')
 
-    pack group: 'org.apache.jclouds.api', name: 's3', version: '2.0.2'
-    pack group: 'org.apache.jclouds.provider', name: 'aws-s3', version: '2.0.2'
+    compile group: 'org.apache.jclouds.api', name: 's3', version: '2.0.2'
+    compile group: 'org.apache.jclouds.provider', name: 'aws-s3', version: '2.0.2'
 
     testCompile project(':core')
 
@@ -27,7 +28,6 @@ check.dependsOn integrationTest
 integrationTest.mustRunAfter test
 
 jar {
-    from configurations.pack
     manifest {
         attributes("Xenon-Adaptors": "nl.esciencecenter.xenon.adaptors.filesystems.s3.S3FileAdaptor")
     }
@@ -56,10 +56,10 @@ task jacocoFixedClientEnvironmentTestReport(type: JacocoReport) {
 publishing {
     publications {
         MyPublication(MavenPublication) {
-            from components.java
             groupId 'nl.esciencecenter.xenon.adaptor'
-            artifactId 'xenon-s3'
+            artifactId 'xenon-adaptor-s3'
             version version
+            artifact shadowJar
             artifact javadocJar
             artifact sourcesJar
         }
