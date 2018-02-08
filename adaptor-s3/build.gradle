@@ -58,7 +58,7 @@ publishing {
         MyPublication(MavenPublication) {
             from components.java
             groupId 'nl.esciencecenter.xenon.adaptor'
-            artifactId 'xenon-local'
+            artifactId 'xenon-s3'
             version version
             artifact javadocJar
             artifact sourcesJar
