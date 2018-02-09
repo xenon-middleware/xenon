@@ -15,6 +15,8 @@ check.dependsOn integrationTest
 integrationTest.mustRunAfter test
 
 shadowJar {
+    // we ship adaptors always as jar with shaded deps
+    classifier = null
     mergeServiceFiles()
 }
 // make sure the dependencies of adaptors are not shadowed to same prefix 'shadow'
