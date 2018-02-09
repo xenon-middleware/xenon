@@ -51,6 +51,7 @@ dependencies {
     compile project(path: 'adaptor-slurm', configuration: 'shadow')
     compile project(path: 'adaptor-gridengine', configuration: 'shadow')
     compile project(path: 'adaptor-torque', configuration: 'shadow')
+    compile project(path: 'adaptor-gridftp', configuration: 'shadow')
 
     // Runtime dependencies
     runtime group: 'ch.qos.logback', name: 'logback-core', version: '1.0.11'
