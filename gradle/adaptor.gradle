@@ -33,7 +33,7 @@ shadowJar {
     mergeServiceFiles()
 }
 // make sure the dependencies of adaptors are not shadowed to same prefix 'shadow'
-configureRelocationShadowJar.prefix = project.name + '.shadow'
+configureRelocationShadowJar.prefix = project.name.replaceAll('-', '_') + '.shadow'
 
 task jacocoIntegrationTestReport(type: JacocoReport) {
     description 'Generate coverage report of integration tests'
