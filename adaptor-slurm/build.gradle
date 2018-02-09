@@ -11,9 +11,3 @@ dependencies {
     fixedClientEnvironmentTestCompile group: 'junit', name: 'junit', version: '4.12'
     fixedClientEnvironmentTestCompile project(':test-utils')
 }
-
-jar {
-    manifest {
-        attributes("Xenon-Adaptors": "nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor")
-    }
-}
