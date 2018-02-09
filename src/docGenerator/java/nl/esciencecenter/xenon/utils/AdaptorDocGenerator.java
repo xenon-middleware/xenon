@@ -48,7 +48,7 @@ public class AdaptorDocGenerator {
 
         try {
             DockerClient docker = DefaultDockerClient.fromEnv().build();
-            docker.pull("busybox");
+            docker.pull("busybox:latest");
         } catch (DockerCertificateException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
