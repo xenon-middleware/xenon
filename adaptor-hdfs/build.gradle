@@ -10,7 +10,6 @@ testSets {
 integrationTest.description = 'Run the integration tests against docker containers'
 fixedClientEnvironmentTest.description = 'Run the integration tests within and against docker containers, should be run within `nlesc/xenon-fixed-client` docker container'
 
-
 dependencies {
     compileOnly project(':core')
 
@@ -28,6 +27,10 @@ dependencies {
 
 check.dependsOn integrationTest
 integrationTest.mustRunAfter test
+
+shadowJar {
+    mergeServiceFiles()
+}
 
 jar {
     manifest {

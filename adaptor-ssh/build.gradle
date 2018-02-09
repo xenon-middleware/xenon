@@ -33,6 +33,10 @@ dependencies {
 check.dependsOn integrationTest
 integrationTest.mustRunAfter test
 
+shadowJar {
+    mergeServiceFiles()
+}
+
 jar {
     manifest {
         attributes("Xenon-Adaptors": "nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor, nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor")
