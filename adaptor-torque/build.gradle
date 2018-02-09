@@ -1,13 +1,4 @@
-apply plugin: 'org.unbroken-dome.test-sets'
-apply plugin: 'com.github.johnrengelman.plugin-shadow'
-
-testSets {
-    integrationTest
-    fixedClientEnvironmentTest
-}
-
-integrationTest.description = 'Run the integration tests against docker containers'
-fixedClientEnvironmentTest.description = 'Run the integration tests within and against docker containers, should be run within `nlesc/xenon-fixed-client` docker container'
+apply from: "${rootProject.rootDir}/gradle/adaptor.gradle"
 
 dependencies {
     compileOnly project(':core')
@@ -21,48 +12,8 @@ dependencies {
     fixedClientEnvironmentTestCompile project(':test-utils')
 }
 
-check.dependsOn integrationTest
-integrationTest.mustRunAfter test
-
-shadowJar {
-    mergeServiceFiles()
-}
-
 jar {
     manifest {
         attributes("Xenon-Adaptors": "nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor")
-    }
-}
-
-task jacocoIntegrationTestReport(type: JacocoReport) {
-    description 'Generate coverage report of integration tests'
-    group 'Code coverage reporting'
-    executionData integrationTest
-    sourceSets sourceSets.main
-    reports {
-        xml.enabled = true // codecov depends on xml format report
-    }
-}
-
-task jacocoFixedClientEnvironmentTestReport(type: JacocoReport) {
-    description 'Generate coverage report of fixed client environment tests'
-    group 'Code coverage reporting'
-    executionData fixedClientEnvironmentTest
-    sourceSets sourceSets.main
-    reports {
-        xml.enabled = true // codecov depends on xml format report
-    }
-}
-
-publishing {
-    publications {
-        MyPublication(MavenPublication) {
-            groupId 'nl.esciencecenter.xenon.adaptor'
-            artifactId 'xenon-adaptor-torque'
-            version version
-            artifact shadowJar
-            artifact javadocJar
-            artifact sourcesJar
-        }
     }
 }
