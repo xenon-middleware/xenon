@@ -23,11 +23,6 @@ repositories {
     }
 }
 
-configurations {
-    pack
-    compileOnly.extendsFrom pack
-}
-
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

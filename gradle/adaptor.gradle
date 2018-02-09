@@ -14,6 +14,19 @@ fixedClientEnvironmentTest.description = 'Run the integration tests within and a
 check.dependsOn integrationTest
 integrationTest.mustRunAfter test
 
+dependencies {
+    compileOnly project(':core')
+
+    testCompile project(':core')
+
+    integrationTestCompile group: 'junit', name: 'junit', version: '4.12'
+    integrationTestCompile group: 'com.palantir.docker.compose', name: 'docker-compose-rule-junit4', version: '0.33.0'
+    integrationTestCompile project(':test-utils')
+
+    fixedClientEnvironmentTestCompile group: 'junit', name: 'junit', version: '4.12'
+    fixedClientEnvironmentTestCompile project(':test-utils')
+}
+
 shadowJar {
     // we ship adaptors always as jar with shaded deps
     classifier = null

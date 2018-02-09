@@ -1,16 +1,5 @@
 apply from: "${rootProject.rootDir}/gradle/adaptor.gradle"
 
 dependencies {
-    compileOnly project(':core')
-
     compile group: 'commons-net', name: 'commons-net', version: '3.3'
-
-    testCompile project(':core')
-
-    integrationTestCompile project(':test-utils')
-    integrationTestCompile group: 'junit', name: 'junit', version: '4.12'
-    integrationTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.32.0'
-
-    fixedClientEnvironmentTestCompile group: 'junit', name: 'junit', version: '4.12'
-    fixedClientEnvironmentTestCompile project(':test-utils')
 }

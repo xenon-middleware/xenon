@@ -1,13 +1,1 @@
 apply from: "${rootProject.rootDir}/gradle/adaptor.gradle"
-
-dependencies {
-    compileOnly project(':core')
-
-    testCompile project(':core')
-
-    integrationTestCompile group: 'junit', name: 'junit', version: '4.12'
-    integrationTestCompile project(':test-utils')
-
-    fixedClientEnvironmentTestCompile group: 'junit', name: 'junit', version: '4.12'
-    fixedClientEnvironmentTestCompile project(':test-utils')
-}
