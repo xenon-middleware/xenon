@@ -59,8 +59,6 @@ dependencies {
 
     liveTestCompile project(':test-utils')
     liveTestCompile group: 'junit', name: 'junit', version: '4.12'
-
-    docGeneratorCompile 'com.spotify:docker-client:8.11.1'
 }
 
 task wrapper(type: Wrapper) {

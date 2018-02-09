@@ -21,11 +21,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import com.spotify.docker.client.DefaultDockerClient;
-import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.exceptions.DockerCertificateException;
-import com.spotify.docker.client.exceptions.DockerException;
-
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
@@ -45,17 +40,6 @@ public class AdaptorDocGenerator {
 
         AdaptorDocGenerator generator = new AdaptorDocGenerator();
         generator.toFile(args[0]);
-
-        try {
-            DockerClient docker = DefaultDockerClient.fromEnv().build();
-            docker.pull("busybox:latest");
-        } catch (DockerCertificateException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (DockerException e) {
-            e.printStackTrace();
-        }
     }
 
     private void toFile(String filename) {
