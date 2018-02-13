@@ -16,7 +16,6 @@ integrationTest.mustRunAfter test
 
 dependencies {
     compileOnly project(':core')
-
     testCompile project(':core')
 
     integrationTestCompile group: 'junit', name: 'junit', version: '4.12'

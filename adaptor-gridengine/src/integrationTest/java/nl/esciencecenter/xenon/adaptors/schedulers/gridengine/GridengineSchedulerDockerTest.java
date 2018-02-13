@@ -15,9 +15,6 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers.gridengine;
 
-import static nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor.LOAD_STANDARD_KNOWN_HOSTS;
-import static nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor.STRICT_HOST_KEY_CHECKING;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +24,7 @@ import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
@@ -47,8 +45,8 @@ public class GridengineSchedulerDockerTest extends GridengineSchedulerTestParent
         // String location = docker.containers().container("gridengine").port(22).inFormat("ssh://$HOST:$EXTERNAL_PORT");
         PasswordCredential cred = new PasswordCredential("xenon", "javagat".toCharArray());
         Map<String, String> props = new HashMap<>();
-        props.put(STRICT_HOST_KEY_CHECKING, "false");
-        props.put(LOAD_STANDARD_KNOWN_HOSTS, "false");
+        props.put(SchedulerAdaptor.ADAPTORS_PREFIX + "ssh.loadKnownHosts", "false");
+        props.put(SchedulerAdaptor.ADAPTORS_PREFIX + "ssh.strictHostKeyChecking", "false");
         return Scheduler.create("gridengine", config.getLocation(), cred, props);
     }
 

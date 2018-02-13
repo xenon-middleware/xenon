@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
+import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
@@ -22,7 +23,16 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
 public abstract class ScriptingSchedulerAdaptor extends SchedulerAdaptor {
 
     protected ScriptingSchedulerAdaptor(String name, String description, String[] locations, XenonPropertyDescription[] properties) throws XenonException {
-        super(name, description, locations, ScriptingUtils.mergeValidProperties(properties, Scheduler.getAdaptorDescription("ssh").getSupportedProperties(),
-                Scheduler.getAdaptorDescription("local").getSupportedProperties()));
+        super(name, description, locations, properties);
+    }
+
+    @Override
+    public XenonPropertyDescription[] getSupportedProperties() {
+        try {
+            return ScriptingUtils.mergeValidProperties(super.getSupportedProperties(), Scheduler.getAdaptorDescription("ssh").getSupportedProperties(),
+                    Scheduler.getAdaptorDescription("local").getSupportedProperties());
+        } catch (UnknownAdaptorException e) {
+            return getSupportedProperties();
+        }
     }
 }

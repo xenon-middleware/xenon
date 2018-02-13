@@ -1,2 +1,8 @@
 apply from: "${rootProject.rootDir}/gradle/adaptor.gradle"
 
+dependencies {
+    project(':core')
+    runtime 'nl.esciencecenter.xenon.adaptor:adaptor-local:3.0.0'
+    runtime 'nl.esciencecenter.xenon.adaptor:adaptor-ssh:3.0.0'
+}
+
