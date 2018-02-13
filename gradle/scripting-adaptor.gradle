@@ -1,8 +1,11 @@
 apply from: "${rootProject.rootDir}/gradle/adaptor.gradle"
 
 dependencies {
-    compile 'nl.esciencecenter.xenon.adaptor:adaptor-local:3.0.0'
-    compile 'nl.esciencecenter.xenon.adaptor:adaptor-ssh:3.0.0'
+//      compile project(':adaptor-local')
+//      compile project(':adaptor-ssh')
+
+    compile project(path: ':adaptor-local', configuration: 'shadow')
+    compile project(path: ':adaptor-ssh', configuration: 'shadow')
 }
 
 
