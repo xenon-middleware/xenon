@@ -123,8 +123,14 @@ final class GridEngineUtils {
         // set shell to sh
         script.format("%s\n", "#$ -S /bin/sh");
 
+        String name = description.getName();
+
+        if (name == null || name.trim().isEmpty()) {
+            name = "xenon";
+        }
+
         // set name of job to xenon
-        script.format("%s\n", "#$ -N xenon");
+        script.format("%s\n", "#$ -N " + name);
 
         // set working directory
         if (description.getWorkingDirectory() != null) {
@@ -146,6 +152,11 @@ final class GridEngineUtils {
 
         // add maximum runtime in hour:minute:second format (converted from minutes in description)
         script.format("#$ -l h_rt=%02d:%02d:00\n", description.getMaxRuntime() / MINUTES_PER_HOUR, description.getMaxRuntime() % MINUTES_PER_HOUR);
+
+        // the max amount of memory per node.
+        if (description.getMaxMemory() > 0) {
+            script.format("#$ -l mem_free=%dM\n", description.getMaxMemory());
+        }
 
         String resources = description.getJobOptions().get(JOB_OPTION_RESOURCES);
 

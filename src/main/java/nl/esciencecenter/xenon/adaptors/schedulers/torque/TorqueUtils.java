@@ -135,8 +135,14 @@ final class TorqueUtils {
         // set shell to sh
         script.format("%s\n", "#PBS -S /bin/sh");
 
+        String name = description.getName();
+
+        if (name == null || name.trim().isEmpty()) {
+            name = "xenon";
+        }
+
         // set name of job to xenon
-        script.format("%s\n", "#PBS -N xenon");
+        script.format("#PBS -N %s\n", name);
 
         // set working directory
         if (description.getWorkingDirectory() != null) {
@@ -160,8 +166,21 @@ final class TorqueUtils {
             script.format("#PBS -l %s\n", resources);
         }
 
+        int processorsPerNode = description.getProcessesPerNode();
+
+        int threads = description.getThreadsPerProcess();
+
+        if (threads > 1) {
+            processorsPerNode = processorsPerNode * threads;
+        }
+
         // number of nodes and processes per node
-        script.format("#PBS -l nodes=%d:ppn=%d\n", description.getNodeCount(), description.getProcessesPerNode());
+        script.format("#PBS -l nodes=%d:ppn=%d\n", description.getNodeCount(), processorsPerNode);
+
+        // the max amount of memory per node.
+        if (description.getMaxMemory() > 0) {
+            script.format("#PBS -l mem=%d\n", description.getMaxMemory());
+        }
 
         // add maximum runtime in hour:minute:second format (converted from minutes in description)
         script.format("#PBS -l walltime=%02d:%02d:00\n", description.getMaxRuntime() / MINUTES_PER_HOUR, description.getMaxRuntime() % MINUTES_PER_HOUR);

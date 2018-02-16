@@ -349,6 +349,16 @@ public final class SlurmUtils {
         // number of processer per node
         arguments.add("--ntasks-per-node=" + description.getProcessesPerNode());
 
+        // number of thread per process
+        if (description.getThreadsPerProcess() > 0) {
+            arguments.add("--cpus-per-task=" + description.getThreadsPerProcess());
+        }
+
+        // the max amount of memory per node.
+        if (description.getMaxMemory() > 0) {
+            arguments.add("--mem=%dM\n" + description.getMaxMemory());
+        }
+
         // add maximum runtime
         arguments.add("--time=" + description.getMaxRuntime());
 
@@ -364,8 +374,14 @@ public final class SlurmUtils {
 
         script.format("%s\n", "#!/bin/sh");
 
+        String name = description.getName();
+
+        if (name == null || name.trim().isEmpty()) {
+            name = "xenon";
+        }
+
         // set name of job to xenon
-        script.format("%s\n", "#SBATCH --job-name xenon");
+        script.format("#SBATCH --job-name='%s'\n", name);
 
         // set working directory
         if (description.getWorkingDirectory() != null) {
@@ -383,8 +399,18 @@ public final class SlurmUtils {
         // number of processer per node
         script.format("#SBATCH --ntasks-per-node=%d\n", description.getProcessesPerNode());
 
+        // number of thread per process
+        if (description.getThreadsPerProcess() > 0) {
+            script.format("#SBATCH --cpus-per-task=%d\n", description.getThreadsPerProcess());
+        }
+
         // add maximum runtime
         script.format("#SBATCH --time=%d\n", description.getMaxRuntime());
+
+        // the max amount of memory per node.
+        if (description.getMaxMemory() > 0) {
+            script.format("#SBATCH --mem=%dM\n", description.getMaxMemory());
+        }
 
         if (description.getStdin() != null) {
             script.format("#SBATCH --input='%s'\n", description.getStdin());
