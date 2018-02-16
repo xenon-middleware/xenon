@@ -173,7 +173,7 @@ public class JobDescription {
 
     /**
      * Get the number of threads needed per process.
-     * 
+     *
      * @return the number of threads per process.
      */
     public int getThreadsPerProcess() {
