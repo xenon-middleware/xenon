@@ -40,6 +40,9 @@ public class JobDescription {
     /** The executable to run. */
     private String executable = null;
 
+    /** The name of the job. */
+    private String jobName = null;
+
     /** The arguments to pass to the executable. */
     private final List<String> arguments = new ArrayList<>(10);
 
@@ -67,6 +70,9 @@ public class JobDescription {
     /** The number of processes to start/reserve per node. */
     private int processesPerNode = 1;
 
+    /** The amount of memory needed (in MB) on each node. */
+    private int memoryInMB = -1;
+
     /** If true, only a single process is started on the first node aquired, instead of nodeCount * processesPerNode. */
     private boolean startSingleProcess = false;
 
@@ -89,6 +95,7 @@ public class JobDescription {
     public JobDescription(JobDescription original) {
         queueName = original.getQueueName();
         executable = original.getExecutable();
+        jobName = original.getJobName();
         arguments.addAll(original.getArguments());
         stdin = original.getStdin();
         stdout = original.getStdout();
@@ -98,8 +105,28 @@ public class JobDescription {
         jobOptions.putAll(original.getJobOptions());
         nodeCount = original.getNodeCount();
         processesPerNode = original.getProcessesPerNode();
+        memoryInMB = original.getMemory();
         startSingleProcess = original.isStartSingleProcess();
         maxRuntime = original.getMaxRuntime();
+    }
+
+    /**
+     * Get the job name.
+     *
+     * @return the job name.
+     */
+    public String getJobName() {
+        return jobName;
+    }
+
+    /**
+     * Set the number of nodes.
+     *
+     * @param nodeCount
+     *            the number of nodes;
+     */
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
     }
 
     /**
@@ -138,6 +165,25 @@ public class JobDescription {
      */
     public void setProcessesPerNode(int processesPerNode) {
         this.processesPerNode = processesPerNode;
+    }
+
+    /**
+     * Get the amount of memory needed for process (in MBytes).
+     *
+     * @return the amount of memory needed.
+     */
+    public int getMemory() {
+        return memoryInMB;
+    }
+
+    /**
+     * Set the amount of memory needed for process (in MBytes).
+     *
+     * @param memoryInMB
+     *            the amount of memory needed per process.
+     */
+    public void setMemory(int memoryInMB) {
+        this.memoryInMB = memoryInMB;
     }
 
     /**
