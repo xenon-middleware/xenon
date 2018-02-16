@@ -124,13 +124,13 @@ public class JobDescription {
     }
 
     /**
-     * Set the number of nodes.
+     * Set the name of the job.
      *
-     * @param nodeCount
-     *            the number of nodes;
+     * @param name
+     *            the name of the job;
      */
-    public void setName(String jobName) {
-        this.name = jobName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -186,8 +186,8 @@ public class JobDescription {
      * @param threadsPerProcess
      *            the number of threads needed per process.
      */
-    public void setThreadsPerProcess(int processesPerNode) {
-        this.threadsPerProcess = processesPerNode;
+    public void setThreadsPerProcess(int threadsPerProcess) {
+        this.threadsPerProcess = threadsPerProcess;
     }
 
     /**
