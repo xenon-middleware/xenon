@@ -119,8 +119,9 @@ public final class SlurmUtils {
         }
 
         // also checks if the job id is correct
-        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JobID", "State", "ExitCode");
+        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JobID", "JobName", "State", "ExitCode");
 
+        String name = jobInfo.get("JobName");
         String state = jobInfo.get("State");
 
         Integer exitcode = exitcodeFromString(jobInfo.get("ExitCode"));
@@ -135,7 +136,8 @@ public final class SlurmUtils {
             exception = new XenonException(ADAPTOR_NAME, "Job failed for unknown reason");
         }
 
-        JobStatus result = new JobStatusImplementation(jobIdentifier, state, exitcode, exception, isRunningState(state), isDoneOrFailedState(state), jobInfo);
+        JobStatus result = new JobStatusImplementation(jobIdentifier, name, state, exitcode, exception, isRunningState(state), isDoneOrFailedState(state),
+                jobInfo);
 
         LOGGER.debug("Got job status from sacct output {}", result);
 
@@ -149,9 +151,11 @@ public final class SlurmUtils {
         }
 
         // also checks if the job id is correct
-        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JobId", "JobState", "ExitCode", "Reason");
+        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JobId", "JobName", "JobState", "ExitCode", "Reason");
 
+        String name = jobInfo.get("JobName");
         String state = jobInfo.get("JobState");
+
         Integer exitcode = exitcodeFromString(jobInfo.get("ExitCode"));
         String reason = jobInfo.get("Reason");
 
@@ -167,7 +171,8 @@ public final class SlurmUtils {
             exception = new XenonException(ADAPTOR_NAME, "Job failed with state \"" + state + "\" for unknown reason");
         }
 
-        JobStatus result = new JobStatusImplementation(jobIdentifier, state, exitcode, exception, isRunningState(state), isDoneOrFailedState(state), jobInfo);
+        JobStatus result = new JobStatusImplementation(jobIdentifier, name, state, exitcode, exception, isRunningState(state), isDoneOrFailedState(state),
+                jobInfo);
 
         LOGGER.debug("Got job status from scontrol output {}", result);
 
@@ -184,11 +189,12 @@ public final class SlurmUtils {
         }
 
         // also checks if the job id is correct
-        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JOBID", "STATE");
+        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JOBID", "NAME", "STATE");
 
+        String name = jobInfo.get("NAME");
         String state = jobInfo.get("STATE");
 
-        return new JobStatusImplementation(jobIdentifier, state, null, null, isRunningState(state), false, jobInfo);
+        return new JobStatusImplementation(jobIdentifier, name, state, null, null, isRunningState(state), false, jobInfo);
     }
 
     protected static QueueStatus getQueueStatusFromSInfo(Map<String, Map<String, String>> info, String queueName, Scheduler scheduler) {

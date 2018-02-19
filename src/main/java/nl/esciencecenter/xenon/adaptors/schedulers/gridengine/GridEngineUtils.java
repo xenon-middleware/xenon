@@ -237,8 +237,9 @@ final class GridEngineUtils {
             return null;
         }
 
-        ScriptingUtils.verifyJobInfo(info, jobIdentifier, ADAPTOR_NAME, "jobnumber", "exit_status", "failed");
+        ScriptingUtils.verifyJobInfo(info, jobIdentifier, ADAPTOR_NAME, "jobnumber", "jobname", "exit_status", "failed");
 
+        String name = info.get("jobname");
         String exitcodeString = info.get("exit_status");
         String failedString = info.get("failed");
 
@@ -258,7 +259,7 @@ final class GridEngineUtils {
             exception = new XenonException(ADAPTOR_NAME, "Job reports error: " + failedString);
         }
 
-        return new JobStatusImplementation(jobIdentifier, state, exitcode, exception, false, true, info);
+        return new JobStatusImplementation(jobIdentifier, name, state, exitcode, exception, false, true, info);
     }
 
     protected static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, String jobIdentifier) throws XenonException {
@@ -269,8 +270,9 @@ final class GridEngineUtils {
             return null;
         }
 
-        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JB_job_number", "state", "long_state");
+        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JB_job_number", "JB_name", "state", "long_state");
 
+        String name = jobInfo.get("JB_name");
         String longState = jobInfo.get("long_state");
         String stateCode = jobInfo.get("state");
 
@@ -280,6 +282,6 @@ final class GridEngineUtils {
             done = true;
         }
 
-        return new JobStatusImplementation(jobIdentifier, longState, null, exception, "running".equals(longState), done, jobInfo);
+        return new JobStatusImplementation(jobIdentifier, name, longState, null, exception, "running".equals(longState), done, jobInfo);
     }
 }

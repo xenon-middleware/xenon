@@ -28,9 +28,16 @@ public interface JobStatus {
     /**
      * Get the job identifier of the Job for which this JobStatus was created.
      *
-     * @return the Job.
+     * @return the identifier of the Job.
      */
     String getJobIdentifier();
+
+    /**
+     * Get the name of the Job for which this JobStatus was created.
+     *
+     * @return the name of the Job.
+     */
+    String getName();
 
     /**
      * Get the state of the Job.
@@ -60,14 +67,13 @@ public interface JobStatus {
      * Throws the exception produced by the Job or while retrieving the status, if it exists. Otherwise continue.
      *
      * @throws JobCanceledException
-     *          if the job was cancelled
+     *             if the job was cancelled
      * @throws NoSuchJobException
-     *          if the job of which the status was requested does not exist
+     *             if the job of which the status was requested does not exist
      * @throws XenonException
-     *          if an I/O error occurred.
+     *             if an I/O error occurred.
      */
     void maybeThrowException() throws XenonException;
-
 
     /**
      * Is the Job running.

@@ -96,8 +96,9 @@ final class TorqueUtils {
         // System.out.println(info.toString());
         // System.out.println("--------------------------------");
 
-        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "Job_Id", "job_state");
+        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "Job_Id", "Job_Name", "job_state");
 
+        String name = jobInfo.get("Job_Name");
         String stateCode = jobInfo.get("job_state");
 
         XenonException exception = null;
@@ -114,7 +115,7 @@ final class TorqueUtils {
             exitStatus = Integer.valueOf(exitStatusStr);
         }
 
-        return new JobStatusImplementation(jobIdentifier, stateCode, exitStatus, exception, stateCode.equals("R"), done, jobInfo);
+        return new JobStatusImplementation(jobIdentifier, name, stateCode, exitStatus, exception, stateCode.equals("R"), done, jobInfo);
     }
 
     public static void generateScriptContent(JobDescription description, Formatter script) {

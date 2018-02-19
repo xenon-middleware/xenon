@@ -349,12 +349,12 @@ public class GridEngineScheduler extends ScriptingScheduler {
         // qstat/qacct output completely
         if (status == null && jobWasDeleted(jobIdentifier)) {
             XenonException exception = new JobCanceledException(ADAPTOR_NAME, "Job " + jobIdentifier + " deleted by user while still pending");
-            status = new JobStatusImplementation(jobIdentifier, "killed", null, exception, false, true, null);
+            status = new JobStatusImplementation(jobIdentifier, null, "killed", null, exception, false, true, null);
         }
 
         // this job is neither in qstat nor qacct output. we assume it is "in between" for a certain grace time.
         if (status == null && haveRecentlySeen(jobIdentifier)) {
-            status = new JobStatusImplementation(jobIdentifier, "unknown", null, null, false, false, new HashMap<String, String>());
+            status = new JobStatusImplementation(jobIdentifier, null, "unknown", null, null, false, false, new HashMap<String, String>());
         }
 
         return status;
@@ -392,7 +392,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
                 // this job really does not exist. set it to an error state.
                 if (result[i] == null) {
                     XenonException exception = new NoSuchJobException(ADAPTOR_NAME, "Job " + jobs[i] + " not found on server");
-                    result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);
+                    result[i] = new JobStatusImplementation(jobs[i], null, null, null, exception, false, false, null);
                 }
             }
         }
