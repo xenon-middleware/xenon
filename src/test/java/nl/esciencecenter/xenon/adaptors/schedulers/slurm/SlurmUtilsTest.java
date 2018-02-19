@@ -713,6 +713,24 @@ public class SlurmUtilsTest {
     }
 
     @Test
+    public void test_generateInterActiveCPUsPerTask() {
+        Path entry = new Path("/entry");
+        UUID tag = new UUID(0, 42);
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("exec");
+        description.setArguments(new String[] { "a", "b", "c" });
+        description.setThreadsPerProcess(4);
+
+        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--nodes=1", "--ntasks-per-node=1", "--cpus-per-task=4", "--time=15",
+                "exec", "a", "b", "c" };
+
+        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag);
+
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
     public void test_generateInterActiveArgumentsWithRelativeDirAndQueue() {
         Path entry = new Path("/entry");
         UUID tag = new UUID(0, 42);
