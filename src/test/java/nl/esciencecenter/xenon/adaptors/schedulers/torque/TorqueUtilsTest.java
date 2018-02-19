@@ -295,6 +295,7 @@ public class TorqueUtilsTest {
         String jobID = "555.localhost";
         Map<String, String> jobInfo = new HashMap<>(3);
         jobInfo.put("Job_Id", jobID);
+        jobInfo.put("Job_Name", "test");
         jobInfo.put("job_state", "Q");
 
         Map<String, Map<String, String>> input = new HashMap<>(2);
@@ -315,6 +316,7 @@ public class TorqueUtilsTest {
         String jobID = "555.localhost";
         Map<String, String> jobInfo = new HashMap<>(3);
         jobInfo.put("Job_Id", jobID);
+        jobInfo.put("Job_Name", "test");
         jobInfo.put("job_state", "R");
 
         Map<String, Map<String, String>> input = new HashMap<>(2);
@@ -335,6 +337,7 @@ public class TorqueUtilsTest {
         String jobID = "555.localhost";
         Map<String, String> jobInfo = new HashMap<>(3);
         jobInfo.put("Job_Id", jobID);
+        jobInfo.put("Job_Name", "test");
         jobInfo.put("job_state", "E");
 
         Map<String, Map<String, String>> input = new HashMap<>(2);

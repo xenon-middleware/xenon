@@ -94,6 +94,7 @@ public class SlurmUtilsTest {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobID", jobID);
+        jobInfo.put("JobName", "test");
         jobInfo.put("State", "COMPLETED");
         jobInfo.put("ExitCode", "5:0");
 
@@ -102,6 +103,7 @@ public class SlurmUtilsTest {
         JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("COMPLETED", result.getState());
         assertEquals(new Integer(5), result.getExitCode());
         assertFalse(result.hasException());
@@ -115,6 +117,7 @@ public class SlurmUtilsTest {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobID", jobID);
+        jobInfo.put("JobName", "test");
         jobInfo.put("State", "RUNNING");
         jobInfo.put("ExitCode", "0:0");
 
@@ -123,6 +126,7 @@ public class SlurmUtilsTest {
         JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("RUNNING", result.getState());
         assertEquals(new Integer(0), result.getExitCode());
         assertFalse(result.hasException());
@@ -136,6 +140,7 @@ public class SlurmUtilsTest {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobID", jobID);
+        jobInfo.put("JobName", "test");
         jobInfo.put("State", "CANCELLED");
         jobInfo.put("ExitCode", "0:0");
 
@@ -144,6 +149,7 @@ public class SlurmUtilsTest {
         JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("CANCELLED", result.getState());
         assertEquals(new Integer(0), result.getExitCode());
         assertTrue(result.hasException());
@@ -158,6 +164,7 @@ public class SlurmUtilsTest {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobID", jobID);
+        jobInfo.put("JobName", "test");
         jobInfo.put("State", "FAILED");
         jobInfo.put("ExitCode", "11:0");
 
@@ -166,6 +173,7 @@ public class SlurmUtilsTest {
         JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("FAILED", result.getState());
         assertEquals(new Integer(11), result.getExitCode());
         assertFalse(result.hasException());
@@ -179,6 +187,7 @@ public class SlurmUtilsTest {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobID", jobID);
+        jobInfo.put("JobName", "test");
         jobInfo.put("State", "FAILED");
         jobInfo.put("ExitCode", "0:0");
 
@@ -187,6 +196,7 @@ public class SlurmUtilsTest {
         JobStatus result = SlurmUtils.getJobStatusFromSacctInfo(input, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("FAILED", result.getState());
         assertEquals(new Integer(0), result.getExitCode());
         assertTrue(result.hasException());
@@ -223,6 +233,7 @@ public class SlurmUtilsTest {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobId", jobID);
+        jobInfo.put("JobName", "test");
         jobInfo.put("JobState", "COMPLETED");
         jobInfo.put("ExitCode", "5:0");
         jobInfo.put("Reason", "None");
@@ -230,6 +241,7 @@ public class SlurmUtilsTest {
         JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("COMPLETED", result.getState());
         assertEquals(new Integer(5), result.getExitCode());
         assertFalse(result.hasException());
@@ -243,6 +255,7 @@ public class SlurmUtilsTest {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobId", jobID);
+        jobInfo.put("JobName", "test");
         jobInfo.put("JobState", "RUNNING");
         jobInfo.put("ExitCode", "0:0");
         jobInfo.put("Reason", "None");
@@ -250,6 +263,7 @@ public class SlurmUtilsTest {
         JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("RUNNING", result.getState());
         assertEquals(new Integer(0), result.getExitCode());
         assertFalse(result.hasException());
@@ -263,6 +277,7 @@ public class SlurmUtilsTest {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobId", jobID);
+        jobInfo.put("JobName", "test");
         jobInfo.put("JobState", "CANCELLED");
         jobInfo.put("ExitCode", "0:0");
         jobInfo.put("Reason", "None");
@@ -270,6 +285,7 @@ public class SlurmUtilsTest {
         JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("CANCELLED", result.getState());
         assertEquals(new Integer(0), result.getExitCode());
         assertTrue(result.hasException());
@@ -284,6 +300,7 @@ public class SlurmUtilsTest {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobId", jobID);
+        jobInfo.put("JobName", "test");
         jobInfo.put("JobState", "FAILED");
         jobInfo.put("ExitCode", "11:0");
         jobInfo.put("Reason", "NonZeroExitCode");
@@ -291,6 +308,7 @@ public class SlurmUtilsTest {
         JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("FAILED", result.getState());
         assertEquals(new Integer(11), result.getExitCode());
         assertFalse(result.hasException());
@@ -304,6 +322,7 @@ public class SlurmUtilsTest {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobId", jobID);
+        jobInfo.put("JobName", "test");
         jobInfo.put("JobState", "FAILED");
         jobInfo.put("ExitCode", "4:0");
         jobInfo.put("Reason", "SomethingWentWrongNoIdea");
@@ -311,6 +330,7 @@ public class SlurmUtilsTest {
         JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("FAILED", result.getState());
         assertEquals(new Integer(4), result.getExitCode());
         assertTrue(result.hasException());
@@ -325,6 +345,7 @@ public class SlurmUtilsTest {
     public void test03f_getJobStatusFromScontrolInfo_FailedJobWithNoReason_JobStatusWithException() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
+        jobInfo.put("JobName", "test");
         jobInfo.put("JobId", jobID);
         jobInfo.put("JobState", "FAILED");
         jobInfo.put("ExitCode", "4:0");
@@ -333,6 +354,7 @@ public class SlurmUtilsTest {
         JobStatus result = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("FAILED", result.getState());
         assertEquals(new Integer(4), result.getExitCode());
         assertTrue(result.hasException());
@@ -366,6 +388,7 @@ public class SlurmUtilsTest {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JOBID", jobID);
+        jobInfo.put("NAME", "test");
         jobInfo.put("STATE", "PENDING");
 
         Map<String, Map<String, String>> input = new HashMap<>();
@@ -373,6 +396,7 @@ public class SlurmUtilsTest {
         JobStatus result = SlurmUtils.getJobStatusFromSqueueInfo(input, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("PENDING", result.getState());
         assertNull(result.getExitCode());
         assertFalse(result.hasException());
@@ -386,6 +410,7 @@ public class SlurmUtilsTest {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JOBID", jobID);
+        jobInfo.put("NAME", "test");
         jobInfo.put("STATE", "RUNNING");
 
         Map<String, Map<String, String>> input = new HashMap<>();
@@ -393,6 +418,7 @@ public class SlurmUtilsTest {
         JobStatus result = SlurmUtils.getJobStatusFromSqueueInfo(input, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("RUNNING", result.getState());
         assertNull(result.getExitCode());
         assertFalse(result.hasException());
