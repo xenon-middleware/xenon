@@ -86,6 +86,18 @@ public class TorqueUtilsTest {
     }
 
     @Test
+    public void test_generate_threadsPerProcess() throws XenonException {
+        JobDescription description = new JobDescription();
+        description.setThreadsPerProcess(4);
+
+        String result = TorqueUtils.generate(description, null);
+
+        String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -l nodes=1:ppn=4\n" + "#PBS -l walltime=00:15:00\n" + "\nnull\n";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
     /**
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
      *

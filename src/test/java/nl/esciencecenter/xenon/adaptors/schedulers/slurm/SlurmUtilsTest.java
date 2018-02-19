@@ -836,6 +836,24 @@ public class SlurmUtilsTest {
     }
 
     @Test
+    public void test_generateWithThreads() {
+        Path entry = new Path("/entry");
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("exec");
+        description.setArguments(new String[] { "a", "b", "c" });
+        description.setThreadsPerProcess(4);
+
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n"
+                + "#SBATCH --cpus-per-task=4\n" + "#SBATCH --time=15\n" + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n"
+                + "srun exec 'a' 'b' 'c'\n";
+
+        String result = SlurmUtils.generate(description, entry);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
     public void test_generateComplex() {
         Path entry = new Path("/entry");
 
