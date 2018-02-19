@@ -695,6 +695,24 @@ public class SlurmUtilsTest {
     }
 
     @Test
+    public void test_generateInterActiveMemory() {
+        Path entry = new Path("/entry");
+        UUID tag = new UUID(0, 42);
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("exec");
+        description.setArguments(new String[] { "a", "b", "c" });
+        description.setMaxMemory(1024);
+
+        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--nodes=1", "--ntasks-per-node=1", "--mem=1024M", "--time=15", "exec",
+                "a", "b", "c" };
+
+        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag);
+
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
     public void test_generateInterActiveArgumentsWithRelativeDirAndQueue() {
         Path entry = new Path("/entry");
         UUID tag = new UUID(0, 42);
@@ -742,6 +760,57 @@ public class SlurmUtilsTest {
 
         String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n"
                 + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "srun exec 'a' 'b' 'c'\n";
+
+        String result = SlurmUtils.generate(description, entry);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_generateWithName() {
+        Path entry = new Path("/entry");
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("exec");
+        description.setArguments(new String[] { "a", "b", "c" });
+        description.setName("test");
+
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='test'\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n"
+                + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "srun exec 'a' 'b' 'c'\n";
+
+        String result = SlurmUtils.generate(description, entry);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_generateWithEmptyName() {
+        Path entry = new Path("/entry");
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("exec");
+        description.setArguments(new String[] { "a", "b", "c" });
+        description.setName("");
+
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n"
+                + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "srun exec 'a' 'b' 'c'\n";
+
+        String result = SlurmUtils.generate(description, entry);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_generateWithMemory() {
+        Path entry = new Path("/entry");
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("exec");
+        description.setArguments(new String[] { "a", "b", "c" });
+        description.setMaxMemory(1024);
+
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n"
+                + "#SBATCH --mem=1024M\n" + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "srun exec 'a' 'b' 'c'\n";
 
         String result = SlurmUtils.generate(description, entry);
 

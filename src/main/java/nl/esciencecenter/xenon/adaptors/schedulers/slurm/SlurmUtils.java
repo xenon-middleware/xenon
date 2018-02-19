@@ -356,7 +356,7 @@ public final class SlurmUtils {
 
         // the max amount of memory per node.
         if (description.getMaxMemory() > 0) {
-            arguments.add("--mem=%dM\n" + description.getMaxMemory());
+            arguments.add("--mem=" + description.getMaxMemory() + "M");
         }
 
         // add maximum runtime

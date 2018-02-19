@@ -49,6 +49,43 @@ public class TorqueUtilsTest {
     }
 
     @Test
+    public void test_generate_Name() throws XenonException {
+        JobDescription description = new JobDescription();
+        description.setName("test");
+
+        String result = TorqueUtils.generate(description, null);
+
+        String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N test\n" + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l walltime=00:15:00\n" + "\nnull\n";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_generate_EmptyName() throws XenonException {
+        JobDescription description = new JobDescription();
+        description.setName("");
+
+        String result = TorqueUtils.generate(description, null);
+
+        String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l walltime=00:15:00\n" + "\nnull\n";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_generate_Memory() throws XenonException {
+        JobDescription description = new JobDescription();
+        description.setMaxMemory(1024);
+
+        String result = TorqueUtils.generate(description, null);
+
+        String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l mem=1024\n"
+                + "#PBS -l walltime=00:15:00\n" + "\nnull\n";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
     /**
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
      *

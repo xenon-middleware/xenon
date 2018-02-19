@@ -51,6 +51,48 @@ public class GridEngineUtilsTest {
     }
 
     @Test
+    public void test_generate_name() throws XenonException {
+        JobDescription description = new JobDescription();
+
+        description.setName("test");
+
+        String result = GridEngineUtils.generate(description, null, null);
+
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N test\n" + "#$ -l h_rt=00:15:00\n" + "#$ -o /dev/null\n" + "#$ -e /dev/null\n" + "\n"
+                + "null\n";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_generate_name_empty() throws XenonException {
+        JobDescription description = new JobDescription();
+
+        description.setName("");
+
+        String result = GridEngineUtils.generate(description, null, null);
+
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -o /dev/null\n" + "#$ -e /dev/null\n" + "\n"
+                + "null\n";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_generate_memory() throws XenonException {
+        JobDescription description = new JobDescription();
+
+        description.setMaxMemory(1024);
+
+        String result = GridEngineUtils.generate(description, null, null);
+
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -l mem_free=1024M\n" + "#$ -o /dev/null\n"
+                + "#$ -e /dev/null\n" + "\n" + "null\n";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
     /**
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
      *
