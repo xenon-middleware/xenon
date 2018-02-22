@@ -367,8 +367,8 @@ public class GridEngineUtilsTest {
         GridEngineUtils.verifyJobDescription(description);
     }
 
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test01l_verifyJobDescription_StringProcessOption_ExceptionThrown() throws Exception {
+    @Test()
+    public void test01l_verifyJobDescription_StringProcessOption_NoException() throws Exception {
         JobDescription description = new JobDescription();
 
         description.setExecutable("/bin/nothing");
