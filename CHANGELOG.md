@@ -1,7 +1,13 @@
-Xenon 2.3.0
+Xenon 2.4.0
 -----------
 
-This is release 2.3.0 of Xenon. 
+This is release 2.4.0 of Xenon.
+
+Notable changes compared to v2.3.0:
+-----------------------------------
+
+- added name to job description (#609)
+- added max memory to job description (#562)
 
 Notable changes compared to v2.2.0:
 -----------------------------------
