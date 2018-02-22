@@ -202,10 +202,6 @@ final class GridEngineUtils {
     protected static void verifyJobDescription(JobDescription description) throws XenonException {
         ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
 
-        if (description.isStartSingleProcess()) {
-            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "StartSingleProcess option not supported");
-        }
-
         // check for option that overrides job script completely.
         if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
             // no remaining settings checked.
