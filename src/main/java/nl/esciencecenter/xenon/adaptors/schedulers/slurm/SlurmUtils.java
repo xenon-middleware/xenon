@@ -119,8 +119,9 @@ public final class SlurmUtils {
         }
 
         // also checks if the job id is correct
-        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JobID", "State", "ExitCode");
+        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JobID", "JobName", "State", "ExitCode");
 
+        String name = jobInfo.get("JobName");
         String state = jobInfo.get("State");
 
         Integer exitcode = exitcodeFromString(jobInfo.get("ExitCode"));
@@ -135,7 +136,8 @@ public final class SlurmUtils {
             exception = new XenonException(ADAPTOR_NAME, "Job failed for unknown reason");
         }
 
-        JobStatus result = new JobStatusImplementation(jobIdentifier, state, exitcode, exception, isRunningState(state), isDoneOrFailedState(state), jobInfo);
+        JobStatus result = new JobStatusImplementation(jobIdentifier, name, state, exitcode, exception, isRunningState(state), isDoneOrFailedState(state),
+                jobInfo);
 
         LOGGER.debug("Got job status from sacct output {}", result);
 
@@ -149,9 +151,11 @@ public final class SlurmUtils {
         }
 
         // also checks if the job id is correct
-        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JobId", "JobState", "ExitCode", "Reason");
+        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JobId", "JobName", "JobState", "ExitCode", "Reason");
 
+        String name = jobInfo.get("JobName");
         String state = jobInfo.get("JobState");
+
         Integer exitcode = exitcodeFromString(jobInfo.get("ExitCode"));
         String reason = jobInfo.get("Reason");
 
@@ -167,7 +171,8 @@ public final class SlurmUtils {
             exception = new XenonException(ADAPTOR_NAME, "Job failed with state \"" + state + "\" for unknown reason");
         }
 
-        JobStatus result = new JobStatusImplementation(jobIdentifier, state, exitcode, exception, isRunningState(state), isDoneOrFailedState(state), jobInfo);
+        JobStatus result = new JobStatusImplementation(jobIdentifier, name, state, exitcode, exception, isRunningState(state), isDoneOrFailedState(state),
+                jobInfo);
 
         LOGGER.debug("Got job status from scontrol output {}", result);
 
@@ -184,11 +189,12 @@ public final class SlurmUtils {
         }
 
         // also checks if the job id is correct
-        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JOBID", "STATE");
+        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JOBID", "NAME", "STATE");
 
+        String name = jobInfo.get("NAME");
         String state = jobInfo.get("STATE");
 
-        return new JobStatusImplementation(jobIdentifier, state, null, null, isRunningState(state), false, jobInfo);
+        return new JobStatusImplementation(jobIdentifier, name, state, null, null, isRunningState(state), false, jobInfo);
     }
 
     protected static QueueStatus getQueueStatusFromSInfo(Map<String, Map<String, String>> info, String queueName, Scheduler scheduler) {
@@ -349,6 +355,16 @@ public final class SlurmUtils {
         // number of processer per node
         arguments.add("--ntasks-per-node=" + description.getProcessesPerNode());
 
+        // number of thread per process
+        if (description.getThreadsPerProcess() > 0) {
+            arguments.add("--cpus-per-task=" + description.getThreadsPerProcess());
+        }
+
+        // the max amount of memory per node.
+        if (description.getMaxMemory() > 0) {
+            arguments.add("--mem=" + description.getMaxMemory() + "M");
+        }
+
         // add maximum runtime
         arguments.add("--time=" + description.getMaxRuntime());
 
@@ -364,8 +380,14 @@ public final class SlurmUtils {
 
         script.format("%s\n", "#!/bin/sh");
 
+        String name = description.getName();
+
+        if (name == null || name.trim().isEmpty()) {
+            name = "xenon";
+        }
+
         // set name of job to xenon
-        script.format("%s\n", "#SBATCH --job-name xenon");
+        script.format("#SBATCH --job-name='%s'\n", name);
 
         // set working directory
         if (description.getWorkingDirectory() != null) {
@@ -383,8 +405,18 @@ public final class SlurmUtils {
         // number of processer per node
         script.format("#SBATCH --ntasks-per-node=%d\n", description.getProcessesPerNode());
 
+        // number of thread per process
+        if (description.getThreadsPerProcess() > 0) {
+            script.format("#SBATCH --cpus-per-task=%d\n", description.getThreadsPerProcess());
+        }
+
         // add maximum runtime
         script.format("#SBATCH --time=%d\n", description.getMaxRuntime());
+
+        // the max amount of memory per node.
+        if (description.getMaxMemory() > 0) {
+            script.format("#SBATCH --mem=%dM\n", description.getMaxMemory());
+        }
 
         if (description.getStdin() != null) {
             script.format("#SBATCH --input='%s'\n", description.getStdin());

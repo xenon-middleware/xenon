@@ -123,8 +123,14 @@ final class GridEngineUtils {
         // set shell to sh
         script.format("%s\n", "#$ -S /bin/sh");
 
+        String name = description.getName();
+
+        if (name == null || name.trim().isEmpty()) {
+            name = "xenon";
+        }
+
         // set name of job to xenon
-        script.format("%s\n", "#$ -N xenon");
+        script.format("%s\n", "#$ -N " + name);
 
         // set working directory
         if (description.getWorkingDirectory() != null) {
@@ -146,6 +152,11 @@ final class GridEngineUtils {
 
         // add maximum runtime in hour:minute:second format (converted from minutes in description)
         script.format("#$ -l h_rt=%02d:%02d:00\n", description.getMaxRuntime() / MINUTES_PER_HOUR, description.getMaxRuntime() % MINUTES_PER_HOUR);
+
+        // the max amount of memory per node.
+        if (description.getMaxMemory() > 0) {
+            script.format("#$ -l mem_free=%dM\n", description.getMaxMemory());
+        }
 
         String resources = description.getJobOptions().get(JOB_OPTION_RESOURCES);
 
@@ -191,10 +202,6 @@ final class GridEngineUtils {
     protected static void verifyJobDescription(JobDescription description) throws XenonException {
         ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
 
-        if (description.isStartSingleProcess()) {
-            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "StartSingleProcess option not supported");
-        }
-
         // check for option that overrides job script completely.
         if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
             // no remaining settings checked.
@@ -226,8 +233,9 @@ final class GridEngineUtils {
             return null;
         }
 
-        ScriptingUtils.verifyJobInfo(info, jobIdentifier, ADAPTOR_NAME, "jobnumber", "exit_status", "failed");
+        ScriptingUtils.verifyJobInfo(info, jobIdentifier, ADAPTOR_NAME, "jobnumber", "jobname", "exit_status", "failed");
 
+        String name = info.get("jobname");
         String exitcodeString = info.get("exit_status");
         String failedString = info.get("failed");
 
@@ -247,7 +255,7 @@ final class GridEngineUtils {
             exception = new XenonException(ADAPTOR_NAME, "Job reports error: " + failedString);
         }
 
-        return new JobStatusImplementation(jobIdentifier, state, exitcode, exception, false, true, info);
+        return new JobStatusImplementation(jobIdentifier, name, state, exitcode, exception, false, true, info);
     }
 
     protected static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, String jobIdentifier) throws XenonException {
@@ -258,8 +266,9 @@ final class GridEngineUtils {
             return null;
         }
 
-        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JB_job_number", "state", "long_state");
+        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JB_job_number", "JB_name", "state", "long_state");
 
+        String name = jobInfo.get("JB_name");
         String longState = jobInfo.get("long_state");
         String stateCode = jobInfo.get("state");
 
@@ -269,6 +278,6 @@ final class GridEngineUtils {
             done = true;
         }
 
-        return new JobStatusImplementation(jobIdentifier, longState, null, exception, "running".equals(longState), done, jobInfo);
+        return new JobStatusImplementation(jobIdentifier, name, longState, null, exception, "running".equals(longState), done, jobInfo);
     }
 }

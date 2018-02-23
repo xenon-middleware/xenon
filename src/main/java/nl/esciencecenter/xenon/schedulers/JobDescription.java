@@ -40,6 +40,9 @@ public class JobDescription {
     /** The executable to run. */
     private String executable = null;
 
+    /** The name of the job. */
+    private String name = null;
+
     /** The arguments to pass to the executable. */
     private final List<String> arguments = new ArrayList<>(10);
 
@@ -67,6 +70,12 @@ public class JobDescription {
     /** The number of processes to start/reserve per node. */
     private int processesPerNode = 1;
 
+    /** The number of threads the executable will use per processes */
+    private int threadsPerProcess = -1;
+
+    /** The maximum amount of memory needed (in MB) on each node/process. */
+    private int maxMemory = -1;
+
     /** If true, only a single process is started on the first node aquired, instead of nodeCount * processesPerNode. */
     private boolean startSingleProcess = false;
 
@@ -89,6 +98,7 @@ public class JobDescription {
     public JobDescription(JobDescription original) {
         queueName = original.getQueueName();
         executable = original.getExecutable();
+        name = original.getName();
         arguments.addAll(original.getArguments());
         stdin = original.getStdin();
         stdout = original.getStdout();
@@ -98,8 +108,29 @@ public class JobDescription {
         jobOptions.putAll(original.getJobOptions());
         nodeCount = original.getNodeCount();
         processesPerNode = original.getProcessesPerNode();
+        threadsPerProcess = original.getThreadsPerProcess();
+        maxMemory = original.getMaxMemory();
         startSingleProcess = original.isStartSingleProcess();
         maxRuntime = original.getMaxRuntime();
+    }
+
+    /**
+     * Get the job name.
+     *
+     * @return the job name.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Set the name of the job.
+     *
+     * @param name
+     *            the name of the job;
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -138,6 +169,44 @@ public class JobDescription {
      */
     public void setProcessesPerNode(int processesPerNode) {
         this.processesPerNode = processesPerNode;
+    }
+
+    /**
+     * Get the number of threads needed per process.
+     *
+     * @return the number of threads per process.
+     */
+    public int getThreadsPerProcess() {
+        return threadsPerProcess;
+    }
+
+    /**
+     * Set the number of threads needed per process.
+     *
+     * @param threadsPerProcess
+     *            the number of threads needed per process.
+     */
+    public void setThreadsPerProcess(int threadsPerProcess) {
+        this.threadsPerProcess = threadsPerProcess;
+    }
+
+    /**
+     * Get the amount of memory needed for process (in MBytes).
+     *
+     * @return the amount of memory needed.
+     */
+    public int getMaxMemory() {
+        return maxMemory;
+    }
+
+    /**
+     * Set the amount of memory needed for process (in MBytes).
+     *
+     * @param maxMemoryInMB
+     *            the amount of memory needed per node/process.
+     */
+    public void setMaxMemory(int maxMemoryInMB) {
+        this.maxMemory = maxMemoryInMB;
     }
 
     /**

@@ -30,6 +30,7 @@ import nl.esciencecenter.xenon.schedulers.JobStatus;
 public class JobStatusImplementation implements JobStatus {
 
     private final String jobIdentifier;
+    private final String name;
     private final String state;
     private final Integer exitCode;
     private final XenonException exception;
@@ -41,21 +42,23 @@ public class JobStatusImplementation implements JobStatus {
      * Create a JobStatus.
      *
      * @param jobIdentifier
-     * 		the identifier of the job for which this status was created.
+     *            the identifier of the job for which this status was created.
+     * @param name
+     *            the name of the job for which this status was created.
      * @param state
-     * 		the state of the <code>Job</code> at the time this status was created.
+     *            the state of the <code>Job</code> at the time this status was created.
      * @param exitCode
-     * 		the exit code of the <code>Job</code> (if the jobs has finished).
+     *            the exit code of the <code>Job</code> (if the jobs has finished).
      * @param exception
-     * 		the exception produced when running <code>Job</code> (if the jobs has failed).
+     *            the exception produced when running <code>Job</code> (if the jobs has failed).
      * @param running
-     * 		is the <code>Job</code> running ?
+     *            is the <code>Job</code> running ?
      * @param done
-     * 		is the <code>Job</code> finished ?
+     *            is the <code>Job</code> finished ?
      * @param schedulerSpecificInformation
-     * 		a map of scheduler implementation specific information on the job.
+     *            a map of scheduler implementation specific information on the job.
      */
-    public JobStatusImplementation(String jobIdentifier, String state, Integer exitCode, XenonException exception, boolean running, boolean done,
+    public JobStatusImplementation(String jobIdentifier, String name, String state, Integer exitCode, XenonException exception, boolean running, boolean done,
             Map<String, String> schedulerSpecificInformation) {
 
         if (jobIdentifier == null) {
@@ -63,6 +66,7 @@ public class JobStatusImplementation implements JobStatus {
         }
 
         this.jobIdentifier = jobIdentifier;
+        this.name = name;
         this.state = state;
         this.exitCode = exitCode;
         this.exception = exception;
@@ -78,6 +82,15 @@ public class JobStatusImplementation implements JobStatus {
      */
     public String getJobIdentifier() {
         return jobIdentifier;
+    }
+
+    /**
+     * Get the name of the Job for which this JobStatus was created.
+     *
+     * @return the Job.
+     */
+    public String getName() {
+        return name;
     }
 
     /**
@@ -99,8 +112,7 @@ public class JobStatusImplementation implements JobStatus {
     }
 
     /**
-     * Get the exception produced by the Job or while retrieving the status. If a job was canceled, will return a
-     * JobCanceledException.
+     * Get the exception produced by the Job or while retrieving the status. If a job was canceled, will return a JobCanceledException.
      *
      * @return the exception.
      */
@@ -153,23 +165,20 @@ public class JobStatusImplementation implements JobStatus {
 
     @Override
     public String toString() {
-        return "JobStatus [jobIdentifier=" + jobIdentifier + ", state=" + state + ", exitCode=" + exitCode + ", exception=" + exception
-                + ", running=" + running + ", done=" + done + ", schedulerSpecificInformation=" + schedulerSpecificInformation
-                + "]";
+        return "JobStatus [jobIdentifier=" + jobIdentifier + ", state=" + state + ", exitCode=" + exitCode + ", exception=" + exception + ", running=" + running
+                + ", done=" + done + ", schedulerSpecificInformation=" + schedulerSpecificInformation + "]";
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         JobStatusImplementation that = (JobStatusImplementation) o;
-        return running == that.running &&
-                done == that.done &&
-                Objects.equals(jobIdentifier, that.jobIdentifier) &&
-                Objects.equals(state, that.state) &&
-                Objects.equals(exitCode, that.exitCode) &&
-                Objects.equals(exception, that.exception) &&
-                Objects.equals(schedulerSpecificInformation, that.schedulerSpecificInformation);
+        return running == that.running && done == that.done && Objects.equals(jobIdentifier, that.jobIdentifier) && Objects.equals(state, that.state)
+                && Objects.equals(exitCode, that.exitCode) && Objects.equals(exception, that.exception)
+                && Objects.equals(schedulerSpecificInformation, that.schedulerSpecificInformation);
     }
 
     @Override

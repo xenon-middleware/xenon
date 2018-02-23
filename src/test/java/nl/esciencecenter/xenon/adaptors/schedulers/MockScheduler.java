@@ -111,7 +111,7 @@ public class MockScheduler extends Scheduler {
     public JobStatus getJobStatus(String jobIdentifier) throws XenonException {
 
         if (jobs.contains(jobIdentifier)) {
-            return new JobStatusImplementation(jobIdentifier, "RUNNING", -1, null, true, false, null);
+            return new JobStatusImplementation(jobIdentifier, "name", "RUNNING", -1, null, true, false, null);
         }
 
         throw new NoSuchJobException("TEST", "No such job " + jobIdentifier);
@@ -122,7 +122,7 @@ public class MockScheduler extends Scheduler {
 
         if (jobs.contains(jobIdentifier)) {
             jobs.remove(jobIdentifier);
-            return new JobStatusImplementation(jobIdentifier, "CANCELLED", 1, new JobCanceledException("TEST", "Cancelled"), false, true, null);
+            return new JobStatusImplementation(jobIdentifier, "name", "CANCELLED", 1, new JobCanceledException("TEST", "Cancelled"), false, true, null);
         }
 
         throw new NoSuchJobException("TEST", "No such job " + jobIdentifier);
@@ -135,9 +135,9 @@ public class MockScheduler extends Scheduler {
             jobs.remove(jobIdentifier);
 
             if (shouldFail) {
-                return new JobStatusImplementation(jobIdentifier, "ERROR", exitCode, new XenonException(getAdaptorName(), "FAIL"), false, true, null);
+                return new JobStatusImplementation(jobIdentifier, "name", "ERROR", exitCode, new XenonException(getAdaptorName(), "FAIL"), false, true, null);
             } else {
-                return new JobStatusImplementation(jobIdentifier, "DONE", exitCode, null, false, true, null);
+                return new JobStatusImplementation(jobIdentifier, "name", "DONE", exitCode, null, false, true, null);
             }
         }
 
@@ -148,7 +148,7 @@ public class MockScheduler extends Scheduler {
     public JobStatus waitUntilRunning(String jobIdentifier, long timeout) throws XenonException {
 
         if (jobs.contains(jobIdentifier)) {
-            return new JobStatusImplementation(jobIdentifier, "RUNNING", -1, null, true, false, null);
+            return new JobStatusImplementation(jobIdentifier, "name", "RUNNING", -1, null, true, false, null);
         }
 
         throw new NoSuchJobException("TEST", "No such job " + jobIdentifier);

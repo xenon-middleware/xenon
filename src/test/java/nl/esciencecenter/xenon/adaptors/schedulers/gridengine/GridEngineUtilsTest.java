@@ -51,6 +51,48 @@ public class GridEngineUtilsTest {
     }
 
     @Test
+    public void test_generate_name() throws XenonException {
+        JobDescription description = new JobDescription();
+
+        description.setName("test");
+
+        String result = GridEngineUtils.generate(description, null, null);
+
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N test\n" + "#$ -l h_rt=00:15:00\n" + "#$ -o /dev/null\n" + "#$ -e /dev/null\n" + "\n"
+                + "null\n";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_generate_name_empty() throws XenonException {
+        JobDescription description = new JobDescription();
+
+        description.setName("");
+
+        String result = GridEngineUtils.generate(description, null, null);
+
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -o /dev/null\n" + "#$ -e /dev/null\n" + "\n"
+                + "null\n";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_generate_memory() throws XenonException {
+        JobDescription description = new JobDescription();
+
+        description.setMaxMemory(1024);
+
+        String result = GridEngineUtils.generate(description, null, null);
+
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -l mem_free=1024M\n" + "#$ -o /dev/null\n"
+                + "#$ -e /dev/null\n" + "\n" + "null\n";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
     /**
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
      *
@@ -325,8 +367,8 @@ public class GridEngineUtilsTest {
         GridEngineUtils.verifyJobDescription(description);
     }
 
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test01l_verifyJobDescription_StringProcessOption_ExceptionThrown() throws Exception {
+    @Test()
+    public void test01l_verifyJobDescription_StringProcessOption_NoException() throws Exception {
         JobDescription description = new JobDescription();
 
         description.setExecutable("/bin/nothing");
@@ -340,12 +382,14 @@ public class GridEngineUtilsTest {
         String jobnumber = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("jobnumber", jobnumber);
+        jobInfo.put("jobname", "test");
         jobInfo.put("exit_status", "5");
         jobInfo.put("failed", "0");
 
         JobStatus result = GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, jobnumber);
 
         assertEquals(jobnumber, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("done", result.getState());
         assertEquals(new Integer(5), result.getExitCode());
         assertFalse(result.hasException());
@@ -359,12 +403,14 @@ public class GridEngineUtilsTest {
         String jobnumber = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("jobnumber", jobnumber);
+        jobInfo.put("jobname", "test");
         jobInfo.put("exit_status", "0");
         jobInfo.put("failed", "100: This job was canceled");
 
         JobStatus result = GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, jobnumber);
 
         assertEquals(jobnumber, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("done", result.getState());
         assertEquals(new Integer(0), result.getExitCode());
         assertTrue(result.hasException());
@@ -379,12 +425,14 @@ public class GridEngineUtilsTest {
         String jobnumber = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("jobnumber", jobnumber);
+        jobInfo.put("jobname", "test");
         jobInfo.put("exit_status", "11");
         jobInfo.put("failed", "0");
 
         JobStatus result = GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, jobnumber);
 
         assertEquals(jobnumber, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("done", result.getState());
         assertEquals(new Integer(11), result.getExitCode());
         assertFalse(result.hasException());
@@ -398,12 +446,14 @@ public class GridEngineUtilsTest {
         String jobnumber = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("jobnumber", jobnumber);
+        jobInfo.put("jobname", "test");
         jobInfo.put("exit_status", "4");
         jobInfo.put("failed", "666: SomethingWentWrongNoIdea");
 
         JobStatus result = GridEngineUtils.getJobStatusFromQacctInfo(jobInfo, jobnumber);
 
         assertEquals(jobnumber, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("done", result.getState());
         assertEquals(new Integer(4), result.getExitCode());
         assertTrue(result.hasException());
@@ -438,6 +488,7 @@ public class GridEngineUtilsTest {
         // empty job info
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("jobnumber", jobnumber);
+        jobInfo.put("jobname", "test");
         jobInfo.put("exit_status", "four");
         jobInfo.put("failed", "0");
 
@@ -449,6 +500,7 @@ public class GridEngineUtilsTest {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JB_job_number", jobID);
+        jobInfo.put("JB_name", "test");
         jobInfo.put("state", "qw");
         jobInfo.put("long_state", "pending");
 
@@ -458,6 +510,7 @@ public class GridEngineUtilsTest {
         JobStatus result = GridEngineUtils.getJobStatusFromQstatInfo(input, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("pending", result.getState());
         assertNull(result.getExitCode());
         assertFalse(result.hasException());
@@ -471,6 +524,7 @@ public class GridEngineUtilsTest {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JB_job_number", jobID);
+        jobInfo.put("JB_name", "test");
         jobInfo.put("state", "r");
         jobInfo.put("long_state", "running");
 
@@ -480,6 +534,7 @@ public class GridEngineUtilsTest {
         JobStatus result = GridEngineUtils.getJobStatusFromQstatInfo(input, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("running", result.getState());
         assertNull(result.getExitCode());
         assertFalse(result.hasException());
@@ -493,6 +548,7 @@ public class GridEngineUtilsTest {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JB_job_number", jobID);
+        jobInfo.put("JB_name", "test");
         jobInfo.put("state", "qEw");
         jobInfo.put("long_state", "error");
 
@@ -502,6 +558,7 @@ public class GridEngineUtilsTest {
         JobStatus result = GridEngineUtils.getJobStatusFromQstatInfo(input, jobID);
 
         assertEquals(jobID, result.getJobIdentifier());
+        assertEquals("test", result.getName());
         assertEquals("error", result.getState());
         assertNull(result.getExitCode());
         assertTrue(result.hasException());

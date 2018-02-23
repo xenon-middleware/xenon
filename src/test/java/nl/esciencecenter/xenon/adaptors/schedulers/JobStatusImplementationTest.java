@@ -21,9 +21,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
-import nl.esciencecenter.xenon.XenonException;
 import org.junit.Test;
 
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
 
 public class JobStatusImplementationTest {
@@ -31,77 +31,77 @@ public class JobStatusImplementationTest {
     @Test
     public void test_handle() throws Exception {
         String id = "JOB-42";
-        JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, true, false, null);
+        JobStatus s = new JobStatusImplementation(id, "test", "STATE", 0, null, true, false, null);
         assertEquals(id, s.getJobIdentifier());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_handleFailsNull() throws Exception {
-        new JobStatusImplementation(null, "STATE", 0, null, true, false, null);
+        new JobStatusImplementation(null, "test", "STATE", 0, null, true, false, null);
     }
 
     @Test
     public void test_state() throws Exception {
         String id = "JOB-42";
-        JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, true, false, null);
+        JobStatus s = new JobStatusImplementation(id, "test", "STATE", 0, null, true, false, null);
         assertEquals("STATE", s.getState());
     }
 
     @Test
     public void test_exit() throws Exception {
         String id = "JOB-42";
-        JobStatus s = new JobStatusImplementation(id, "STATE", 42, null, true, false, null);
+        JobStatus s = new JobStatusImplementation(id, "test", "STATE", 42, null, true, false, null);
         assertEquals(new Integer(42), s.getExitCode());
     }
 
     @Test
     public void test_exception() throws Exception {
         String id = "JOB-42";
-        XenonException e = new XenonException("adapter","EEP");
-        JobStatus s = new JobStatusImplementation(id, "STATE", 0, e, true, false, null);
+        XenonException e = new XenonException("adapter", "EEP");
+        JobStatus s = new JobStatusImplementation(id, "test", "STATE", 0, e, true, false, null);
         assertEquals(e, s.getException());
     }
 
     @Test
     public void test_hasExceptionTrue() throws Exception {
         String id = "JOB-42";
-        XenonException e = new XenonException("adapter","EEP");
-        JobStatus s = new JobStatusImplementation(id, "STATE", 0, e, true, false, null);
+        XenonException e = new XenonException("adapter", "EEP");
+        JobStatus s = new JobStatusImplementation(id, "test", "STATE", 0, e, true, false, null);
         assertTrue(s.hasException());
     }
 
     @Test
     public void test_hasExceptionFalse() throws Exception {
         String id = "JOB-42";
-        JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, true, false, null);
+        JobStatus s = new JobStatusImplementation(id, "test", "STATE", 0, null, true, false, null);
         assertFalse(s.hasException());
     }
 
     @Test
     public void test_runningTrue() throws Exception {
         String id = "JOB-42";
-        JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, true, false, null);
+        JobStatus s = new JobStatusImplementation(id, "test", "STATE", 0, null, true, false, null);
         assertTrue(s.isRunning());
     }
 
     @Test
     public void test_runningFalse() throws Exception {
         String id = "JOB-42";
-        JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, false, false, null);
+        JobStatus s = new JobStatusImplementation(id, "test", "STATE", 0, null, false, false, null);
         assertFalse(s.isRunning());
     }
 
     @Test
     public void test_doneTrue() throws Exception {
         String id = "JOB-42";
-        JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, false, true, null);
+        JobStatus s = new JobStatusImplementation(id, "test", "STATE", 0, null, false, true, null);
         assertTrue(s.isDone());
     }
 
     @Test
     public void test_doneFalse() throws Exception {
         String id = "JOB-42";
-        JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, false, false, null);
+        JobStatus s = new JobStatusImplementation(id, "test", "STATE", 0, null, false, false, null);
         assertFalse(s.isRunning());
     }
 
@@ -111,7 +111,7 @@ public class JobStatusImplementationTest {
         tmp.put("key", "value");
 
         String id = "JOB-42";
-        JobStatus s = new JobStatusImplementation(id, "STATE", 0, null, false, false, tmp);
+        JobStatus s = new JobStatusImplementation(id, "test", "STATE", 0, null, false, false, tmp);
         assertEquals(tmp, s.getSchedulerSpecificInformation());
     }
 
@@ -122,26 +122,26 @@ public class JobStatusImplementationTest {
         tmp.put("key", "value");
 
         String id = "JOB-42";
-        XenonException e = new XenonException("adapter","EEP");
-        JobStatus s = new JobStatusImplementation(id, "STATE", 0, e, false, false, tmp);
+        XenonException e = new XenonException("adapter", "EEP");
+        JobStatus s = new JobStatusImplementation(id, "test", "STATE", 0, e, false, false, tmp);
 
-        String expected = "JobStatus [jobIdentifier=" + id + ", state=" + "STATE" + ", exitCode=" + 0 + ", exception=" + e
-                + ", running=" + false + ", done=" + false + ", schedulerSpecificInformation=" + tmp + "]";
+        String expected = "JobStatus [jobIdentifier=" + id + ", state=" + "STATE" + ", exitCode=" + 0 + ", exception=" + e + ", running=" + false + ", done="
+                + false + ", schedulerSpecificInformation=" + tmp + "]";
 
         assertEquals(expected, s.toString());
     }
 
     @Test
     public void test_hashcode() {
-        JobStatus a = new JobStatusImplementation("JOB-42", "STATE", 0, null, true, false, null);
-        JobStatus b = new JobStatusImplementation("JOB-42", "STATE", 0, null, true, false, null);
+        JobStatus a = new JobStatusImplementation("JOB-42", "test", "STATE", 0, null, true, false, null);
+        JobStatus b = new JobStatusImplementation("JOB-42", "test", "STATE", 0, null, true, false, null);
         assertEquals(a.hashCode(), b.hashCode());
     }
 
     @Test
     public void test_equals() {
-        JobStatus a = new JobStatusImplementation("JOB-42", "STATE", 0, null, true, false, null);
-        JobStatus b = new JobStatusImplementation("JOB-42", "STATE", 0, null, true, false, null);
+        JobStatus a = new JobStatusImplementation("JOB-42", "test", "STATE", 0, null, true, false, null);
+        JobStatus b = new JobStatusImplementation("JOB-42", "test", "STATE", 0, null, true, false, null);
         assertTrue(a.equals(b));
     }
 }

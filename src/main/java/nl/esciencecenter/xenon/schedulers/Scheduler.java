@@ -498,9 +498,9 @@ public abstract class Scheduler implements AutoCloseable {
                     result[i] = null;
                 }
             } catch (NoSuchJobException e) {
-                result[i] = new JobStatusImplementation(jobIdentifiers[i], "UNKNOWN", null, e, false, false, null);
+                result[i] = new JobStatusImplementation(jobIdentifiers[i], null, "UNKNOWN", null, e, false, false, null);
             } catch (XenonException e) {
-                result[i] = new JobStatusImplementation(jobIdentifiers[i], "ERROR", null, e, false, false, null);
+                result[i] = new JobStatusImplementation(jobIdentifiers[i], null, "ERROR", null, e, false, false, null);
             }
         }
 
