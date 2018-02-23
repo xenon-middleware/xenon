@@ -6,8 +6,9 @@ This is release 2.4.0 of Xenon.
 Notable changes compared to v2.3.0:
 -----------------------------------
 
-- added name to job description (#609)
+- added name to job description and job status (#609)
 - added max memory to job description (#562)
+- added threads per process to job description
 
 Notable changes compared to v2.2.0:
 -----------------------------------
