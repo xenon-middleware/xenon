@@ -154,44 +154,56 @@ public class JobDescriptionTest {
         j.addJobOption("key", null);
     }
 
+    private int doHash(String queueName, String executable, String name, String[] arguments, String stdin, String stdout, String stderr,
+            String workingDirectory, Map<String, String> environment, Map<String, String> jobOptions, int nodeCount, int processesPerNode,
+            int threadsPerProcess, int maxMemory, boolean startSingleProcess, int maxRuntime) {
+
+        List<String> tmp = new ArrayList<>(10);
+
+        if (arguments != null && arguments.length > 0) {
+            for (String s : arguments) {
+                tmp.add(s);
+            }
+        }
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + tmp.hashCode();
+        result = prime * result + environment.hashCode();
+        result = prime * result + ((executable == null) ? 0 : executable.hashCode());
+        result = prime * result + jobOptions.hashCode();
+        result = prime * result + maxMemory;
+        result = prime * result + maxRuntime;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + nodeCount;
+        result = prime * result + processesPerNode;
+        result = prime * result + ((queueName == null) ? 0 : queueName.hashCode());
+        result = prime * result + (startSingleProcess ? 1231 : 1237);
+        result = prime * result + ((stderr == null) ? 0 : stderr.hashCode());
+        result = prime * result + ((stdin == null) ? 0 : stdin.hashCode());
+        result = prime * result + ((stdout == null) ? 0 : stdout.hashCode());
+        result = prime * result + threadsPerProcess;
+        result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
+        return result;
+    }
+
     @Test
     public void test_hashCode() throws Exception {
         JobDescription j = new JobDescription();
 
+        int expected = doHash(null, null, null, new String[0], null, null, null, null, new HashMap<>(5), new HashMap<>(5), 1, 1, -1, -1, false, 15);
         int hash = j.hashCode();
 
-        final int prime = 31;
-        int result = 1;
-
-        result = prime * result + new ArrayList<String>(0).hashCode();
-        result = prime * result + new HashMap<String, String>(0).hashCode();
-        result = prime * result + new HashMap<String, String>(0).hashCode();
-        // noinspection PointlessArithmeticExpression
-        result = prime * result + 0;
-        result = prime * result + 15;
-        result = prime * result + 1;
-        result = prime * result + 1;
-        // noinspection PointlessArithmeticExpression
-        result = prime * result + 0;
-        result = prime * result + 1237;
-        // noinspection PointlessArithmeticExpression
-        result = prime * result + 0;
-        // noinspection PointlessArithmeticExpression
-        result = prime * result + 0;
-        // noinspection PointlessArithmeticExpression
-        result = prime * result + 0;
-        // noinspection PointlessArithmeticExpression
-        result = prime * result + 0;
-
-        assertEquals(result, hash);
+        assertEquals(expected, hash);
     }
 
     @Test
     public void test_hashCode2() throws Exception {
 
         JobDescription j = new JobDescription();
-        j.setWorkingDirectory("aap");
-        j.setQueueName("noot");
+        j.setWorkingDirectory("workdir");
+        j.setName("name");
+        j.setQueueName("queue");
         j.setStdout(null);
         j.setStdin("stdin");
         j.setStderr(null);
@@ -211,28 +223,10 @@ public class JobDescriptionTest {
         opt.put("OPT2", "ARG2");
         j.setJobOptions(opt);
 
+        int expected = doHash("queue", "exec", "name", args, "stdin", null, null, "workdir", env, opt, 1, 1, -1, -1, true, 15);
         int hash = j.hashCode();
 
-        final int prime = 31;
-        int result = 1;
-
-        result = prime * result + Arrays.asList(args).hashCode();
-        result = prime * result + env.hashCode();
-        result = prime * result + "exec".hashCode();
-        result = prime * result + opt.hashCode();
-        result = prime * result + 15;
-        result = prime * result + 1;
-        result = prime * result + 1;
-        result = prime * result + "noot".hashCode();
-        result = prime * result + 1231;
-        // noinspection PointlessArithmeticExpression
-        result = prime * result + 0;
-        result = prime * result + "stdin".hashCode();
-        // noinspection PointlessArithmeticExpression
-        result = prime * result + 0;
-        result = prime * result + "aap".hashCode();
-
-        assertEquals(result, hash);
+        assertEquals(expected, hash);
     }
 
     @Test
@@ -246,6 +240,8 @@ public class JobDescriptionTest {
         j.setStderr("stderr");
         j.setExecutable("exec");
         j.setStartSingleProcess(true);
+        j.setThreadsPerProcess(4);
+        j.setMaxMemory(1024);
 
         String[] args = new String[] { "a", "b", "c" };
         j.setArguments(args);
@@ -260,28 +256,9 @@ public class JobDescriptionTest {
         opt.put("OPT2", "ARG2");
         j.setJobOptions(opt);
 
+        int expected = doHash("noot", "exec", null, args, "stdin", "stdout", "stderr", "aap", env, opt, 1, 1, 4, 1024, true, 15);
         int hash = j.hashCode();
-
-        final int prime = 31;
-        int result = 1;
-
-        result = prime * result + Arrays.asList(args).hashCode();
-        result = prime * result + env.hashCode();
-        result = prime * result + "exec".hashCode();
-        result = prime * result + opt.hashCode();
-        result = prime * result + 15;
-        result = prime * result + 1;
-        result = prime * result + 1;
-        result = prime * result + "noot".hashCode();
-        result = prime * result + 1231;
-        // noinspection PointlessArithmeticExpression
-        result = prime * result + "stderr".hashCode();
-        result = prime * result + "stdin".hashCode();
-        // noinspection PointlessArithmeticExpression
-        result = prime * result + "stdout".hashCode();
-        result = prime * result + "aap".hashCode();
-
-        assertEquals(result, hash);
+        assertEquals(expected, hash);
     }
 
     @Test
@@ -299,6 +276,21 @@ public class JobDescriptionTest {
         other.setMaxRuntime(42);
         assertFalse(j.equals(other));
         other.setMaxRuntime(15);
+        assertTrue(j.equals(other));
+
+        other.setMaxMemory(1024);
+        assertFalse(j.equals(other));
+        other.setMaxMemory(-1);
+        assertTrue(j.equals(other));
+
+        other.setThreadsPerProcess(4);
+        assertFalse(j.equals(other));
+        other.setThreadsPerProcess(-1);
+        assertTrue(j.equals(other));
+
+        other.setName("test");
+        assertFalse(j.equals(other));
+        other.setName(null);
         assertTrue(j.equals(other));
 
         other.setNodeCount(2);
@@ -378,17 +370,20 @@ public class JobDescriptionTest {
     @Test
     public void test_toString() throws Exception {
 
-        String expected = "JobDescription [queueName=noot, executable=exec, arguments=[a, b, c], stdin=stdin.txt, stdout=stdout.txt,"
+        String expected = "JobDescription [name=job, queueName=noot, executable=exec, arguments=[a, b, c], stdin=stdin.txt, stdout=stdout.txt,"
                 + " stderr=stderr.txt, workingDirectory=aap, environment={ENV1=ARG1}, jobOptions={OPT1=ARG1},"
-                + " nodeCount=1, processesPerNode=1, startSingleProcess=false, maxTime=15]";
+                + " nodeCount=1, processesPerNode=1, threadsPerProcess=4, maxMemory=1024, startSingleProcess=false, maxTime=15]";
 
         JobDescription j = new JobDescription();
+        j.setName("job");
         j.setWorkingDirectory("aap");
         j.setQueueName("noot");
         j.setStdout("stdout.txt");
         j.setStderr("stderr.txt");
         j.setStdin("stdin.txt");
         j.setExecutable("exec");
+        j.setThreadsPerProcess(4);
+        j.setMaxMemory(1024);
 
         String[] args = new String[] { "a", "b", "c" };
         j.setArguments(args);

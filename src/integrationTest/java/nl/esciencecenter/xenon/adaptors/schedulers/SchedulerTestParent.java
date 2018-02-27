@@ -430,6 +430,41 @@ public abstract class SchedulerTestParent {
     }
 
     @Test
+    public void test_getJobStatus_finishedJob() throws XenonException {
+
+        assumeFalse(description.isEmbedded());
+        assumeTrue(description.supportsBatch());
+
+        // Get the available queues
+        String[] queueNames = locationConfig.getQueueNames();
+
+        assumeTrue(queueNames != null);
+        assumeTrue(queueNames.length >= 1);
+
+        // Submit job to one queue
+        String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 1));
+
+        JobStatus status = scheduler.waitUntilDone(jobID, 5000);
+
+        assertNotNull(status);
+        assertEquals(jobID, status.getJobIdentifier());
+        assertTrue(status.isDone());
+
+        // Wait for a while and see if we can still get the job info.
+        try {
+            Thread.sleep(5000);
+        } catch (Exception e) {
+            // ignored
+        }
+
+        status = scheduler.getJobStatus(jobID);
+
+        assertNotNull(status);
+        assertEquals(jobID, status.getJobIdentifier());
+        assertTrue(status.isDone());
+    }
+
+    @Test
     public void test_getJobStatuses_noJobs() throws XenonException {
 
         // Get the status of no jobs

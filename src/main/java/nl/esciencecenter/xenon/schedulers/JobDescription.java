@@ -511,10 +511,10 @@ public class JobDescription {
     /* Generated */
     @Override
     public String toString() {
-        return "JobDescription [queueName=" + queueName + ", executable=" + executable + ", arguments=" + arguments + ", stdin=" + stdin + ", stdout=" + stdout
-                + ", stderr=" + stderr + ", workingDirectory=" + workingDirectory + ", environment=" + environment + ", jobOptions=" + jobOptions
-                + ", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode + ", startSingleProcess=" + startSingleProcess + ", maxTime="
-                + maxRuntime + "]";
+        return "JobDescription [name=" + name + ", queueName=" + queueName + ", executable=" + executable + ", arguments=" + arguments + ", stdin=" + stdin
+                + ", stdout=" + stdout + ", stderr=" + stderr + ", workingDirectory=" + workingDirectory + ", environment=" + environment + ", jobOptions="
+                + jobOptions + ", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode + ", threadsPerProcess=" + threadsPerProcess
+                + ", maxMemory=" + maxMemory + ", startSingleProcess=" + startSingleProcess + ", maxTime=" + maxRuntime + "]";
     }
 
     /* Generated */
@@ -527,7 +527,9 @@ public class JobDescription {
         result = prime * result + environment.hashCode();
         result = prime * result + ((executable == null) ? 0 : executable.hashCode());
         result = prime * result + jobOptions.hashCode();
+        result = prime * result + maxMemory;
         result = prime * result + maxRuntime;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + nodeCount;
         result = prime * result + processesPerNode;
         result = prime * result + ((queueName == null) ? 0 : queueName.hashCode());
@@ -535,6 +537,7 @@ public class JobDescription {
         result = prime * result + ((stderr == null) ? 0 : stderr.hashCode());
         result = prime * result + ((stdin == null) ? 0 : stdin.hashCode());
         result = prime * result + ((stdout == null) ? 0 : stdout.hashCode());
+        result = prime * result + threadsPerProcess;
         result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
         return result;
     }
@@ -552,9 +555,10 @@ public class JobDescription {
         JobDescription other = (JobDescription) obj;
 
         return maxRuntime == other.maxRuntime && nodeCount == other.nodeCount && startSingleProcess == other.startSingleProcess
-                && processesPerNode == other.processesPerNode && Objects.equals(executable, other.executable)
-                && Objects.equals(workingDirectory, other.workingDirectory) && Objects.equals(queueName, other.queueName) && Objects.equals(stdin, other.stdin)
-                && Objects.equals(stdout, other.stdout) && Objects.equals(stderr, other.stderr) && Objects.equals(arguments, other.arguments)
-                && Objects.equals(environment, other.environment) && Objects.equals(jobOptions, other.jobOptions);
+                && processesPerNode == other.processesPerNode && maxMemory == other.maxMemory && threadsPerProcess == other.threadsPerProcess
+                && Objects.equals(name, other.name) && Objects.equals(executable, other.executable) && Objects.equals(workingDirectory, other.workingDirectory)
+                && Objects.equals(queueName, other.queueName) && Objects.equals(stdin, other.stdin) && Objects.equals(stdout, other.stdout)
+                && Objects.equals(stderr, other.stderr) && Objects.equals(arguments, other.arguments) && Objects.equals(environment, other.environment)
+                && Objects.equals(jobOptions, other.jobOptions);
     }
 }

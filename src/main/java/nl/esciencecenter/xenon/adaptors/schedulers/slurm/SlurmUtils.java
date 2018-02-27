@@ -111,6 +111,12 @@ public final class SlurmUtils {
     }
 
     protected static JobStatus getJobStatusFromSacctInfo(Map<String, Map<String, String>> info, String jobIdentifier) throws XenonException {
+
+        if (info == null) {
+            LOGGER.debug("No sacct output provided");
+            return null;
+        }
+
         Map<String, String> jobInfo = info.get(jobIdentifier);
 
         if (jobInfo == null) {
@@ -145,13 +151,21 @@ public final class SlurmUtils {
     }
 
     protected static JobStatus getJobStatusFromScontrolInfo(Map<String, String> jobInfo, String jobIdentifier) throws XenonException {
+
         if (jobInfo == null) {
-            LOGGER.debug("job {} not found in scontrol output", jobIdentifier);
+            LOGGER.debug("No scontrol output provided");
             return null;
         }
 
-        // also checks if the job id is correct
-        ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JobId", "JobName", "JobState", "ExitCode", "Reason");
+        // Checks if the job id is correct and mandatory fields are present.
+        // Note that slurm 14, 15 and 16 seem to return the last job if scontrol fails to parse jobIdentifier string. We assume this
+        // is the case if the verification fails.
+        try {
+            ScriptingUtils.verifyJobInfo(jobInfo, jobIdentifier, ADAPTOR_NAME, "JobId", "JobName", "JobState", "ExitCode", "Reason");
+        } catch (XenonException e) {
+            LOGGER.debug("Scontrol output does not contain expected job info");
+            return null;
+        }
 
         String name = jobInfo.get("JobName");
         String state = jobInfo.get("JobState");
@@ -181,6 +195,11 @@ public final class SlurmUtils {
 
     protected static JobStatus getJobStatusFromSqueueInfo(Map<String, Map<String, String>> info, String jobIdentifier) throws XenonException {
 
+        if (info == null) {
+            LOGGER.debug("No info provided");
+            return null;
+        }
+
         Map<String, String> jobInfo = info.get(jobIdentifier);
 
         if (jobInfo == null) {
@@ -198,6 +217,12 @@ public final class SlurmUtils {
     }
 
     protected static QueueStatus getQueueStatusFromSInfo(Map<String, Map<String, String>> info, String queueName, Scheduler scheduler) {
+
+        if (info == null) {
+            LOGGER.debug("No info provided");
+            return null;
+        }
+
         Map<String, String> queueInfo = info.get(queueName);
 
         if (queueInfo == null) {
