@@ -370,18 +370,42 @@ public class SlurmScheduler extends ScriptingScheduler {
         assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
 
         // try the queue first
-        Map<String, Map<String, String>> sQueueInfo = getSqueueInfo(jobIdentifier);
-        JobStatus result = getJobStatusFromSqueueInfo(sQueueInfo, jobIdentifier);
+        Map<String, Map<String, String>> sQueueInfo = null;
+        JobStatus result = null;
+
+        try {
+            sQueueInfo = getSqueueInfo(jobIdentifier);
+        } catch (Exception e) {
+            // The call to squeue may fail if we request a specific job that no longer exist.
+            LOGGER.debug("Squeue produced error output", e);
+        }
+
+        result = getJobStatusFromSqueueInfo(sQueueInfo, jobIdentifier);
 
         // try the accounting (if available)
         if (result == null) {
-            Map<String, Map<String, String>> sacctInfo = getSacctInfo(jobIdentifier);
+            Map<String, Map<String, String>> sacctInfo = null;
+
+            try {
+                sacctInfo = getSacctInfo(jobIdentifier);
+            } catch (Exception e) {
+                // The call to squeue may fail if we request a specific job that no longer exist.
+                LOGGER.debug("Sacct produced error output", e);
+            }
+
             result = getJobStatusFromSacctInfo(sacctInfo, jobIdentifier);
         }
 
         // check scontrol.
         if (result == null) {
-            Map<String, String> scontrolInfo = getSControlInfo(jobIdentifier);
+            Map<String, String> scontrolInfo = null;
+
+            try {
+                scontrolInfo = getSControlInfo(jobIdentifier);
+            } catch (Exception e) {
+                // The call to squeue may fail if we request a specific job that no longer exist.
+                LOGGER.debug("Scontrol produced error output", e);
+            }
             result = getJobStatusFromScontrolInfo(scontrolInfo, jobIdentifier);
         }
 
