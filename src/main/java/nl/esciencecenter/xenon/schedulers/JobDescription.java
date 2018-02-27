@@ -511,10 +511,10 @@ public class JobDescription {
     /* Generated */
     @Override
     public String toString() {
-        return "JobDescription [queueName=" + queueName + ", executable=" + executable + ", arguments=" + arguments + ", stdin=" + stdin + ", stdout=" + stdout
-                + ", stderr=" + stderr + ", workingDirectory=" + workingDirectory + ", environment=" + environment + ", jobOptions=" + jobOptions
-                + ", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode + ", startSingleProcess=" + startSingleProcess + ", maxTime="
-                + maxRuntime + "]";
+        return "JobDescription [name=" + name + ", queueName=" + queueName + ", executable=" + executable + ", arguments=" + arguments + ", stdin=" + stdin
+                + ", stdout=" + stdout + ", stderr=" + stderr + ", workingDirectory=" + workingDirectory + ", environment=" + environment + ", jobOptions="
+                + jobOptions + ", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode + ", threadsPerProcess=" + threadsPerProcess
+                + ", maxMemory=" + maxMemory + ", startSingleProcess=" + startSingleProcess + ", maxTime=" + maxRuntime + "]";
     }
 
     /* Generated */
