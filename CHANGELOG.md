@@ -1,7 +1,14 @@
-Xenon 2.4.0
+Xenon 2.4.1
 -----------
 
-This is release 2.4.0 of Xenon.
+This is release 2.4.1 of Xenon.
+
+Notable changes compared to v2.4.1:
+-----------------------------------
+
+- fixed JobDescription equals, hashCode and toString (#612)
+- fixed slurm adaptors status retrieval of finished jobs (#613)
+- fixed slurm adaptors parsing of scontrol output on pre 17 slurm versions
 
 Notable changes compared to v2.3.0:
 -----------------------------------
