@@ -140,6 +140,7 @@ public class ScriptingUtils {
      */
     public static void verifyJobInfo(Map<String, String> jobInfo, String jobIdentifier, String adaptorName, String jobIDField, String... additionalFields)
             throws XenonException {
+
         if (jobInfo == null) {
             // redundant check, calling functions usually already check for this and return null.
             throw new XenonException(adaptorName, "Job " + jobIdentifier + " not found in job info");

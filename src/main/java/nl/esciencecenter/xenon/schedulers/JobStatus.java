@@ -41,6 +41,10 @@ public interface JobStatus {
 
     /**
      * Get the state of the Job.
+     * 
+     * The state is a scheduler specific string, generally intended to be human readable. Very different state strings can be returned depending on which
+     * scheduler is used. Therefore, this method should only be used to provide feedback to the user. To programmatically inspect the state of the job use
+     * {{@link #isRunning()}, {@link JobStatus#isDone()} or {@link #hasException()} instead.
      *
      * @return the state of the Job.
      */
