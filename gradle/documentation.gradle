@@ -16,4 +16,17 @@ javadoc {
     classpath = files(project(':core').sourceSets.main.compileClasspath)
 }
 
+task javadocDevel(type: Javadoc) {
+    description 'Generates Javadoc API documentation for the main source code for Xenon developers.'
+    group 'Documentation'
+    options.showFromPrivate()
+    options.overview = file("${buildDir}/overview.html")
+    options.setNoTimestamp(true)
+    title = javadoc.title + ' for Xenon developers'
+    destinationDir = file("${project.docsDir}/javadoc-devel")
+    source = project(':core').sourceSets.main.allJava
+    classpath = files(project(':core').sourceSets.main.compileClasspath)
+}
+
 javadoc.dependsOn adaptorDocumentation
+javadocDevel.dependsOn adaptorDocumentation
