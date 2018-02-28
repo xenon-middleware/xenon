@@ -31,6 +31,7 @@ import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.filesystems.jclouds.JCloudsFileSytem;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
@@ -81,7 +82,7 @@ public class S3FileAdaptor extends FileAdaptor {
             throw new InvalidCredentialException(ADAPTOR_NAME, "Credential may not be null.");
         }
 
-        if (!(credential instanceof PasswordCredential)) {
+        if (!(credential instanceof PasswordCredential) || credential instanceof DefaultCredential) {
             throw new InvalidCredentialException(ADAPTOR_NAME, "Credential type not supported");
         }
 
@@ -134,12 +135,18 @@ public class S3FileAdaptor extends FileAdaptor {
                     "Invalid value for " + BUFFER_SIZE + ": " + bufferSize + " (must be between 1 and " + Integer.MAX_VALUE + ")");
         }
 
-        PasswordCredential pwUser = (PasswordCredential) credential;
+        BlobStoreContext context = null;
 
-        BlobStoreContext context = ContextBuilder.newBuilder("s3").endpoint(server).credentials(pwUser.getUsername(), new String(pwUser.getPassword()))
-                .buildView(BlobStoreContext.class);
+        if (credential instanceof PasswordCredential) {
+            PasswordCredential pwUser = (PasswordCredential) credential;
+            context = ContextBuilder.newBuilder("s3").endpoint(server).credentials(pwUser.getUsername(), new String(pwUser.getPassword()))
+                    .buildView(BlobStoreContext.class);
+        } else {
+            // Default credentials, so we do not need to set the credentials for the server
+            context = ContextBuilder.newBuilder("s3").endpoint(server).buildView(BlobStoreContext.class);
+        }
 
-        return new JCloudsFileSytem(getNewUniqueID(), ADAPTOR_NAME, server, pwUser, path, context, bucket, (int) bufferSize, xp);
+        return new JCloudsFileSytem(getNewUniqueID(), ADAPTOR_NAME, server, credential, path, context, bucket, (int) bufferSize, xp);
     }
 
     @Override
@@ -186,6 +193,6 @@ public class S3FileAdaptor extends FileAdaptor {
     @Override
     public Class[] getSupportedCredentials() {
         // The S3 adaptor supports these credentials
-        return new Class[] { PasswordCredential.class };
+        return new Class[] { DefaultCredential.class, PasswordCredential.class };
     }
 }
