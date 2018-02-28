@@ -42,6 +42,14 @@ public interface AdaptorDescription {
     String[] getSupportedLocations();
 
     /**
+     * Get the supported credential types for this adaptor.
+     *
+     * @return the credential types supported by this adaptor.
+     */
+    @SuppressWarnings("rawtypes")
+    Class[] getSupportedCredentials();
+
+    /**
      * Returns an array containing all properties this adaptor supports.
      *
      * @return an array containing all properties this adaptor supports.

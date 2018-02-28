@@ -35,7 +35,11 @@ import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHConnection;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil;
+import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.CredentialMap;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.NoSuchPathException;
 import nl.esciencecenter.xenon.filesystems.Path;
@@ -203,5 +207,12 @@ public class SftpFileAdaptor extends FileAdaptor {
     @Override
     public boolean supportsSettingPosixPermissions() {
         return true;
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Class[] getSupportedCredentials() {
+        // The sftp adaptor supports these credentials
+        return new Class[] { DefaultCredential.class, CertificateCredential.class, PasswordCredential.class, CredentialMap.class };
     }
 }

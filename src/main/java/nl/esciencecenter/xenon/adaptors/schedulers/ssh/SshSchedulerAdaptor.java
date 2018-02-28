@@ -30,7 +30,11 @@ import nl.esciencecenter.xenon.adaptors.schedulers.JobQueueScheduler;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHConnection;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil;
+import nl.esciencecenter.xenon.credentials.CertificateCredential;
 import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.CredentialMap;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 
@@ -132,6 +136,13 @@ public class SshSchedulerAdaptor extends SchedulerAdaptor {
     public boolean supportsInteractive() {
         // The SSH scheduler supports interactive jobs
         return true;
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Class[] getSupportedCredentials() {
+        // The SSH adaptor supports these credentials
+        return new Class[] { DefaultCredential.class, CertificateCredential.class, PasswordCredential.class, CredentialMap.class };
     }
 
     @Override

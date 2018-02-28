@@ -181,4 +181,11 @@ public class S3FileAdaptor extends FileAdaptor {
     public boolean isConnectionless() {
         return true;
     }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Class[] getSupportedCredentials() {
+        // The S3 adaptor supports these credentials
+        return new Class[] { PasswordCredential.class };
+    }
 }

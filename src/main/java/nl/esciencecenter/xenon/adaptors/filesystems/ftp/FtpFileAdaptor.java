@@ -217,4 +217,10 @@ public class FtpFileAdaptor extends FileAdaptor {
         return true;
     }
 
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Class[] getSupportedCredentials() {
+        // The ftp adaptor supports these credentials
+        return new Class[] { DefaultCredential.class, PasswordCredential.class };
+    }
 }
