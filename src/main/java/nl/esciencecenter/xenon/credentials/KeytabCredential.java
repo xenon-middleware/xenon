@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon.credentials;
 
+import java.util.Objects;
+
 public class KeytabCredential implements UserCredential {
 
     private final String username;
@@ -32,5 +34,24 @@ public class KeytabCredential implements UserCredential {
 
     public String getKeytabFile() {
         return keytabFile;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        KeytabCredential that = (KeytabCredential) o;
+        return Objects.equals(username, that.username) && Objects.equals(keytabFile, that.keytabFile);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, keytabFile);
     }
 }
