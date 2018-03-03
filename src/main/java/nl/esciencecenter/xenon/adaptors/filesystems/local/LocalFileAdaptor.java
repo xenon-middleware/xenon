@@ -89,6 +89,13 @@ public class LocalFileAdaptor extends FileAdaptor {
         return true;
     }
 
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Class[] getSupportedCredentials() {
+        // The local adaptor supports these credentials
+        return new Class[] { DefaultCredential.class };
+    }
+
     @Override
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
 

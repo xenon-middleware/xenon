@@ -85,6 +85,13 @@ public class WebdavFileAdaptor extends FileAdaptor {
         return false;
     }
 
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Class[] getSupportedCredentials() {
+        // The webdav adaptor supports these credentials
+        return new Class[] { DefaultCredential.class, PasswordCredential.class };
+    }
+
     @Override
     public FileSystem createFileSystem(String location, Credential credential, Map<String, String> properties) throws XenonException {
 

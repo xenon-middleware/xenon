@@ -17,6 +17,10 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.credentials.CertificateCredential;
+import nl.esciencecenter.xenon.credentials.CredentialMap;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 public abstract class ScriptingSchedulerAdaptor extends SchedulerAdaptor {
@@ -24,5 +28,11 @@ public abstract class ScriptingSchedulerAdaptor extends SchedulerAdaptor {
     protected ScriptingSchedulerAdaptor(String name, String description, String[] locations, XenonPropertyDescription[] properties) throws XenonException {
         super(name, description, locations, ScriptingUtils.mergeValidProperties(properties, Scheduler.getAdaptorDescription("ssh").getSupportedProperties(),
                 Scheduler.getAdaptorDescription("local").getSupportedProperties()));
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Class[] getSupportedCredentials() {
+        return new Class[] { DefaultCredential.class, CertificateCredential.class, PasswordCredential.class, CredentialMap.class };
     }
 }

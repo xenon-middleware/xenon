@@ -178,4 +178,11 @@ public class HDFSFileAdaptor extends FileAdaptor {
     public boolean canCreateSymboliclinks() {
         return false;
     }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Class[] getSupportedCredentials() {
+        // The hdfs adaptor supports these credentials
+        return new Class[] { DefaultCredential.class, PasswordCredential.class, KeytabCredential.class };
+    }
 }

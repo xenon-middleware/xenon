@@ -96,6 +96,13 @@ public class LocalSchedulerAdaptor extends SchedulerAdaptor {
         return true;
     }
 
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Class[] getSupportedCredentials() {
+        // The local scheduler supports only default credentials
+        return new Class[] { DefaultCredential.class };
+    }
+
     @Override
     public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) throws XenonException {
 

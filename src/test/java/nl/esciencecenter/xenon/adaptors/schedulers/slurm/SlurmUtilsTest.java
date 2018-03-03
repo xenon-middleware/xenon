@@ -374,14 +374,14 @@ public class SlurmUtilsTest {
         assertNull(result);
     }
 
-    @Test(expected = XenonException.class)
-    public void test03h_getJobStatusFromScontrolInfo_IncompleteJobInfo_ExceptionThrown() throws XenonException {
-        String jobID = "555";
-        // empty job info
-        Map<String, String> jobInfo = new HashMap<>();
-
-        SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
-    }
+    // @Test(expected = XenonException.class)
+    // public void test03h_getJobStatusFromScontrolInfo_IncompleteJobInfo_ExceptionThrown() throws XenonException {
+    // String jobID = "555";
+    // // empty job info
+    // Map<String, String> jobInfo = new HashMap<>();
+    //
+    // SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
+    // }
 
     @Test
     public void test04a_getJobStatusFromSqueueInfo_PendingJob_JobStatus() throws XenonException {
