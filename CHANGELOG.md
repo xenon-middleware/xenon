@@ -1,9 +1,16 @@
-Xenon 2.4.1
+Xenon 2.5.0
 -----------
 
-This is release 2.4.1 of Xenon.
+This is release 2.5.0 of Xenon.
 
 Notable changes compared to v2.4.1:
+-----------------------------------
+
+- added equals to KeytabCredential (#615)
+- added getSupportedCrenentials to AdaptorDescription (#595)
+- clarified description of JobState.getState (#596)
+
+Notable changes compared to v2.4.0:
 -----------------------------------
 
 - fixed JobDescription equals, hashCode and toString (#612)
