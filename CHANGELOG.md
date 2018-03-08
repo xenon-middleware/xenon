@@ -1,7 +1,13 @@
-Xenon 2.5.0
+Xenon 2.6.0
 -----------
 
-This is release 2.5.0 of Xenon.
+This is release 2.6.0 of Xenon.
+
+Notable changes compared to v2.5.0:
+-----------------------------------
+
+- added support for scheduler specific arguments to JobDescription
+- fixed specification of runtime limit in gridengine adaptor 
 
 Notable changes compared to v2.4.1:
 -----------------------------------

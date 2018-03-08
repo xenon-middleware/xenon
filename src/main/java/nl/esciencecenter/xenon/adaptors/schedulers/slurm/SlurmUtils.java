@@ -459,6 +459,10 @@ public final class SlurmUtils {
             script.format("#SBATCH --error='%s'\n", description.getStderr());
         }
 
+        for (String argument : description.getSchedulerArguments()) {
+            script.format("#SBATCH %s\n", argument);
+        }
+
         for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
             script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());
         }

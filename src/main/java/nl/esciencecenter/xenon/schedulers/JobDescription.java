@@ -46,6 +46,9 @@ public class JobDescription {
     /** The arguments to pass to the executable. */
     private final List<String> arguments = new ArrayList<>(10);
 
+    /** The arguments to pass to the scheduler. */
+    private final List<String> schedulerArguments = new ArrayList<>(10);
+
     /** The location file from which to redirect stdin. (optional) */
     private String stdin = null;
 
@@ -324,6 +327,52 @@ public class JobDescription {
         }
 
         arguments.add(argument);
+    }
+
+    /**
+     * Get the scheduler specific arguments.
+     *
+     * @return Returns the scheduler specific arguments.
+     */
+    public List<String> getSchedulerArguments() {
+        return Collections.unmodifiableList(schedulerArguments);
+    }
+
+    /**
+     * Sets the scheduler specific arguments for this job.
+     *
+     * Some jobs require extra arguments to be provided to the scheduler, for example to select a certain type of node. These arguments tend to be very
+     * scheduler and location specific and are therefore hard to generalize.
+     *
+     * This method provides a simple mechanism to add such arguments to a JobDescription. These arguments are typically copied into the scheduler specific
+     * section of a generated submit script.
+     *
+     * @param arguments
+     *            the scheduler specific arguments.
+     */
+    public void setSchedulerArguments(String... arguments) {
+        this.schedulerArguments.clear();
+
+        for (String argument : arguments) {
+            addSchedulerArgument(argument);
+        }
+    }
+
+    /**
+     * Add a scheduler specific argument.
+     *
+     * The argument may not be <code>null</code> or empty.
+     *
+     * @param argument
+     *            the scheduler specific argument.
+     */
+    public void addSchedulerArgument(String argument) {
+
+        if (argument == null || argument.length() == 0) {
+            throw new IllegalArgumentException("Scheduker argument may not be null or empty!");
+        }
+
+        schedulerArguments.add(argument);
     }
 
     /**
