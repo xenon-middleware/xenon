@@ -46,6 +46,9 @@ public class JobDescription {
     /** The arguments to pass to the executable. */
     private final List<String> arguments = new ArrayList<>(10);
 
+    /** The arguments to pass to the scheduler. */
+    private final List<String> schedulerArguments = new ArrayList<>(10);
+
     /** The location file from which to redirect stdin. (optional) */
     private String stdin = null;
 
@@ -324,6 +327,46 @@ public class JobDescription {
         }
 
         arguments.add(argument);
+    }
+
+    /**
+     * Get the command line arguments of the executable.
+     *
+     * @return Returns the arguments of the executable.
+     */
+    public List<String> getSchedulerArguments() {
+        return Collections.unmodifiableList(schedulerArguments);
+    }
+
+    /**
+     * Sets the command line arguments of the executable.
+     *
+     * @param arguments
+     *            the command line arguments of the executable.
+     */
+    public void setSchedulerArguments(String... arguments) {
+        this.schedulerArguments.clear();
+
+        for (String argument : arguments) {
+            addArgument(argument);
+        }
+    }
+
+    /**
+     * Add a command line argument for the executable.
+     *
+     * The argument may not be <code>null</code> or empty.
+     *
+     * @param argument
+     *            the command line argument to add.
+     */
+    public void addSchedulerArgument(String argument) {
+
+        if (argument == null || argument.length() == 0) {
+            throw new IllegalArgumentException("Scheduker argument may not be null or empty!");
+        }
+
+        schedulerArguments.add(argument);
     }
 
     /**
