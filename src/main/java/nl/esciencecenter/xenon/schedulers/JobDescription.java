@@ -348,7 +348,7 @@ public class JobDescription {
         this.schedulerArguments.clear();
 
         for (String argument : arguments) {
-            addArgument(argument);
+            addSchedulerArgument(argument);
         }
     }
 

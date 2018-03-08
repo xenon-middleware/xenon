@@ -86,7 +86,21 @@ public class GridEngineUtilsTest {
 
         String result = GridEngineUtils.generate(description, null, null);
 
-        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -l mem_free=1024M\n" + "#$ -o /dev/null\n"
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -l mem_free=1024M,h_vmem=1024M\n"
+                + "#$ -o /dev/null\n" + "#$ -e /dev/null\n" + "\n" + "null\n";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_generate_schedulerArguments() throws XenonException {
+        JobDescription description = new JobDescription();
+
+        description.setSchedulerArguments("-l gpu=1");
+
+        String result = GridEngineUtils.generate(description, null, null);
+
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -l gpu=1\n" + "#$ -o /dev/null\n"
                 + "#$ -e /dev/null\n" + "\n" + "null\n";
 
         assertEquals(expected, result);

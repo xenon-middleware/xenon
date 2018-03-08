@@ -460,7 +460,7 @@ public final class SlurmUtils {
         }
 
         for (String argument : description.getSchedulerArguments()) {
-            script.format("#SBATCH %s\n", CommandLineUtils.protectAgainstShellMetas(argument));
+            script.format("#SBATCH %s\n", argument);
         }
 
         for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
