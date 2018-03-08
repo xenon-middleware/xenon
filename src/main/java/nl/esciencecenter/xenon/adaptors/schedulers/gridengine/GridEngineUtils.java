@@ -155,13 +155,17 @@ final class GridEngineUtils {
 
         // the max amount of memory per node.
         if (description.getMaxMemory() > 0) {
-            script.format("#$ -l mem_free=%dM\n", description.getMaxMemory());
+            script.format("#$ -l mem_free=%dM,h_vmem=%dM\n", description.getMaxMemory(), description.getMaxMemory());
         }
 
         String resources = description.getJobOptions().get(JOB_OPTION_RESOURCES);
 
         if (resources != null) {
             script.format("#$ -l %s\n", resources);
+        }
+
+        for (String argument : description.getSchedulerArguments()) {
+            script.format("#$ %s\n", argument);
         }
 
         if (description.getStdin() != null) {
