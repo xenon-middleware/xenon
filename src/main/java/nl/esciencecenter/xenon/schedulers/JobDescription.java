@@ -343,7 +343,7 @@ public class JobDescription {
      *
      * Some jobs require extra arguments to be provided to the scheduler, for example to select a certain type of node. These arguments tend to be very
      * scheduler and location specific and are therefore hard to generalize.
-     * 
+     *
      * This method provides a simple mechanism to add such arguments to a JobDescription. These arguments are typically copied into the scheduler specific
      * section of a generated submit script.
      *
