@@ -1,7 +1,12 @@
-Xenon 2.6.0
+Xenon 2.6.1
 -----------
 
-This is release 2.6.0 of Xenon.
+This is release 2.6.1 of Xenon.
+
+Notable changes compared to v2.6.0:
+-----------------------------------
+
+- fixed hashCode and equals of JobDescription
 
 Notable changes compared to v2.5.0:
 -----------------------------------
