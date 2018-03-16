@@ -103,6 +103,7 @@ public class JobDescription {
         executable = original.getExecutable();
         name = original.getName();
         arguments.addAll(original.getArguments());
+        schedulerArguments.addAll(original.getSchedulerArguments());
         stdin = original.getStdin();
         stdout = original.getStdout();
         stderr = original.getStderr();
@@ -560,10 +561,11 @@ public class JobDescription {
     /* Generated */
     @Override
     public String toString() {
-        return "JobDescription [name=" + name + ", queueName=" + queueName + ", executable=" + executable + ", arguments=" + arguments + ", stdin=" + stdin
-                + ", stdout=" + stdout + ", stderr=" + stderr + ", workingDirectory=" + workingDirectory + ", environment=" + environment + ", jobOptions="
-                + jobOptions + ", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode + ", threadsPerProcess=" + threadsPerProcess
-                + ", maxMemory=" + maxMemory + ", startSingleProcess=" + startSingleProcess + ", maxTime=" + maxRuntime + "]";
+        return "JobDescription [name=" + name + ", queueName=" + queueName + ", executable=" + executable + ", arguments=" + arguments + ", schedulerArguments="
+                + schedulerArguments + ", stdin=" + stdin + ", stdout=" + stdout + ", stderr=" + stderr + ", workingDirectory=" + workingDirectory
+                + ", environment=" + environment + ", jobOptions=" + jobOptions + ", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode
+                + ", threadsPerProcess=" + threadsPerProcess + ", maxMemory=" + maxMemory + ", startSingleProcess=" + startSingleProcess + ", maxTime="
+                + maxRuntime + "]";
     }
 
     /* Generated */
@@ -573,6 +575,7 @@ public class JobDescription {
         final int prime = 31;
         int result = 1;
         result = prime * result + arguments.hashCode();
+        result = prime * result + schedulerArguments.hashCode();
         result = prime * result + environment.hashCode();
         result = prime * result + ((executable == null) ? 0 : executable.hashCode());
         result = prime * result + jobOptions.hashCode();
@@ -607,7 +610,8 @@ public class JobDescription {
                 && processesPerNode == other.processesPerNode && maxMemory == other.maxMemory && threadsPerProcess == other.threadsPerProcess
                 && Objects.equals(name, other.name) && Objects.equals(executable, other.executable) && Objects.equals(workingDirectory, other.workingDirectory)
                 && Objects.equals(queueName, other.queueName) && Objects.equals(stdin, other.stdin) && Objects.equals(stdout, other.stdout)
-                && Objects.equals(stderr, other.stderr) && Objects.equals(arguments, other.arguments) && Objects.equals(environment, other.environment)
+                && Objects.equals(stderr, other.stderr) && Objects.equals(arguments, other.arguments)
+                && Objects.equals(schedulerArguments, other.schedulerArguments) && Objects.equals(environment, other.environment)
                 && Objects.equals(jobOptions, other.jobOptions);
     }
 }
