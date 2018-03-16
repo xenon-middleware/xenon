@@ -1,0 +1,73 @@
+--- 
+authors: 
+  - 
+    affiliation: "Netherlands eScience Center"
+    family-names: Maassen
+    given-names: Jason
+  - 
+    affiliation: "Netherlands eScience Center"
+    family-names: Verhoeven
+    given-names: Stefan
+  - 
+    affiliation: "Netherlands eScience Center"
+    family-names: Borgdorff
+    given-names: Joris
+  - 
+    affiliation: "Netherlands eScience Center"
+    family-names: Spaaks
+    given-names: "Jurriaan H."
+  - 
+    affiliation: "Netherlands eScience Center"
+    family-names: Drost
+    given-names: Niels
+  - 
+    affiliation: "Netherlands eScience Center"
+    family-names: Meijer
+    given-names: Christiaan
+  - 
+    affiliation: "Netherlands eScience Center"
+    family-names: Ploeg
+    given-names: Atze
+    name-particle: "van der"
+  - 
+    affiliation: "Netherlands eScience Center"
+    family-names: Boer
+    given-names: "Piter T."
+    name-particle: de
+  - 
+    affiliation: "Netherlands eScience Center"
+    family-names: Nieuwpoort
+    given-names: Rob
+    name-particle: van
+  - 
+    affiliation: "Netherlands eScience Center"
+    family-names: Werkhoven
+    given-names: Ben
+    name-particle: van
+  - 
+    affiliation: "Netherlands eScience Center"
+    family-names: Kuzniar
+    given-names: Arnold
+    orcid: "https://orcid.org/0000-0003-1711-7961"
+cff-version: "1.0.3"
+date-released: 2018-03-08
+keywords: 
+  - Java
+  - batch-job
+  - middleware
+  - library
+  - FTP
+  - S3
+  - SFTP
+  - WebDAV
+  - HDFS
+  - SGE
+  - SLURM
+  - SSH
+  - Torque
+  - "distributed computing"
+license: Apache-2.0
+message: "If you use this software, please cite it using these metadata."
+repository-code: "https://github.com/NLeSC/Xenon"
+title: Xenon
+version: "2.6.0"
