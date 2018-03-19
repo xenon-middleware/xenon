@@ -51,6 +51,7 @@ authors:
     orcid: "https://orcid.org/0000-0003-1711-7961"
 cff-version: "1.0.3"
 date-released: 2018-03-08
+doi: "10.5281/zenodo.597993"
 keywords: 
   - Java
   - batch-job
