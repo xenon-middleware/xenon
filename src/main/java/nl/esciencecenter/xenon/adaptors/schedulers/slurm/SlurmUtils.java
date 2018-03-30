@@ -390,6 +390,10 @@ public final class SlurmUtils {
             arguments.add("--mem=" + description.getMaxMemory() + "M");
         }
 
+        if (description.getTempSpace() > 0) {
+            arguments.add("--tmp=" + description.getTempSpace() + "M");
+        }
+
         // add maximum runtime
         arguments.add("--time=" + description.getMaxRuntime());
 
@@ -441,6 +445,10 @@ public final class SlurmUtils {
         // the max amount of memory per node.
         if (description.getMaxMemory() > 0) {
             script.format("#SBATCH --mem=%dM\n", description.getMaxMemory());
+        }
+
+        if (description.getTempSpace() > 0) {
+            script.format("#SBATCH --tmp=%dM\n", description.getTempSpace());
         }
 
         if (description.getStdin() != null) {

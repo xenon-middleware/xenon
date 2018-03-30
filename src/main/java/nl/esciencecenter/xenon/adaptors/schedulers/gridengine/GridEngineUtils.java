@@ -158,6 +158,10 @@ final class GridEngineUtils {
             script.format("#$ -l mem_free=%dM,h_vmem=%dM\n", description.getMaxMemory(), description.getMaxMemory());
         }
 
+        if (description.getTempSpace() > 0) {
+            script.format("#$ -l tmpspace=%dM\n", description.getTempSpace());
+        }
+
         String resources = description.getJobOptions().get(JOB_OPTION_RESOURCES);
 
         if (resources != null) {

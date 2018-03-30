@@ -79,6 +79,9 @@ public class JobDescription {
     /** The maximum amount of memory needed (in MB) on each node/process. */
     private int maxMemory = -1;
 
+    /** The tempspace needed (in MB) on each node/process. */
+    private int tempSpace = -1;
+
     /** If true, only a single process is started on the first node aquired, instead of nodeCount * processesPerNode. */
     private boolean startSingleProcess = false;
 
@@ -114,6 +117,7 @@ public class JobDescription {
         processesPerNode = original.getProcessesPerNode();
         threadsPerProcess = original.getThreadsPerProcess();
         maxMemory = original.getMaxMemory();
+        tempSpace = original.getTempSpace();
         startSingleProcess = original.isStartSingleProcess();
         maxRuntime = original.getMaxRuntime();
     }
@@ -211,6 +215,25 @@ public class JobDescription {
      */
     public void setMaxMemory(int maxMemoryInMB) {
         this.maxMemory = maxMemoryInMB;
+    }
+
+    /**
+     * Get the amount of temp space needed for process (in MBytes).
+     *
+     * @return the amount of temp space needed.
+     */
+    public int getTempSpace() {
+        return tempSpace;
+    }
+
+    /**
+     * Set the amount of memory needed for process (in MBytes).
+     *
+     * @param tempSpaceInMB
+     *            the amount of temp space needed per node/process.
+     */
+    public void setTempSpace(int tempSpaceInMB) {
+        this.tempSpace = tempSpaceInMB;
     }
 
     /**
@@ -564,8 +587,8 @@ public class JobDescription {
         return "JobDescription [name=" + name + ", queueName=" + queueName + ", executable=" + executable + ", arguments=" + arguments + ", schedulerArguments="
                 + schedulerArguments + ", stdin=" + stdin + ", stdout=" + stdout + ", stderr=" + stderr + ", workingDirectory=" + workingDirectory
                 + ", environment=" + environment + ", jobOptions=" + jobOptions + ", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode
-                + ", threadsPerProcess=" + threadsPerProcess + ", maxMemory=" + maxMemory + ", startSingleProcess=" + startSingleProcess + ", maxTime="
-                + maxRuntime + "]";
+                + ", threadsPerProcess=" + threadsPerProcess + ", maxMemory=" + maxMemory + ", tempSpace=" + tempSpace + ", startSingleProcess="
+                + startSingleProcess + ", maxTime=" + maxRuntime + "]";
     }
 
     /* Generated */
@@ -580,6 +603,7 @@ public class JobDescription {
         result = prime * result + ((executable == null) ? 0 : executable.hashCode());
         result = prime * result + jobOptions.hashCode();
         result = prime * result + maxMemory;
+        result = prime * result + tempSpace;
         result = prime * result + maxRuntime;
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + nodeCount;
@@ -606,7 +630,7 @@ public class JobDescription {
 
         JobDescription other = (JobDescription) obj;
 
-        return maxRuntime == other.maxRuntime && nodeCount == other.nodeCount && startSingleProcess == other.startSingleProcess
+        return maxRuntime == other.maxRuntime && nodeCount == other.nodeCount && startSingleProcess == other.startSingleProcess && tempSpace == other.tempSpace
                 && processesPerNode == other.processesPerNode && maxMemory == other.maxMemory && threadsPerProcess == other.threadsPerProcess
                 && Objects.equals(name, other.name) && Objects.equals(executable, other.executable) && Objects.equals(workingDirectory, other.workingDirectory)
                 && Objects.equals(queueName, other.queueName) && Objects.equals(stdin, other.stdin) && Objects.equals(stdout, other.stdout)
