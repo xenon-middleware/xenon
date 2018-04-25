@@ -59,15 +59,15 @@ final class TorqueUtils {
     public static void verifyJobDescription(JobDescription description) throws XenonException {
         ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
 
-        if (description.getStdout() != null) {
-            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Torque adaptor cannot set STDOUT: a custom STDOUT is set internally");
-        }
-        if (description.getStderr() != null) {
-            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Torque adaptor cannot set STDERR: a custom STDERR is set internally");
-        }
-        if (description.getStdin() != null) {
-            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Torque cannot process STDIN");
-        }
+        // if (description.getStdout() != null) {
+        // throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Torque adaptor cannot set STDOUT: a custom STDOUT is set internally");
+        // }
+        // if (description.getStderr() != null) {
+        // throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Torque adaptor cannot set STDERR: a custom STDERR is set internally");
+        // }
+        // if (description.getStdin() != null) {
+        // throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Torque cannot process STDIN");
+        // }
 
         // check for option that overrides job script completely.
         if (description.getJobOptions().containsKey(JOB_OPTION_JOB_SCRIPT)) {
@@ -124,6 +124,25 @@ final class TorqueUtils {
         for (String argument : description.getArguments()) {
             script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
         }
+
+        String stdin = description.getStdin();
+
+        if (stdin != null) {
+            script.format("< %s", stdin);
+        }
+
+        // String stdout = description.getStdout().trim();
+        //
+        // if (stdout != null && !stdout.isEmpty()) {
+        // script.format("> %s", stdout);
+        // }
+        //
+        // String stderr = description.getStderr().trim();
+        //
+        // if (stderr != null && !stderr.isEmpty()) {
+        // script.format("2> %s", stderr);
+        // }
+
         script.format("\n");
     }
 
@@ -153,6 +172,36 @@ final class TorqueUtils {
                 workingDirectory = workdir.resolve(workingDirectory).toString();
             }
             script.format("#PBS -d %s\n", workingDirectory);
+        }
+
+        String workingDirectory = description.getWorkingDirectory();
+
+        if (workingDirectory != null) {
+            if (!workingDirectory.startsWith("/")) {
+                // make relative path absolute
+                workingDirectory = workdir.resolve(workingDirectory).toString();
+            }
+            script.format("#PBS -d %s\n", workingDirectory);
+        }
+
+        String stdout = description.getStdout();
+
+        if (stdout != null) {
+            if (workingDirectory != null) {
+                stdout = workingDirectory + "/" + stdout;
+            }
+
+            script.format("#PBS -o %s\n", stdout);
+        }
+
+        String stderr = description.getStderr();
+
+        if (stderr != null) {
+            if (workingDirectory != null) {
+                stderr = workingDirectory + "/" + stderr;
+            }
+
+            script.format("#PBS -e %s\n", stderr);
         }
 
         if (description.getQueueName() != null) {
@@ -197,6 +246,7 @@ final class TorqueUtils {
         script.format("\n");
 
         String customContents = description.getJobOptions().get(JOB_OPTION_JOB_CONTENTS);
+
         if (customContents == null) {
             generateScriptContent(description, script);
         } else {

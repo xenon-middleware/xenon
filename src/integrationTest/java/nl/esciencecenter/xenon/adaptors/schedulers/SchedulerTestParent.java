@@ -23,7 +23,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 import org.junit.After;
 import org.junit.Before;
@@ -805,6 +809,157 @@ public abstract class SchedulerTestParent {
             assertTrue("Exit code not 0 but " + status.getExitCode(), status.getExitCode() == 0);
             assertTrue("Test output was not found in expected location",
                     fs.exists(fs.getWorkingDirectory().resolve(new Path(false, "test_workdir_usage", "test_file"))));
+
+        } finally {
+            try {
+                fs.delete(testDir, true);
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+    }
+
+    @Test
+    public void test_stdout_usage_linux() throws Exception {
+
+        // We need a scheduler that actually has a filesystem underneath.
+        assumeTrue("Scheduler does not use filesystem", description.usesFileSystem());
+
+        FileSystem fs = scheduler.getFileSystem();
+
+        // This test does not run on windows.
+        assumeFalse("Test only suited for linux", scheduler.getAdaptorName().equals("local") && (LocalFileSystemUtils.isWindows()));
+
+        String command = "/bin/echo";
+
+        if (LocalFileSystemUtils.isOSX() && scheduler.getAdaptorName().equals("local")) {
+            command = "/usr/bin/echo";
+        }
+
+        assertTrue("Working dir does not exist", fs.exists(fs.getWorkingDirectory()));
+
+        Path testDir = fs.getWorkingDirectory().resolve(new Path(false, "test_workdir_usage"));
+
+        assertFalse("Test dir already exists", fs.exists(testDir));
+
+        try {
+            fs.createDirectory(testDir);
+
+            assertTrue("Failed to create test directory", fs.exists(testDir));
+
+            JobDescription job = new JobDescription();
+            job.setExecutable(command);
+            job.setArguments("Hello World");
+            job.setWorkingDirectory("test_workdir_usage");
+            job.setStdout("test_out.txt");
+
+            String id = scheduler.submitBatchJob(job);
+
+            // Torque seems slow (occasionally) to update the status, so we need a long timeout for a short job...
+            JobStatus status = scheduler.waitUntilDone(id, 20 * 1000);
+
+            assertTrue("Job is not done after timeout", status.isDone());
+
+            if (status.hasException()) {
+                throw status.getException();
+            }
+
+            assertTrue("Exit code not 0 but " + status.getExitCode(), status.getExitCode() == 0);
+
+            Path out = fs.getWorkingDirectory().resolve(new Path(false, "test_workdir_usage", "test_out.txt"));
+
+            assertTrue("Test output was not found in expected location", fs.exists(out));
+
+            BufferedReader r = new BufferedReader(new InputStreamReader(fs.readFromFile(out)));
+
+            String str = r.readLine();
+
+            assertEquals("Test output dit not match expected value", "Hello World", str);
+
+            str = r.readLine();
+
+            assertNull("Test output contained more data than expected: " + str, str);
+
+            r.close();
+
+        } finally {
+            try {
+                fs.delete(testDir, true);
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+    }
+
+    @Test
+    public void test_stdin_stdout_redirect_linux() throws Exception {
+
+        // We need a scheduler that actually has a filesystem underneath.
+        assumeTrue("Scheduler does not use filesystem", description.usesFileSystem());
+
+        FileSystem fs = scheduler.getFileSystem();
+
+        // This test does not run on windows.
+        assumeFalse("Test only suited for linux", scheduler.getAdaptorName().equals("local") && (LocalFileSystemUtils.isWindows()));
+
+        String command = "/bin/cat";
+
+        if (LocalFileSystemUtils.isOSX() && scheduler.getAdaptorName().equals("local")) {
+            command = "/usr/bin/cat";
+        }
+
+        assertTrue("Working dir does not exist", fs.exists(fs.getWorkingDirectory()));
+
+        Path testDir = fs.getWorkingDirectory().resolve(new Path(false, "test_workdir_usage"));
+
+        assertFalse("Test dir already exists", fs.exists(testDir));
+
+        try {
+            fs.createDirectory(testDir);
+
+            assertTrue("Failed to create test directory", fs.exists(testDir));
+
+            Path in = fs.getWorkingDirectory().resolve(new Path(false, "test_workdir_usage", "test_in.txt"));
+
+            BufferedWriter w = new BufferedWriter(new OutputStreamWriter(fs.writeToFile(in)));
+
+            w.write("Hello World");
+            w.close();
+
+            JobDescription job = new JobDescription();
+            job.setExecutable(command);
+            job.setWorkingDirectory("test_workdir_usage");
+            job.setStdin("test_in.txt");
+            job.setStdout("test_out.txt");
+
+            String id = scheduler.submitBatchJob(job);
+
+            // Torque seems slow (occasionally) to update the status, so we need a long timeout for a short job...
+            JobStatus status = scheduler.waitUntilDone(id, 20 * 1000);
+
+            assertTrue("Job is not done after timeout", status.isDone());
+
+            if (status.hasException()) {
+                throw status.getException();
+            }
+
+            assertTrue("Exit code not 0 but " + status.getExitCode(), status.getExitCode() == 0);
+
+            Path out = fs.getWorkingDirectory().resolve(new Path(false, "test_workdir_usage", "test_out.txt"));
+
+            assertTrue("Test output was not found in expected location", fs.exists(out));
+
+            BufferedReader r = new BufferedReader(new InputStreamReader(fs.readFromFile(out)));
+
+            String str = r.readLine();
+
+            assertEquals("Test output dit not match expected value", "Hello World", str);
+
+            str = r.readLine();
+
+            assertNull("Test output contained more data than expected: " + str, str);
+
+            r.close();
 
         } finally {
             try {

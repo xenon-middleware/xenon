@@ -180,6 +180,22 @@ public class TorqueUtilsTest {
     }
 
     @Test
+    public void test03b_generateSerialScriptContentWithStdin() {
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/executable");
+        description.setArguments("some", "arguments");
+        description.setStdin("in.txt");
+
+        Formatter output = new Formatter();
+
+        String expected = "/bin/executable 'some' 'arguments' < in.txt\n";
+
+        TorqueUtils.generateScriptContent(description, output);
+
+        assertEquals("serial script content incorrect", expected, output.out().toString());
+    }
+
+    @Test
     public void test01a_verifyJobDescription_ValidJobDescription_NoException() throws Exception {
         JobDescription description = new JobDescription();
 
