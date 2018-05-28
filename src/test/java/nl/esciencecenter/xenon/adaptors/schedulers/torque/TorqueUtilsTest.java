@@ -263,39 +263,6 @@ public class TorqueUtilsTest {
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
-    public void test01f_verifyJobDescription_InvalidStdout_ExceptionThrown() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // verify the standard settings are also checked
-        description.setExecutable("bin/bla");
-        description.setStdout("foo");
-        ;
-        TorqueUtils.verifyJobDescription(description);
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test01f_verifyJobDescription_InvalidStderr_ExceptionThrown() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // verify the standard settings are also checked
-        description.setExecutable("bin/bla");
-        description.setStderr("foo");
-        ;
-        TorqueUtils.verifyJobDescription(description);
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test01f_verifyJobDescription_InvalidStdin_ExceptionThrown() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // verify the standard settings are also checked
-        description.setExecutable("bin/bla");
-        description.setStdin("foo");
-        ;
-        TorqueUtils.verifyJobDescription(description);
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
     public void test01l_verifyJobDescription_JobScriptAndContents_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 

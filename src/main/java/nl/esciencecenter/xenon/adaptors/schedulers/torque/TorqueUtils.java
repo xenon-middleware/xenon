@@ -59,16 +59,6 @@ final class TorqueUtils {
     public static void verifyJobDescription(JobDescription description) throws XenonException {
         ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
 
-        // if (description.getStdout() != null) {
-        // throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Torque adaptor cannot set STDOUT: a custom STDOUT is set internally");
-        // }
-        // if (description.getStderr() != null) {
-        // throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Torque adaptor cannot set STDERR: a custom STDERR is set internally");
-        // }
-        // if (description.getStdin() != null) {
-        // throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Torque cannot process STDIN");
-        // }
-
         // check for option that overrides job script completely.
         if (description.getJobOptions().containsKey(JOB_OPTION_JOB_SCRIPT)) {
             if (description.getJobOptions().containsKey(JOB_OPTION_JOB_CONTENTS)) {
@@ -128,20 +118,8 @@ final class TorqueUtils {
         String stdin = description.getStdin();
 
         if (stdin != null) {
-            script.format("< %s", stdin);
+            script.format(" < %s", stdin);
         }
-
-        // String stdout = description.getStdout().trim();
-        //
-        // if (stdout != null && !stdout.isEmpty()) {
-        // script.format("> %s", stdout);
-        // }
-        //
-        // String stderr = description.getStderr().trim();
-        //
-        // if (stderr != null && !stderr.isEmpty()) {
-        // script.format("2> %s", stderr);
-        // }
 
         script.format("\n");
     }
@@ -165,15 +143,6 @@ final class TorqueUtils {
         script.format("#PBS -N %s\n", name);
 
         // set working directory
-        if (description.getWorkingDirectory() != null) {
-            String workingDirectory = description.getWorkingDirectory();
-            if (!workingDirectory.startsWith("/")) {
-                // make relative path absolute
-                workingDirectory = workdir.resolve(workingDirectory).toString();
-            }
-            script.format("#PBS -d %s\n", workingDirectory);
-        }
-
         String workingDirectory = description.getWorkingDirectory();
 
         if (workingDirectory != null) {
