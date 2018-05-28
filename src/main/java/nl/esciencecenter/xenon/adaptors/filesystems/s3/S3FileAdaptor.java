@@ -142,19 +142,20 @@ public class S3FileAdaptor extends FileAdaptor {
                     .buildView(BlobStoreContext.class);
         } else {
             // Default credentials, so we do not need to set the credentials for the server
-            context = ContextBuilder.newBuilder("s3").endpoint(server).credentials("anonymous", "javagat01").buildView(BlobStoreContext.class);
+            // context = ContextBuilder.newBuilder("s3").endpoint(server).credentials("anonymous", "javagat01").buildView(BlobStoreContext.class);
+            //
+            // System.out.println("EXISTS = " + context.getBlobStore().blobExists("minio", "filesystem-test-fixture2"));
+            //
+            // new Exception().printStackTrace(System.out);
+            //
+            // try {
+            // Thread.sleep(120);
+            // } catch (InterruptedException e) {
+            // // TODO Auto-generated catch block
+            // e.printStackTrace();
+            // }
 
-            System.out.println("EXISTS = " + context.getBlobStore().blobExists("minio", "filesystem-test-fixture2"));
-
-            new Exception().printStackTrace(System.out);
-
-            try {
-                Thread.sleep(120);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
+            throw new InvalidCredentialException(ADAPTOR_NAME, "Default credentials not supported yet!");
         }
 
         return new JCloudsFileSytem(getNewUniqueID(), ADAPTOR_NAME, server, credential, path, context, bucket, (int) bufferSize, xp);

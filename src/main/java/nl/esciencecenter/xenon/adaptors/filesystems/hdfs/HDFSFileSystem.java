@@ -47,6 +47,8 @@ public class HDFSFileSystem extends FileSystem {
     final org.apache.hadoop.fs.FileSystem fs;
     boolean closed;
 
+    private final String ERROR_MSG = "Error in HDFS connector";
+
     protected HDFSFileSystem(String uniqueID, String endPoint, Credential credential, org.apache.hadoop.fs.FileSystem fs, int bufferSize,
             XenonProperties properties) {
         super(uniqueID, "hdfs", endPoint, credential, fromHDFSPath(fs.getWorkingDirectory()), bufferSize, properties);
@@ -67,7 +69,7 @@ public class HDFSFileSystem extends FileSystem {
             fs.close();
             closed = true;
         } catch (IOException e) {
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+            throw new XenonException(getAdaptorName(), ERROR_MSG, e);
         }
     }
 
@@ -88,7 +90,7 @@ public class HDFSFileSystem extends FileSystem {
         try {
             fs.rename(toHDFSPath(source), toHDFSPath(target));
         } catch (IOException e) {
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+            throw new XenonException(getAdaptorName(), ERROR_MSG, e);
         }
     }
 
@@ -101,7 +103,7 @@ public class HDFSFileSystem extends FileSystem {
         try {
             fs.mkdirs(toHDFSPath(dir));
         } catch (IOException e) {
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+            throw new XenonException(getAdaptorName(), ERROR_MSG, e);
         }
 
     }
@@ -114,7 +116,7 @@ public class HDFSFileSystem extends FileSystem {
         try {
             fs.createNewFile(toHDFSPath(file));
         } catch (IOException e) {
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+            throw new XenonException(getAdaptorName(), ERROR_MSG, e);
         }
     }
 
@@ -126,7 +128,7 @@ public class HDFSFileSystem extends FileSystem {
         try {
             fs.createSymlink(toHDFSPath(target), toHDFSPath(link), false);
         } catch (IOException e) {
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+            throw new XenonException(getAdaptorName(), ERROR_MSG, e);
         }
 
     }
@@ -144,7 +146,7 @@ public class HDFSFileSystem extends FileSystem {
         try {
             fs.delete(toHDFSPath(path), recursive);
         } catch (IOException e) {
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+            throw new XenonException(getAdaptorName(), ERROR_MSG, e);
         }
     }
 
@@ -155,7 +157,7 @@ public class HDFSFileSystem extends FileSystem {
         try {
             return fs.exists(toHDFSPath(path));
         } catch (IOException e) {
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+            throw new XenonException(getAdaptorName(), ERROR_MSG, e);
         }
     }
 
@@ -200,7 +202,7 @@ public class HDFSFileSystem extends FileSystem {
         try {
             it = fs.listLocatedStatus(toHDFSPath(dir));
         } catch (IOException e) {
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+            throw new XenonException(getAdaptorName(), ERROR_MSG, e);
 
         }
         return new Iterator<PathAttributes>() {
@@ -236,7 +238,7 @@ public class HDFSFileSystem extends FileSystem {
             }
             return fs.open(toHDFSPath(path));
         } catch (IOException e) {
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+            throw new XenonException(getAdaptorName(), ERROR_MSG, e);
         }
     }
 
@@ -254,7 +256,7 @@ public class HDFSFileSystem extends FileSystem {
         try {
             return fs.create(toHDFSPath(path));
         } catch (IOException e) {
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+            throw new XenonException(getAdaptorName(), ERROR_MSG, e);
         }
     }
 
@@ -266,7 +268,7 @@ public class HDFSFileSystem extends FileSystem {
             org.apache.hadoop.fs.Path p = toHDFSPath(path);
             return fs.append(p);
         } catch (IOException e) {
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+            throw new XenonException(getAdaptorName(), ERROR_MSG, e);
         }
     }
 
@@ -382,7 +384,7 @@ public class HDFSFileSystem extends FileSystem {
             }
             return fromHDFSPath(fs.resolvePath(toHDFSPath(link)));
         } catch (IOException e) {
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+            throw new XenonException(getAdaptorName(), ERROR_MSG, e);
         }
 
     }
@@ -431,7 +433,7 @@ public class HDFSFileSystem extends FileSystem {
         try {
             fs.setPermission(toHDFSPath(path), new FsPermission(user, group, other));
         } catch (IOException e) {
-            throw new XenonException("hdfs", "Error in HDFS connector :" + e.getMessage(), e);
+            throw new XenonException(getAdaptorName(), ERROR_MSG, e);
         }
 
     }
