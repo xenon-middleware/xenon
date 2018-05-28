@@ -828,7 +828,7 @@ public abstract class SchedulerTestParent {
         FileSystem fs = scheduler.getFileSystem();
 
         // This test does not run on windows.
-        assumeFalse("Test only suited for linux", scheduler.getAdaptorName().equals("local") && (LocalFileSystemUtils.isWindows()));
+        assumeTrue("Test only suited for linux", scheduler.getAdaptorName().equals("local") && (LocalFileSystemUtils.isLinux()));
 
         String command = "/bin/echo";
 
@@ -900,7 +900,7 @@ public abstract class SchedulerTestParent {
         FileSystem fs = scheduler.getFileSystem();
 
         // This test does not run on windows.
-        assumeFalse("Test only suited for linux", scheduler.getAdaptorName().equals("local") && (LocalFileSystemUtils.isWindows()));
+        assumeTrue("Test only suited for linux", scheduler.getAdaptorName().equals("local") && (LocalFileSystemUtils.isLinux()));
 
         String command = "/bin/cat";
 
