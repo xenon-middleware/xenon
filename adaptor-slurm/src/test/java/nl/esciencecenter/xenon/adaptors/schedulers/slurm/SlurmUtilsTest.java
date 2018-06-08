@@ -373,13 +373,15 @@ public class SlurmUtilsTest {
         assertNull(result);
     }
 
-    @Test(expected = XenonException.class)
+    @Test
     public void test03h_getJobStatusFromScontrolInfo_IncompleteJobInfo_ExceptionThrown() throws XenonException {
         String jobID = "555";
         // empty job info
         Map<String, String> jobInfo = new HashMap<>();
 
-        SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
+        JobStatus status = SlurmUtils.getJobStatusFromScontrolInfo(jobInfo, jobID);
+
+        assertNull(status);
     }
 
     @Test

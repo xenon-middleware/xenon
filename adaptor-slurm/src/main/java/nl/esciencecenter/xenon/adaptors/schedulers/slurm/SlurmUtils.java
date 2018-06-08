@@ -152,7 +152,7 @@ public final class SlurmUtils {
 
     protected static JobStatus getJobStatusFromScontrolInfo(Map<String, String> jobInfo, String jobIdentifier) throws XenonException {
 
-        if (jobInfo == null) {
+        if (jobInfo == null || jobInfo.isEmpty()) {
             LOGGER.debug("No scontrol output provided");
             return null;
         }

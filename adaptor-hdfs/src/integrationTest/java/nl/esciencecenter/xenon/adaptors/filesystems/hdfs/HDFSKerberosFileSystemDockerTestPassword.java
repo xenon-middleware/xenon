@@ -94,6 +94,7 @@ public class HDFSKerberosFileSystemDockerTestPassword extends FileSystemTestInfr
 
     public FileSystem setupFileSystem() throws XenonException {
         String location = docker.containers().container("hdfs").port(8020).inFormat("localhost:$EXTERNAL_PORT");
+
         System.setProperty("java.security.krb5.conf", "src/integrationTest/resources/kerberos/krb5.conf");
         Map<String, String> props = new HashMap<>();
         props.put(HADOOP_SETTINGS_FILE, "src/integrationTest/resources/core-site-kerberos.xml");
