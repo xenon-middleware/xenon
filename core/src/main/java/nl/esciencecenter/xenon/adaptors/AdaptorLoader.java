@@ -35,13 +35,16 @@ public class AdaptorLoader {
 
     private static final HashMap<String, SchedulerAdaptor> schedulerAdaptors = new LinkedHashMap<>();
 
+    private static boolean loaded = false;
+
     static {
+        System.out.println("LOADING ADAPTORS");
         loadAdaptors();
     }
 
     private static void loadAdaptors() {
-        loadSchedulerAdaptors();
         loadFileAdaptors();
+        loadSchedulerAdaptors();
     }
 
     private static void loadSchedulerAdaptors() {
@@ -58,8 +61,12 @@ public class AdaptorLoader {
         ServiceLoader<SchedulerAdaptor> loader = ServiceLoader.load(SchedulerAdaptor.class);
         Iterator<SchedulerAdaptor> iterator = loader.iterator();
         schedulerAdaptors.clear();
+
+        System.out.println("LOADING SCHEDULER ADAPTORS");
+
         while (iterator.hasNext()) {
             SchedulerAdaptor adaptor = iterator.next();
+            System.out.println("   loading: " + adaptor.getName());
             schedulerAdaptors.put(adaptor.getName(), adaptor);
         }
     }
@@ -95,6 +102,8 @@ public class AdaptorLoader {
 
     public static SchedulerAdaptor getSchedulerAdaptor(String adaptorName) throws UnknownAdaptorException {
         checkAdaptorName(adaptorName);
+
+        System.out.println("Available schedulers: " + schedulerAdaptors.keySet());
 
         if (!schedulerAdaptors.containsKey(adaptorName)) {
             throw new UnknownAdaptorException(COMPONENT_NAME, String.format("Adaptor '%s' not found", adaptorName));

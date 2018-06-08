@@ -11,7 +11,8 @@ plugins {
 
     id 'org.unbroken-dome.test-sets' version '1.4.2'
 
-    id 'com.github.johnrengelman.plugin-shadow' version '2.0.2' apply false
+//    id 'com.github.johnrengelman.plugin-shadow' version '2.0.4' apply false
+    id 'com.github.johnrengelman.shadow' version '2.0.4'apply false
 }
 
 description = 'Xenon: a middleware abstraction library that provides a simple programming interface to various compute and storage resources.'

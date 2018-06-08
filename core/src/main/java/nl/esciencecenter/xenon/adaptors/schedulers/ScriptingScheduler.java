@@ -37,7 +37,7 @@ import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.Streams;
 
 /**
- * Connection to a remote scheduler, implemented by calling command line commands over a ssh connection.
+ * Connection to a (remote) scheduler, implemented by calling command line commands over a local or ssh connection.
  *
  */
 public abstract class ScriptingScheduler extends Scheduler {
