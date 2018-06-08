@@ -1,24 +1,3 @@
-// javadoc and userguide generation
-
-javadoc {
-    exclude 'nl/esciencecenter/xenon/adaptors/**'
-    options.overview = file("${buildDir}/overview.html")
-    options.showFromPublic()
-    options.setNoTimestamp(true)
-}
-
-task javadocDevel(type: Javadoc) {
-    description 'Generates Javadoc API documentation for the main source code for Xenon developers.'
-    group 'Documentation'
-    source = sourceSets.main.allJava
-    classpath = sourceSets.main.compileClasspath
-    title = javadoc.title + ' for Xenon developers'
-    destinationDir = file("${project.docsDir}/javadoc-devel")
-    options.showFromPrivate()
-    options.overview = file("${buildDir}/overview.html")
-    options.setNoTimestamp(true)
-}
-
 task adaptorDocumentation(type: JavaExec) {
     description 'Generates html snippet with options of adaptors (used in the javadoc overview page)'
     group 'documentation'
@@ -27,6 +6,26 @@ task adaptorDocumentation(type: JavaExec) {
     args = [output]
     classpath = sourceSets.docGenerator.runtimeClasspath
     outputs.file output
+}
+
+javadoc {
+    options.overview = file("${buildDir}/overview.html")
+    options.showFromPublic()
+    options.setNoTimestamp(true)
+    source = project(':core').sourceSets.main.allJava
+    classpath = files(project(':core').sourceSets.main.compileClasspath)
+}
+
+task javadocDevel(type: Javadoc) {
+    description 'Generates Javadoc API documentation for the main source code for Xenon developers.'
+    group 'Documentation'
+    options.showFromPrivate()
+    options.overview = file("${buildDir}/overview.html")
+    options.setNoTimestamp(true)
+    title = javadoc.title + ' for Xenon developers'
+    destinationDir = file("${project.docsDir}/javadoc-devel")
+    source = project(':core').sourceSets.main.allJava
+    classpath = files(project(':core').sourceSets.main.compileClasspath)
 }
 
 javadoc.dependsOn adaptorDocumentation

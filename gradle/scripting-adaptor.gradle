@@ -1,0 +1,9 @@
+apply from: "${rootProject.rootDir}/gradle/adaptor.gradle"
+
+dependencies {
+    compile project(path: ':adaptor-local', configuration: 'shadow')
+    compile project(path: ':adaptor-ssh', configuration: 'shadow')
+}
+
+
+

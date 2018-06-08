@@ -1,0 +1,6 @@
+apply from: "${rootProject.rootDir}/gradle/adaptor.gradle"
+
+dependencies {
+    compile group: 'org.jglobus', name: 'gridftp', version: '2.1.0'
+}
+
