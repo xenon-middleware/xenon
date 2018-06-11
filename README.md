@@ -87,7 +87,7 @@ and
 
 ```gradle
 	dependencies {
-	        compile 'nl.esciencecenter.xenon:xenon:2.6.1'
+	        compile 'nl.esciencecenter.xenon:xenon:2.6.2'
 	}
 
 ```
@@ -110,7 +110,7 @@ and
 	<dependency>
 	    <groupId>nl.esciencecenter.xenon</groupId>
 	    <artifactId>xenon</artifactId>
-	    <version>2.6.1</version>
+	    <version>2.6.2</version>
 	</dependency>
 ```
 
@@ -220,7 +220,7 @@ For more examples, see the tutorial at [Read The Docs](http://xenonrse2017.readt
 
 ## Documentation
 
-Xenon's JavaDoc is available online at <http://nlesc.github.io/Xenon/versions/2.6.1/javadoc/>.
+Xenon's JavaDoc is available online at <http://nlesc.github.io/Xenon/versions/2.6.2/javadoc/>.
 
 ## Legal
 
