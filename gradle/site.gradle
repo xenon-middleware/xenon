@@ -1,0 +1,29 @@
+// PUBLISH DOCUMENTATION
+
+task versionSite() {
+    description 'Update Xenon version of site'
+    group 'Publishing'
+    def content = """current: ${version}
+"""
+    def siteVersionFn = "docs/_data/version.yml"
+    doLast {
+        new File(siteVersionFn).text = content
+    }
+    outputs.upToDateWhen {
+        new File(siteVersionFn).text == content
+    }
+}
+
+task copyJavadoc(type: Copy) {
+    description 'Copy Xenon Java documentation to site'
+    group 'Publishing'
+    from "build/docs"
+    into "docs/versions/${version}"
+    dependsOn 'adaptorDocumentation', 'javadoc'
+}
+
+task publishSite() {
+    description 'Publishes artifacts to site (aka /docs/ directory)'
+    group 'Publishing'
+    dependsOn 'versionSite', 'copyJavadoc'
+}

@@ -99,7 +99,7 @@ Run examples
 # slurm on das5 with default credentials and a custom property
 ./gradlew liveTest -Dxenon.scheduler=slurm -Dxenon.scheduler.location=das5.vu.nl -Dxenon.adaptors.slurm.strictHostKeyChecking=false
 # sftp on localhost:10022
-/gradlew liveTest -Dxenon.filesystem=sftp -Dxenon.filesystem.location=localhost:10022  -Dxenon.username=xenon -Dxenon.password=javagat -Dxenon.adaptors.file.sftp.strictHostKeyChecking=false -Dxenon.adaptors.file.sftp.loadKnownHosts=false
+./gradlew liveTest -Dxenon.filesystem=sftp -Dxenon.filesystem.location=localhost:10022  -Dxenon.username=xenon -Dxenon.password=javagat -Dxenon.adaptors.file.sftp.strictHostKeyChecking=false -Dxenon.adaptors.file.sftp.loadKnownHosts=false
 # local filesystem and scheduler
 ./gradlew liveTest -Dxenon.scheduler=local -Dxenon.filesystem=file -Dxenon.filesystem.location=/ -Dxenon.username=$USERNAME -Dxenon.basedir=$PWD -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
 ```

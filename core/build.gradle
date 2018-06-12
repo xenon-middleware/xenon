@@ -1,0 +1,23 @@
+dependencies {
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.5'
+//    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.16.0'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-core', version: '1.3'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-library', version: '1.3'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+
+    testCompile project(path: ':adaptor-local', configuration: 'shadow')
+    testCompile project(path: ':adaptor-ssh', configuration: 'shadow')
+}
+
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            groupId 'nl.esciencecenter.xenon'
+            artifactId 'xenon-core'
+            version version
+            artifact sourcesJar
+        }
+    }
+}
