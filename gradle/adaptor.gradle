@@ -1,7 +1,8 @@
 apply plugin: 'org.unbroken-dome.test-sets'
 apply plugin: 'com.github.johnrengelman.plugin-shadow'
+apply plugin: 'maven'
 
-group = 'nl.esciencecenter.xenon.adaptor'
+group = 'nl.esciencecenter.xenon.adaptors'
 
 testSets {
     integrationTest
@@ -32,6 +33,7 @@ shadowJar {
     classifier = null
     mergeServiceFiles()
 }
+
 // make sure the dependencies of adaptors are not shadowed to same prefix 'shadow'
 configureRelocationShadowJar.prefix = project.name.replaceAll('-', '_') + '.shadow'
 
@@ -58,6 +60,7 @@ task jacocoFixedClientEnvironmentTestReport(type: JacocoReport) {
 publishing {
     publications {
         MyPublication(MavenPublication) {
+            version version
             artifact shadowJar
             artifact javadocJar
             artifact sourcesJar

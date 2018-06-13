@@ -5,5 +5,15 @@ dependencies {
     compile project(path: ':adaptor-ssh', configuration: 'shadow')
 }
 
+shadowJar {
+    // we ship adaptors always as jar with shaded deps
+    classifier = null
+    mergeServiceFiles()
+    dependencies {
+       exclude(project(':adaptor-local'))
+       exclude(project(':adaptor-ssh'))
+    }
+}
+
 
 

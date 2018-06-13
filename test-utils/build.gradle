@@ -9,7 +9,7 @@ publishing {
         MyPublication(MavenPublication) {
             from components.java
             groupId 'nl.esciencecenter.xenon'
-            artifactId 'xenon-test-utils'
+            artifactId 'test-utils'
             version version
             artifact sourcesJar
         }
