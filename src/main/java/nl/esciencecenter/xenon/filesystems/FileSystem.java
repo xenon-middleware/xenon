@@ -1445,9 +1445,13 @@ public abstract class FileSystem implements AutoCloseable {
         } catch (ExecutionException ee) {
             ex = new XenonException(getAdaptorName(), ee.getMessage(), ee);
             state = "FAILED";
-        } catch (CancellationException | InterruptedException ec) {
+        } catch (CancellationException ce) {
             ex = new CopyCancelledException(getAdaptorName(), "Copy cancelled by user");
             state = "FAILED";
+        } catch (InterruptedException e) {
+            ex = new CopyCancelledException(getAdaptorName(), "Copy interrupted by user");
+            state = "FAILED";
+            Thread.currentThread().interrupt();
         }
         return new CopyStatusImplementation(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
     }
@@ -1511,9 +1515,13 @@ public abstract class FileSystem implements AutoCloseable {
                 ex = new XenonException(getAdaptorName(), cause.getMessage(), cause);
             }
             state = "FAILED";
-        } catch (CancellationException | InterruptedException ec) {
+        } catch (CancellationException ce) {
             ex = new CopyCancelledException(getAdaptorName(), "Copy cancelled by user");
             state = "FAILED";
+        } catch (InterruptedException ie) {
+            ex = new CopyCancelledException(getAdaptorName(), "Copy interrupted by user");
+            state = "FAILED";
+            Thread.currentThread().interrupt();
         }
 
         if (copy.future.isDone()) {
@@ -1566,9 +1574,13 @@ public abstract class FileSystem implements AutoCloseable {
             } catch (ExecutionException ee) {
                 ex = new XenonException(getAdaptorName(), ee.getMessage(), ee);
                 state = "FAILED";
-            } catch (CancellationException | InterruptedException ec) {
+            } catch (CancellationException ce) {
                 ex = new CopyCancelledException(getAdaptorName(), "Copy cancelled by user");
                 state = "FAILED";
+            } catch (InterruptedException ie) {
+                ex = new CopyCancelledException(getAdaptorName(), "Copy interrupted by user");
+                state = "FAILED";
+                Thread.currentThread().interrupt();
             }
         } else if (copy.callback.isStarted()) {
             state = "RUNNING";
