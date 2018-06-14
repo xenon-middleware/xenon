@@ -1,0 +1,6 @@
+
+nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAdaptor
+nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor
+nl.esciencecenter.xenon.adaptors.schedulers.slurm.SlurmSchedulerAdaptor
+nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor
+nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor

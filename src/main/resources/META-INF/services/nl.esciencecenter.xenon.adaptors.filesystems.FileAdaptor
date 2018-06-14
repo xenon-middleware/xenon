@@ -1,0 +1,4 @@
+nl.esciencecenter.xenon.adaptors.filesystems.local.LocalFileAdaptor
+nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor
+nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor
+nl.esciencecenter.xenon.adaptors.filesystems.webdav.WebdavFileAdaptor

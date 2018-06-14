@@ -1,1 +1,0 @@
-apply from: "${rootProject.rootDir}/gradle/adaptor.gradle"
