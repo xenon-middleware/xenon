@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/NLeSC/Xenon.svg?branch=develop)](https://travis-ci.org/NLeSC/Xenon)
 [![Build status Windows](https://ci.appveyor.com/api/projects/status/h4l4wn158db23kuf?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon/branch/master)
 [![codecov.io](https://codecov.io/github/NLeSC/Xenon/coverage.svg?branch=master)](https://codecov.io/github/NLeSC/Xenon?branch=master)
-[![SonarQube Gate](https://sonarqube.com/api/badges/gate?key=nlesc%3AXenon)](https://sonarqube.com/dashboard?id=nlesc%3AXenon)
+[![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=nlesc%3AXenon&metric=alert_status)](https://sonarcloud.io/dashboard?id=nlesc%3AXenon)
 [![GitHub license](https://img.shields.io/badge/license-Apache--2.0%20-blue.svg)](https://github.com/NLeSC/Xenon/blob/master/LICENSE)
 [![Download](https://jitpack.io/v/NLeSC/Xenon.svg)](https://jitpack.io/#NLeSC/Xenon)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.597993.svg)](https://doi.org/10.5281/zenodo.597993)
