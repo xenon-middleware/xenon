@@ -1,0 +1,5 @@
+
+// TODO instead of running shell script to run fixed client env tests us a gradle task
+// Use our own previous solution or https://github.com/palantir/gradle-docker-test-runner
+
+// TODO add task to pull all Docker images used in the tests, to prevent pulling images during test run

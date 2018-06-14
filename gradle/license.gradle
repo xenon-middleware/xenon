@@ -1,0 +1,18 @@
+// Checking license
+// Depends on plugins:
+//   id 'com.github.hierynomus.license' version '0.12.1'
+
+license {
+    ext.copyright_year = 2013
+    ext.copyright_owner = 'Netherlands eScience Center'
+    header rootProject.file('config/license/HEADER')
+    strictCheck true
+    excludes(["**/create_symlinks*", "**/fixtures/**", "**/logback.xml"])
+    mapping {
+        // IntelliJ IDEA gives "Dangling Javadoc comment." warning when default JAVADOC_STYLE is used,
+        // so switch to comment style
+        java = 'SLASHSTAR_STYLE'
+    }
+}
+
+licenseFormat.description = "Applies the license found in the header file in files missing the header"
