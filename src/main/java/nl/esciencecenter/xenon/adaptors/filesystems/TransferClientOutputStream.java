@@ -13,26 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.filesystems.ftp;
+package nl.esciencecenter.xenon.adaptors.filesystems;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.commons.net.ftp.FTPClient;
-
 /**
- * Wraps an OutputStream instance. Only functionality added is sending a pending command completed signal after closing the output
- * stream.
+ * Wraps an OutputStream instance. Only functionality added is calling an extra close on a transfer client after closing the output stream.
  */
-public class FtpOutputStream extends OutputStream {
+public class TransferClientOutputStream extends OutputStream {
 
     private final OutputStream outputStream;
-    private final FTPClient ftpClient;
-    private boolean completedPendingFtpCommand = false;
+    private final Closeable client;
 
-    public FtpOutputStream(OutputStream outputStream, FTPClient ftpClient) {
+    public TransferClientOutputStream(OutputStream outputStream, Closeable client) {
         this.outputStream = outputStream;
-        this.ftpClient = ftpClient;
+        this.client = client;
     }
 
     @Override
@@ -52,14 +49,9 @@ public class FtpOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
+        outputStream.flush();
         outputStream.close();
-
-        // Added functionality:
-        if (!completedPendingFtpCommand) {
-            ftpClient.completePendingCommand();
-            completedPendingFtpCommand = true;
-            ftpClient.disconnect();
-        }
+        client.close();
     }
 
     @Override

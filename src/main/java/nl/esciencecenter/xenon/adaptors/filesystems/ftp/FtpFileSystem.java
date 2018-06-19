@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.adaptors.filesystems.ftp;
 import static nl.esciencecenter.xenon.adaptors.filesystems.ftp.FtpFileAdaptor.ADAPTOR_NAME;
 
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,6 +38,8 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.PathAttributesImplementation;
+import nl.esciencecenter.xenon.adaptors.filesystems.TransferClientInputStream;
+import nl.esciencecenter.xenon.adaptors.filesystems.TransferClientOutputStream;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.InvalidPathException;
@@ -56,6 +59,26 @@ public class FtpFileSystem extends FileSystem {
     private final FTPClient ftpClient;
     private final Credential credential;
     private final FtpFileAdaptor adaptor;
+
+    private static class CloseableClient implements Closeable {
+
+        private final FTPClient client;
+        private boolean closed = false;
+
+        CloseableClient(FTPClient client) {
+            this.client = client;
+        }
+
+        @Override
+        public void close() throws IOException {
+            // Added functionality:
+            if (!closed) {
+                closed = true;
+                client.completePendingCommand();
+                client.disconnect();
+            }
+        }
+    }
 
     protected FtpFileSystem(String uniqueID, String name, String location, Path entryPath, int bufferSize, FTPClient ftpClient, Credential credential,
             FtpFileAdaptor adaptor, XenonProperties properties) {
@@ -393,7 +416,7 @@ public class FtpFileSystem extends FileSystem {
 
             checkClientReply(newClient, "Failed to read from path: " + absPath.toString());
 
-            return new FtpInputStream(in, newClient);
+            return new TransferClientInputStream(in, new CloseableClient(newClient));
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to read from path: " + absPath);
         }
@@ -417,7 +440,7 @@ public class FtpFileSystem extends FileSystem {
             newClient.setFileType(FTPClient.BINARY_FILE_TYPE);
             OutputStream out = newClient.storeFileStream(absPath.toString());
             checkClientReply(newClient, "Failed to write to path: " + absPath.toString());
-            return new FtpOutputStream(out, newClient);
+            return new TransferClientOutputStream(out, new CloseableClient(newClient));
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to write to path: " + absPath);
         }
@@ -448,7 +471,7 @@ public class FtpFileSystem extends FileSystem {
                 checkClientReply("Failed to append to path: " + absPath.toString());
             }
 
-            return new FtpOutputStream(out, newClient);
+            return new TransferClientOutputStream(out, new CloseableClient(newClient));
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to append to path: " + absPath);
         }
