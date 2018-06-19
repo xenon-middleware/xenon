@@ -429,6 +429,10 @@ public abstract class FileSystem implements AutoCloseable {
         this.pool = Executors.newFixedThreadPool(1, f);
     }
 
+    protected int getBufferSize() {
+        return bufferSize;
+    }
+
     private synchronized String getNextCopyID() {
         return "COPY-" + getAdaptorName() + "-" + nextCopyID++;
     }
