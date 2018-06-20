@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.filesystems;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -1261,6 +1262,40 @@ public class FileSystemTest {
         Path entry = new Path("/test");
         FileSystem f = new MockFileSystem("0", "TEST0", "MEM", entry);
         f.getStatus("AAP");
+    }
+
+    @Test
+    public void test_getStatusFails() throws XenonException {
+        Path entry = new Path("/test");
+        MockFileSystem f = new MockFileSystem("0", "TEST0", "MEM", entry);
+
+        Path file = new Path("/test/file");
+
+        f.ensureFile(file);
+        f.addData(file, new byte[] { 42 });
+
+        Path target = new Path("/test/target");
+        String ID = f.copy(file, f, target, CopyMode.REPLACE, false);
+
+        CopyStatus status = f.getStatus(ID);
+
+        while (!status.isDone()) {
+            try {
+                Thread.sleep(50);
+            } catch (Exception e) {
+                // ignore
+            }
+
+            status = f.getStatus(ID);
+        }
+
+        assertTrue(f.exists(target));
+
+        byte[] data = f.getData(target);
+
+        assertNotNull(data);
+        assertEquals(1, data.length);
+        assertEquals(42, data[0]);
     }
 
     // cancel
