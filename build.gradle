@@ -8,18 +8,18 @@ plugins {
     id 'distribution'
     // publishing
     id 'maven-publish'
-    id 'com.jfrog.bintray' version '1.7.3'
+    id 'com.jfrog.bintray' version '1.8.2'
     // ide
     id 'idea'
     id 'eclipse'
     // code style
-    id "com.diffplug.gradle.spotless" version "3.4.1"
+    id "com.diffplug.gradle.spotless" version "3.13.0"
     // code coverage
     id 'jacoco'
     // license
     id 'com.github.hierynomus.license' version '0.14.0'
     // test sets
-    id 'org.unbroken-dome.test-sets' version '1.4.2'
+    id 'org.unbroken-dome.test-sets' version '1.5.0'
 }
 
 //    METADATA
