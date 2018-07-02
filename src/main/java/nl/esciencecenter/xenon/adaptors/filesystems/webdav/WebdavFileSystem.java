@@ -243,9 +243,12 @@ public class WebdavFileSystem extends FileSystem {
         Path absPath = toAbsolutePath(path);
 
         try {
+            System.out.println("Exists: " + getDirectoryPath(absPath));
+            System.out.println("Exists: " + getFilePath(absPath));
+
             return client.exists(getDirectoryPath(absPath)) || client.exists(getFilePath(absPath));
         } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to check existence of directory: " + absPath);
+            throw new XenonException(ADAPTOR_NAME, "Failed to check existence of directory: " + absPath, e);
         }
     }
 
@@ -258,7 +261,7 @@ public class WebdavFileSystem extends FileSystem {
         try {
             return client.get(getFilePath(absPath));
         } catch (IOException e) {
-            throw new XenonException(ADAPTOR_NAME, "Failed to access file: " + absPath);
+            throw new XenonException(ADAPTOR_NAME, "Failed to access file: " + absPath, e);
         }
     }
 

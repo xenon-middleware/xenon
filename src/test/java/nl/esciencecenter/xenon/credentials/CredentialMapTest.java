@@ -157,12 +157,25 @@ public class CredentialMapTest {
     }
 
     @Test
+    public void test_hashcode_equal() {
+
+        PasswordCredential p = new PasswordCredential("test", "foo".toCharArray());
+
+        CredentialMap m = new CredentialMap();
+        m.put("key", p);
+
+        PasswordCredential p2 = new PasswordCredential("test", "foo".toCharArray());
+
+        assertEquals(p.hashCode(), p2.hashCode());
+    }
+
+    @Test
     public void test_keySet() {
         CredentialMap m = new CredentialMap();
         PasswordCredential p = new PasswordCredential("test", "foo".toCharArray());
         m.put("key", p);
 
-        Set<String>ks = m.keySet();
+        Set<String> ks = m.keySet();
 
         Set<String> expected = new HashSet<>();
         expected.add("key");

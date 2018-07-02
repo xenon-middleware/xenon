@@ -20,3 +20,4 @@ services:
     image: nlesc/xenon-webdav
     ports:
     - 80
+    - 443

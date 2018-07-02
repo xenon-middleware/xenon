@@ -143,8 +143,11 @@ public class WebdavFileAdaptor extends FileAdaptor {
             server = server + ":" + port;
         }
 
-        String cwd = uri.getPath();
+        if (uri.getScheme().equals("https")) {
+            sardine.enablePreemptiveAuthentication(server, port, port);
+        }
 
+        String cwd = uri.getPath();
         return new WebdavFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, credential, server, new Path(cwd), (int) bufferSize, sardine, xp);
     }
 }
