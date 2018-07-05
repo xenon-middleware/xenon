@@ -21,17 +21,8 @@ ext.testLibDir = file('lib/test')
 ext.codestyleLibDir = file('lib/codestyle')
 
 sourceSets {
-    docGenerator {
-        java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
-        }
-    }
-}
-
-configurations {
-    docGeneratorCompile.extendsFrom compile
-    docGeneratorRuntime.extendsFrom runtime
+    docGenerator
+    testApi
 }
 
 testSets {
