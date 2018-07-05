@@ -15,7 +15,9 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.webdav;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -133,6 +135,12 @@ public class WebdavFileAdaptor extends FileAdaptor {
         } else if (credential instanceof PasswordCredential) {
             PasswordCredential tmp = (PasswordCredential) credential;
             sardine = SardineFactory.begin(tmp.getUsername(), new String(tmp.getPassword()));
+
+            try {
+                sardine.enablePreemptiveAuthentication(new URL(location));
+            } catch (MalformedURLException e) {
+                throw new InvalidLocationException(ADAPTOR_NAME, "Failed to parse location: " + location, e);
+            }
         }
 
         String server = uri.getScheme() + "://" + uri.getHost();
@@ -141,10 +149,6 @@ public class WebdavFileAdaptor extends FileAdaptor {
 
         if (port != -1) {
             server = server + ":" + port;
-        }
-
-        if (uri.getScheme().equals("https")) {
-            sardine.enablePreemptiveAuthentication(server, port, port);
         }
 
         String cwd = uri.getPath();

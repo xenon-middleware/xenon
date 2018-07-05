@@ -29,12 +29,8 @@ import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineU
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +39,7 @@ import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobSeenMap;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
@@ -65,21 +62,11 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GridEngineScheduler.class);
 
-    private final long accountingGraceTime;
-
-    /**
-     * Map with the last seen time of jobs. There is a delay between jobs disappearing from the qstat queue output, and information about this job appearing in
-     * the qacct output. Instead of throwing an exception, we allow for a certain grace time. Jobs will report the status "pending" during this time. Typical
-     * delays are in the order of seconds.
-     */
-    private final Map<String, Long> lastSeenMap;
-
-    // list of jobs we have killed before they even started. These will not end up in qacct, so we keep them here.
-    private final Set<Long> deletedJobs;
-
     private final GridEngineXmlParser parser;
 
     private final GridEngineSetup setupInfo;
+
+    private final JobSeenMap jobSeenMap;
 
     protected GridEngineScheduler(String uniqueID, String location, Credential credential, XenonPropertyDescription[] valid, Map<String, String> prop)
             throws XenonException {
@@ -87,12 +74,10 @@ public class GridEngineScheduler extends ScriptingScheduler {
         super(uniqueID, ADAPTOR_NAME, location, credential, prop, valid, POLL_DELAY_PROPERTY);
 
         boolean ignoreVersion = properties.getBooleanProperty(IGNORE_VERSION_PROPERTY);
-        accountingGraceTime = properties.getLongProperty(ACCOUNTING_GRACE_TIME_PROPERTY);
+        long accountingGraceTime = properties.getLongProperty(ACCOUNTING_GRACE_TIME_PROPERTY);
 
         parser = new GridEngineXmlParser(ignoreVersion);
-
-        lastSeenMap = new HashMap<>();
-        deletedJobs = new HashSet<>();
+        jobSeenMap = new JobSeenMap(accountingGraceTime);
 
         // Run a few commands to fetch info about the queue
         this.setupInfo = new GridEngineSetup(this);
@@ -108,57 +93,12 @@ public class GridEngineScheduler extends ScriptingScheduler {
         return null;
     }
 
-    private synchronized void updateJobsSeenMap(Set<String> identifiers) {
-        long currentTime = System.currentTimeMillis();
-
-        for (String identifier : identifiers) {
-            lastSeenMap.put(identifier, currentTime);
-        }
-
-        long expiredTime = currentTime + accountingGraceTime;
-
-        Iterator<Entry<String, Long>> iterator = lastSeenMap.entrySet().iterator();
-
-        while (iterator.hasNext()) {
-            Entry<String, Long> entry = iterator.next();
-
-            if (entry.getValue() > expiredTime) {
-                iterator.remove();
-            }
-        }
-
-    }
-
-    private synchronized boolean haveRecentlySeen(String identifier) {
-        if (!lastSeenMap.containsKey(identifier)) {
-            return false;
-        }
-
-        return (lastSeenMap.get(identifier) + accountingGraceTime) > System.currentTimeMillis();
-    }
-
-    private synchronized void addDeletedJob(String jobIdentifier) {
-        deletedJobs.add(Long.parseLong(jobIdentifier));
-    }
-
-    /*
-     * Note: Works exactly once per job.
-     */
-    private synchronized boolean jobWasDeleted(String jobIdentifier) {
-        // optimization of common case
-        if (deletedJobs.isEmpty()) {
-            return false;
-        }
-        return deletedJobs.remove(Long.parseLong(jobIdentifier));
-    }
-
     private void jobsFromStatus(String statusOutput, List<String> result) throws XenonException {
         Map<String, Map<String, String>> status = parser.parseJobInfos(statusOutput);
 
-        updateJobsSeenMap(status.keySet());
+        jobSeenMap.updateRecentlySeen(status.keySet());
 
         result.addAll(status.keySet());
-
     }
 
     @Override
@@ -259,7 +199,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
         String identifier = ScriptingParser.parseJobIDFromLine(output, ADAPTOR_NAME, "Your job");
 
-        updateJobsSeenMap(Collections.singleton(identifier));
+        jobSeenMap.updateRecentlySeen(Collections.singleton(identifier));
 
         return identifier;
     }
@@ -278,10 +218,10 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
         // keep track of the deleted jobs.
         if (matched == 1) {
-            addDeletedJob(jobIdentifier);
+            jobSeenMap.addDeletedJob(jobIdentifier);
         } else {
             // it will take a while to get this job to the accounting. Remember it existed for now
-            updateJobsSeenMap(Collections.singleton(jobIdentifier));
+            jobSeenMap.updateRecentlySeen(Collections.singleton(jobIdentifier));
         }
 
         return getJobStatus(jobIdentifier);
@@ -298,7 +238,7 @@ public class GridEngineScheduler extends ScriptingScheduler {
         Map<String, Map<String, String>> result = parser.parseJobInfos(runner.getStdout());
 
         // mark jobs we found as seen, in case they disappear from the queue
-        updateJobsSeenMap(result.keySet());
+        jobSeenMap.updateRecentlySeen(result.keySet());
 
         return result;
     }
@@ -347,13 +287,13 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
         // perhaps the job was killed while it was not running yet ("deleted", in sge speak). This will make it disappear from
         // qstat/qacct output completely
-        if (status == null && jobWasDeleted(jobIdentifier)) {
+        if (status == null && jobSeenMap.jobWasDeleted(jobIdentifier)) {
             XenonException exception = new JobCanceledException(ADAPTOR_NAME, "Job " + jobIdentifier + " deleted by user while still pending");
             status = new JobStatusImplementation(jobIdentifier, null, "killed", null, exception, false, true, null);
         }
 
         // this job is neither in qstat nor qacct output. we assume it is "in between" for a certain grace time.
-        if (status == null && haveRecentlySeen(jobIdentifier)) {
+        if (status == null && jobSeenMap.haveRecentlySeen(jobIdentifier)) {
             status = new JobStatusImplementation(jobIdentifier, null, "unknown", null, null, false, false, new HashMap<String, String>());
         }
 
