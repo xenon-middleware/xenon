@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.xenon.adaptors.schedulers.at;
 
 import static nl.esciencecenter.xenon.adaptors.schedulers.at.AtSchedulerAdaptor.ADAPTOR_NAME;
@@ -56,24 +71,24 @@ public class AtUtils {
 
     /**
      * Parse one or more lines of queue info as produced by <code>atq</code>.
-     * 
+     *
      * These lines have the following syntax:
-     * 
+     *
      * [jobID] [weekday] [month] [dayOfMonth] [time] [year] [queue] [user]
-     * 
+     *
      * For example:
-     * 
+     *
      * 11 Mon Jul 2 10:22:00 2018 a jason
-     * 
+     *
      * The parsed output will be split into "jobID", "startDate", "queue" and "user" data, which is combined in a Map (each using the respective keys). Each of
      * this Maps is stored is a larger Map using the "jobID" as a key. This larger map is returned as the return value this method.
-     * 
-     * For example, the example line above will result in the following return value: <code> 
+     *
+     * For example, the example line above will result in the following return value: <code>
      * Map("11":Map("jobID":"11", "startDate":"Mon Jul 2 10:22:00 2018", "queue":"a", "user":"jason"))
      * </code> If a set of queue names is provided in <code>queues</code>, only jobs from a matching queue will be returned in results. If
-     * <code>queues<code> is 
+     * <code>queues<code> is
      * <code>null</code> or empty, all jobs from all queues will be returned.
-     * 
+     *
      * @param atqOutput
      *            the output as produced by atq
      * @param queues

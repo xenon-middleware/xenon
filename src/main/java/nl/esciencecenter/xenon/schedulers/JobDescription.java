@@ -312,7 +312,7 @@ public class JobDescription {
 
     /**
      * Set the start time of the job.
-     * 
+     *
      * Currently supported values are "now", or an explicit time and optional date in the format "HH:mm[ dd.MM[.YYYY]]"
      *
      * @param startTime

@@ -74,7 +74,7 @@ public class ScriptingUtils {
 
     /**
      * Verify a String containing a start time.
-     * 
+     *
      * Currently supported values are "now", or an explicit time and date in the format "HH:mm[ dd.MM[.YYYY]]"
      *
      * @param startTime
@@ -110,11 +110,11 @@ public class ScriptingUtils {
 
     /**
      * Retrieve a working directory from a <code>JobDescription</code> and, if necessary, resolve it against a current working directory.
-     * 
+     *
      * This method retrieves the working directory from a <code>JobDescription</code>. If it is not specified, the <code>currentWorkingDir</code> will be
      * returned. If it is specified and an absolute path, it will be returned directly. Otherwise, it will first be resolved against the provided
      * <code>currentWorkingDir</code> and the resulting path will be returned.
-     * 
+     *
      * @param description
      *            the JobDescription containing the workingDirectory
      * @param currentWorkingDir
