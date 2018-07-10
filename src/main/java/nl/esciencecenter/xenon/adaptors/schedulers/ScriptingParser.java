@@ -38,14 +38,13 @@ public final class ScriptingParser {
 
     public static final Pattern HORIZONTAL_LINE_REGEX = Pattern.compile("^\\s*([=_-]{3,}\\s*)+$");
 
-    private ScriptingParser() {
-        throw new IllegalStateException("Utility class");
+    public ScriptingParser() {
+        // empty as this is a utility class
     }
 
-
     /**
-     * Parses a output with key=value pairs separated by whitespace, on one or more lines. This function fails if there is any
-     * whitespace between the key and value, or whitespace inside the values.
+     * Parses a output with key=value pairs separated by whitespace, on one or more lines. This function fails if there is any whitespace between the key and
+     * value, or whitespace inside the values.
      *
      * @param input
      *            the text to parse.
@@ -57,8 +56,7 @@ public final class ScriptingParser {
      * @throws XenonException
      *             if the input cannot be parsed.
      */
-    public static Map<String, String> parseKeyValuePairs(String input, String adaptorName, String... ignoredLines)
-            throws XenonException {
+    public static Map<String, String> parseKeyValuePairs(String input, String adaptorName, String... ignoredLines) throws XenonException {
         String[] lines = NEWLINE_REGEX.split(input);
         Map<String, String> result = new HashMap<>(lines.length * 4 / 3);
 
@@ -84,8 +82,10 @@ public final class ScriptingParser {
     /**
      * Returns if the given input String contains any of the option Strings given.
      *
-     * @param input String to check on
-     * @param options Strings to check for
+     * @param input
+     *            String to check on
+     * @param options
+     *            Strings to check for
      *
      * @return is any of the Strings in options is contain in the input string
      */
@@ -99,8 +99,7 @@ public final class ScriptingParser {
     }
 
     /**
-     * Parses lines containing single key/value pairs separated by the given separator, possibly surrounded by whitespace. Will
-     * ignore empty lines.
+     * Parses lines containing single key/value pairs separated by the given separator, possibly surrounded by whitespace. Will ignore empty lines.
      *
      * @param input
      *            the input to parse
@@ -114,8 +113,8 @@ public final class ScriptingParser {
      * @throws XenonException
      *             if the input cannot be parsed
      */
-    public static Map<String, String> parseKeyValueLines(String input, Pattern separatorRegEx, String adaptorName,
-            String... ignoredLines) throws XenonException {
+    public static Map<String, String> parseKeyValueLines(String input, Pattern separatorRegEx, String adaptorName, String... ignoredLines)
+            throws XenonException {
         String[] lines = NEWLINE_REGEX.split(input);
         Map<String, String> result = new HashMap<>(lines.length * 4 / 3);
 
@@ -145,29 +144,28 @@ public final class ScriptingParser {
      *            a number of possible prefixes before the job ID.
      * @return the job ID found on the input line.
      * @throws XenonException
-     *          if the input could not be parsed.
+     *             if the input could not be parsed.
      */
     public static String parseJobIDFromLine(String input, String adaptorName, String... possiblePrefixes) throws XenonException {
         for (String prefix : possiblePrefixes) {
             if (input.startsWith(prefix)) {
-                //cut off prefix
+                // cut off prefix
                 String jobId = input.substring(prefix.length()).trim();
 
-                //trim leading and trailing whitespace
+                // trim leading and trailing whitespace
                 jobId = jobId.trim();
 
-                //see if anything remains
+                // see if anything remains
                 if (jobId.length() == 0) {
-                    throw new XenonException(adaptorName, "failed to get jobID from line: \"" + input
-                            + "\" Line did not contain job ID.");
+                    throw new XenonException(adaptorName, "failed to get jobID from line: \"" + input + "\" Line did not contain job ID.");
                 }
 
-                //cut of anything after the job id
+                // cut of anything after the job id
                 return WHITESPACE_REGEX.split(jobId)[0];
             }
         }
-        throw new XenonException(adaptorName, "Failed to get jobID from line: \"" + input
-                + "\" Line does not match expected prefixes: " + Arrays.toString(possiblePrefixes));
+        throw new XenonException(adaptorName,
+                "Failed to get jobID from line: \"" + input + "\" Line does not match expected prefixes: " + Arrays.toString(possiblePrefixes));
     }
 
     /**
@@ -176,11 +174,10 @@ public final class ScriptingParser {
      * Although more than one possible suffix can be provided, only the first suffix encountered will be removed.
      *
      * @param value
-     *          the text to clean
+     *            the text to clean
      * @param suffixes
-     *          the possible suffixes to remove
-     * @return
-     *          the cleaned text
+     *            the possible suffixes to remove
+     * @return the cleaned text
      */
     public static String cleanValue(String value, String... suffixes) {
         String trimmed = value.trim();
@@ -209,15 +206,16 @@ public final class ScriptingParser {
      *            the adaptor name to report in case parsing failed
      *
      * @param valueSuffixes
-     *            suffixes to be removed from values in the table. Useful if the output contains special markers for defaults,
-     *            disabled queues, broken nodes, etc
+     *            suffixes to be removed from values in the table. Useful if the output contains special markers for defaults, disabled queues, broken nodes,
+     *            etc
      *
      * @return a map containing key/value maps of all records.
-     * @throws XenonException when parsing fails
+     * @throws XenonException
+     *             when parsing fails
      */
     @SuppressWarnings("PMD.NPathComplexity")
-    public static Map<String, Map<String, String>> parseTable(String input, String keyField, Pattern fieldSeparatorRegEx,
-            String adaptorName, String... valueSuffixes) throws XenonException {
+    public static Map<String, Map<String, String>> parseTable(String input, String keyField, Pattern fieldSeparatorRegEx, String adaptorName,
+            String... valueSuffixes) throws XenonException {
         if (input.isEmpty()) {
             throw new XenonException(adaptorName, "Cannot parse table, Got no input, expected at least a header");
         }
@@ -226,7 +224,7 @@ public final class ScriptingParser {
 
         int headerLine = 0;
         String[] fields;
-        //the first line will contain the fields (unless it is a separator)
+        // the first line will contain the fields (unless it is a separator)
         while (headerLine < lines.length && HORIZONTAL_LINE_REGEX.matcher(lines[headerLine]).find()) {
             headerLine++;
         }
@@ -245,7 +243,7 @@ public final class ScriptingParser {
         }
 
         Map<String, Map<String, String>> result = new HashMap<>(lines.length * 4 / 3);
-        int rowSize = (int)Math.ceil(fields.length / 0.75);
+        int rowSize = (int) Math.ceil(fields.length / 0.75);
 
         for (int i = headerLine + 1; i < lines.length; i++) {
             if (HORIZONTAL_LINE_REGEX.matcher(lines[i]).find()) {
@@ -256,8 +254,8 @@ public final class ScriptingParser {
             String[] values = mergeTuples(fieldSeparatorRegEx.split(lines[i]));
 
             if (fields.length != values.length) {
-                throw new XenonException(adaptorName, "Expected " + fields.length + " fields in output " + Arrays.toString(fields)
-                    + ", got line with " + values.length + " values: " + lines[i] + "parsed to: " + Arrays.toString(values) + " original input\n\n" + input + "\n\n");
+                throw new XenonException(adaptorName, "Expected " + fields.length + " fields in output " + Arrays.toString(fields) + ", got line with "
+                        + values.length + " values: " + lines[i] + "parsed to: " + Arrays.toString(values) + " original input\n\n" + input + "\n\n");
             }
 
             Map<String, String> map = new HashMap<>(rowSize);
@@ -278,16 +276,15 @@ public final class ScriptingParser {
     /*
      * Attempt to support simple tuples in the output. The splitter will typically split these into two elements. For example:
      *
-     *     "(bla, bla)"
+     * "(bla, bla)"
      *
      * will be split into
      *
-     *     "(bla,"
-     *     "bla)
+     * "(bla," "bla)
      *
      * while we typically expect these to remain as one string.
      */
-    private static String [] mergeTuples(String [] values) {
+    private static String[] mergeTuples(String[] values) {
 
         boolean inTuple = false;
 
@@ -305,7 +302,7 @@ public final class ScriptingParser {
                     tmp.add(v);
                 }
             } else {
-                current = CommandLineUtils.concat(current, " ", v); // Damn.. no clue which whitespace to use here :-(
+                current = ScriptingUtils.concat(current, " ", v); // Damn.. no clue which whitespace to use here :-(
 
                 if (v.endsWith(")") && !v.startsWith("(")) {
                     inTuple = false;
@@ -324,8 +321,7 @@ public final class ScriptingParser {
     }
 
     /**
-     * Checks if the given text contains any of the given options. Returns which option it contains, throws an exception if it
-     * doesn't.
+     * Checks if the given text contains any of the given options. Returns which option it contains, throws an exception if it doesn't.
      *
      * @param input
      *            the input text to check
@@ -347,8 +343,7 @@ public final class ScriptingParser {
     }
 
     /**
-     * Parses a list of strings, separated by whitespace (including newlines)
-     * Trailing empty strings are not included.
+     * Parses a list of strings, separated by whitespace (including newlines) Trailing empty strings are not included.
      *
      * @param input
      *            the input to parse
@@ -363,8 +358,8 @@ public final class ScriptingParser {
     }
 
     /**
-     * Parses multiple key value records. A new record begins when the given key field is found. Each line contains a single
-     * key/value pair, separated by the given separator.
+     * Parses multiple key value records. A new record begins when the given key field is found. Each line contains a single key/value pair, separated by the
+     * given separator.
      *
      * @param input
      *            the input to parse.
@@ -377,10 +372,11 @@ public final class ScriptingParser {
      * @param keyField
      *            the header field which triggers a new record. the first line of the output must contain this key
      * @return a map with all records found. The value of the key field is used as a key.
-     * @throws XenonException in case the output does not match the expected format
+     * @throws XenonException
+     *             in case the output does not match the expected format
      */
-    public static Map<String, Map<String, String>> parseKeyValueRecords(String input, String keyField, Pattern separatorRegEx,
-            String adaptorName, String... ignoredLines) throws XenonException {
+    public static Map<String, Map<String, String>> parseKeyValueRecords(String input, String keyField, Pattern separatorRegEx, String adaptorName,
+            String... ignoredLines) throws XenonException {
         String[] lines = NEWLINE_REGEX.split(input);
         Map<String, Map<String, String>> result = new HashMap<>();
 
@@ -398,12 +394,11 @@ public final class ScriptingParser {
                 String value = elements[1].trim();
 
                 if (key.equals(keyField)) {
-                    //listing of a new item starts
+                    // listing of a new item starts
                     currentMap = new HashMap<>(2);
                     result.put(value, currentMap);
                 } else if (currentMap == null) {
-                    throw new XenonException(adaptorName, "Expecting \"" + keyField
-                            + "\" on first line, got \"" + line + "\"");
+                    throw new XenonException(adaptorName, "Expecting \"" + keyField + "\" on first line, got \"" + line + "\"");
                 }
                 currentMap.put(key, value);
             }

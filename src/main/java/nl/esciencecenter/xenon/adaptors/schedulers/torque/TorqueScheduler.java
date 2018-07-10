@@ -232,9 +232,7 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         Path workdir = getWorkingDirectory();
 
-        verifyJobDescription(description);
-
-        checkQueue(queueNames, description.getQueueName());
+        verifyJobDescription(description, queueNames);
 
         // check for option that overrides job script completely.
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);

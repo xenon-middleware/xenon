@@ -1,12 +1,29 @@
 package nl.esciencecenter.xenon.adaptors.schedulers.at;
 
+import static nl.esciencecenter.xenon.adaptors.schedulers.at.AtSchedulerAdaptor.ADAPTOR_NAME;
+
+import java.util.Formatter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
+import nl.esciencecenter.xenon.filesystems.Path;
+import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 public class AtUtils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AtUtils.class);
+
+    public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
+
+    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
 
     public AtUtils() {
         // utility class
@@ -89,8 +106,109 @@ public class AtUtils {
         return ids.toArray(new String[ids.size()]);
     }
 
-    public static String generateJobScript(JobDescription description) {
-        // TODO Auto-generated method stub
-        return null;
+    public static void verifyJobDescription(JobDescription description, String[] queueNames) throws XenonException {
+
+        ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
+
+        // check for option that overrides job script completely.
+        // if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
+        // no other settings checked.
+        // return;
+        // }
+
+        // Perform standard checks.
+        ScriptingUtils.verifyJobDescription(description, queueNames, ADAPTOR_NAME);
+
+        // Perform at specific checks
+        int nodeCount = description.getNodeCount();
+
+        if (nodeCount > 1) {
+            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Unsupported node count: " + nodeCount);
+        }
+
+        int processesPerNode = description.getProcessesPerNode();
+
+        if (processesPerNode > 1) {
+            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Unsupported processes per node count: " + processesPerNode);
+        }
+
+        int maxTime = description.getMaxRuntime();
+
+        if (maxTime != 0) {
+            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Unsupported maximum runtime: " + maxTime);
+        }
     }
+
+    public static String generateJobScript(JobDescription description, Path fsEntryPath) {
+        StringBuilder stringBuilder = new StringBuilder();
+        Formatter script = new Formatter(stringBuilder, Locale.US);
+
+        // script.format("%s\n", "#!/bin/sh");
+
+        String name = description.getName();
+
+        if (name == null || name.trim().isEmpty()) {
+            name = "xenon";
+        }
+
+        // set name of job to xenon
+        script.format("#AT_JOBNAME %s\n", name);
+
+        // set working directory
+        String workingDir = ScriptingUtils.getWorkingDirPath(description, fsEntryPath);
+        script.format("#AT_WORKDIR %s\n", workingDir);
+
+        if (description.getQueueName() != null) {
+            script.format("#AT_QUEUE %s\n", description.getQueueName());
+        }
+
+        if (description.getStartTime() != null) {
+            script.format("#AT_STARTTIME %s\n", description.getStartTime());
+        }
+
+        if (description.getStdin() != null) {
+            script.format("#SBATCH --input='%s'\n", description.getStdin());
+        }
+
+        if (description.getStdout() == null) {
+            script.format("#SBATCH --output=/dev/null\n");
+        } else {
+            script.format("#SBATCH --output='%s'\n", description.getStdout());
+        }
+
+        if (description.getStderr() == null) {
+            script.format("%s\n", "#SBATCH --error=/dev/null");
+        } else {
+            script.format("#SBATCH --error='%s'\n", description.getStderr());
+        }
+
+        for (String argument : description.getSchedulerArguments()) {
+            script.format("#SBATCH %s\n", argument);
+        }
+
+        for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
+            script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());
+        }
+
+        script.format("\n");
+
+        if (!description.isStartSingleProcess()) {
+            // run commands through srun
+            script.format("%s ", "srun");
+        }
+
+        script.format("%s", description.getExecutable());
+
+        for (String argument : description.getArguments()) {
+            script.format(" %s", ScriptingUtils.protectAgainstShellMetas(argument));
+        }
+        script.format("\n");
+
+        script.close();
+
+        LOGGER.debug("Created job script:%n{} from description {}", stringBuilder, description);
+
+        return stringBuilder.toString();
+    }
+
 }

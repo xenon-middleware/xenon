@@ -206,7 +206,7 @@ public class TorqueUtilsTest {
         description.setMaxRuntime(1);
         // GridEngine specific info
 
-        TorqueUtils.verifyJobDescription(description);
+        TorqueUtils.verifyJobDescription(description, null);
     }
 
     @Test
@@ -221,7 +221,7 @@ public class TorqueUtilsTest {
         // GridEngine specific info
         description.addJobOption(TorqueUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
 
-        TorqueUtils.verifyJobDescription(description);
+        TorqueUtils.verifyJobDescription(description, null);
     }
 
     @Test
@@ -238,7 +238,7 @@ public class TorqueUtilsTest {
         description.setMaxRuntime(0);
         // GridEngine specific info
 
-        TorqueUtils.verifyJobDescription(description);
+        TorqueUtils.verifyJobDescription(description, null);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -248,7 +248,7 @@ public class TorqueUtilsTest {
         // set a job option
         description.addJobOption("wrong.setting", "wrong.value");
 
-        TorqueUtils.verifyJobDescription(description);
+        TorqueUtils.verifyJobDescription(description, null);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -259,7 +259,7 @@ public class TorqueUtilsTest {
         description.setExecutable("bin/bla");
         description.setMaxRuntime(0);
 
-        TorqueUtils.verifyJobDescription(description);
+        TorqueUtils.verifyJobDescription(description, null);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -270,7 +270,7 @@ public class TorqueUtilsTest {
         description.addJobOption(TorqueUtils.JOB_OPTION_JOB_SCRIPT, "other");
         description.addJobOption(TorqueUtils.JOB_OPTION_JOB_CONTENTS, "some");
 
-        TorqueUtils.verifyJobDescription(description);
+        TorqueUtils.verifyJobDescription(description, null);
     }
 
     @Test

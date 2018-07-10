@@ -154,6 +154,24 @@ public class JobDescriptionTest {
         j.addJobOption("key", null);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void test_addSchedulerArgumentNull() throws Exception {
+        JobDescription j = new JobDescription();
+        j.addSchedulerArgument(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_addSchedulerArgumentEmpty() throws Exception {
+        JobDescription j = new JobDescription();
+        j.addSchedulerArgument("");
+    }
+
+    @Test
+    public void test_addSchedulerArgument() throws Exception {
+        JobDescription j = new JobDescription();
+        j.addSchedulerArgument("ARG");
+    }
+
     private int doHash(String queueName, String executable, String name, String[] arguments, String[] schedulerArguments, String stdin, String stdout,
             String stderr, String workingDirectory, Map<String, String> environment, Map<String, String> jobOptions, int nodeCount, int processesPerNode,
             int threadsPerProcess, int maxMemory, int tempSpace, boolean startSingleProcess, int maxRuntime) {

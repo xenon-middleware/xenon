@@ -34,6 +34,7 @@ import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GridEngineUtilsTest {
@@ -263,7 +264,7 @@ public class GridEngineUtilsTest {
         description.setMaxRuntime(1);
         // GridEngine specific info
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test
@@ -278,7 +279,7 @@ public class GridEngineUtilsTest {
         // GridEngine specific info
         description.addJobOption(GridEngineUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test
@@ -295,7 +296,7 @@ public class GridEngineUtilsTest {
         description.setMaxRuntime(0);
         // GridEngine specific info
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -305,7 +306,7 @@ public class GridEngineUtilsTest {
         // set a job option
         description.addJobOption("wrong.setting", "wrong.value");
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -316,7 +317,7 @@ public class GridEngineUtilsTest {
         description.setExecutable("bin/bla");
         description.setMaxRuntime(0);
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test
@@ -332,7 +333,39 @@ public class GridEngineUtilsTest {
         description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
         description.setQueueName("some.queue");
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
+    }
+
+    @Test
+    public void test01g_verifyJobDescription_ValidParallelJobDescriptionWithQueue_NoException2() throws Exception {
+        JobDescription description = new JobDescription();
+
+        // all the settings the function checks for set exactly right
+        description.setExecutable("/bin/nothing");
+        description.setNodeCount(2);
+        description.setProcessesPerNode(2);
+        description.setMaxRuntime(1);
+        // GridEngine specific info
+        description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
+        description.setQueueName("some.queue");
+
+        GridEngineUtils.verifyJobDescription(description, new String[] { "some.queue" });
+    }
+
+    @Test(expected = NoSuchQueueException.class)
+    public void test01g_verifyJobDescription_ValidParallelJobDescriptionWithQueue_ExceptionWrongQueue() throws Exception {
+        JobDescription description = new JobDescription();
+
+        // all the settings the function checks for set exactly right
+        description.setExecutable("/bin/nothing");
+        description.setNodeCount(2);
+        description.setProcessesPerNode(2);
+        description.setMaxRuntime(1);
+        // GridEngine specific info
+        description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
+        description.setQueueName("some.queue");
+
+        GridEngineUtils.verifyJobDescription(description, new String[] { "some.other.queue" });
     }
 
     @Test
@@ -348,7 +381,7 @@ public class GridEngineUtilsTest {
         description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
         description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_SLOTS, "11");
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -363,7 +396,7 @@ public class GridEngineUtilsTest {
         // GridEngine specific info
         description.setQueueName("some.queue");
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -378,7 +411,7 @@ public class GridEngineUtilsTest {
         // GridEngine specific info
         description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test()
@@ -388,7 +421,7 @@ public class GridEngineUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setStartSingleProcess(true);
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test

@@ -517,7 +517,7 @@ public class SlurmUtilsTest {
         description.setProcessesPerNode(1);
         description.setMaxRuntime(1);
         // slurm specific info
-        SlurmUtils.verifyJobDescription(description, false);
+        SlurmUtils.verifyJobDescription(description, null, false);
     }
 
     @Test
@@ -532,7 +532,7 @@ public class SlurmUtilsTest {
         // slurm specific info
         description.addJobOption(SlurmUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
 
-        SlurmUtils.verifyJobDescription(description, false);
+        SlurmUtils.verifyJobDescription(description, null, false);
     }
 
     @Test
@@ -548,7 +548,7 @@ public class SlurmUtilsTest {
         description.setProcessesPerNode(0);
         description.setMaxRuntime(0);
 
-        SlurmUtils.verifyJobDescription(description, false);
+        SlurmUtils.verifyJobDescription(description, null, false);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -558,7 +558,7 @@ public class SlurmUtilsTest {
         // set a job option
         description.addJobOption("wrong.setting", "wrong.value");
 
-        SlurmUtils.verifyJobDescription(description, false);
+        SlurmUtils.verifyJobDescription(description, null, false);
     }
 
     // @Test(expected = InvalidJobDescriptionException.class)
@@ -578,7 +578,7 @@ public class SlurmUtilsTest {
         description.setExecutable("bin/bla");
         description.setMaxRuntime(0);
 
-        SlurmUtils.verifyJobDescription(description, false);
+        SlurmUtils.verifyJobDescription(description, null, false);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -593,7 +593,7 @@ public class SlurmUtilsTest {
         // slurm specific info
         description.addJobOption(SlurmUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
 
-        SlurmUtils.verifyJobDescription(description, true);
+        SlurmUtils.verifyJobDescription(description, null, true);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -608,7 +608,7 @@ public class SlurmUtilsTest {
         // slurm specific info
         description.setStartSingleProcess(true);
 
-        SlurmUtils.verifyJobDescription(description, true);
+        SlurmUtils.verifyJobDescription(description, null, true);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -623,7 +623,7 @@ public class SlurmUtilsTest {
         // slurm specific info
         description.setStdin("stdin.txt");
 
-        SlurmUtils.verifyJobDescription(description, true);
+        SlurmUtils.verifyJobDescription(description, null, true);
     }
 
     @Test
@@ -638,7 +638,7 @@ public class SlurmUtilsTest {
         // slurm specific info
         description.setStdout("stdout.txt");
 
-        SlurmUtils.verifyJobDescription(description, true);
+        SlurmUtils.verifyJobDescription(description, null, true);
     }
 
     @Test
@@ -653,7 +653,7 @@ public class SlurmUtilsTest {
         // slurm specific info
         description.setStderr("stderr.txt");
 
-        SlurmUtils.verifyJobDescription(description, true);
+        SlurmUtils.verifyJobDescription(description, null, true);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -668,7 +668,7 @@ public class SlurmUtilsTest {
         // slurm specific info
         description.setStdout("foobar.txt");
 
-        SlurmUtils.verifyJobDescription(description, true);
+        SlurmUtils.verifyJobDescription(description, null, true);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -683,7 +683,7 @@ public class SlurmUtilsTest {
         // slurm specific info
         description.setStderr("foobar.txt");
 
-        SlurmUtils.verifyJobDescription(description, true);
+        SlurmUtils.verifyJobDescription(description, null, true);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -702,7 +702,7 @@ public class SlurmUtilsTest {
 
         description.setEnvironment(env);
 
-        SlurmUtils.verifyJobDescription(description, true);
+        SlurmUtils.verifyJobDescription(description, null, true);
     }
 
     @Test

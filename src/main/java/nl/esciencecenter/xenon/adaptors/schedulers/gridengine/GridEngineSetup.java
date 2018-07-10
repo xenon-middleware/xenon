@@ -20,14 +20,14 @@ import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineS
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.ParallelEnvironmentInfo.AllocationRule;
-import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
-import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
-import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
+import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.ParallelEnvironmentInfo.AllocationRule;
 
 /**
  * Holds some info on the specifics of the machine we are connected to, such as queues and parallel environments.
@@ -65,12 +65,10 @@ public class GridEngineSetup {
         return ScriptingParser.parseList(queueListOutput);
     }
 
-    private static Map<String, QueueInfo> getQueues(String[] queueNames, GridEngineScheduler scheduler)
-            throws XenonException {
-        String output = scheduler.runCheckedCommand(null, "qconf", "-sq", CommandLineUtils.asCSList(queueNames));
+    private static Map<String, QueueInfo> getQueues(String[] queueNames, GridEngineScheduler scheduler) throws XenonException {
+        String output = scheduler.runCheckedCommand(null, "qconf", "-sq", ScriptingUtils.asCSList(queueNames));
 
-        Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(output, "qname",
-                ScriptingParser.WHITESPACE_REGEX, ADAPTOR_NAME);
+        Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(output, "qname", ScriptingParser.WHITESPACE_REGEX, ADAPTOR_NAME);
 
         Map<String, QueueInfo> result = new HashMap<>();
 
@@ -92,29 +90,26 @@ public class GridEngineSetup {
         LOGGER.debug("Created setup info, queues = {}, parallel environments = {}", this.queues, this.parallelEnvironments);
     }
 
-    private static Map<String, ParallelEnvironmentInfo> getParallelEnvironments(GridEngineScheduler scheduler)
-            throws XenonException {
-        //first retrieve a list of parallel environments
+    private static Map<String, ParallelEnvironmentInfo> getParallelEnvironments(GridEngineScheduler scheduler) throws XenonException {
+        // first retrieve a list of parallel environments
         RemoteCommandRunner runner = scheduler.runCommand(null, "qconf", "-spl");
 
-        //qconf returns an error if there are no parallel environments
+        // qconf returns an error if there are no parallel environments
         if (runner.getExitCode() == 1 && runner.getStderr().contains("no parallel environment defined")) {
             return new HashMap<>();
         }
 
         if (!runner.success()) {
-            throw new XenonException(ADAPTOR_NAME, "Could not get parallel environment info from scheduler: "
-                    + runner);
+            throw new XenonException(ADAPTOR_NAME, "Could not get parallel environment info from scheduler: " + runner);
         }
 
         String[] parallelEnvironmentNames = ScriptingParser.parseList(runner.getStdout());
 
-        //then get the details of each parallel environment
-        String peDetailsOutput = scheduler.runCheckedCommand(null, "qconf",
-                qconfPeDetailsArguments(parallelEnvironmentNames));
+        // then get the details of each parallel environment
+        String peDetailsOutput = scheduler.runCheckedCommand(null, "qconf", qconfPeDetailsArguments(parallelEnvironmentNames));
 
-        Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(peDetailsOutput, "pe_name",
-                ScriptingParser.WHITESPACE_REGEX, ADAPTOR_NAME);
+        Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(peDetailsOutput, "pe_name", ScriptingParser.WHITESPACE_REGEX,
+                ADAPTOR_NAME);
 
         Map<String, ParallelEnvironmentInfo> result = new HashMap<>();
 
@@ -146,37 +141,33 @@ public class GridEngineSetup {
     }
 
     /*
-     * Get SGE to give us the required number of nodes. Since sge uses the rather abstract notion of slots, the number we need to
-     * give is dependent on the parallel environment settings.
+     * Get SGE to give us the required number of nodes. Since sge uses the rather abstract notion of slots, the number we need to give is dependent on the
+     * parallel environment settings.
      */
     protected int calculateSlots(String parallelEnvironmentName, String queueName, int nodeCount) throws XenonException {
         ParallelEnvironmentInfo pe = parallelEnvironments.get(parallelEnvironmentName);
         QueueInfo queue = queues.get(queueName);
 
         if (pe == null) {
-            throw new XenonException(ADAPTOR_NAME, "requested parallel environment \""
-                    + parallelEnvironmentName + "\" cannot be found at server");
+            throw new XenonException(ADAPTOR_NAME, "requested parallel environment \"" + parallelEnvironmentName + "\" cannot be found at server");
         }
 
         if (queue == null) {
-            throw new XenonException(ADAPTOR_NAME, "requested queue \"" + queueName
-                    + "\" cannot be found at server");
+            throw new XenonException(ADAPTOR_NAME, "requested queue \"" + queueName + "\" cannot be found at server");
         }
 
-        LOGGER.debug("Calculating slots to get {} nodes in queue \"{}\" with parallel environment \"{}\""
-                + " and allocation rule \"{}\" with ppn {}", nodeCount, queueName, parallelEnvironmentName,
-                pe.getAllocationRule(), pe.getPpn());
+        LOGGER.debug("Calculating slots to get {} nodes in queue \"{}\" with parallel environment \"{}\"" + " and allocation rule \"{}\" with ppn {}",
+                nodeCount, queueName, parallelEnvironmentName, pe.getAllocationRule(), pe.getPpn());
 
         AllocationRule allocationRule = pe.getAllocationRule();
         if (allocationRule == AllocationRule.PE_SLOTS) {
             if (nodeCount > 1) {
-                throw new XenonException(ADAPTOR_NAME, "Parallel environment " + parallelEnvironmentName
-                        + " only supports single node parallel jobs");
+                throw new XenonException(ADAPTOR_NAME, "Parallel environment " + parallelEnvironmentName + " only supports single node parallel jobs");
             }
             return 1;
         } else if (allocationRule == AllocationRule.FILL_UP) {
-            //we need to request all slots of a node before we get a new node. The number of slots per node is listed in the
-            //queue info.
+            // we need to request all slots of a node before we get a new node. The number of slots per node is listed in the
+            // queue info.
             return nodeCount * queue.getSlots();
         } else if (allocationRule == AllocationRule.ROUND_ROBIN) {
             if (nodeCount > 1) {
@@ -185,7 +176,7 @@ public class GridEngineSetup {
             }
             return 1;
         } else if (allocationRule == AllocationRule.INTEGER) {
-            //Multiply the number of nodes we require with the number of slots on each host.
+            // Multiply the number of nodes we require with the number of slots on each host.
             return nodeCount * pe.getPpn();
         } else {
             throw new XenonException(ADAPTOR_NAME, "unknown pe allocation rule: " + pe.getAllocationRule());

@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
@@ -82,7 +81,7 @@ public final class SlurmUtils {
                 if (result == null) {
                     result = job;
                 } else {
-                    result = CommandLineUtils.concat(result, ",", job);
+                    result = ScriptingUtils.concat(result, ",", job);
                 }
             }
         }
@@ -303,7 +302,7 @@ public final class SlurmUtils {
         return false;
     }
 
-    protected static void verifyJobDescription(JobDescription description, boolean interactive) throws XenonException {
+    protected static void verifyJobDescription(JobDescription description, String[] queueNames, boolean interactive) throws XenonException {
         ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
 
         if (interactive) {
@@ -334,25 +333,12 @@ public final class SlurmUtils {
 
         // check for option that overrides job script completely.
         if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
-            // no other settings checked.
+            ScriptingUtils.checkQueue(queueNames, description.getQueueName(), ADAPTOR_NAME);
             return;
         }
 
         // Perform standard checks.
-        ScriptingUtils.verifyJobDescription(description, ADAPTOR_NAME);
-    }
-
-    private static String getWorkingDirPath(JobDescription description, Path fsEntryPath) {
-        String path;
-        if (description.getWorkingDirectory().startsWith("/")) {
-            path = description.getWorkingDirectory();
-        } else {
-            // make relative path absolute
-            Path workingDirectory = fsEntryPath.resolve(description.getWorkingDirectory());
-            path = workingDirectory.toString();
-        }
-
-        return path;
+        ScriptingUtils.verifyJobDescription(description, queueNames, ADAPTOR_NAME);
     }
 
     public static String[] generateInteractiveArguments(JobDescription description, Path fsEntryPath, UUID tag) {
@@ -366,7 +352,7 @@ public final class SlurmUtils {
 
         // set working directory
         if (description.getWorkingDirectory() != null) {
-            String path = getWorkingDirPath(description, fsEntryPath);
+            String path = ScriptingUtils.getWorkingDirPath(description, fsEntryPath);
             arguments.add("--chdir=" + path);
         }
 
@@ -420,7 +406,7 @@ public final class SlurmUtils {
 
         // set working directory
         if (description.getWorkingDirectory() != null) {
-            String path = getWorkingDirPath(description, fsEntryPath);
+            String path = ScriptingUtils.getWorkingDirPath(description, fsEntryPath);
             script.format("#SBATCH --workdir='%s'\n", path);
         }
 
@@ -485,7 +471,7 @@ public final class SlurmUtils {
         script.format("%s", description.getExecutable());
 
         for (String argument : description.getArguments()) {
-            script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
+            script.format(" %s", ScriptingUtils.protectAgainstShellMetas(argument));
         }
         script.format("\n");
 

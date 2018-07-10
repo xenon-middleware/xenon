@@ -27,8 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcess;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.StreamsImplementation;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
@@ -90,7 +90,7 @@ class SshInteractiveProcess implements InteractiveProcess {
 
         if (workdir != null) {
             command.append("cd ");
-            command.append(CommandLineUtils.protectAgainstShellMetas(workdir));
+            command.append(ScriptingUtils.protectAgainstShellMetas(workdir));
             command.append(" && ");
         }
 
@@ -98,7 +98,7 @@ class SshInteractiveProcess implements InteractiveProcess {
 
         for (String s : description.getArguments()) {
             command.append(" ");
-            command.append(CommandLineUtils.protectAgainstShellMetas(s));
+            command.append(ScriptingUtils.protectAgainstShellMetas(s));
         }
 
         return command.toString();

@@ -1,5 +1,8 @@
 package nl.esciencecenter.xenon.adaptors.schedulers.at;
 
+import static nl.esciencecenter.xenon.adaptors.schedulers.at.AtSchedulerAdaptor.ADAPTOR_NAME;
+import static nl.esciencecenter.xenon.adaptors.schedulers.at.AtSchedulerAdaptor.POLL_DELAY_PROPERTY;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -13,6 +16,7 @@ import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobSeenMap;
 import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingScheduler;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
@@ -67,9 +71,10 @@ public class AtScheduler extends ScriptingScheduler {
 
     private final JobSeenMap jobSeenMap;
 
-    public AtScheduler(String uniqueID, String adaptor, String location, Credential credential, Map<String, String> prop,
-            XenonPropertyDescription[] validProperties, String pollDelayProperty) throws XenonException {
-        super(uniqueID, adaptor, location, credential, prop, validProperties, pollDelayProperty);
+    public AtScheduler(String uniqueID, String location, Credential credential, XenonPropertyDescription[] validProperties, Map<String, String> prop)
+            throws XenonException {
+
+        super(uniqueID, ADAPTOR_NAME, location, credential, prop, validProperties, POLL_DELAY_PROPERTY);
         // TODO Auto-generated constructor stub
 
         jobSeenMap = new JobSeenMap(0);
@@ -187,23 +192,21 @@ public class AtScheduler extends ScriptingScheduler {
     @Override
     public String submitBatchJob(JobDescription description) throws XenonException {
 
-        // TODO: check description and defaults here?
+        // Verify the job description
+        AtUtils.verifyJobDescription(description, QNAMES);
 
         // Generate a job script.
-        String script = AtUtils.generateJobScript(description);
+        String script = AtUtils.generateJobScript(description, getWorkingDirectory());
 
         // Submit it.
-        RemoteCommandRunner runner = runCommand(script, "at", new String[] { "now" });
+        RemoteCommandRunner runner = runCommand(script, "at", new String[] { description.getStartTime() });
 
-HIERO
-
+        // Retrieve the job ID from the output and return it.
         if (runner.success()) {
-            return AtUtils.parseJobInfo(runner.getStdout(), queues);
+            return ScriptingParser.parseJobIDFromLine(runner.getStderr(), ADAPTOR_NAME, "job ");
         } else {
-            throw new XenonException(getAdaptorName(), "Failed to get queue status using atq: (" + runner.getExitCode() + ") " + runner.getStderr());
+            throw new XenonException(getAdaptorName(), "Failed to submit job using at: (" + runner.getExitCode() + ") " + runner.getStderr());
         }
-
-        return null;
     }
 
     @Override
