@@ -44,7 +44,7 @@ public class AtUtils {
         // utility class
     }
 
-    private static void parseJobLine(String line, Set<String> queues, HashMap<String, Map<String, String>> result) {
+    public static void parseJobLine(String line, Set<String> queues, HashMap<String, Map<String, String>> result) {
 
         // Check if there is anything to parse
         if (line == null || line.trim().isEmpty()) {
@@ -85,8 +85,7 @@ public class AtUtils {
      *
      * For example, the example line above will result in the following return value: <code>
      * Map("11":Map("jobID":"11", "startDate":"Mon Jul 2 10:22:00 2018", "queue":"a", "user":"jason"))
-     * </code> If a set of queue names is provided in <code>queues</code>, only jobs from a matching queue will be returned in results. If
-     * <code>queues<code> is
+     * </code> If a set of queue names is provided in <code>queues</code>, only jobs from a matching queue will be returned in results. If <code>queues<code> is
      * <code>null</code> or empty, all jobs from all queues will be returned.
      *
      * @param atqOutput
@@ -154,6 +153,15 @@ public class AtUtils {
         }
     }
 
+    private static String getStream(String target) {
+
+        if (target == null) {
+            return "/dev/null";
+        }
+
+        return target;
+    }
+
     public static String generateJobScript(JobDescription description, Path fsEntryPath) {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
@@ -181,44 +189,32 @@ public class AtUtils {
             script.format("#AT_STARTTIME %s\n", description.getStartTime());
         }
 
-        if (description.getStdin() != null) {
-            script.format("#SBATCH --input='%s'\n", description.getStdin());
-        }
+        String stdin = getStream(description.getStdin());
+        String stderr = getStream(description.getStderr());
+        String stdout = getStream(description.getStdout());
 
-        if (description.getStdout() == null) {
-            script.format("#SBATCH --output=/dev/null\n");
-        } else {
-            script.format("#SBATCH --output='%s'\n", description.getStdout());
-        }
+        script.format("#AT_INPUT '%s'\n", stdin);
+        script.format("#AT_OUTPUT '%s'\n", stdout);
+        script.format("#AT_ERROR '%s'\n", stderr);
 
-        if (description.getStderr() == null) {
-            script.format("%s\n", "#SBATCH --error=/dev/null");
-        } else {
-            script.format("#SBATCH --error='%s'\n", description.getStderr());
-        }
+        if (!description.getEnvironment().isEmpty()) {
+            script.format("\n");
 
-        for (String argument : description.getSchedulerArguments()) {
-            script.format("#SBATCH %s\n", argument);
-        }
-
-        for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
-            script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());
+            for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
+                script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());
+            }
         }
 
         script.format("\n");
 
-        if (!description.isStartSingleProcess()) {
-            // run commands through srun
-            script.format("%s ", "srun");
-        }
-
+        script.format("cd '%s' && ", workingDir);
         script.format("%s", description.getExecutable());
 
         for (String argument : description.getArguments()) {
             script.format(" %s", ScriptingUtils.protectAgainstShellMetas(argument));
         }
-        script.format("\n");
 
+        script.format(" < '%s' > '%s' 2> '%s'\n", stdin, stdout, stderr);
         script.close();
 
         LOGGER.debug("Created job script:%n{} from description {}", stringBuilder, description);

@@ -30,6 +30,7 @@ import org.junit.runners.MethodSorters;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
@@ -41,7 +42,7 @@ public class TorqueUtilsTest {
     public void test01a_generate_EmptyDescription_Result() throws XenonException {
         JobDescription description = new JobDescription();
 
-        String result = TorqueUtils.generate(description, null);
+        String result = TorqueUtils.generate(description, new Path("/test"));
 
         String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l walltime=00:15:00\n" + "\nnull\n";
 
@@ -115,7 +116,7 @@ public class TorqueUtilsTest {
         description.setQueueName("the.queue");
         description.setWorkingDirectory("/some/working/directory");
 
-        String result = TorqueUtils.generate(description, null);
+        String result = TorqueUtils.generate(description, new Path("/test"));
 
         String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -d /some/working/directory\n" + "#PBS -q the.queue\n"
                 + "#PBS -l list-of-resources\n" + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l walltime=01:40:00\n"
@@ -142,7 +143,7 @@ public class TorqueUtilsTest {
         description.setQueueName("the.queue");
         description.setWorkingDirectory("/some/working/directory");
 
-        String result = TorqueUtils.generate(description, null);
+        String result = TorqueUtils.generate(description, new Path("/test"));
 
         String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -d /some/working/directory\n" + "#PBS -q the.queue\n"
                 + "#PBS -l list-of-resources\n" + "#PBS -l nodes=4:ppn=10\n" + "#PBS -l walltime=01:40:00\n" + "export some=\"environment.value\"\n\n"

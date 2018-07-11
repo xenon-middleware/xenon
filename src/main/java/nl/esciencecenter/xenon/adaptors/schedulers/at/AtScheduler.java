@@ -78,6 +78,11 @@ public class AtScheduler extends ScriptingScheduler {
     //
     // When specifying something like "5pm" or "teatime", the job will be scheduled for the next occurrence of that moment of the day (which may be tomorrow).
     // Providing a detailed time in the past starts the job ASAP. For example "-t 07021022" for "July 2nd 10:22".
+    //
+    // we can limit the time used by a process with the /usr/bin/timeout tool like this:
+    //
+    // timeout [--preserve-status] 15m command
+    //
 
     private static final String[] QNAMES = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x",
             "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "T", "U", "V", "W", "X", "Y", "Z", "=" };

@@ -118,9 +118,13 @@ public class ScriptingUtils {
      * @param description
      *            the JobDescription containing the workingDirectory
      * @param currentWorkingDir
-     *            the current working directory of the adaptor.
+     *            the current working directory of the adaptor. Must not be null.
      */
     public static String getWorkingDirPath(JobDescription description, Path currentWorkingDir) {
+
+        if (currentWorkingDir == null) {
+            throw new IllegalArgumentException("Current working directory may not be null");
+        }
 
         String dir = description.getWorkingDirectory();
 
@@ -196,7 +200,7 @@ public class ScriptingUtils {
 
         int maxTime = description.getMaxRuntime();
 
-        if (maxTime <= 0) {
+        if (maxTime < 0) {
             throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);
         }
 

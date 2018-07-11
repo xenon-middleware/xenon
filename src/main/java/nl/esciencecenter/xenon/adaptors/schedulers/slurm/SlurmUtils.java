@@ -339,6 +339,11 @@ public final class SlurmUtils {
 
         // Perform standard checks.
         ScriptingUtils.verifyJobDescription(description, queueNames, ADAPTOR_NAME);
+
+        // Check is the maxTime is set
+        if (description.getMaxRuntime() == 0) {
+            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Illegal maximum runtime: 0");
+        }
     }
 
     public static String[] generateInteractiveArguments(JobDescription description, Path fsEntryPath, UUID tag) {

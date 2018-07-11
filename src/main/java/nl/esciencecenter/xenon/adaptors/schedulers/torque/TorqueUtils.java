@@ -70,6 +70,11 @@ final class TorqueUtils {
 
         // perform standard checks.
         ScriptingUtils.verifyJobDescription(description, queueNames, ADAPTOR_NAME);
+
+        // Check is the maxTime is set
+        if (description.getMaxRuntime() == 0) {
+            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Illegal maximum runtime: 0");
+        }
     }
 
     protected static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, String jobIdentifier) throws XenonException {

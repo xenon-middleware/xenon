@@ -213,6 +213,11 @@ final class GridEngineUtils {
         // perform standard checks.
         ScriptingUtils.verifyJobDescription(description, queueNames, ADAPTOR_NAME);
 
+        // Check is the maxTime is set
+        if (description.getMaxRuntime() == 0) {
+            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Illegal maximum runtime: 0");
+        }
+
         // check if the parallel environment and queue are specified.
         if (description.getNodeCount() != 1) {
             if (!description.getJobOptions().containsKey(JOB_OPTION_PARALLEL_ENVIRONMENT)) {
