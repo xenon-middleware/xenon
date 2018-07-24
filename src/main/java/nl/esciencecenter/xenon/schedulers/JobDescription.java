@@ -31,9 +31,6 @@ import java.util.Objects;
  */
 public class JobDescription {
 
-    /** The default maximum run time */
-    public static final int DEFAULT_MAX_RUN_TIME_IN_MINUTES = 15;
-
     /** The default start time */
     public static final String DEFAULT_START_TIME = "now";
 
@@ -89,7 +86,7 @@ public class JobDescription {
     private boolean startSingleProcess = false;
 
     /** The maximum run time in minutes. */
-    private int maxRuntime = DEFAULT_MAX_RUN_TIME_IN_MINUTES;
+    private int maxRuntime = -1;
 
     /** The requested start time */
     private String startTime = DEFAULT_START_TIME;

@@ -29,13 +29,14 @@ import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobSeenMap;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
-import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingScheduler;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.schedulers.NoSuchJobException;
 import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
 import nl.esciencecenter.xenon.schedulers.QueueStatus;
 import nl.esciencecenter.xenon.schedulers.Streams;
@@ -112,7 +113,11 @@ public class AtScheduler extends ScriptingScheduler {
      */
     private void checkQueue(String queueName) throws XenonException {
 
-        if (queueName == null || queueName.isEmpty()) {
+        if (queueName == null) {
+            throw new IllegalArgumentException("Queue name may not be null");
+        }
+
+        if (queueName.isEmpty()) {
             throw new NoSuchQueueException(getAdaptorName(), "No queue provided");
         }
 
@@ -198,11 +203,15 @@ public class AtScheduler extends ScriptingScheduler {
 
         for (String q : targetQueueNames) {
 
-            try {
-                checkQueue(q);
-                result[index++] = new QueueStatusImplementation(this, q, null, null);
-            } catch (XenonException e) {
-                result[index++] = new QueueStatusImplementation(this, q, e, null);
+            if (q == null) {
+                result[index++] = null;
+            } else {
+                try {
+                    checkQueue(q);
+                    result[index++] = new QueueStatusImplementation(this, q, null, null);
+                } catch (XenonException e) {
+                    result[index++] = new QueueStatusImplementation(this, q, e, null);
+                }
             }
         }
 
@@ -222,11 +231,13 @@ public class AtScheduler extends ScriptingScheduler {
         RemoteCommandRunner runner = runCommand(script, "at", new String[] { description.getStartTime() });
 
         // Retrieve the job ID from the output and return it.
-        if (runner.success()) {
-            return ScriptingParser.parseJobIDFromLine(runner.getStderr(), ADAPTOR_NAME, "job ");
-        } else {
+        if (!runner.successIgnoreError()) {
             throw new XenonException(getAdaptorName(), "Failed to submit job using at: (" + runner.getExitCode() + ") " + runner.getStderr());
         }
+
+        String jobID = AtUtils.parseSubmitOutput(runner.getStderr());
+        jobSeenMap.updateRecentlySeen(jobID);
+        return jobID;
     }
 
     @Override
@@ -236,14 +247,59 @@ public class AtScheduler extends ScriptingScheduler {
 
     @Override
     public JobStatus getJobStatus(String jobIdentifier) throws XenonException {
-        // TODO Auto-generated method stub
-        return null;
+
+        assertNonNullOrEmpty(jobIdentifier, "Job identifier cannot be null or empty");
+
+        Map<String, Map<String, String>> info = getJobInfo(null);
+
+        Map<String, String> tmp = info.get(jobIdentifier);
+
+        String state = "UNKNOWN";
+
+        if (tmp != null) {
+            String queue = tmp.get("queue");
+
+            if (queue != null) {
+                if (queue.equals("=")) {
+                    state = "RUNNING";
+                } else {
+                    state = "PENDING";
+                }
+            }
+        } else if (jobSeenMap.haveRecentlySeen(jobIdentifier)) {
+            state = "DONE";
+        } else {
+            throw new NoSuchJobException(ADAPTOR_NAME, "Job " + jobIdentifier + " could not be found!");
+        }
+
+        return new JobStatusImplementation(jobIdentifier, "unknown", state, 0, null, state.equals("RUNNING"), state.equals("DONE"), tmp);
     }
 
     @Override
     public JobStatus cancelJob(String jobIdentifier) throws XenonException {
-        // TODO Auto-generated method stub
-        return null;
+
+        JobStatus s = getJobStatus(jobIdentifier);
+
+        if (s.isDone()) {
+            return s;
+        }
+
+        // Submit the cancel.
+        RemoteCommandRunner runner = runCommand(null, "atrm", new String[] { jobIdentifier });
+
+        // Check the error code to see if the job was found. Note that some info may be printed on stderr if the job was running.
+        if (!runner.successIgnoreError()) {
+            throw new NoSuchJobException(ADAPTOR_NAME, "Job " + jobIdentifier + " could not be found!");
+        }
+
+        // The job should have been cancelled now.
+        jobSeenMap.addDeletedJob(jobIdentifier);
+
+        return new JobStatusImplementation(jobIdentifier, "unknown", "CANCELLED", 0, null, false, true, s.getSchedulerSpecificInformation());
     }
 
+    @Override
+    public int getDefaultRuntime() {
+        return 0;
+    }
 }

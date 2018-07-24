@@ -716,7 +716,7 @@ public class SlurmUtilsTest {
 
         String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--nodes=1", "--ntasks-per-node=1", "--time=15", "exec", "a", "b", "c" };
 
-        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag);
+        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag, 15);
 
         assertArrayEquals(expected, result);
     }
@@ -734,7 +734,7 @@ public class SlurmUtilsTest {
         String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--nodes=1", "--ntasks-per-node=1", "--mem=1024M", "--time=15", "exec",
                 "a", "b", "c" };
 
-        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag);
+        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag, 15);
 
         assertArrayEquals(expected, result);
     }
@@ -752,7 +752,7 @@ public class SlurmUtilsTest {
         String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--nodes=1", "--ntasks-per-node=1", "--cpus-per-task=4", "--time=15",
                 "exec", "a", "b", "c" };
 
-        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag);
+        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag, 15);
 
         assertArrayEquals(expected, result);
     }
@@ -771,7 +771,7 @@ public class SlurmUtilsTest {
         String[] expected = new String[] { "--quiet", "--job-name=" + tag, "--chdir=" + entry.resolve("workdir"), "--partition=queue", "--nodes=1",
                 "--ntasks-per-node=1", "--time=15", "exec", "a", "b", "c" };
 
-        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag);
+        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag, 15);
 
         assertArrayEquals(expected, result);
     }
@@ -790,7 +790,7 @@ public class SlurmUtilsTest {
         String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--chdir=/workdir", "--partition=queue", "--nodes=1",
                 "--ntasks-per-node=1", "--time=15", "exec", "a", "b", "c" };
 
-        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag);
+        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag, 15);
 
         assertArrayEquals(expected, result);
     }
@@ -806,7 +806,7 @@ public class SlurmUtilsTest {
         String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n"
                 + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "srun exec 'a' 'b' 'c'\n";
 
-        String result = SlurmUtils.generate(description, entry);
+        String result = SlurmUtils.generate(description, entry, 15);
 
         assertEquals(expected, result);
     }
@@ -823,7 +823,7 @@ public class SlurmUtilsTest {
         String expected = "#!/bin/sh\n" + "#SBATCH --job-name='test'\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n"
                 + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "srun exec 'a' 'b' 'c'\n";
 
-        String result = SlurmUtils.generate(description, entry);
+        String result = SlurmUtils.generate(description, entry, 15);
 
         assertEquals(expected, result);
     }
@@ -840,7 +840,7 @@ public class SlurmUtilsTest {
         String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n"
                 + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "srun exec 'a' 'b' 'c'\n";
 
-        String result = SlurmUtils.generate(description, entry);
+        String result = SlurmUtils.generate(description, entry, 15);
 
         assertEquals(expected, result);
     }
@@ -857,7 +857,7 @@ public class SlurmUtilsTest {
         String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n"
                 + "#SBATCH --mem=1024M\n" + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "srun exec 'a' 'b' 'c'\n";
 
-        String result = SlurmUtils.generate(description, entry);
+        String result = SlurmUtils.generate(description, entry, 15);
 
         assertEquals(expected, result);
     }
@@ -875,7 +875,7 @@ public class SlurmUtilsTest {
                 + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "#SBATCH --gres=gpu:1\n" + "#SBATCH -C TitanX\n" + "\n"
                 + "srun exec 'a' 'b' 'c'\n";
 
-        String result = SlurmUtils.generate(description, entry);
+        String result = SlurmUtils.generate(description, entry, 15);
 
         assertEquals(expected, result);
     }
@@ -893,7 +893,7 @@ public class SlurmUtilsTest {
                 + "#SBATCH --cpus-per-task=4\n" + "#SBATCH --time=15\n" + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n"
                 + "srun exec 'a' 'b' 'c'\n";
 
-        String result = SlurmUtils.generate(description, entry);
+        String result = SlurmUtils.generate(description, entry, 15);
 
         assertEquals(expected, result);
     }
@@ -923,7 +923,7 @@ public class SlurmUtilsTest {
                 + "#SBATCH --output='out.txt'\n" + "#SBATCH --error='err.txt'\n" + "export key1=\"value1\"\n" + "export key2=\"value2\"\n" + "\n"
                 + "exec 'a' 'b' 'c'\n";
 
-        String result = SlurmUtils.generate(description, entry);
+        String result = SlurmUtils.generate(description, entry, 15);
 
         assertEquals(expected, result);
     }

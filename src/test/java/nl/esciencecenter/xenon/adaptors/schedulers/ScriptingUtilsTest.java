@@ -339,7 +339,7 @@ public class ScriptingUtilsTest {
         String[] queueNames = new String[] { "q" };
         JobDescription job = new JobDescription();
         job.setExecutable("test.exe");
-        job.setMaxRuntime(-1);
+        job.setMaxRuntime(-3);
 
         ScriptingUtils.verifyJobDescription(job, queueNames, "test");
     }

@@ -43,6 +43,8 @@ public class GridEngineSetup {
 
     private final Map<String, ParallelEnvironmentInfo> parallelEnvironments;
 
+    private final int defaultRuntime;
+
     /**
      * generate arguments to list details of all parallel environments given
      *
@@ -87,6 +89,8 @@ public class GridEngineSetup {
 
         this.parallelEnvironments = getParallelEnvironments(scheduler);
 
+        this.defaultRuntime = scheduler.getDefaultRuntime();
+
         LOGGER.debug("Created setup info, queues = {}, parallel environments = {}", this.queues, this.parallelEnvironments);
     }
 
@@ -130,14 +134,19 @@ public class GridEngineSetup {
      * @param parallelEnvironments
      *            parallel environments to use.
      */
-    GridEngineSetup(String[] queueNames, Map<String, QueueInfo> queues, Map<String, ParallelEnvironmentInfo> parallelEnvironments) {
+    GridEngineSetup(String[] queueNames, Map<String, QueueInfo> queues, Map<String, ParallelEnvironmentInfo> parallelEnvironments, int defaultRuntime) {
         this.queueNames = queueNames.clone();
         this.queues = queues;
         this.parallelEnvironments = parallelEnvironments;
+        this.defaultRuntime = defaultRuntime;
     }
 
     public String[] getQueueNames() {
         return queueNames.clone();
+    }
+
+    public int getDefaultRuntime() {
+        return defaultRuntime;
     }
 
     /*

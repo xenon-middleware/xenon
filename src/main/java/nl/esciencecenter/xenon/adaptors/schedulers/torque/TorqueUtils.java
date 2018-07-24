@@ -128,7 +128,7 @@ final class TorqueUtils {
         script.format("\n");
     }
 
-    public static String generate(JobDescription description, Path workdir) {
+    public static String generate(JobDescription description, Path workdir, int defaultRuntime) {
         StringBuilder stringBuilder = new StringBuilder(500);
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
@@ -203,7 +203,14 @@ final class TorqueUtils {
         }
 
         // add maximum runtime in hour:minute:second format (converted from minutes in description)
-        script.format("#PBS -l walltime=%02d:%02d:00\n", description.getMaxRuntime() / MINUTES_PER_HOUR, description.getMaxRuntime() % MINUTES_PER_HOUR);
+        int runtime = description.getMaxRuntime();
+
+        if (runtime == -1) {
+            runtime = defaultRuntime;
+        }
+
+        // add maximum runtime in hour:minute:second format (converted from minutes in description)
+        script.format("#PBS -l walltime=%02d:%02d:00\n", runtime / MINUTES_PER_HOUR, runtime % MINUTES_PER_HOUR);
 
         for (String argument : description.getSchedulerArguments()) {
             script.format("#PBS %s\n", argument);

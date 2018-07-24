@@ -346,7 +346,7 @@ public final class SlurmUtils {
         }
     }
 
-    public static String[] generateInteractiveArguments(JobDescription description, Path fsEntryPath, UUID tag) {
+    public static String[] generateInteractiveArguments(JobDescription description, Path fsEntryPath, UUID tag, int defaultRuntime) {
         ArrayList<String> arguments = new ArrayList<>();
 
         // suppress printing of status messages
@@ -385,8 +385,15 @@ public final class SlurmUtils {
             arguments.add("--tmp=" + description.getTempSpace() + "M");
         }
 
+        // add maximum runtime in hour:minute:second format (converted from minutes in description)
+        int runtime = description.getMaxRuntime();
+
+        if (runtime == -1) {
+            runtime = defaultRuntime;
+        }
+
         // add maximum runtime
-        arguments.add("--time=" + description.getMaxRuntime());
+        arguments.add("--time=" + runtime);
 
         arguments.add(description.getExecutable());
         arguments.addAll(description.getArguments());
@@ -394,7 +401,7 @@ public final class SlurmUtils {
         return arguments.toArray(new String[arguments.size()]);
     }
 
-    public static String generate(JobDescription description, Path fsEntryPath) {
+    public static String generate(JobDescription description, Path fsEntryPath, int defaultRuntime) {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
@@ -430,8 +437,15 @@ public final class SlurmUtils {
             script.format("#SBATCH --cpus-per-task=%d\n", description.getThreadsPerProcess());
         }
 
+        // add maximum runtime in hour:minute:second format (converted from minutes in description)
+        int runtime = description.getMaxRuntime();
+
+        if (runtime == -1) {
+            runtime = defaultRuntime;
+        }
+
         // add maximum runtime
-        script.format("#SBATCH --time=%d\n", description.getMaxRuntime());
+        script.format("#SBATCH --time=%d\n", runtime);
 
         // the max amount of memory per node.
         if (description.getMaxMemory() > 0) {

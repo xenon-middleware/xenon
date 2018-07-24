@@ -367,4 +367,9 @@ public abstract class ScriptingScheduler extends Scheduler {
     public FileSystem getFileSystem() throws XenonException {
         return subFileSystem;
     }
+
+    @Override
+    public int getDefaultRuntime() {
+        return 15;
+    }
 }

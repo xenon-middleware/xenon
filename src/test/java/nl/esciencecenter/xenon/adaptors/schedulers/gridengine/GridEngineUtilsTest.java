@@ -44,7 +44,9 @@ public class GridEngineUtilsTest {
     public void test01a_generate_EmptyDescription_Result() throws XenonException {
         JobDescription description = new JobDescription();
 
-        String result = GridEngineUtils.generate(description, null, null);
+        GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
+
+        String result = GridEngineUtils.generate(description, null, setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -o /dev/null\n" + "#$ -e /dev/null\n" + "\n"
                 + "null\n";
@@ -58,7 +60,9 @@ public class GridEngineUtilsTest {
 
         description.setName("test");
 
-        String result = GridEngineUtils.generate(description, null, null);
+        GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
+
+        String result = GridEngineUtils.generate(description, null, setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N test\n" + "#$ -l h_rt=00:15:00\n" + "#$ -o /dev/null\n" + "#$ -e /dev/null\n" + "\n"
                 + "null\n";
@@ -71,8 +75,9 @@ public class GridEngineUtilsTest {
         JobDescription description = new JobDescription();
 
         description.setName("");
+        GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
 
-        String result = GridEngineUtils.generate(description, null, null);
+        String result = GridEngineUtils.generate(description, null, setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -o /dev/null\n" + "#$ -e /dev/null\n" + "\n"
                 + "null\n";
@@ -86,7 +91,9 @@ public class GridEngineUtilsTest {
 
         description.setMaxMemory(1024);
 
-        String result = GridEngineUtils.generate(description, null, null);
+        GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
+
+        String result = GridEngineUtils.generate(description, null, setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -l mem_free=1024M,h_vmem=1024M\n"
                 + "#$ -o /dev/null\n" + "#$ -e /dev/null\n" + "\n" + "null\n";
@@ -100,7 +107,9 @@ public class GridEngineUtilsTest {
 
         description.setSchedulerArguments("-l gpu=1");
 
-        String result = GridEngineUtils.generate(description, null, null);
+        GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
+
+        String result = GridEngineUtils.generate(description, null, setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -l gpu=1\n" + "#$ -o /dev/null\n"
                 + "#$ -e /dev/null\n" + "\n" + "null\n";
@@ -129,7 +138,9 @@ public class GridEngineUtilsTest {
         description.setStdout("stdout.file");
         description.setWorkingDirectory("/some/working/directory");
 
-        String result = GridEngineUtils.generate(description, new Path("/test"), null);
+        GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
+
+        String result = GridEngineUtils.generate(description, new Path("/test"), setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n" + "#$ -q the.queue\n"
                 + "#$ -l h_rt=01:40:00\n" + "#$ -l list-of-resources\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n"
@@ -161,7 +172,9 @@ public class GridEngineUtilsTest {
         description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
         description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_SLOTS, "5");
 
-        String result = GridEngineUtils.generate(description, new Path("/test"), null);
+        GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
+
+        String result = GridEngineUtils.generate(description, new Path("/test"), setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n" + "#$ -q the.queue\n"
                 + "#$ -pe some.pe 5\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"

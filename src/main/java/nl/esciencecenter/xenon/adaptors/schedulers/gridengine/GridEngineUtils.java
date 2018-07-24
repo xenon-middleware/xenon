@@ -145,7 +145,13 @@ final class GridEngineUtils {
         generateParallelEnvironmentSpecification(description, setup, script);
 
         // add maximum runtime in hour:minute:second format (converted from minutes in description)
-        script.format("#$ -l h_rt=%02d:%02d:00\n", description.getMaxRuntime() / MINUTES_PER_HOUR, description.getMaxRuntime() % MINUTES_PER_HOUR);
+        int runtime = description.getMaxRuntime();
+
+        if (runtime == -1) {
+            runtime = setup.getDefaultRuntime();
+        }
+
+        script.format("#$ -l h_rt=%02d:%02d:00\n", runtime / MINUTES_PER_HOUR, runtime % MINUTES_PER_HOUR);
 
         // the max amount of memory per node.
         if (description.getMaxMemory() > 0) {
@@ -213,9 +219,9 @@ final class GridEngineUtils {
         // perform standard checks.
         ScriptingUtils.verifyJobDescription(description, queueNames, ADAPTOR_NAME);
 
-        // Check is the maxTime is set
+        // Check if the maxRuntimeTime is not set to infinite.
         if (description.getMaxRuntime() == 0) {
-            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Illegal maximum runtime: 0");
+            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Invalid runtime: 0");
         }
 
         // check if the parallel environment and queue are specified.

@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers.at;
 
+import static nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser.NEWLINE_REGEX;
 import static nl.esciencecenter.xenon.adaptors.schedulers.at.AtSchedulerAdaptor.ADAPTOR_NAME;
 
 import java.util.Formatter;
@@ -27,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
 import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
@@ -60,12 +62,25 @@ public class AtUtils {
 
         // Check if we are interested in this queue. If so, add the result
         if (queues == null || queues.isEmpty() || queues.contains(fields[6])) {
-            HashMap<String, String> tmp = new HashMap<>();
-            tmp.put("jobID", fields[0]);
-            tmp.put("startDate", fields[1] + " " + fields[2] + " " + fields[3] + " " + fields[4] + " " + fields[5]);
-            tmp.put("queue", fields[6]);
-            tmp.put("user", fields[7]);
-            result.put(fields[0], tmp);
+
+            // Note: some installations of at seem to show jobs both in the queue they where submitted to (ie. "a"), and the running queue "=", while others
+            // remove the jobs from the submission queue at soon as they start running. If we see both, we prefer the running queue.
+
+            Map<String, String> tmp = result.get(fields[0]);
+
+            if (tmp == null) {
+                tmp = new HashMap<>();
+                tmp.put("jobID", fields[0]);
+                tmp.put("startDate", fields[1] + " " + fields[2] + " " + fields[3] + " " + fields[4] + " " + fields[5]);
+                tmp.put("queue", fields[6]);
+                tmp.put("user", fields[7]);
+                result.put(fields[0], tmp);
+            } else {
+                // Job seen twice, so check the current queue. If the this queue is running "=" we overwrite the job info.
+                if (fields[6].equals("=")) {
+                    tmp.put("queue", fields[6]);
+                }
+            }
         }
     }
 
@@ -110,6 +125,17 @@ public class AtUtils {
         return result;
     }
 
+    public static String parseSubmitOutput(String output) throws XenonException {
+
+        String[] lines = NEWLINE_REGEX.split(output);
+
+        if (lines == null || lines.length != 2) {
+            throw new XenonException(ADAPTOR_NAME, "Failed to get jobID from output: \"" + output + "\"");
+        }
+
+        return ScriptingParser.parseJobIDFromLine(lines[1], ADAPTOR_NAME, "job ");
+    }
+
     public static String[] getJobIDs(Map<String, Map<String, String>> jobs) {
 
         if (jobs == null || jobs.isEmpty()) {
@@ -148,7 +174,7 @@ public class AtUtils {
 
         int maxTime = description.getMaxRuntime();
 
-        if (maxTime != 0) {
+        if (maxTime > 0) {
             throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Unsupported maximum runtime: " + maxTime);
         }
     }

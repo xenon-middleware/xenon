@@ -48,7 +48,7 @@ public class JobSeenMap {
         return expireTime;
     }
 
-    public synchronized void updateRecentlySeen(Set<String> identifiers) {
+    public synchronized void updateRecentlySeen(String... identifiers) {
         long currentTime = System.currentTimeMillis();
 
         for (String identifier : identifiers) {
@@ -70,6 +70,10 @@ public class JobSeenMap {
                 iterator.remove();
             }
         }
+    }
+
+    public synchronized void updateRecentlySeen(Set<String> identifiers) {
+        updateRecentlySeen(identifiers.toArray(new String[identifiers.size()]));
     }
 
     public synchronized boolean haveRecentlySeen(String identifier) {

@@ -198,9 +198,10 @@ public class ScriptingUtils {
             throw new InvalidJobDescriptionException(adaptorName, "Illegal processes per node count: " + processesPerNode);
         }
 
+        // Check if the time is set to -1 (default), 0 (infinite), or a value.
         int maxTime = description.getMaxRuntime();
 
-        if (maxTime < 0) {
+        if (maxTime < -1) {
             throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);
         }
 

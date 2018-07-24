@@ -72,6 +72,11 @@ public class MockScheduler extends Scheduler {
     }
 
     @Override
+    public int getDefaultRuntime() {
+        return 0;
+    }
+
+    @Override
     public String[] getJobs(String... queueNames) throws XenonException {
         return jobs.toArray(new String[jobs.size()]);
     }

@@ -144,7 +144,7 @@ public class SlurmScheduler extends ScriptingScheduler {
 
         if (customScriptFile == null) {
             checkWorkingDirectory(description.getWorkingDirectory());
-            String jobScript = generate(description, fsEntryPath);
+            String jobScript = generate(description, fsEntryPath, getDefaultRuntime());
 
             output = runCheckedCommand(jobScript, "sbatch");
         } else {
@@ -209,7 +209,7 @@ public class SlurmScheduler extends ScriptingScheduler {
 
         UUID tag = UUID.randomUUID();
 
-        String[] arguments = generateInteractiveArguments(description, fsEntryPath, tag);
+        String[] arguments = generateInteractiveArguments(description, fsEntryPath, tag, getDefaultRuntime());
 
         // There is a two step job submission here, since we submit a job to via a subscheduler (typically SSH).
         // So the job we get back here is the local SSH job that connects to the remote machine running slurm.

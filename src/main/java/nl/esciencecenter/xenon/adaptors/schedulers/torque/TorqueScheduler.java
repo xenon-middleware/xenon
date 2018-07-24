@@ -239,7 +239,7 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         if (customScriptFile == null) {
             checkWorkingDirectory(description.getWorkingDirectory());
-            String jobScript = TorqueUtils.generate(description, workdir);
+            String jobScript = TorqueUtils.generate(description, workdir, getDefaultRuntime());
 
             output = runCheckedCommand(jobScript, "qsub");
         } else {

@@ -56,5 +56,4 @@ public class AtSchedulerAdaptor extends ScriptingSchedulerAdaptor {
     public Scheduler createScheduler(String location, Credential credential, Map<String, String> properties) throws XenonException {
         return new AtScheduler(getNewUniqueID(), location, credential, VALID_PROPERTIES, properties);
     }
-
 }

@@ -21,12 +21,12 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.ParallelEnvironmentInfo.AllocationRule;
-
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.ParallelEnvironmentInfo.AllocationRule;
 
 /**
  *
@@ -42,7 +42,7 @@ public class GridEngineSetupTest {
     public void test01_getQueueNames() {
         String[] input = new String[] { "small.q", "middle.q", "large.q" };
 
-        GridEngineSetup testSetup = new GridEngineSetup(input, null, null);
+        GridEngineSetup testSetup = new GridEngineSetup(input, null, null, 15);
 
         String[] result = testSetup.getQueueNames();
 
@@ -59,7 +59,7 @@ public class GridEngineSetupTest {
         Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.PE_SLOTS, 0));
 
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
+        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos, 15);
 
         int expected = 1;
 
@@ -78,7 +78,7 @@ public class GridEngineSetupTest {
         Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.PE_SLOTS, 0));
 
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
+        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos, 15);
 
         testSetup.calculateSlots("some.pe", "some.q", 2);
     }
@@ -93,9 +93,9 @@ public class GridEngineSetupTest {
         Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.FILL_UP, 0));
 
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
+        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos, 15);
 
-        //we expect all slots of the pe to be claimed for all nodes
+        // we expect all slots of the pe to be claimed for all nodes
         int expected = 2 * 4;
 
         int result = testSetup.calculateSlots("some.pe", "some.q", 2);
@@ -113,9 +113,9 @@ public class GridEngineSetupTest {
         Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.ROUND_ROBIN, 0));
 
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
+        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos, 15);
 
-        //we expect the number of nodes
+        // we expect the number of nodes
         int expected = 1;
 
         int result = testSetup.calculateSlots("some.pe", "some.q", 1);
@@ -133,7 +133,7 @@ public class GridEngineSetupTest {
         Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.ROUND_ROBIN, 0));
 
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
+        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos, 15);
         testSetup.calculateSlots("some.pe", "some.q", 2);
         // Should fail.
     }
@@ -148,9 +148,9 @@ public class GridEngineSetupTest {
         Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 3));
 
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
+        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos, 15);
 
-        //we expect the number of nodes
+        // we expect the number of nodes
         int expected = 6;
 
         int result = testSetup.calculateSlots("some.pe", "some.q", 2);
@@ -167,7 +167,7 @@ public class GridEngineSetupTest {
 
         Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
 
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
+        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos, 15);
 
         testSetup.calculateSlots("some.pe", "some.q", 2);
     }
@@ -181,7 +181,7 @@ public class GridEngineSetupTest {
         Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 3));
 
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
+        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos, 15);
 
         testSetup.calculateSlots("some.pe", "some.q", 2);
     }
