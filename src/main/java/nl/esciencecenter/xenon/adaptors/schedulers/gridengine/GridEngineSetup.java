@@ -133,6 +133,8 @@ public class GridEngineSetup {
      *            queues to use.
      * @param parallelEnvironments
      *            parallel environments to use.
+     * @param defaultRuntime
+     *            the default runtime to use.
      */
     GridEngineSetup(String[] queueNames, Map<String, QueueInfo> queues, Map<String, ParallelEnvironmentInfo> parallelEnvironments, int defaultRuntime) {
         this.queueNames = queueNames.clone();

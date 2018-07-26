@@ -100,8 +100,8 @@ public class AtUtils {
      *
      * For example, the example line above will result in the following return value: <code>
      * Map("11":Map("jobID":"11", "startDate":"Mon Jul 2 10:22:00 2018", "queue":"a", "user":"jason"))
-     * </code> If a set of queue names is provided in <code>queues</code>, only jobs from a matching queue will be returned in results. If <code>queues<code> is
-     * <code>null</code> or empty, all jobs from all queues will be returned.
+     * </code> If a set of queue names is provided in <code>queues</code>, only jobs from a matching queue will be returned in results. If <code>queues</code>
+     * is <code>null</code> or empty, all jobs from all queues will be returned.
      *
      * @param atqOutput
      *            the output as produced by atq

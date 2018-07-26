@@ -79,6 +79,8 @@ public class ScriptingUtils {
      *
      * @param startTime
      *            the start time to parse
+     * @param adaptorName
+     *            the name of the calling adaptor (used in exceptions).
      * @throws XenonException
      *             if the startTime does not have an accepted format
      */
@@ -119,6 +121,7 @@ public class ScriptingUtils {
      *            the JobDescription containing the workingDirectory
      * @param currentWorkingDir
      *            the current working directory of the adaptor. Must not be null.
+     * @return the retrieved (and possibly resolved) working directory.
      */
     public static String getWorkingDirPath(JobDescription description, Path currentWorkingDir) {
 
@@ -147,9 +150,11 @@ public class ScriptingUtils {
      * throw a <code>NoSuchQueueException</code>.
      *
      * @param queueNames
-     *            the valid queue names.
+     *            the names of the available queues.
      * @param queueName
      *            the queueName to check.
+     * @param adaptorName
+     *            the name of the calling adaptor (used in exceptions).
      * @throws NoSuchQueueException
      *             if workingDirectory does not exist, or an error occurred.
      */
@@ -172,6 +177,8 @@ public class ScriptingUtils {
      *
      * @param description
      *            the job description to check
+     * @param queueNames
+     *            the names of the available queues.
      * @param adaptorName
      *            the name of the adaptor. Used when an exception is thrown
      * @throws IncompleteJobDescriptionException
