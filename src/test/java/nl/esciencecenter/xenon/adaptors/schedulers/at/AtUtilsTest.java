@@ -224,6 +224,63 @@ public class AtUtilsTest {
     }
 
     @Test
+    public void test_atq_double_job() {
+        String tmp = "11 Mon Jul 2 10:22:00 2018 a jason\n11 Mon Jul 2 10:22:00 2018 = jason\n";
+
+        Set<String> queues = new HashSet<String>();
+        queues.add("a");
+        queues.add("=");
+
+        Map<String, Map<String, String>> result = AtUtils.parseJobInfo(tmp, queues);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertTrue(result.containsKey("11"));
+        assertEquals("=", result.get("11").get("queue"));
+    }
+
+    @Test
+    public void test_atq_double_job2() {
+        String tmp = "11 Mon Jul 2 10:22:00 2018 = jason\n11 Mon Jul 2 10:22:00 2018 a jason\n";
+
+        Set<String> queues = new HashSet<String>();
+        queues.add("a");
+        queues.add("=");
+
+        Map<String, Map<String, String>> result = AtUtils.parseJobInfo(tmp, queues);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertTrue(result.containsKey("11"));
+        assertEquals("=", result.get("11").get("queue"));
+    }
+
+    @Test
+    public void test_atq_parser_submit() throws XenonException {
+        String tmp = "warning: commands will be executed using /bin/sh\njob 39 at Thu Jul 26 12:47:00 2018\n";
+
+        String result = AtUtils.parseSubmitOutput(tmp);
+
+        assertNotNull(result);
+        assertEquals("39", result);
+    }
+
+    @Test(expected = XenonException.class)
+    public void test_atq_parser_submit_fails_single_line() throws XenonException {
+        AtUtils.parseSubmitOutput("bladibla");
+    }
+
+    @Test(expected = XenonException.class)
+    public void test_atq_parser_submit_fails_to_many_lines() throws XenonException {
+        AtUtils.parseSubmitOutput("warning: commands will be executed using /bin/sh\njob 39 at Thu Jul 26 12:47:00 2018\nbladibla\n");
+    }
+
+    @Test(expected = XenonException.class)
+    public void test_atq_parser_submit_fails_no_job_id() throws XenonException {
+        AtUtils.parseSubmitOutput("warning: commands will be executed using /bin/sh\nbladibla\n");
+    }
+
+    @Test
     public void test_getJobIDs_null() {
         String[] result = AtUtils.getJobIDs(null);
         assertNotNull(result);

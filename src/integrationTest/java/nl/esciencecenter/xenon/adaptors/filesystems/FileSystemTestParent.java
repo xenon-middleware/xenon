@@ -1363,6 +1363,12 @@ public abstract class FileSystemTestParent extends FileSystemTestInfrastructure 
         assertEquals("Working dir not equal: " + expected + " != " + result, expected, result);
     }
 
+    @Test
+    public void test_supportedCredentials() throws XenonException {
+        Class[] result = description.getSupportedCredentials();
+        assertNotNull(result);
+    }
+
     // TODO: Symbolic links in a cycle tests
     // TODO: Test asynchronous exceptions
     // TODO: Test create symbolic link

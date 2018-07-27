@@ -15,15 +15,20 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems.webdav;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.ClassRule;
+import org.junit.Test;
 
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
 
+import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.filesystems.LocationConfig;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
 
@@ -66,4 +71,22 @@ public class WebdavFileSystemAnonymousUserDockerTest extends WebdavFileSystemTes
         return FileSystem.create("webdav", location);
     }
 
+    @Test(expected = InvalidPropertyException.class)
+    public void createFileSystem_bufferSize_underflow() throws XenonException {
+        HashMap<String, String> properties = new HashMap<>();
+        properties.put("xenon.adaptors.filesystems.webdav.bufferSize", "0");
+        FileSystem.create("webdav", "http://localhost", new DefaultCredential(), properties);
+    }
+
+    @Test(expected = InvalidPropertyException.class)
+    public void createFileSystem_bufferSize_overflow() throws XenonException {
+        HashMap<String, String> properties = new HashMap<>();
+        properties.put("xenon.adaptors.filesystems.webdav.bufferSize", Long.toString(Long.MAX_VALUE));
+        FileSystem.create("webdav", "http://localhost", new DefaultCredential(), properties);
+    }
+
+    @Test(expected = InvalidLocationException.class)
+    public void createFileSystem_illegal_location() throws XenonException {
+        FileSystem.create("webdav", ":/bla");
+    }
 }
