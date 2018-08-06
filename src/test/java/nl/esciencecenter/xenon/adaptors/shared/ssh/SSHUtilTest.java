@@ -17,6 +17,8 @@ package nl.esciencecenter.xenon.adaptors.shared.ssh;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -31,6 +33,10 @@ import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor;
 import nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor;
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil.PasswordProvider;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.CredentialMap;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 
 public class SSHUtilTest {
 
@@ -191,4 +197,120 @@ public class SSHUtilTest {
         SSHUtil.extractLocations("Test", " via:localhost:22/tmp via:somehost:33");
     }
 
+    @Test
+    public void test_extractCredential_null() {
+        SshdSocketAddress address = new SshdSocketAddress("somehost", 33);
+
+        Credential c = SSHUtil.extractCredential(address, null);
+        assertNull(c);
+    }
+
+    @Test
+    public void test_extractCredential_direct() {
+        SshdSocketAddress address = new SshdSocketAddress("somehost", 33);
+
+        DefaultCredential dc = new DefaultCredential();
+
+        Credential c = SSHUtil.extractCredential(address, dc);
+        assertNotNull(c);
+        assertEquals(dc, c);
+    }
+
+    @Test
+    public void test_extractCredential_mapWithPort() {
+        SshdSocketAddress address = new SshdSocketAddress("somehost", 33);
+
+        DefaultCredential dc = new DefaultCredential();
+        PasswordCredential pc = new PasswordCredential("aap", "noot".toCharArray());
+
+        CredentialMap cm = new CredentialMap();
+        cm.put("somehost:33", pc);
+        cm.put("somehost", dc);
+
+        Credential c = SSHUtil.extractCredential(address, cm);
+        assertNotNull(c);
+        assertEquals(pc, c);
+    }
+
+    @Test
+    public void test_extractCredential_mapWithoutPort() {
+        SshdSocketAddress address = new SshdSocketAddress("somehost", 44);
+
+        DefaultCredential dc = new DefaultCredential();
+        PasswordCredential pc = new PasswordCredential("aap", "noot".toCharArray());
+
+        CredentialMap cm = new CredentialMap();
+        cm.put("somehost:33", pc);
+        cm.put("somehost", dc);
+
+        Credential c = SSHUtil.extractCredential(address, cm);
+        assertNotNull(c);
+        assertEquals(dc, c);
+    }
+
+    @Test
+    public void test_extractCredential_mapNotFound() {
+        SshdSocketAddress address = new SshdSocketAddress("someOtherHost", 33);
+
+        DefaultCredential dc = new DefaultCredential();
+        PasswordCredential pc = new PasswordCredential("aap", "noot".toCharArray());
+
+        CredentialMap cm = new CredentialMap();
+        cm.put("somehost:33", pc);
+        cm.put("somehost", dc);
+
+        Credential c = SSHUtil.extractCredential(address, cm);
+        assertNull(c);
+    }
+
+    @Test
+    public void test_extractCredentials_single() throws CredentialNotFoundException {
+        SshdSocketAddress[] address = new SshdSocketAddress[] { new SshdSocketAddress("somehost", 33) };
+
+        DefaultCredential dc = new DefaultCredential();
+        PasswordCredential pc = new PasswordCredential("aap", "noot".toCharArray());
+
+        CredentialMap cm = new CredentialMap();
+        cm.put("somehost:33", pc);
+        cm.put("somehost", dc);
+
+        Credential[] c = SSHUtil.extractCredentials("test", address, cm);
+
+        assertNotNull(c);
+        assertEquals(1, c.length);
+        assertEquals(pc, c[0]);
+    }
+
+    @Test
+    public void test_extractCredentials_double() throws CredentialNotFoundException {
+        SshdSocketAddress[] address = new SshdSocketAddress[] { new SshdSocketAddress("somehost", 33), new SshdSocketAddress("somehost", 44) };
+
+        DefaultCredential dc = new DefaultCredential();
+        PasswordCredential pc = new PasswordCredential("aap", "noot".toCharArray());
+
+        CredentialMap cm = new CredentialMap();
+        cm.put("somehost:33", pc);
+        cm.put("somehost", dc);
+
+        Credential[] c = SSHUtil.extractCredentials("test", address, cm);
+
+        assertNotNull(c);
+        assertEquals(2, c.length);
+        assertEquals(pc, c[0]);
+        assertEquals(dc, c[0]);
+    }
+
+    @Test(expected = CredentialNotFoundException.class)
+    public void test_extractCredentials_not_found() throws CredentialNotFoundException {
+        SshdSocketAddress[] address = new SshdSocketAddress[] { new SshdSocketAddress("aap", 33) };
+
+        DefaultCredential dc = new DefaultCredential();
+        PasswordCredential pc = new PasswordCredential("aap", "noot".toCharArray());
+
+        CredentialMap cm = new CredentialMap();
+        cm.put("somehost:33", pc);
+        cm.put("somehost", dc);
+
+        SSHUtil.extractCredentials("test", address, cm);
+    }
 }
