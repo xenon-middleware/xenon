@@ -110,6 +110,24 @@ public class SSHUtilTest {
         SSHUtil.getPort("TEST", "localhost:aap");
     }
 
+    @Test(expected = InvalidLocationException.class)
+    public void test_validatehost_null() throws InvalidLocationException {
+        SSHUtil.validateHost("test", null);
+    }
+
+    @Test(expected = InvalidLocationException.class)
+    public void test_validatehost_empyy() throws InvalidLocationException {
+        SSHUtil.validateHost("test", "");
+    }
+
+    @Test
+    public void test_validatehost() throws InvalidLocationException {
+        String host = SSHUtil.validateHost("test", "somehost");
+
+        assertNotNull(host);
+        assertEquals("somehost", host);
+    }
+
     @Test
     public void test_translateProperties_ssh_sftp() throws InvalidLocationException, UnknownAdaptorException {
 
@@ -153,6 +171,36 @@ public class SSHUtilTest {
         // assertEquals("/somewhere/config", result.get("xenon.adaptors.schedulers.ssh.sshConfigFile"));
     }
 
+    @Test
+    public void test_translateProperties_sftp_ssh_with_others() throws InvalidLocationException, UnknownAdaptorException {
+
+        Map<String, String> prop = new HashMap<>();
+        prop.put("xenon.adaptors.filesystems.sftp.strictHostKeyChecking", "false");
+        prop.put("xenon.adaptors.filesystems.gridftp.test", "true");
+
+        Map<String, String> result = SSHUtil.translateProperties(prop, SftpFileAdaptor.PREFIX, new SshSchedulerAdaptor().getSupportedProperties(),
+                SshSchedulerAdaptor.PREFIX);
+
+        assertEquals(1, result.size());
+        assertTrue(result.containsKey("xenon.adaptors.schedulers.ssh.strictHostKeyChecking"));
+        assertEquals("false", result.get("xenon.adaptors.schedulers.ssh.strictHostKeyChecking"));
+    }
+
+    @Test
+    public void test_translateProperties_sftp_ssh_with_invalid() throws InvalidLocationException, UnknownAdaptorException {
+
+        Map<String, String> prop = new HashMap<>();
+        prop.put("xenon.adaptors.filesystems.sftp.strictHostKeyChecking", "false");
+        prop.put("xenon.adaptors.filesystems.sftp.test", "true");
+
+        Map<String, String> result = SSHUtil.translateProperties(prop, SftpFileAdaptor.PREFIX, new SshSchedulerAdaptor().getSupportedProperties(),
+                SshSchedulerAdaptor.PREFIX);
+
+        assertEquals(1, result.size());
+        assertTrue(result.containsKey("xenon.adaptors.schedulers.ssh.strictHostKeyChecking"));
+        assertEquals("false", result.get("xenon.adaptors.schedulers.ssh.strictHostKeyChecking"));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void test_extractLocations_null() throws InvalidLocationException {
         SSHUtil.extractLocations("Test", null);
@@ -162,6 +210,14 @@ public class SSHUtilTest {
     public void test_extractLocations_singleLocation() throws InvalidLocationException {
         SshdSocketAddress[] expected = new SshdSocketAddress[] { new SshdSocketAddress("localhost", 22) };
         SshdSocketAddress[] result = SSHUtil.extractLocations("Test", "localhost:22/tmp");
+
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
+    public void test_extractLocations_singleLocationNoPort() throws InvalidLocationException {
+        SshdSocketAddress[] expected = new SshdSocketAddress[] { new SshdSocketAddress("localhost", 22) };
+        SshdSocketAddress[] result = SSHUtil.extractLocations("Test", "localhost/tmp");
 
         assertArrayEquals(expected, result);
     }
@@ -195,6 +251,16 @@ public class SSHUtilTest {
     @Test(expected = InvalidLocationException.class)
     public void test_extractLocations_dualLocation_wrong() throws InvalidLocationException {
         SSHUtil.extractLocations("Test", " via:localhost:22/tmp via:somehost:33");
+    }
+
+    @Test(expected = InvalidLocationException.class)
+    public void test_extractLocations_empty() throws InvalidLocationException {
+        SSHUtil.extractLocations("Test", "");
+    }
+
+    @Test(expected = InvalidLocationException.class)
+    public void test_extractLocations_invalid() throws InvalidLocationException {
+        SSHUtil.extractLocations("Test", "   ");
     }
 
     @Test
@@ -297,7 +363,7 @@ public class SSHUtilTest {
         assertNotNull(c);
         assertEquals(2, c.length);
         assertEquals(pc, c[0]);
-        assertEquals(dc, c[0]);
+        assertEquals(dc, c[1]);
     }
 
     @Test(expected = CredentialNotFoundException.class)
