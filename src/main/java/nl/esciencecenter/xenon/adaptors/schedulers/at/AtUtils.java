@@ -188,50 +188,64 @@ public class AtUtils {
         return target;
     }
 
-    public static String generateJobScript(JobDescription description, Path fsEntryPath) {
+    private static void echo(Formatter script, String label, String message, String file) {
+        script.format("echo \"#AT_%s %s\" >> %s\n", label, message, file);
+    }
+
+    public static String generateJobScript(JobDescription description, Path fsEntryPath, String tmpID) {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
         // script.format("%s\n", "#!/bin/sh");
-
         String name = description.getName();
 
         if (name == null || name.trim().isEmpty()) {
             name = "xenon";
         }
 
-        // set name of job to xenon
-        script.format("#AT_JOBNAME %s\n", name);
-
-        // set working directory
         String workingDir = ScriptingUtils.getWorkingDirPath(description, fsEntryPath);
-        script.format("#AT_WORKDIR %s\n", workingDir);
+
+        String tmpFile = "/tmp/xenon.at." + tmpID;
+
+        // Save some info on the job to the tmpFile so we can reconstruct it later.
+
+        // set name of job to xenon
+        echo(script, "JOBNAME", name, tmpFile);
+        echo(script, "WORKDIR", workingDir, tmpFile);
 
         if (description.getQueueName() != null) {
-            script.format("#AT_QUEUE %s\n", description.getQueueName());
+            echo(script, "QUEUE", description.getQueueName(), tmpFile);
         }
 
         if (description.getStartTime() != null) {
-            script.format("#AT_STARTTIME %s\n", description.getStartTime());
+            echo(script, "STARTTIME", description.getStartTime(), tmpFile);
         }
 
         String stdin = getStream(description.getStdin());
         String stderr = getStream(description.getStderr());
         String stdout = getStream(description.getStdout());
 
-        script.format("#AT_INPUT '%s'\n", stdin);
-        script.format("#AT_OUTPUT '%s'\n", stdout);
-        script.format("#AT_ERROR '%s'\n", stderr);
+        echo(script, "INPUT", stdin, tmpFile);
+        echo(script, "OUTPUT", stdout, tmpFile);
+        echo(script, "ERROR", stderr, tmpFile);
 
         if (!description.getEnvironment().isEmpty()) {
-            script.format("\n");
+            for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
+                echo(script, "ENV", entry.getKey() + "=" + entry.getValue(), tmpFile);
+            }
+        }
 
+        echo(script, "EXEC", description.getExecutable(), tmpFile);
+
+        for (String argument : description.getArguments()) {
+            echo(script, "EXEC_PARAM", ScriptingUtils.protectAgainstShellMetas(argument), tmpFile);
+        }
+
+        if (!description.getEnvironment().isEmpty()) {
             for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
                 script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());
             }
         }
-
-        script.format("\n");
 
         script.format("cd '%s' && ", workingDir);
         script.format("%s", description.getExecutable());
@@ -240,10 +254,19 @@ public class AtUtils {
             script.format(" %s", ScriptingUtils.protectAgainstShellMetas(argument));
         }
 
-        script.format(" < '%s' > '%s' 2> '%s'\n", stdin, stdout, stderr);
+        script.format(" < '%s' > '%s' 2> '%s' &\n", stdin, stdout, stderr);
+
+        script.format("PID=$!\n");
+
+        echo(script, "PID", "$PID", tmpFile);
+        script.format("wait $PID\n");
+
+        script.format("EXIT_CODE=$?\n");
+
+        echo(script, "EXIT", "$EXIT_CODE", tmpFile);
         script.close();
 
-        LOGGER.debug("Created job script:%n{} from description {}", stringBuilder, description);
+        LOGGER.debug("Created job script:{} from description {}", stringBuilder, description);
 
         return stringBuilder.toString();
     }

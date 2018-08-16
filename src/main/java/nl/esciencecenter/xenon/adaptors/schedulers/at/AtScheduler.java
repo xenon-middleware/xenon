@@ -92,6 +92,8 @@ public class AtScheduler extends ScriptingScheduler {
 
     private final JobSeenMap jobSeenMap;
 
+    private long nextUniqueID = 0;
+
     public AtScheduler(String uniqueID, String location, Credential credential, XenonPropertyDescription[] validProperties, Map<String, String> prop)
             throws XenonException {
 
@@ -218,6 +220,10 @@ public class AtScheduler extends ScriptingScheduler {
         return result;
     }
 
+    private synchronized String getUniqueID() {
+        return Long.toString(nextUniqueID++);
+    }
+
     @Override
     public String submitBatchJob(JobDescription description) throws XenonException {
 
@@ -225,7 +231,7 @@ public class AtScheduler extends ScriptingScheduler {
         AtUtils.verifyJobDescription(description, QNAMES);
 
         // Generate a job script.
-        String script = AtUtils.generateJobScript(description, getWorkingDirectory());
+        String script = AtUtils.generateJobScript(description, getWorkingDirectory(), getUniqueID());
 
         // Submit it.
         RemoteCommandRunner runner = runCommand(script, "at", new String[] { description.getStartTime() });

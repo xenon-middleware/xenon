@@ -358,10 +358,13 @@ public class AtUtilsTest {
         job.setExecutable("text.exe");
         job.setMaxRuntime(0);
 
-        String script = AtUtils.generateJobScript(job, new Path("/test"));
+        String script = AtUtils.generateJobScript(job, new Path("/test"), "42");
 
-        String expected = "#AT_JOBNAME xenon\n" + "#AT_WORKDIR /test\n" + "#AT_STARTTIME now\n" + "#AT_INPUT '/dev/null'\n" + "#AT_OUTPUT '/dev/null'\n"
-                + "#AT_ERROR '/dev/null'\n\n" + "cd '/test' && text.exe < '/dev/null' > '/dev/null' 2> '/dev/null'\n";
+        String expected = "echo \"#AT_JOBNAME xenon\" >> /tmp/xenon.at.42\n" + "echo \"#AT_WORKDIR /test\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_STARTTIME now\" >> /tmp/xenon.at.42\n" + "echo \"#AT_INPUT /dev/null\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_OUTPUT /dev/null\" >> /tmp/xenon.at.42\n" + "echo \"#AT_ERROR /dev/null\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_EXEC text.exe\" >> /tmp/xenon.at.42\n" + "cd '/test' && text.exe < '/dev/null' > '/dev/null' 2> '/dev/null' &\n" + "PID=$!\n"
+                + "echo \"#AT_PID $PID\" >> /tmp/xenon.at.42\n" + "wait $PID\n" + "EXIT_CODE=$?\n" + "echo \"#AT_EXIT $EXIT_CODE\" >> /tmp/xenon.at.42\n";
 
         assertNotNull(script);
         assertEquals(expected, script);
@@ -374,10 +377,13 @@ public class AtUtilsTest {
         job.setMaxRuntime(0);
         job.setName("NAME");
 
-        String script = AtUtils.generateJobScript(job, new Path("/test"));
+        String expected = "echo \"#AT_JOBNAME NAME\" >> /tmp/xenon.at.42\n" + "echo \"#AT_WORKDIR /test\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_STARTTIME now\" >> /tmp/xenon.at.42\n" + "echo \"#AT_INPUT /dev/null\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_OUTPUT /dev/null\" >> /tmp/xenon.at.42\n" + "echo \"#AT_ERROR /dev/null\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_EXEC text.exe\" >> /tmp/xenon.at.42\n" + "cd '/test' && text.exe < '/dev/null' > '/dev/null' 2> '/dev/null' &\n" + "PID=$!\n"
+                + "echo \"#AT_PID $PID\" >> /tmp/xenon.at.42\n" + "wait $PID\n" + "EXIT_CODE=$?\n" + "echo \"#AT_EXIT $EXIT_CODE\" >> /tmp/xenon.at.42\n";
 
-        String expected = "#AT_JOBNAME NAME\n" + "#AT_WORKDIR /test\n" + "#AT_STARTTIME now\n" + "#AT_INPUT '/dev/null'\n" + "#AT_OUTPUT '/dev/null'\n"
-                + "#AT_ERROR '/dev/null'\n\n" + "cd '/test' && text.exe < '/dev/null' > '/dev/null' 2> '/dev/null'\n";
+        String script = AtUtils.generateJobScript(job, new Path("/test"), "42");
 
         assertNotNull(script);
         assertEquals(expected, script);
@@ -390,10 +396,13 @@ public class AtUtilsTest {
         job.setMaxRuntime(0);
         job.setName("");
 
-        String script = AtUtils.generateJobScript(job, new Path("/test"));
+        String script = AtUtils.generateJobScript(job, new Path("/test"), "42");
 
-        String expected = "#AT_JOBNAME xenon\n" + "#AT_WORKDIR /test\n" + "#AT_STARTTIME now\n" + "#AT_INPUT '/dev/null'\n" + "#AT_OUTPUT '/dev/null'\n"
-                + "#AT_ERROR '/dev/null'\n\n" + "cd '/test' && text.exe < '/dev/null' > '/dev/null' 2> '/dev/null'\n";
+        String expected = "echo \"#AT_JOBNAME xenon\" >> /tmp/xenon.at.42\n" + "echo \"#AT_WORKDIR /test\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_STARTTIME now\" >> /tmp/xenon.at.42\n" + "echo \"#AT_INPUT /dev/null\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_OUTPUT /dev/null\" >> /tmp/xenon.at.42\n" + "echo \"#AT_ERROR /dev/null\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_EXEC text.exe\" >> /tmp/xenon.at.42\n" + "cd '/test' && text.exe < '/dev/null' > '/dev/null' 2> '/dev/null' &\n" + "PID=$!\n"
+                + "echo \"#AT_PID $PID\" >> /tmp/xenon.at.42\n" + "wait $PID\n" + "EXIT_CODE=$?\n" + "echo \"#AT_EXIT $EXIT_CODE\" >> /tmp/xenon.at.42\n";
 
         assertNotNull(script);
         assertEquals(expected, script);
@@ -408,10 +417,13 @@ public class AtUtilsTest {
         job.setStdout("stdout.txt");
         job.setStdin("stdin.txt");
 
-        String script = AtUtils.generateJobScript(job, new Path("/test"));
+        String script = AtUtils.generateJobScript(job, new Path("/test"), "42");
 
-        String expected = "#AT_JOBNAME xenon\n" + "#AT_WORKDIR /test\n" + "#AT_STARTTIME now\n" + "#AT_INPUT 'stdin.txt'\n" + "#AT_OUTPUT 'stdout.txt'\n"
-                + "#AT_ERROR 'stderr.txt'\n\n" + "cd '/test' && text.exe < 'stdin.txt' > 'stdout.txt' 2> 'stderr.txt'\n";
+        String expected = "echo \"#AT_JOBNAME xenon\" >> /tmp/xenon.at.42\n" + "echo \"#AT_WORKDIR /test\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_STARTTIME now\" >> /tmp/xenon.at.42\n" + "echo \"#AT_INPUT stdin.txt\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_OUTPUT stdout.txt\" >> /tmp/xenon.at.42\n" + "echo \"#AT_ERROR stderr.txt\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_EXEC text.exe\" >> /tmp/xenon.at.42\n" + "cd '/test' && text.exe < 'stdin.txt' > 'stdout.txt' 2> 'stderr.txt' &\n" + "PID=$!\n"
+                + "echo \"#AT_PID $PID\" >> /tmp/xenon.at.42\n" + "wait $PID\n" + "EXIT_CODE=$?\n" + "echo \"#AT_EXIT $EXIT_CODE\" >> /tmp/xenon.at.42\n";
 
         assertNotNull(script);
         assertEquals(expected, script);
@@ -426,10 +438,15 @@ public class AtUtilsTest {
         job.addArgument("b");
         job.addArgument("c");
 
-        String script = AtUtils.generateJobScript(job, new Path("/test"));
+        String script = AtUtils.generateJobScript(job, new Path("/test"), "42");
 
-        String expected = "#AT_JOBNAME xenon\n" + "#AT_WORKDIR /test\n" + "#AT_STARTTIME now\n" + "#AT_INPUT '/dev/null'\n" + "#AT_OUTPUT '/dev/null'\n"
-                + "#AT_ERROR '/dev/null'\n\n" + "cd '/test' && text.exe 'a' 'b' 'c' < '/dev/null' > '/dev/null' 2> '/dev/null'\n";
+        String expected = "echo \"#AT_JOBNAME xenon\" >> /tmp/xenon.at.42\n" + "echo \"#AT_WORKDIR /test\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_STARTTIME now\" >> /tmp/xenon.at.42\n" + "echo \"#AT_INPUT /dev/null\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_OUTPUT /dev/null\" >> /tmp/xenon.at.42\n" + "echo \"#AT_ERROR /dev/null\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_EXEC text.exe\" >> /tmp/xenon.at.42\n" + "echo \"#AT_EXEC_PARAM 'a'\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_EXEC_PARAM 'b'\" >> /tmp/xenon.at.42\n" + "echo \"#AT_EXEC_PARAM 'c'\" >> /tmp/xenon.at.42\n"
+                + "cd '/test' && text.exe 'a' 'b' 'c' < '/dev/null' > '/dev/null' 2> '/dev/null' &\n" + "PID=$!\n"
+                + "echo \"#AT_PID $PID\" >> /tmp/xenon.at.42\n" + "wait $PID\n" + "EXIT_CODE=$?\n" + "echo \"#AT_EXIT $EXIT_CODE\" >> /tmp/xenon.at.42\n";
 
         assertNotNull(script);
         assertEquals(expected, script);
@@ -442,10 +459,14 @@ public class AtUtilsTest {
         job.setMaxRuntime(0);
         job.setQueueName("Z");
 
-        String script = AtUtils.generateJobScript(job, new Path("/test"));
+        String script = AtUtils.generateJobScript(job, new Path("/test"), "42");
 
-        String expected = "#AT_JOBNAME xenon\n" + "#AT_WORKDIR /test\n" + "#AT_QUEUE Z\n" + "#AT_STARTTIME now\n" + "#AT_INPUT '/dev/null'\n"
-                + "#AT_OUTPUT '/dev/null'\n" + "#AT_ERROR '/dev/null'\n\n" + "cd '/test' && text.exe < '/dev/null' > '/dev/null' 2> '/dev/null'\n";
+        String expected = "echo \"#AT_JOBNAME xenon\" >> /tmp/xenon.at.42\n" + "echo \"#AT_WORKDIR /test\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_QUEUE Z\" >> /tmp/xenon.at.42\n" + "echo \"#AT_STARTTIME now\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_INPUT /dev/null\" >> /tmp/xenon.at.42\n" + "echo \"#AT_OUTPUT /dev/null\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_ERROR /dev/null\" >> /tmp/xenon.at.42\n" + "echo \"#AT_EXEC text.exe\" >> /tmp/xenon.at.42\n"
+                + "cd '/test' && text.exe < '/dev/null' > '/dev/null' 2> '/dev/null' &\n" + "PID=$!\n" + "echo \"#AT_PID $PID\" >> /tmp/xenon.at.42\n"
+                + "wait $PID\n" + "EXIT_CODE=$?\n" + "echo \"#AT_EXIT $EXIT_CODE\" >> /tmp/xenon.at.42\n";
 
         assertNotNull(script);
         assertEquals(expected, script);
@@ -459,18 +480,17 @@ public class AtUtilsTest {
         job.addEnvironment("aap", "noot");
         job.addEnvironment("noot", "aap");
 
-        String script = AtUtils.generateJobScript(job, new Path("/test"));
+        String script = AtUtils.generateJobScript(job, new Path("/test"), "42");
 
         System.err.println(script);
 
-        String expected = "#AT_JOBNAME xenon\n" + "#AT_WORKDIR /test\n" + "#AT_STARTTIME now\n" + "#AT_INPUT '/dev/null'\n" + "#AT_OUTPUT '/dev/null'\n"
-                + "#AT_ERROR '/dev/null'\n\n" + "export aap=\"noot\"\n" + "export noot=\"aap\"\n\n"
-                + "cd '/test' && text.exe < '/dev/null' > '/dev/null' 2> '/dev/null'\n";
-
-        System.err.println(script);
-
-        System.err.println("expected");
-        System.err.println(expected);
+        String expected = "echo \"#AT_JOBNAME xenon\" >> /tmp/xenon.at.42\n" + "echo \"#AT_WORKDIR /test\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_STARTTIME now\" >> /tmp/xenon.at.42\n" + "echo \"#AT_INPUT /dev/null\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_OUTPUT /dev/null\" >> /tmp/xenon.at.42\n" + "echo \"#AT_ERROR /dev/null\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_ENV aap=noot\" >> /tmp/xenon.at.42\n" + "echo \"#AT_ENV noot=aap\" >> /tmp/xenon.at.42\n"
+                + "echo \"#AT_EXEC text.exe\" >> /tmp/xenon.at.42\n" + "export aap=\"noot\"\n" + "export noot=\"aap\"\n"
+                + "cd '/test' && text.exe < '/dev/null' > '/dev/null' 2> '/dev/null' &\n" + "PID=$!\n" + "echo \"#AT_PID $PID\" >> /tmp/xenon.at.42\n"
+                + "wait $PID\n" + "EXIT_CODE=$?\n" + "echo \"#AT_EXIT $EXIT_CODE\" >> /tmp/xenon.at.42\n";
 
         assertNotNull(script);
         assertEquals(expected, script);

@@ -115,7 +115,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
                 int pid = pidField.getInt(process);
 
                 if (pid > 0) {
-                    CommandRunner killRunner = new CommandRunner("kill", "-9", "" + pid);
+                    CommandRunner killRunner = new CommandRunner("kill", "-9", "-" + pid);
                     success = (killRunner.getExitCode() == 0);
                 }
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException | XenonException e) {
