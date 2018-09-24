@@ -957,5 +957,4 @@ public class SlurmUtilsTest {
 
         assertEquals("AAP,NOOT", result);
     }
-
 }

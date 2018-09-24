@@ -652,4 +652,43 @@ public class GridEngineUtilsTest {
         GridEngineUtils.getJobStatusFromQstatInfo(input, jobID);
     }
 
+    @Test
+    public void test_substituteJobID_null() throws XenonException {
+
+        String result = GridEngineUtils.substituteJobID(null);
+
+        assertNull(result);
+    }
+
+    @Test
+    public void test_substituteJobID_noReplace() throws XenonException {
+
+        String path = "/test/test/file";
+
+        String result = GridEngineUtils.substituteJobID(path);
+
+        assertEquals(result, path);
+    }
+
+    @Test
+    public void test_substituteJobID_replaceOne() throws XenonException {
+
+        String path = "/test/test/file%j";
+        String expected = "/test/test/file$JOB_ID";
+
+        String result = GridEngineUtils.substituteJobID(path);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_substituteJobID_replaceTwo() throws XenonException {
+
+        String path = "/test/test%j/file%j";
+        String expected = "/test/test$JOB_ID/file$JOB_ID";
+
+        String result = GridEngineUtils.substituteJobID(path);
+
+        assertEquals(expected, result);
+    }
 }

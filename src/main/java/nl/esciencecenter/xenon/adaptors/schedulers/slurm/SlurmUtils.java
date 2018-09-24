@@ -463,12 +463,14 @@ public final class SlurmUtils {
         if (description.getStdout() == null) {
             script.format("#SBATCH --output=/dev/null\n");
         } else {
+            // NOTE: SLURM directly accepts the %j when the JOB_ID needs to be inserted.
             script.format("#SBATCH --output='%s'\n", description.getStdout());
         }
 
         if (description.getStderr() == null) {
             script.format("%s\n", "#SBATCH --error=/dev/null");
         } else {
+            // NOTE: SLURM directly accepts the %j when the JOB_ID needs to be inserted.
             script.format("#SBATCH --error='%s'\n", description.getStderr());
         }
 

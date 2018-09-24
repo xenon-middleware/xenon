@@ -179,13 +179,13 @@ final class GridEngineUtils {
         if (description.getStdout() == null) {
             script.format("#$ -o /dev/null\n");
         } else {
-            script.format("#$ -o '%s'\n", description.getStdout());
+            script.format("#$ -o '%s'\n", substituteJobID(description.getStdout()));
         }
 
         if (description.getStderr() == null) {
             script.format("#$ -e /dev/null\n");
         } else {
-            script.format("#$ -e '%s'\n", description.getStderr());
+            script.format("#$ -e '%s'\n", substituteJobID(description.getStderr()));
         }
 
         for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
@@ -205,6 +205,15 @@ final class GridEngineUtils {
         LOGGER.debug("Created job script:%n{}", stringBuilder);
 
         return stringBuilder.toString();
+    }
+
+    protected static String substituteJobID(String path) {
+
+        if (path == null) {
+            return null;
+        }
+
+        return path.replace("%j", "$JOB_ID");
     }
 
     protected static void verifyJobDescription(JobDescription description, String[] queueNames) throws XenonException {

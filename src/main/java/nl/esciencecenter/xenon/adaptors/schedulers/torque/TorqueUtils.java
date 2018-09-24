@@ -128,6 +128,15 @@ final class TorqueUtils {
         script.format("\n");
     }
 
+    public static String substituteJobID(String path) {
+
+        if (path == null) {
+            return null;
+        }
+
+        return path.replace("%j", "$PBS_JOBID");
+    }
+
     public static String generate(JobDescription description, Path workdir, int defaultRuntime) {
         StringBuilder stringBuilder = new StringBuilder(500);
         Formatter script = new Formatter(stringBuilder, Locale.US);
@@ -161,7 +170,7 @@ final class TorqueUtils {
                 stdout = workingDirectory + "/" + stdout;
             }
 
-            script.format("#PBS -o %s\n", stdout);
+            script.format("#PBS -o %s\n", substituteJobID(stdout));
         }
 
         String stderr = description.getStderr();
@@ -171,7 +180,7 @@ final class TorqueUtils {
                 stderr = workingDirectory + "/" + stderr;
             }
 
-            script.format("#PBS -e %s\n", stderr);
+            script.format("#PBS -e %s\n", substituteJobID(stderr));
         }
 
         if (description.getQueueName() != null) {

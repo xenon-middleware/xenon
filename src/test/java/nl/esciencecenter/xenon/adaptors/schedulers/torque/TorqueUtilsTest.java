@@ -360,4 +360,44 @@ public class TorqueUtilsTest {
 
         TorqueUtils.getJobStatusFromQstatInfo(input, jobID);
     }
+
+    @Test
+    public void test_substituteJobID_null() throws XenonException {
+
+        String result = TorqueUtils.substituteJobID(null);
+
+        assertNull(result);
+    }
+
+    @Test
+    public void test_substituteJobID_noReplace() throws XenonException {
+
+        String path = "/test/test/file";
+
+        String result = TorqueUtils.substituteJobID(path);
+
+        assertEquals(result, path);
+    }
+
+    @Test
+    public void test_substituteJobID_replaceOne() throws XenonException {
+
+        String path = "/test/test/file%j";
+        String expected = "/test/test/file$PBS_JOBID";
+
+        String result = TorqueUtils.substituteJobID(path);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_substituteJobID_replaceTwo() throws XenonException {
+
+        String path = "/test/test%j/file%j";
+        String expected = "/test/test$PBS_JOBID/file$PBS_JOBID";
+
+        String result = TorqueUtils.substituteJobID(path);
+
+        assertEquals(expected, result);
+    }
 }

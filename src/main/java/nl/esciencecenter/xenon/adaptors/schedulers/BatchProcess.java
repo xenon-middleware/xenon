@@ -58,8 +58,8 @@ class BatchProcess implements Process {
             }
         }
 
-        OutputStream out = createOutputStream(filesystem, workdir, description.getStdout());
-        OutputStream err = createOutputStream(filesystem, workdir, description.getStderr());
+        OutputStream out = createOutputStream(filesystem, workdir, substituteJobID(description.getStdout(), jobIdentifier));
+        OutputStream err = createOutputStream(filesystem, workdir, substituteJobID(description.getStderr(), jobIdentifier));
 
         process = factory.createInteractiveProcess(description, workdir.toString(), jobIdentifier, startupTimeout);
         Streams streams = process.getStreams();
@@ -73,6 +73,15 @@ class BatchProcess implements Process {
         } else {
             stdinForwarder = new StreamForwarder(filesystem.readFromFile(stdin), streams.getStdin());
         }
+    }
+
+    private String substituteJobID(String path, String jobIdentifier) {
+
+        if (path == null) {
+            return null;
+        }
+
+        return path.replace("%j", jobIdentifier);
     }
 
     private Path processPath(Path root, String path) {
