@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.adaptors.schedulers.at;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
@@ -496,4 +497,48 @@ public class AtUtilsTest {
         assertEquals(expected, script);
     }
 
+    @Test
+    public void test_substituteJobID_null() throws XenonException {
+
+        String ID = "ID007";
+
+        String result = AtUtils.substituteJobID(null, ID);
+
+        assertNull(result);
+    }
+
+    @Test
+    public void test_substituteJobID_noReplace() throws XenonException {
+
+        String ID = "ID007";
+        String path = "/test/test/file";
+
+        String result = AtUtils.substituteJobID(path, ID);
+
+        assertEquals(result, path);
+    }
+
+    @Test
+    public void test_substituteJobID_replaceOne() throws XenonException {
+
+        String ID = "ID007";
+        String path = "/test/test/file%j";
+        String expected = "/test/test/fileID007";
+
+        String result = AtUtils.substituteJobID(path, ID);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_substituteJobID_replaceTwo() throws XenonException {
+
+        String ID = "ID007";
+        String path = "/test/test%j/file%j";
+        String expected = "/test/testID007/fileID007";
+
+        String result = AtUtils.substituteJobID(path, ID);
+
+        assertEquals(expected, result);
+    }
 }

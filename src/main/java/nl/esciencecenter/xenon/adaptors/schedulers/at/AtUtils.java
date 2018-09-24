@@ -192,6 +192,15 @@ public class AtUtils {
         script.format("echo \"#AT_%s %s\" >> %s\n", label, message, file);
     }
 
+    protected static String substituteJobID(String path, String jobID) {
+
+        if (path == null) {
+            return null;
+        }
+
+        return path.replace("%j", jobID);
+    }
+
     public static String generateJobScript(JobDescription description, Path fsEntryPath, String tmpID) {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
@@ -222,8 +231,8 @@ public class AtUtils {
         }
 
         String stdin = getStream(description.getStdin());
-        String stderr = getStream(description.getStderr());
-        String stdout = getStream(description.getStdout());
+        String stderr = getStream(substituteJobID(description.getStderr(), tmpID));
+        String stdout = getStream(substituteJobID(description.getStdout(), tmpID));
 
         echo(script, "INPUT", stdin, tmpFile);
         echo(script, "OUTPUT", stdout, tmpFile);
