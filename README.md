@@ -44,9 +44,13 @@ languages (e.g. Python) through its gRPC interface.
 | component | repository |
 |---|---|
 | Xenon library | https://github.com/NLeSC/Xenon |
+| Xenon cloud adaptors like s3 | https://github.com/NLeSC/xenon-adaptors-cloud |
+| Xenon grid adaptors like gridftp| https://github.com/NLeSC/xenon-adaptors-grid |
+| Xenon hadoop adaptors like hdfs | https://github.com/NLeSC/xenon-adaptors-hadoop |
 | gRPC extension for Xenon | https://github.com/NLeSC/xenon-grpc |
 | command line interface to Xenon | https://github.com/NLeSC/xenon-cli |
 | Python API for Xenon | https://github.com/NLeSC/pyxenon |
+| Docker images | https://github.com/NLeSC/xenon-docker-images |
 
 ## Supported middleware
 
@@ -87,31 +91,16 @@ and
 
 ```gradle
 	dependencies {
-	        compile 'nl.esciencecenter.xenon:xenon:2.6.2'
+	        compile group: 'nl.esciencecenter.xenon', name: 'xenon', version: '3.0.0'
 	}
 
 ```
 
-Or for a Maven project,
-
-```maven
-	<repositories>
-		<repository>
-		    <id>jcenter</id>
-		    <url>https://jcenter.bintray.com</url>
-		</repository>
-	</repositories>
-```
-
-and
-
-
-```maven
-	<dependency>
-	    <groupId>nl.esciencecenter.xenon</groupId>
-	    <artifactId>xenon</artifactId>
-	    <version>2.6.2</version>
-	</dependency>
+This will give the core adaptors to get cloud, grid and hadoop adaptors add the following dependencies:
+```gradle
+    compile group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-cloud', version: '3.0.0'
+    compile group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-grid', version: '3.0.0'
+    compile group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-hadoop', version: '3.0.0'
 ```
 
 ## Simple examples
