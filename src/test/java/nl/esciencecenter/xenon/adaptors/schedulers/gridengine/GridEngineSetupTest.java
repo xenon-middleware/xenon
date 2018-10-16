@@ -50,6 +50,55 @@ public class GridEngineSetupTest {
     }
 
     @Test
+    public void test_getSingleNodeParallelEnvironment_allocationruleroundrobin_notpresent() {
+    }
+
+    @Test
+    public void test_getSingleNodeParallelEnvironment_allocationrulefillup_notpresent() {
+
+    }
+
+    @Test
+    public void test_getSingleNodeParallelEnvironment_allocationrulepeslots_present() {
+
+    }
+
+    @Test
+    public void test_getSingleNodeParallelEnvironment_allocationruleintsmaller_notpresent() {
+
+    }
+
+    @Test
+    public void test_getSingleNodeParallelEnvironment_allocationruleinttequal_present() {
+
+    }
+
+    @Test
+    public void test_getSingleNodeParallelEnvironment_allocationruleintbigger_present() {
+
+    }
+
+    @Test
+    public void test_getSingleNodeParallelEnvironment_queueugiven_notinqueue() {
+
+    }
+
+    @Test
+    public void test_getSingleNodeParallelEnvironment_queueugiven_inqueue() {
+
+    }
+
+    @Test
+    public void test_getSingleNodeParallelEnvironment_queueuabsent_notinqueues() {
+
+    }
+
+    @Test
+    public void test_getSingleNodeParallelEnvironment_queueuabsent_inqueues() {
+
+    }
+
+    @Test
     public void test02a_calculateSlots_singleNodePe_slots() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
