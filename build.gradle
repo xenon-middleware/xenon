@@ -59,7 +59,8 @@ dependencies {
     compile group: 'commons-net', name: 'commons-net', version: '3.3'
 
     // ssh and sftp 
-    compile group: 'com.github.NLeSC.mina-sshd', name: 'sshd-core', version: 'known-host-hash-with-port-1.6.0-SNAPSHOT'
+    compile group: 'org.apache.sshd', name: 'sshd-mina', version:'2.1.0'
+    compile group: 'org.apache.sshd', name:'sshd-sftp', version:'2.1.0'
     compile group: 'org.apache.mina', name: 'mina-core', version: '2.0.7'
     compile group: 'net.i2p.crypto', name: 'eddsa', version: '0.2.0'
     compile group: 'com.google.guava', name: 'guava', version: '19.0'
