@@ -15,9 +15,6 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers.gridengine;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +24,8 @@ import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.ParallelEnvironmen
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+
+import static org.junit.Assert.*;
 
 /**
  *
@@ -49,190 +48,116 @@ public class GridEngineSetupTest {
         assertArrayEquals("returned queue names should be equal to input queue names", input, result);
     }
 
+    private GridEngineSetup getGridEngineSetup(ParallelEnvironmentInfo pe) {
+        String[] queueNames = new String[]{"some.q"};
+
+        Map<String, QueueInfo> queueInfos = new HashMap<>();
+        queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
+
+        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
+        peInfos.put("some.pe", pe);
+        return new GridEngineSetup(queueNames, queueInfos, peInfos);
+    }
+
     @Test
     public void test_getSingleNodeParallelEnvironment_allocationruleroundrobin_notpresent() {
+        ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.ROUND_ROBIN, 0);
+        GridEngineSetup setup = getGridEngineSetup(pe);
+
+        assertFalse(setup.getSingleNodeParallelEnvironment(4, null).isPresent());
     }
 
     @Test
     public void test_getSingleNodeParallelEnvironment_allocationrulefillup_notpresent() {
+        ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.FILL_UP, 0);
+        GridEngineSetup setup = getGridEngineSetup(pe);
 
+        assertFalse(setup.getSingleNodeParallelEnvironment(4, null).isPresent());
     }
 
     @Test
     public void test_getSingleNodeParallelEnvironment_allocationrulepeslots_present() {
+        ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.PE_SLOTS, 0);
+        GridEngineSetup setup = getGridEngineSetup(pe);
 
+        assertTrue(setup.getSingleNodeParallelEnvironment(4, null).isPresent());
     }
 
     @Test
     public void test_getSingleNodeParallelEnvironment_allocationruleintsmaller_notpresent() {
+        ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 2);
+        GridEngineSetup setup = getGridEngineSetup(pe);
 
+        assertFalse(setup.getSingleNodeParallelEnvironment(4, null).isPresent());
     }
 
     @Test
     public void test_getSingleNodeParallelEnvironment_allocationruleinttequal_present() {
+        ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 4);
+        GridEngineSetup setup = getGridEngineSetup(pe);
 
+        assertTrue(setup.getSingleNodeParallelEnvironment(4, null).isPresent());
     }
 
     @Test
     public void test_getSingleNodeParallelEnvironment_allocationruleintbigger_present() {
+        ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 8);
+        GridEngineSetup setup = getGridEngineSetup(pe);
 
+        assertTrue(setup.getSingleNodeParallelEnvironment(4, null).isPresent());
     }
 
     @Test
     public void test_getSingleNodeParallelEnvironment_queueugiven_notinqueue() {
+        String[] queueNames = new String[]{"some.q"};
 
+        Map<String, QueueInfo> queueInfos = new HashMap<>();
+        queueInfos.put("some.q", new QueueInfo("some.q", 4));
+
+        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
+        ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 4);
+        peInfos.put("some.pe", pe);
+        GridEngineSetup setup = new GridEngineSetup(queueNames, queueInfos, peInfos);
+
+        assertTrue(setup.getSingleNodeParallelEnvironment(4, "some.q").isPresent());
     }
 
     @Test
     public void test_getSingleNodeParallelEnvironment_queueugiven_inqueue() {
+        ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 4);
+        GridEngineSetup setup = getGridEngineSetup(pe);
 
+        assertTrue(setup.getSingleNodeParallelEnvironment(4, "some.q").isPresent());
     }
 
     @Test
     public void test_getSingleNodeParallelEnvironment_queueuabsent_notinqueues() {
+        String[] queueNames = new String[]{"some.q"};
 
+        Map<String, QueueInfo> queueInfos = new HashMap<>();
+        queueInfos.put("some.q", new QueueInfo("some.q", 4));
+
+        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
+        ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 4);
+        peInfos.put("some.pe", pe);
+        GridEngineSetup setup = new GridEngineSetup(queueNames, queueInfos, peInfos);
+
+        assertTrue(setup.getSingleNodeParallelEnvironment(4, null).isPresent());
     }
 
     @Test
     public void test_getSingleNodeParallelEnvironment_queueuabsent_inqueues() {
-
-    }
-
-    @Test
-    public void test02a_calculateSlots_singleNodePe_slots() throws XenonException {
-        String[] queueNames = new String[] { "some.q" };
+        String[] queueNames = new String[]{"some.q"};
 
         Map<String, QueueInfo> queueInfos = new HashMap<>();
         queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
 
         Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
-        peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.PE_SLOTS, 0));
+        ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 4);
+        peInfos.put("some.pe", pe);
+        GridEngineSetup setup = new GridEngineSetup(queueNames, queueInfos, peInfos);
 
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
-
-        int expected = 1;
-
-        int result = testSetup.calculateSlots("some.pe", "some.q", 1);
-
-        assertEquals("pe_slots pe allocation should always return 1", expected, result);
-    }
-
-    @Test(expected = XenonException.class)
-    public void test02b_calculateSlots_singleNodePeMultipleNodes_exceptionThrown() throws XenonException {
-        String[] queueNames = new String[] { "some.q" };
-
-        Map<String, QueueInfo> queueInfos = new HashMap<>();
-        queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
-
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
-        peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.PE_SLOTS, 0));
-
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
-
-        testSetup.calculateSlots("some.pe", "some.q", 2);
-    }
-
-    @Test
-    public void test02c_calculateSlots_fillUpPe_slots() throws XenonException {
-        String[] queueNames = new String[] { "some.q" };
-
-        Map<String, QueueInfo> queueInfos = new HashMap<>();
-        queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
-
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
-        peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.FILL_UP, 0));
-
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
-
-        //we expect all slots of the pe to be claimed for all nodes
-        int expected = 2 * 4;
-
-        int result = testSetup.calculateSlots("some.pe", "some.q", 2);
-
-        assertEquals("fill_up pe allocation should return node*slots", expected, result);
-    }
-
-    @Test
-    public void test02d_calculateSlots_roundRobinPe_slots() throws XenonException {
-        String[] queueNames = new String[] { "some.q" };
-
-        Map<String, QueueInfo> queueInfos = new HashMap<>();
-        queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
-
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
-        peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.ROUND_ROBIN, 0));
-
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
-
-        //we expect the number of nodes
-        int expected = 1;
-
-        int result = testSetup.calculateSlots("some.pe", "some.q", 1);
-
-        assertEquals("round_robin pe allocation should return the number of nodes", expected, result);
-    }
-
-    @Test(expected = XenonException.class)
-    public void test02d_calculateSlots_roundRobinPe_tooManySlots_Fails() throws XenonException {
-        String[] queueNames = new String[] { "some.q" };
-
-        Map<String, QueueInfo> queueInfos = new HashMap<>();
-        queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
-
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
-        peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.ROUND_ROBIN, 0));
-
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
-        testSetup.calculateSlots("some.pe", "some.q", 2);
-        // Should fail.
-    }
-
-    @Test
-    public void test02e_calculateSlots_integerPe_slots() throws XenonException {
-        String[] queueNames = new String[] { "some.q" };
-
-        Map<String, QueueInfo> queueInfos = new HashMap<>();
-        queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
-
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
-        peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 3));
-
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
-
-        //we expect the number of nodes
-        int expected = 6;
-
-        int result = testSetup.calculateSlots("some.pe", "some.q", 2);
-
-        assertEquals("normal pe allocation should always return node*slots", expected, result);
-    }
-
-    @Test(expected = XenonException.class)
-    public void test02e_calculateSlots_InvalidPe_exceptionThrown() throws XenonException {
-        String[] queueNames = new String[] { "some.q" };
-
-        Map<String, QueueInfo> queueInfos = new HashMap<>();
-        queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
-
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
-
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
-
-        testSetup.calculateSlots("some.pe", "some.q", 2);
-    }
-
-    @Test(expected = XenonException.class)
-    public void test02e_calculateSlots_InvalidQueue_exceptionThrown() throws XenonException {
-        String[] queueNames = new String[] { "some.q" };
-
-        Map<String, QueueInfo> queueInfos = new HashMap<>();
-
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
-        peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 3));
-
-        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
-
-        testSetup.calculateSlots("some.pe", "some.q", 2);
+        assertTrue(setup.getSingleNodeParallelEnvironment(4, null).isPresent());
     }
 
     @Test
