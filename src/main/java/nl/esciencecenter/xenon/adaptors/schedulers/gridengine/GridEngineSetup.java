@@ -153,7 +153,7 @@ public class GridEngineSetup {
      * Try to find a parallel environment that can be used to get a number of cores on a single node
      *
      * @param coresPerNode number of cores to reserve on a node
-     * @param queueName
+     * @param queueName Name of the queue
      * @return optional parallel environment
      */
     Optional<ParallelEnvironmentInfo> getSingleNodeParallelEnvironment(int coresPerNode, String queueName) {
@@ -168,6 +168,7 @@ public class GridEngineSetup {
             }
             stream = stream.filter(pe -> pesOfQueues.contains(pe.getName()));
         } else {
+            // don't know which queue the scheduler will pick, make sure atleast one queue has the candidate pe
             Set<String> pesOfQueue = new HashSet<>(Arrays.asList(queue.getParallelEnvironments()));
             stream = stream.filter(pe -> pesOfQueue.contains(pe.getName()));
         }
@@ -179,7 +180,7 @@ public class GridEngineSetup {
      *
      * @param coresPerNode number of cores to reserve on each node
      * @param nodes number of nodes to reserve
-     * @param queueName
+     * @param queueName Name of the queue
      * @return optional parallel environment
      */
     Optional<ParallelEnvironmentInfo> getMultiNodeParallelEnvironment(int coresPerNode, int nodes, String queueName) {

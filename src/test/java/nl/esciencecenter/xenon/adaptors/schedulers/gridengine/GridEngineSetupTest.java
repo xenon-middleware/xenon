@@ -15,17 +15,18 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers.gridengine;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.ParallelEnvironmentInfo.AllocationRule;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import static org.junit.Assert.*;
+import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.ParallelEnvironmentInfo.AllocationRule;
 
 /**
  *
@@ -35,7 +36,7 @@ import static org.junit.Assert.*;
 public class GridEngineSetupTest {
 
     /**
-     * Test method for {@link nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineSetup#getQueueNames()}.
+     * Test method for {@link nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSetup#getQueueNames()}.
      */
     @Test
     public void test01_getQueueNames() {
@@ -48,14 +49,14 @@ public class GridEngineSetupTest {
         assertArrayEquals("returned queue names should be equal to input queue names", input, result);
     }
 
-    private GridEngineSetup getGridEngineSetup(ParallelEnvironmentInfo pe) {
+    static GridEngineSetup getGridEngineSetup(ParallelEnvironmentInfo pe) {
         String[] queueNames = new String[]{"some.q"};
 
         Map<String, QueueInfo> queueInfos = new HashMap<>();
-        queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
+        queueInfos.put("some.q", new QueueInfo("some.q", 4, pe.getName()));
 
         Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
-        peInfos.put("some.pe", pe);
+        peInfos.put(pe.getName(), pe);
         return new GridEngineSetup(queueNames, queueInfos, peInfos);
     }
 
@@ -108,7 +109,7 @@ public class GridEngineSetupTest {
     }
 
     @Test
-    public void test_getSingleNodeParallelEnvironment_queueugiven_notinqueue() {
+    public void test_getSingleNodeParallelEnvironment_queueugiven_penotinqueue() {
         String[] queueNames = new String[]{"some.q"};
 
         Map<String, QueueInfo> queueInfos = new HashMap<>();
@@ -119,11 +120,11 @@ public class GridEngineSetupTest {
         peInfos.put("some.pe", pe);
         GridEngineSetup setup = new GridEngineSetup(queueNames, queueInfos, peInfos);
 
-        assertTrue(setup.getSingleNodeParallelEnvironment(4, "some.q").isPresent());
+        assertFalse(setup.getSingleNodeParallelEnvironment(4, "some.q").isPresent());
     }
 
     @Test
-    public void test_getSingleNodeParallelEnvironment_queueugiven_inqueue() {
+    public void test_getSingleNodeParallelEnvironment_queueugiven_peinqueue() {
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 4);
         GridEngineSetup setup = getGridEngineSetup(pe);
 
@@ -131,7 +132,7 @@ public class GridEngineSetupTest {
     }
 
     @Test
-    public void test_getSingleNodeParallelEnvironment_queueuabsent_notinqueues() {
+    public void test_getSingleNodeParallelEnvironment_queueuabsent_penotinqueues() {
         String[] queueNames = new String[]{"some.q"};
 
         Map<String, QueueInfo> queueInfos = new HashMap<>();
@@ -142,11 +143,11 @@ public class GridEngineSetupTest {
         peInfos.put("some.pe", pe);
         GridEngineSetup setup = new GridEngineSetup(queueNames, queueInfos, peInfos);
 
-        assertTrue(setup.getSingleNodeParallelEnvironment(4, null).isPresent());
+        assertFalse(setup.getSingleNodeParallelEnvironment(4, null).isPresent());
     }
 
     @Test
-    public void test_getSingleNodeParallelEnvironment_queueuabsent_inqueues() {
+    public void test_getSingleNodeParallelEnvironment_queueuabsent_peinqueues() {
         String[] queueNames = new String[]{"some.q"};
 
         Map<String, QueueInfo> queueInfos = new HashMap<>();

@@ -129,7 +129,7 @@ class ParallelEnvironmentInfo {
             // TODO check if hosts (of queue) have that many slots
         ) || (
             allocationRule == AllocationRule.INTEGER && ppn >= coresPerNode
-        ) && slots <= coresPerNode;
+        ) && coresPerNode <= slots;
     }
 
     /**
@@ -141,7 +141,7 @@ class ParallelEnvironmentInfo {
      */
     boolean canAllocateMultiNode(int coresPerNode, int nodes) {
         return (
-            allocationRule == AllocationRule.INTEGER && ppn == coresPerNode && slots <= coresPerNode * nodes
+            allocationRule == AllocationRule.INTEGER && ppn == coresPerNode && coresPerNode * nodes <= slots
         );
     }
 }

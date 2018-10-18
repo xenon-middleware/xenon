@@ -44,14 +44,9 @@ final class GridEngineUtils {
 
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
 
-    public static final String JOB_OPTION_PARALLEL_ENVIRONMENT = "parallel.environment";
-
-    public static final String JOB_OPTION_PARALLEL_SLOTS = "parallel.slots";
-
     public static final String JOB_OPTION_RESOURCES = "resources";
 
-    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_PARALLEL_ENVIRONMENT, JOB_OPTION_PARALLEL_SLOTS,
-            JOB_OPTION_RESOURCES };
+    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_RESOURCES };
 
     public static final String QACCT_HEADER = "==============================================================";
 
@@ -60,6 +55,7 @@ final class GridEngineUtils {
     protected static void generateParallelEnvironmentSpecification(JobDescription description, GridEngineSetup setup, Formatter script) throws XenonException {
         if (description.getNodeCount() == 1 && description.getProcessesPerNode() == 1) {
             // Single node + single core
+            // nothing to do
         } else if (description.getNodeCount() == 1 && description.getProcessesPerNode() > 1) {
             // Single node + multi core
             Optional<ParallelEnvironmentInfo> pe = setup.getSingleNodeParallelEnvironment(description.getProcessesPerNode(), description.getQueueName());
@@ -193,7 +189,7 @@ final class GridEngineUtils {
 
         script.format("\n");
 
-        if (description.getNodeCount() == 1 && description.getProcessesPerNode() == 1) {
+        if ((description.getNodeCount() == 1 && description.getProcessesPerNode() == 1) || description.isStartSingleProcess()) {
             generateSerialScriptContent(description, script);
         } else {
             generateParallelScriptContent(description, script);
@@ -217,17 +213,6 @@ final class GridEngineUtils {
 
         // perform standard checks.
         ScriptingUtils.verifyJobDescription(description, ADAPTOR_NAME);
-
-        // check if the parallel environment and queue are specified.
-        if (description.getNodeCount() != 1) {
-            if (!description.getJobOptions().containsKey(JOB_OPTION_PARALLEL_ENVIRONMENT)) {
-                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Parallel job requested but mandatory parallel.environment option not specified.");
-            }
-            if (description.getQueueName() == null && !description.getJobOptions().containsKey(JOB_OPTION_PARALLEL_SLOTS)) {
-                throw new InvalidJobDescriptionException(ADAPTOR_NAME,
-                        "Parallel job requested but neither queue nor number of slots specificied (at least one is required)");
-            }
-        }
     }
 
     @SuppressWarnings("PMD.EmptyIfStmt")
