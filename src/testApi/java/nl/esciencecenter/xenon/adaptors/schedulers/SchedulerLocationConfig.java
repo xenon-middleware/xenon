@@ -51,7 +51,7 @@ public abstract class SchedulerLocationConfig {
     }
 
     public long getMaxWaintUntilDone() {
-        return 60 * 1000;
+        return 2 * 60 * 1000;
     }
 
     public boolean supportsBatch() {

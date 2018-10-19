@@ -25,9 +25,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class PathTest {
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void test_separatorOnly() {
@@ -277,14 +281,11 @@ public class PathTest {
     }
 
     @Test
-    public void testGetName_IndexOutsideElements_IllegalArgmentException() {
+    public void testGetName_IndexOutsideElements_IllegalArgumentException() {
+        thrown.expect(IndexOutOfBoundsException.class);
+
         Path path = new Path("mydir/myfile");
-        try {
-            path.getName(3);
-            fail("Able to fetch index out of bounds");
-        } catch (IndexOutOfBoundsException e) {
-            assertEquals("Index: 3, Size: 2", e.getMessage());
-        }
+        path.getName(3);
     }
 
     @Test

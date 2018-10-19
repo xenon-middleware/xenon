@@ -116,4 +116,32 @@ class ParallelEnvironmentInfo {
         return "ParallelEnvironmentInfo [name=" + name + ", slots=" + slots + ", allocationRule=" + allocationRule + ", ppn="
                 + ppn + "]";
     }
+
+    /**
+     * Check if pe can allocate all slots on the same node
+     *
+     * @param coresPerNode number of cores to reserve on a node
+     * @return True if pe can
+     */
+    boolean canAllocateSingleNode(int coresPerNode) {
+        return (
+            allocationRule == AllocationRule.PE_SLOTS
+            // TODO check if hosts (of queue) have that many slots
+        ) || (
+            allocationRule == AllocationRule.INTEGER && ppn >= coresPerNode
+        ) && coresPerNode <= slots;
+    }
+
+    /**
+     * Check if pe can allocate X number of cores per node on Y number of nodes
+     *
+     * @param coresPerNode number of cores to reserve on each node
+     * @param nodes number of nodes to reserve
+     * @return True if pe can
+     */
+    boolean canAllocateMultiNode(int coresPerNode, int nodes) {
+        return (
+            allocationRule == AllocationRule.INTEGER && ppn == coresPerNode && coresPerNode * nodes <= slots
+        );
+    }
 }
