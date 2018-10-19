@@ -24,6 +24,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.Deadline;
 import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcess;
 import nl.esciencecenter.xenon.adaptors.schedulers.StreamsImplementation;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
@@ -90,16 +91,31 @@ class LocalInteractiveProcess implements InteractiveProcess {
         return exitCode;
     }
 
+    private boolean processTerminated(int pid, long timeoutInMillis) throws XenonException {
+
+        long deadline = Deadline.getDeadline(timeoutInMillis);
+
+        while (deadline < System.currentTimeMillis()) {
+            CommandRunner psRunner = new CommandRunner("ps", "-ppid", "" + pid, "-o", "pid=");
+
+            // This returns exit code 1 and an empty result if the process (and all subprocesses) do not exists
+            if (psRunner.getExitCode() == 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
-     * Destroy (stop) process. Does nothing if the process has already finished. Does not re-evaluate whether process has finished. Will run the kill command on
-     * Unix, and Process.destroy() if that does not work or does not apply.
+     * Destroy (stop) process. Does nothing if the process has already finished. Will run the kill command on Unix using a SIGTERM first, followed by a SIGKILL
+     * if the process does not terminate within 5 seconds. If the kill command is not available (i.e., on Windows) a Process.destroy() is used instead.
      */
     public void destroy() {
+
         if (done) {
             return;
         }
-
-        boolean success = false;
 
         if (!LocalFileSystemUtils.isWindows()) {
             try {
@@ -115,16 +131,33 @@ class LocalInteractiveProcess implements InteractiveProcess {
                 int pid = pidField.getInt(process);
 
                 if (pid > 0) {
-                    CommandRunner killRunner = new CommandRunner("kill", "-9", "-" + pid);
-                    success = (killRunner.getExitCode() == 0);
+                    // Try a SIGTERM first. Also kill subprocesses by adding a "-" before the pid. Then if kill was able to deliver the signal.
+                    if (new CommandRunner("kill", "-" + pid).getExitCode() != 0) {
+                        // It could not deliver the signal, so the process is already gone!
+                        return;
+                    }
+
+                    // Process has received the signal. Now check if it actually terminates within 5 seconds
+                    if (processTerminated(pid, 5000)) {
+                        return;
+                    }
+
+                    // It has not yet terminated, so send it a SIGKILL. Also kill subprocesses by adding a "-" before the pid.
+                    if (new CommandRunner("kill", "-9", "-" + pid).getExitCode() != 0) {
+                        return;
+                    }
+
+                    // Process has received the signal. Now check if it actually is killed within 1 second
+                    if (processTerminated(pid, 1000)) {
+                        return;
+                    }
                 }
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException | XenonException e) {
-                // Failed, so use the regular Java destroy.
+                // Failed to retrieve the pid or run kill. Fall through and use the regular Java destroy.
             }
         }
 
-        if (!success) {
-            process.destroy();
-        }
+        // Use the Java way to kill a process as a last resort.
+        process.destroy();
     }
 }
