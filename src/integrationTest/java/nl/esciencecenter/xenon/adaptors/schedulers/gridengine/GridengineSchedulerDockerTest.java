@@ -17,10 +17,16 @@ package nl.esciencecenter.xenon.adaptors.schedulers.gridengine;
 
 import static nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor.LOAD_STANDARD_KNOWN_HOSTS;
 import static nl.esciencecenter.xenon.adaptors.schedulers.ssh.SshSchedulerAdaptor.STRICT_HOST_KEY_CHECKING;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
+import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 import org.junit.ClassRule;
 
 import com.palantir.docker.compose.DockerComposeRule;
@@ -30,6 +36,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
+import org.junit.Test;
 
 public class GridengineSchedulerDockerTest extends GridengineSchedulerTestParent {
 
@@ -51,4 +58,40 @@ public class GridengineSchedulerDockerTest extends GridengineSchedulerTestParent
         props.put(STRICT_HOST_KEY_CHECKING, "false");
         return Scheduler.create("gridengine", config.getLocation(), cred, props);
     }
+
+    @Test
+    public void test_submitBatch_peUsingSchedulerArg() throws XenonException {
+        // This test does not run on windows.
+        assumeFalse("Test only suited for linux", scheduler.getAdaptorName().equals("local") && (LocalFileSystemUtils.isWindows()));
+        assumeTrue(description.supportsBatch());
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/hostname");
+        job.addSchedulerArgument("-pe smp 2");
+
+        String jobID = scheduler.submitBatchJob(job);
+
+        JobStatus status = waitUntilDone(jobID);
+
+        assertTrue("Job is not done yet", status.isDone());
+    }
+
+    @Test
+    public void test_submitBatch_peUsingCoreCount() throws XenonException {
+        // This test does not run on windows.
+        assumeFalse("Test only suited for linux", scheduler.getAdaptorName().equals("local") && (LocalFileSystemUtils.isWindows()));
+        assumeTrue(description.supportsBatch());
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/hostname");
+        job.setProcessesPerNode(2);
+        job.setStartSingleProcess(true);
+
+        String jobID = scheduler.submitBatchJob(job);
+
+        JobStatus status = waitUntilDone(jobID);
+
+        assertTrue("Job is not done yet", status.isDone());
+    }
+
 }

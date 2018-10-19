@@ -55,8 +55,8 @@ public abstract class SchedulerTestParent {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(SchedulerTestParent.class);
 
-    private Scheduler scheduler;
-    private SchedulerAdaptorDescription description;
+    protected Scheduler scheduler;
+    protected SchedulerAdaptorDescription description;
     private SchedulerLocationConfig locationConfig;
 
     @Before
@@ -171,7 +171,7 @@ public abstract class SchedulerTestParent {
         return status;
     }
 
-    private JobStatus waitUntilDone(String jobID) throws XenonException {
+    protected JobStatus waitUntilDone(String jobID) throws XenonException {
         return waitUntilDone(jobID, locationConfig.getMaxWaintUntilDone());
     }
 
