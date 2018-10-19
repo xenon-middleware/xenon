@@ -107,7 +107,7 @@ public class TorqueUtilsTest {
         JobDescription description = new JobDescription();
         description.setArguments("some", "arguments");
         description.addEnvironment("some.more", "environment value with spaces");
-        description.addJobOption(TorqueUtils.JOB_OPTION_RESOURCES, "list-of-resources");
+        description.addSchedulerArgument("-l list-of-resources");
         description.setExecutable("/bin/executable");
         description.setMaxRuntime(100);
         description.setNodeCount(1);
@@ -118,7 +118,7 @@ public class TorqueUtilsTest {
         String result = TorqueUtils.generate(description, null);
 
         String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -d /some/working/directory\n" + "#PBS -q the.queue\n"
-                + "#PBS -l list-of-resources\n" + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l walltime=01:40:00\n"
+                + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l walltime=01:40:00\n" + "#PBS -l list-of-resources\n"
                 + "export some.more=\"environment value with spaces\"\n\n" + "/bin/executable 'some' 'arguments'\n";
 
         assertEquals(expected, result);
@@ -134,7 +134,7 @@ public class TorqueUtilsTest {
         JobDescription description = new JobDescription();
         description.setArguments("some", "arguments");
         description.addEnvironment("some", "environment.value");
-        description.addJobOption(TorqueUtils.JOB_OPTION_RESOURCES, "list-of-resources");
+        description.addSchedulerArgument("-l list-of-resources");
         description.setExecutable("/bin/executable");
         description.setMaxRuntime(100);
         description.setNodeCount(4);
@@ -145,7 +145,7 @@ public class TorqueUtilsTest {
         String result = TorqueUtils.generate(description, null);
 
         String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -d /some/working/directory\n" + "#PBS -q the.queue\n"
-                + "#PBS -l list-of-resources\n" + "#PBS -l nodes=4:ppn=10\n" + "#PBS -l walltime=01:40:00\n" + "export some=\"environment.value\"\n\n"
+                + "#PBS -l nodes=4:ppn=10\n" + "#PBS -l walltime=01:40:00\n" + "#PBS -l list-of-resources\n" + "export some=\"environment.value\"\n\n"
                 + "/bin/executable 'some' 'arguments'\n";
 
         assertEquals(expected, result);
