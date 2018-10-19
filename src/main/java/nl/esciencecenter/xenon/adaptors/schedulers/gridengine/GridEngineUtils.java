@@ -44,9 +44,7 @@ final class GridEngineUtils {
 
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
 
-    public static final String JOB_OPTION_RESOURCES = "resources";
-
-    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_RESOURCES };
+    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
 
     public static final String QACCT_HEADER = "==============================================================";
 
@@ -155,12 +153,6 @@ final class GridEngineUtils {
 
         if (description.getTempSpace() > 0) {
             script.format("#$ -l tmpspace=%dM\n", description.getTempSpace());
-        }
-
-        String resources = description.getJobOptions().get(JOB_OPTION_RESOURCES);
-
-        if (resources != null) {
-            script.format("#$ -l %s\n", resources);
         }
 
         for (String argument : description.getSchedulerArguments()) {

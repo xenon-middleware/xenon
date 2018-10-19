@@ -122,7 +122,7 @@ public class GridEngineUtilsTest {
         JobDescription description = new JobDescription();
         description.setArguments("some", "arguments");
         description.addEnvironment("some.more", "environment value with spaces");
-        description.addJobOption(GridEngineUtils.JOB_OPTION_RESOURCES, "list-of-resources");
+        description.addSchedulerArgument("-l list-of-resources");
         description.setExecutable("/bin/executable");
         description.setMaxRuntime(100);
         description.setNodeCount(1);
