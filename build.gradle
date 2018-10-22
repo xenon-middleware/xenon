@@ -4,7 +4,7 @@
 // ==============
 plugins {
     // Changes in the plugins section should be also be applied to build.offline.gradle
-    id 'java-library'
+    id 'java'
     id 'distribution'
     // publishing
     id 'maven-publish'
