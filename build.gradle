@@ -4,7 +4,7 @@
 // ==============
 plugins {
     // Changes in the plugins section should be also be applied to build.offline.gradle
-    id 'java'
+    id 'java-library'
     id 'distribution'
     // publishing
     id 'maven-publish'
@@ -58,10 +58,10 @@ dependencies {
     // ftp 
     compile group: 'commons-net', name: 'commons-net', version: '3.3'
 
-    // ssh and sftp 
-    compile group: 'org.apache.sshd', name: 'sshd-mina', version:'2.1.0'
-    compile group: 'org.apache.sshd', name:'sshd-sftp', version:'2.1.0'
-    compile group: 'org.apache.mina', name: 'mina-core', version: '2.0.7'
+    // ssh and sftp
+    compile 'com.github.apache.mina-sshd:sshd-mina:f8ae0a295a'
+    compile 'com.github.apache.mina-sshd:sshd-sftp:f8ae0a295a'
+    compile group: 'org.apache.mina', name: 'mina-core', version: '2.0.19'
     compile group: 'net.i2p.crypto', name: 'eddsa', version: '0.2.0'
     compile group: 'com.google.guava', name: 'guava', version: '19.0'
 
