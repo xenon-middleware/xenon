@@ -15,18 +15,22 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers.gridengine;
 
+import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSetupTest.getGridEngineSetup;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.FixMethodOrder;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runners.MethodSorters;
 
 import nl.esciencecenter.xenon.XenonException;
@@ -35,10 +39,11 @@ import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
-import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GridEngineUtilsTest {
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void test01a_generate_EmptyDescription_Result() throws XenonException {
@@ -127,7 +132,7 @@ public class GridEngineUtilsTest {
         JobDescription description = new JobDescription();
         description.setArguments("some", "arguments");
         description.addEnvironment("some.more", "environment value with spaces");
-        description.addJobOption(GridEngineUtils.JOB_OPTION_RESOURCES, "list-of-resources");
+        description.addSchedulerArgument("-l list-of-resources");
         description.setExecutable("/bin/executable");
         description.setMaxRuntime(100);
         description.setNodeCount(1);
@@ -155,29 +160,26 @@ public class GridEngineUtilsTest {
      *
      * @throws XenonException
      */
-    public void test01c_generate__ParallelDescription_Result() throws XenonException {
+    public void test01c_generate__MultinodeDescription_Result() throws XenonException {
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/executable");
         description.setArguments("some", "arguments");
         description.setMaxRuntime(100);
         description.setNodeCount(4);
         description.setProcessesPerNode(10);
-        description.setQueueName("the.queue");
+        description.setQueueName("some.q");
         description.setStderr("stderr.file");
         description.setStdin("stdin.file");
         description.setStdout("stdout.file");
         description.setWorkingDirectory("/some/working/directory");
 
-        // set pe and slots explicitly. We test the setup class used to automatically get these values separately.
-        description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
-        description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_SLOTS, "5");
+        ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.INTEGER, 10);
+        GridEngineSetup setup = getGridEngineSetup(pe);
 
-        GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
+        String result = GridEngineUtils.generate(description, null, setup);
 
-        String result = GridEngineUtils.generate(description, new Path("/test"), setup);
-
-        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n" + "#$ -q the.queue\n"
-                + "#$ -pe some.pe 5\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n" + "#$ -q some.q\n"
+                + "#$ -pe some.pe 40\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"
                 + "for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n"
                 + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
                 + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
@@ -194,44 +196,78 @@ public class GridEngineUtilsTest {
         assertEquals(expected, result);
     }
 
-    public void test02a__generateParallelEnvironmentSpecification_SlotsProvided_Result() throws XenonException {
+    @Test
+    /**
+     * Check to see if the output is _exactly_ what we expect, and not a single char different.
+     *
+     * @throws XenonException
+     */
+    public void test01c_generate__ThreadsDescription_Result() throws XenonException {
         JobDescription description = new JobDescription();
-        description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
-        description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_SLOTS, "5");
+        description.setExecutable("/bin/executable");
+        description.setArguments("some", "arguments");
+        description.setMaxRuntime(100);
+        description.setNodeCount(1);
+        description.setProcessesPerNode(10);
+        description.setQueueName("some.q");
+        description.setStderr("stderr.file");
+        description.setStdin("stdin.file");
+        description.setStdout("stdout.file");
+        description.setWorkingDirectory("/some/working/directory");
+        description.setStartSingleProcess(true);
 
-        Formatter output = new Formatter();
+        ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.INTEGER, 10);
+        GridEngineSetup setup = getGridEngineSetup(pe);
+
+        String result = GridEngineUtils.generate(description, null, setup);
+
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n" + "#$ -q some.q\n"
+            + "#$ -pe some.pe 10\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"
+            + "/bin/executable 'some' 'arguments'\n";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test02a__generate_peAsSchedulerArgument() throws XenonException {
+        JobDescription description = new JobDescription();
+        description.addSchedulerArgument("-pe some.pe 5");
 
         String expected = "#$ -pe some.pe 5\n";
 
-        GridEngineUtils.generateParallelEnvironmentSpecification(description, null, output);
+        String script = GridEngineUtils.generate(description, null, null);
 
-        assertEquals("parallel environment specification incorrect", expected, output.out().toString());
+        assertThat(script, containsString(expected));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void test02b__generateParallelEnvironmentSpecification_ParallelSlotsNotProvided_SetupUsed() throws XenonException {
-        // this should trigger the usage of the GridEngineSetup to calculate the slots
+    @Test
+    public void testGenerate_PeNotFoundForMultiNode() throws XenonException {
+        thrown.expect(InvalidJobDescriptionException.class);
+        thrown.expectMessage("Unable to find a parallel environment for multiple nodes, replace node count and cores per node with scheduler.addSchedulerArgument(\"-pe <name of parallel environment (qconf -spl)> <number of slots>\")");
+
         JobDescription description = new JobDescription();
-        description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
+        description.setNodeCount(10);
 
-        Formatter output = new Formatter();
+        ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.FILL_UP, 0);
+        GridEngineSetup setup = getGridEngineSetup(pe);
 
-        // setup not provided, leads to NullpointerException
-        GridEngineUtils.generateParallelEnvironmentSpecification(description, null, output);
-
-        fail("calling generator should lead to null pointer exception");
+        GridEngineUtils.generate(description, null, setup);
     }
 
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test02c__generateParallelEnvironmentSpecification_InvalidParallelSlotsOption_ExceptionThrown() throws XenonException {
+    @Test
+    public void testGenerate_PeNotFoundForSingleNode() throws XenonException {
+        thrown.expect(InvalidJobDescriptionException.class);
+        thrown.expectMessage("Unable to find a parallel environment for multi core on single node, replace node count and cores per node with scheduler.addSchedulerArgument(\"-pe <name of parallel environment (qconf -spl)> <number of slots>\")");
+
         JobDescription description = new JobDescription();
-        description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
-        description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_SLOTS, "five");
+        description.setProcessesPerNode(10);
 
-        Formatter output = new Formatter();
+        ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.FILL_UP, 0);
+        GridEngineSetup setup = getGridEngineSetup(pe);
 
-        GridEngineUtils.generateParallelEnvironmentSpecification(description, null, output);
+        GridEngineUtils.generate(description, null, setup);
     }
+
 
     @Test
     public void test03a_generateSerialScriptContent() {
@@ -343,87 +379,7 @@ public class GridEngineUtilsTest {
         description.setNodeCount(2);
         description.setProcessesPerNode(2);
         description.setMaxRuntime(1);
-        // GridEngine specific info
-        description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
         description.setQueueName("some.queue");
-
-        GridEngineUtils.verifyJobDescription(description, null);
-    }
-
-    @Test
-    public void test01g_verifyJobDescription_ValidParallelJobDescriptionWithQueue_NoException2() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // all the settings the function checks for set exactly right
-        description.setExecutable("/bin/nothing");
-        description.setNodeCount(2);
-        description.setProcessesPerNode(2);
-        description.setMaxRuntime(1);
-        // GridEngine specific info
-        description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
-        description.setQueueName("some.queue");
-
-        GridEngineUtils.verifyJobDescription(description, new String[] { "some.queue" });
-    }
-
-    @Test(expected = NoSuchQueueException.class)
-    public void test01g_verifyJobDescription_ValidParallelJobDescriptionWithQueue_ExceptionWrongQueue() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // all the settings the function checks for set exactly right
-        description.setExecutable("/bin/nothing");
-        description.setNodeCount(2);
-        description.setProcessesPerNode(2);
-        description.setMaxRuntime(1);
-        // GridEngine specific info
-        description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
-        description.setQueueName("some.queue");
-
-        GridEngineUtils.verifyJobDescription(description, new String[] { "some.other.queue" });
-    }
-
-    @Test
-    public void test01h_verifyJobDescription_ValidParallelJobDescriptionWithSlots_NoException() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // all the settings the function checks for set exactly right
-        description.setExecutable("/bin/nothing");
-        description.setNodeCount(2);
-        description.setProcessesPerNode(2);
-        description.setMaxRuntime(1);
-        // GridEngine specific info
-        description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
-        description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_SLOTS, "11");
-
-        GridEngineUtils.verifyJobDescription(description, null);
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test01i_verifyJobDescription_ParallelJobDescriptionWithoutPe_ExceptionThrown() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // all the settings the function checks for set exactly right
-        description.setExecutable("/bin/nothing");
-        description.setNodeCount(2);
-        description.setProcessesPerNode(2);
-        description.setMaxRuntime(1);
-        // GridEngine specific info
-        description.setQueueName("some.queue");
-
-        GridEngineUtils.verifyJobDescription(description, null);
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test01j_verifyJobDescription_ParallelJobDescriptionWithoutQueueOrSlots_ExceptionThrown() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // all the settings the function checks for set exactly right
-        description.setExecutable("/bin/nothing");
-        description.setNodeCount(2);
-        description.setProcessesPerNode(2);
-        description.setMaxRuntime(1);
-        // GridEngine specific info
-        description.addJobOption(GridEngineUtils.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
 
         GridEngineUtils.verifyJobDescription(description, null);
     }

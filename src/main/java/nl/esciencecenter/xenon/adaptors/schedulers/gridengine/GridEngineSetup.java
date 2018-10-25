@@ -17,8 +17,13 @@ package nl.esciencecenter.xenon.adaptors.schedulers.gridengine;
 
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.ADAPTOR_NAME;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +32,6 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
-import nl.esciencecenter.xenon.adaptors.schedulers.gridengine.ParallelEnvironmentInfo.AllocationRule;
 
 /**
  * Holds some info on the specifics of the machine we are connected to, such as queues and parallel environments.
@@ -151,46 +155,42 @@ public class GridEngineSetup {
         return defaultRuntime;
     }
 
-    /*
-     * Get SGE to give us the required number of nodes. Since sge uses the rather abstract notion of slots, the number we need to give is dependent on the
-     * parallel environment settings.
+    /**
+     * Try to find a parallel environment that can be used to get a number of cores on a single node
+     *
+     * @param coresPerNode number of cores to reserve on a node
+     * @param queueName Name of the queue
+     * @return optional parallel environment
      */
-    protected int calculateSlots(String parallelEnvironmentName, String queueName, int nodeCount) throws XenonException {
-        ParallelEnvironmentInfo pe = parallelEnvironments.get(parallelEnvironmentName);
+    Optional<ParallelEnvironmentInfo> getSingleNodeParallelEnvironment(int coresPerNode, String queueName) {
+        Stream<ParallelEnvironmentInfo> stream = this.parallelEnvironments.values().stream()
+            .filter(pe -> pe.canAllocateSingleNode(coresPerNode));
+        // Filter pe on queue
         QueueInfo queue = queues.get(queueName);
-
-        if (pe == null) {
-            throw new XenonException(ADAPTOR_NAME, "requested parallel environment \"" + parallelEnvironmentName + "\" cannot be found at server");
-        }
-
         if (queue == null) {
-            throw new XenonException(ADAPTOR_NAME, "requested queue \"" + queueName + "\" cannot be found at server");
-        }
-
-        LOGGER.debug("Calculating slots to get {} nodes in queue \"{}\" with parallel environment \"{}\"" + " and allocation rule \"{}\" with ppn {}",
-                nodeCount, queueName, parallelEnvironmentName, pe.getAllocationRule(), pe.getPpn());
-
-        AllocationRule allocationRule = pe.getAllocationRule();
-        if (allocationRule == AllocationRule.PE_SLOTS) {
-            if (nodeCount > 1) {
-                throw new XenonException(ADAPTOR_NAME, "Parallel environment " + parallelEnvironmentName + " only supports single node parallel jobs");
+            Set<String> pesOfQueues = new HashSet<>();
+            for (QueueInfo q : queues.values()) {
+                pesOfQueues.addAll(Arrays.asList(q.getParallelEnvironments()));
             }
-            return 1;
-        } else if (allocationRule == AllocationRule.FILL_UP) {
-            // we need to request all slots of a node before we get a new node. The number of slots per node is listed in the
-            // queue info.
-            return nodeCount * queue.getSlots();
-        } else if (allocationRule == AllocationRule.ROUND_ROBIN) {
-            if (nodeCount > 1) {
-                throw new XenonException(ADAPTOR_NAME, "Parallel environment " + parallelEnvironmentName
-                        + " only supports single node parallel jobs, as the round robin allocation rule places jobs on a undeterministic number of nodes");
-            }
-            return 1;
-        } else if (allocationRule == AllocationRule.INTEGER) {
-            // Multiply the number of nodes we require with the number of slots on each host.
-            return nodeCount * pe.getPpn();
+            stream = stream.filter(pe -> pesOfQueues.contains(pe.getName()));
         } else {
-            throw new XenonException(ADAPTOR_NAME, "unknown pe allocation rule: " + pe.getAllocationRule());
+            // don't know which queue the scheduler will pick, make sure atleast one queue has the candidate pe
+            Set<String> pesOfQueue = new HashSet<>(Arrays.asList(queue.getParallelEnvironments()));
+            stream = stream.filter(pe -> pesOfQueue.contains(pe.getName()));
         }
+        return stream.findFirst();
+    }
+
+    /**
+     * Try to find a parallel environment that can be used to get X number of cores per node on Y number of nodes
+     *
+     * @param coresPerNode number of cores to reserve on each node
+     * @param nodes number of nodes to reserve
+     * @param queueName Name of the queue
+     * @return optional parallel environment
+     */
+    Optional<ParallelEnvironmentInfo> getMultiNodeParallelEnvironment(int coresPerNode, int nodes, String queueName) {
+        return this.parallelEnvironments.values().stream().filter(s -> s.canAllocateMultiNode(coresPerNode, nodes)
+        ).findFirst();
     }
 }

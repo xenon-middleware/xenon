@@ -47,9 +47,8 @@ final class TorqueUtils {
 
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
     public static final String JOB_OPTION_JOB_CONTENTS = "job.contents";
-    public static final String JOB_OPTION_RESOURCES = "job.resources";
 
-    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_RESOURCES };
+    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
 
     private TorqueUtils() {
         throw new IllegalStateException("Utility class");
@@ -185,14 +184,6 @@ final class TorqueUtils {
 
         if (description.getQueueName() != null) {
             script.format("#PBS -q %s\n", description.getQueueName());
-        }
-
-        String resources = description.getJobOptions().get(JOB_OPTION_RESOURCES);
-
-        // TODO: check if resources clash with nodes or walltime ?
-
-        if (resources != null) {
-            script.format("#PBS -l %s\n", resources);
         }
 
         int processorsPerNode = description.getProcessesPerNode();

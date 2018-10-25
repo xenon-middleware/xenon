@@ -17,6 +17,16 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
+task testApiJar(type: Jar) {
+    description "Creates jar with test api"
+    from sourceSets.testApi.output
+}
+
+task docGeneratorJar(type: Jar) {
+    description "Creates jar with doc generator"
+    from sourceSets.docGenerator.output
+}
+
 artifacts {
     archives sourcesJar
     archives javadocJar
@@ -68,6 +78,27 @@ publishing {
 
             artifact sourcesJar
             artifact javadocJar
+        }
+        TestApiPublication(MavenPublication) {
+            groupId 'nl.esciencecenter.xenon'
+            artifactId 'xenon-testapi'
+            version version
+
+            artifact testApiJar
+        }
+        DocGeneratorPublication(MavenPublication) {
+            groupId 'nl.esciencecenter.xenon'
+            artifactId 'xenon-docgenerator'
+            version version
+
+            artifact docGeneratorJar
+        }
+        LiveTestPublication(MavenPublication) {
+            groupId 'nl.esciencecenter.xenon'
+            artifactId 'xenon-livetest'
+            version version
+
+            artifact liveTestJar
         }
     }
 }
