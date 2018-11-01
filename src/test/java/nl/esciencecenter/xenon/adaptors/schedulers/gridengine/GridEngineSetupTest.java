@@ -19,8 +19,10 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -49,15 +51,14 @@ public class GridEngineSetupTest {
         assertArrayEquals("returned queue names should be equal to input queue names", input, result);
     }
 
-    static GridEngineSetup getGridEngineSetup(ParallelEnvironmentInfo pe) {
+    static GridEngineSetup getGridEngineSetup(ParallelEnvironmentInfo... pes) {
         String[] queueNames = new String[]{"some.q"};
 
         Map<String, QueueInfo> queueInfos = new HashMap<>();
-        queueInfos.put("some.q", new QueueInfo("some.q", 4, pe.getName()));
+        String[] peNames = Arrays.stream(pes).map(ParallelEnvironmentInfo::getName).toArray(String[]::new);
+        queueInfos.put("some.q", new QueueInfo("some.q", 4, peNames));
 
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
-
-        peInfos.put(pe.getName(), pe);
+        Map<String, ParallelEnvironmentInfo> peInfos = Arrays.stream(pes).collect(Collectors.toMap(ParallelEnvironmentInfo::getName, pe -> pe));
         return new GridEngineSetup(queueNames, queueInfos, peInfos, 15);
     }
 

@@ -176,7 +176,7 @@ public class GridEngineUtilsTest {
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.INTEGER, 10);
         GridEngineSetup setup = getGridEngineSetup(pe);
 
-        String result = GridEngineUtils.generate(description, null, setup);
+        String result = GridEngineUtils.generate(description, new Path(), setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n" + "#$ -q some.q\n"
                 + "#$ -pe some.pe 40\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"
@@ -219,7 +219,7 @@ public class GridEngineUtilsTest {
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.INTEGER, 10);
         GridEngineSetup setup = getGridEngineSetup(pe);
 
-        String result = GridEngineUtils.generate(description, null, setup);
+        String result = GridEngineUtils.generate(description, new Path(), setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n" + "#$ -q some.q\n"
             + "#$ -pe some.pe 10\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"
@@ -235,7 +235,8 @@ public class GridEngineUtilsTest {
 
         String expected = "#$ -pe some.pe 5\n";
 
-        String script = GridEngineUtils.generate(description, null, null);
+        GridEngineSetup setup = getGridEngineSetup();
+        String script = GridEngineUtils.generate(description, new Path(), setup);
 
         assertThat(script, containsString(expected));
     }
