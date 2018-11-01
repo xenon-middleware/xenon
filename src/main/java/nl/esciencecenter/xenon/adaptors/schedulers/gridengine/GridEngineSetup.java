@@ -178,7 +178,9 @@ public class GridEngineSetup {
             Set<String> pesOfQueue = new HashSet<>(Arrays.asList(queue.getParallelEnvironments()));
             stream = stream.filter(pe -> pesOfQueue.contains(pe.getName()));
         }
-        return stream.findFirst();
+        Optional<ParallelEnvironmentInfo> r = stream.findFirst();
+        LOGGER.debug("Gridengine choose to use following pe: " + r.toString());
+        return r;
     }
 
     /**
