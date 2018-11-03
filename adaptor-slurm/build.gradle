@@ -1,0 +1,1 @@
+apply from: "${rootProject.rootDir}/gradle/scripting-adaptor.gradle"

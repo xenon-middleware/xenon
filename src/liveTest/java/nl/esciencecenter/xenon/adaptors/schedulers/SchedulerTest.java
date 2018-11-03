@@ -15,16 +15,17 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.schedulers.Scheduler;
-import org.junit.BeforeClass;
-
-import java.util.Map;
-
 import static nl.esciencecenter.xenon.adaptors.Utils.buildCredential;
 import static nl.esciencecenter.xenon.adaptors.Utils.buildProperties;
 import static org.junit.Assume.assumeFalse;
+
+import java.util.Map;
+
+import org.junit.BeforeClass;
+
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 public class SchedulerTest extends SchedulerTestParent {
     @BeforeClass
@@ -39,11 +40,11 @@ public class SchedulerTest extends SchedulerTestParent {
     }
 
     @Override
-    public Scheduler setupScheduler() throws XenonException {
+    public Scheduler setupScheduler(SchedulerLocationConfig config) throws XenonException {
         String name = System.getProperty("xenon.scheduler");
-        String location = System.getProperty("xenon.scheduler.location");
+        // String location = System.getProperty("xenon.scheduler.location");
         Credential cred = buildCredential();
         Map<String, String> props = buildProperties(SchedulerAdaptor.ADAPTORS_PREFIX + System.getProperty("xenon.scheduler"));
-        return Scheduler.create(name, location, cred, props);
+        return Scheduler.create(name, config.getLocation(), cred, props);
     }
 }

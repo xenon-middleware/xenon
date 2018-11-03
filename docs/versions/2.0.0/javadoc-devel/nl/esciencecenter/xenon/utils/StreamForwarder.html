@@ -118,9 +118,8 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>public final class <span class="typeNameLabel">StreamForwarder</span>
 extends java.lang.Thread</pre>
-<div class="block">A simple stream forwarder that uses a daemon thread to read from an <code>InputStream</code> and write it to a
- <code>OutputStream</code>.
- A small buffer is used (typically 1 KB) to improve performance. Any exceptions will be ignored.</div>
+<div class="block">A simple stream forwarder that uses a daemon thread to read from an <code>InputStream</code> and write it to a <code>OutputStream</code>. A small
+ buffer is used (typically 1 KB) to improve performance. Any exceptions will be ignored.</div>
 </li>
 </ul>
 </div>
@@ -155,22 +154,26 @@ extends java.lang.Thread</pre>
 <th class="colLast" scope="col">Field and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>private static int</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/StreamForwarder.html#BUFFER_SIZE">BUFFER_SIZE</a></span></code>&nbsp;</td>
+<td class="colFirst"><code>private int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/StreamForwarder.html#bufferSize">bufferSize</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code>private static int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/StreamForwarder.html#DEFAULT_BUFFER_SIZE">DEFAULT_BUFFER_SIZE</a></span></code>&nbsp;</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>private boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/StreamForwarder.html#done">done</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>private java.io.InputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/StreamForwarder.html#in">in</a></span></code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>private static org.slf4j.Logger</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/StreamForwarder.html#LOGGER">LOGGER</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>private java.io.OutputStream</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/StreamForwarder.html#out">out</a></span></code>&nbsp;</td>
 </tr>
@@ -198,6 +201,14 @@ extends java.lang.Thread</pre>
 <tr class="altColor">
 <td class="colOne"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/StreamForwarder.html#StreamForwarder-java.io.InputStream-java.io.OutputStream-">StreamForwarder</a></span>(java.io.InputStream&nbsp;in,
                java.io.OutputStream&nbsp;out)</code>
+<div class="block">Create a new StreamForwarder and start it immediately.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/utils/StreamForwarder.html#StreamForwarder-java.lang.String-java.io.InputStream-java.io.OutputStream-int-">StreamForwarder</a></span>(java.lang.String&nbsp;name,
+               java.io.InputStream&nbsp;in,
+               java.io.OutputStream&nbsp;out,
+               int&nbsp;bufferSize)</code>
 <div class="block">Create a new StreamForwarder and start it immediately.</div>
 </td>
 </tr>
@@ -279,16 +290,16 @@ extends java.lang.Thread</pre>
 <pre>private static final&nbsp;org.slf4j.Logger LOGGER</pre>
 </li>
 </ul>
-<a name="BUFFER_SIZE">
+<a name="DEFAULT_BUFFER_SIZE">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>BUFFER_SIZE</h4>
-<pre>private static final&nbsp;int BUFFER_SIZE</pre>
+<h4>DEFAULT_BUFFER_SIZE</h4>
+<pre>private static final&nbsp;int DEFAULT_BUFFER_SIZE</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../constant-values.html#nl.esciencecenter.xenon.utils.StreamForwarder.BUFFER_SIZE">Constant Field Values</a></dd>
+<dd><a href="../../../../constant-values.html#nl.esciencecenter.xenon.utils.StreamForwarder.DEFAULT_BUFFER_SIZE">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -310,6 +321,15 @@ extends java.lang.Thread</pre>
 <pre>private final&nbsp;java.io.OutputStream out</pre>
 </li>
 </ul>
+<a name="bufferSize">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>bufferSize</h4>
+<pre>private final&nbsp;int bufferSize</pre>
+</li>
+</ul>
 <a name="done">
 <!--   -->
 </a>
@@ -327,6 +347,26 @@ extends java.lang.Thread</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
+<a name="StreamForwarder-java.lang.String-java.io.InputStream-java.io.OutputStream-int-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>StreamForwarder</h4>
+<pre>public&nbsp;StreamForwarder(java.lang.String&nbsp;name,
+                       java.io.InputStream&nbsp;in,
+                       java.io.OutputStream&nbsp;out,
+                       int&nbsp;bufferSize)</pre>
+<div class="block">Create a new StreamForwarder and start it immediately.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>name</code> - the name of the thread</dd>
+<dd><code>in</code> - the <code>InputStream</code> to read from.</dd>
+<dd><code>out</code> - the <code>OutputStream</code> to write to, or <code>null</code> to discard the output.</dd>
+<dd><code>bufferSize</code> - the buffer size to use, or 0 to use the default.</dd>
+</dl>
+</li>
+</ul>
 <a name="StreamForwarder-java.io.InputStream-java.io.OutputStream-">
 <!--   -->
 </a>
@@ -384,8 +424,8 @@ extends java.lang.Thread</pre>
 <li class="blockList">
 <h4>terminate</h4>
 <pre>public&nbsp;void&nbsp;terminate(long&nbsp;timeout)</pre>
-<div class="block">Wait for a given timeout for the StreamForwarder to terminate by reading an end-of-stream on the input. When the timeout
- expires both input and output streams will be closed, regardless of whether the input has reached end-of-line.</div>
+<div class="block">Wait for a given timeout for the StreamForwarder to terminate by reading an end-of-stream on the input. When the timeout expires both input and output
+ streams will be closed, regardless of whether the input has reached end-of-line.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>timeout</code> - The number of milliseconds to wait for termination.</dd>

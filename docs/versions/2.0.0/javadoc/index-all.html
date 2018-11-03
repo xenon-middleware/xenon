@@ -84,6 +84,18 @@
 <dd>
 <div class="block">Add a variable to the environment of the executable.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#addJavaArgument-java.lang.String-">addJavaArgument(String)</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#addJavaClasspathElement-java.lang.String-">addJavaClasspathElement(String)</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#addJavaOption-java.lang.String-">addJavaOption(String)</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block">Adds a JVM option.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#addJavaSystemProperty-java.lang.String-java.lang.String-">addJavaSystemProperty(String, String)</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block">Adds a system property to the current set of system properties.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/JobDescription.html#addJobOption-java.lang.String-java.lang.String-">addJobOption(String, String)</a></span> - Method in class nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a></dt>
 <dd>
 <div class="block">Add a job option to the job.</div>
@@ -160,6 +172,10 @@
 <dd>
 <div class="block">Check if a sequence of <code>PosixFilePermission</code>s contains a specific option.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/CredentialMap.html#containsCredential-java.lang.String-">containsCredential(String)</a></span> - Method in class nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/CredentialMap.html" title="class in nl.esciencecenter.xenon.credentials">CredentialMap</a></dt>
+<dd>
+<div class="block">Check if the <code>key</code> is stored in this CredentialMap.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/filesystems/FileSystem.html#copy-nl.esciencecenter.xenon.filesystems.Path-nl.esciencecenter.xenon.filesystems.FileSystem-nl.esciencecenter.xenon.filesystems.Path-nl.esciencecenter.xenon.filesystems.CopyMode-boolean-">copy(Path, FileSystem, Path, CopyMode, boolean)</a></span> - Method in class nl.esciencecenter.xenon.filesystems.<a href="nl/esciencecenter/xenon/filesystems/FileSystem.html" title="class in nl.esciencecenter.xenon.filesystems">FileSystem</a></dt>
 <dd>
 <div class="block">Asynchronously Copy an existing source path to a target path on a different file system.</div>
@@ -231,6 +247,18 @@
 <dd>
 <div class="block">Credential represents a user credential uses to gain access to a resource.</div>
 </dd>
+<dt><a href="nl/esciencecenter/xenon/credentials/CredentialMap.html" title="class in nl.esciencecenter.xenon.credentials"><span class="typeNameLink">CredentialMap</span></a> - Class in <a href="nl/esciencecenter/xenon/credentials/package-summary.html">nl.esciencecenter.xenon.credentials</a></dt>
+<dd>
+<div class="block">A <a href="nl/esciencecenter/xenon/credentials/Credential.html" title="interface in nl.esciencecenter.xenon.credentials"><code>Credential</code></a> consisting of a collection of Credentials each uniquely identified by a String (typically a host name or host alias).</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/CredentialMap.html#CredentialMap--">CredentialMap()</a></span> - Constructor for class nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/CredentialMap.html" title="class in nl.esciencecenter.xenon.credentials">CredentialMap</a></dt>
+<dd>
+<div class="block">Create a new CredentialMap using <code>null</code> as the default credential.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/CredentialMap.html#CredentialMap-nl.esciencecenter.xenon.credentials.UserCredential-">CredentialMap(UserCredential)</a></span> - Constructor for class nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/CredentialMap.html" title="class in nl.esciencecenter.xenon.credentials">CredentialMap</a></dt>
+<dd>
+<div class="block">Creates a new <code>CredentialMap</code> and set the default credential to <code>defaultCredential</code>.</div>
+</dd>
 </dl>
 <a name="I:D">
 <!--   -->
@@ -293,6 +321,8 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/Scheduler.html#equals-java.lang.Object-">equals(Object)</a></span> - Method in class nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/Scheduler.html" title="class in nl.esciencecenter.xenon.schedulers">Scheduler</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#equals-java.lang.Object-">equals(Object)</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/filesystems/FileSystem.html#exists-nl.esciencecenter.xenon.filesystems.Path-">exists(Path)</a></span> - Method in class nl.esciencecenter.xenon.filesystems.<a href="nl/esciencecenter/xenon/filesystems/FileSystem.html" title="class in nl.esciencecenter.xenon.filesystems">FileSystem</a></dt>
 <dd>
 <div class="block">Tests if a path exists.</div>
@@ -327,6 +357,10 @@
 </a>
 <h2 class="title">G</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/CredentialMap.html#get-java.lang.String-">get(String)</a></span> - Method in class nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/CredentialMap.html" title="class in nl.esciencecenter.xenon.credentials">CredentialMap</a></dt>
+<dd>
+<div class="block">Retrieve the <a href="nl/esciencecenter/xenon/credentials/UserCredential.html" title="interface in nl.esciencecenter.xenon.credentials"><code>UserCredential</code></a> stored using the <code>key</code>.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/filesystems/FileSystem.html#getAdaptorDescription-java.lang.String-">getAdaptorDescription(String)</a></span> - Static method in class nl.esciencecenter.xenon.filesystems.<a href="nl/esciencecenter/xenon/filesystems/FileSystem.html" title="class in nl.esciencecenter.xenon.filesystems">FileSystem</a></dt>
 <dd>
 <div class="block">Gives the description of the adaptor with the given name.</div>
@@ -362,6 +396,14 @@
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/JobDescription.html#getArguments--">getArguments()</a></span> - Method in class nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a></dt>
 <dd>
 <div class="block">Get the command line arguments of the executable.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#getArguments--">getArguments()</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block">Constructs the command line arguments from the class path, the JVM options, the system properties, the main and the java arguments.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#getArguments-char-">getArguments(char)</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block">Constructs the command line arguments from the class path, the JVM options, the system properties, the main and the java arguments.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/filesystems/FileSystem.html#getAttributes-nl.esciencecenter.xenon.filesystems.Path-">getAttributes(Path)</a></span> - Method in class nl.esciencecenter.xenon.filesystems.<a href="nl/esciencecenter/xenon/filesystems/FileSystem.html" title="class in nl.esciencecenter.xenon.filesystems">FileSystem</a></dt>
 <dd>
@@ -415,6 +457,10 @@
 <dd>
 <div class="block">Get the path to the executable.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#getExecutable--">getExecutable()</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block">Returns the executable.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/JobStatus.html#getExitCode--">getExitCode()</a></span> - Method in interface nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/JobStatus.html" title="interface in nl.esciencecenter.xenon.schedulers">JobStatus</a></dt>
 <dd>
 <div class="block">Get the exit code for the Job.</div>
@@ -434,6 +480,26 @@
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/filesystems/PathAttributes.html#getGroup--">getGroup()</a></span> - Method in interface nl.esciencecenter.xenon.filesystems.<a href="nl/esciencecenter/xenon/filesystems/PathAttributes.html" title="interface in nl.esciencecenter.xenon.filesystems">PathAttributes</a></dt>
 <dd>
 <div class="block">Get the group of this file (optional operation).</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#getJavaArguments--">getJavaArguments()</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block">Returns the arguments for the main class.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#getJavaClasspath--">getJavaClasspath()</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block">Returns the java class path.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#getJavaMain--">getJavaMain()</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block">Returns the main class of the java application.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#getJavaOptions--">getJavaOptions()</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block">Returns the JVM options.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#getJavaSystemProperties--">getJavaSystemProperties()</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block">Returns the java system properties.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/JobStatus.html#getJobIdentifier--">getJobIdentifier()</a></span> - Method in interface nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/JobStatus.html" title="interface in nl.esciencecenter.xenon.schedulers">JobStatus</a></dt>
 <dd>
@@ -651,14 +717,14 @@
 <dd>
 <div class="block">Returns the type of the property.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/Credential.html#getUsername--">getUsername()</a></span> - Method in interface nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/Credential.html" title="interface in nl.esciencecenter.xenon.credentials">Credential</a></dt>
-<dd>
-<div class="block">Get user name associated with this Credential.</div>
-</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/DefaultCredential.html#getUsername--">getUsername()</a></span> - Method in class nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/DefaultCredential.html" title="class in nl.esciencecenter.xenon.credentials">DefaultCredential</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/PasswordCredential.html#getUsername--">getUsername()</a></span> - Method in class nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/PasswordCredential.html" title="class in nl.esciencecenter.xenon.credentials">PasswordCredential</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/UserCredential.html#getUsername--">getUsername()</a></span> - Method in interface nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/UserCredential.html" title="interface in nl.esciencecenter.xenon.credentials">UserCredential</a></dt>
+<dd>
+<div class="block">Returns the user name associated with this credential.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/filesystems/FileSystem.html#getWorkingDirectory--">getWorkingDirectory()</a></span> - Method in class nl.esciencecenter.xenon.filesystems.<a href="nl/esciencecenter/xenon/filesystems/FileSystem.html" title="class in nl.esciencecenter.xenon.filesystems">FileSystem</a></dt>
 <dd>
 <div class="block">Get the current working directory of this file system.</div>
@@ -698,6 +764,8 @@
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/JobDescription.html#hashCode--">hashCode()</a></span> - Method in class nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/Scheduler.html#hashCode--">hashCode()</a></span> - Method in class nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/Scheduler.html" title="class in nl.esciencecenter.xenon.schedulers">Scheduler</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#hashCode--">hashCode()</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
 <dd>&nbsp;</dd>
 </dl>
 <a name="I:I">
@@ -897,6 +965,12 @@
 </a>
 <h2 class="title">J</h2>
 <dl>
+<dt><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils"><span class="typeNameLink">JavaJobDescription</span></a> - Class in <a href="nl/esciencecenter/xenon/utils/package-summary.html">nl.esciencecenter.xenon.utils</a></dt>
+<dd>
+<div class="block">A JobDescription specialized in Java applications.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#JavaJobDescription--">JavaJobDescription()</a></span> - Constructor for class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers"><span class="typeNameLink">JobDescription</span></a> - Class in <a href="nl/esciencecenter/xenon/schedulers/package-summary.html">nl.esciencecenter.xenon.schedulers</a></dt>
 <dd>
 <div class="block">JobDescription contains a description of a job that can be submitted to a <a href="nl/esciencecenter/xenon/schedulers/Scheduler.html" title="class in nl.esciencecenter.xenon.schedulers"><code>Scheduler</code></a>.</div>
@@ -1091,6 +1165,10 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/PropertyTypeException.html#PropertyTypeException-java.lang.String-java.lang.String-">PropertyTypeException(String, String)</a></span> - Constructor for exception nl.esciencecenter.xenon.<a href="nl/esciencecenter/xenon/PropertyTypeException.html" title="class in nl.esciencecenter.xenon">PropertyTypeException</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/credentials/CredentialMap.html#put-java.lang.String-nl.esciencecenter.xenon.credentials.UserCredential-">put(String, UserCredential)</a></span> - Method in class nl.esciencecenter.xenon.credentials.<a href="nl/esciencecenter/xenon/credentials/CredentialMap.html" title="class in nl.esciencecenter.xenon.credentials">CredentialMap</a></dt>
+<dd>
+<div class="block">Add a <a href="nl/esciencecenter/xenon/credentials/Credential.html" title="interface in nl.esciencecenter.xenon.credentials"><code>Credential</code></a> to the CredentialMap using <code>key</code> as a unique key.</div>
+</dd>
 </dl>
 <a name="I:Q">
 <!--   -->
@@ -1163,6 +1241,10 @@
 <dd>
 <div class="block">Sets the command line arguments of the executable.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#setArguments-java.lang.String...-">setArguments(String...)</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block"><b>This method should not be used</b>.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/JobDescription.html#setEnvironment-java.util.Map-">setEnvironment(Map&lt;String, String&gt;)</a></span> - Method in class nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a></dt>
 <dd>
 <div class="block">Sets the environment of the executable.</div>
@@ -1170,6 +1252,26 @@
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/JobDescription.html#setExecutable-java.lang.String-">setExecutable(String)</a></span> - Method in class nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a></dt>
 <dd>
 <div class="block">Sets the path to the executable.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#setJavaArguments-java.lang.String...-">setJavaArguments(String...)</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block">Sets the arguments of the java main class.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#setJavaClasspath-java.lang.String...-">setJavaClasspath(String...)</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block">Sets the java class path.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#setJavaMain-java.lang.String-">setJavaMain(String)</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block">Sets the main class.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#setJavaOptions-java.lang.String...-">setJavaOptions(String...)</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block">Sets the JVM options.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#setJavaSystemProperties-java.util.Map-">setJavaSystemProperties(Map&lt;String, String&gt;)</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>
+<div class="block">Sets the system properties.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/JobDescription.html#setJobOptions-java.util.Map-">setJobOptions(Map&lt;String, String&gt;)</a></span> - Method in class nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a></dt>
 <dd>
@@ -1241,8 +1343,11 @@
 </dd>
 <dt><a href="nl/esciencecenter/xenon/utils/StreamForwarder.html" title="class in nl.esciencecenter.xenon.utils"><span class="typeNameLink">StreamForwarder</span></a> - Class in <a href="nl/esciencecenter/xenon/utils/package-summary.html">nl.esciencecenter.xenon.utils</a></dt>
 <dd>
-<div class="block">A simple stream forwarder that uses a daemon thread to read from an <code>InputStream</code> and write it to a
- <code>OutputStream</code>.</div>
+<div class="block">A simple stream forwarder that uses a daemon thread to read from an <code>InputStream</code> and write it to a <code>OutputStream</code>.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/StreamForwarder.html#StreamForwarder-java.lang.String-java.io.InputStream-java.io.OutputStream-int-">StreamForwarder(String, InputStream, OutputStream, int)</a></span> - Constructor for class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/StreamForwarder.html" title="class in nl.esciencecenter.xenon.utils">StreamForwarder</a></dt>
+<dd>
+<div class="block">Create a new StreamForwarder and start it immediately.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/StreamForwarder.html#StreamForwarder-java.io.InputStream-java.io.OutputStream-">StreamForwarder(InputStream, OutputStream)</a></span> - Constructor for class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/StreamForwarder.html" title="class in nl.esciencecenter.xenon.utils">StreamForwarder</a></dt>
 <dd>
@@ -1310,6 +1415,8 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/JobDescription.html#toString--">toString()</a></span> - Method in class nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/JobDescription.html" title="class in nl.esciencecenter.xenon.schedulers">JobDescription</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html#toString--">toString()</a></span> - Method in class nl.esciencecenter.xenon.utils.<a href="nl/esciencecenter/xenon/utils/JavaJobDescription.html" title="class in nl.esciencecenter.xenon.utils">JavaJobDescription</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/XenonPropertyDescription.html#toString--">toString()</a></span> - Method in class nl.esciencecenter.xenon.<a href="nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a></dt>
 <dd>&nbsp;</dd>
 </dl>
@@ -1350,9 +1457,14 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/UnsupportedOperationException.html#UnsupportedOperationException-java.lang.String-java.lang.String-">UnsupportedOperationException(String, String)</a></span> - Constructor for exception nl.esciencecenter.xenon.<a href="nl/esciencecenter/xenon/UnsupportedOperationException.html" title="class in nl.esciencecenter.xenon">UnsupportedOperationException</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/Scheduler.html#usesFileSystem--">usesFileSystem()</a></span> - Method in class nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/Scheduler.html" title="class in nl.esciencecenter.xenon.schedulers">Scheduler</a></dt>
+<dt><a href="nl/esciencecenter/xenon/credentials/UserCredential.html" title="interface in nl.esciencecenter.xenon.credentials"><span class="typeNameLink">UserCredential</span></a> - Interface in <a href="nl/esciencecenter/xenon/credentials/package-summary.html">nl.esciencecenter.xenon.credentials</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="nl/esciencecenter/xenon/schedulers/SchedulerAdaptorDescription.html#usesFileSystem--">usesFileSystem()</a></span> - Method in interface nl.esciencecenter.xenon.schedulers.<a href="nl/esciencecenter/xenon/schedulers/SchedulerAdaptorDescription.html" title="interface in nl.esciencecenter.xenon.schedulers">SchedulerAdaptorDescription</a></dt>
 <dd>
-<div class="block">Does this <code>Scheduler</code> use a <code>FileSystem</code> internally to access files and directories ?</div>
+<div class="block">Does this Scheduler create a FileSystem to support the submission of jobs ?
+
+ Many scheduler implementations use a FileSystem internally to handle job submission, for example to store submission scripts or handle the standard I/O
+ streams of a process.</div>
 </dd>
 </dl>
 <a name="I:V">

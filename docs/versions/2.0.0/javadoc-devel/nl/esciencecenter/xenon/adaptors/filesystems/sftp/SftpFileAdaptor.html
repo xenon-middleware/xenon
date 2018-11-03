@@ -148,7 +148,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>static java.lang.String[]</code></td>
+<td class="colFirst"><code>private static java.lang.String[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/sftp/SftpFileAdaptor.html#ADAPTOR_LOCATIONS">ADAPTOR_LOCATIONS</a></span></code>
 <div class="block">The locations supported by this adaptor</div>
 </td>
@@ -190,7 +190,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/
 </td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>protected static int</code></td>
+<td class="colFirst"><code>static int</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/sftp/SftpFileAdaptor.html#DEFAULT_PORT">DEFAULT_PORT</a></span></code>
 <div class="block">The default SSH port</div>
 </td>
@@ -236,7 +236,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/
 </td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>static <a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[]</code></td>
+<td class="colFirst"><code>private static <a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/sftp/SftpFileAdaptor.html#VALID_PROPERTIES">VALID_PROPERTIES</a></span></code>
 <div class="block">List of properties supported by this SSH adaptor</div>
 </td>
@@ -379,7 +379,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/
 <ul class="blockList">
 <li class="blockList">
 <h4>DEFAULT_PORT</h4>
-<pre>protected static final&nbsp;int DEFAULT_PORT</pre>
+<pre>public static final&nbsp;int DEFAULT_PORT</pre>
 <div class="block">The default SSH port</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
@@ -399,16 +399,6 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../../../constant-values.html#nl.esciencecenter.xenon.adaptors.filesystems.sftp.SftpFileAdaptor.ADAPTOR_DESCRIPTION">Constant Field Values</a></dd>
 </dl>
-</li>
-</ul>
-<a name="ADAPTOR_LOCATIONS">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>ADAPTOR_LOCATIONS</h4>
-<pre>public static final&nbsp;java.lang.String[] ADAPTOR_LOCATIONS</pre>
-<div class="block">The locations supported by this adaptor</div>
 </li>
 </ul>
 <a name="PREFIX">
@@ -565,13 +555,23 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/filesystems/
 </dl>
 </li>
 </ul>
+<a name="ADAPTOR_LOCATIONS">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>ADAPTOR_LOCATIONS</h4>
+<pre>private static final&nbsp;java.lang.String[] ADAPTOR_LOCATIONS</pre>
+<div class="block">The locations supported by this adaptor</div>
+</li>
+</ul>
 <a name="VALID_PROPERTIES">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>VALID_PROPERTIES</h4>
-<pre>public static final&nbsp;<a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[] VALID_PROPERTIES</pre>
+<pre>private static final&nbsp;<a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[] VALID_PROPERTIES</pre>
 <div class="block">List of properties supported by this SSH adaptor</div>
 </li>
 </ul>

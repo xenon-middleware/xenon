@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":6,"i1":6,"i2":6};
+var methods = {"i0":6,"i1":6,"i2":6,"i3":6};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -151,6 +151,15 @@ extends <a href="../../../../nl/esciencecenter/xenon/AdaptorDescription.html" ti
  For interactive jobs the standard streams of the job must be handled by the submitting process.</div>
 </td>
 </tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/SchedulerAdaptorDescription.html#usesFileSystem--">usesFileSystem</a></span>()</code>
+<div class="block">Does this Scheduler create a FileSystem to support the submission of jobs ?
+
+ Many scheduler implementations use a FileSystem internally to handle job submission, for example to store submission scripts or handle the standard I/O
+ streams of a process.</div>
+</td>
+</tr>
 </table>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.nl.esciencecenter.xenon.AdaptorDescription">
@@ -182,11 +191,11 @@ extends <a href="../../../../nl/esciencecenter/xenon/AdaptorDescription.html" ti
 <pre>boolean&nbsp;isEmbedded()</pre>
 <div class="block">Is this an embedded scheduler ?
 
- Embedded schedulers are implemented inside the Xenon process itself. Therefore this process needs to remain active for its jobs
- to run. Ending an online scheduler will typically orphan or kill all jobs that were submitted to it.
+ Embedded schedulers are implemented inside the Xenon process itself. Therefore this process needs to remain active for its jobs to run. Ending an online
+ scheduler will typically orphan or kill all jobs that were submitted to it.
 
- Non-embedded schedulers do not need to remain active for their jobs to run. A submitted job will typically be handed over to
- some external server that will manage the job for the rest of its lifetime.</div>
+ Non-embedded schedulers do not need to remain active for their jobs to run. A submitted job will typically be handed over to some external server that
+ will manage the job for the rest of its lifetime.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>if this scheduler is embedded.</dd>
@@ -212,17 +221,34 @@ extends <a href="../../../../nl/esciencecenter/xenon/AdaptorDescription.html" ti
 <a name="supportsInteractive--">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>supportsInteractive</h4>
 <pre>boolean&nbsp;supportsInteractive()</pre>
 <div class="block">Does this Scheduler supports the submission of interactive jobs ?
 
- For interactive jobs the standard streams of the job must be handled by the submitting process. Failing to do so may cause
- the job to hang indefinitely.</div>
+ For interactive jobs the standard streams of the job must be handled by the submitting process. Failing to do so may cause the job to hang indefinitely.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>if this scheduler supports the submission of interactive jobs ?</dd>
+</dl>
+</li>
+</ul>
+<a name="usesFileSystem--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>usesFileSystem</h4>
+<pre>boolean&nbsp;usesFileSystem()</pre>
+<div class="block">Does this Scheduler create a FileSystem to support the submission of jobs ?
+
+ Many scheduler implementations use a FileSystem internally to handle job submission, for example to store submission scripts or handle the standard I/O
+ streams of a process. This FileSystem can optionally be retrieved by the user to perform other tasks, such as staging in and output data of the job. To
+ do so use <a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#getFileSystem--"><code>Scheduler.getFileSystem()</code></a> method.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>does this <a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html" title="class in nl.esciencecenter.xenon.schedulers"><code>Scheduler</code></a> create a FileSystem to support the submission of jobs ?</dd>
 </dl>
 </li>
 </ul>

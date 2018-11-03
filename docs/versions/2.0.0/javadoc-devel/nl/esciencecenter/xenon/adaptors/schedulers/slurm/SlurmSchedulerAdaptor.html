@@ -154,7 +154,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>static java.lang.String[]</code></td>
+<td class="colFirst"><code>private static java.lang.String[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/slurm/SlurmSchedulerAdaptor.html#ADAPTOR_LOCATIONS">ADAPTOR_LOCATIONS</a></span></code>
 <div class="block">The locations supported by this adaptor</div>
 </td>
@@ -192,11 +192,11 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/slurm/SlurmSchedulerAdaptor.html#SLURM_UPDATE_TIMEOUT">SLURM_UPDATE_TIMEOUT</a></span></code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>static java.lang.String[]</code></td>
+<td class="colFirst"><code>protected static java.lang.String[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/slurm/SlurmSchedulerAdaptor.html#SUPPORTED_VERSIONS">SUPPORTED_VERSIONS</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>static <a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[]</code></td>
+<td class="colFirst"><code>private static <a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/slurm/SlurmSchedulerAdaptor.html#VALID_PROPERTIES">VALID_PROPERTIES</a></span></code>
 <div class="block">List of all properties supported by this adaptor</div>
 </td>
@@ -260,7 +260,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;nl.esciencecenter.xenon.adaptors.schedulers.<a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html" title="class in nl.esciencecenter.xenon.adaptors.schedulers">SchedulerAdaptor</a></h3>
-<code><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html#isEmbedded--">isEmbedded</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html#supportsBatch--">supportsBatch</a></code></li>
+<code><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html#isEmbedded--">isEmbedded</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html#supportsBatch--">supportsBatch</a>, <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/SchedulerAdaptor.html#usesFileSystem--">usesFileSystem</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.nl.esciencecenter.xenon.adaptors.Adaptor">
@@ -325,16 +325,6 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 </dl>
 </li>
 </ul>
-<a name="ADAPTOR_LOCATIONS">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>ADAPTOR_LOCATIONS</h4>
-<pre>public static final&nbsp;java.lang.String[] ADAPTOR_LOCATIONS</pre>
-<div class="block">The locations supported by this adaptor</div>
-</li>
-</ul>
 <a name="DISABLE_ACCOUNTING_USAGE">
 <!--   -->
 </a>
@@ -377,16 +367,6 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 </dl>
 </li>
 </ul>
-<a name="VALID_PROPERTIES">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>VALID_PROPERTIES</h4>
-<pre>public static final&nbsp;<a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[] VALID_PROPERTIES</pre>
-<div class="block">List of all properties supported by this adaptor</div>
-</li>
-</ul>
 <a name="SLURM_UPDATE_TIMEOUT">
 <!--   -->
 </a>
@@ -413,13 +393,33 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 </dl>
 </li>
 </ul>
+<a name="ADAPTOR_LOCATIONS">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>ADAPTOR_LOCATIONS</h4>
+<pre>private static final&nbsp;java.lang.String[] ADAPTOR_LOCATIONS</pre>
+<div class="block">The locations supported by this adaptor</div>
+</li>
+</ul>
+<a name="VALID_PROPERTIES">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>VALID_PROPERTIES</h4>
+<pre>private static final&nbsp;<a href="../../../../../../nl/esciencecenter/xenon/XenonPropertyDescription.html" title="class in nl.esciencecenter.xenon">XenonPropertyDescription</a>[] VALID_PROPERTIES</pre>
+<div class="block">List of all properties supported by this adaptor</div>
+</li>
+</ul>
 <a name="SUPPORTED_VERSIONS">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>SUPPORTED_VERSIONS</h4>
-<pre>public static final&nbsp;java.lang.String[] SUPPORTED_VERSIONS</pre>
+<pre>protected static final&nbsp;java.lang.String[] SUPPORTED_VERSIONS</pre>
 </li>
 </ul>
 </li>
@@ -436,7 +436,12 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 <ul class="blockListLast">
 <li class="blockList">
 <h4>SlurmSchedulerAdaptor</h4>
-<pre>public&nbsp;SlurmSchedulerAdaptor()</pre>
+<pre>public&nbsp;SlurmSchedulerAdaptor()
+                      throws <a href="../../../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></pre>
+<dl>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></code></dd>
+</dl>
 </li>
 </ul>
 </li>
@@ -457,8 +462,7 @@ extends <a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/S
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../../nl/esciencecenter/xenon/schedulers/SchedulerAdaptorDescription.html#supportsInteractive--">SchedulerAdaptorDescription</a></code></span></div>
 <div class="block">Does this Scheduler supports the submission of interactive jobs ?
 
- For interactive jobs the standard streams of the job must be handled by the submitting process. Failing to do so may cause
- the job to hang indefinitely.</div>
+ For interactive jobs the standard streams of the job must be handled by the submitting process. Failing to do so may cause the job to hang indefinitely.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../../nl/esciencecenter/xenon/schedulers/SchedulerAdaptorDescription.html#supportsInteractive--">supportsInteractive</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../nl/esciencecenter/xenon/schedulers/SchedulerAdaptorDescription.html" title="interface in nl.esciencecenter.xenon.schedulers">SchedulerAdaptorDescription</a></code></dd>

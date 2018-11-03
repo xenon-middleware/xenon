@@ -136,8 +136,7 @@ extends java.lang.Object</pre>
 <tr class="rowColor">
 <td class="colFirst"><code>private static java.lang.String[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/slurm/SlurmUtils.html#FAILED_STATES">FAILED_STATES</a></span></code>
-<div class="block">These are the states a job can be in when it has failed:
- FAILED:    the job terminated with non-zero exit code or other failure condition.</div>
+<div class="block">These are the states a job can be in when it has failed: FAILED: the job terminated with non-zero exit code or other failure condition.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -153,7 +152,7 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../nl/esciencecenter/xenon/adaptors/schedulers/slurm/SlurmUtils.html#PENDING_STATES">PENDING_STATES</a></span></code>
 <div class="block">These are the states a job can be in when it is pending:
 
- PENDING:      the job is awaiting resource allocation.</div>
+ PENDING: the job is awaiting resource allocation.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -342,13 +341,10 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>FAILED_STATES</h4>
 <pre>private static final&nbsp;java.lang.String[] FAILED_STATES</pre>
-<div class="block">These are the states a job can be in when it has failed:
- FAILED:    the job terminated with non-zero exit code or other failure condition.
- CANCELLED: the job was explicitly cancelled by the user or system administrator.
- NODE_FAIL: the job terminated due to failure of one or more allocated nodes.
- TIMEOUT:   the job terminated upon reaching its time limit.
- PREEMPTED: the job terminated due to preemption (a more important job took its place).
- BOOT_FAIL: the job terminated due to a launch failure (typically a hardware failure).</div>
+<div class="block">These are the states a job can be in when it has failed: FAILED: the job terminated with non-zero exit code or other failure condition. CANCELLED: the
+ job was explicitly cancelled by the user or system administrator. NODE_FAIL: the job terminated due to failure of one or more allocated nodes. TIMEOUT:
+ the job terminated upon reaching its time limit. PREEMPTED: the job terminated due to preemption (a more important job took its place). BOOT_FAIL: the
+ job terminated due to a launch failure (typically a hardware failure).</div>
 </li>
 </ul>
 <a name="RUNNING_STATES">
@@ -360,9 +356,8 @@ extends java.lang.Object</pre>
 <pre>private static final&nbsp;java.lang.String[] RUNNING_STATES</pre>
 <div class="block">These are the states a job can be in when it is running:
 
- CONFIGURING: the resources are available and being preparing to run the job (for example by booting).
- RUNNING:     the resources are running the job.
- COMPLETING:  the job is in process of completing. Some processes may have completed, others may still be running.</div>
+ CONFIGURING: the resources are available and being preparing to run the job (for example by booting). RUNNING: the resources are running the job.
+ COMPLETING: the job is in process of completing. Some processes may have completed, others may still be running.</div>
 </li>
 </ul>
 <a name="PENDING_STATES">
@@ -374,10 +369,9 @@ extends java.lang.Object</pre>
 <pre>private static final&nbsp;java.lang.String[] PENDING_STATES</pre>
 <div class="block">These are the states a job can be in when it is pending:
 
- PENDING:      the job is awaiting resource allocation.
- STOPPED:      the job has an allocation, but execution has been stopped with SIGSTOP signal (allocation is retained).
- SUSPENDED:    the job has an allocation, but execution has been suspended (resources have been released for other jobs).
- SPECIAL_EXIT: The job was requeued in a special state.</div>
+ PENDING: the job is awaiting resource allocation. STOPPED: the job has an allocation, but execution has been stopped with SIGSTOP signal (allocation is
+ retained). SUSPENDED: the job has an allocation, but execution has been suspended (resources have been released for other jobs). SPECIAL_EXIT: The job
+ was requeued in a special state.</div>
 </li>
 </ul>
 <a name="DONE_STATE">

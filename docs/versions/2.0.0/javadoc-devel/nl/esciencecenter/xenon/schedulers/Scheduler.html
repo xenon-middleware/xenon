@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":10,"i2":10,"i3":6,"i4":6,"i5":9,"i6":9,"i7":9,"i8":9,"i9":10,"i10":9,"i11":9,"i12":9,"i13":10,"i14":9,"i15":6,"i16":6,"i17":6,"i18":6,"i19":10,"i20":10,"i21":10,"i22":6,"i23":6,"i24":6,"i25":10,"i26":6,"i27":6,"i28":6,"i29":6,"i30":6,"i31":6};
+var methods = {"i0":9,"i1":10,"i2":10,"i3":6,"i4":6,"i5":9,"i6":9,"i7":9,"i8":9,"i9":10,"i10":9,"i11":9,"i12":9,"i13":10,"i14":9,"i15":6,"i16":6,"i17":6,"i18":6,"i19":10,"i20":10,"i21":10,"i22":6,"i23":6,"i24":6,"i25":10,"i26":6,"i27":6,"i28":6,"i29":6,"i30":6};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -375,19 +375,13 @@ implements java.lang.AutoCloseable</pre>
 </td>
 </tr>
 <tr id="i29" class="rowColor">
-<td class="colFirst"><code>abstract boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#usesFileSystem--">usesFileSystem</a></span>()</code>
-<div class="block">Does this <code>Scheduler</code> use a <code>FileSystem</code> internally to access files and directories ?</div>
-</td>
-</tr>
-<tr id="i30" class="altColor">
 <td class="colFirst"><code>abstract <a href="../../../../nl/esciencecenter/xenon/schedulers/JobStatus.html" title="interface in nl.esciencecenter.xenon.schedulers">JobStatus</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#waitUntilDone-java.lang.String-long-">waitUntilDone</a></span>(java.lang.String&nbsp;jobIdentifier,
              long&nbsp;timeout)</code>
 <div class="block">Wait until a job is done or until a timeout expires.</div>
 </td>
 </tr>
-<tr id="i31" class="rowColor">
+<tr id="i30" class="altColor">
 <td class="colFirst"><code>abstract <a href="../../../../nl/esciencecenter/xenon/schedulers/JobStatus.html" title="interface in nl.esciencecenter.xenon.schedulers">JobStatus</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../nl/esciencecenter/xenon/schedulers/Scheduler.html#waitUntilRunning-java.lang.String-long-">waitUntilRunning</a></span>(java.lang.String&nbsp;jobIdentifier,
                 long&nbsp;timeout)</code>
@@ -1065,20 +1059,6 @@ implements java.lang.AutoCloseable</pre>
 <dd><code>java.lang.IllegalArgumentException</code> - If the value of timeout is negative</dd>
 <dd><code><a href="../../../../nl/esciencecenter/xenon/schedulers/NoSuchJobException.html" title="class in nl.esciencecenter.xenon.schedulers">NoSuchJobException</a></code> - If the job is not known.</dd>
 <dd><code><a href="../../../../nl/esciencecenter/xenon/XenonException.html" title="class in nl.esciencecenter.xenon">XenonException</a></code> - If the status of the job could not be retrieved.</dd>
-</dl>
-</li>
-</ul>
-<a name="usesFileSystem--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>usesFileSystem</h4>
-<pre>public abstract&nbsp;boolean&nbsp;usesFileSystem()</pre>
-<div class="block">Does this <code>Scheduler</code> use a <code>FileSystem</code> internally to access files and directories ?</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>If this <code>Scheduler</code> use a <code>FileSystem</code> internally ?</dd>
 </dl>
 </li>
 </ul>
