@@ -154,4 +154,17 @@ public class QueueInfoTest {
         assertEquals(expected, result);
     }
 
+    @Test
+    public void test03_peComplex_ignoresAfterComma() throws XenonException {
+        Map<String, String> input = new HashMap<>();
+        input.put("qname", "some.q");
+        input.put("slots", "200");
+        input.put("pe_list", "mpi threaded,[n0061.compute.hpc=NONE]");
+
+        QueueInfo result = new QueueInfo(input);
+
+        String[] expected = new String[] { "mpi", "threaded"};
+        assertArrayEquals(expected, result.getParallelEnvironments());
+    }
+
 }
