@@ -1,4 +1,4 @@
-**Run your distributed computing tasks on a variety of systems through  abstraction with Xenon**
+**Distributed computing on a variety of systems through abstraction with Xenon**
 
 At the Netherlands eScience Center, we come across many projects that make use of remote resources, both for storage and for compute. 
 
