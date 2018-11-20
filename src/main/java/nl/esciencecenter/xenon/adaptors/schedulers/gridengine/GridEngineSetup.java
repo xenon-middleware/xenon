@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
-import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
 
 /**
  * Holds some info on the specifics of the machine we are connected to, such as queues and parallel environments.
@@ -158,13 +158,14 @@ public class GridEngineSetup {
     /**
      * Try to find a parallel environment that can be used to get a number of cores on a single node
      *
-     * @param coresPerNode number of cores to reserve on a node
-     * @param queueName Name of the queue
+     * @param coresPerNode
+     *            number of cores to reserve on a node
+     * @param queueName
+     *            Name of the queue
      * @return optional parallel environment
      */
     Optional<ParallelEnvironmentInfo> getSingleNodeParallelEnvironment(int coresPerNode, String queueName) {
-        Stream<ParallelEnvironmentInfo> stream = this.parallelEnvironments.values().stream()
-            .filter(pe -> pe.canAllocateSingleNode(coresPerNode));
+        Stream<ParallelEnvironmentInfo> stream = this.parallelEnvironments.values().stream().filter(pe -> pe.canAllocateSingleNode(coresPerNode));
         // Filter pe on queue
         QueueInfo queue = queues.get(queueName);
         if (queue == null) {
@@ -174,7 +175,7 @@ public class GridEngineSetup {
             }
             stream = stream.filter(pe -> pesOfQueues.contains(pe.getName()));
         } else {
-            // don't know which queue the scheduler will pick, make sure atleast one queue has the candidate pe
+            // don't know which queue the scheduler will pick, make sure at least one queue has the candidate pe
             Set<String> pesOfQueue = new HashSet<>(Arrays.asList(queue.getParallelEnvironments()));
             stream = stream.filter(pe -> pesOfQueue.contains(pe.getName()));
         }
@@ -186,13 +187,15 @@ public class GridEngineSetup {
     /**
      * Try to find a parallel environment that can be used to get X number of cores per node on Y number of nodes
      *
-     * @param coresPerNode number of cores to reserve on each node
-     * @param nodes number of nodes to reserve
-     * @param queueName Name of the queue
+     * @param coresPerNode
+     *            number of cores to reserve on each node
+     * @param nodes
+     *            number of nodes to reserve
+     * @param queueName
+     *            Name of the queue
      * @return optional parallel environment
      */
     Optional<ParallelEnvironmentInfo> getMultiNodeParallelEnvironment(int coresPerNode, int nodes, String queueName) {
-        return this.parallelEnvironments.values().stream().filter(s -> s.canAllocateMultiNode(coresPerNode, nodes)
-        ).findFirst();
+        return this.parallelEnvironments.values().stream().filter(s -> s.canAllocateMultiNode(coresPerNode, nodes)).findFirst();
     }
 }
