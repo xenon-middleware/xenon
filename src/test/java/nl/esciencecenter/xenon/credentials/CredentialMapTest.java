@@ -20,6 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -200,4 +201,59 @@ public class CredentialMapTest {
 
         assertEquals(p, d);
     }
+
+    private int hashCode(Credential defaultCredential, HashMap<String, UserCredential> map) {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((defaultCredential == null) ? 0 : defaultCredential.hashCode());
+        result = prime * result + map.hashCode();
+        return result;
+    }
+
+    @Test
+    public void test_hashcode1() {
+        PasswordCredential p = new PasswordCredential("test", "foo".toCharArray());
+        CredentialMap m = new CredentialMap(p);
+
+        HashMap<String, UserCredential> map = new HashMap<>();
+
+        assertEquals(hashCode(p, map), m.hashCode());
+    }
+
+    @Test
+    public void test_hashcode2() {
+        PasswordCredential p = new PasswordCredential("test", "foo".toCharArray());
+        CredentialMap m = new CredentialMap();
+        m.put("test", p);
+
+        HashMap<String, UserCredential> map = new HashMap<>();
+        map.put("test", p);
+
+        assertEquals(hashCode(null, map), m.hashCode());
+    }
+
+    @Test
+    public void test_equals1() {
+        PasswordCredential p = new PasswordCredential("test", "foo".toCharArray());
+        CredentialMap m = new CredentialMap(p);
+
+        PasswordCredential p2 = new PasswordCredential("test", "foo".toCharArray());
+        CredentialMap m2 = new CredentialMap(p2);
+
+        assertEquals(m, m2);
+    }
+
+    @Test
+    public void test_equals2() {
+        PasswordCredential p = new PasswordCredential("test", "foo".toCharArray());
+        CredentialMap m = new CredentialMap();
+        m.put("test", p);
+
+        PasswordCredential p2 = new PasswordCredential("test", "foo".toCharArray());
+        CredentialMap m2 = new CredentialMap();
+        m2.put("test", p2);
+
+        assertEquals(m, m2);
+    }
+
 }

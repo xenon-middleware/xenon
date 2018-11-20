@@ -40,10 +40,10 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingScheduler;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.StreamsImplementation;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.filesystems.Path;
@@ -137,16 +137,14 @@ public class SlurmScheduler extends ScriptingScheduler {
         String output;
         Path fsEntryPath = getWorkingDirectory();
 
-        verifyJobDescription(description, false);
-
-        checkQueue(queueNames, description.getQueueName());
+        verifyJobDescription(description, queueNames, false);
 
         // check for option that overrides job script completely.
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
 
         if (customScriptFile == null) {
             checkWorkingDirectory(description.getWorkingDirectory());
-            String jobScript = generate(description, fsEntryPath);
+            String jobScript = generate(description, fsEntryPath, getDefaultRuntime());
 
             output = runCheckedCommand(jobScript, "sbatch");
         } else {
@@ -205,15 +203,13 @@ public class SlurmScheduler extends ScriptingScheduler {
 
         Path fsEntryPath = getWorkingDirectory();
 
-        verifyJobDescription(description, true);
+        verifyJobDescription(description, queueNames, true);
 
         checkWorkingDirectory(description.getWorkingDirectory());
 
-        checkQueue(queueNames, description.getQueueName());
-
         UUID tag = UUID.randomUUID();
 
-        String[] arguments = generateInteractiveArguments(description, fsEntryPath, tag);
+        String[] arguments = generateInteractiveArguments(description, fsEntryPath, tag, getDefaultRuntime());
 
         // There is a two step job submission here, since we submit a job to via a subscheduler (typically SSH).
         // So the job we get back here is the local SSH job that connects to the remote machine running slurm.
@@ -297,7 +293,7 @@ public class SlurmScheduler extends ScriptingScheduler {
             checkQueueNames(queueNames);
 
             // add a list of all requested queues
-            output = runCheckedCommand(null, "squeue", "--noheader", "--format=%i", "--partitions=" + CommandLineUtils.asCSList(queueNames));
+            output = runCheckedCommand(null, "squeue", "--noheader", "--format=%i", "--partitions=" + ScriptingUtils.asCSList(queueNames));
         }
 
         // Job id's are on separate lines, on their own.
@@ -330,7 +326,7 @@ public class SlurmScheduler extends ScriptingScheduler {
     }
 
     private Map<String, Map<String, String>> getSinfoInfo(String... partitions) throws XenonException {
-        String output = runCheckedCommand(null, "sinfo", "--format=%P %a %l %F %N %C %D", "--partition=" + CommandLineUtils.asCSList(partitions));
+        String output = runCheckedCommand(null, "sinfo", "--format=%P %a %l %F %N %C %D", "--partition=" + ScriptingUtils.asCSList(partitions));
 
         return ScriptingParser.parseTable(output, "PARTITION", ScriptingParser.WHITESPACE_REGEX, ADAPTOR_NAME, "*", "~");
     }

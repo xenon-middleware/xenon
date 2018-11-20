@@ -127,9 +127,35 @@ public class LocalInteractiveProcessTest {
         assumeFalse(LocalFileSystemUtils.isWindows());
 
         JobDescription job = new JobDescription();
-        job.setExecutable("/bin/cat");
+        job.setExecutable("/bin/sleep");
+        job.setArguments("60");
 
         LocalInteractiveProcess p = new LocalInteractiveProcess(job, null, "job42");
+
+        p.getStreams().getStdin().close();
+
+        assertFalse(p.isDone());
+
+        // Should be kill the process
+        p.destroy();
+
+        Thread.sleep(250);
+
+        assertTrue(p.isDone());
+    }
+
+    @Test
+    public void test_scriptJob_destroyBeforeDone() throws Exception {
+
+        assumeFalse(LocalFileSystemUtils.isWindows());
+
+        JobDescription job = new JobDescription();
+        job.setExecutable("/bin/bash");
+        job.setArguments("/code/src/fixedClientEnvironmentTest/resources/sleepscript.sh");
+
+        LocalInteractiveProcess p = new LocalInteractiveProcess(job, null, "job42");
+
+        p.getStreams().getStdin().close();
 
         assertFalse(p.isDone());
 

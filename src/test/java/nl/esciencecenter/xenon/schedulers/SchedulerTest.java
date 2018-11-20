@@ -17,6 +17,8 @@ package nl.esciencecenter.xenon.schedulers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
@@ -27,6 +29,9 @@ import nl.esciencecenter.xenon.UnknownAdaptorException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 
 public class SchedulerTest {
 
@@ -106,26 +111,42 @@ public class SchedulerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void test_createSchedulerFailsIDNull() throws Exception {
-        try (Scheduler s = new MockScheduler(null, "TEST", "MEM", true, true, true, null)) {
+        try (Scheduler s = new MockScheduler(null, "TEST", "MEM", new DefaultCredential(), null)) {
         }
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void test_createSchedulerFailsNameNull() throws Exception {
-        try (Scheduler s = new MockScheduler("0", null, "MEM", true, true, true, null)) {
+        try (Scheduler s = new MockScheduler("0", null, "MEM", new DefaultCredential(), null)) {
         }
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void test_createSchedulerFailsLocationNull() throws Exception {
-        try (Scheduler s = new MockScheduler("0", "TEST", null, true, true, true, null)) {
+        try (Scheduler s = new MockScheduler("0", "TEST", null, new DefaultCredential(), null)) {
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_createSchedulerFailsCredentialNull() throws Exception {
+        try (Scheduler s = new MockScheduler("0", "TEST", "MEM", null, null)) {
         }
     }
 
     @Test
     public void test_getLocation() throws Exception {
-        try (Scheduler s = new MockScheduler("0", "TEST", "MEM", true, true, true, null)) {
+        try (Scheduler s = new MockScheduler("0", "TEST", "MEM", new DefaultCredential(), null)) {
             assertEquals("MEM", s.getLocation());
+        }
+    }
+
+    @Test
+    public void test_getCredential() throws Exception {
+
+        Credential c = new PasswordCredential("jason", "test");
+
+        try (Scheduler s = new MockScheduler("0", "TEST", "MEM", c, null)) {
+            assertEquals(c, s.getCredential());
         }
     }
 
@@ -185,29 +206,29 @@ public class SchedulerTest {
 
     @Test
     public void test_equalsTrueSelf() throws Exception {
-        try (Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null)) {
+        try (Scheduler s = new MockScheduler("ID0", "TEST", "MEM", new DefaultCredential(), null)) {
             assertTrue(s.equals(s));
         }
     }
 
     @Test
     public void test_equalsTrueSameID() throws Exception {
-        try (Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
-                Scheduler s2 = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null)) {
+        try (Scheduler s = new MockScheduler("ID0", "TEST", "MEM", new DefaultCredential(), null);
+                Scheduler s2 = new MockScheduler("ID0", "TEST", "MEM", new DefaultCredential(), null)) {
             assertTrue(s.equals(s2));
         }
     }
 
     @Test
     public void test_equalsFalseNull() throws Exception {
-        try (Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null)) {
+        try (Scheduler s = new MockScheduler("ID0", "TEST", "MEM", new DefaultCredential(), null)) {
             assertFalse(s.equals(null));
         }
     }
 
     @Test
     public void test_equalsFalseWrongType() throws Exception {
-        try (Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null)) {
+        try (Scheduler s = new MockScheduler("ID0", "TEST", "MEM", new DefaultCredential(), null)) {
             assertFalse(s.equals("hello"));
         }
     }
@@ -220,24 +241,88 @@ public class SchedulerTest {
         XenonPropertyDescription d = new XenonPropertyDescription("aap", Type.STRING, "empty", "test");
         XenonProperties prop = new XenonProperties(new XenonPropertyDescription[] { d }, p);
 
-        try (Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, true, prop)) {
+        try (Scheduler s = new MockScheduler("ID0", "TEST", "MEM", new DefaultCredential(), prop)) {
             assertEquals(p, s.getProperties());
         }
     }
 
     @Test
     public void test_hashcode() throws Exception {
-        try (Scheduler s1 = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null);
-                Scheduler s2 = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null)) {
+        try (Scheduler s1 = new MockScheduler("ID0", "TEST", "MEM", new DefaultCredential(), null);
+                Scheduler s2 = new MockScheduler("ID0", "TEST", "MEM", new DefaultCredential(), null)) {
             assertEquals(s2.hashCode(), s1.hashCode());
         }
     }
 
-    @Test
-    public void test_autoclose() throws Exception {
-        try (Scheduler s = new MockScheduler("ID0", "TEST", "MEM", true, true, false, null)) {
-            s.getAdaptorName();
+    @Test(expected = IllegalArgumentException.class)
+    public void test_assertNonNullOrEmptyFailsNull() throws Exception {
+        try (Scheduler s = new MockScheduler()) {
+            s.assertNonNullOrEmpty(null, "EEP");
         }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_assertNonNullOrEmptyFailsEmpty() throws Exception {
+        try (Scheduler s = new MockScheduler()) {
+            s.assertNonNullOrEmpty("", "EEP");
+        }
+    }
+
+    @Test
+    public void test_assertNonNullOrEmpty() throws Exception {
+        try (Scheduler s = new MockScheduler()) {
+            s.assertNonNullOrEmpty("hello", "EEP");
+        }
+    }
+
+    @Test
+    public void test_assertPositive() throws Exception {
+        try (Scheduler s = new MockScheduler()) {
+            s.assertPositive(2, "EEP");
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_assertPositiveFailsNegative() throws Exception {
+        try (Scheduler s = new MockScheduler()) {
+            s.assertPositive(-2, "EEP");
+        }
+    }
+
+    @Test
+    public void test_create() throws Exception {
+        Scheduler.create("local").close();
+    }
+
+    @Test
+    public void test_getJobStatusses() throws Exception {
+
+        JobStatus[] result;
+
+        try (Scheduler s = new MockScheduler()) {
+            result = s.getJobStatuses("DONE", "CRASH", null, "EXCEPTION", "RUNNING", "UNKNOWN", "ERROR");
+        }
+
+        assertNotNull(result);
+        assertTrue(result.length == 7);
+        assertEquals("DONE", result[0].getJobIdentifier());
+
+        assertEquals("CRASH", result[1].getJobIdentifier());
+        assertEquals(Integer.valueOf(42), result[1].getExitCode());
+
+        assertNull(result[2]);
+
+        assertEquals("EXCEPTION", result[3].getJobIdentifier());
+        assertTrue(result[3].hasException());
+
+        assertEquals("RUNNING", result[4].getJobIdentifier());
+        assertTrue(result[4].isRunning());
+
+        assertEquals("UNKNOWN", result[5].getJobIdentifier());
+        assertEquals("UNKNOWN", result[5].getState());
+
+        assertEquals("ERROR", result[6].getJobIdentifier());
+        assertEquals("ERROR", result[6].getState());
     }
 
 }

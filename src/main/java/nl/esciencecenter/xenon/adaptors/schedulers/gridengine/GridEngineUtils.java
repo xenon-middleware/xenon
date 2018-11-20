@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
@@ -77,7 +76,7 @@ final class GridEngineUtils {
         script.format("%s", description.getExecutable());
 
         for (String argument : description.getArguments()) {
-            script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
+            script.format(" %s", ScriptingUtils.protectAgainstShellMetas(argument));
         }
         script.format("\n");
     }
@@ -89,7 +88,7 @@ final class GridEngineUtils {
             script.format("%s", "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && ");
             script.format("%s", description.getExecutable());
             for (String argument : description.getArguments()) {
-                script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
+                script.format(" %s", ScriptingUtils.protectAgainstShellMetas(argument));
             }
             script.format("%c&\n", '"');
         }
@@ -125,13 +124,8 @@ final class GridEngineUtils {
 
         // set working directory
         if (description.getWorkingDirectory() != null) {
-            if (description.getWorkingDirectory().startsWith("/")) {
-                script.format("#$ -wd '%s'\n", description.getWorkingDirectory());
-            } else {
-                // make relative path absolute
-                Path workingDirectory = fsEntryPath.resolve(description.getWorkingDirectory());
-                script.format("#$ -wd '%s'\n", workingDirectory.toString());
-            }
+            String path = ScriptingUtils.getWorkingDirPath(description, fsEntryPath);
+            script.format("#$ -wd '%s'\n", path);
         }
 
         if (description.getQueueName() != null) {
@@ -144,7 +138,13 @@ final class GridEngineUtils {
         }
 
         // add maximum runtime in hour:minute:second format (converted from minutes in description)
-        script.format("#$ -l h_rt=%02d:%02d:00\n", description.getMaxRuntime() / MINUTES_PER_HOUR, description.getMaxRuntime() % MINUTES_PER_HOUR);
+        int runtime = description.getMaxRuntime();
+
+        if (runtime == -1) {
+            runtime = setup.getDefaultRuntime();
+        }
+
+        script.format("#$ -l h_rt=%02d:%02d:00\n", runtime / MINUTES_PER_HOUR, runtime % MINUTES_PER_HOUR);
 
         // the max amount of memory per node.
         if (description.getMaxMemory() > 0) {
@@ -166,13 +166,13 @@ final class GridEngineUtils {
         if (description.getStdout() == null) {
             script.format("#$ -o /dev/null\n");
         } else {
-            script.format("#$ -o '%s'\n", description.getStdout());
+            script.format("#$ -o '%s'\n", substituteJobID(description.getStdout()));
         }
 
         if (description.getStderr() == null) {
             script.format("#$ -e /dev/null\n");
         } else {
-            script.format("#$ -e '%s'\n", description.getStderr());
+            script.format("#$ -e '%s'\n", substituteJobID(description.getStderr()));
         }
 
         for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
@@ -194,7 +194,16 @@ final class GridEngineUtils {
         return stringBuilder.toString();
     }
 
-    protected static void verifyJobDescription(JobDescription description) throws XenonException {
+    protected static String substituteJobID(String path) {
+
+        if (path == null) {
+            return null;
+        }
+
+        return path.replace("%j", "$JOB_ID");
+    }
+
+    protected static void verifyJobDescription(JobDescription description, String[] queueNames) throws XenonException {
         ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
 
         // check for option that overrides job script completely.
@@ -204,7 +213,12 @@ final class GridEngineUtils {
         }
 
         // perform standard checks.
-        ScriptingUtils.verifyJobDescription(description, ADAPTOR_NAME);
+        ScriptingUtils.verifyJobDescription(description, queueNames, ADAPTOR_NAME);
+
+        // Check if the maxRuntimeTime is not set to infinite.
+        if (description.getMaxRuntime() == 0) {
+            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Invalid runtime: 0");
+        }
     }
 
     @SuppressWarnings("PMD.EmptyIfStmt")

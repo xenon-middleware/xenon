@@ -21,9 +21,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
-import nl.esciencecenter.xenon.XenonException;
 import org.junit.Test;
 
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.schedulers.MockScheduler;
 import nl.esciencecenter.xenon.schedulers.QueueStatus;
 
@@ -31,35 +31,35 @@ public class QueueStatusImplementationTest {
 
     @Test
     public void test_scheduler() throws Exception {
-        MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
+        MockScheduler s = new MockScheduler();
         QueueStatus stat = new QueueStatusImplementation(s, "Q", null, null);
-        assertEquals(s,  stat.getScheduler());
+        assertEquals(s, stat.getScheduler());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_schedulerFailsNull() throws Exception {
         new QueueStatusImplementation(null, "Q", null, null);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_queueNameFailsNull() throws Exception {
-        MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
+        MockScheduler s = new MockScheduler();
         new QueueStatusImplementation(s, null, null, null);
     }
 
     @Test
     public void test_queue() throws Exception {
-        MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
+        MockScheduler s = new MockScheduler();
         QueueStatus stat = new QueueStatusImplementation(s, "Q", null, null);
-        assertEquals("Q",  stat.getQueueName());
+        assertEquals("Q", stat.getQueueName());
     }
 
     @Test
     public void test_exeption() throws Exception {
-        MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
-        XenonException e = new XenonException("adapter","EEP");
+        MockScheduler s = new MockScheduler();
+        XenonException e = new XenonException("adapter", "EEP");
         QueueStatus stat = new QueueStatusImplementation(s, "Q", e, null);
-        assertEquals(e,  stat.getException());
+        assertEquals(e, stat.getException());
     }
 
     @Test
@@ -67,23 +67,23 @@ public class QueueStatusImplementationTest {
         HashMap<String, String> tmp = new HashMap<>();
         tmp.put("key", "value");
 
-        MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
-        XenonException e = new XenonException("adaptor","aap");
+        MockScheduler s = new MockScheduler();
+        XenonException e = new XenonException("adaptor", "aap");
         QueueStatus stat = new QueueStatusImplementation(s, "Q", e, tmp);
-        assertEquals(tmp,  stat.getSchedulerSpecificInformation());
+        assertEquals(tmp, stat.getSchedulerSpecificInformation());
     }
 
     @Test
     public void test_hasExeptionTrue() throws Exception {
-        MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
-       XenonException e = new XenonException("adapter","aap");
+        MockScheduler s = new MockScheduler();
+        XenonException e = new XenonException("adapter", "aap");
         QueueStatus stat = new QueueStatusImplementation(s, "Q", e, null);
         assertTrue(stat.hasException());
     }
 
     @Test
     public void test_hasExeptionFalse() throws Exception {
-        MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
+        MockScheduler s = new MockScheduler();
         QueueStatus stat = new QueueStatusImplementation(s, "Q", null, null);
         assertFalse(stat.hasException());
     }
@@ -92,16 +92,13 @@ public class QueueStatusImplementationTest {
     public void test_toString() throws Exception {
         HashMap<String, String> tmp = new HashMap<>();
         tmp.put("key", "value");
-        MockScheduler s = new MockScheduler("ID", "TEST", "MEM", true, true, true, null);
-        XenonException e = new XenonException("adaptor","aap");
+        MockScheduler s = new MockScheduler();
+        XenonException e = new XenonException("adaptor", "aap");
         QueueStatus stat = new QueueStatusImplementation(s, "Q", e, tmp);
 
-        String expected = "QueueStatus [scheduler=" + s + ", queueName=" + "Q" + ", exception=" + e
-                 + ", schedulerSpecificInformation=" + tmp + "]";
+        String expected = "QueueStatus [scheduler=" + s + ", queueName=" + "Q" + ", exception=" + e + ", schedulerSpecificInformation=" + tmp + "]";
 
         assertEquals(expected, stat.toString());
     }
-
-
 
 }

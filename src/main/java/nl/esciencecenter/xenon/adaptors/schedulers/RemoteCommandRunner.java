@@ -90,8 +90,8 @@ public class RemoteCommandRunner {
 
         long runtime = System.currentTimeMillis() - start;
 
-        LOGGER.debug("CommandRunner took {} ms, executable = {}, arguments = {}, exitcode = {}, stdout:\n{}\nstderr:\n{}",
-                runtime, executable, arguments, exitCode, output, error);
+        LOGGER.debug("CommandRunner took {} ms, executable = {}, arguments = {}, exitcode = {}, stdout:\n{}\nstderr:\n{}", runtime, executable, arguments,
+                exitCode, output, error);
     }
 
     public String getStdout() {
@@ -108,6 +108,10 @@ public class RemoteCommandRunner {
 
     public boolean success() {
         return exitCode == 0 && error.isEmpty();
+    }
+
+    public boolean successIgnoreError() {
+        return exitCode == 0;
     }
 
     public String toString() {

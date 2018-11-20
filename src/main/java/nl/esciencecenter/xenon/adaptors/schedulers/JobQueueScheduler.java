@@ -42,9 +42,6 @@ import nl.esciencecenter.xenon.schedulers.QueueStatus;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.Streams;
 
-/**
- *
- */
 public class JobQueueScheduler extends Scheduler {
 
     /**
@@ -145,8 +142,14 @@ public class JobQueueScheduler extends Scheduler {
         }
     }
 
+    @Override
     public String getDefaultQueueName() throws XenonException {
         return SINGLE_QUEUE_NAME;
+    }
+
+    @Override
+    public int getDefaultRuntime() {
+        return 0;
     }
 
     public String[] getJobs(String... queueNames) throws NoSuchQueueException {
@@ -322,7 +325,7 @@ public class JobQueueScheduler extends Scheduler {
 
         int maxTime = description.getMaxRuntime();
 
-        if (maxTime < 0) {
+        if (maxTime < -1) {
             throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);
         }
 

@@ -17,10 +17,15 @@ package nl.esciencecenter.xenon.schedulers;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 
 public class MockDefaultScheduler extends Scheduler {
+
+    public MockDefaultScheduler(String uniqueID, String adaptor, String location, Credential credential, XenonProperties properties) {
+        super(uniqueID, adaptor, location, credential, properties);
+    }
 
     public MockDefaultScheduler(String uniqueID, String adaptor, String location, XenonProperties properties) {
         super(uniqueID, adaptor, location, new DefaultCredential(), properties);
@@ -47,6 +52,11 @@ public class MockDefaultScheduler extends Scheduler {
     public String getDefaultQueueName() throws XenonException {
 
         return null;
+    }
+
+    @Override
+    public int getDefaultRuntime() {
+        return -1;
     }
 
     @Override

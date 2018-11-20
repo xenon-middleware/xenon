@@ -326,6 +326,20 @@ public abstract class Scheduler implements AutoCloseable {
     public abstract String getDefaultQueueName() throws XenonException;
 
     /**
+     * Get the default runtime of a job in minutes.
+     *
+     * If no default runtime is available, <code>-1</code> will be returned. If the default runtime is infinite, <code>0</code> will be returned.
+     *
+     * @return the default runtime of a job in minutes, <code>-1</code> if no default is available, <code>0</code> if the default is infinite.
+     *
+     * @throws NotConnectedException
+     *             If scheduler is closed.
+     * @throws XenonException
+     *             If an I/O error occurred.
+     */
+    public abstract int getDefaultRuntime() throws XenonException;
+
+    /**
      * Get all job identifier of jobs currently in (one ore more) queues.
      *
      * If no queue names are specified, the job identifiers for all queues are returned.

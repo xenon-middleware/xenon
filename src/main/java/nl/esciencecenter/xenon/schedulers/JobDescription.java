@@ -31,8 +31,8 @@ import java.util.Objects;
  */
 public class JobDescription {
 
-    /** The default maximum run time */
-    public static final int DEFAULT_MAX_RUN_TIME_IN_MINUTES = 15;
+    /** The default start time */
+    public static final String DEFAULT_START_TIME = "now";
 
     /** The queue to submit to. */
     private String queueName = null;
@@ -82,11 +82,14 @@ public class JobDescription {
     /** The tempspace needed (in MB) on each node/process. */
     private int tempSpace = -1;
 
-    /** If true, only a single process is started on the first node aquired, instead of nodeCount * processesPerNode. */
+    /** If true, only a single process is started on the first node acquired, instead of nodeCount * processesPerNode. */
     private boolean startSingleProcess = false;
 
     /** The maximum run time in minutes. */
-    private int maxRuntime = DEFAULT_MAX_RUN_TIME_IN_MINUTES;
+    private int maxRuntime = -1;
+
+    /** The requested start time */
+    private String startTime = DEFAULT_START_TIME;
 
     /**
      * Create a JobDescription.
@@ -120,6 +123,7 @@ public class JobDescription {
         tempSpace = original.getTempSpace();
         startSingleProcess = original.isStartSingleProcess();
         maxRuntime = original.getMaxRuntime();
+        startTime = original.getStartTime();
     }
 
     /**
@@ -292,6 +296,27 @@ public class JobDescription {
      */
     public void setMaxRuntime(int minutes) {
         this.maxRuntime = minutes;
+    }
+
+    /**
+     * Get the start time of the job.
+     *
+     * @return the start time of the job.
+     */
+    public String getStartTime() {
+        return startTime;
+    }
+
+    /**
+     * Set the start time of the job.
+     *
+     * Currently supported values are "now", or an explicit time and optional date in the format "HH:mm[ dd.MM[.YYYY]]"
+     *
+     * @param startTime
+     *            the start time of the job.
+     */
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 
     /**

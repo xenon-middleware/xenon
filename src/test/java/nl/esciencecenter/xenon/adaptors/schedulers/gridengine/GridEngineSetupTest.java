@@ -16,11 +16,15 @@
 package nl.esciencecenter.xenon.adaptors.schedulers.gridengine;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -42,22 +46,22 @@ public class GridEngineSetupTest {
     public void test01_getQueueNames() {
         String[] input = new String[] { "small.q", "middle.q", "large.q" };
 
-        GridEngineSetup testSetup = new GridEngineSetup(input, null, null);
+        GridEngineSetup testSetup = new GridEngineSetup(input, null, null, 15);
 
         String[] result = testSetup.getQueueNames();
 
         assertArrayEquals("returned queue names should be equal to input queue names", input, result);
     }
 
-    static GridEngineSetup getGridEngineSetup(ParallelEnvironmentInfo pe) {
+    static GridEngineSetup getGridEngineSetup(ParallelEnvironmentInfo... pes) {
         String[] queueNames = new String[]{"some.q"};
 
         Map<String, QueueInfo> queueInfos = new HashMap<>();
-        queueInfos.put("some.q", new QueueInfo("some.q", 4, pe.getName()));
+        String[] peNames = Arrays.stream(pes).map(ParallelEnvironmentInfo::getName).toArray(String[]::new);
+        queueInfos.put("some.q", new QueueInfo("some.q", 4, peNames));
 
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
-        peInfos.put(pe.getName(), pe);
-        return new GridEngineSetup(queueNames, queueInfos, peInfos);
+        Map<String, ParallelEnvironmentInfo> peInfos = Arrays.stream(pes).collect(Collectors.toMap(ParallelEnvironmentInfo::getName, pe -> pe));
+        return new GridEngineSetup(queueNames, queueInfos, peInfos, 15);
     }
 
     @Test
@@ -118,7 +122,7 @@ public class GridEngineSetupTest {
         Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 4);
         peInfos.put("some.pe", pe);
-        GridEngineSetup setup = new GridEngineSetup(queueNames, queueInfos, peInfos);
+        GridEngineSetup setup = new GridEngineSetup(queueNames, queueInfos, peInfos, 15);
 
         assertFalse(setup.getSingleNodeParallelEnvironment(4, "some.q").isPresent());
     }
@@ -141,7 +145,7 @@ public class GridEngineSetupTest {
         Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 4);
         peInfos.put("some.pe", pe);
-        GridEngineSetup setup = new GridEngineSetup(queueNames, queueInfos, peInfos);
+        GridEngineSetup setup = new GridEngineSetup(queueNames, queueInfos, peInfos, 15);
 
         assertFalse(setup.getSingleNodeParallelEnvironment(4, null).isPresent());
     }
@@ -151,14 +155,39 @@ public class GridEngineSetupTest {
         String[] queueNames = new String[]{"some.q"};
 
         Map<String, QueueInfo> queueInfos = new HashMap<>();
-        queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
+        queueInfos.put("some.q", new QueueInfo("some.q", 4));
 
         Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 4);
         peInfos.put("some.pe", pe);
-        GridEngineSetup setup = new GridEngineSetup(queueNames, queueInfos, peInfos);
+        GridEngineSetup setup = new GridEngineSetup(queueNames, queueInfos, peInfos, 15);
 
         assertTrue(setup.getSingleNodeParallelEnvironment(4, null).isPresent());
+    }
+
+    @Test
+    public void test_getSingleNodeParallelEnvironment_peWithTooFewSlots() {
+        GridEngineSetup setup = getGridEngineSetup(
+            new ParallelEnvironmentInfo("smp", 1, AllocationRule.PE_SLOTS, 0)
+        );
+
+        assertFalse(setup.getSingleNodeParallelEnvironment(24, null).isPresent());
+    }
+
+    @Test
+    public void test_getSingleNodeParallelEnvironment_multiplePEs() {
+        ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 6000, AllocationRule.PE_SLOTS, 0);
+        GridEngineSetup setup = getGridEngineSetup(
+            new ParallelEnvironmentInfo("make", 1, AllocationRule.ROUND_ROBIN, 0),
+            new ParallelEnvironmentInfo("mpi", 250, AllocationRule.ROUND_ROBIN, 0),
+            new ParallelEnvironmentInfo("smp", 1, AllocationRule.PE_SLOTS, 0),
+            pe
+        );
+
+        Optional<ParallelEnvironmentInfo> chosenPe = setup.getSingleNodeParallelEnvironment(24, null);
+
+        assertTrue(chosenPe.isPresent());
+        assertEquals(pe, chosenPe.get());
     }
 
     @Test

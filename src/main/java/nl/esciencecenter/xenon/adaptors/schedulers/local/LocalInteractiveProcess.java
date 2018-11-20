@@ -19,16 +19,13 @@ import static nl.esciencecenter.xenon.adaptors.schedulers.local.LocalSchedulerAd
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+import java.util.concurrent.TimeUnit;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.InteractiveProcess;
 import nl.esciencecenter.xenon.adaptors.schedulers.StreamsImplementation;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.Streams;
-import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 
 /**
  * LocalInteractiveProcess implements a {@link InteractiveProcess} for local interactive processes.
@@ -37,6 +34,9 @@ import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
  * @since 1.0
  */
 class LocalInteractiveProcess implements InteractiveProcess {
+
+    public final static int DEFAULT_TIMEOUT = 1000;
+
     private final Process process;
 
     private int exitCode;
@@ -90,41 +90,59 @@ class LocalInteractiveProcess implements InteractiveProcess {
         return exitCode;
     }
 
+    private boolean destroyProcess(ProcessHandle s, int timeout, TimeUnit unit) {
+
+        if (s.isAlive() && s.destroy()) {
+            try {
+                s.onExit().get(timeout, unit);
+                return true;
+            } catch (Exception e) {
+                // Failed to destroy
+            }
+        }
+
+        if (s.isAlive() && s.destroyForcibly()) {
+            try {
+                s.onExit().get(timeout, unit);
+                return true;
+            } catch (Exception e) {
+                // Failed to destroy
+            }
+        }
+
+        return !s.isAlive();
+    }
+
     /**
-     * Destroy (stop) process. Does nothing if the process has already finished. Does not re-evaluate whether process has finished. Will run the kill command on
-     * Unix, and Process.destroy() if that does not work or does not apply.
+     * Destroy (stop) process. Does nothing if the process has already finished. Will try a destroy first, followed by a destroyForcibly if the process has not
+     * terminated after the given timeout. All subprocessed that can be found will also be destroyed.
+     * 
+     * @param timeout
+     *            the timeout for each destroy and destroyForcibly operation.
+     * @param unit
+     *            the unit of the timeout.
      */
-    public void destroy() {
+    public void destroy(int timeout, TimeUnit unit) {
+
         if (done) {
             return;
         }
 
-        boolean success = false;
+        // Try to kill the process and all its children.
+        ProcessHandle h = process.toHandle();
 
-        if (!LocalFileSystemUtils.isWindows()) {
-            try {
-                final Field pidField = process.getClass().getDeclaredField("pid");
+        destroyProcess(h, timeout, unit);
 
-                AccessController.doPrivileged(new PrivilegedAction<Object>() {
-                    public Object run() {
-                        pidField.setAccessible(true);
-                        return null;
-                    }
-                });
+        h.descendants().forEach(s -> {
+            destroyProcess(s, timeout, TimeUnit.MILLISECONDS);
+        });
+    }
 
-                int pid = pidField.getInt(process);
-
-                if (pid > 0) {
-                    CommandRunner killRunner = new CommandRunner("kill", "-9", "" + pid);
-                    success = (killRunner.getExitCode() == 0);
-                }
-            } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException | XenonException e) {
-                // Failed, so use the regular Java destroy.
-            }
-        }
-
-        if (!success) {
-            process.destroy();
-        }
+    /**
+     * Destroy (stop) process. Does nothing if the process has already finished. Will try a destroy first, followed by a destroyForcibly if the process has not
+     * terminated after 1 second. All subprocessed that can be found will also be destroyed.
+     */
+    public void destroy() {
+        destroy(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
 }

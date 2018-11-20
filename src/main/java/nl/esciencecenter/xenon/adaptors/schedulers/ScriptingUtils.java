@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -22,15 +24,17 @@ import java.util.Map;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.IncompleteJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 
 public class ScriptingUtils {
 
-    private ScriptingUtils() {
-        throw new IllegalStateException("Utility class");
+    public ScriptingUtils() {
+        // empty as this is a utility class
     }
 
     public static boolean isLocal(String location) {
@@ -69,10 +73,112 @@ public class ScriptingUtils {
     }
 
     /**
+     * Verify a String containing a start time.
+     *
+     * Currently supported values are "now", or an explicit time and date in the format "HH:mm[ dd.MM[.YYYY]]"
+     *
+     * @param startTime
+     *            the start time to parse
+     * @param adaptorName
+     *            the name of the calling adaptor (used in exceptions).
+     * @throws XenonException
+     *             if the startTime does not have an accepted format
+     */
+    public static void verifyStartTime(String startTime, String adaptorName) throws XenonException {
+
+        if (startTime == null || startTime.isEmpty()) {
+            throw new XenonException(adaptorName, "Start time must not be null or empty!");
+        }
+
+        if (startTime.equals("now")) {
+            return;
+        }
+
+        try {
+            // If the parsing succeeds, we fall through and return.
+            if (startTime.length() == 16) {
+                new SimpleDateFormat("HH:mm dd.MM.yyyy").parse(startTime);
+            } else if (startTime.length() == 11) {
+                new SimpleDateFormat("HH:mm dd.MM").parse(startTime);
+            } else if (startTime.length() == 5) {
+                new SimpleDateFormat("HH:mm").parse(startTime);
+            } else {
+                throw new XenonException(adaptorName, "Failed to parse start time: " + startTime);
+            }
+        } catch (ParseException e) {
+            throw new XenonException(adaptorName, "Failed to parse start time: " + startTime, e);
+        }
+    }
+
+    /**
+     * Retrieve a working directory from a <code>JobDescription</code> and, if necessary, resolve it against a current working directory.
+     *
+     * This method retrieves the working directory from a <code>JobDescription</code>. If it is not specified, the <code>currentWorkingDir</code> will be
+     * returned. If it is specified and an absolute path, it will be returned directly. Otherwise, it will first be resolved against the provided
+     * <code>currentWorkingDir</code> and the resulting path will be returned.
+     *
+     * @param description
+     *            the JobDescription containing the workingDirectory
+     * @param currentWorkingDir
+     *            the current working directory of the adaptor. Must not be null.
+     * @return the retrieved (and possibly resolved) working directory.
+     */
+    public static String getWorkingDirPath(JobDescription description, Path currentWorkingDir) {
+
+        if (currentWorkingDir == null) {
+            throw new IllegalArgumentException("Current working directory may not be null");
+        }
+
+        String dir = description.getWorkingDirectory();
+
+        if (dir == null || dir.trim().isEmpty()) {
+            // return the current working directory
+            return currentWorkingDir.toString();
+        } else if (dir.startsWith("/")) {
+            // return the absolute directory specified by the user
+            return dir;
+        } else {
+            // make the relative directory absolute
+            return currentWorkingDir.resolve(dir).toString();
+        }
+    }
+
+    /**
+     * Check if the given <code>queueName</code> is presents in <code>queueNames</code>.
+     *
+     * If <code>queueName</code> is <code>null</code> or <code>queueName</code> is present in <code>queueNames</code> this method will return. Otherwise it will
+     * throw a <code>NoSuchQueueException</code>.
+     *
+     * @param queueNames
+     *            the names of the available queues.
+     * @param queueName
+     *            the queueName to check.
+     * @param adaptorName
+     *            the name of the calling adaptor (used in exceptions).
+     * @throws NoSuchQueueException
+     *             if workingDirectory does not exist, or an error occurred.
+     */
+    public static void checkQueue(String[] queueNames, String queueName, String adaptorName) throws NoSuchQueueException {
+        if (queueName == null || queueNames == null || queueName.length() == 0) {
+            return;
+        }
+
+        for (String q : queueNames) {
+            if (queueName.equals(q)) {
+                return;
+            }
+        }
+
+        throw new NoSuchQueueException(adaptorName, "Queue does not exist: " + queueName);
+    }
+
+    /**
      * Do some checks on a job description.
      *
      * @param description
      *            the job description to check
+     * @param queueNames
+     *            the names of the available queues.
      * @param adaptorName
      *            the name of the adaptor. Used when an exception is thrown
      * @throws IncompleteJobDescriptionException
@@ -80,7 +186,7 @@ public class ScriptingUtils {
      * @throws InvalidJobDescriptionException
      *             if the description contains illegal values.
      */
-    public static void verifyJobDescription(JobDescription description, String adaptorName) throws XenonException {
+    public static void verifyJobDescription(JobDescription description, String[] queueNames, String adaptorName) throws XenonException {
         String executable = description.getExecutable();
 
         if (executable == null) {
@@ -99,11 +205,16 @@ public class ScriptingUtils {
             throw new InvalidJobDescriptionException(adaptorName, "Illegal processes per node count: " + processesPerNode);
         }
 
+        // Check if the time is set to -1 (default), 0 (infinite), or a value.
         int maxTime = description.getMaxRuntime();
 
-        if (maxTime <= 0) {
+        if (maxTime < -1) {
             throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);
         }
+
+        checkQueue(queueNames, description.getQueueName(), adaptorName);
+
+        verifyStartTime(description.getStartTime(), adaptorName);
     }
 
     public static void verifyJobOptions(Map<String, String> options, String[] validOptions, String adaptorName) throws InvalidJobDescriptionException {
@@ -163,4 +274,73 @@ public class ScriptingUtils {
         }
     }
 
+    /**
+     * Concatinate a series of <code>String</code>s using a <code>StringBuilder</code>.
+     *
+     * @param strings
+     *            Strings to concatinate. Any Strings that are <code>null</code> will be ignored.
+     *
+     * @return the concatination of the provided strings, or the empty string is no strings where provided.
+     */
+    public static String concat(String... strings) {
+
+        if (strings == null || strings.length == 0) {
+            return "";
+        }
+
+        StringBuilder b = new StringBuilder("");
+
+        for (String s : strings) {
+            if (s != null && !s.isEmpty()) {
+                b.append(s);
+            }
+        }
+
+        return b.toString();
+    }
+
+    /**
+     * Create a single comma separated string out of a list of strings. Will ignore null values
+     *
+     * @param values
+     *            an array of values.
+     * @return the given values as a single comma separated list (no spaces between elements, no trailing comma)
+     */
+    public static String asCSList(String[] values) {
+        String result = null;
+        for (String value : values) {
+            if (value != null) {
+                if (result == null) {
+                    result = value;
+                } else {
+                    result = concat(result, ",", value);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Escapes and quotes command line arguments to keep shells from expanding/interpreting them.
+     *
+     * @param argument
+     *            the argument to protect.
+     * @return an argument with quotes, and escaped characters where needed.
+     */
+    public static String protectAgainstShellMetas(String argument) {
+        char[] chars = argument.toCharArray();
+        StringBuilder b = new StringBuilder(chars.length + 10);
+        b.append('\'');
+        for (char c : chars) {
+            if (c == '\'') {
+                b.append('\'');
+                b.append('\\');
+                b.append('\'');
+            }
+            b.append(c);
+        }
+        b.append('\'');
+        return b.toString();
+    }
 }

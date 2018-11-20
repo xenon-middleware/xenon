@@ -35,6 +35,7 @@ import org.junit.runners.MethodSorters;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
@@ -48,7 +49,9 @@ public class GridEngineUtilsTest {
     public void test01a_generate_EmptyDescription_Result() throws XenonException {
         JobDescription description = new JobDescription();
 
-        String result = GridEngineUtils.generate(description, null, null);
+        GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
+
+        String result = GridEngineUtils.generate(description, null, setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -o /dev/null\n" + "#$ -e /dev/null\n" + "\n"
                 + "null\n";
@@ -62,7 +65,9 @@ public class GridEngineUtilsTest {
 
         description.setName("test");
 
-        String result = GridEngineUtils.generate(description, null, null);
+        GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
+
+        String result = GridEngineUtils.generate(description, null, setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N test\n" + "#$ -l h_rt=00:15:00\n" + "#$ -o /dev/null\n" + "#$ -e /dev/null\n" + "\n"
                 + "null\n";
@@ -75,8 +80,9 @@ public class GridEngineUtilsTest {
         JobDescription description = new JobDescription();
 
         description.setName("");
+        GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
 
-        String result = GridEngineUtils.generate(description, null, null);
+        String result = GridEngineUtils.generate(description, null, setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -o /dev/null\n" + "#$ -e /dev/null\n" + "\n"
                 + "null\n";
@@ -90,7 +96,9 @@ public class GridEngineUtilsTest {
 
         description.setMaxMemory(1024);
 
-        String result = GridEngineUtils.generate(description, null, null);
+        GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
+
+        String result = GridEngineUtils.generate(description, null, setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -l mem_free=1024M,h_vmem=1024M\n"
                 + "#$ -o /dev/null\n" + "#$ -e /dev/null\n" + "\n" + "null\n";
@@ -104,7 +112,9 @@ public class GridEngineUtilsTest {
 
         description.setSchedulerArguments("-l gpu=1");
 
-        String result = GridEngineUtils.generate(description, null, null);
+        GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
+
+        String result = GridEngineUtils.generate(description, null, setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -l gpu=1\n" + "#$ -o /dev/null\n"
                 + "#$ -e /dev/null\n" + "\n" + "null\n";
@@ -133,7 +143,9 @@ public class GridEngineUtilsTest {
         description.setStdout("stdout.file");
         description.setWorkingDirectory("/some/working/directory");
 
-        String result = GridEngineUtils.generate(description, null, null);
+        GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
+
+        String result = GridEngineUtils.generate(description, new Path("/test"), setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n" + "#$ -q the.queue\n"
                 + "#$ -l h_rt=01:40:00\n" + "#$ -l list-of-resources\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n"
@@ -164,7 +176,7 @@ public class GridEngineUtilsTest {
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.INTEGER, 10);
         GridEngineSetup setup = getGridEngineSetup(pe);
 
-        String result = GridEngineUtils.generate(description, null, setup);
+        String result = GridEngineUtils.generate(description, new Path(), setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n" + "#$ -q some.q\n"
                 + "#$ -pe some.pe 40\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"
@@ -207,7 +219,7 @@ public class GridEngineUtilsTest {
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.INTEGER, 10);
         GridEngineSetup setup = getGridEngineSetup(pe);
 
-        String result = GridEngineUtils.generate(description, null, setup);
+        String result = GridEngineUtils.generate(description, new Path(), setup);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n" + "#$ -q some.q\n"
             + "#$ -pe some.pe 10\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"
@@ -223,7 +235,8 @@ public class GridEngineUtilsTest {
 
         String expected = "#$ -pe some.pe 5\n";
 
-        String script = GridEngineUtils.generate(description, null, null);
+        GridEngineSetup setup = getGridEngineSetup();
+        String script = GridEngineUtils.generate(description, new Path(), setup);
 
         assertThat(script, containsString(expected));
     }
@@ -252,7 +265,6 @@ public class GridEngineUtilsTest {
 
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.FILL_UP, 0);
         GridEngineSetup setup = getGridEngineSetup(pe);
-
         GridEngineUtils.generate(description, null, setup);
     }
 
@@ -302,7 +314,7 @@ public class GridEngineUtilsTest {
         description.setMaxRuntime(1);
         // GridEngine specific info
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test
@@ -317,7 +329,7 @@ public class GridEngineUtilsTest {
         // GridEngine specific info
         description.addJobOption(GridEngineUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test
@@ -334,7 +346,7 @@ public class GridEngineUtilsTest {
         description.setMaxRuntime(0);
         // GridEngine specific info
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -344,7 +356,7 @@ public class GridEngineUtilsTest {
         // set a job option
         description.addJobOption("wrong.setting", "wrong.value");
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -355,7 +367,7 @@ public class GridEngineUtilsTest {
         description.setExecutable("bin/bla");
         description.setMaxRuntime(0);
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test
@@ -369,7 +381,7 @@ public class GridEngineUtilsTest {
         description.setMaxRuntime(1);
         description.setQueueName("some.queue");
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test()
@@ -379,7 +391,7 @@ public class GridEngineUtilsTest {
         description.setExecutable("/bin/nothing");
         description.setStartSingleProcess(true);
 
-        GridEngineUtils.verifyJobDescription(description);
+        GridEngineUtils.verifyJobDescription(description, null);
     }
 
     @Test
@@ -596,4 +608,43 @@ public class GridEngineUtilsTest {
         GridEngineUtils.getJobStatusFromQstatInfo(input, jobID);
     }
 
+    @Test
+    public void test_substituteJobID_null() throws XenonException {
+
+        String result = GridEngineUtils.substituteJobID(null);
+
+        assertNull(result);
+    }
+
+    @Test
+    public void test_substituteJobID_noReplace() throws XenonException {
+
+        String path = "/test/test/file";
+
+        String result = GridEngineUtils.substituteJobID(path);
+
+        assertEquals(result, path);
+    }
+
+    @Test
+    public void test_substituteJobID_replaceOne() throws XenonException {
+
+        String path = "/test/test/file%j";
+        String expected = "/test/test/file$JOB_ID";
+
+        String result = GridEngineUtils.substituteJobID(path);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_substituteJobID_replaceTwo() throws XenonException {
+
+        String path = "/test/test%j/file%j";
+        String expected = "/test/test$JOB_ID/file$JOB_ID";
+
+        String result = GridEngineUtils.substituteJobID(path);
+
+        assertEquals(expected, result);
+    }
 }

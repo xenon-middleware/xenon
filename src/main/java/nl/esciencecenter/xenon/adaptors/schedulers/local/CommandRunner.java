@@ -19,12 +19,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.utils.InputWriter;
 import nl.esciencecenter.xenon.utils.OutputReader;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Runs a command. Constructor waits for command to finish.
@@ -88,11 +88,10 @@ public class CommandRunner {
         try {
             p = builder.start();
         } catch (IOException e) {
-            throw new CommandNotFoundException(getClass().getName(), "CommandRunner cannot run command "
-                    + Arrays.toString(command), e);
+            throw new CommandNotFoundException(getClass().getName(), "CommandRunner cannot run command " + Arrays.toString(command), e);
         }
 
-        //write given content to stdin of process
+        // write given content to stdin of process
         new InputWriter((stdin == null ? "" : stdin), p.getOutputStream());
 
         // we must always read the output and error streams to avoid deadlocks

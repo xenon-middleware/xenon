@@ -45,6 +45,7 @@ public class PathTest {
         assertFalse(path.isAbsolute());
     }
 
+    @Test
     public void testStartsWith_Absolute_True() {
         Path path = new Path("/aap/noot");
         assertTrue(path.startsWith("/aap"));
@@ -80,6 +81,12 @@ public class PathTest {
         assertEquals(path.toString(), "" + path.getSeparator());
     }
 
+    @Test
+    public void testToRelativePath() {
+        Path path = new Path("/bla").toRelativePath();
+        assertEquals("bla", path.toString());
+    }
+
     // @Test
     // public void testRelativePath2a() {
     // Path path = new Path(new Path[0]);
@@ -101,6 +108,12 @@ public class PathTest {
     @Test(expected = IllegalArgumentException.class)
     public void test_path_withEmptyFails() {
         String[] tmp = new String[] { "aap", "", "noot" };
+        new Path(true, tmp);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_path_withSeparatorFails() {
+        String[] tmp = new String[] { "aap", "bla", "noot/aap" };
         new Path(true, tmp);
     }
 
@@ -215,6 +228,12 @@ public class PathTest {
         String[] strings = new String[] { "mydir", "myfile" };
         Path path = new Path('@', true, strings);
         assertEquals(path.toString(), "@mydir@myfile");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testPathWithSeparatorInElt() {
+        String[] strings = new String[] { "mydir", "/myfile" };
+        new Path('/', true, strings);
     }
 
     @Test

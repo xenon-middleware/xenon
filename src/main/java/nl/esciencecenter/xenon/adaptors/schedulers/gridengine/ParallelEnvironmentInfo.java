@@ -124,12 +124,14 @@ class ParallelEnvironmentInfo {
      * @return True if pe can
      */
     boolean canAllocateSingleNode(int coresPerNode) {
-        return (
-            allocationRule == AllocationRule.PE_SLOTS
-            // TODO check if hosts (of queue) have that many slots
+
+        boolean validAllocationRule = ( 
+             allocationRule == AllocationRule.PE_SLOTS // TODO check if hosts (of queue) have that many slots
         ) || (
             allocationRule == AllocationRule.INTEGER && ppn >= coresPerNode
-        ) && coresPerNode <= slots;
+        );
+        boolean validSlots = slots >= coresPerNode;
+        return validAllocationRule && validSlots;
     }
 
     /**
@@ -140,8 +142,8 @@ class ParallelEnvironmentInfo {
      * @return True if pe can
      */
     boolean canAllocateMultiNode(int coresPerNode, int nodes) {
-        return (
-            allocationRule == AllocationRule.INTEGER && ppn == coresPerNode && coresPerNode * nodes <= slots
-        );
+        boolean validAllocationRule = allocationRule == AllocationRule.INTEGER && ppn == coresPerNode;
+        boolean validSlots = slots >= coresPerNode * nodes;
+        return validAllocationRule && validSlots;
     }
 }

@@ -20,6 +20,8 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.XenonProperties;
+import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
@@ -38,6 +40,10 @@ public class MockScheduler extends Scheduler {
     private boolean shouldFail;
     private String toStderr;
     private int exitCode;
+
+    protected MockScheduler(String uniqueID, String adaptor, String location, Credential credential, XenonProperties properties) {
+        super(uniqueID, adaptor, location, credential, properties);
+    }
 
     protected MockScheduler(boolean shouldFail, String toStderr, int exitCode) {
         super("TEST0", "TEST", "location", new DefaultCredential(), null);
@@ -63,6 +69,11 @@ public class MockScheduler extends Scheduler {
     @Override
     public String getDefaultQueueName() throws XenonException {
         return "unlimited";
+    }
+
+    @Override
+    public int getDefaultRuntime() {
+        return 0;
     }
 
     @Override

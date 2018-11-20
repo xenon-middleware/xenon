@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
@@ -82,7 +81,7 @@ public final class SlurmUtils {
                 if (result == null) {
                     result = job;
                 } else {
-                    result = CommandLineUtils.concat(result, ",", job);
+                    result = ScriptingUtils.concat(result, ",", job);
                 }
             }
         }
@@ -303,7 +302,7 @@ public final class SlurmUtils {
         return false;
     }
 
-    protected static void verifyJobDescription(JobDescription description, boolean interactive) throws XenonException {
+    protected static void verifyJobDescription(JobDescription description, String[] queueNames, boolean interactive) throws XenonException {
         ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
 
         if (interactive) {
@@ -334,28 +333,20 @@ public final class SlurmUtils {
 
         // check for option that overrides job script completely.
         if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
-            // no other settings checked.
+            ScriptingUtils.checkQueue(queueNames, description.getQueueName(), ADAPTOR_NAME);
             return;
         }
 
         // Perform standard checks.
-        ScriptingUtils.verifyJobDescription(description, ADAPTOR_NAME);
-    }
+        ScriptingUtils.verifyJobDescription(description, queueNames, ADAPTOR_NAME);
 
-    private static String getWorkingDirPath(JobDescription description, Path fsEntryPath) {
-        String path;
-        if (description.getWorkingDirectory().startsWith("/")) {
-            path = description.getWorkingDirectory();
-        } else {
-            // make relative path absolute
-            Path workingDirectory = fsEntryPath.resolve(description.getWorkingDirectory());
-            path = workingDirectory.toString();
+        // Check is the maxTime is set
+        if (description.getMaxRuntime() == 0) {
+            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Illegal maximum runtime: 0");
         }
-
-        return path;
     }
 
-    public static String[] generateInteractiveArguments(JobDescription description, Path fsEntryPath, UUID tag) {
+    public static String[] generateInteractiveArguments(JobDescription description, Path fsEntryPath, UUID tag, int defaultRuntime) {
         ArrayList<String> arguments = new ArrayList<>();
 
         // suppress printing of status messages
@@ -366,7 +357,7 @@ public final class SlurmUtils {
 
         // set working directory
         if (description.getWorkingDirectory() != null) {
-            String path = getWorkingDirPath(description, fsEntryPath);
+            String path = ScriptingUtils.getWorkingDirPath(description, fsEntryPath);
             arguments.add("--chdir=" + path);
         }
 
@@ -394,8 +385,15 @@ public final class SlurmUtils {
             arguments.add("--tmp=" + description.getTempSpace() + "M");
         }
 
+        // add maximum runtime in hour:minute:second format (converted from minutes in description)
+        int runtime = description.getMaxRuntime();
+
+        if (runtime == -1) {
+            runtime = defaultRuntime;
+        }
+
         // add maximum runtime
-        arguments.add("--time=" + description.getMaxRuntime());
+        arguments.add("--time=" + runtime);
 
         arguments.add(description.getExecutable());
         arguments.addAll(description.getArguments());
@@ -403,7 +401,7 @@ public final class SlurmUtils {
         return arguments.toArray(new String[arguments.size()]);
     }
 
-    public static String generate(JobDescription description, Path fsEntryPath) {
+    public static String generate(JobDescription description, Path fsEntryPath, int defaultRuntime) {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
@@ -420,7 +418,7 @@ public final class SlurmUtils {
 
         // set working directory
         if (description.getWorkingDirectory() != null) {
-            String path = getWorkingDirPath(description, fsEntryPath);
+            String path = ScriptingUtils.getWorkingDirPath(description, fsEntryPath);
             script.format("#SBATCH --workdir='%s'\n", path);
         }
 
@@ -439,8 +437,15 @@ public final class SlurmUtils {
             script.format("#SBATCH --cpus-per-task=%d\n", description.getThreadsPerProcess());
         }
 
+        // add maximum runtime in hour:minute:second format (converted from minutes in description)
+        int runtime = description.getMaxRuntime();
+
+        if (runtime == -1) {
+            runtime = defaultRuntime;
+        }
+
         // add maximum runtime
-        script.format("#SBATCH --time=%d\n", description.getMaxRuntime());
+        script.format("#SBATCH --time=%d\n", runtime);
 
         // the max amount of memory per node.
         if (description.getMaxMemory() > 0) {
@@ -458,12 +463,14 @@ public final class SlurmUtils {
         if (description.getStdout() == null) {
             script.format("#SBATCH --output=/dev/null\n");
         } else {
+            // NOTE: SLURM directly accepts the %j when the JOB_ID needs to be inserted.
             script.format("#SBATCH --output='%s'\n", description.getStdout());
         }
 
         if (description.getStderr() == null) {
             script.format("%s\n", "#SBATCH --error=/dev/null");
         } else {
+            // NOTE: SLURM directly accepts the %j when the JOB_ID needs to be inserted.
             script.format("#SBATCH --error='%s'\n", description.getStderr());
         }
 
@@ -485,7 +492,7 @@ public final class SlurmUtils {
         script.format("%s", description.getExecutable());
 
         for (String argument : description.getArguments()) {
-            script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
+            script.format(" %s", ScriptingUtils.protectAgainstShellMetas(argument));
         }
         script.format("\n");
 

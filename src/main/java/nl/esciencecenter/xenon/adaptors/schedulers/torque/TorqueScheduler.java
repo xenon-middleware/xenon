@@ -26,11 +26,8 @@ import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueUtils.ver
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 
@@ -41,6 +38,7 @@ import nl.esciencecenter.xenon.UnsupportedOperationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.adaptors.schedulers.JobSeenMap;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
@@ -63,18 +61,9 @@ public class TorqueScheduler extends ScriptingScheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TorqueScheduler.class);
 
-    private final long accountingGraceTime;
-
-    /**
-     * Map with the last seen time of jobs. There is a delay between jobs disappearing from the qstat queue output. Instead of throwing an exception, we allow
-     * for a certain grace time. Jobs will report the status "pending" during this time. Typical delays are in the order of seconds.
-     */
-    private final Map<String, Long> lastSeenMap;
-
-    // list of jobs we have killed before they even started. These will not end up in qstat, so we keep them here.
-    private final Set<String> deletedJobs;
-
     private final TorqueXmlParser parser;
+
+    private final JobSeenMap jobsSeenMap;
 
     private final String[] queueNames;
 
@@ -82,13 +71,11 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         super(uniqueID, ADAPTOR_NAME, location, credential, prop, valid, POLL_DELAY_PROPERTY);
 
-        accountingGraceTime = properties.getLongProperty(ACCOUNTING_GRACE_TIME_PROPERTY);
+        long accountingGraceTime = properties.getLongProperty(ACCOUNTING_GRACE_TIME_PROPERTY);
+
+        jobsSeenMap = new JobSeenMap(accountingGraceTime);
 
         parser = new TorqueXmlParser();
-
-        lastSeenMap = new HashMap<>(30);
-        deletedJobs = new HashSet<>(10);
-
         queueNames = queryQueueNames();
     }
 
@@ -108,49 +95,9 @@ public class TorqueScheduler extends ScriptingScheduler {
         return null;
     }
 
-    private synchronized void updateJobsSeenMap(Set<String> identifiers) {
-        long currentTime = System.currentTimeMillis();
-
-        for (String identifier : identifiers) {
-            lastSeenMap.put(identifier, currentTime);
-        }
-
-        long expiredTime = currentTime + accountingGraceTime;
-
-        Iterator<Entry<String, Long>> iterator = lastSeenMap.entrySet().iterator();
-
-        while (iterator.hasNext()) {
-            Entry<String, Long> entry = iterator.next();
-
-            if (entry.getValue() > expiredTime) {
-                iterator.remove();
-            }
-        }
-
-    }
-
-    private synchronized boolean haveRecentlySeen(String identifier) {
-        if (!lastSeenMap.containsKey(identifier)) {
-            return false;
-        }
-
-        return (lastSeenMap.get(identifier) + accountingGraceTime) > System.currentTimeMillis();
-    }
-
-    private synchronized void addDeletedJob(String jobIdentifier) {
-        deletedJobs.add(jobIdentifier);
-    }
-
-    /*
-     * Note: Works exactly once per job.
-     */
-    private synchronized boolean jobWasDeleted(String jobIdentifier) {
-        return deletedJobs.remove(jobIdentifier);
-    }
-
     private void jobsFromStatus(String statusOutput, List<String> result) throws XenonException {
         Map<String, Map<String, String>> status = parser.parseJobInfos(statusOutput);
-        updateJobsSeenMap(status.keySet());
+        jobsSeenMap.updateRecentlySeen(status.keySet());
         result.addAll(status.keySet());
     }
 
@@ -285,16 +232,14 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         Path workdir = getWorkingDirectory();
 
-        verifyJobDescription(description);
-
-        checkQueue(queueNames, description.getQueueName());
+        verifyJobDescription(description, queueNames);
 
         // check for option that overrides job script completely.
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
 
         if (customScriptFile == null) {
             checkWorkingDirectory(description.getWorkingDirectory());
-            String jobScript = TorqueUtils.generate(description, workdir);
+            String jobScript = TorqueUtils.generate(description, workdir, getDefaultRuntime());
 
             output = runCheckedCommand(jobScript, "qsub");
         } else {
@@ -311,7 +256,7 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         String identifier = ScriptingParser.parseJobIDFromLine(output, ADAPTOR_NAME, "");
 
-        updateJobsSeenMap(Collections.singleton(identifier));
+        jobsSeenMap.updateRecentlySeen(Collections.singleton(identifier));
 
         if (!description.getJobOptions().containsKey(JOB_OPTION_JOB_SCRIPT)) {
             String[] idParts = identifier.split("\\.");
@@ -340,7 +285,7 @@ public class TorqueScheduler extends ScriptingScheduler {
         RemoteCommandRunner runner = runCommand(null, "qdel", jobIdentifier);
         if (runner.success()) {
             // deleted or already finished
-            addDeletedJob(jobIdentifier);
+            jobsSeenMap.addDeletedJob(jobIdentifier);
         } else if (runner.getExitCode() == 170) {
             // job was already finished.
         } else {
@@ -362,7 +307,7 @@ public class TorqueScheduler extends ScriptingScheduler {
         Map<String, Map<String, String>> result = parser.parseJobInfos(runner.getStdout());
 
         // mark jobs we found as seen, in case they disappear from the queue
-        updateJobsSeenMap(result.keySet());
+        jobsSeenMap.updateRecentlySeen(result.keySet());
 
         return result;
     }
@@ -392,13 +337,13 @@ public class TorqueScheduler extends ScriptingScheduler {
         }
 
         if (status == null) {
-            if (jobWasDeleted(job)) {
+            if (jobsSeenMap.jobWasDeleted(job)) {
                 XenonException exception = new JobCanceledException(ADAPTOR_NAME, "Job " + job + " deleted by user");
                 status = new JobStatusImplementation(job, null, "killed", null, exception, false, true, null);
-            } else if (haveRecentlySeen(job)) {
+            } else if (jobsSeenMap.haveRecentlySeen(job)) {
                 status = new JobStatusImplementation(job, null, "unknown", null, null, false, true, new HashMap<String, String>(0));
             }
-        } else if (status.isDone() && jobWasDeleted(job)) {
+        } else if (status.isDone() && jobsSeenMap.jobWasDeleted(job)) {
             XenonException exception = new JobCanceledException(ADAPTOR_NAME, "Job " + job + " deleted by user");
             status = new JobStatusImplementation(job, null, "killed", status.getExitCode(), exception, false, true, status.getSchedulerSpecificInformation());
         }

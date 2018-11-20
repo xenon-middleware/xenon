@@ -29,8 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
+import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 
 /**
@@ -46,6 +47,8 @@ public class GridEngineSetup {
     private final Map<String, QueueInfo> queues;
 
     private final Map<String, ParallelEnvironmentInfo> parallelEnvironments;
+
+    private final int defaultRuntime;
 
     /**
      * generate arguments to list details of all parallel environments given
@@ -69,12 +72,10 @@ public class GridEngineSetup {
         return ScriptingParser.parseList(queueListOutput);
     }
 
-    private static Map<String, QueueInfo> getQueues(String[] queueNames, GridEngineScheduler scheduler)
-            throws XenonException {
-        String output = scheduler.runCheckedCommand(null, "qconf", "-sq", CommandLineUtils.asCSList(queueNames));
+    private static Map<String, QueueInfo> getQueues(String[] queueNames, GridEngineScheduler scheduler) throws XenonException {
+        String output = scheduler.runCheckedCommand(null, "qconf", "-sq", ScriptingUtils.asCSList(queueNames));
 
-        Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(output, "qname",
-                ScriptingParser.WHITESPACE_REGEX, ADAPTOR_NAME);
+        Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(output, "qname", ScriptingParser.WHITESPACE_REGEX, ADAPTOR_NAME);
 
         Map<String, QueueInfo> result = new HashMap<>();
 
@@ -93,32 +94,31 @@ public class GridEngineSetup {
 
         this.parallelEnvironments = getParallelEnvironments(scheduler);
 
+        this.defaultRuntime = scheduler.getDefaultRuntime();
+
         LOGGER.debug("Created setup info, queues = {}, parallel environments = {}", this.queues, this.parallelEnvironments);
     }
 
-    private static Map<String, ParallelEnvironmentInfo> getParallelEnvironments(GridEngineScheduler scheduler)
-            throws XenonException {
-        //first retrieve a list of parallel environments
+    private static Map<String, ParallelEnvironmentInfo> getParallelEnvironments(GridEngineScheduler scheduler) throws XenonException {
+        // first retrieve a list of parallel environments
         RemoteCommandRunner runner = scheduler.runCommand(null, "qconf", "-spl");
 
-        //qconf returns an error if there are no parallel environments
+        // qconf returns an error if there are no parallel environments
         if (runner.getExitCode() == 1 && runner.getStderr().contains("no parallel environment defined")) {
             return new HashMap<>();
         }
 
         if (!runner.success()) {
-            throw new XenonException(ADAPTOR_NAME, "Could not get parallel environment info from scheduler: "
-                    + runner);
+            throw new XenonException(ADAPTOR_NAME, "Could not get parallel environment info from scheduler: " + runner);
         }
 
         String[] parallelEnvironmentNames = ScriptingParser.parseList(runner.getStdout());
 
-        //then get the details of each parallel environment
-        String peDetailsOutput = scheduler.runCheckedCommand(null, "qconf",
-                qconfPeDetailsArguments(parallelEnvironmentNames));
+        // then get the details of each parallel environment
+        String peDetailsOutput = scheduler.runCheckedCommand(null, "qconf", qconfPeDetailsArguments(parallelEnvironmentNames));
 
-        Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(peDetailsOutput, "pe_name",
-                ScriptingParser.WHITESPACE_REGEX, ADAPTOR_NAME);
+        Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(peDetailsOutput, "pe_name", ScriptingParser.WHITESPACE_REGEX,
+                ADAPTOR_NAME);
 
         Map<String, ParallelEnvironmentInfo> result = new HashMap<>();
 
@@ -138,15 +138,22 @@ public class GridEngineSetup {
      *            queues to use.
      * @param parallelEnvironments
      *            parallel environments to use.
+     * @param defaultRuntime
+     *            the default runtime to use.
      */
-    GridEngineSetup(String[] queueNames, Map<String, QueueInfo> queues, Map<String, ParallelEnvironmentInfo> parallelEnvironments) {
+    GridEngineSetup(String[] queueNames, Map<String, QueueInfo> queues, Map<String, ParallelEnvironmentInfo> parallelEnvironments, int defaultRuntime) {
         this.queueNames = queueNames.clone();
         this.queues = queues;
         this.parallelEnvironments = parallelEnvironments;
+        this.defaultRuntime = defaultRuntime;
     }
 
     public String[] getQueueNames() {
         return queueNames.clone();
+    }
+
+    public int getDefaultRuntime() {
+        return defaultRuntime;
     }
 
     /**
@@ -172,7 +179,9 @@ public class GridEngineSetup {
             Set<String> pesOfQueue = new HashSet<>(Arrays.asList(queue.getParallelEnvironments()));
             stream = stream.filter(pe -> pesOfQueue.contains(pe.getName()));
         }
-        return stream.findFirst();
+        Optional<ParallelEnvironmentInfo> r = stream.findFirst();
+        LOGGER.debug("Gridengine choose to use following pe: " + r.toString());
+        return r;
     }
 
     /**

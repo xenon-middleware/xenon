@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
 import nl.esciencecenter.xenon.filesystems.Path;
@@ -55,7 +54,7 @@ final class TorqueUtils {
         throw new IllegalStateException("Utility class");
     }
 
-    public static void verifyJobDescription(JobDescription description) throws XenonException {
+    public static void verifyJobDescription(JobDescription description, String[] queueNames) throws XenonException {
         ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
 
         // check for option that overrides job script completely.
@@ -69,7 +68,12 @@ final class TorqueUtils {
         }
 
         // perform standard checks.
-        ScriptingUtils.verifyJobDescription(description, ADAPTOR_NAME);
+        ScriptingUtils.verifyJobDescription(description, queueNames, ADAPTOR_NAME);
+
+        // Check is the maxTime is set
+        if (description.getMaxRuntime() == 0) {
+            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Illegal maximum runtime: 0");
+        }
     }
 
     protected static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, String jobIdentifier) throws XenonException {
@@ -111,7 +115,7 @@ final class TorqueUtils {
         script.format("%s", description.getExecutable());
 
         for (String argument : description.getArguments()) {
-            script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
+            script.format(" %s", ScriptingUtils.protectAgainstShellMetas(argument));
         }
 
         String stdin = description.getStdin();
@@ -123,7 +127,16 @@ final class TorqueUtils {
         script.format("\n");
     }
 
-    public static String generate(JobDescription description, Path workdir) {
+    public static String substituteJobID(String path) {
+
+        if (path == null) {
+            return null;
+        }
+
+        return path.replace("%j", "$PBS_JOBID");
+    }
+
+    public static String generate(JobDescription description, Path workdir, int defaultRuntime) {
         StringBuilder stringBuilder = new StringBuilder(500);
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
@@ -145,11 +158,8 @@ final class TorqueUtils {
         String workingDirectory = description.getWorkingDirectory();
 
         if (workingDirectory != null) {
-            if (!workingDirectory.startsWith("/")) {
-                // make relative path absolute
-                workingDirectory = workdir.resolve(workingDirectory).toString();
-            }
-            script.format("#PBS -d %s\n", workingDirectory);
+            String path = ScriptingUtils.getWorkingDirPath(description, workdir);
+            script.format("#PBS -d %s\n", path);
         }
 
         String stdout = description.getStdout();
@@ -159,7 +169,7 @@ final class TorqueUtils {
                 stdout = workingDirectory + "/" + stdout;
             }
 
-            script.format("#PBS -o %s\n", stdout);
+            script.format("#PBS -o %s\n", substituteJobID(stdout));
         }
 
         String stderr = description.getStderr();
@@ -169,7 +179,7 @@ final class TorqueUtils {
                 stderr = workingDirectory + "/" + stderr;
             }
 
-            script.format("#PBS -e %s\n", stderr);
+            script.format("#PBS -e %s\n", substituteJobID(stderr));
         }
 
         if (description.getQueueName() != null) {
@@ -193,7 +203,14 @@ final class TorqueUtils {
         }
 
         // add maximum runtime in hour:minute:second format (converted from minutes in description)
-        script.format("#PBS -l walltime=%02d:%02d:00\n", description.getMaxRuntime() / MINUTES_PER_HOUR, description.getMaxRuntime() % MINUTES_PER_HOUR);
+        int runtime = description.getMaxRuntime();
+
+        if (runtime == -1) {
+            runtime = defaultRuntime;
+        }
+
+        // add maximum runtime in hour:minute:second format (converted from minutes in description)
+        script.format("#PBS -l walltime=%02d:%02d:00\n", runtime / MINUTES_PER_HOUR, runtime % MINUTES_PER_HOUR);
 
         for (String argument : description.getSchedulerArguments()) {
             script.format("#PBS %s\n", argument);

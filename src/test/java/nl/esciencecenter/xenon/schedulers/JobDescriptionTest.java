@@ -154,6 +154,24 @@ public class JobDescriptionTest {
         j.addJobOption("key", null);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void test_addSchedulerArgumentNull() throws Exception {
+        JobDescription j = new JobDescription();
+        j.addSchedulerArgument(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_addSchedulerArgumentEmpty() throws Exception {
+        JobDescription j = new JobDescription();
+        j.addSchedulerArgument("");
+    }
+
+    @Test
+    public void test_addSchedulerArgument() throws Exception {
+        JobDescription j = new JobDescription();
+        j.addSchedulerArgument("ARG");
+    }
+
     private int doHash(String queueName, String executable, String name, String[] arguments, String[] schedulerArguments, String stdin, String stdout,
             String stderr, String workingDirectory, Map<String, String> environment, Map<String, String> jobOptions, int nodeCount, int processesPerNode,
             int threadsPerProcess, int maxMemory, int tempSpace, boolean startSingleProcess, int maxRuntime) {
@@ -202,7 +220,7 @@ public class JobDescriptionTest {
         JobDescription j = new JobDescription();
 
         int expected = doHash(null, null, null, new String[0], new String[0], null, null, null, null, new HashMap<>(5), new HashMap<>(5), 1, 1, -1, -1, -1,
-                false, 15);
+                false, -1);
         int hash = j.hashCode();
 
         assertEquals(expected, hash);
@@ -234,7 +252,7 @@ public class JobDescriptionTest {
         opt.put("OPT2", "ARG2");
         j.setJobOptions(opt);
 
-        int expected = doHash("queue", "exec", "name", args, new String[0], "stdin", null, null, "workdir", env, opt, 1, 1, -1, -1, -1, true, 15);
+        int expected = doHash("queue", "exec", "name", args, new String[0], "stdin", null, null, "workdir", env, opt, 1, 1, -1, -1, -1, true, -1);
         int hash = j.hashCode();
 
         assertEquals(expected, hash);
@@ -254,6 +272,7 @@ public class JobDescriptionTest {
         j.setThreadsPerProcess(4);
         j.setMaxMemory(1024);
         j.setTempSpace(512);
+        j.setMaxRuntime(15);
 
         String[] args = new String[] { "a", "b", "c" };
         j.setArguments(args);
@@ -290,7 +309,7 @@ public class JobDescriptionTest {
 
         other.setMaxRuntime(42);
         assertFalse(j.equals(other));
-        other.setMaxRuntime(15);
+        other.setMaxRuntime(-1);
         assertTrue(j.equals(other));
 
         other.setMaxMemory(1024);
@@ -397,7 +416,7 @@ public class JobDescriptionTest {
 
         String expected = "JobDescription [name=job, queueName=noot, executable=exec, arguments=[a, b, c], schedulerArguments=[1, 2, 3], stdin=stdin.txt,"
                 + " stdout=stdout.txt, stderr=stderr.txt, workingDirectory=aap, environment={ENV1=ARG1}, jobOptions={OPT1=ARG1},"
-                + " nodeCount=1, processesPerNode=1, threadsPerProcess=4, maxMemory=1024, tempSpace=512, startSingleProcess=false, maxTime=15]";
+                + " nodeCount=1, processesPerNode=1, threadsPerProcess=4, maxMemory=1024, tempSpace=512, startSingleProcess=false, maxTime=-1]";
 
         JobDescription j = new JobDescription();
         j.setName("job");

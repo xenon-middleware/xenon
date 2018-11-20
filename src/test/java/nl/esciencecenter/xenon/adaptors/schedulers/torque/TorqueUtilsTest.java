@@ -30,6 +30,7 @@ import org.junit.runners.MethodSorters;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.JobCanceledException;
+import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
@@ -41,7 +42,7 @@ public class TorqueUtilsTest {
     public void test01a_generate_EmptyDescription_Result() throws XenonException {
         JobDescription description = new JobDescription();
 
-        String result = TorqueUtils.generate(description, null);
+        String result = TorqueUtils.generate(description, new Path("/test"), 15);
 
         String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l walltime=00:15:00\n" + "\nnull\n";
 
@@ -53,7 +54,7 @@ public class TorqueUtilsTest {
         JobDescription description = new JobDescription();
         description.setName("test");
 
-        String result = TorqueUtils.generate(description, null);
+        String result = TorqueUtils.generate(description, null, 15);
 
         String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N test\n" + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l walltime=00:15:00\n" + "\nnull\n";
 
@@ -65,7 +66,7 @@ public class TorqueUtilsTest {
         JobDescription description = new JobDescription();
         description.setName("");
 
-        String result = TorqueUtils.generate(description, null);
+        String result = TorqueUtils.generate(description, null, 15);
 
         String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l walltime=00:15:00\n" + "\nnull\n";
 
@@ -77,7 +78,7 @@ public class TorqueUtilsTest {
         JobDescription description = new JobDescription();
         description.setMaxMemory(1024);
 
-        String result = TorqueUtils.generate(description, null);
+        String result = TorqueUtils.generate(description, null, 15);
 
         String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l mem=1024\n"
                 + "#PBS -l walltime=00:15:00\n" + "\nnull\n";
@@ -90,7 +91,7 @@ public class TorqueUtilsTest {
         JobDescription description = new JobDescription();
         description.setThreadsPerProcess(4);
 
-        String result = TorqueUtils.generate(description, null);
+        String result = TorqueUtils.generate(description, null, 15);
 
         String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -l nodes=1:ppn=4\n" + "#PBS -l walltime=00:15:00\n" + "\nnull\n";
 
@@ -115,7 +116,7 @@ public class TorqueUtilsTest {
         description.setQueueName("the.queue");
         description.setWorkingDirectory("/some/working/directory");
 
-        String result = TorqueUtils.generate(description, null);
+        String result = TorqueUtils.generate(description, new Path("/test"), 15);
 
         String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -d /some/working/directory\n" + "#PBS -q the.queue\n"
                 + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l walltime=01:40:00\n" + "#PBS -l list-of-resources\n"
@@ -142,7 +143,7 @@ public class TorqueUtilsTest {
         description.setQueueName("the.queue");
         description.setWorkingDirectory("/some/working/directory");
 
-        String result = TorqueUtils.generate(description, null);
+        String result = TorqueUtils.generate(description, new Path("/test"), 15);
 
         String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -d /some/working/directory\n" + "#PBS -q the.queue\n"
                 + "#PBS -l nodes=4:ppn=10\n" + "#PBS -l walltime=01:40:00\n" + "#PBS -l list-of-resources\n" + "export some=\"environment.value\"\n\n"
@@ -156,7 +157,7 @@ public class TorqueUtilsTest {
         JobDescription description = new JobDescription();
         description.addJobOption(TorqueUtils.JOB_OPTION_JOB_CONTENTS, "/myscript/or_other");
 
-        String result = TorqueUtils.generate(description, null);
+        String result = TorqueUtils.generate(description, null, 15);
 
         String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l walltime=00:15:00\n"
                 + "\n/myscript/or_other\n";
@@ -206,7 +207,7 @@ public class TorqueUtilsTest {
         description.setMaxRuntime(1);
         // GridEngine specific info
 
-        TorqueUtils.verifyJobDescription(description);
+        TorqueUtils.verifyJobDescription(description, null);
     }
 
     @Test
@@ -221,7 +222,7 @@ public class TorqueUtilsTest {
         // GridEngine specific info
         description.addJobOption(TorqueUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
 
-        TorqueUtils.verifyJobDescription(description);
+        TorqueUtils.verifyJobDescription(description, null);
     }
 
     @Test
@@ -238,7 +239,7 @@ public class TorqueUtilsTest {
         description.setMaxRuntime(0);
         // GridEngine specific info
 
-        TorqueUtils.verifyJobDescription(description);
+        TorqueUtils.verifyJobDescription(description, null);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -248,7 +249,7 @@ public class TorqueUtilsTest {
         // set a job option
         description.addJobOption("wrong.setting", "wrong.value");
 
-        TorqueUtils.verifyJobDescription(description);
+        TorqueUtils.verifyJobDescription(description, null);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -259,7 +260,7 @@ public class TorqueUtilsTest {
         description.setExecutable("bin/bla");
         description.setMaxRuntime(0);
 
-        TorqueUtils.verifyJobDescription(description);
+        TorqueUtils.verifyJobDescription(description, null);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -270,7 +271,7 @@ public class TorqueUtilsTest {
         description.addJobOption(TorqueUtils.JOB_OPTION_JOB_SCRIPT, "other");
         description.addJobOption(TorqueUtils.JOB_OPTION_JOB_CONTENTS, "some");
 
-        TorqueUtils.verifyJobDescription(description);
+        TorqueUtils.verifyJobDescription(description, null);
     }
 
     @Test
@@ -358,5 +359,45 @@ public class TorqueUtilsTest {
         input.put(jobID, jobInfo);
 
         TorqueUtils.getJobStatusFromQstatInfo(input, jobID);
+    }
+
+    @Test
+    public void test_substituteJobID_null() throws XenonException {
+
+        String result = TorqueUtils.substituteJobID(null);
+
+        assertNull(result);
+    }
+
+    @Test
+    public void test_substituteJobID_noReplace() throws XenonException {
+
+        String path = "/test/test/file";
+
+        String result = TorqueUtils.substituteJobID(path);
+
+        assertEquals(result, path);
+    }
+
+    @Test
+    public void test_substituteJobID_replaceOne() throws XenonException {
+
+        String path = "/test/test/file%j";
+        String expected = "/test/test/file$PBS_JOBID";
+
+        String result = TorqueUtils.substituteJobID(path);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_substituteJobID_replaceTwo() throws XenonException {
+
+        String path = "/test/test%j/file%j";
+        String expected = "/test/test$PBS_JOBID/file$PBS_JOBID";
+
+        String result = TorqueUtils.substituteJobID(path);
+
+        assertEquals(expected, result);
     }
 }
