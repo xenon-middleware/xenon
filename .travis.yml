@@ -3,10 +3,10 @@ language: java
 matrix:
   include:
     - os: linux
-      jdk: oraclejdk10
+      jdk: openjdk10
       env:
         - INTEGRATION_TEST="integration"
-        - JDK=oraclejdk10
+        - JDK=openjdk10
         - OS=linux
       sudo: true
       dist: trusty
@@ -30,7 +30,7 @@ matrix:
     - os: osx
       env:
         - INTEGRATION_TEST="livelocal"
-        - JDK=oraclejdk10
+        - JDK=openjdk10
         - OS=osx
       osx_image: xcode9
       script:
