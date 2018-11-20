@@ -265,7 +265,6 @@ public class GridEngineUtilsTest {
 
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.FILL_UP, 0);
         GridEngineSetup setup = getGridEngineSetup(pe);
-
         GridEngineUtils.generate(description, null, setup);
     }
 

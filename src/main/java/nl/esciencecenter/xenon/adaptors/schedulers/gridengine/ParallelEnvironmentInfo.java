@@ -124,9 +124,9 @@ class ParallelEnvironmentInfo {
      * @return True if pe can
      */
     boolean canAllocateSingleNode(int coresPerNode) {
-        boolean validAllocationRule = (
-            allocationRule == AllocationRule.PE_SLOTS
-            // TODO check if hosts (of queue) have that many slots
+
+        boolean validAllocationRule = ( 
+             allocationRule == AllocationRule.PE_SLOTS // TODO check if hosts (of queue) have that many slots
         ) || (
             allocationRule == AllocationRule.INTEGER && ppn >= coresPerNode
         );

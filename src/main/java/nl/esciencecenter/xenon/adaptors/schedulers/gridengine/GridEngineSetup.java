@@ -30,8 +30,9 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
-import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
+import nl.esciencecenter.xenon.adaptors.schedulers.CommandLineUtils;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 
 /**
  * Holds some info on the specifics of the machine we are connected to, such as queues and parallel environments.

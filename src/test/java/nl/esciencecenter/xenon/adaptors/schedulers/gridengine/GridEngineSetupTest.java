@@ -155,7 +155,7 @@ public class GridEngineSetupTest {
         String[] queueNames = new String[]{"some.q"};
 
         Map<String, QueueInfo> queueInfos = new HashMap<>();
-        queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
+        queueInfos.put("some.q", new QueueInfo("some.q", 4));
 
         Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 4);
