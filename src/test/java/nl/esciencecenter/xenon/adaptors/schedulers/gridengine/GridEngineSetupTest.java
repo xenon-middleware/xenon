@@ -152,14 +152,14 @@ public class GridEngineSetupTest {
 
     /*
      * NOTE: this test is the same as test_getSingleNodeParallelEnvironment_queueuabsent_penotinqueues but expects the opposite assert??
-     * 
+     *
      * @Test public void test_getSingleNodeParallelEnvironment_queueuabsent_peinqueues() { String[] queueNames = new String[] { "some.q" };
-     * 
+     *
      * Map<String, QueueInfo> queueInfos = new HashMap<>(); queueInfos.put("some.q", new QueueInfo("some.q", 4));
-     * 
+     *
      * Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>(); ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100,
      * AllocationRule.INTEGER, 4); peInfos.put("some.pe", pe); GridEngineSetup setup = new GridEngineSetup(queueNames, queueInfos, peInfos, 15);
-     * 
+     *
      * assertTrue(setup.getSingleNodeParallelEnvironment(4, null).isPresent()); }
      */
 
