@@ -77,7 +77,14 @@ class QueueInfo {
         if (peValue == null) {
             throw new XenonException(ADAPTOR_NAME, "Cannot find parallel environments for queue \"" + name + "\"");
         }
-        parallelEnvironments = ScriptingParser.WHITESPACE_REGEX.split(peValue);
+        // The pe_list can like the slots contain multiple values, for example:
+        //
+        // mpi threaded,[n0061.compute.hpc=NONE]
+        //
+        // This means that all hosts except n0061.compute.hpc can run mpi and threaded jobs.
+        // For now, we educate the parser to accept this string, but only use the first value before the comma
+        String[] peValue2 = peValue.split(",");
+        parallelEnvironments = ScriptingParser.WHITESPACE_REGEX.split(peValue2[0]);
     }
 
     /**

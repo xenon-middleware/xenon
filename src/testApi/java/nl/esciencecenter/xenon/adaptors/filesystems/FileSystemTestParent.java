@@ -15,14 +15,12 @@
  */
 package nl.esciencecenter.xenon.adaptors.filesystems;
 
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.InputStream;
@@ -33,6 +31,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.hamcrest.core.Is;
+import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -66,7 +67,7 @@ public abstract class FileSystemTestParent extends FileSystemTestInfrastructure 
         Map.Entry<Path, Path> linkTarget = locationConfig.getSymbolicLinksToExistingFile();
         Path target = fileSystem.readSymbolicLink(linkTarget.getKey());
         Path expectedTarget = linkTarget.getValue();
-        assertThat(target, is(expectedTarget));
+        assertThat(target, Is.is(expectedTarget));
     }
 
     // Tests to create directories
@@ -223,7 +224,7 @@ public abstract class FileSystemTestParent extends FileSystemTestInfrastructure 
             expected = "Hello World\n";
         }
 
-        assertEquals(expected, reader.getResultAsString());
+        Assert.assertEquals(expected, reader.getResultAsString());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -1219,7 +1220,7 @@ public abstract class FileSystemTestParent extends FileSystemTestInfrastructure 
         Path file1 = createNewTestFileName(testDir);
         String copyId = fileSystem.copy(file0, fileSystem, file1, CopyMode.CREATE, false);
         CopyStatus status = fileSystem.waitUntilDone(copyId, 1000);
-        assertEquals(status.bytesCopied(), data.length);
+        Assert.assertEquals(status.bytesCopied(), data.length);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -1338,7 +1339,7 @@ public abstract class FileSystemTestParent extends FileSystemTestInfrastructure 
         assumeTrue(description.canReadSymboliclinks());
         Map.Entry<Path, Path> map = locationConfig.getSymbolicLinksToExistingFile();
         Path res = fileSystem.readSymbolicLink(map.getKey());
-        assertEquals(res, map.getValue());
+        Assert.assertEquals(res, map.getValue());
     }
 
     @Test
@@ -1356,11 +1357,11 @@ public abstract class FileSystemTestParent extends FileSystemTestInfrastructure 
     @Test
     public void test_getWorkingDirectory() {
         Path expected = locationConfig.getExpectedWorkingDirectory();
-        assumeNotNull(expected);
+        Assume.assumeNotNull(expected);
 
         Path result = fileSystem.getWorkingDirectory();
 
-        assertEquals("Working dir not equal: " + expected + " != " + result, expected, result);
+        Assert.assertEquals("Working dir not equal: " + expected + " != " + result, expected, result);
     }
 
     @Test

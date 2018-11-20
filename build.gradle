@@ -8,7 +8,7 @@ plugins {
     id 'distribution'
     // publishing
     id 'maven-publish'
-    id 'com.jfrog.bintray' version '1.7.3'
+    id 'com.jfrog.bintray' version '1.8.2'
     // ide
     id 'idea'
     id 'eclipse'
@@ -19,7 +19,7 @@ plugins {
     // license
     id 'com.github.hierynomus.license' version '0.14.0'
     // test sets
-    id 'org.unbroken-dome.test-sets' version '1.4.2'
+    id 'org.unbroken-dome.test-sets' version '1.5.0'
 }
 
 //    METADATA
@@ -76,7 +76,6 @@ dependencies {
     // Runtime dependencies
     runtime group: 'ch.qos.logback', name: 'logback-core', version: '1.0.11'
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.11'
-//    runtime group: 'org.apache.hadoop', name: 'hadoop-client-runtime', version: '3.0.0'
 
     // Testing dependencies
     testCompile group: 'junit', name: 'junit', version: '4.12'
@@ -85,17 +84,25 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
     testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.16.0'
 
+    testApiCompile sourceSets.main.output
+    testApiCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.5'
+    testApiCompile group: 'junit', name: 'junit', version: '4.12'
+
+    integrationTestCompile sourceSets.testApi.output
     integrationTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.32.0'
 
     // allow isolated and live tests to import from integration test,
     // so abstract test classes and docker compose files can be extended and reused
-    fixedClientEnvironmentTestCompile sourceSets.integrationTest.output
+    fixedClientEnvironmentTestCompile sourceSets.testApi.output
 
-    liveTestCompile sourceSets.integrationTest.output
+    liveTestCompile sourceSets.testApi.output
 
-    // TODO isolatedTest should have same dependencies as integrationTest,
+    // TODO fixedClientEnvironmentTest should have same dependencies as integrationTest,
     // do no copy deps but append integrationTest.deps to fixedClientEnvironmentTest.deps
     fixedClientEnvironmentTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.32.0'
+
+    docGeneratorCompile sourceSets.main.output
+    docGeneratorRuntime configurations.runtime
 }
 
 task downloadCompileDependencies(type: Copy) {

@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -54,8 +55,8 @@ public abstract class SchedulerTestParent {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(SchedulerTestParent.class);
 
-    private Scheduler scheduler;
-    private SchedulerAdaptorDescription description;
+    protected Scheduler scheduler;
+    protected SchedulerAdaptorDescription description;
     private SchedulerLocationConfig locationConfig;
 
     @Before
@@ -97,17 +98,17 @@ public abstract class SchedulerTestParent {
 
     @Test
     public void test_isEmbedded() throws XenonException {
-        assertEquals(locationConfig.isEmbedded(), description.isEmbedded());
+        Assert.assertEquals(locationConfig.isEmbedded(), description.isEmbedded());
     }
 
     @Test
     public void test_supportsBatch() throws XenonException {
-        assertEquals(locationConfig.supportsBatch(), description.supportsBatch());
+        Assert.assertEquals(locationConfig.supportsBatch(), description.supportsBatch());
     }
 
     @Test
     public void test_supportsInteractive() throws XenonException {
-        assertEquals(locationConfig.supportsInteractive(), description.supportsInteractive());
+        Assert.assertEquals(locationConfig.supportsInteractive(), description.supportsInteractive());
     }
 
     private boolean contains(String[] options, String expected) {
@@ -170,7 +171,7 @@ public abstract class SchedulerTestParent {
         return status;
     }
 
-    private JobStatus waitUntilDone(String jobID) throws XenonException {
+    protected JobStatus waitUntilDone(String jobID) throws XenonException {
         return waitUntilDone(jobID, locationConfig.getMaxWaintUntilDone());
     }
 
@@ -240,7 +241,7 @@ public abstract class SchedulerTestParent {
 
     @Test
     public void test_getDefaultQueueNames() throws XenonException {
-        assertEquals(locationConfig.getDefaultQueueName(), scheduler.getDefaultQueueName());
+        Assert.assertEquals(locationConfig.getDefaultQueueName(), scheduler.getDefaultQueueName());
     }
 
     private JobDescription getSleepJob(String queue, int time) {
@@ -426,7 +427,7 @@ public abstract class SchedulerTestParent {
         JobStatus status = scheduler.getJobStatus(jobID);
 
         assertNotNull(status);
-        assertEquals(jobID, status.getJobIdentifier());
+        Assert.assertEquals(jobID, status.getJobIdentifier());
         assertFalse(status.isDone());
 
         // Clean up the mess...
@@ -451,7 +452,7 @@ public abstract class SchedulerTestParent {
         JobStatus status = scheduler.waitUntilDone(jobID, 5000);
 
         assertNotNull(status);
-        assertEquals(jobID, status.getJobIdentifier());
+        Assert.assertEquals(jobID, status.getJobIdentifier());
         assertTrue(status.isDone());
 
         // Wait for a while and see if we can still get the job info.
@@ -464,7 +465,7 @@ public abstract class SchedulerTestParent {
         status = scheduler.getJobStatus(jobID);
 
         assertNotNull(status);
-        assertEquals(jobID, status.getJobIdentifier());
+        Assert.assertEquals(jobID, status.getJobIdentifier());
         assertTrue(status.isDone());
     }
 
@@ -486,11 +487,11 @@ public abstract class SchedulerTestParent {
         assertTrue(result.length == 2);
 
         assertNotNull(result[0]);
-        assertEquals("aap", result[0].getJobIdentifier());
+        Assert.assertEquals("aap", result[0].getJobIdentifier());
         assertTrue(result[0].hasException());
 
         assertNotNull(result[1]);
-        assertEquals("noot", result[1].getJobIdentifier());
+        Assert.assertEquals("noot", result[1].getJobIdentifier());
         assertTrue(result[1].hasException());
     }
 
@@ -503,13 +504,13 @@ public abstract class SchedulerTestParent {
         assertTrue(result.length == 3);
 
         assertNotNull(result[0]);
-        assertEquals("aap", result[0].getJobIdentifier());
+        Assert.assertEquals("aap", result[0].getJobIdentifier());
         assertTrue(result[0].hasException());
 
         assertNull(result[1]);
 
         assertNotNull(result[2]);
-        assertEquals("noot", result[2].getJobIdentifier());
+        Assert.assertEquals("noot", result[2].getJobIdentifier());
         assertTrue(result[2].hasException());
     }
 
@@ -535,11 +536,11 @@ public abstract class SchedulerTestParent {
         assertTrue(result.length == 2);
 
         assertNotNull(result[0]);
-        assertEquals(jobID1, result[0].getJobIdentifier());
+        Assert.assertEquals(jobID1, result[0].getJobIdentifier());
         assertFalse(result[0].isDone());
 
         assertNotNull(result[1]);
-        assertEquals(jobID2, result[1].getJobIdentifier());
+        Assert.assertEquals(jobID2, result[1].getJobIdentifier());
         assertFalse(result[1].isDone());
 
         // Clean up the mess...
@@ -568,7 +569,7 @@ public abstract class SchedulerTestParent {
         QueueStatus status = scheduler.getQueueStatus(queueNames[0]);
 
         assertNotNull(status);
-        assertEquals(queueNames[0], status.getQueueName());
+        Assert.assertEquals(queueNames[0], status.getQueueName());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -590,7 +591,7 @@ public abstract class SchedulerTestParent {
 
         for (int i = 0; i < queueNames.length; i++) {
             assertNotNull(result[i]);
-            assertEquals(queueNames[i], result[i].getQueueName());
+            Assert.assertEquals(queueNames[i], result[i].getQueueName());
             assertFalse(result[i].hasException());
         }
     }
@@ -609,7 +610,7 @@ public abstract class SchedulerTestParent {
 
         for (int i = 0; i < queueNames.length; i++) {
             assertNotNull(result[i]);
-            assertEquals(queueNames[i], result[i].getQueueName());
+            Assert.assertEquals(queueNames[i], result[i].getQueueName());
             assertFalse(result[i].hasException());
         }
     }
@@ -636,13 +637,13 @@ public abstract class SchedulerTestParent {
         assertTrue(alt.length == result.length);
 
         assertNotNull(result[0]);
-        assertEquals(queueNames[0], result[0].getQueueName());
+        Assert.assertEquals(queueNames[0], result[0].getQueueName());
 
         assertNull(result[1]);
 
         for (int i = 1; i < queueNames.length; i++) {
             assertNotNull(result[i + 1]);
-            assertEquals(queueNames[i], result[i + 1].getQueueName());
+            Assert.assertEquals(queueNames[i], result[i + 1].getQueueName());
             assertFalse(result[i + 1].hasException());
         }
     }
@@ -684,7 +685,7 @@ public abstract class SchedulerTestParent {
         out.waitUntilFinished();
         err.waitUntilFinished();
 
-        assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
+        Assert.assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
 
         cleanupJob(streams.getJobIdentifier());
     }
@@ -714,7 +715,7 @@ public abstract class SchedulerTestParent {
         out.waitUntilFinished();
         err.waitUntilFinished();
 
-        assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
+        Assert.assertEquals("Hello World\nGoodbye World\n", out.getResultAsString());
 
         cleanupJob(streams.getJobIdentifier());
     }
@@ -745,7 +746,7 @@ public abstract class SchedulerTestParent {
         err.waitUntilFinished();
 
         // Note that more add an extra newlin on windows
-        assertEquals("Hello World\r\nGoodbye World\r\n\r\n", out.getResultAsString());
+        Assert.assertEquals("Hello World\r\nGoodbye World\r\n\r\n", out.getResultAsString());
 
         cleanupJob(streams.getJobIdentifier());
     }
@@ -759,7 +760,7 @@ public abstract class SchedulerTestParent {
         FileSystem fs = scheduler.getFileSystem();
         Path p = fs.getWorkingDirectory();
 
-        assertEquals(locationConfig.getWorkdir(), p.toString());
+        Assert.assertEquals(locationConfig.getWorkdir(), p.toString());
     }
 
     @Test

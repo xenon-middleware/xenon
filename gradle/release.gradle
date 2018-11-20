@@ -19,7 +19,7 @@ bintray {
         vcsUrl = 'https://github.com/NLeSC/Xenon.git'
         issueTrackerUrl = 'https://github.com/NLeSC/Xenon/issues'
     }
-    publications = ['MyPublication']
+    publications = ['MyPublication', 'TestApiPublication', 'DocGeneratorPublication']
 }
 
 tasks.publish.dependsOn 'bintrayUpload'
