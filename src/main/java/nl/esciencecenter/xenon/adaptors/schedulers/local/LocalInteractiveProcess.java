@@ -116,7 +116,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
     /**
      * Destroy (stop) process. Does nothing if the process has already finished. Will try a destroy first, followed by a destroyForcibly if the process has not
      * terminated after the given timeout. All subprocessed that can be found will also be destroyed.
-     * 
+     *
      * @param timeout
      *            the timeout for each destroy and destroyForcibly operation.
      * @param unit
