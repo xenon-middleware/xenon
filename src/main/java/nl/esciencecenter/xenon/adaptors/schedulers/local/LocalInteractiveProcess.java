@@ -34,6 +34,9 @@ import nl.esciencecenter.xenon.schedulers.Streams;
  * @since 1.0
  */
 class LocalInteractiveProcess implements InteractiveProcess {
+
+    public final static int DEFAULT_TIMEOUT = 1000;
+
     private final Process process;
 
     private int exitCode;
@@ -111,10 +114,15 @@ class LocalInteractiveProcess implements InteractiveProcess {
     }
 
     /**
-     * Destroy (stop) process. Does nothing if the process has already finished. Will run the kill command on Unix using a SIGTERM first, followed by a SIGKILL
-     * if the process does not terminate within 5 seconds. If the kill command is not available (i.e., on Windows) a Process.destroy() is used instead.
+     * Destroy (stop) process. Does nothing if the process has already finished. Will try a destroy first, followed by a destroyForcibly if the process has not
+     * terminated after the given timeout. All subprocessed that can be found will also be destroyed.
+     * 
+     * @param timeout
+     *            the timeout for each destroy and destroyForcibly operation.
+     * @param unit
+     *            the unit of the timeout.
      */
-    public void destroy() {
+    public void destroy(int timeout, TimeUnit unit) {
 
         if (done) {
             return;
@@ -123,28 +131,18 @@ class LocalInteractiveProcess implements InteractiveProcess {
         // Try to kill the process and all its children.
         ProcessHandle h = process.toHandle();
 
-        destroyProcess(h, 1000, TimeUnit.MILLISECONDS);
+        destroyProcess(h, timeout, unit);
 
         h.descendants().forEach(s -> {
-            destroyProcess(s, 1000, TimeUnit.MILLISECONDS);
+            destroyProcess(s, timeout, TimeUnit.MILLISECONDS);
         });
+    }
 
-        // if (!LocalFileSystemUtils.isWindows()) {
-        // try {
-        // if (ProcessUtils.killProcessAndChildren(process, 5000)) {
-        // return;
-        // }
-        //
-        // System.out.println("FAILED to kill all subprocesses");
-        // } catch (XenonException e) {
-        // // Failed to retrieve the pid or run kill. Fall through and use the regular Java destroy.
-        // System.out.println("EXCEPTION " + e);
-        // }
-        // }
-        //
-        // System.out.println("PROCESS DESTROY");
-        //
-        // // Use the Java way to kill a process as a last resort.
-        // process.destroy();
+    /**
+     * Destroy (stop) process. Does nothing if the process has already finished. Will try a destroy first, followed by a destroyForcibly if the process has not
+     * terminated after 1 second. All subprocessed that can be found will also be destroyed.
+     */
+    public void destroy() {
+        destroy(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
 }
