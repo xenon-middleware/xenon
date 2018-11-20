@@ -15,10 +15,13 @@
  */
 package nl.esciencecenter.xenon.adaptors;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -517,6 +520,290 @@ public class XenonPropertiesTest {
         Map<String, String> props = new HashMap<>(0);
 
         XenonProperties xprop = new XenonProperties(supportedProperties, props).exclude("bla");
+
+        assertEquals("{<<aap.key=aap>>}", xprop.toString());
+    }
+
+    @Test
+    public void testXenonProperties_clearPrefix() throws Exception {
+
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.STRING, "aap", "test property"),
+                new XenonPropertyDescription("noot.key", Type.STRING, "aap", "test property") };
+
+        Map<String, String> props = new HashMap<>(0);
+        props.put("aap.key", "noot");
+        props.put("noot.key", "noot");
+
+        XenonProperties xprop = new XenonProperties(supportedProperties, props).clear("aap.");
+
+        assertEquals("{<<aap.key=aap>>, noot.key=noot}", xprop.toString());
+    }
+
+    @Test
+    public void testXenonProperties_getPropertyNames() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.STRING, "aap", "test property"),
+                new XenonPropertyDescription("noot.key", Type.STRING, "aap", "test property") };
+
+        String[] result = new XenonProperties(supportedProperties, null).getPropertyNames();
+
+        String[] expected = new String[] { "aap.key", "noot.key" };
+
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
+    public void testXenonProperties_getSupportedProperties() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.STRING, "aap", "test property"),
+                new XenonPropertyDescription("noot.key", Type.STRING, "aap", "test property") };
+
+        XenonPropertyDescription[] result = new XenonProperties(supportedProperties, null).getSupportedProperties();
+        assertArrayEquals(supportedProperties, result);
+    }
+
+    @Test
+    public void testXenonProperties_getStringProperty() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.STRING, "aap", "test property"),
+                new XenonPropertyDescription("noot.key", Type.STRING, "aap", "test property") };
+
+        Map<String, String> props = new HashMap<>(0);
+        props.put("aap.key", "noot");
+
+        XenonProperties result = new XenonProperties(supportedProperties, props);
+        assertEquals("noot", result.getStringProperty("aap.key"));
+        assertEquals("aap", result.getStringProperty("noot.key"));
+    }
+
+    @Test
+    public void testXenonProperties_printProperties() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.STRING, "aap", "test property"),
+                new XenonPropertyDescription("noot.key", Type.STRING, "aap", "test property") };
+
+        Map<String, String> props = new HashMap<>(0);
+        props.put("aap.key", "noot");
+
+        XenonProperties p = new XenonProperties(supportedProperties, props);
+
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+
+        PrintStream s = new PrintStream(b);
+
+        p.printProperties(s, null);
+
+        String result = b.toString();
+
+        assertEquals("aap.key = noot\nnoot.key = aap\n", result);
+    }
+
+    @Test
+    public void testXenonProperties_printPropertiesWithPrefix() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.STRING, "aap", "test property"),
+                new XenonPropertyDescription("noot.key", Type.STRING, "aap", "test property") };
+
+        Map<String, String> props = new HashMap<>(0);
+        props.put("aap.key", "noot");
+
+        XenonProperties p = new XenonProperties(supportedProperties, props);
+
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+
+        PrintStream s = new PrintStream(b);
+
+        p.printProperties(s, "noot.");
+
+        String result = b.toString();
+
+        assertEquals("noot.key = aap\n", result);
+    }
+
+    @Test
+    public void testXenonProperties_printPropertiesWithPrefixCase() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.STRING, "aap", "test property"),
+                new XenonPropertyDescription("noot.key", Type.STRING, "aap", "test property") };
+
+        Map<String, String> props = new HashMap<>(0);
+        props.put("aap.key", "NOOT");
+
+        XenonProperties p = new XenonProperties(supportedProperties, props);
+
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+
+        PrintStream s = new PrintStream(b);
+
+        p.printProperties(s, "noot.");
+
+        String result = b.toString();
+
+        assertEquals("noot.key = aap\n", result);
+    }
+
+    @Test
+    public void testXenonProperties_getLongProperty() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.LONG, "42", "test property") };
+
+        Map<String, String> props = new HashMap<>(0);
+        props.put("aap.key", "43");
+
+        XenonProperties p = new XenonProperties(supportedProperties, props);
+
+        assertEquals(43L, p.getLongProperty("aap.key"));
+    }
+
+    @Test(expected = InvalidPropertyException.class)
+    public void testXenonProperties_getLongPropertyInvalid() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.LONG, "42", "test property") };
+
+        Map<String, String> props = new HashMap<>(0);
+        props.put("aap.key", "hello world");
+
+        XenonProperties p = new XenonProperties(supportedProperties, props);
+
+        p.getLongProperty("aap.key");
+    }
+
+    @Test(expected = InvalidPropertyException.class)
+    public void testXenonProperties_getLongPropertyInvalidDefault() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.LONG, "Hello", "test property") };
+
+        XenonProperties p = new XenonProperties(supportedProperties, null);
+        p.getLongProperty("aap.key");
+    }
+
+    @Test
+    public void testXenonProperties_getIntegerPropertyWithDefault() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.INTEGER, "42", "test property") };
+
+        Map<String, String> props = new HashMap<>(0);
+        props.put("aap.key", "43");
+
+        XenonProperties p = new XenonProperties(supportedProperties, props);
+        assertEquals(43, p.getIntegerProperty("aap.key", 66));
+    }
+
+    @Test
+    public void testXenonProperties_getIntegerPropertyWithDefault2() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.INTEGER, "42", "test property") };
+
+        Map<String, String> props = new HashMap<>(0);
+
+        XenonProperties p = new XenonProperties(supportedProperties, props);
+        assertEquals(42, p.getIntegerProperty("aap.key", 66));
+    }
+
+    @Test
+    public void testXenonProperties_getIntegerPropertyWithDefault3() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.INTEGER, null, "test property") };
+
+        Map<String, String> props = new HashMap<>(0);
+
+        XenonProperties p = new XenonProperties(supportedProperties, props);
+        assertEquals(66, p.getIntegerProperty("aap.key", 66));
+    }
+
+    @Test
+    public void testXenonProperties_getIntegerPropertyWithDefault4() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.INTEGER, "", "test property") };
+
+        Map<String, String> props = new HashMap<>(0);
+
+        XenonProperties p = new XenonProperties(supportedProperties, props);
+        assertEquals(66, p.getIntegerProperty("aap.key", 66));
+    }
+
+    @Test(expected = InvalidPropertyException.class)
+    public void testXenonProperties_getIntPropertyInvalidDefault() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.INTEGER, "Hello", "test property") };
+
+        XenonProperties p = new XenonProperties(supportedProperties, null);
+        p.getIntegerProperty("aap.key", 42);
+    }
+
+    @Test
+    public void testXenonProperties_getNaturalProperty() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.NATURAL, "42", "test property") };
+
+        Map<String, String> props = new HashMap<>(0);
+        props.put("aap.key", "43");
+
+        XenonProperties p = new XenonProperties(supportedProperties, props);
+
+        assertEquals(43L, p.getNaturalProperty("aap.key"));
+    }
+
+    @Test(expected = InvalidPropertyException.class)
+    public void testXenonProperties_getNaturalPropertyInvalidValue() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.NATURAL, "42", "test property") };
+
+        Map<String, String> props = new HashMap<>(0);
+        props.put("aap.key", "-43");
+
+        XenonProperties p = new XenonProperties(supportedProperties, props);
+
+        p.getNaturalProperty("aap.key");
+    }
+
+    @Test(expected = InvalidPropertyException.class)
+    public void testXenonProperties_getNaturalPropertyInvalid() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.NATURAL, "42", "test property") };
+
+        Map<String, String> props = new HashMap<>(0);
+        props.put("aap.key", "hello");
+
+        XenonProperties p = new XenonProperties(supportedProperties, props);
+
+        p.getNaturalProperty("aap.key");
+    }
+
+    @Test(expected = InvalidPropertyException.class)
+    public void testXenonProperties_getNaturalPropertyInvalidDefault() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.NATURAL, "-42", "test property") };
+
+        XenonProperties p = new XenonProperties(supportedProperties, null);
+
+        p.getNaturalProperty("aap.key");
+    }
+
+    @Test(expected = InvalidPropertyException.class)
+    public void testXenonProperties_getNaturalPropertyInvalidDefault2() throws Exception {
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.NATURAL, "hello", "test property") };
+
+        XenonProperties p = new XenonProperties(supportedProperties, null);
+
+        p.getNaturalProperty("aap.key");
+    }
+
+    @Test
+    public void testXenonProperties_emptyConstructor() throws Exception {
+        XenonProperties xprop = new XenonProperties();
+        assertEquals("{}", xprop.toString());
+    }
+
+    @Test
+    public void testXenonProperties_addPropertiesNull() throws Exception {
+
+        XenonPropertyDescription[] supportedProperties = new XenonPropertyDescription[] {
+                new XenonPropertyDescription("aap.key", Type.STRING, "aap", "test property") };
+
+        XenonProperties xprop = new XenonProperties(supportedProperties, null);
 
         assertEquals("{<<aap.key=aap>>}", xprop.toString());
     }

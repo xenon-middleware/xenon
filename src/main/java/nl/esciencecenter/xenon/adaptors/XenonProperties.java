@@ -168,6 +168,13 @@ public class XenonProperties {
             case LONG:
                 Long.parseLong(value);
                 break;
+            case NATURAL:
+                long tmp = Long.parseLong(value);
+
+                if (tmp < 0) {
+                    throw new IllegalArgumentException("Not a natural value: " + value);
+                }
+                break;
             case SIZE:
                 parseSizeValue(value);
                 break;
