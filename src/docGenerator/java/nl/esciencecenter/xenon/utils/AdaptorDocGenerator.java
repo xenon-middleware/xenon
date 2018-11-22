@@ -66,11 +66,11 @@ public class AdaptorDocGenerator {
 
     public void generate(PrintWriter out) throws XenonException {
         out.println("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Xenon Javadoc overview</title></head><body>");
-        out.println("A middleware abstraction library that provides a simple programming interface to various compute and storage resources.");
-        out.println("<p>The main entry points are<ul>");
+        out.println("<p>A middleware abstraction library that provides a simple programming interface to various compute and storage resources.</p>");
+        out.println("The main entry points are<ul>");
         out.println("<li><a href=\"nl/esciencecenter/xenon/schedulers/Scheduler.html\">nl.esciencecenter.xenon.schedulers.Scheduler</a></li>");
         out.println("<li><a href=\"nl/esciencecenter/xenon/filesystems/FileSystem.html\">nl.esciencecenter.xenon.filesystems.FileSystem</a></li>");
-        out.println("</ul></p>");
+        out.println("</ul>");
         out.println("<h1>Adaptor Documentation</h1>");
         out.println("<p>This section contains the adaptor documentation which is generated "
                 + "from the information provided by the adaptors themselves.</p>");
@@ -98,17 +98,17 @@ public class AdaptorDocGenerator {
     }
 
     private void generateFileSystems(PrintWriter out) throws XenonException {
-        out.println("<h2><a name=\"filesystems\">File systems<a/></h2>");
+        out.println("<h2><a id=\"filesystems\">File systems</a></h2>");
         for (FileSystemAdaptorDescription description : FileSystem.getAdaptorDescriptions()) {
             generateFileSystem(description, out);
         }
     }
 
     private void generateFileSystem(FileSystemAdaptorDescription description, PrintWriter out) {
-        out.println(String.format("<h2><a name=\"%s\">%s</a></h2>", description.getName(), description.getName()));
+        out.println(String.format("<h2><a id=\"%s\">%s</a></h2>", description.getName(), description.getName()));
         out.println(String.format("<p>%s</p>", description.getDescription()));
         out.println("<h4>Supported locations:</h4>");
-        out.println("Supported locations for <i>FileSystem.create(type, location, credential, properties)</i> method.<il>");
+        out.println("Supported locations for <i>FileSystem.create(type, location, credential, properties)</i> method.<ul>");
         for (String supportedLocation : description.getSupportedLocations()) {
             out.println(String.format("<li>%s</li>", supportedLocation));
         }
@@ -141,14 +141,14 @@ public class AdaptorDocGenerator {
     }
 
     private void generateSchedulers(PrintWriter out) throws XenonException {
-        out.println("<h2><a name=\"schedulers\">Schedulers</a></h2>");
+        out.println("<h2><a id=\"schedulers\">Schedulers</a></h2>");
         for (SchedulerAdaptorDescription description : Scheduler.getAdaptorDescriptions()) {
             generateScheduler(description, out);
         }
     }
 
     private void generateScheduler(SchedulerAdaptorDescription description, PrintWriter out) {
-        out.println(String.format("<h2><a name=\"%s\">%s</a></h2>", description.getName(), description.getName()));
+        out.println(String.format("<h2><a id=\"%s\">%s</a></h2>", description.getName(), description.getName()));
         out.println(String.format("<p>%s</p>", description.getDescription()));
         out.println("<h4>Supported locations:</h4>");
         out.println("Supported locations for <i>Scheduler.create(type, location, credential, properties)</i> method.<ul>");

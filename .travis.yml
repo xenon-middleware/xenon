@@ -18,8 +18,7 @@ matrix:
       before_install:
         - docker-compose --version
       install:
-        - ./gradlew --info assemble
-        - cat /home/travis/build/NLeSC/Xenon/build/tmp/javadoc/javadoc.options
+        - ./gradlew assemble
       script:
         - ./gradlew check
         - ./src/fixedClientEnvironmentTest/resources/run-fixed-client-environment-test.sh;
