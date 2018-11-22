@@ -91,10 +91,26 @@ public class GridEngineUtilsTest {
     }
 
     @Test
-    public void test_generate_memory() throws XenonException {
+    public void test_generate_tempspace() throws XenonException {
         JobDescription description = new JobDescription();
 
         description.setMaxMemory(1024);
+
+        GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
+
+        String result = GridEngineUtils.generate(description, null, setup);
+
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -l tmpspace=1024M\n" + "#$ -o /dev/null\n"
+                + "#$ -e /dev/null\n" + "\n" + "null\n";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test_generate_memory() throws XenonException {
+        JobDescription description = new JobDescription();
+
+        description.setTempSpace(1024);
 
         GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
 
@@ -178,8 +194,8 @@ public class GridEngineUtilsTest {
 
         String result = GridEngineUtils.generate(description, new Path(), setup);
 
-        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n" + "#$ -q some.q\n"
-                + "#$ -pe some.pe 40\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n" + "#$ -q some.q\n" + "#$ -pe some.pe 40\n"
+                + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"
                 + "for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n"
                 + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
                 + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
@@ -221,9 +237,9 @@ public class GridEngineUtilsTest {
 
         String result = GridEngineUtils.generate(description, new Path(), setup);
 
-        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n" + "#$ -q some.q\n"
-            + "#$ -pe some.pe 10\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"
-            + "/bin/executable 'some' 'arguments'\n";
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n" + "#$ -q some.q\n" + "#$ -pe some.pe 10\n"
+                + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"
+                + "/bin/executable 'some' 'arguments'\n";
 
         assertEquals(expected, result);
     }
@@ -244,7 +260,8 @@ public class GridEngineUtilsTest {
     @Test
     public void testGenerate_PeNotFoundForMultiNode() throws XenonException {
         thrown.expect(InvalidJobDescriptionException.class);
-        thrown.expectMessage("Unable to find a parallel environment for multiple nodes, replace node count and cores per node with scheduler.addSchedulerArgument(\"-pe <name of parallel environment (qconf -spl)> <number of slots>\")");
+        thrown.expectMessage(
+                "Unable to find a parallel environment for multiple nodes, replace node count and cores per node with scheduler.addSchedulerArgument(\"-pe <name of parallel environment (qconf -spl)> <number of slots>\")");
 
         JobDescription description = new JobDescription();
         description.setNodeCount(10);
@@ -258,7 +275,8 @@ public class GridEngineUtilsTest {
     @Test
     public void testGenerate_PeNotFoundForSingleNode() throws XenonException {
         thrown.expect(InvalidJobDescriptionException.class);
-        thrown.expectMessage("Unable to find a parallel environment for multi core on single node, replace node count and cores per node with scheduler.addSchedulerArgument(\"-pe <name of parallel environment (qconf -spl)> <number of slots>\")");
+        thrown.expectMessage(
+                "Unable to find a parallel environment for multi core on single node, replace node count and cores per node with scheduler.addSchedulerArgument(\"-pe <name of parallel environment (qconf -spl)> <number of slots>\")");
 
         JobDescription description = new JobDescription();
         description.setProcessesPerNode(10);
@@ -267,7 +285,6 @@ public class GridEngineUtilsTest {
         GridEngineSetup setup = getGridEngineSetup(pe);
         GridEngineUtils.generate(description, null, setup);
     }
-
 
     @Test
     public void test03a_generateSerialScriptContent() {
