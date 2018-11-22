@@ -9,7 +9,7 @@ matrix:
         - JDK=openjdk10
         - OS=linux
       sudo: true
-      dist: trusty
+      dist: xenial
       services:
         - docker
       addons:
