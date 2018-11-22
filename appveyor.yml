@@ -5,7 +5,8 @@ test_script:
   - mkdir build\integrationTest & cd build\integrationTest & ..\..\src\liveTest\resources\scripts\create_symlinks.bat & cd ..\..
   - cmd: gradlew.bat test liveTest -Dxenon.scheduler=local -Dxenon.scheduler.location=%HomeDrive%\projects\xenon -Dxenon.filesystem=file -Dxenon.filesystem.location=%HomeDrive%\projects\xenon -Dxenon.username=%USERNAME% -Dxenon.filesystem.basedir=\projects\xenon\build\integrationTest -Dxenon.separator=\ -Dxenon.filesystem.expected.workdir=\projects\xenon -Dxenon.scheduler.workdir=\projects\xenon -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
 on_finish:
-  - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
+  - "SET PATH=C:\\Program\ Files\\Java\\jdk10\\bin;C:\\Python34;C:\\Python34\\Scripts;%PATH%"
+  - "SET JAVA_HOME=C:\\Program\ Files\\Java\\jdk10"
   - "SET JDK=openjdk10"
   - .\gradlew.bat jacocoTestReport jacocoLiveTestReport
   - pip install codecov
