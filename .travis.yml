@@ -17,6 +17,9 @@ matrix:
           organization: nlesc
       before_install:
         - docker-compose --version
+      install:
+        - ./gradlew --info assemble
+        - cat /home/travis/build/NLeSC/Xenon/build/tmp/javadoc/javadoc.options
       script:
         - ./gradlew check
         - ./src/fixedClientEnvironmentTest/resources/run-fixed-client-environment-test.sh;
