@@ -94,7 +94,7 @@ public class GridEngineUtilsTest {
     public void test_generate_tempspace() throws XenonException {
         JobDescription description = new JobDescription();
 
-        description.setMaxMemory(1024);
+        description.setTempSpace(1024);
 
         GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
 
@@ -110,7 +110,7 @@ public class GridEngineUtilsTest {
     public void test_generate_memory() throws XenonException {
         JobDescription description = new JobDescription();
 
-        description.setTempSpace(1024);
+        description.setMaxMemory(1024);
 
         GridEngineSetup setup = new GridEngineSetup(new String[] { "queue" }, null, null, 15);
 
