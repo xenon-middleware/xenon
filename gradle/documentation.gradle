@@ -5,6 +5,7 @@ javadoc {
     options.overview = file("${buildDir}/overview.html")
     options.showFromPublic()
     options.setNoTimestamp(true)
+    options.addBooleanOption('html5', true)
 }
 
 task javadocDevel(type: Javadoc) {
@@ -17,6 +18,7 @@ task javadocDevel(type: Javadoc) {
     options.showFromPrivate()
     options.overview = file("${buildDir}/overview.html")
     options.setNoTimestamp(true)
+    options.addBooleanOption('html5', true)
 }
 
 task adaptorDocumentation(type: JavaExec) {
