@@ -6,6 +6,7 @@ javadoc {
     options.showFromPublic()
     options.setNoTimestamp(true)
     options.addBooleanOption('html5', true)
+    options.addBooleanOption('Xdoclint', true)
 }
 
 task javadocDevel(type: Javadoc) {

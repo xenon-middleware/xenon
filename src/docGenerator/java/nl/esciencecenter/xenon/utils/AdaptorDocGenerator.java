@@ -107,16 +107,16 @@ public class AdaptorDocGenerator {
     private void generateFileSystem(FileSystemAdaptorDescription description, PrintWriter out) {
         out.println(String.format("<h2><a id=\"%s\">%s</a></h2>", description.getName(), description.getName()));
         out.println(String.format("<p>%s</p>", description.getDescription()));
-        out.println("<h4>Supported locations:</h4>");
+        out.println("<h3>Supported locations:</h3>");
         out.println("Supported locations for <i>FileSystem.create(type, location, credential, properties)</i> method.<ul>");
         for (String supportedLocation : description.getSupportedLocations()) {
             out.println(String.format("<li>%s</li>", supportedLocation));
         }
         out.println("</ul>");
-        out.println("<h4>Supported properties:</h4>");
+        out.println("<h3>Supported properties:</h3>");
         if (description.getSupportedProperties().length > 0) {
             out.println("Supported properties for <i>FileSystem.create(type, location, credential, properties)</i> method.");
-            out.println("<table border=1><tr><th>Name</th><th>Description</th><th>Expected type</th><th>Default</th></tr>");
+            out.println("<table border=1><caption>Supported properties</caption><tr><th>Name</th><th>Description</th><th>Expected type</th><th>Default</th></tr>");
             for (XenonPropertyDescription prop : description.getSupportedProperties()) {
                 generateSupportedProperty(prop, out);
             }
@@ -124,7 +124,7 @@ public class AdaptorDocGenerator {
         } else {
             out.println("No properties.");
         }
-        out.println("<h4>Supported features</h4><ul>");
+        out.println("<h3>Supported features</h3><ul>");
         out.println(String.format("<li>Read symbolic links: %s</li>", description.canReadSymboliclinks()));
         out.println(String.format("<li>Create symbolic links: %s</li>", description.canCreateSymboliclinks()));
         out.println(String.format("<li>Third party copy: %s</li>", description.supportsThirdPartyCopy()));
@@ -150,16 +150,16 @@ public class AdaptorDocGenerator {
     private void generateScheduler(SchedulerAdaptorDescription description, PrintWriter out) {
         out.println(String.format("<h2><a id=\"%s\">%s</a></h2>", description.getName(), description.getName()));
         out.println(String.format("<p>%s</p>", description.getDescription()));
-        out.println("<h4>Supported locations:</h4>");
+        out.println("<h3>Supported locations:</h3>");
         out.println("Supported locations for <i>Scheduler.create(type, location, credential, properties)</i> method.<ul>");
         for (String supportedLocation : description.getSupportedLocations()) {
             out.println(String.format("<li>%s</li>", supportedLocation));
         }
         out.println("</ul>");
-        out.println("<h4>Supported properties:</h4>");
+        out.println("<h3>Supported properties:</h3>");
         if (description.getSupportedProperties().length > 0) {
             out.println("Supported properties for <i>Scheduler.create(type, location, credential, properties)</i> method.");
-            out.println("<table border=1><tr><th>Name</th><th>Description</th><th>Expected type</th><th>Default</th></tr>");
+            out.println("<table border=1><caption>Supported properties</caption><tr><th>Name</th><th>Description</th><th>Expected type</th><th>Default</th></tr>");
             for (XenonPropertyDescription prop : description.getSupportedProperties()) {
                 generateSupportedProperty(prop, out);
             }
@@ -167,7 +167,7 @@ public class AdaptorDocGenerator {
         } else {
             out.println("No properties.");
         }
-        out.println("<h4>Supported features</h4><ul>");
+        out.println("<h3>Supported features</h3><ul>");
         out.println(String.format("<li>Batch: %s</li>", description.supportsBatch()));
         out.println(String.format("<li>Interactive: %s</li>", description.supportsInteractive()));
         out.println(String.format("<li>Embedded: %s</li>", description.isEmbedded()));
