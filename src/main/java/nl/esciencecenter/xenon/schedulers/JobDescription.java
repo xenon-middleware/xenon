@@ -83,7 +83,7 @@ public class JobDescription {
     private int tempSpace = -1;
 
     /** If true, only a single process is started on the first node acquired, instead of nodeCount * processesPerNode. */
-    private boolean startSingleProcess = false;
+    private boolean startSingleProcess = true;
 
     /** The maximum run time in minutes. */
     private int maxRuntime = -1;
