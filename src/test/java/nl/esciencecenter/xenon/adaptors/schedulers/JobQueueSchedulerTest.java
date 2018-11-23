@@ -180,10 +180,8 @@ public class JobQueueSchedulerTest {
 
         JobDescription job = new JobDescription();
         job.setExecutable("/bin/aap");
-        ;
-        job.setNodeCount(42);
+        job.setTasks(42);
         try {
-
             s.submitBatchJob(job);
         } finally {
             s.end();
@@ -191,7 +189,7 @@ public class JobQueueSchedulerTest {
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
-    public void test_verifyJobDescription_invalidProcessCount() throws Exception {
+    public void test_verifyJobDescription_invalidTasksPerNode() throws Exception {
 
         MockFileSystem fs = new MockFileSystem("FID", "MockFS", "local://", new Path("/home/xenon"));
 
@@ -202,10 +200,8 @@ public class JobQueueSchedulerTest {
 
         JobDescription job = new JobDescription();
         job.setExecutable("/bin/aap");
-        ;
-        job.setProcessesPerNode(42);
+        job.setTasksPerNode(42);
         try {
-
             s.submitBatchJob(job);
         } finally {
             s.end();

@@ -310,10 +310,6 @@ public final class SlurmUtils {
                 throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Custom job script not supported in interactive mode");
             }
 
-            if (description.isStartSingleProcess()) {
-                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "StartSingleProcess option not supported in interactive mode");
-            }
-
             if (description.getStdin() != null) {
                 throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Stdin redirect not supported in interactive mode");
             }
@@ -366,15 +362,15 @@ public final class SlurmUtils {
         }
 
         // number of nodes
-        arguments.add("--nodes=" + description.getNodeCount());
+        arguments.add("--ntasks=" + description.getTasks());
 
-        // number of processer per node
-        arguments.add("--ntasks-per-node=" + description.getProcessesPerNode());
+        // number of processor per node
+        if (description.getTasksPerNode() > 0) {
+            arguments.add("--ntasks-per-node=" + description.getTasksPerNode());
+        }
 
         // number of thread per process
-        if (description.getThreadsPerProcess() > 0) {
-            arguments.add("--cpus-per-task=" + description.getThreadsPerProcess());
-        }
+        arguments.add("--cpus-per-task=" + description.getCoresPerTask());
 
         // the max amount of memory per node.
         if (description.getMaxMemory() > 0) {
@@ -427,14 +423,14 @@ public final class SlurmUtils {
         }
 
         // number of nodes
-        script.format("#SBATCH --nodes=%d\n", description.getNodeCount());
-
-        // number of processer per node
-        script.format("#SBATCH --ntasks-per-node=%d\n", description.getProcessesPerNode());
+        script.format("#SBATCH --ntasks=%d\n", description.getTasks());
 
         // number of thread per process
-        if (description.getThreadsPerProcess() > 0) {
-            script.format("#SBATCH --cpus-per-task=%d\n", description.getThreadsPerProcess());
+        script.format("#SBATCH --cpus-per-task=%d\n", description.getCoresPerTask());
+
+        // number of processer per node
+        if (description.getTasksPerNode() > 0) {
+            script.format("#SBATCH --ntasks-per-node=%d\n", description.getTasksPerNode());
         }
 
         // add maximum runtime in hour:minute:second format (converted from minutes in description)
@@ -484,7 +480,7 @@ public final class SlurmUtils {
 
         script.format("\n");
 
-        if (!description.isStartSingleProcess()) {
+        if (description.startPerTask()) {
             // run commands through srun
             script.format("%s ", "srun");
         }

@@ -338,17 +338,17 @@ public class AtUtilsTest {
         JobDescription job = new JobDescription();
         job.setExecutable("text.exe");
         job.setMaxRuntime(0);
-        job.setNodeCount(2);
+        job.setTasks(2);
 
         AtUtils.verifyJobDescription(job, null);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
-    public void test_verifyJobDescription_fail_processes() throws XenonException {
+    public void test_verifyJobDescription_fail_tasksPerNode() throws XenonException {
         JobDescription job = new JobDescription();
         job.setExecutable("text.exe");
         job.setMaxRuntime(0);
-        job.setProcessesPerNode(2);
+        job.setTasksPerNode(2);
 
         AtUtils.verifyJobDescription(job, null);
     }

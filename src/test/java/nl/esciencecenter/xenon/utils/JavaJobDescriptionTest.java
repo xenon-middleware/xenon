@@ -209,7 +209,7 @@ public class JavaJobDescriptionTest {
     public void toString_default() {
         String result = description.toString();
 
-        String expected = "JavaJobDescription [javaOptions=[], javaSystemProperties={}, javaMain=null, javaArguments=[], javaClassPath=[], queueName=null, executable=java, stdin=null, stdout=null, stderr=null, workingDirectory=null, environment={}, jobOptions={}, nodeCount=1, processesPerNode=1, maxTime=-1]";
+        String expected = "JavaJobDescription [javaOptions=[], javaSystemProperties={}, javaMain=null, javaArguments=[], javaClassPath=[], queueName=null, executable=java, stdin=null, stdout=null, stderr=null, workingDirectory=null, environment={}, jobOptions={}, tasks=1, coresPerTask=1, maxTime=-1]";
         assertEquals(expected, result);
     }
 
@@ -227,7 +227,7 @@ public class JavaJobDescriptionTest {
 
         String result = description.toString();
 
-        String expected = "JavaJobDescription [javaOptions=[-server], javaSystemProperties={xenon.someprop=somevalue}, javaMain=nl.esciencecenter.xenon.cli.Main, javaArguments=[filesystem, file, list, /etc], javaClassPath=[/opt/xenon.jar, /opt/xenon-cli.jar], queueName=null, executable=java, stdin=null, stdout=null, stderr=null, workingDirectory=/workdir, environment={CI=1}, jobOptions={}, nodeCount=1, processesPerNode=1, maxTime=-1]";
+        String expected = "JavaJobDescription [javaOptions=[-server], javaSystemProperties={xenon.someprop=somevalue}, javaMain=nl.esciencecenter.xenon.cli.Main, javaArguments=[filesystem, file, list, /etc], javaClassPath=[/opt/xenon.jar, /opt/xenon-cli.jar], queueName=null, executable=java, stdin=null, stdout=null, stderr=null, workingDirectory=/workdir, environment={CI=1}, jobOptions={}, tasks=1, coresPerTask=1, maxTime=-1]";
         assertEquals(expected, result);
     }
 

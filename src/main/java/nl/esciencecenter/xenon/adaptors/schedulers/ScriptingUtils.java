@@ -193,16 +193,16 @@ public class ScriptingUtils {
             throw new IncompleteJobDescriptionException(adaptorName, "Executable missing in JobDescription!");
         }
 
-        int nodeCount = description.getNodeCount();
+        int tasks = description.getTasks();
 
-        if (nodeCount < 1) {
-            throw new InvalidJobDescriptionException(adaptorName, "Illegal node count: " + nodeCount);
+        if (tasks < 1) {
+            throw new InvalidJobDescriptionException(adaptorName, "Illegal task count: " + tasks);
         }
 
-        int processesPerNode = description.getProcessesPerNode();
+        int coresPerTask = description.getCoresPerTask();
 
-        if (processesPerNode < 1) {
-            throw new InvalidJobDescriptionException(adaptorName, "Illegal processes per node count: " + processesPerNode);
+        if (coresPerTask < 1) {
+            throw new InvalidJobDescriptionException(adaptorName, "Illegal cores per task count: " + coresPerTask);
         }
 
         // Check if the time is set to -1 (default), 0 (infinite), or a value.
