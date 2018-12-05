@@ -76,22 +76,23 @@ we used snakemake to tie the components together. snakemake includes support for
 distributed computing, which allows applications to run in parallel using
 multiple compute nodes.
 
-workflow to do <something important> using 4 reference tools.
-each tool requires its own environment.
-we solved the environments problem using conda
-we wrote down the steps of the workflow in a snakemake recipe
+workflow to detect structural variants (SVs) in whole-genome sequencing data using 4 reference tools (SV callers)
+tools implemented in different languages
+each tool requires its own dependencies / environment.
+the environments problem is solved by using Conda env/package manager (I haven't used Docker/Singularity but it's supported by Snakemake)
+we wrote down the steps of the workflow in a Makefile-like recipe (Snakefile)
 conda gives us the environment, snakemake ties everything together in the right order
 
-we wanted to run the workflow on two datasets: bla and bla
-what made this challenging was that the data could not be moved due to privacy reasons.
-so needed to do the analysis using on-premises compute infrastructure
-problem: one was slurm the other sge
+we wanted to run the workflow on several data sets
+sensitive (patient) data could not be moved (yet) to Cartesius due to privacy reasons so the analysis had to be done on-premises, GridEngine cluster at UMCU
+the development/production compute infrastructures differ: SLURM vs. GE clusters
 
 (maybe sidenote: this is a manifestation of larger problem, namely difficulty of reproducibility when it comes to distributed computing)
 
-snakemake has support for slurm (?) but not SGE.
-
-we solved the distributed-computing problem using xenon-cli
+snakemake does support different batch schedulers via DRMAA, which is a server- rather than client-side solution (such as Xenon, see the details in the paper)
+alternatively, one can supply a scheduler-specific job submission command via the snakemake's --cluster option
+if the workflow needs to run on different infrastructure/batch systems (portabilone needs to known the intricacies of each scheduler
+xenon-cli solves this issue because the workflow jobs can be submitted using (almost) the same command line (except the scheduler type:)
 
 -->
 
