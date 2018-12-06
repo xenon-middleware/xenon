@@ -1,0 +1,59 @@
+sge
+pbs, torque 
+slurm
+
+multiple clusters 
+kleine taak op cluster a pf b, afhankelijk van availability of van waar je data staat
+of grote taak of a en b tegelijk
+
+of je schrijft software die een cluster gebruikt en het is nog niet bekend of het a of b gaat worden
+
+taak op cluster a of b, afhankelijk van availability of van waar je data staat
+
+bash / xenoncli
+
+https://github.com/GooglingTheCancerGenome/sv-callers
+conda install xenon-cli ?
+
+https://anaconda.org/NLeSC/xenon-cli
+
+
+services: xenonflow, osmium
+
+
+
+- Within a given project, you may have to update your code if the service provider decides to decommission say, Slurm 14, in favor of Slurm 17.
+- Within a given project, you may want to move to a different service provider if they can offer for example better pricing or better performance.
+- From a Research Software Engineer's perspective, switching between projects that overlap in time, but which use different schedulers, can be difficult. Trying to remember the intricacies of how one version is different from another is difficult and makes it easy to introduce bugs.
+- Easily switch between local development and remote development.
+
+(Can we show how this was easy for us thanks to Xenon?)
+
+What technology is available around Xenon?
+
+<img src="https://raw.githubusercontent.com/NLeSC/Xenon/master/docs/images/readme-xenon-api.svg.png" width="800px">
+
+- gRPC 
+- pyXenon
+- xenon-cli
+
+(call to action: get started with the RSE2017 virtual machine? Could use an update particularly re pyXenon)
+
+
+multiple clusters 
+kleine taak op cluster a pf b, afhankelijk van availability of van waar je data staat
+of grote taak of a en b tegelijk
+
+of je schrijft software die een cluster gebruikt en het is nog niet bekend of het a of b gaat worden
+
+taak op cluster a of b, afhankelijk van availability of van waar je data staat
+
+bash / xenoncli
+
+https://github.com/GooglingTheCancerGenome/sv-callers
+conda install xenon-cli ?
+
+https://anaconda.org/NLeSC/xenon-cli
+
+
+services: xenonflow, osmium
