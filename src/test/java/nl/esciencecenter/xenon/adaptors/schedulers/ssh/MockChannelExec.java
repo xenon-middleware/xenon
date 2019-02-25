@@ -22,7 +22,6 @@ import java.util.HashMap;
 
 import org.apache.sshd.client.channel.ChannelExec;
 import org.apache.sshd.client.future.OpenFuture;
-import org.apache.sshd.common.future.CloseFuture;
 import org.apache.sshd.common.future.SshFutureListener;
 
 public class MockChannelExec extends ChannelExec {
@@ -53,60 +52,6 @@ public class MockChannelExec extends ChannelExec {
     }
 
     @Override
-    public boolean isClosed() {
-        return closed;
-    }
-
-    @Override
-    public CloseFuture close(boolean immediately) {
-
-        this.gotClose = true;
-
-        return new CloseFuture() {
-
-            @Override
-            public boolean isDone() {
-                return true;
-            }
-
-            @Override
-            public boolean awaitUninterruptibly(long timeoutMillis) {
-                return true;
-            }
-
-            @Override
-            public boolean await(long timeoutMillis) throws IOException {
-
-                if (closeThrows) {
-                    throw new IOException("Bang!");
-                }
-
-                return true;
-            }
-
-            @Override
-            public CloseFuture removeListener(SshFutureListener<CloseFuture> listener) {
-                return null;
-            }
-
-            @Override
-            public CloseFuture addListener(SshFutureListener<CloseFuture> listener) {
-                return null;
-            }
-
-            @Override
-            public void setClosed() {
-            }
-
-            @Override
-            public boolean isClosed() {
-                return true;
-            }
-        };
-
-    }
-
-    @Override
     public InputStream getInvertedOut() {
         return null;
     }
@@ -133,12 +78,17 @@ public class MockChannelExec extends ChannelExec {
 
             @Override
             public boolean isDone() {
-                return true;
+                return closed;
             }
 
             @Override
             public boolean awaitUninterruptibly(long timeoutMillis) {
                 return true;
+            }
+
+            @Override
+            public Object getId() {
+                return null;
             }
 
             @Override

@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.net.HostAndPort;
 import org.apache.sshd.agent.local.ProxyAgentFactory;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ChannelDirectTcpip;
@@ -42,13 +43,14 @@ import org.apache.sshd.client.keyverifier.AcceptAllServerKeyVerifier;
 import org.apache.sshd.client.keyverifier.DefaultKnownHostsServerKeyVerifier;
 import org.apache.sshd.client.keyverifier.RejectAllServerKeyVerifier;
 import org.apache.sshd.client.session.ClientSession;
+import org.apache.sshd.common.NamedResource;
 import org.apache.sshd.common.config.keys.FilePasswordProvider;
+import org.apache.sshd.common.session.SessionContext;
+import org.apache.sshd.common.util.io.resource.PathResource;
 import org.apache.sshd.common.util.net.SshdSocketAddress;
 import org.apache.sshd.common.util.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.net.HostAndPort;
 
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
@@ -79,7 +81,7 @@ public class SSHUtil {
         }
 
         @Override
-        public String getPassword(String resourceKey) throws IOException {
+        public String getPassword(SessionContext session, NamedResource resourceKey, int retryIndex) throws IOException {
             return new String(password);
         }
     }
@@ -409,9 +411,9 @@ public class SSHUtil {
                 char[] password = c.getPassword();
 
                 if (password.length == 0) {
-                    pair = SecurityUtils.loadKeyPairIdentity(path.toString(), inputStream, null);
+                    pair = SecurityUtils.loadKeyPairIdentities(session, new PathResource(path), inputStream, null).iterator().next();
                 } else {
-                    pair = SecurityUtils.loadKeyPairIdentity(path.toString(), inputStream, new PasswordProvider(password));
+                    pair = SecurityUtils.loadKeyPairIdentities(session, new PathResource(path), inputStream, new PasswordProvider(password)).iterator().next();
                 }
 
             } catch (Exception e) {

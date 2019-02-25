@@ -48,7 +48,7 @@ public class SSHUtilTest {
     @Test
     public void test_passwordProvider() throws IOException {
         PasswordProvider p = new PasswordProvider("Hello World".toCharArray());
-        assertEquals("Hello World", p.getPassword(null));
+        assertEquals("Hello World", p.getPassword(null, null, 0));
     }
 
     @Test(expected = InvalidLocationException.class)

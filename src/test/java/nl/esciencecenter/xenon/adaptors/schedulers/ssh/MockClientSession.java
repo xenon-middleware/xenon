@@ -17,11 +17,11 @@ package nl.esciencecenter.xenon.adaptors.schedulers.ssh;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.nio.file.FileSystem;
 import java.security.KeyPair;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -37,15 +37,14 @@ import org.apache.sshd.client.channel.ChannelSubsystem;
 import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.keyverifier.ServerKeyVerifier;
-import org.apache.sshd.client.scp.ScpClient;
 import org.apache.sshd.client.session.ClientProxyConnector;
 import org.apache.sshd.client.session.ClientSession;
-import org.apache.sshd.client.subsystem.sftp.SftpClient;
-import org.apache.sshd.client.subsystem.sftp.SftpVersionSelector;
+import org.apache.sshd.common.AttributeRepository;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.PropertyResolver;
 import org.apache.sshd.common.Service;
 import org.apache.sshd.common.channel.ChannelListener;
+import org.apache.sshd.common.channel.throttle.ChannelStreamPacketWriterResolver;
 import org.apache.sshd.common.cipher.Cipher;
 import org.apache.sshd.common.cipher.CipherInformation;
 import org.apache.sshd.common.compression.Compression;
@@ -58,13 +57,12 @@ import org.apache.sshd.common.io.IoSession;
 import org.apache.sshd.common.io.IoWriteFuture;
 import org.apache.sshd.common.kex.KexProposalOption;
 import org.apache.sshd.common.kex.KeyExchange;
-import org.apache.sshd.common.keyprovider.KeyPairProvider;
+import org.apache.sshd.common.keyprovider.KeyIdentityProvider;
 import org.apache.sshd.common.mac.Mac;
 import org.apache.sshd.common.mac.MacInformation;
-import org.apache.sshd.common.scp.ScpFileOpener;
-import org.apache.sshd.common.scp.ScpTransferEventListener;
 import org.apache.sshd.common.session.ReservedSessionMessagesHandler;
 import org.apache.sshd.common.session.SessionListener;
+import org.apache.sshd.common.session.UnknownChannelReferenceHandler;
 import org.apache.sshd.common.signature.Signature;
 import org.apache.sshd.common.util.buffer.Buffer;
 import org.apache.sshd.common.util.net.SshdSocketAddress;
@@ -192,12 +190,6 @@ public class MockClientSession implements ClientSession {
     }
 
     @Override
-    public void resetIdleTimeout() {
-        throw new RuntimeException("Not implemented");
-
-    }
-
-    @Override
     public TimeoutStatus getTimeoutStatus() {
         throw new RuntimeException("Not implemented");
     }
@@ -208,8 +200,28 @@ public class MockClientSession implements ClientSession {
     }
 
     @Override
+    public long getAuthTimeoutStart() {
+        return 0;
+    }
+
+    @Override
+    public long resetAuthTimeout() {
+        return 0;
+    }
+
+    @Override
     public long getIdleTimeout() {
         throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public long getIdleTimeoutStart() {
+        return 0;
+    }
+
+    @Override
+    public long resetIdleTimeout() {
+        return 0;
     }
 
     @Override
@@ -285,17 +297,6 @@ public class MockClientSession implements ClientSession {
 
     @Override
     public void setMacFactories(List<NamedFactory<Mac>> macFactories) {
-        throw new RuntimeException("Not implemented");
-
-    }
-
-    @Override
-    public KeyPairProvider getKeyPairProvider() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public void setKeyPairProvider(KeyPairProvider keyPairProvider) {
         throw new RuntimeException("Not implemented");
 
     }
@@ -384,6 +385,11 @@ public class MockClientSession implements ClientSession {
     }
 
     @Override
+    public int getAttributesCount() {
+        return 0;
+    }
+
+    @Override
     public <T> T getAttribute(AttributeKey<T> key) {
         throw new RuntimeException("Not implemented");
     }
@@ -399,8 +405,18 @@ public class MockClientSession implements ClientSession {
     }
 
     @Override
+    public void clearAttributes() {
+
+    }
+
+    @Override
     public <T> T resolveAttribute(AttributeKey<T> key) {
         throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public Collection<AttributeKey<?>> attributeKeys() {
+        return null;
     }
 
     @Override
@@ -417,6 +433,11 @@ public class MockClientSession implements ClientSession {
             @Override
             public boolean awaitUninterruptibly(long timeoutMillis) {
                 return true;
+            }
+
+            @Override
+            public Object getId() {
+                return null;
             }
 
             @Override
@@ -475,69 +496,6 @@ public class MockClientSession implements ClientSession {
 
     @Override
     public String getUsername() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public ScpClient createScpClient(ScpFileOpener opener, ScpTransferEventListener listener) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public ScpTransferEventListener getScpTransferEventListener() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public void setScpTransferEventListener(ScpTransferEventListener listener) {
-        throw new RuntimeException("Not implemented");
-
-    }
-
-    @Override
-    public ScpFileOpener getScpFileOpener() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public void setScpFileOpener(ScpFileOpener opener) {
-        throw new RuntimeException("Not implemented");
-
-    }
-
-    @Override
-    public SftpClient createSftpClient(SftpVersionSelector selector) throws IOException {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public FileSystem createSftpFileSystem() throws IOException {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public FileSystem createSftpFileSystem(int version) throws IOException {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public FileSystem createSftpFileSystem(SftpVersionSelector selector) throws IOException {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public FileSystem createSftpFileSystem(int readBufferSize, int writeBufferSize) throws IOException {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public FileSystem createSftpFileSystem(int version, int readBufferSize, int writeBufferSize) throws IOException {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public FileSystem createSftpFileSystem(SftpVersionSelector selector, int readBufferSize, int writeBufferSize)
-            throws IOException {
         throw new RuntimeException("Not implemented");
     }
 
@@ -664,6 +622,11 @@ public class MockClientSession implements ClientSession {
     }
 
     @Override
+    public AttributeRepository getConnectionContext() {
+        return null;
+    }
+
+    @Override
     public AuthFuture auth() throws IOException {
         throw new RuntimeException("Not implemented");
     }
@@ -725,4 +688,68 @@ public class MockClientSession implements ClientSession {
         throw new RuntimeException("Not implemented");
     }
 
+    @Override
+    public ChannelStreamPacketWriterResolver getChannelStreamPacketWriterResolver() {
+        return null;
+    }
+
+    @Override
+    public void setChannelStreamPacketWriterResolver(ChannelStreamPacketWriterResolver resolver) {
+
+    }
+
+    @Override
+    public NavigableSet<Integer> getStartedLocalPortForwards() {
+        return null;
+    }
+
+    @Override
+    public SshdSocketAddress getBoundLocalPortForward(int port) {
+        return null;
+    }
+
+    @Override
+    public List<Map.Entry<Integer, SshdSocketAddress>> getLocalForwardsBindings() {
+        return null;
+    }
+
+    @Override
+    public NavigableSet<Integer> getStartedRemotePortForwards() {
+        return null;
+    }
+
+    @Override
+    public SshdSocketAddress getBoundRemotePortForward(int port) {
+        return null;
+    }
+
+    @Override
+    public List<Map.Entry<Integer, SshdSocketAddress>> getRemoteForwardsBindings() {
+        return null;
+    }
+
+    @Override
+    public KeyIdentityProvider getKeyIdentityProvider() {
+        return null;
+    }
+
+    @Override
+    public void setKeyIdentityProvider(KeyIdentityProvider provider) {
+
+    }
+
+    @Override
+    public UnknownChannelReferenceHandler getUnknownChannelReferenceHandler() {
+        return null;
+    }
+
+    @Override
+    public void setUnknownChannelReferenceHandler(UnknownChannelReferenceHandler handler) {
+
+    }
+
+    @Override
+    public UnknownChannelReferenceHandler resolveUnknownChannelReferenceHandler() {
+        return null;
+    }
 }
