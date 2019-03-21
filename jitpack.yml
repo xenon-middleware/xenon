@@ -2,3 +2,5 @@
 # To get snapshots of branches use https://jitpack.io/#NLeSC/Xenon
 install:
 - ./gradlew clean -Pgroup=$GROUP -Pversion=$VERSION -xtest -xintegrationTest build publishToMavenLocal
+jdk:
+- openjdk9
