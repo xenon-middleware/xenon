@@ -596,7 +596,7 @@ public class XenonPropertiesTest {
 
         String result = b.toString();
 
-        assertEquals("aap.key = noot\nnoot.key = aap\n", result);
+        assertEquals(String.format("aap.key = noot%nnoot.key = aap%n"), result);
     }
 
     @Test
@@ -618,7 +618,7 @@ public class XenonPropertiesTest {
 
         String result = b.toString();
 
-        assertEquals("noot.key = aap\n", result);
+        assertEquals(String.format("noot.key = aap%n"), result);
     }
 
     @Test
@@ -640,7 +640,7 @@ public class XenonPropertiesTest {
 
         String result = b.toString();
 
-        assertEquals("noot.key = aap\n", result);
+        assertEquals(String.format("noot.key = aap%n"), result);
     }
 
     @Test
