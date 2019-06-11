@@ -1,12 +1,12 @@
 
 # Xenon
 
-[![Build Status](https://travis-ci.org/NLeSC/Xenon.svg?branch=develop)](https://travis-ci.org/NLeSC/Xenon)
+[![Build Status](https://travis-ci.org/xenon-middleware/xenon.svg?branch=master)](https://travis-ci.org/xenon-middleware/xenon)
 [![Build status Windows](https://ci.appveyor.com/api/projects/status/h4l4wn158db23kuf?svg=true)](https://ci.appveyor.com/project/NLeSC/xenon/branch/master)
-[![codecov.io](https://codecov.io/github/NLeSC/Xenon/coverage.svg?branch=master)](https://codecov.io/github/NLeSC/Xenon?branch=master)
+[![codecov](https://codecov.io/gh/xenon-middleware/xenon/branch/master/graph/badge.svg)](https://codecov.io/gh/xenon-middleware/xenon)
 [![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=nlesc%3AXenon&metric=alert_status)](https://sonarcloud.io/dashboard?id=nlesc%3AXenon)
-[![GitHub license](https://img.shields.io/badge/license-Apache--2.0%20-blue.svg)](https://github.com/NLeSC/Xenon/blob/master/LICENSE)
-[![Download](https://jitpack.io/v/NLeSC/Xenon.svg)](https://jitpack.io/#NLeSC/Xenon)
+[![GitHub license](https://img.shields.io/badge/license-Apache--2.0%20-blue.svg)](https://github.com/xenon-middleware/xenon/blob/master/LICENSE)
+[![Download](https://jitpack.io/v/xenon-middleware/xenon.svg)](https://jitpack.io/#xenon-middleware/xenon)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.597993.svg)](https://doi.org/10.5281/zenodo.597993)
 [![Research Software Directory](https://img.shields.io/badge/rsd-xenon-00a3e3.svg)](https://www.research-software.nl/software/xenon)
 

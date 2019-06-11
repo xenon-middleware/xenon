@@ -19,11 +19,13 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 
 task testApiJar(type: Jar) {
     description "Creates jar with test api"
+    baseName = 'xenon-testapi'
     from sourceSets.testApi.output
 }
 
 task docGeneratorJar(type: Jar) {
     description "Creates jar with doc generator"
+    baseName = 'xenon-docgenerator'
     from sourceSets.docGenerator.output
 }
 
