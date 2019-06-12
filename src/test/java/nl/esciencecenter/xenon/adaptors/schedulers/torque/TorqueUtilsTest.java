@@ -153,19 +153,6 @@ public class TorqueUtilsTest {
     }
 
     @Test
-    public void test01d_generate_CustomContents() throws XenonException {
-        JobDescription description = new JobDescription();
-        description.addJobOption(TorqueUtils.JOB_OPTION_JOB_CONTENTS, "/myscript/or_other");
-
-        String result = TorqueUtils.generate(description, null, 15);
-
-        String expected = "#!/bin/sh\n" + "#PBS -S /bin/sh\n" + "#PBS -N xenon\n" + "#PBS -l nodes=1:ppn=1\n" + "#PBS -l walltime=00:15:00\n"
-                + "\n/myscript/or_other\n";
-
-        assertEquals(expected, result);
-    }
-
-    @Test
     public void test03a_generateSerialScriptContent() {
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/executable");
@@ -210,48 +197,6 @@ public class TorqueUtilsTest {
         TorqueUtils.verifyJobDescription(description, null);
     }
 
-    @Test
-    public void test01b_verifyJobDescription_ScriptOptionSet_NoException() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // all the settings the function checks for set exactly right
-        description.setExecutable("/bin/nothing");
-        description.setTasks(1);
-        description.setCoresPerTask(1);
-        description.setMaxRuntime(1);
-        // GridEngine specific info
-        description.addJobOption(TorqueUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
-
-        TorqueUtils.verifyJobDescription(description, null);
-    }
-
-    @Test
-    public void test01c_verifyJobDescription_JobScriptSet_NoFurtherChecking() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // set a job option
-        description.addJobOption(TorqueUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
-
-        // All these settings are wrong. This should not lead to an error
-        description.setExecutable(null);
-        description.setTasks(0);
-        description.setCoresPerTask(0);
-        description.setMaxRuntime(0);
-        // GridEngine specific info
-
-        TorqueUtils.verifyJobDescription(description, null);
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test01d_verifyJobDescription_InvalidOptions_ExceptionThrown() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // set a job option
-        description.addJobOption("wrong.setting", "wrong.value");
-
-        TorqueUtils.verifyJobDescription(description, null);
-    }
-
     @Test(expected = InvalidJobDescriptionException.class)
     public void test01f_verifyJobDescription_InvalidStandardSetting_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
@@ -259,17 +204,6 @@ public class TorqueUtilsTest {
         // verify the standard settings are also checked
         description.setExecutable("bin/bla");
         description.setMaxRuntime(0);
-
-        TorqueUtils.verifyJobDescription(description, null);
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test01l_verifyJobDescription_JobScriptAndContents_ExceptionThrown() throws Exception {
-        JobDescription description = new JobDescription();
-
-        description.setExecutable("/bin/nothing");
-        description.addJobOption(TorqueUtils.JOB_OPTION_JOB_SCRIPT, "other");
-        description.addJobOption(TorqueUtils.JOB_OPTION_JOB_CONTENTS, "some");
 
         TorqueUtils.verifyJobDescription(description, null);
     }

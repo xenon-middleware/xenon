@@ -38,10 +38,6 @@ public class AtUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AtUtils.class);
 
-    public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
-
-    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
-
     public AtUtils() {
         // utility class
     }
@@ -147,9 +143,6 @@ public class AtUtils {
     }
 
     public static void verifyJobDescription(JobDescription description, String[] queueNames) throws XenonException {
-
-        ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
-
         // check for option that overrides job script completely.
         // if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
         // no other settings checked.

@@ -273,7 +273,7 @@ public class JavaJobDescription extends JobDescription {
         return "JavaJobDescription [javaOptions=" + javaOptions + ", javaSystemProperties=" + javaSystemProperties + ", javaMain=" + javaMain
                 + ", javaArguments=" + javaArguments + ", javaClassPath=" + javaClasspath + ", queueName=" + getQueueName() + ", executable=" + getExecutable()
                 + ", stdin=" + getStdin() + ", stdout=" + getStdout() + ", stderr=" + getStderr() + ", workingDirectory=" + getWorkingDirectory()
-                + ", environment=" + getEnvironment() + ", jobOptions=" + getJobOptions() + ", tasks=" + getTasks() + ", coresPerTask=" + getCoresPerTask()
+                + ", environment=" + getEnvironment() + ", tasks=" + getTasks() + ", coresPerTask=" + getCoresPerTask()
                 + ", maxTime=" + getMaxRuntime() + "]";
     }
 

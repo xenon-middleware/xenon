@@ -19,7 +19,6 @@ import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineS
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.ADAPTOR_NAME;
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.IGNORE_VERSION_PROPERTY;
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineSchedulerAdaptor.POLL_DELAY_PROPERTY;
-import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.JOB_OPTION_JOB_SCRIPT;
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.QACCT_HEADER;
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.generate;
 import static nl.esciencecenter.xenon.adaptors.schedulers.gridengine.GridEngineUtils.getJobStatusFromQacctInfo;
@@ -176,24 +175,9 @@ public class GridEngineScheduler extends ScriptingScheduler {
 
         verifyJobDescription(description, setupInfo.getQueueNames());
 
-        // check for option that overrides job script completely.
-        String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
+        String jobScript = generate(description, fsEntryPath, setupInfo);
 
-        if (customScriptFile == null) {
-            String jobScript = generate(description, fsEntryPath, setupInfo);
-
-            output = runCheckedCommand(jobScript, "qsub");
-        } else {
-            // the user gave us a job script. Pass it to qsub as-is
-
-            // convert to absolute path if needed
-            if (!customScriptFile.startsWith("/")) {
-                Path scriptFile = fsEntryPath.resolve(customScriptFile);
-                customScriptFile = scriptFile.toString();
-            }
-
-            output = runCheckedCommand(null, "qsub", customScriptFile);
-        }
+        output = runCheckedCommand(jobScript, "qsub");
 
         String identifier = ScriptingParser.parseJobIDFromLine(output, ADAPTOR_NAME, "Your job");
 

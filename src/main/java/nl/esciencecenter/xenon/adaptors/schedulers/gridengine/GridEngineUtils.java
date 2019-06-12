@@ -41,10 +41,6 @@ final class GridEngineUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GridEngineUtils.class);
 
-    public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
-
-    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
-
     public static final String QACCT_HEADER = "==============================================================";
 
     private static final int MINUTES_PER_HOUR = 60;
@@ -212,14 +208,6 @@ final class GridEngineUtils {
     }
 
     protected static void verifyJobDescription(JobDescription description, String[] queueNames) throws XenonException {
-        ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
-
-        // check for option that overrides job script completely.
-        if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
-            // no remaining settings checked.
-            return;
-        }
-
         // perform standard checks.
         ScriptingUtils.verifyJobDescription(description, queueNames, ADAPTOR_NAME);
 

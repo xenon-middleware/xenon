@@ -45,28 +45,11 @@ final class TorqueUtils {
 
     public static final Pattern QUEUE_INFO_NAME = Pattern.compile("^Queue: ([a-zA-Z_]+)$");
 
-    public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
-    public static final String JOB_OPTION_JOB_CONTENTS = "job.contents";
-
-    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
-
     private TorqueUtils() {
         throw new IllegalStateException("Utility class");
     }
 
     public static void verifyJobDescription(JobDescription description, String[] queueNames) throws XenonException {
-        ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
-
-        // check for option that overrides job script completely.
-        if (description.getJobOptions().containsKey(JOB_OPTION_JOB_SCRIPT)) {
-            if (description.getJobOptions().containsKey(JOB_OPTION_JOB_CONTENTS)) {
-                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Adaptor cannot process job script and job contents simultaneously.");
-            }
-
-            // no remaining settings checked.
-            return;
-        }
-
         // perform standard checks.
         ScriptingUtils.verifyJobDescription(description, queueNames, ADAPTOR_NAME);
 
@@ -231,13 +214,7 @@ final class TorqueUtils {
 
         script.format("\n");
 
-        String customContents = description.getJobOptions().get(JOB_OPTION_JOB_CONTENTS);
-
-        if (customContents == null) {
-            generateScriptContent(description, script);
-        } else {
-            script.format("%s\n", customContents);
-        }
+        generateScriptContent(description, script);
 
         script.close();
 
