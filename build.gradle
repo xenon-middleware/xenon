@@ -96,7 +96,7 @@ dependencies {
 
     // TODO fixedClientEnvironmentTest should have same dependencies as integrationTest,
     // do no copy deps but append integrationTest.deps to fixedClientEnvironmentTest.deps
-    fixedClientEnvironmentTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.32.0'
+    fixedClientEnvironmentTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.35.0'
 
     docGeneratorCompile sourceSets.main.output
     docGeneratorRuntime configurations.runtime
