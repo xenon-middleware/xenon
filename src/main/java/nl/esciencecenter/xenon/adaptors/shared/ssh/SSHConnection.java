@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.client.subsystem.sftp.SftpClient;
+import org.apache.sshd.client.subsystem.sftp.SftpClientFactory;
 
 import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil.Tunnel;
 
@@ -47,7 +48,7 @@ public class SSHConnection implements AutoCloseable {
     }
 
     public SftpClient createSftpClient() throws IOException {
-        return session.createSftpClient();
+        return SftpClientFactory.instance().createSftpClient(session);
     }
 
     public ClientSession getSession() {

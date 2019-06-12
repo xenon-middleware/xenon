@@ -16,9 +16,10 @@
 package nl.esciencecenter.xenon.adaptors.filesystems.sftp;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.NavigableMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.sshd.client.channel.ClientChannel;
@@ -67,7 +68,17 @@ public class MockSftpClient implements SftpClient {
     }
 
     @Override
-    public Map<String, byte[]> getServerExtensions() {
+    public Charset getNameDecodingCharset() {
+        return null;
+    }
+
+    @Override
+    public void setNameDecodingCharset(Charset cs) {
+
+    }
+
+    @Override
+    public NavigableMap<String, byte[]> getServerExtensions() {
         return null;
     }
 
