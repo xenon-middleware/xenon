@@ -214,16 +214,6 @@ public class Path implements Iterable<Path> {
         return result;
     }
 
-    // List<String> filterNonEmpty(List<String> elts) {
-    // List<String> res = new LinkedList<>();
-    // for (String s : elts) {
-    // if (s != null && !s.isEmpty()) {
-    // res.add(s);
-    // }
-    // }
-    // return res;
-    // }
-
     /**
      * Get the file name or <code>null</code> if the Path is empty.
      *
