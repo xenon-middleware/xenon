@@ -520,56 +520,6 @@ public class SlurmUtilsTest {
         SlurmUtils.verifyJobDescription(description, null, false);
     }
 
-    @Test
-    public void test08b_verifyJobDescription_ScriptOptionSet_NoException() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // all the settings the function checks for set exactly right
-        description.setExecutable("/bin/nothing");
-        description.setNodeCount(1);
-        description.setProcessesPerNode(1);
-        description.setMaxRuntime(1);
-        // slurm specific info
-        description.addJobOption(SlurmUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
-
-        SlurmUtils.verifyJobDescription(description, null, false);
-    }
-
-    @Test
-    public void test08c_verifyJobDescription_JobScriptSet_NoFurtherChecking() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // set a job option
-        description.addJobOption(SlurmUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
-
-        // All these settings are wrong. This should not lead to an error
-        description.setExecutable(null);
-        description.setNodeCount(0);
-        description.setProcessesPerNode(0);
-        description.setMaxRuntime(0);
-
-        SlurmUtils.verifyJobDescription(description, null, false);
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test08d_verifyJobDescription_InvalidOptions_ExceptionThrown() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // set a job option
-        description.addJobOption("wrong.setting", "wrong.value");
-
-        SlurmUtils.verifyJobDescription(description, null, false);
-    }
-
-    // @Test(expected = InvalidJobDescriptionException.class)
-    // public void test08e_verifyJobDescription_InteractiveJob_ExceptionThrown() throws Exception {
-    // JobDescription description = new JobDescription();
-    //
-    // description.setInteractive(true);
-    //
-    // SlurmSchedulerConnection.verifyJobDescription(description);
-    // }
-
     @Test(expected = InvalidJobDescriptionException.class)
     public void test08f_verifyJobDescription_InvalidStandardSetting_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
@@ -579,21 +529,6 @@ public class SlurmUtilsTest {
         description.setMaxRuntime(0);
 
         SlurmUtils.verifyJobDescription(description, null, false);
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test_verifyJobDescriptionInteractive_FailsScriptOptionSet() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // all the settings the function checks for set exactly right
-        description.setExecutable("/bin/nothing");
-        description.setNodeCount(1);
-        description.setProcessesPerNode(1);
-        description.setMaxRuntime(1);
-        // slurm specific info
-        description.addJobOption(SlurmUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
-
-        SlurmUtils.verifyJobDescription(description, null, true);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)

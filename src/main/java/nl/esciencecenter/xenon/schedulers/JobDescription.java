@@ -64,9 +64,6 @@ public class JobDescription {
     /** The environment variables and their values */
     private final Map<String, String> environment = new HashMap<>(5);
 
-    /** The job options of this job */
-    private final Map<String, String> jobOptions = new HashMap<>(5);
-
     /** The number of nodes to run the job on. */
     private int nodeCount = 1;
 
@@ -115,7 +112,6 @@ public class JobDescription {
         stderr = original.getStderr();
         workingDirectory = original.getWorkingDirectory();
         environment.putAll(original.getEnvironment());
-        jobOptions.putAll(original.getJobOptions());
         nodeCount = original.getNodeCount();
         processesPerNode = original.getProcessesPerNode();
         threadsPerProcess = original.getThreadsPerProcess();
@@ -476,61 +472,6 @@ public class JobDescription {
     }
 
     /**
-     * Get a copy of the job options of this job.
-     *
-     * The job options consist of a {@link Map} of options variables with their values (for example: "PE", "MPI").
-     *
-     * @return the job options of the job.
-     */
-    public Map<String, String> getJobOptions() {
-        return Collections.unmodifiableMap(jobOptions);
-    }
-
-    /**
-     * Sets the job options of the job.
-     *
-     * The job options consist of a {@link Map} of options variables with their values (for example: "PE", "MPI").
-     *
-     * @param options
-     *            job options of the job.
-     */
-    public void setJobOptions(Map<String, String> options) {
-
-        jobOptions.clear();
-
-        if (options != null) {
-            for (Entry<String, String> entry : options.entrySet()) {
-                addJobOption(entry.getKey(), entry.getValue());
-            }
-        }
-    }
-
-    /**
-     * Add a job option to the job.
-     *
-     * The job option consist of a key-value pair (for example: "PE", "MPI").
-     *
-     * Neither the key or value of a job option may be <code>null</code> or empty.
-     *
-     * @param key
-     *            the unique key under which to store the job option.
-     * @param value
-     *            the value of the option to store.
-     */
-    public void addJobOption(String key, String value) {
-
-        if (key == null || key.length() == 0) {
-            throw new IllegalArgumentException("Job option key may not be null or empty!");
-        }
-
-        if (value == null || value.length() == 0) {
-            throw new IllegalArgumentException("Job option value may not be null or empty!");
-        }
-
-        jobOptions.put(key, value);
-    }
-
-    /**
      * Sets the path to the file from which the executable must redirect stdin.
      *
      * @param stdin
@@ -611,7 +552,7 @@ public class JobDescription {
     public String toString() {
         return "JobDescription [name=" + name + ", queueName=" + queueName + ", executable=" + executable + ", arguments=" + arguments + ", schedulerArguments="
                 + schedulerArguments + ", stdin=" + stdin + ", stdout=" + stdout + ", stderr=" + stderr + ", workingDirectory=" + workingDirectory
-                + ", environment=" + environment + ", jobOptions=" + jobOptions + ", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode
+                + ", environment=" + environment + ", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode
                 + ", threadsPerProcess=" + threadsPerProcess + ", maxMemory=" + maxMemory + ", tempSpace=" + tempSpace + ", startSingleProcess="
                 + startSingleProcess + ", maxTime=" + maxRuntime + "]";
     }
@@ -626,7 +567,6 @@ public class JobDescription {
         result = prime * result + schedulerArguments.hashCode();
         result = prime * result + environment.hashCode();
         result = prime * result + ((executable == null) ? 0 : executable.hashCode());
-        result = prime * result + jobOptions.hashCode();
         result = prime * result + maxMemory;
         result = prime * result + tempSpace;
         result = prime * result + maxRuntime;
@@ -660,7 +600,6 @@ public class JobDescription {
                 && Objects.equals(name, other.name) && Objects.equals(executable, other.executable) && Objects.equals(workingDirectory, other.workingDirectory)
                 && Objects.equals(queueName, other.queueName) && Objects.equals(stdin, other.stdin) && Objects.equals(stdout, other.stdout)
                 && Objects.equals(stderr, other.stderr) && Objects.equals(arguments, other.arguments)
-                && Objects.equals(schedulerArguments, other.schedulerArguments) && Objects.equals(environment, other.environment)
-                && Objects.equals(jobOptions, other.jobOptions);
+                && Objects.equals(schedulerArguments, other.schedulerArguments) && Objects.equals(environment, other.environment);
     }
 }

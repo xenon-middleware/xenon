@@ -303,13 +303,7 @@ public final class SlurmUtils {
     }
 
     protected static void verifyJobDescription(JobDescription description, String[] queueNames, boolean interactive) throws XenonException {
-        ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
-
         if (interactive) {
-            if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
-                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Custom job script not supported in interactive mode");
-            }
-
             if (description.isStartSingleProcess()) {
                 throw new InvalidJobDescriptionException(ADAPTOR_NAME, "StartSingleProcess option not supported in interactive mode");
             }
@@ -329,12 +323,6 @@ public final class SlurmUtils {
             if (description.getEnvironment().size() != 0) {
                 throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Environment variables not supported in interactive mode");
             }
-        }
-
-        // check for option that overrides job script completely.
-        if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
-            ScriptingUtils.checkQueue(queueNames, description.getQueueName(), ADAPTOR_NAME);
-            return;
         }
 
         // Perform standard checks.

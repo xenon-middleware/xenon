@@ -217,22 +217,6 @@ public class ScriptingUtils {
         verifyStartTime(description.getStartTime(), adaptorName);
     }
 
-    public static void verifyJobOptions(Map<String, String> options, String[] validOptions, String adaptorName) throws InvalidJobDescriptionException {
-
-        // check if all given job options are valid
-        for (String option : options.keySet()) {
-            boolean found = false;
-            for (String validOption : validOptions) {
-                if (validOption.equals(option)) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                throw new InvalidJobDescriptionException(adaptorName, "Given Job option \"" + option + "\" not supported");
-            }
-        }
-    }
-
     /**
      * Check if the info map for a job exists, contains the expected job ID, and contains the given additional fields
      *

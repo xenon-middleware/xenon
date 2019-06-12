@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors.schedulers.torque;
 import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor.ACCOUNTING_GRACE_TIME_PROPERTY;
 import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor.ADAPTOR_NAME;
 import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueSchedulerAdaptor.POLL_DELAY_PROPERTY;
-import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueUtils.JOB_OPTION_JOB_SCRIPT;
 import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueUtils.QUEUE_INFO_NAME;
 import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueUtils.getJobStatusFromQstatInfo;
 import static nl.esciencecenter.xenon.adaptors.schedulers.torque.TorqueUtils.verifyJobDescription;
@@ -234,39 +233,22 @@ public class TorqueScheduler extends ScriptingScheduler {
 
         verifyJobDescription(description, queueNames);
 
-        // check for option that overrides job script completely.
-        String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
+        checkWorkingDirectory(description.getWorkingDirectory());
+        String jobScript = TorqueUtils.generate(description, workdir, getDefaultRuntime());
 
-        if (customScriptFile == null) {
-            checkWorkingDirectory(description.getWorkingDirectory());
-            String jobScript = TorqueUtils.generate(description, workdir, getDefaultRuntime());
-
-            output = runCheckedCommand(jobScript, "qsub");
-        } else {
-            // the user gave us a job script. Pass it to qsub as-is
-
-            // convert to absolute path if needed
-            if (!customScriptFile.startsWith("/")) {
-                Path scriptFile = workdir.resolve(customScriptFile);
-                customScriptFile = scriptFile.toString();
-            }
-
-            output = runCheckedCommand(null, "qsub", customScriptFile);
-        }
+        output = runCheckedCommand(jobScript, "qsub");
 
         String identifier = ScriptingParser.parseJobIDFromLine(output, ADAPTOR_NAME, "");
 
         jobsSeenMap.updateRecentlySeen(Collections.singleton(identifier));
 
-        if (!description.getJobOptions().containsKey(JOB_OPTION_JOB_SCRIPT)) {
-            String[] idParts = identifier.split("\\.");
-            try {
-                long idNumber = Long.parseLong(idParts[0]);
-                description.setStderr("xenon.e" + idNumber);
-                description.setStdout("xenon.o" + idNumber);
-            } catch (NumberFormatException ex) {
-                LOGGER.warn("Standard out and standard err could not be set from Job ID {0}", identifier);
-            }
+        String[] idParts = identifier.split("\\.");
+        try {
+            long idNumber = Long.parseLong(idParts[0]);
+            description.setStderr("xenon.e" + idNumber);
+            description.setStdout("xenon.o" + idNumber);
+        } catch (NumberFormatException ex) {
+            LOGGER.warn("Standard out and standard err could not be set from Job ID {0}", identifier);
         }
 
         return identifier;

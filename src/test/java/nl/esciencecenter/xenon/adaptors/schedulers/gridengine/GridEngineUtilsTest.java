@@ -334,48 +334,6 @@ public class GridEngineUtilsTest {
         GridEngineUtils.verifyJobDescription(description, null);
     }
 
-    @Test
-    public void test01b_verifyJobDescription_ScriptOptionSet_NoException() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // all the settings the function checks for set exactly right
-        description.setExecutable("/bin/nothing");
-        description.setNodeCount(1);
-        description.setProcessesPerNode(1);
-        description.setMaxRuntime(1);
-        // GridEngine specific info
-        description.addJobOption(GridEngineUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
-
-        GridEngineUtils.verifyJobDescription(description, null);
-    }
-
-    @Test
-    public void test01c_verifyJobDescription_JobScriptSet_NoFurtherChecking() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // set a job option
-        description.addJobOption(GridEngineUtils.JOB_OPTION_JOB_SCRIPT, "some.script");
-
-        // All these settings are wrong. This should not lead to an error
-        description.setExecutable(null);
-        description.setNodeCount(0);
-        description.setProcessesPerNode(0);
-        description.setMaxRuntime(0);
-        // GridEngine specific info
-
-        GridEngineUtils.verifyJobDescription(description, null);
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test01d_verifyJobDescription_InvalidOptions_ExceptionThrown() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // set a job option
-        description.addJobOption("wrong.setting", "wrong.value");
-
-        GridEngineUtils.verifyJobDescription(description, null);
-    }
-
     @Test(expected = InvalidJobDescriptionException.class)
     public void test01f_verifyJobDescription_InvalidStandardSetting_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();

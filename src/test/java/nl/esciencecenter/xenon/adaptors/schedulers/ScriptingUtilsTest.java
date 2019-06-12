@@ -366,35 +366,6 @@ public class ScriptingUtilsTest {
         ScriptingUtils.verifyJobDescription(job, queueNames, "test");
     }
 
-    @Test
-    public void test_verify_job_options_empty() throws XenonException {
-
-        Map<String, String> options = new HashMap<>();
-        String[] valid = new String[0];
-
-        ScriptingUtils.verifyJobOptions(options, valid, "test");
-    }
-
-    @Test
-    public void test_verify_job_options_found() throws XenonException {
-
-        Map<String, String> options = new HashMap<>();
-        options.put("opt1", "value1");
-        String[] valid = new String[] { "opt1" };
-
-        ScriptingUtils.verifyJobOptions(options, valid, "test");
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test_verify_job_options_not_found() throws XenonException {
-
-        Map<String, String> options = new HashMap<>();
-        options.put("opt1", "value1");
-        String[] valid = new String[] { "opt2" };
-
-        ScriptingUtils.verifyJobOptions(options, valid, "test");
-    }
-
     @Test(expected = XenonException.class)
     public void test_verify_job_info_null() throws XenonException {
         ScriptingUtils.verifyJobInfo(null, "42", "test", "jobID");
