@@ -480,7 +480,7 @@ public final class SlurmUtils {
 
         script.format("\n");
 
-        if (description.startPerTask()) {
+        if (description.isStartPerTask()) {
             // run commands through srun
             script.format("%s ", "srun");
         }

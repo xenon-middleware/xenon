@@ -244,7 +244,7 @@ public class JobDescription {
      * Will the executable be started per task?
      *
      * <code>false</code> by default.
-     * 
+     *
      * @return if the executable is started per task.
      */
     public boolean isStartPerTask() {

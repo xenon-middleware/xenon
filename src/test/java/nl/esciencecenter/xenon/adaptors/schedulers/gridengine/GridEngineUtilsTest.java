@@ -188,7 +188,7 @@ public class GridEngineUtilsTest {
         description.setStdin("stdin.file");
         description.setStdout("stdout.file");
         description.setWorkingDirectory("/some/working/directory");
-        description.setStartPerTask(true);
+        description.setStartPerTask();
 
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.INTEGER, 10);
         GridEngineSetup setup = getGridEngineSetup(pe);
@@ -222,7 +222,7 @@ public class GridEngineUtilsTest {
         description.setStdin("stdin.file");
         description.setStdout("stdout.file");
         description.setWorkingDirectory("/some/working/directory");
-        description.setStartPerTask(true);
+        description.setStartPerTask();
 
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.INTEGER, 10);
         GridEngineSetup setup = getGridEngineSetup(pe);
@@ -299,7 +299,7 @@ public class GridEngineUtilsTest {
         description.setTasks(2);
         description.setExecutable("/bin/executable");
         description.setArguments("some", "arguments");
-        description.setStartPerTask(true);
+        description.setStartPerTask();
 
         Formatter output = new Formatter();
 
@@ -402,7 +402,7 @@ public class GridEngineUtilsTest {
         JobDescription description = new JobDescription();
 
         description.setExecutable("/bin/nothing");
-        description.setStartPerTask(false);
+        description.setStartPerJob();
 
         GridEngineUtils.verifyJobDescription(description, null);
     }

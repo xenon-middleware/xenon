@@ -237,7 +237,7 @@ public class JobDescriptionTest {
         j.setStdin("stdin");
         j.setStderr(null);
         j.setExecutable("exec");
-        j.setStartPerTask(true);
+        j.setStartPerTask();
 
         String[] args = new String[] { "a", "b", "c" };
         j.setArguments(args);
@@ -268,7 +268,7 @@ public class JobDescriptionTest {
         j.setStdin("stdin");
         j.setStderr("stderr");
         j.setExecutable("exec");
-        j.setStartPerTask(true);
+        j.setStartPerTask();
         j.setTasksPerNode(4);
         j.setMaxMemory(1024);
         j.setTempSpace(512);
@@ -342,9 +342,9 @@ public class JobDescriptionTest {
         other.setCoresPerTask(1);
         assertTrue(j.equals(other));
 
-        other.setStartPerTask(true);
+        other.setStartPerTask();
         assertFalse(j.equals(other));
-        other.setStartPerTask(false);
+        other.setStartPerJob();
         assertTrue(j.equals(other));
 
         other.setExecutable("aap");

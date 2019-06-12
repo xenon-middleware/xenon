@@ -933,7 +933,7 @@ public class SlurmUtilsTest {
         env.put("key2", "value2");
 
         description.setEnvironment(env);
-        description.setStartPerTask(true);
+        description.setStartPerTask();
 
         String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --workdir='" + entry.resolve("workdir").toString() + "'\n"
                 + "#SBATCH --partition=queue\n" + "#SBATCH --ntasks=1\n" + "#SBATCH --cpus-per-task=1\n" + "#SBATCH --time=15\n" + "#SBATCH --input='in.txt'\n"

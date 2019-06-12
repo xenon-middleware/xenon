@@ -85,7 +85,7 @@ public class GridengineSchedulerDockerTest extends GridengineSchedulerTestParent
         JobDescription job = new JobDescription();
         job.setExecutable("/bin/hostname");
         job.setCoresPerTask(2);
-        job.setStartPerTask(false);
+        job.setStartPerJob();
 
         String jobID = scheduler.submitBatchJob(job);
 

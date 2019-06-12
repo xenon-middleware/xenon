@@ -189,7 +189,7 @@ final class GridEngineUtils {
 
         script.format("\n");
 
-        if (description.startPerTask() && description.getTasks() > 1) {
+        if (description.isStartPerTask() && description.getTasks() > 1) {
             generateParallelScriptContent(description, script);
         } else {
             generateSerialScriptContent(description, script);
