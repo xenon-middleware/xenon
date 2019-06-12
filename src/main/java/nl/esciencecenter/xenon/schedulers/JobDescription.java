@@ -121,7 +121,7 @@ public class JobDescription {
         tasksPerNode = original.getTasksPerNode();
         maxMemory = original.getMaxMemory();
         tempSpace = original.getTempSpace();
-        startPerTask = original.startPerTask();
+        startPerTask = original.isStartPerTask();
         maxRuntime = original.getMaxRuntime();
         startTime = original.getStartTime();
     }
@@ -241,22 +241,39 @@ public class JobDescription {
     }
 
     /**
-     * Will the executable be started per task or per job?
+     * Will the executable be started per task?
      *
+     * <code>false</code> by default.
+     * 
      * @return if the executable is started per task.
      */
-    public boolean startPerTask() {
+    public boolean isStartPerTask() {
         return startPerTask;
     }
 
     /**
-     * Set if the executable must be started for each task, instead of once per job.
+     * Will the executable be started per job?
      *
-     * @param startPerTask
-     *            if the executable must be started per task
+     * <code>true</code> by default.
+     *
+     * @return if the executable is started per job.
      */
-    public void setStartPerTask(boolean startPerTask) {
-        this.startPerTask = startPerTask;
+    public boolean isStartPerJob() {
+        return !startPerTask;
+    }
+
+    /**
+     * Set if the executable must be started for each task instead of once per job.
+     */
+    public void setStartPerTask() {
+        this.startPerTask = true;
+    }
+
+    /**
+     * Set if the executable must be started for once per job instead of for each task.
+     */
+    public void setStartPerJob() {
+        this.startPerTask = false;
     }
 
     /**
