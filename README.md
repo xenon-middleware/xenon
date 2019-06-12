@@ -33,9 +33,9 @@ changing a single line of code.
 
 ## How does Xenon work?
 
-Xenon is an abstraction layer that sits between your application and the remote
+Xenon is an abstraction layer that sits between your application and the (usually remote)
 resource it uses. Xenon is written in Java, but is also accessible from other
-languages (e.g. Python) through its gRPC interface.
+languages (e.g. Python) through its gRPC interface and via the command line.
 
 ![Xenon API](/docs/images/readme-xenon-api.svg.png "Xenon API")
 
