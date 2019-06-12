@@ -13,7 +13,7 @@ test_script:
 on_finish:
   - SET "PATH=%JAVA_HOME%\bin;%PATH%"
   - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
-  - "SET JDK=openjdk10"
+  - "SET JDK=openjdk11"
   - .\gradlew.bat jacocoTestReport jacocoLiveTestReport
   - pip install codecov
   - codecov -e OS,JDK -F unit -f build/reports/jacoco/test/jacocoTestReport.xml
