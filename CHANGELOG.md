@@ -1,14 +1,24 @@
-Xenon 2.6.2
+Xenon 3.0.0
 -----------
 
-This is release 2.6.2 of Xenon.
+This is release 3.0.0 of Xenon.
+
+Notable changes compared to v2.6.2:
+-----------------------------------
+
+- Moved adaptors with large dependencies (such as S3 and HDFS) into separate libraries, resulting in a much smaller "core" distribution.
+- Changed JobDescription to a tasks+cores model, instead of nodes+processes+thread (#625).   
+- Remove the JOB_OPTIONS hack from JobDescription (#629 and #628)
+- Added support for memory requirements and job name in JobDescription (#562 and #609)
+- Added an adaptor for the at scheduler (#381)
+- Many smaller bugfixes and updates of dependencies. 
 
 Notable changes compared to v2.6.1:
 -----------------------------------
 
 - added support for temp space in JobDescription. 
 - added support stdout, stderr and stdin to Torque.
-- fixed several unit tests that failed on OS
+- fixed several unit tests that failed on OSX
 
 Notable changes compared to v2.6.0:
 -----------------------------------
