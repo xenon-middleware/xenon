@@ -67,6 +67,7 @@ Xenon currently supports the following job submission mechanisms:
 
 - ``local``
 - ``ssh``
+- ``at``
 - ``gridengine``
 - ``slurm``
 - ``torque``  
