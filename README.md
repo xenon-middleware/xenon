@@ -12,7 +12,7 @@
 
 
 
-Copyright 2013-2018 The Netherlands eScience Center
+Copyright 2013-2019 The Netherlands eScience Center
 
 ## What problem does Xenon solve?
 
@@ -43,14 +43,14 @@ languages (e.g. Python) through its gRPC interface.
 
 | component | repository |
 |---|---|
-| Xenon library | https://github.com/NLeSC/Xenon |
-| Xenon cloud adaptors like s3 | https://github.com/NLeSC/xenon-adaptors-cloud |
-| Xenon grid adaptors like gridftp| https://github.com/NLeSC/xenon-adaptors-grid |
-| Xenon hadoop adaptors like hdfs | https://github.com/NLeSC/xenon-adaptors-hadoop |
-| gRPC extension for Xenon | https://github.com/NLeSC/xenon-grpc |
-| command line interface to Xenon | https://github.com/NLeSC/xenon-cli |
-| Python API for Xenon | https://github.com/NLeSC/pyxenon |
-| Docker images | https://github.com/NLeSC/xenon-docker-images |
+| Xenon library | https://github.com/xenon-middleware/Xenon |
+| Xenon cloud adaptors like s3 | https://github.com/xenon-middleware/xenon-adaptors-cloud |
+| Xenon grid adaptors like gridftp| https://github.com/xenon-middleware/xenon-adaptors-grid |
+| Xenon hadoop adaptors like hdfs | https://github.com/xenon-middleware/xenon-adaptors-hadoop |
+| gRPC extension for Xenon | https://github.com/xenon-middleware/xenon-grpc |
+| command line interface to Xenon | https://github.com/xenon-middleware/xenon-cli |
+| Python API for Xenon | https://github.com/xenon-middleware/pyxenon |
+| Docker images | https://github.com/xenon-middleware/xenon-docker-images |
 
 ## Supported middleware
 
@@ -209,7 +209,7 @@ For more examples, see the tutorial at [Read The Docs](http://xenonrse2017.readt
 
 ## Documentation
 
-Xenon's JavaDoc is available online at <http://nlesc.github.io/Xenon/versions/2.6.2/javadoc/>.
+Xenon's JavaDoc is available online at <http://xenon-middleware.github.io/Xenon/versions/2.6.2/javadoc/>.
 
 ## Legal
 
