@@ -1,5 +1,5 @@
 # The Xenon releases are available on jcenter.
-# To get snapshots of branches use https://jitpack.io/#NLeSC/Xenon
+# To get snapshots of branches use https://jitpack.io/#xenon-middleware/Xenon
 install:
 - ./gradlew clean -Pgroup=$GROUP -Pversion=$VERSION publishToMavenLocal
 jdk:
