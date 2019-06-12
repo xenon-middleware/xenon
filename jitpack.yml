@@ -3,4 +3,4 @@
 install:
 - ./gradlew clean -Pgroup=$GROUP -Pversion=$VERSION publishToMavenLocal
 jdk:
-- openjdk9
+- openjdk11

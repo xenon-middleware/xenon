@@ -10,8 +10,8 @@ description = 'Xenon: a middleware abstraction library that provides a simple pr
 
 // will generate a warning with JDK 8, since the runtime jar (rt.jar) of
 // Java 7 is not available. Could configure gradle wrapper for this
-sourceCompatibility = '1.9'
-targetCompatibility = '1.9'
+sourceCompatibility = JavaVersion.VERSION_1_11
+targetCompatibility = JavaVersion.VERSION_1_11
 
 // PROJECT DIRECTORIES
 // ==============
