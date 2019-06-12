@@ -40,12 +40,6 @@ apply from: 'gradle/documentation.gradle'
 apply from: 'gradle/distribution.gradle'
 apply from: 'gradle/docker.gradle'
 
-task wrapper(type: Wrapper) {
-    description 'Generates gradle wrapper'
-    group 'Build Setup'
-    gradleVersion = '4.1'
-}
-
 cleanIdeaWorkspace.group = 'IDE'
 cleanIdeaWorkspace.description = 'Removes the IDEA workspace file'
 
