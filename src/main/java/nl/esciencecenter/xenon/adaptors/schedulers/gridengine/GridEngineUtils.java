@@ -50,24 +50,27 @@ final class GridEngineUtils {
     private static final int MINUTES_PER_HOUR = 60;
 
     protected static void generateParallelEnvironmentSpecification(JobDescription description, GridEngineSetup setup, Formatter script) throws XenonException {
-        if (description.getNodeCount() == 1 && description.getProcessesPerNode() == 1) {
-            // Single node + single core
+        if (description.getTasks() == 1 && description.getCoresPerTask() == 1) {
+            // Single task + single core
             // nothing to do
-        } else if (description.getNodeCount() == 1 && description.getProcessesPerNode() > 1) {
+        } else if (description.getTasks() == 1 && description.getCoresPerTask() > 1) {
             // Single node + multi core
-            Optional<ParallelEnvironmentInfo> pe = setup.getSingleNodeParallelEnvironment(description.getProcessesPerNode(), description.getQueueName());
+            Optional<ParallelEnvironmentInfo> pe = setup.getSingleNodeParallelEnvironment(description.getCoresPerTask(), description.getQueueName());
             if (pe.isPresent()) {
-                script.format("#$ -pe %s %d\n", pe.get().getName(), description.getProcessesPerNode());
+                script.format("#$ -pe %s %d\n", pe.get().getName(), description.getCoresPerTask());
             } else {
-                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Unable to find a parallel environment for multi core on single node, replace node count and cores per node with scheduler.addSchedulerArgument(\"-pe <name of parallel environment (qconf -spl)> <number of slots>\")");
+                throw new InvalidJobDescriptionException(ADAPTOR_NAME,
+                        "Unable to find a parallel environment for multi core on single node, replace node count and cores per node with scheduler.addSchedulerArgument(\"-pe <name of parallel environment (qconf -spl)> <number of slots>\")");
             }
         } else {
             // Multi node + multi core
-            Optional<ParallelEnvironmentInfo> pe = setup.getMultiNodeParallelEnvironment(description.getProcessesPerNode(), description.getNodeCount(), description.getQueueName());
+            Optional<ParallelEnvironmentInfo> pe = setup.getMultiNodeParallelEnvironment(description.getCoresPerTask(), description.getTasks(),
+                    description.getQueueName());
             if (pe.isPresent()) {
-                script.format("#$ -pe %s %d\n", pe.get().getName(), description.getProcessesPerNode() * description.getNodeCount());
+                script.format("#$ -pe %s %d\n", pe.get().getName(), description.getCoresPerTask() * description.getTasks());
             } else {
-                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Unable to find a parallel environment for multiple nodes, replace node count and cores per node with scheduler.addSchedulerArgument(\"-pe <name of parallel environment (qconf -spl)> <number of slots>\")");
+                throw new InvalidJobDescriptionException(ADAPTOR_NAME,
+                        "Unable to find a parallel environment for multiple nodes, replace node count and cores per node with scheduler.addSchedulerArgument(\"-pe <name of parallel environment (qconf -spl)> <number of slots>\")");
             }
         }
     }
@@ -84,14 +87,19 @@ final class GridEngineUtils {
     protected static void generateParallelScriptContent(JobDescription description, Formatter script) {
         script.format("%s\n", "for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do");
 
-        for (int i = 0; i < description.getProcessesPerNode(); i++) {
-            script.format("%s", "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && ");
-            script.format("%s", description.getExecutable());
-            for (String argument : description.getArguments()) {
-                script.format(" %s", ScriptingUtils.protectAgainstShellMetas(argument));
-            }
-            script.format("%c&\n", '"');
+        // TODO: the PE_HOSTFILE seems to contain "<host> <slots> <queue> <processor range>"
+        //
+        // What happens if we want 2x2 slots on a PE with 4 slots per host? Will we get 1 or 2 lines in the PE_HOSTFILE???
+
+        // for (int i = 0; i < 1; i++) {
+        script.format("%s", "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && ");
+        script.format("%s", description.getExecutable());
+        for (String argument : description.getArguments()) {
+            script.format(" %s", ScriptingUtils.protectAgainstShellMetas(argument));
         }
+        script.format("%c&\n", '"');
+        // }
+
         // wait for all ssh connections to finish
         script.format("%s\n\n", "done");
         script.format("%s\n", "wait");
@@ -181,10 +189,10 @@ final class GridEngineUtils {
 
         script.format("\n");
 
-        if ((description.getNodeCount() == 1 && description.getProcessesPerNode() == 1) || description.isStartSingleProcess()) {
-            generateSerialScriptContent(description, script);
-        } else {
+        if (description.isStartPerTask() && description.getTasks() > 1) {
             generateParallelScriptContent(description, script);
+        } else {
+            generateSerialScriptContent(description, script);
         }
 
         script.close();

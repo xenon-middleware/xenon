@@ -24,10 +24,8 @@ import static org.junit.Assume.assumeTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.schedulers.JobDescription;
-import nl.esciencecenter.xenon.schedulers.JobStatus;
-import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 import org.junit.ClassRule;
+import org.junit.Test;
 
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
@@ -35,8 +33,10 @@ import com.palantir.docker.compose.connection.waiting.HealthChecks;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
+import nl.esciencecenter.xenon.schedulers.JobDescription;
+import nl.esciencecenter.xenon.schedulers.JobStatus;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
-import org.junit.Test;
+import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
 
 public class GridengineSchedulerDockerTest extends GridengineSchedulerTestParent {
 
@@ -84,8 +84,8 @@ public class GridengineSchedulerDockerTest extends GridengineSchedulerTestParent
 
         JobDescription job = new JobDescription();
         job.setExecutable("/bin/hostname");
-        job.setProcessesPerNode(2);
-        job.setStartSingleProcess(true);
+        job.setCoresPerTask(2);
+        job.setStartPerJob();
 
         String jobID = scheduler.submitBatchJob(job);
 

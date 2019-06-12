@@ -317,7 +317,7 @@ public class ScriptingUtilsTest {
         String[] queueNames = new String[] { "q" };
         JobDescription job = new JobDescription();
         job.setExecutable("test.exe");
-        job.setNodeCount(-2);
+        job.setTasks(-2);
 
         ScriptingUtils.verifyJobDescription(job, queueNames, "test");
     }
@@ -328,7 +328,7 @@ public class ScriptingUtilsTest {
         String[] queueNames = new String[] { "q" };
         JobDescription job = new JobDescription();
         job.setExecutable("test.exe");
-        job.setProcessesPerNode(-2);
+        job.setCoresPerTask(-2);
 
         ScriptingUtils.verifyJobDescription(job, queueNames, "test");
     }
