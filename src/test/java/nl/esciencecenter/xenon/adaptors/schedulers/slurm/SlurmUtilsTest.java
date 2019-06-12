@@ -513,8 +513,8 @@ public class SlurmUtilsTest {
 
         // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
-        description.setNodeCount(1);
-        description.setProcessesPerNode(1);
+        description.setTasks(1);
+        description.setCoresPerTask(1);
         description.setMaxRuntime(1);
         // slurm specific info
         SlurmUtils.verifyJobDescription(description, null, false);
@@ -532,28 +532,13 @@ public class SlurmUtilsTest {
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
-    public void test_verifyJobDescriptionInteractive_FailsSingleProcess() throws Exception {
-        JobDescription description = new JobDescription();
-
-        // all the settings the function checks for set exactly right
-        description.setExecutable("/bin/nothing");
-        description.setNodeCount(1);
-        description.setProcessesPerNode(1);
-        description.setMaxRuntime(1);
-        // slurm specific info
-        description.setStartSingleProcess(true);
-
-        SlurmUtils.verifyJobDescription(description, null, true);
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
     public void test_verifyJobDescriptionInteractive__FailsStdinSet() throws Exception {
         JobDescription description = new JobDescription();
 
         // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
-        description.setNodeCount(1);
-        description.setProcessesPerNode(1);
+        description.setTasks(1);
+        description.setCoresPerTask(1);
         description.setMaxRuntime(1);
         // slurm specific info
         description.setStdin("stdin.txt");
@@ -567,8 +552,8 @@ public class SlurmUtilsTest {
 
         // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
-        description.setNodeCount(1);
-        description.setProcessesPerNode(1);
+        description.setTasks(1);
+        description.setCoresPerTask(1);
         description.setMaxRuntime(1);
         // slurm specific info
         description.setStdout("stdout.txt");
@@ -582,8 +567,8 @@ public class SlurmUtilsTest {
 
         // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
-        description.setNodeCount(1);
-        description.setProcessesPerNode(1);
+        description.setTasks(1);
+        description.setCoresPerTask(1);
         description.setMaxRuntime(1);
         // slurm specific info
         description.setStderr("stderr.txt");
@@ -597,8 +582,8 @@ public class SlurmUtilsTest {
 
         // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
-        description.setNodeCount(1);
-        description.setProcessesPerNode(1);
+        description.setTasks(1);
+        description.setCoresPerTask(1);
         description.setMaxRuntime(1);
         // slurm specific info
         description.setStdout("foobar.txt");
@@ -612,8 +597,8 @@ public class SlurmUtilsTest {
 
         // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
-        description.setNodeCount(1);
-        description.setProcessesPerNode(1);
+        description.setTasks(1);
+        description.setCoresPerTask(1);
         description.setMaxRuntime(1);
         // slurm specific info
         description.setStderr("foobar.txt");
@@ -627,8 +612,8 @@ public class SlurmUtilsTest {
 
         // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
-        description.setNodeCount(1);
-        description.setProcessesPerNode(1);
+        description.setTasks(1);
+        description.setCoresPerTask(1);
         description.setMaxRuntime(1);
         // slurm specific info
 
@@ -649,7 +634,7 @@ public class SlurmUtilsTest {
         description.setExecutable("exec");
         description.setArguments(new String[] { "a", "b", "c" });
 
-        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--nodes=1", "--ntasks-per-node=1", "--time=15", "exec", "a", "b", "c" };
+        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--ntasks=1", "--cpus-per-task=1", "--time=15", "exec", "a", "b", "c" };
 
         String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag, 15);
 
@@ -666,7 +651,7 @@ public class SlurmUtilsTest {
         description.setArguments(new String[] { "a", "b", "c" });
         description.setMaxMemory(1024);
 
-        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--nodes=1", "--ntasks-per-node=1", "--mem=1024M", "--time=15", "exec",
+        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--ntasks=1", "--cpus-per-task=1", "--mem=1024M", "--time=15", "exec",
                 "a", "b", "c" };
 
         String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag, 15);
@@ -684,7 +669,7 @@ public class SlurmUtilsTest {
         description.setArguments(new String[] { "a", "b", "c" });
         description.setTempSpace(1024);
 
-        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--nodes=1", "--ntasks-per-node=1", "--tmp=1024M", "--time=15", "exec",
+        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--ntasks=1", "--cpus-per-task=1", "--tmp=1024M", "--time=15", "exec",
                 "a", "b", "c" };
 
         String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag, 15);
@@ -700,10 +685,9 @@ public class SlurmUtilsTest {
         JobDescription description = new JobDescription();
         description.setExecutable("exec");
         description.setArguments(new String[] { "a", "b", "c" });
-        description.setThreadsPerProcess(4);
+        description.setCoresPerTask(4);
 
-        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--nodes=1", "--ntasks-per-node=1", "--cpus-per-task=4", "--time=15",
-                "exec", "a", "b", "c" };
+        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--ntasks=1", "--cpus-per-task=4", "--time=15", "exec", "a", "b", "c" };
 
         String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag, 15);
 
@@ -721,8 +705,8 @@ public class SlurmUtilsTest {
         description.setWorkingDirectory("workdir");
         description.setQueueName("queue");
 
-        String[] expected = new String[] { "--quiet", "--job-name=" + tag, "--chdir=" + entry.resolve("workdir"), "--partition=queue", "--nodes=1",
-                "--ntasks-per-node=1", "--time=15", "exec", "a", "b", "c" };
+        String[] expected = new String[] { "--quiet", "--job-name=" + tag, "--chdir=" + entry.resolve("workdir"), "--partition=queue", "--ntasks=1",
+                "--cpus-per-task=1", "--time=15", "exec", "a", "b", "c" };
 
         String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag, 15);
 
@@ -740,8 +724,8 @@ public class SlurmUtilsTest {
         description.setWorkingDirectory("/workdir");
         description.setQueueName("queue");
 
-        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--chdir=/workdir", "--partition=queue", "--nodes=1",
-                "--ntasks-per-node=1", "--time=15", "exec", "a", "b", "c" };
+        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--chdir=/workdir", "--partition=queue", "--ntasks=1",
+                "--cpus-per-task=1", "--time=15", "exec", "a", "b", "c" };
 
         String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag, 15);
 
@@ -756,8 +740,8 @@ public class SlurmUtilsTest {
         description.setExecutable("exec");
         description.setArguments(new String[] { "a", "b", "c" });
 
-        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n"
-                + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "srun exec 'a' 'b' 'c'\n";
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --ntasks=1\n" + "#SBATCH --cpus-per-task=1\n" + "#SBATCH --time=15\n"
+                + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "exec 'a' 'b' 'c'\n";
 
         String result = SlurmUtils.generate(description, entry, 15);
 
@@ -773,8 +757,8 @@ public class SlurmUtilsTest {
         description.setArguments(new String[] { "a", "b", "c" });
         description.setName("test");
 
-        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='test'\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n"
-                + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "srun exec 'a' 'b' 'c'\n";
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='test'\n" + "#SBATCH --ntasks=1\n" + "#SBATCH --cpus-per-task=1\n" + "#SBATCH --time=15\n"
+                + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "exec 'a' 'b' 'c'\n";
 
         String result = SlurmUtils.generate(description, entry, 15);
 
@@ -790,8 +774,8 @@ public class SlurmUtilsTest {
         description.setArguments(new String[] { "a", "b", "c" });
         description.setName("");
 
-        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n"
-                + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "srun exec 'a' 'b' 'c'\n";
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --ntasks=1\n" + "#SBATCH --cpus-per-task=1\n" + "#SBATCH --time=15\n"
+                + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "exec 'a' 'b' 'c'\n";
 
         String result = SlurmUtils.generate(description, entry, 15);
 
@@ -807,8 +791,8 @@ public class SlurmUtilsTest {
         description.setArguments(new String[] { "a", "b", "c" });
         description.setMaxMemory(1024);
 
-        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n"
-                + "#SBATCH --mem=1024M\n" + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "srun exec 'a' 'b' 'c'\n";
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --ntasks=1\n" + "#SBATCH --cpus-per-task=1\n" + "#SBATCH --time=15\n"
+                + "#SBATCH --mem=1024M\n" + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n" + "exec 'a' 'b' 'c'\n";
 
         String result = SlurmUtils.generate(description, entry, 15);
 
@@ -824,9 +808,9 @@ public class SlurmUtilsTest {
         description.setArguments(new String[] { "a", "b", "c" });
         description.setSchedulerArguments("--gres=gpu:1", "-C TitanX");
 
-        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n"
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --ntasks=1\n" + "#SBATCH --cpus-per-task=1\n" + "#SBATCH --time=15\n"
                 + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "#SBATCH --gres=gpu:1\n" + "#SBATCH -C TitanX\n" + "\n"
-                + "srun exec 'a' 'b' 'c'\n";
+                + "exec 'a' 'b' 'c'\n";
 
         String result = SlurmUtils.generate(description, entry, 15);
 
@@ -834,17 +818,17 @@ public class SlurmUtilsTest {
     }
 
     @Test
-    public void test_generateWithThreads() {
+    public void test_generateWithTasksPerNode() {
         Path entry = new Path("/entry");
 
         JobDescription description = new JobDescription();
         description.setExecutable("exec");
         description.setArguments(new String[] { "a", "b", "c" });
-        description.setThreadsPerProcess(4);
+        description.setTasksPerNode(4);
 
-        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n"
-                + "#SBATCH --cpus-per-task=4\n" + "#SBATCH --time=15\n" + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n"
-                + "srun exec 'a' 'b' 'c'\n";
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --ntasks=1\n" + "#SBATCH --cpus-per-task=1\n"
+                + "#SBATCH --ntasks-per-node=4\n" + "#SBATCH --time=15\n" + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n" + "\n"
+                + "exec 'a' 'b' 'c'\n";
 
         String result = SlurmUtils.generate(description, entry, 15);
 
@@ -869,12 +853,12 @@ public class SlurmUtilsTest {
         env.put("key2", "value2");
 
         description.setEnvironment(env);
-        description.setStartSingleProcess(true);
+        description.setStartPerTask();
 
         String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --workdir='" + entry.resolve("workdir").toString() + "'\n"
-                + "#SBATCH --partition=queue\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n" + "#SBATCH --input='in.txt'\n"
+                + "#SBATCH --partition=queue\n" + "#SBATCH --ntasks=1\n" + "#SBATCH --cpus-per-task=1\n" + "#SBATCH --time=15\n" + "#SBATCH --input='in.txt'\n"
                 + "#SBATCH --output='out.txt'\n" + "#SBATCH --error='err.txt'\n" + "export key1=\"value1\"\n" + "export key2=\"value2\"\n" + "\n"
-                + "exec 'a' 'b' 'c'\n";
+                + "srun exec 'a' 'b' 'c'\n";
 
         String result = SlurmUtils.generate(description, entry, 15);
 

@@ -151,8 +151,8 @@ public class GridEngineUtilsTest {
         description.addSchedulerArgument("-l list-of-resources");
         description.setExecutable("/bin/executable");
         description.setMaxRuntime(100);
-        description.setNodeCount(1);
-        description.setProcessesPerNode(1);
+        description.setTasks(1);
+        description.setCoresPerTask(1);
         description.setQueueName("the.queue");
         description.setStderr("stderr.file");
         description.setStdin("stdin.file");
@@ -181,13 +181,14 @@ public class GridEngineUtilsTest {
         description.setExecutable("/bin/executable");
         description.setArguments("some", "arguments");
         description.setMaxRuntime(100);
-        description.setNodeCount(4);
-        description.setProcessesPerNode(10);
+        description.setTasks(4);
+        description.setCoresPerTask(10);
         description.setQueueName("some.q");
         description.setStderr("stderr.file");
         description.setStdin("stdin.file");
         description.setStdout("stdout.file");
         description.setWorkingDirectory("/some/working/directory");
+        description.setStartPerTask();
 
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.INTEGER, 10);
         GridEngineSetup setup = getGridEngineSetup(pe);
@@ -197,15 +198,6 @@ public class GridEngineUtilsTest {
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n" + "#$ -q some.q\n" + "#$ -pe some.pe 40\n"
                 + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"
                 + "for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
                 + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n" + "done\n" + "\n" + "wait\n"
                 + "exit 0\n\n";
 
@@ -223,14 +215,14 @@ public class GridEngineUtilsTest {
         description.setExecutable("/bin/executable");
         description.setArguments("some", "arguments");
         description.setMaxRuntime(100);
-        description.setNodeCount(1);
-        description.setProcessesPerNode(10);
+        description.setTasks(1);
+        description.setCoresPerTask(10);
         description.setQueueName("some.q");
         description.setStderr("stderr.file");
         description.setStdin("stdin.file");
         description.setStdout("stdout.file");
         description.setWorkingDirectory("/some/working/directory");
-        description.setStartSingleProcess(true);
+        description.setStartPerTask();
 
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.INTEGER, 10);
         GridEngineSetup setup = getGridEngineSetup(pe);
@@ -264,7 +256,7 @@ public class GridEngineUtilsTest {
                 "Unable to find a parallel environment for multiple nodes, replace node count and cores per node with scheduler.addSchedulerArgument(\"-pe <name of parallel environment (qconf -spl)> <number of slots>\")");
 
         JobDescription description = new JobDescription();
-        description.setNodeCount(10);
+        description.setTasks(10);
 
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.FILL_UP, 0);
         GridEngineSetup setup = getGridEngineSetup(pe);
@@ -279,7 +271,7 @@ public class GridEngineUtilsTest {
                 "Unable to find a parallel environment for multi core on single node, replace node count and cores per node with scheduler.addSchedulerArgument(\"-pe <name of parallel environment (qconf -spl)> <number of slots>\")");
 
         JobDescription description = new JobDescription();
-        description.setProcessesPerNode(10);
+        description.setCoresPerTask(10);
 
         ParallelEnvironmentInfo pe = new ParallelEnvironmentInfo("some.pe", 100, ParallelEnvironmentInfo.AllocationRule.FILL_UP, 0);
         GridEngineSetup setup = getGridEngineSetup(pe);
@@ -304,18 +296,22 @@ public class GridEngineUtilsTest {
     @Test
     public void test04a_generateParallelScriptContent() {
         JobDescription description = new JobDescription();
-        description.setProcessesPerNode(2);
+        description.setTasks(2);
         description.setExecutable("/bin/executable");
         description.setArguments("some", "arguments");
+        description.setStartPerTask();
 
         Formatter output = new Formatter();
 
         String expected = "for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
                 + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n" + "done\n" + "\n" + "wait\n"
                 + "exit 0\n\n";
 
         GridEngineUtils.generateParallelScriptContent(description, output);
+
+        System.out.println("GENERATED:\n" + output.out().toString() + "\n");
+
+        System.out.println("EXPECTED:\n" + expected + "\n");
 
         assertEquals("parallel script content incorrect", expected, output.out().toString());
     }
@@ -326,8 +322,8 @@ public class GridEngineUtilsTest {
 
         // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
-        description.setNodeCount(1);
-        description.setProcessesPerNode(1);
+        description.setTasks(1);
+        description.setCoresPerTask(1);
         description.setMaxRuntime(1);
         // GridEngine specific info
 
@@ -351,8 +347,8 @@ public class GridEngineUtilsTest {
 
         // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
-        description.setNodeCount(2);
-        description.setProcessesPerNode(2);
+        description.setTasks(2);
+        description.setCoresPerTask(2);
         description.setMaxRuntime(1);
         description.setQueueName("some.queue");
 
@@ -364,7 +360,7 @@ public class GridEngineUtilsTest {
         JobDescription description = new JobDescription();
 
         description.setExecutable("/bin/nothing");
-        description.setStartSingleProcess(true);
+        description.setStartPerJob();
 
         GridEngineUtils.verifyJobDescription(description, null);
     }

@@ -153,16 +153,16 @@ public class AtUtils {
         ScriptingUtils.verifyJobDescription(description, queueNames, ADAPTOR_NAME);
 
         // Perform at specific checks
-        int nodeCount = description.getNodeCount();
+        int tasks = description.getTasks();
 
-        if (nodeCount > 1) {
-            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Unsupported node count: " + nodeCount);
+        if (tasks > 1) {
+            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Unsupported task count: " + tasks);
         }
 
-        int processesPerNode = description.getProcessesPerNode();
+        int tasksPerNode = description.getTasksPerNode();
 
-        if (processesPerNode > 1) {
-            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Unsupported processes per node count: " + processesPerNode);
+        if (tasksPerNode > 1) {
+            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Unsupported task per node count: " + tasksPerNode);
         }
 
         int maxTime = description.getMaxRuntime();

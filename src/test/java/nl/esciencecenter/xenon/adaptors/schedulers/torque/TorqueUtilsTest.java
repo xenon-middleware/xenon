@@ -89,7 +89,7 @@ public class TorqueUtilsTest {
     @Test
     public void test_generate_threadsPerProcess() throws XenonException {
         JobDescription description = new JobDescription();
-        description.setThreadsPerProcess(4);
+        description.setCoresPerTask(4);
 
         String result = TorqueUtils.generate(description, null, 15);
 
@@ -111,8 +111,8 @@ public class TorqueUtilsTest {
         description.addSchedulerArgument("-l list-of-resources");
         description.setExecutable("/bin/executable");
         description.setMaxRuntime(100);
-        description.setNodeCount(1);
-        description.setProcessesPerNode(1);
+        description.setTasks(1);
+        description.setCoresPerTask(1);
         description.setQueueName("the.queue");
         description.setWorkingDirectory("/some/working/directory");
 
@@ -138,8 +138,8 @@ public class TorqueUtilsTest {
         description.addSchedulerArgument("-l list-of-resources");
         description.setExecutable("/bin/executable");
         description.setMaxRuntime(100);
-        description.setNodeCount(4);
-        description.setProcessesPerNode(10);
+        description.setTasks(4);
+        description.setCoresPerTask(10);
         description.setQueueName("the.queue");
         description.setWorkingDirectory("/some/working/directory");
 
@@ -189,8 +189,8 @@ public class TorqueUtilsTest {
 
         // all the settings the function checks for set exactly right
         description.setExecutable("/bin/nothing");
-        description.setNodeCount(1);
-        description.setProcessesPerNode(1);
+        description.setTasks(1);
+        description.setCoresPerTask(1);
         description.setMaxRuntime(1);
         // GridEngine specific info
 

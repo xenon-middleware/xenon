@@ -64,14 +64,14 @@ public class JobDescription {
     /** The environment variables and their values */
     private final Map<String, String> environment = new HashMap<>(5);
 
-    /** The number of nodes to run the job on. */
-    private int nodeCount = 1;
+    /** The number of tasks the jobs consists of. */
+    private int tasks = 1;
 
-    /** The number of processes to start/reserve per node. */
-    private int processesPerNode = 1;
+    /** The number of cores needed per tasks. */
+    private int coresPerTask = 1;
 
-    /** The number of threads the executable will use per processes */
-    private int threadsPerProcess = -1;
+    /** The number of tasks per node */
+    private int tasksPerNode = -1;
 
     /** The maximum amount of memory needed (in MB) on each node/process. */
     private int maxMemory = -1;
@@ -79,8 +79,8 @@ public class JobDescription {
     /** The tempspace needed (in MB) on each node/process. */
     private int tempSpace = -1;
 
-    /** If true, only a single process is started on the first node acquired, instead of nodeCount * processesPerNode. */
-    private boolean startSingleProcess = false;
+    /** Start the executable once per task instead of once per job? */
+    private boolean startPerTask = false;
 
     /** The maximum run time in minutes. */
     private int maxRuntime = -1;
@@ -112,12 +112,12 @@ public class JobDescription {
         stderr = original.getStderr();
         workingDirectory = original.getWorkingDirectory();
         environment.putAll(original.getEnvironment());
-        nodeCount = original.getNodeCount();
-        processesPerNode = original.getProcessesPerNode();
-        threadsPerProcess = original.getThreadsPerProcess();
+        tasks = original.getTasks();
+        coresPerTask = original.getCoresPerTask();
+        tasksPerNode = original.getTasksPerNode();
         maxMemory = original.getMaxMemory();
         tempSpace = original.getTempSpace();
-        startSingleProcess = original.isStartSingleProcess();
+        startPerTask = original.isStartPerTask();
         maxRuntime = original.getMaxRuntime();
         startTime = original.getStartTime();
     }
@@ -142,60 +142,60 @@ public class JobDescription {
     }
 
     /**
-     * Get the number of nodes.
+     * Get the number of tasks in this job.
      *
-     * @return the number of nodes.
+     * @return the number of tasks.
      */
-    public int getNodeCount() {
-        return nodeCount;
+    public int getTasks() {
+        return tasks;
     }
 
     /**
-     * Set the number of nodes.
+     * Set the number of tasks in this job.
      *
-     * @param nodeCount
-     *            the number of nodes;
+     * @param tasks
+     *            the number of tasks;
      */
-    public void setNodeCount(int nodeCount) {
-        this.nodeCount = nodeCount;
+    public void setTasks(int tasks) {
+        this.tasks = tasks;
     }
 
     /**
-     * Get the number of processes to start on each node.
+     * Get the number of cores needed for each task.
      *
-     * @return the number of processesPerNode.
+     * @return the number of cores needed for each task.
      */
-    public int getProcessesPerNode() {
-        return processesPerNode;
+    public int getCoresPerTask() {
+        return coresPerTask;
     }
 
     /**
-     * Set the number of processes started on each node.
+     * Set the number of cores needed for each task.
      *
-     * @param processesPerNode
-     *            the number of processes started on each node.
+     * @param coresPerTask
+     *            the number of cores needed for each task.
      */
-    public void setProcessesPerNode(int processesPerNode) {
-        this.processesPerNode = processesPerNode;
+    public void setCoresPerTask(int coresPerTask) {
+        this.coresPerTask = coresPerTask;
     }
 
     /**
-     * Get the number of threads needed per process.
+     * Get the number of tasks per node.
      *
-     * @return the number of threads per process.
+     * @return the number of tasks per node.
      */
-    public int getThreadsPerProcess() {
-        return threadsPerProcess;
+    public int getTasksPerNode() {
+        return tasksPerNode;
     }
 
     /**
-     * Set the number of threads needed per process.
+     * Set the number of tasks allowed per node.
      *
-     * @param threadsPerProcess
-     *            the number of threads needed per process.
+     * @param tasksPerNode
+     *            the number of tasks allowed per node.
      */
-    public void setThreadsPerProcess(int threadsPerProcess) {
-        this.threadsPerProcess = threadsPerProcess;
+    public void setTasksPerNode(int tasksPerNode) {
+        this.tasksPerNode = tasksPerNode;
     }
 
     /**
@@ -237,23 +237,39 @@ public class JobDescription {
     }
 
     /**
-     * Is only a single process started?
+     * Will the executable be started per task?
      *
-     * @return if only a single process is started.
+     * <code>false</code> by default.
+     *
+     * @return if the executable is started per task.
      */
-    public boolean isStartSingleProcess() {
-        return startSingleProcess;
+    public boolean isStartPerTask() {
+        return startPerTask;
     }
 
     /**
-     * Set if only a single process is started, instead of nodeCount * processesPerNode. Resources are still reserved, but it is up to the user to start all the
-     * processes. Mainly useful for MPI.
+     * Will the executable be started per job?
      *
-     * @param startSingleProcess
-     *            if only a single process is started.
+     * <code>true</code> by default.
+     *
+     * @return if the executable is started per job.
      */
-    public void setStartSingleProcess(boolean startSingleProcess) {
-        this.startSingleProcess = startSingleProcess;
+    public boolean isStartPerJob() {
+        return !startPerTask;
+    }
+
+    /**
+     * Set if the executable must be started for each task instead of once per job.
+     */
+    public void setStartPerTask() {
+        this.startPerTask = true;
+    }
+
+    /**
+     * Set if the executable must be started for once per job instead of for each task.
+     */
+    public void setStartPerJob() {
+        this.startPerTask = false;
     }
 
     /**
@@ -552,9 +568,8 @@ public class JobDescription {
     public String toString() {
         return "JobDescription [name=" + name + ", queueName=" + queueName + ", executable=" + executable + ", arguments=" + arguments + ", schedulerArguments="
                 + schedulerArguments + ", stdin=" + stdin + ", stdout=" + stdout + ", stderr=" + stderr + ", workingDirectory=" + workingDirectory
-                + ", environment=" + environment + ", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode
-                + ", threadsPerProcess=" + threadsPerProcess + ", maxMemory=" + maxMemory + ", tempSpace=" + tempSpace + ", startSingleProcess="
-                + startSingleProcess + ", maxTime=" + maxRuntime + "]";
+                + ", environment=" + environment + ", tasks=" + tasks + ", coresPerTask=" + coresPerTask + ", tasksPerNode="
+                + tasksPerNode + ", maxMemory=" + maxMemory + ", tempSpace=" + tempSpace + ", startPerTask=" + startPerTask + ", maxTime=" + maxRuntime + "]";
     }
 
     /* Generated */
@@ -571,14 +586,14 @@ public class JobDescription {
         result = prime * result + tempSpace;
         result = prime * result + maxRuntime;
         result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + nodeCount;
-        result = prime * result + processesPerNode;
+        result = prime * result + tasks;
+        result = prime * result + coresPerTask;
         result = prime * result + ((queueName == null) ? 0 : queueName.hashCode());
-        result = prime * result + (startSingleProcess ? 1231 : 1237);
+        result = prime * result + (startPerTask ? 1231 : 1237);
         result = prime * result + ((stderr == null) ? 0 : stderr.hashCode());
         result = prime * result + ((stdin == null) ? 0 : stdin.hashCode());
         result = prime * result + ((stdout == null) ? 0 : stdout.hashCode());
-        result = prime * result + threadsPerProcess;
+        result = prime * result + tasksPerNode;
         result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
         return result;
     }
@@ -595,9 +610,9 @@ public class JobDescription {
 
         JobDescription other = (JobDescription) obj;
 
-        return maxRuntime == other.maxRuntime && nodeCount == other.nodeCount && startSingleProcess == other.startSingleProcess && tempSpace == other.tempSpace
-                && processesPerNode == other.processesPerNode && maxMemory == other.maxMemory && threadsPerProcess == other.threadsPerProcess
-                && Objects.equals(name, other.name) && Objects.equals(executable, other.executable) && Objects.equals(workingDirectory, other.workingDirectory)
+        return maxRuntime == other.maxRuntime && tasks == other.tasks && startPerTask == other.startPerTask && tempSpace == other.tempSpace
+                && coresPerTask == other.coresPerTask && maxMemory == other.maxMemory && tasksPerNode == other.tasksPerNode && Objects.equals(name, other.name)
+                && Objects.equals(executable, other.executable) && Objects.equals(workingDirectory, other.workingDirectory)
                 && Objects.equals(queueName, other.queueName) && Objects.equals(stdin, other.stdin) && Objects.equals(stdout, other.stdout)
                 && Objects.equals(stderr, other.stderr) && Objects.equals(arguments, other.arguments)
                 && Objects.equals(schedulerArguments, other.schedulerArguments) && Objects.equals(environment, other.environment);
