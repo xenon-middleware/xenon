@@ -38,10 +38,6 @@ public class AtUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AtUtils.class);
 
-    public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
-
-    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
-
     public AtUtils() {
         // utility class
     }
@@ -147,9 +143,6 @@ public class AtUtils {
     }
 
     public static void verifyJobDescription(JobDescription description, String[] queueNames) throws XenonException {
-
-        ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
-
         // check for option that overrides job script completely.
         // if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
         // no other settings checked.
@@ -160,16 +153,16 @@ public class AtUtils {
         ScriptingUtils.verifyJobDescription(description, queueNames, ADAPTOR_NAME);
 
         // Perform at specific checks
-        int nodeCount = description.getNodeCount();
+        int tasks = description.getTasks();
 
-        if (nodeCount > 1) {
-            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Unsupported node count: " + nodeCount);
+        if (tasks > 1) {
+            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Unsupported task count: " + tasks);
         }
 
-        int processesPerNode = description.getProcessesPerNode();
+        int tasksPerNode = description.getTasksPerNode();
 
-        if (processesPerNode > 1) {
-            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Unsupported processes per node count: " + processesPerNode);
+        if (tasksPerNode > 1) {
+            throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Unsupported task per node count: " + tasksPerNode);
         }
 
         int maxTime = description.getMaxRuntime();

@@ -311,16 +311,16 @@ public class JobQueueScheduler extends Scheduler {
             throw new IncompleteJobDescriptionException(adaptorName, "Executable missing in JobDescription!");
         }
 
-        int nodeCount = description.getNodeCount();
+        int tasks = description.getTasks();
 
-        if (nodeCount != 1) {
-            throw new InvalidJobDescriptionException(adaptorName, "Illegal node count: " + nodeCount);
+        if (tasks != 1) {
+            throw new InvalidJobDescriptionException(adaptorName, "Unsupported task count: " + tasks);
         }
 
-        int processesPerNode = description.getProcessesPerNode();
+        int tasksPerNode = description.getTasksPerNode();
 
-        if (processesPerNode != 1) {
-            throw new InvalidJobDescriptionException(adaptorName, "Illegal processes per node count: " + processesPerNode);
+        if (tasksPerNode > 1) {
+            throw new InvalidJobDescriptionException(adaptorName, "Unsupported task per node count: " + tasksPerNode);
         }
 
         int maxTime = description.getMaxRuntime();

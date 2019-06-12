@@ -42,10 +42,6 @@ public final class SlurmUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SlurmUtils.class);
 
-    public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
-
-    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
-
     /**
      * These are the states a job can be in when it has failed: FAILED: the job terminated with non-zero exit code or other failure condition. CANCELLED: the
      * job was explicitly cancelled by the user or system administrator. NODE_FAIL: the job terminated due to failure of one or more allocated nodes. TIMEOUT:
@@ -303,17 +299,7 @@ public final class SlurmUtils {
     }
 
     protected static void verifyJobDescription(JobDescription description, String[] queueNames, boolean interactive) throws XenonException {
-        ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
-
         if (interactive) {
-            if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
-                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Custom job script not supported in interactive mode");
-            }
-
-            if (description.isStartSingleProcess()) {
-                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "StartSingleProcess option not supported in interactive mode");
-            }
-
             if (description.getStdin() != null) {
                 throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Stdin redirect not supported in interactive mode");
             }
@@ -329,12 +315,6 @@ public final class SlurmUtils {
             if (description.getEnvironment().size() != 0) {
                 throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Environment variables not supported in interactive mode");
             }
-        }
-
-        // check for option that overrides job script completely.
-        if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
-            ScriptingUtils.checkQueue(queueNames, description.getQueueName(), ADAPTOR_NAME);
-            return;
         }
 
         // Perform standard checks.
@@ -366,15 +346,15 @@ public final class SlurmUtils {
         }
 
         // number of nodes
-        arguments.add("--nodes=" + description.getNodeCount());
+        arguments.add("--ntasks=" + description.getTasks());
 
-        // number of processer per node
-        arguments.add("--ntasks-per-node=" + description.getProcessesPerNode());
+        // number of processor per node
+        if (description.getTasksPerNode() > 0) {
+            arguments.add("--ntasks-per-node=" + description.getTasksPerNode());
+        }
 
         // number of thread per process
-        if (description.getThreadsPerProcess() > 0) {
-            arguments.add("--cpus-per-task=" + description.getThreadsPerProcess());
-        }
+        arguments.add("--cpus-per-task=" + description.getCoresPerTask());
 
         // the max amount of memory per node.
         if (description.getMaxMemory() > 0) {
@@ -427,14 +407,14 @@ public final class SlurmUtils {
         }
 
         // number of nodes
-        script.format("#SBATCH --nodes=%d\n", description.getNodeCount());
-
-        // number of processer per node
-        script.format("#SBATCH --ntasks-per-node=%d\n", description.getProcessesPerNode());
+        script.format("#SBATCH --ntasks=%d\n", description.getTasks());
 
         // number of thread per process
-        if (description.getThreadsPerProcess() > 0) {
-            script.format("#SBATCH --cpus-per-task=%d\n", description.getThreadsPerProcess());
+        script.format("#SBATCH --cpus-per-task=%d\n", description.getCoresPerTask());
+
+        // number of processer per node
+        if (description.getTasksPerNode() > 0) {
+            script.format("#SBATCH --ntasks-per-node=%d\n", description.getTasksPerNode());
         }
 
         // add maximum runtime in hour:minute:second format (converted from minutes in description)
@@ -484,7 +464,7 @@ public final class SlurmUtils {
 
         script.format("\n");
 
-        if (!description.isStartSingleProcess()) {
+        if (description.isStartPerTask()) {
             // run commands through srun
             script.format("%s ", "srun");
         }

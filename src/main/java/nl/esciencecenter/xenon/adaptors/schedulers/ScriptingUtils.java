@@ -193,16 +193,16 @@ public class ScriptingUtils {
             throw new IncompleteJobDescriptionException(adaptorName, "Executable missing in JobDescription!");
         }
 
-        int nodeCount = description.getNodeCount();
+        int tasks = description.getTasks();
 
-        if (nodeCount < 1) {
-            throw new InvalidJobDescriptionException(adaptorName, "Illegal node count: " + nodeCount);
+        if (tasks < 1) {
+            throw new InvalidJobDescriptionException(adaptorName, "Illegal task count: " + tasks);
         }
 
-        int processesPerNode = description.getProcessesPerNode();
+        int coresPerTask = description.getCoresPerTask();
 
-        if (processesPerNode < 1) {
-            throw new InvalidJobDescriptionException(adaptorName, "Illegal processes per node count: " + processesPerNode);
+        if (coresPerTask < 1) {
+            throw new InvalidJobDescriptionException(adaptorName, "Illegal cores per task count: " + coresPerTask);
         }
 
         // Check if the time is set to -1 (default), 0 (infinite), or a value.
@@ -215,22 +215,6 @@ public class ScriptingUtils {
         checkQueue(queueNames, description.getQueueName(), adaptorName);
 
         verifyStartTime(description.getStartTime(), adaptorName);
-    }
-
-    public static void verifyJobOptions(Map<String, String> options, String[] validOptions, String adaptorName) throws InvalidJobDescriptionException {
-
-        // check if all given job options are valid
-        for (String option : options.keySet()) {
-            boolean found = false;
-            for (String validOption : validOptions) {
-                if (validOption.equals(option)) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                throw new InvalidJobDescriptionException(adaptorName, "Given Job option \"" + option + "\" not supported");
-            }
-        }
     }
 
     /**

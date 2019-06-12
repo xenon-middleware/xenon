@@ -33,8 +33,11 @@ tasks.withType(Test) {
 //    COVERAGE
 // ==============
 
-// TODO upgrade gradle to 4.0 to get jacocoTestCoverageVerification task
-//jacocoTestCoverageVerification.group = 'Code coverage reporting'
+jacocoTestCoverageVerification.group = 'Code coverage reporting'
+
+jacoco {
+    toolVersion = "0.8.3"
+}
 
 jacocoTestReport {
     description 'Generate coverage report of unit tests'

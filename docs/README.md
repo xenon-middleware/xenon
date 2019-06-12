@@ -1,6 +1,6 @@
 # Serve site
 
-Serve site on [http://localhost:4000/Xenon/](http://localhost:4000/Xenon/) with the following command
+Serve site on [http://localhost:4000/xenon/](http://localhost:4000/xenon/) with the following command
 ```
 docker run --rm --label=jekyll --volume=$(pwd):/srv/jekyll \
 -i -t -p 127.0.0.1:4000:4000 jekyll/jekyll:pages jekyll serve

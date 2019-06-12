@@ -45,28 +45,11 @@ final class TorqueUtils {
 
     public static final Pattern QUEUE_INFO_NAME = Pattern.compile("^Queue: ([a-zA-Z_]+)$");
 
-    public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
-    public static final String JOB_OPTION_JOB_CONTENTS = "job.contents";
-
-    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
-
     private TorqueUtils() {
         throw new IllegalStateException("Utility class");
     }
 
     public static void verifyJobDescription(JobDescription description, String[] queueNames) throws XenonException {
-        ScriptingUtils.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, ADAPTOR_NAME);
-
-        // check for option that overrides job script completely.
-        if (description.getJobOptions().containsKey(JOB_OPTION_JOB_SCRIPT)) {
-            if (description.getJobOptions().containsKey(JOB_OPTION_JOB_CONTENTS)) {
-                throw new InvalidJobDescriptionException(ADAPTOR_NAME, "Adaptor cannot process job script and job contents simultaneously.");
-            }
-
-            // no remaining settings checked.
-            return;
-        }
-
         // perform standard checks.
         ScriptingUtils.verifyJobDescription(description, queueNames, ADAPTOR_NAME);
 
@@ -186,16 +169,25 @@ final class TorqueUtils {
             script.format("#PBS -q %s\n", description.getQueueName());
         }
 
-        int processorsPerNode = description.getProcessesPerNode();
+        int tasks = description.getTasks();
+        int coresPerTask = description.getCoresPerTask();
+        int tasksPerNode = description.getTasksPerNode();
 
-        int threads = description.getThreadsPerProcess();
-
-        if (threads > 1) {
-            processorsPerNode = processorsPerNode * threads;
+        if (tasksPerNode < 0) {
+            // assume 1 task per node
+            tasksPerNode = 1;
         }
 
+        int nodes = tasks / tasksPerNode;
+
+        if (tasks % tasksPerNode > 0) {
+            nodes += 1;
+        }
+
+        int ppn = coresPerTask * tasksPerNode;
+
         // number of nodes and processes per node
-        script.format("#PBS -l nodes=%d:ppn=%d\n", description.getNodeCount(), processorsPerNode);
+        script.format("#PBS -l nodes=%d:ppn=%d\n", nodes, ppn);
 
         // the max amount of memory per node.
         if (description.getMaxMemory() > 0) {
@@ -222,13 +214,7 @@ final class TorqueUtils {
 
         script.format("\n");
 
-        String customContents = description.getJobOptions().get(JOB_OPTION_JOB_CONTENTS);
-
-        if (customContents == null) {
-            generateScriptContent(description, script);
-        } else {
-            script.format("%s\n", customContents);
-        }
+        generateScriptContent(description, script);
 
         script.close();
 

@@ -317,7 +317,7 @@ public class ScriptingUtilsTest {
         String[] queueNames = new String[] { "q" };
         JobDescription job = new JobDescription();
         job.setExecutable("test.exe");
-        job.setNodeCount(-2);
+        job.setTasks(-2);
 
         ScriptingUtils.verifyJobDescription(job, queueNames, "test");
     }
@@ -328,7 +328,7 @@ public class ScriptingUtilsTest {
         String[] queueNames = new String[] { "q" };
         JobDescription job = new JobDescription();
         job.setExecutable("test.exe");
-        job.setProcessesPerNode(-2);
+        job.setCoresPerTask(-2);
 
         ScriptingUtils.verifyJobDescription(job, queueNames, "test");
     }
@@ -364,35 +364,6 @@ public class ScriptingUtilsTest {
         job.setStartTime("hello");
 
         ScriptingUtils.verifyJobDescription(job, queueNames, "test");
-    }
-
-    @Test
-    public void test_verify_job_options_empty() throws XenonException {
-
-        Map<String, String> options = new HashMap<>();
-        String[] valid = new String[0];
-
-        ScriptingUtils.verifyJobOptions(options, valid, "test");
-    }
-
-    @Test
-    public void test_verify_job_options_found() throws XenonException {
-
-        Map<String, String> options = new HashMap<>();
-        options.put("opt1", "value1");
-        String[] valid = new String[] { "opt1" };
-
-        ScriptingUtils.verifyJobOptions(options, valid, "test");
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test_verify_job_options_not_found() throws XenonException {
-
-        Map<String, String> options = new HashMap<>();
-        options.put("opt1", "value1");
-        String[] valid = new String[] { "opt2" };
-
-        ScriptingUtils.verifyJobOptions(options, valid, "test");
     }
 
     @Test(expected = XenonException.class)

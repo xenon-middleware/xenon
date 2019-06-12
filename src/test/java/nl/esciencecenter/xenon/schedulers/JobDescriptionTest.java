@@ -71,12 +71,12 @@ public class JobDescriptionTest {
         tmp = j.getExecutable();
         assertTrue(tmp.equals("exec"));
 
-        j.setProcessesPerNode(42);
-        int p = j.getProcessesPerNode();
+        j.setCoresPerTask(42);
+        int p = j.getCoresPerTask();
         assertTrue(p == 42);
 
-        j.setNodeCount(33);
-        p = j.getNodeCount();
+        j.setTasks(33);
+        p = j.getTasks();
         assertTrue(p == 33);
 
         j.setMaxRuntime(500);
@@ -100,10 +100,6 @@ public class JobDescriptionTest {
         Map<String, String> opt = new HashMap<>(3);
         opt.put("OPT1", "ARG1");
         opt.put("OPT2", "ARG2");
-
-        j.setJobOptions(opt);
-        Map<String, String> opt2 = j.getJobOptions();
-        assertTrue(opt.equals(opt2));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -131,30 +127,6 @@ public class JobDescriptionTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void test_jobOptionKeyEmpty() throws Exception {
-        JobDescription j = new JobDescription();
-        j.addJobOption("", "value");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void test_jobOptionKeyNull() throws Exception {
-        JobDescription j = new JobDescription();
-        j.addJobOption(null, "value");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void test_jobOptionValueEmpty() throws Exception {
-        JobDescription j = new JobDescription();
-        j.addJobOption("key", "");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void test_jobOptionValueNull() throws Exception {
-        JobDescription j = new JobDescription();
-        j.addJobOption("key", null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
     public void test_addSchedulerArgumentNull() throws Exception {
         JobDescription j = new JobDescription();
         j.addSchedulerArgument(null);
@@ -173,7 +145,7 @@ public class JobDescriptionTest {
     }
 
     private int doHash(String queueName, String executable, String name, String[] arguments, String[] schedulerArguments, String stdin, String stdout,
-            String stderr, String workingDirectory, Map<String, String> environment, Map<String, String> jobOptions, int nodeCount, int processesPerNode,
+            String stderr, String workingDirectory, Map<String, String> environment, int tasks, int processesPerNode,
             int threadsPerProcess, int maxMemory, int tempSpace, boolean startSingleProcess, int maxRuntime) {
 
         List<String> tmp = new ArrayList<>(10);
@@ -198,12 +170,11 @@ public class JobDescriptionTest {
         result = prime * result + tmp2.hashCode();
         result = prime * result + environment.hashCode();
         result = prime * result + ((executable == null) ? 0 : executable.hashCode());
-        result = prime * result + jobOptions.hashCode();
         result = prime * result + maxMemory;
         result = prime * result + tempSpace;
         result = prime * result + maxRuntime;
         result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + nodeCount;
+        result = prime * result + tasks;
         result = prime * result + processesPerNode;
         result = prime * result + ((queueName == null) ? 0 : queueName.hashCode());
         result = prime * result + (startSingleProcess ? 1231 : 1237);
@@ -219,7 +190,7 @@ public class JobDescriptionTest {
     public void test_hashCode() throws Exception {
         JobDescription j = new JobDescription();
 
-        int expected = doHash(null, null, null, new String[0], new String[0], null, null, null, null, new HashMap<>(5), new HashMap<>(5), 1, 1, -1, -1, -1,
+        int expected = doHash(null, null, null, new String[0], new String[0], null, null, null, null, new HashMap<>(5), 1, 1, -1, -1, -1,
                 false, -1);
         int hash = j.hashCode();
 
@@ -237,7 +208,7 @@ public class JobDescriptionTest {
         j.setStdin("stdin");
         j.setStderr(null);
         j.setExecutable("exec");
-        j.setStartSingleProcess(true);
+        j.setStartPerTask();
 
         String[] args = new String[] { "a", "b", "c" };
         j.setArguments(args);
@@ -247,12 +218,7 @@ public class JobDescriptionTest {
         env.put("ENV2", "ARG2");
         j.setEnvironment(env);
 
-        Map<String, String> opt = new HashMap<>(3);
-        opt.put("OPT1", "ARG1");
-        opt.put("OPT2", "ARG2");
-        j.setJobOptions(opt);
-
-        int expected = doHash("queue", "exec", "name", args, new String[0], "stdin", null, null, "workdir", env, opt, 1, 1, -1, -1, -1, true, -1);
+        int expected = doHash("queue", "exec", "name", args, new String[0], "stdin", null, null, "workdir", env, 1, 1, -1, -1, -1, true, -1);
         int hash = j.hashCode();
 
         assertEquals(expected, hash);
@@ -268,8 +234,8 @@ public class JobDescriptionTest {
         j.setStdin("stdin");
         j.setStderr("stderr");
         j.setExecutable("exec");
-        j.setStartSingleProcess(true);
-        j.setThreadsPerProcess(4);
+        j.setStartPerTask();
+        j.setTasksPerNode(4);
         j.setMaxMemory(1024);
         j.setTempSpace(512);
         j.setMaxRuntime(15);
@@ -285,12 +251,7 @@ public class JobDescriptionTest {
         env.put("ENV2", "ARG2");
         j.setEnvironment(env);
 
-        Map<String, String> opt = new HashMap<>(3);
-        opt.put("OPT1", "ARG1");
-        opt.put("OPT2", "ARG2");
-        j.setJobOptions(opt);
-
-        int expected = doHash("noot", "exec", null, args, schedArgs, "stdin", "stdout", "stderr", "aap", env, opt, 1, 1, 4, 1024, 512, true, 15);
+        int expected = doHash("noot", "exec", null, args, schedArgs, "stdin", "stdout", "stderr", "aap", env, 1, 1, 4, 1024, 512, true, 15);
         int hash = j.hashCode();
         assertEquals(expected, hash);
     }
@@ -322,9 +283,9 @@ public class JobDescriptionTest {
         other.setTempSpace(-1);
         assertTrue(j.equals(other));
 
-        other.setThreadsPerProcess(4);
+        other.setTasksPerNode(4);
         assertFalse(j.equals(other));
-        other.setThreadsPerProcess(-1);
+        other.setTasksPerNode(-1);
         assertTrue(j.equals(other));
 
         other.setName("test");
@@ -332,19 +293,19 @@ public class JobDescriptionTest {
         other.setName(null);
         assertTrue(j.equals(other));
 
-        other.setNodeCount(2);
+        other.setTasks(2);
         assertFalse(j.equals(other));
-        other.setNodeCount(1);
+        other.setTasks(1);
         assertTrue(j.equals(other));
 
-        other.setProcessesPerNode(2);
+        other.setCoresPerTask(2);
         assertFalse(j.equals(other));
-        other.setProcessesPerNode(1);
+        other.setCoresPerTask(1);
         assertTrue(j.equals(other));
 
-        other.setStartSingleProcess(true);
+        other.setStartPerTask();
         assertFalse(j.equals(other));
-        other.setStartSingleProcess(false);
+        other.setStartPerJob();
         assertTrue(j.equals(other));
 
         other.setExecutable("aap");
@@ -400,23 +361,13 @@ public class JobDescriptionTest {
         assertFalse(j.equals(other));
         other.setEnvironment(null);
         assertTrue(j.equals(other));
-
-        Map<String, String> opt = new HashMap<>(3);
-        opt.put("OPT1", "ARG1");
-        opt.put("OPT2", "ARG2");
-        other.setJobOptions(opt);
-        assertFalse(j.equals(other));
-        other.setJobOptions(null);
-
-        assertTrue(j.equals(other));
     }
 
     @Test
     public void test_toString() throws Exception {
-
         String expected = "JobDescription [name=job, queueName=noot, executable=exec, arguments=[a, b, c], schedulerArguments=[1, 2, 3], stdin=stdin.txt,"
-                + " stdout=stdout.txt, stderr=stderr.txt, workingDirectory=aap, environment={ENV1=ARG1}, jobOptions={OPT1=ARG1},"
-                + " nodeCount=1, processesPerNode=1, threadsPerProcess=4, maxMemory=1024, tempSpace=512, startSingleProcess=false, maxTime=-1]";
+                + " stdout=stdout.txt, stderr=stderr.txt, workingDirectory=aap, environment={ENV1=ARG1},"
+                + " tasks=1, coresPerTask=1, tasksPerNode=4, maxMemory=1024, tempSpace=512, startPerTask=false, maxTime=-1]";
 
         JobDescription j = new JobDescription();
         j.setName("job");
@@ -426,7 +377,7 @@ public class JobDescriptionTest {
         j.setStderr("stderr.txt");
         j.setStdin("stdin.txt");
         j.setExecutable("exec");
-        j.setThreadsPerProcess(4);
+        j.setTasksPerNode(4);
         j.setMaxMemory(1024);
         j.setTempSpace(512);
         j.setArguments(new String[] { "a", "b", "c" });
@@ -435,10 +386,6 @@ public class JobDescriptionTest {
         Map<String, String> env = new HashMap<>(2);
         env.put("ENV1", "ARG1");
         j.setEnvironment(env);
-
-        Map<String, String> opt = new HashMap<>(2);
-        opt.put("OPT1", "ARG1");
-        j.setJobOptions(opt);
 
         String tmp = j.toString();
 
