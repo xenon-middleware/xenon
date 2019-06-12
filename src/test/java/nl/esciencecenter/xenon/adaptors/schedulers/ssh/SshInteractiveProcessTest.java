@@ -20,6 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import org.junit.Test;
@@ -148,7 +149,7 @@ public class SshInteractiveProcessTest {
     }
 
     @Test
-    public void test_isDoneTrue() throws XenonException {
+    public void test_isDoneTrue() throws XenonException, IOException {
         JobDescription desc = new JobDescription();
         desc.setExecutable("exec");
 
@@ -161,14 +162,13 @@ public class SshInteractiveProcessTest {
         MockClientSession session = new MockClientSession(false);
         SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42", 10000L);
 
-        MockChannelExec e = (MockChannelExec) session.exec;
-        e.closed = true;
+        session.exec.close();
 
         assertTrue(p.isDone());
     }
 
     @Test
-    public void test_isDoubleDoneTrue() throws XenonException {
+    public void test_isDoubleDoneTrue() throws XenonException, IOException {
         JobDescription desc = new JobDescription();
         desc.setExecutable("exec");
 
@@ -184,7 +184,7 @@ public class SshInteractiveProcessTest {
         assertNotNull(session.exec);
 
         MockChannelExec e = (MockChannelExec) session.exec;
-        e.closed = true;
+        e.close();
 
         p.isDone();
 
@@ -204,15 +204,15 @@ public class SshInteractiveProcessTest {
 
         MockClientSession session = new MockClientSession(false);
         SshInteractiveProcess p = new SshInteractiveProcess(session, desc, "JOB-42", 10000L);
+        assertFalse(p.isDone());
+
         p.destroy();
 
-        assertNotNull(session.exec);
-        MockChannelExec e = (MockChannelExec) session.exec;
-        assertTrue(e.gotClose);
+        assertTrue(p.isDone());
     }
 
     @Test
-    public void test_destroyAfterDone() throws XenonException {
+    public void test_destroyAfterDone() throws XenonException, IOException {
         JobDescription desc = new JobDescription();
         desc.setExecutable("exec");
 
@@ -227,13 +227,13 @@ public class SshInteractiveProcessTest {
 
         assertNotNull(session.exec);
         MockChannelExec e = (MockChannelExec) session.exec;
-        e.closed = true;
+        e.close();
 
         p.isDone();
 
         p.destroy();
 
-        assertTrue(e.gotClose);
+        assertTrue(e.isClosed());
     }
 
     @Test
