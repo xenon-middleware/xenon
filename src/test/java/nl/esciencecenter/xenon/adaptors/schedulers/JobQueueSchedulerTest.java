@@ -479,8 +479,6 @@ public class JobQueueSchedulerTest {
 
         JobStatus status = s.getJobStatus(jobID);
 
-        assertFalse(status.isDone());
-
         status = s.waitUntilDone(jobID, 1000);
 
         assertTrue(status.isDone());
