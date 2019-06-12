@@ -30,8 +30,6 @@ public class MockChannelExec extends ChannelExec {
 
     public String command;
 
-    public boolean gotClose = false;
-
     public boolean closeThrows = false;
 
     public HashMap<String, String> env = new HashMap<>();
