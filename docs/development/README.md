@@ -8,54 +8,11 @@ The javadoc aimed at users of the Xenon library is available at <http://nlesc.gi
 
 The javadoc aimed at developers of the Xenon library is available at <http://nlesc.github.io/Xenon/versions/1.1.0/javadoc-devel>.
 
-
-
-
-- [Building Xenon online](#building-xenon-online)
-- [Building Xenon offline](#building-xenon-offline)
-	- [Update offline jars](#update-offline-jars)
 - [Integration tests](#integration-tests)
 	- [Using live systems](#using-live-systems)
 	- [Using docker containers](#using-docker-containers)
 		- [Filtering tests](#filtering-tests)
 - [Release a new version](#release-a-new-version)
-
-# Building Xenon online
-
-Xenon uses the Gradle build automation tool.
-Use `./gradlew tasks` to list all available tasks.
-
-# Building Xenon offline
-
-Prerequisites:
-
-* JDK
-* Gradle, http://gradle.org/, tested with version 2.9
-
-The dist can be built offline with
-```
-gradle -b build-offline.gradle --offline build
-```
-Replace `build` to run another gradle task offline.
-
-Offline limitations/workarounds:
-
-* Requires that gradle is installed
-* No test coverage, as coverage report generation requires download
-* Publishing to Bintray must be done manually
-
-## Update offline jars
-
-To work offline all the jars required by Xenon are available in the `lib/` folder.
-
-When dependencies are added to the `build.gradle` file the jar files of the dependencies must be added to the `lib/` folder.
-This can be done with the following command:
-
-```
-./gradlew downloadDependencies
-```
-
-PS. Do not forget to commit the downloaded jar files.
 
 # Integration tests
 

@@ -1,5 +1,4 @@
-// Common gradle configuration between offline and online build.
-// This file can not be run by itself either run build.gradle or build-offline.gradle .
+// This file can not be run by itself either run build.gradle.
 
 defaultTasks 'clean', 'assemble', 'test'
 
@@ -12,13 +11,6 @@ description = 'Xenon: a middleware abstraction library that provides a simple pr
 // Java 7 is not available. Could configure gradle wrapper for this
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
-
-// PROJECT DIRECTORIES
-// ==============
-ext.compileLibDir = file('lib')
-ext.runtimeLibDir = file('lib/runtime')
-ext.testLibDir = file('lib/test')
-ext.codestyleLibDir = file('lib/codestyle')
 
 sourceSets {
     docGenerator
