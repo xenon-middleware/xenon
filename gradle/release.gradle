@@ -9,11 +9,11 @@
 bintray {
     user = System.getenv('BINTRAY_USER')
     key = System.getenv('BINTRAY_KEY')
+    publish = true
     pkg {
         repo = 'xenon'
         name = 'xenon'
         desc = description
-        publish = true
         userOrg = 'nlesc'
         licenses = ['Apache-2.0']
         websiteUrl = 'https://nlesc.github.io/Xenon'
