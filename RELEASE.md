@@ -43,7 +43,7 @@ you should get something like this:
     Untracked files:
     (use "git add <file>..." to include in what will be committed)
 
-	docs/versions/1.2.2/
+	docs/versions/3.0.0/
 
 Add and commit these files using `git add` and `git commit` and `git push`.
 
