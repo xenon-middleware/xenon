@@ -13,13 +13,14 @@ bintray {
         repo = 'xenon'
         name = 'xenon'
         desc = description
+        publish = true
         userOrg = 'nlesc'
         licenses = ['Apache-2.0']
         websiteUrl = 'https://nlesc.github.io/Xenon'
         vcsUrl = 'https://github.com/NLeSC/Xenon.git'
         issueTrackerUrl = 'https://github.com/NLeSC/Xenon/issues'
     }
-    publications = ['MyPublication', 'TestApiPublication', 'DocGeneratorPublication']
+    publications = ['MyPublication']
 }
 
 tasks.publish.dependsOn 'bintrayUpload'
@@ -49,7 +50,13 @@ task copyJavadoc(type: Copy) {
 }
 
 task publishSite() {
-   description 'Publishes artifacts to site (aka /docs/ directory)'
-   group 'Publishing'
-   dependsOn 'versionSite', 'copyJavadoc'
+    description 'Publishes artifacts to site (aka /docs/ directory)'
+    group 'Publishing'
+    dependsOn 'versionSite', 'copyJavadoc'
+}
+
+task publishToBintray() {
+    dependsOn 'bintrayUpload',
+        'publishDocGeneratorPublicationPublicationToDocGeneratorRepoRepository',
+        'publishTestApiPublicationPublicationToTestApiRepoRepository'
 }

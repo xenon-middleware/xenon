@@ -71,17 +71,14 @@ To add the release to bintray, do the following:
 ```bash
 export BINTRAY_USER=<your bintray username>
 export BINTRAY_KEY=<your bintray API key>
-./gradlew bintrayUpload
+./gradlew publishToBintray
 ```
 
 This should create the new release on bintray and upload all necessary data, jars, etc.
 
-Next, go to the bintray page: 
+On https://bintray.com/nlesc/xenon check that xenon* packages have been updated.
 
-https://bintray.com/nlesc/xenon/xenon#
-
-and click on 'publish' to publish the release. The latest verion tag usually takes a few minutes to update. 
-
+The latest version tag usually takes a few minutes to update.
 
 ### Alternative manual bintray step
 
@@ -111,6 +108,6 @@ the .m2 repository. Click on `save` and then on `publish` to publish the version
  
 ### 7. Update applications using Xenon.
 
-Update related repros such as Xenon-examples, pyXenon, xenon-cli, etc
+Update related repos such as Xenon-examples, pyXenon, xenon-cli, etc
 
 And finally celebrate.
