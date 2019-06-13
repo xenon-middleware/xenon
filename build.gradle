@@ -19,7 +19,7 @@ plugins {
     // license
     id 'com.github.hierynomus.license' version '0.14.0'
     // test sets
-    id 'org.unbroken-dome.test-sets' version '1.5.0'
+    id 'org.unbroken-dome.test-sets' version '2.1.1'
 }
 
 //    METADATA
@@ -86,7 +86,7 @@ dependencies {
     testApiCompile group: 'junit', name: 'junit', version: '4.12'
 
     integrationTestCompile sourceSets.testApi.output
-    integrationTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.32.0'
+    integrationTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.35.0'
 
     // allow isolated and live tests to import from integration test,
     // so abstract test classes and docker compose files can be extended and reused
@@ -96,7 +96,7 @@ dependencies {
 
     // TODO fixedClientEnvironmentTest should have same dependencies as integrationTest,
     // do no copy deps but append integrationTest.deps to fixedClientEnvironmentTest.deps
-    fixedClientEnvironmentTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.32.0'
+    fixedClientEnvironmentTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.35.0'
 
     docGeneratorCompile sourceSets.main.output
     docGeneratorRuntime configurations.runtime

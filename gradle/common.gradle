@@ -10,8 +10,8 @@ description = 'Xenon: a middleware abstraction library that provides a simple pr
 
 // will generate a warning with JDK 8, since the runtime jar (rt.jar) of
 // Java 7 is not available. Could configure gradle wrapper for this
-sourceCompatibility = '1.9'
-targetCompatibility = '1.9'
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 // PROJECT DIRECTORIES
 // ==============
@@ -39,12 +39,6 @@ testSets {
 apply from: 'gradle/documentation.gradle'
 apply from: 'gradle/distribution.gradle'
 apply from: 'gradle/docker.gradle'
-
-task wrapper(type: Wrapper) {
-    description 'Generates gradle wrapper'
-    group 'Build Setup'
-    gradleVersion = '4.1'
-}
 
 cleanIdeaWorkspace.group = 'IDE'
 cleanIdeaWorkspace.description = 'Removes the IDEA workspace file'
