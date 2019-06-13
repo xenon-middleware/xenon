@@ -11,6 +11,8 @@ Notable changes compared to v2.6.2:
 - Remove the JOB_OPTIONS hack from JobDescription (#629 and #628)
 - Added support for memory requirements and job name in JobDescription (#562 and #609)
 - Added an adaptor for the at scheduler (#381)
+- Dropped offline support (#649)
+- Require Java 11 or greater (#647)
 - Many smaller bugfixes and updates of dependencies. 
 
 Notable changes compared to v2.6.1:
