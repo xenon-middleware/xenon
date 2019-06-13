@@ -1,5 +1,7 @@
 # Adding an adaptor
 
+> This documentation is out of date, for now use https://github.com/xenon-middleware/xenon-adaptors-cloud as an example.
+
 To add an adaptor the following steps must be performed:
 * source code
 * dependencies (optional)
@@ -22,4 +24,3 @@ Adding an adaptor can be completed by adding/changing files in the following loc
   2. Register the Docker image in `src/integrationTest/docker/docker-compose.yml` and  `gradle/docker.gradle`
   3. Add the Docker container credentials/location/configuration to `src/integrationTest/docker/xenon.test.properties.docker`
   4. Create an integration test in `src/integrationTest/java/esciencecenter/xenon/adaptors/<adaptor name>/`
-

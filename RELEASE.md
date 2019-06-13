@@ -2,7 +2,7 @@
 
 Step-by-step guide on creating a Xenon release
 
-## Up the version number and add changelog
+## 1. Up the version number and add changelog
 
 To create a release, version numbers should be updated in:
 
@@ -13,7 +13,7 @@ To create a release, version numbers should be updated in:
 Also, in `CHANGELOG.md` a section should be added with 
 notable changes in this version.
 
-## Update the site
+## 2. Update the site
 
 To update Xenon version in `docs/_data/version.yml` and update Javadocs inside `docs/` directory run:
 
@@ -23,7 +23,7 @@ To update Xenon version in `docs/_data/version.yml` and update Javadocs inside `
 
 The site is a [Jekyll](https://jekyllrb.com/) powered site and hosted by GitHub pages at http://nlesc.github.io/Xenon/
 
-## Commit the changes
+## 3. Commit the changes
 
 Next, commit all changes you have made to the master branch. If you check with  
 
@@ -47,7 +47,7 @@ you should get something like this:
 
 Add and commit these files using `git add` and `git commit` and `git push`.
 
-## Create a GitHub release
+## 4. Create a GitHub release
 
 On GitHub, go to the releases tab and draft a new release.
 
@@ -55,7 +55,7 @@ The tag and title should be set to the version.
 
 The release description should contain a small text to explain what Xenon is and the part of the CHANGELOG.md which pertains to this version.
 
-## Check if DOI is created in Zenodo
+## 5. Check if DOI is created in Zenodo
 
 Zenodo is linked to the Xenon github, so when a release is created, a DOI 
 will be created automatically. Click the DOI badge on the github page to check 
@@ -64,7 +64,7 @@ this.
 Check that the authors and license of the Zenodo entry are correct.
 If not, then correct, save and publish the Zenodo entry.
 
-### Add jars to bintray
+### 6. Add jars to bintray
 
 To add the release to bintray, do the following: 
 
@@ -109,3 +109,8 @@ ask for the 'Target Repository Path', which should be:
 Click on the `click to add files` button and add the files that where generated in 
 the .m2 repository. Click on `save` and then on `publish` to publish the version.
  
+### 7. Update applications using Xenon.
+
+Update related repros such as Xenon-examples, pyXenon, xenon-cli, etc
+
+And finally celebrate.
