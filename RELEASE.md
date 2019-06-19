@@ -23,6 +23,13 @@ To update Xenon version in `docs/_data/version.yml` and update Javadocs inside `
 
 The site is a [Jekyll](https://jekyllrb.com/) powered site and hosted by GitHub pages at http://nlesc.github.io/Xenon/
 
+## 2.1 Update the CITATION.cff
+
+The CITATION.cff contains the information on how to cite xenon in scientific applications. Update the authors list is needed, and
+change the date-released and version fields to reflect the current release.  
+
+NOTE: the CITATION.cff contains the concept DOI of xenon (refering to all versions), so this does not need to be changed. 
+
 ## 3. Commit the changes
 
 Next, commit all changes you have made to the master branch. If you check with  
