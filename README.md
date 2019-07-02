@@ -212,7 +212,10 @@ For more examples, see the tutorial at [Read The Docs](http://xenonrse2017.readt
 
 Xenon's JavaDoc is available online at <http://xenon-middleware.github.io/xenon/>.
 
+## Documentation for maintainers
+
 For developers of Xenon itself 
+
 * see [RELEASE.md](RELEASE.md) how to perform a release.
 * see [ADAPTOR_DEVELOPMENT.md](ADAPTOR_DEVELOPMENT.md) how to write a new adaptor.
 
