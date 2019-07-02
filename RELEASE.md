@@ -12,6 +12,8 @@ To create a release, version numbers should be updated in:
 
     Also, add a section to the CHANGELOG.md with notable changes in this version.
 
+- CITATION.cff (see section below)
+
 ## 2. Update the site
 
 To update Xenon version in `docs/_data/version.yml` and update Javadocs inside `docs/` directory run:
