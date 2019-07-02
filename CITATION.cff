@@ -1,25 +1,31 @@
 --- 
+abstract: "Many applications use remote storage and compute resources. To do so, they need to include code to interact with the scheduling systems and file transfer protocols used on those remote machines. Unfortunately, many different scheduler systems and file transfer protocols exist, often with completely different programming interfaces. This makes it hard for applications to switch to a different system or support multiple remote systems simultaneously. Xenon solves this problem by providing a single programming interface to many different types of remote resources, allowing applications to switch without changing a single line of code."
 authors: 
   - 
     affiliation: "Netherlands eScience Center"
     family-names: Maassen
     given-names: Jason
+    orcid: "https://orcid.org/0000-0002-8172-4865"
   - 
     affiliation: "Netherlands eScience Center"
     family-names: Verhoeven
     given-names: Stefan
+    orcid: "https://orcid.org/0000-0002-5821-2060"
   - 
     affiliation: "Netherlands eScience Center"
     family-names: Borgdorff
     given-names: Joris
+    orcid: "https://orcid.org/0000-0001-7911-9490"
   - 
     affiliation: "Netherlands eScience Center"
     family-names: Spaaks
     given-names: "Jurriaan H."
+    orcid: "https://orcid.org/0000-0002-7064-4069"
   - 
     affiliation: "Netherlands eScience Center"
     family-names: Drost
     given-names: Niels
+    orcid: "https://orcid.org/0000-0001-9795-7981"
   - 
     affiliation: "Netherlands eScience Center"
     family-names: Meijer
@@ -39,11 +45,13 @@ authors:
     family-names: Nieuwpoort
     given-names: Rob
     name-particle: van
+    orcid: "https://orcid.org/0000-0002-2947-9444"
   - 
     affiliation: "Netherlands eScience Center"
     family-names: Werkhoven
     given-names: Ben
     name-particle: van
+    orcid: "https://orcid.org/0000-0002-7508-3272"
   - 
     affiliation: "Netherlands eScience Center"
     family-names: Kuzniar

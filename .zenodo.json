@@ -1,27 +1,29 @@
 {
-    "description": "A middleware abstraction library that provides a simple programming interface to various compute and storage resources.",
-    "license": "Apache-2.0",
-    "title": "Xenon",
-    "upload_type": "software",
-    "creators": [{
+    "creators": [
+        {
             "affiliation": "Netherlands eScience Center",
-            "name": "Maassen, Jason"
+            "name": "Maassen, Jason",
+            "orcid": "0000-0002-8172-4865"
         },
         {
             "affiliation": "Netherlands eScience Center",
-            "name": "Verhoeven, Stefan"
+            "name": "Verhoeven, Stefan",
+            "orcid": "0000-0002-5821-2060"
         },
         {
             "affiliation": "Netherlands eScience Center",
-            "name": "Borgdorff, Joris"
+            "name": "Borgdorff, Joris",
+            "orcid": "0000-0001-7911-9490"
         },
         {
             "affiliation": "Netherlands eScience Center",
-            "name": "Spaaks, Jurriaan H."
+            "name": "Spaaks, Jurriaan H.",
+            "orcid": "0000-0002-7064-4069"
         },
         {
             "affiliation": "Netherlands eScience Center",
-            "name": "Drost, Niels"
+            "name": "Drost, Niels",
+            "orcid": "0000-0001-9795-7981"
         },
         {
             "affiliation": "Netherlands eScience Center",
@@ -37,11 +39,13 @@
         },
         {
             "affiliation": "Netherlands eScience Center",
-            "name": "van Nieuwpoort, Rob"
+            "name": "van Nieuwpoort, Rob",
+            "orcid": "0000-0002-2947-9444"
         },
         {
             "affiliation": "Netherlands eScience Center",
-            "name": "van Werkhoven, Ben"
+            "name": "van Werkhoven, Ben",
+            "orcid": "0000-0002-7508-3272"
         },
         {
             "affiliation": "Netherlands eScience Center",
@@ -49,7 +53,7 @@
             "orcid": "0000-0003-1711-7961"
         }
     ],
-    "access_right": "open",
+    "description": "Many applications use remote storage and compute resources. To do so, they need to include code to interact with the scheduling systems and file transfer protocols used on those remote machines. Unfortunately, many different scheduler systems and file transfer protocols exist, often with completely different programming interfaces. This makes it hard for applications to switch to a different system or support multiple remote systems simultaneously. Xenon solves this problem by providing a single programming interface to many different types of remote resources, allowing applications to switch without changing a single line of code.",
     "keywords": [
         "Java",
         "batch-job",
@@ -65,5 +69,9 @@
         "SSH",
         "Torque",
         "distributed computing"
-    ]
+    ],
+    "license": {
+        "id": "Apache-2.0"
+    },
+    "title": "Xenon"
 }
