@@ -21,7 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -41,20 +40,9 @@ import nl.esciencecenter.xenon.schedulers.NoSuchQueueException;
 import nl.esciencecenter.xenon.schedulers.QueueStatus;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 import nl.esciencecenter.xenon.schedulers.Streams;
+import nl.esciencecenter.xenon.utils.DaemonThreadFactory;
 
 public class JobQueueScheduler extends Scheduler {
-
-    /**
-     * Simple thread factory which returns daemon threads instead of normal threads
-     *
-     */
-    private class DaemonThreadFactory implements ThreadFactory {
-        public Thread newThread(Runnable runnable) {
-            Thread thread = Executors.defaultThreadFactory().newThread(runnable);
-            thread.setDaemon(true);
-            return thread;
-        }
-    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobQueueScheduler.class);
 
@@ -125,11 +113,9 @@ public class JobQueueScheduler extends Scheduler {
             throw new BadParameterException(adaptorName, "Polling delay must be between " + MIN_POLLING_DELAY + " and " + MAX_POLLING_DELAY + "!");
         }
 
-        ThreadFactory threadFactory = new DaemonThreadFactory();
-
-        unlimitedExecutor = Executors.newCachedThreadPool(threadFactory);
-        singleExecutor = Executors.newSingleThreadExecutor(threadFactory);
-        multiExecutor = Executors.newFixedThreadPool(multiQThreads, threadFactory);
+        unlimitedExecutor = Executors.newCachedThreadPool(new DaemonThreadFactory("JobExecutorThread." + uniqueID + "." + UNLIMITED_QUEUE_NAME));
+        singleExecutor = Executors.newSingleThreadExecutor(new DaemonThreadFactory("JobExecutorThread." + uniqueID + "." + SINGLE_QUEUE_NAME));
+        multiExecutor = Executors.newFixedThreadPool(multiQThreads, new DaemonThreadFactory("JobExecutorThread." + uniqueID + "." + MULTI_QUEUE_NAME));
     }
 
     public long getCurrentJobID() {
@@ -472,9 +458,11 @@ public class JobQueueScheduler extends Scheduler {
     }
 
     public void end() {
-        singleExecutor.shutdownNow();
-        multiExecutor.shutdownNow();
-        unlimitedExecutor.shutdownNow();
+        try {
+            close();
+        } catch (XenonException e) {
+            // TODO: ignored?
+        }
     }
 
     public FileSystem getFileSystem() throws XenonException {
@@ -483,6 +471,9 @@ public class JobQueueScheduler extends Scheduler {
 
     @Override
     public void close() throws XenonException {
+        singleExecutor.shutdownNow();
+        multiExecutor.shutdownNow();
+        unlimitedExecutor.shutdownNow();
         factory.close();
     }
 

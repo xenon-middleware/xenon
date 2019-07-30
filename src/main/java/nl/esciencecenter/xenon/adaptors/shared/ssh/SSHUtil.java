@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.net.HostAndPort;
 import org.apache.sshd.agent.local.ProxyAgentFactory;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ChannelDirectTcpip;
@@ -51,6 +50,8 @@ import org.apache.sshd.common.util.net.SshdSocketAddress;
 import org.apache.sshd.common.util.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.net.HostAndPort;
 
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
@@ -480,7 +481,7 @@ public class SSHUtil {
         SshdSocketAddress[] locations = extractLocations(adaptorName, location);
         UserCredential[] creds = extractCredentials(adaptorName, locations, credential);
 
-        SSHConnection connection = new SSHConnection(locations.length - 1);
+        SSHConnection connection = new SSHConnection(client, locations.length - 1);
 
         // Connect to the last location. This is either the destination (without tunneling) or the first hop.
         ClientSession session = connectAndAuthenticate(adaptorName, client, locations[0].getHostName(), locations[0].getPort(), creds[0], timeout);
