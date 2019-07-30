@@ -457,14 +457,6 @@ public class JobQueueScheduler extends Scheduler {
         return result;
     }
 
-    public void end() {
-        try {
-            close();
-        } catch (XenonException e) {
-            // TODO: ignored?
-        }
-    }
-
     public FileSystem getFileSystem() throws XenonException {
         return filesystem;
     }
