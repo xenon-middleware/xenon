@@ -55,8 +55,8 @@ dependencies {
     compile group: 'commons-net', name: 'commons-net', version: '3.3'
 
     // ssh and sftp 
-    compile group: 'org.apache.sshd', name: 'sshd-mina', version: '2.3.0'
-    compile group: 'org.apache.sshd', name: 'sshd-sftp', version: '2.3.0'
+    compile group: 'org.apache.sshd', name: 'sshd-mina', version: '2.2.0'
+    compile group: 'org.apache.sshd', name: 'sshd-sftp', version: '2.2.0'
     compile group: 'net.i2p.crypto', name: 'eddsa', version: '0.3.0'
     compile group: 'com.google.guava', name: 'guava', version: '19.0'
 

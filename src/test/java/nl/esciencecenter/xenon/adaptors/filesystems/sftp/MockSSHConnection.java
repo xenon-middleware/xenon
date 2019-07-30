@@ -26,11 +26,16 @@ public class MockSSHConnection extends SSHConnection {
     MockSftpClient client;
 
     protected MockSSHConnection(MockSftpClient client) {
-        super(0);
+        super(null, 0);
         this.client = client;
     }
 
     public SftpClient createSftpClient() throws IOException {
         return client;
+    }
+
+    @Override
+    public void close() {
+        // do nothing
     }
 }
