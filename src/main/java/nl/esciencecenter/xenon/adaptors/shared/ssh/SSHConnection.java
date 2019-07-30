@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.adaptors.shared.ssh;
 
 import java.io.IOException;
 
+import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.client.subsystem.sftp.SftpClient;
 import org.apache.sshd.client.subsystem.sftp.SftpClientFactory;
@@ -25,14 +26,16 @@ import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHUtil.Tunnel;
 
 public class SSHConnection implements AutoCloseable {
 
-    private ClientSession[] sessions;
-    private Tunnel[] tunnels;
+    private final SshClient client;
+    private final ClientSession[] sessions;
+    private final Tunnel[] tunnels;
     private final int hops;
     private boolean closed = false;
 
     private ClientSession session;
 
-    protected SSHConnection(int hops) {
+    protected SSHConnection(SshClient client, int hops) {
+        this.client = client;
         this.hops = hops;
         sessions = new ClientSession[hops];
         tunnels = new Tunnel[hops];
@@ -72,29 +75,33 @@ public class SSHConnection implements AutoCloseable {
 
         closed = true;
 
-        if (session != null) {
-            try {
-                session.close();
-            } catch (Exception e) {
-                // ignored?
+        try {
+            if (session != null) {
+                try {
+                    session.close();
+                } catch (Exception e) {
+                    // ignored?
+                }
             }
-        }
 
-        for (int i = hops - 1; i >= 0; i--) {
-            if (tunnels[i] != null) {
-                try {
-                    tunnels[i].close();
-                } catch (Exception e) {
-                    // ignored?
+            for (int i = hops - 1; i >= 0; i--) {
+                if (tunnels[i] != null) {
+                    try {
+                        tunnels[i].close();
+                    } catch (Exception e) {
+                        // ignored?
+                    }
+                }
+                if (sessions[i] != null) {
+                    try {
+                        sessions[i].close();
+                    } catch (Exception e) {
+                        // ignored?
+                    }
                 }
             }
-            if (sessions[i] != null) {
-                try {
-                    sessions[i].close();
-                } catch (Exception e) {
-                    // ignored?
-                }
-            }
+        } finally {
+            client.stop();
         }
     }
 }

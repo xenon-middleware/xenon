@@ -29,7 +29,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -46,6 +45,7 @@ import nl.esciencecenter.xenon.adaptors.XenonProperties;
 import nl.esciencecenter.xenon.adaptors.filesystems.FileAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.DefaultCredential;
+import nl.esciencecenter.xenon.utils.DaemonThreadFactory;
 
 /**
  * FileSystem represent a (possibly remote) file system that can be used to access data.
@@ -419,14 +419,7 @@ public abstract class FileSystem implements AutoCloseable {
         this.workingDirectory = workDirectory;
         this.properties = properties;
         this.bufferSize = bufferSize;
-
-        ThreadFactory f = r -> {
-            Thread t = new Thread(r, "CopyThread-" + adaptor + "-" + uniqueID);
-            t.setDaemon(true);
-            return t;
-        };
-
-        this.pool = Executors.newFixedThreadPool(1, f);
+        this.pool = Executors.newFixedThreadPool(1, new DaemonThreadFactory("CopyThread." + uniqueID));
     }
 
     protected int getBufferSize() {

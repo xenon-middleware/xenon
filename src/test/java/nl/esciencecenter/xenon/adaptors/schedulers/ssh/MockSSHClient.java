@@ -15,20 +15,14 @@
  */
 package nl.esciencecenter.xenon.adaptors.schedulers.ssh;
 
-import org.apache.sshd.client.session.ClientSession;
+import org.apache.sshd.client.SshClient;
 
-import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHConnection;
+public class MockSSHClient extends SshClient {
 
-public class MockSSHConnection extends SSHConnection {
-
-    boolean closed = false;
-
-    protected MockSSHConnection() {
-        super(new MockSSHClient(), 0);
+    public MockSSHClient() {
     }
 
-    @Override
-    public void setSession(ClientSession s) {
-        super.setSession(s);
+    public void stop() {
+        // do nothing
     }
 }

@@ -13,22 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.schedulers.ssh;
+package nl.esciencecenter.xenon.utils;
 
-import org.apache.sshd.client.session.ClientSession;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
-import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHConnection;
+public class DaemonThreadFactory implements ThreadFactory {
 
-public class MockSSHConnection extends SSHConnection {
+    private final String name;
+    private int count = 0;
 
-    boolean closed = false;
-
-    protected MockSSHConnection() {
-        super(new MockSSHClient(), 0);
+    public DaemonThreadFactory(String name) {
+        this.name = name;
     }
 
-    @Override
-    public void setSession(ClientSession s) {
-        super.setSession(s);
+    private synchronized int getCount() {
+        return count++;
+    }
+
+    public Thread newThread(Runnable runnable) {
+        Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+        thread.setDaemon(true);
+        thread.setName(name + "-" + getCount());
+        return thread;
     }
 }
