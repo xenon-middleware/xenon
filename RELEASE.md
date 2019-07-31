@@ -10,8 +10,9 @@ To create a release, version numbers should be updated in:
 - gradle/common.gradle
 - CHANGELOG.md
 
-Also, in `CHANGELOG.md` a section should be added with 
-notable changes in this version.
+    Also, add a section to the CHANGELOG.md with notable changes in this version.
+
+- CITATION.cff (see section below)
 
 ## 2. Update the site
 
@@ -23,12 +24,33 @@ To update Xenon version in `docs/_data/version.yml` and update Javadocs inside `
 
 The site is a [Jekyll](https://jekyllrb.com/) powered site and hosted by GitHub pages at http://nlesc.github.io/Xenon/
 
-## 2.1 Update the CITATION.cff
+## 2.1 Update the CITATION.cff and generate the Zenodo metadata
 
-The CITATION.cff contains the information on how to cite xenon in scientific applications. Update the authors list is needed, and
-change the date-released and version fields to reflect the current release.  
+The ``CITATION.cff`` contains the information on how to cite Xenon in scientific
+applications. Update the authors list if needed, and change the
+``date-released`` and ``version`` fields to reflect the release that you are
+about to make.
 
 NOTE: the CITATION.cff contains the concept DOI of xenon (refering to all versions), so this does not need to be changed. 
+
+After updating the citation metadata, use [``cffconvert``](https://pypi.org/project/cffconvert/)
+to generate the metadata as used by Zenodo. Install ``cffconvert`` as follows:
+
+```bash
+# install cffconvert in user space from PyPI
+pip install --user cffconvert
+
+# change directory
+cd <directory where the CITATION.cff lives>
+
+# check if the CITATION.cff file is valid (if there is no output, that 
+# means it's all good)
+cffconvert --validate
+
+# generate the zenodo file by (note the dot in the file name):
+cffconvert --outputformat zenodo --ignore-suspect-keys > .zenodo.json
+```
+
 
 ## 3. Commit the changes
 
@@ -42,6 +64,8 @@ you should get something like this:
     Your branch is up-to-date with 'origin/master'.
     Changes not staged for commit:
 
+	modified:   .zenodo.json
+	modified:   CITATION.cff
 	modified:   CHANGELOG.md
 	modified:   README.md
 	modified:   gradle/common.gradle
