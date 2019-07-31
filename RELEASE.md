@@ -41,7 +41,7 @@ to generate the metadata as used by Zenodo. Install ``cffconvert`` as follows:
 pip3 install --user cffconvert
 
 # change directory to xenon root dir (if needed)
-# cd <directory where the CITATION.cff lives>
+cd <directory where the CITATION.cff lives>
 
 # check if the CITATION.cff file is valid (if there is no output, that 
 # means it's all good)
