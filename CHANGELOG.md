@@ -1,7 +1,12 @@
-Xenon 3.0.0
+Xenon 3.0.1
 -----------
 
-This is release 3.0.0 of Xenon.
+This is release 3.0.1 of Xenon.
+
+Notable changes compared to v3.0.1:
+-----------------------------------
+
+- fixed minute delay on shutdown when SSH adaptor was used (discussed as part of #654).
 
 Notable changes compared to v2.6.2:
 -----------------------------------

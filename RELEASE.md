@@ -38,10 +38,10 @@ to generate the metadata as used by Zenodo. Install ``cffconvert`` as follows:
 
 ```bash
 # install cffconvert in user space from PyPI
-pip install --user cffconvert
+pip3 install --user cffconvert
 
-# change directory
-cd <directory where the CITATION.cff lives>
+# change directory to xenon root dir (if needed)
+# cd <directory where the CITATION.cff lives>
 
 # check if the CITATION.cff file is valid (if there is no output, that 
 # means it's all good)
@@ -74,7 +74,7 @@ you should get something like this:
     Untracked files:
     (use "git add <file>..." to include in what will be committed)
 
-	docs/versions/3.0.0/
+	docs/versions/3.0.1/
 
 Add and commit these files using `git add` and `git commit` and `git push`.
 
