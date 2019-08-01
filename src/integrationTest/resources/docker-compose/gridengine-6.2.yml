@@ -18,7 +18,7 @@
 version: '3'
 services:
   gridengine:
-    image: nlesc/xenon-gridengine
+    image: xenonmiddleware/gridengine
     hostname: xenon-gridengine
     ports:
     - 22 # ssh

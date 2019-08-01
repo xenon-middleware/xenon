@@ -51,7 +51,7 @@ Requirements:
 
 Run tests which expect the client environment (like credentials and ssh agent) to be in a fixed state.
 
-The [nlesc/xenon-fixed-client](https://hub.docker.com/r/nlesc/xenon-fixed-client/) Docker image is used as the fixed state client environment.
+The [xenonmiddleware/fixed-client](https://hub.docker.com/r/nlesc/xenon-fixed-client/) Docker image is used as the fixed state client environment.
 
 The fixed client environment tests can be run with:
 ```bash
@@ -59,7 +59,7 @@ The fixed client environment tests can be run with:
 ./src/fixedClientEnvironmentTest/resources/run-fixed-client-environment-test.sh
 ```
 
-The script will startup the [nlesc/xenon-fixed-client](https://hub.docker.com/r/nlesc/xenon-fixed-client/) Docker container which:
+The script will startup the [xenonmiddleware/fixed-client](https://hub.docker.com/r/nlesc/xenon-fixed-client/) Docker container which:
 * has the current code mounted
 * can communicate with Docker server, so tests can start filesystem/scheduler containers
 * can connect to host local ports, so tests can connect to filesystem/scheduler containers
