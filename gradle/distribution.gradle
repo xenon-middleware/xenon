@@ -43,6 +43,16 @@ task docGeneratorSourceJar(type: Jar, dependsOn: classes) {
     from sourceSets.docGenerator.allSource
 }
 
+liveTestJar.description "Creates jar with live test"
+liveTestJar.archiveBaseName = 'xenon-livetest'
+liveTestJar.archiveClassifier = ''
+
+task liveTestSourceJar(type: Jar, dependsOn: classes) {
+    description "Creates jar with live test Java sources"
+    archiveBaseName = 'xenon-docgenerator'
+    archiveClassifier = 'sources'
+    from sourceSets.liveTest.allSource
+}
 
 artifacts {
     archives sourcesJar
@@ -107,7 +117,6 @@ publishing {
             pom {
                 url = "https://xenon-middleware.github.io/xenon"
                 description = "Abstract classes for Xenon adaptor integration tests"
-                url = "https://github.com/xenon-middleware/xenon"
                 licenses {
                     license {
                         name = "The Apache License, Version 2.0"
@@ -146,7 +155,6 @@ publishing {
             pom {
                 url = "https://xenon-middleware.github.io/xenon"
                 description = "Class to generate documentation for all Xenon adaptors in class path"
-                url = "https://github.com/xenon-middleware/xenon"
                 licenses {
                     license {
                         name = "The Apache License, Version 2.0"
@@ -174,6 +182,29 @@ publishing {
             version version
 
             artifact liveTestJar
+            artifact liveTestSourceJar
+            pom {
+                url = "https://xenon-middleware.github.io/xenon"
+                description = "live tests for all Xenon adaptors in class path"
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                scm {
+                    connection = "scm:git:https://github.com/xenon-middleware/xenon.git"
+                    url = "https://github.com/xenon-middleware/xenon"
+                }
+            }
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+                // xenon-testapi is added as sourceSets.testApi.output, which cannot be resolved to a dependency, so add manually
+                def dependencyNode = dependenciesNode.appendNode('dependency')
+                dependencyNode.appendNode('groupId', 'nl.esciencecenter.xenon')
+                dependencyNode.appendNode('artifactId', 'xenon-testapi')
+                dependencyNode.appendNode('version', version)
+            }
         }
     }
     repositories {
@@ -188,6 +219,14 @@ publishing {
         maven {
             name = 'DocGeneratorRepo'
             url = 'https://api.bintray.com/maven/nlesc/xenon/xenon-docgenerator/;publish=1'
+            credentials {
+                username = System.getenv('BINTRAY_USER')
+                password = System.getenv('BINTRAY_KEY')
+            }
+        }
+        maven {
+            name = 'LiveTestRepo'
+            url = 'https://api.bintray.com/maven/nlesc/xenon/xenon-livetest/;publish=1'
             credentials {
                 username = System.getenv('BINTRAY_USER')
                 password = System.getenv('BINTRAY_KEY')

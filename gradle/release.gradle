@@ -56,7 +56,10 @@ task publishSite() {
 }
 
 task publishToBintray() {
+    description 'Publishes artifacts to bintray'
+    group 'Publishing'
     dependsOn 'bintrayUpload',
         'publishDocGeneratorPublicationPublicationToDocGeneratorRepoRepository',
-        'publishTestApiPublicationPublicationToTestApiRepoRepository'
+        'publishTestApiPublicationPublicationToTestApiRepoRepository',
+        'publishLiveTestPublicationPublicationToLiveTestRepoRepository'
 }
