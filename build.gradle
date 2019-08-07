@@ -21,11 +21,6 @@ plugins {
     id 'org.unbroken-dome.test-sets' version '2.1.1'
 }
 
-//    METADATA
-// ==============
-version = '3.0.0'
-description = 'Xenon: a middleware abstraction library that provides a simple programming interface to various compute and storage resources.'
-
 //    IMPORTS
 // =============
 apply from: 'gradle/common.gradle'
