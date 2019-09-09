@@ -1,15 +1,21 @@
-Xenon 3.0.2
+Xenon 3.0.3
 -----------
 
-This is release 3.0.2 of Xenon.
+This is release 3.0.3 of Xenon.
 
 Notable changes compared to v3.0.2:
+-----------------------------------
+
+- fixed the FTP adaptor which lost bytes due to being in ASCII mode 
+- fixed the numbering in this changelog
+
+Notable changes compared to v3.0.1:
 -----------------------------------
 
 - updated jaxb dependencies to prevent illegal access warning from JVM
 - removed leftover debug print in webdav 
 
-Notable changes compared to v3.0.1:
+Notable changes compared to v3.0.0:
 -----------------------------------
 
 - fixed minute delay on shutdown when SSH adaptor was used (discussed as part of #654).

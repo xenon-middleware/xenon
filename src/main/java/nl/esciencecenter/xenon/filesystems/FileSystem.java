@@ -328,11 +328,11 @@ public abstract class FileSystem implements AutoCloseable {
 
     class CopyCallback {
 
-        long bytesToCopy = 0;
-        long bytesCopied = 0;
+        private long bytesToCopy = 0;
+        private long bytesCopied = 0;
 
-        boolean started = false;
-        boolean cancelled = false;
+        private boolean started = false;
+        private boolean cancelled = false;
 
         synchronized void start(long bytesToCopy) {
             if (!started) {
@@ -343,6 +343,14 @@ public abstract class FileSystem implements AutoCloseable {
 
         synchronized boolean isStarted() {
             return started;
+        }
+
+        synchronized long getBytesCopied() {
+            return bytesCopied;
+        }
+
+        synchronized long getBytesToCopy() {
+            return bytesToCopy;
         }
 
         synchronized void addBytesCopied(long bytes) {
@@ -1007,6 +1015,9 @@ public abstract class FileSystem implements AutoCloseable {
 
             size = in.read(buffer);
         }
+
+        // Flush the output to ensure all data is written when this method returns.
+        out.flush();
     }
 
     /**
@@ -1450,7 +1461,7 @@ public abstract class FileSystem implements AutoCloseable {
             state = "FAILED";
             Thread.currentThread().interrupt();
         }
-        return new CopyStatusImplementation(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
+        return new CopyStatusImplementation(copyIdentifier, state, copy.callback.getBytesToCopy(), copy.callback.getBytesCopied(), ex);
     }
 
     /**
@@ -1525,7 +1536,7 @@ public abstract class FileSystem implements AutoCloseable {
             pendingCopies.remove(copyIdentifier);
         }
 
-        return new CopyStatusImplementation(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
+        return new CopyStatusImplementation(copyIdentifier, state, copy.callback.getBytesToCopy(), copy.callback.getBytesCopied(), ex);
     }
 
     /**
@@ -1583,7 +1594,7 @@ public abstract class FileSystem implements AutoCloseable {
             state = "RUNNING";
         }
 
-        return new CopyStatusImplementation(copyIdentifier, state, copy.callback.bytesToCopy, copy.callback.bytesCopied, ex);
+        return new CopyStatusImplementation(copyIdentifier, state, copy.callback.getBytesToCopy(), copy.callback.getBytesCopied(), ex);
     }
 
     protected void assertNotNull(Path path) {
