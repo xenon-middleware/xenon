@@ -1,7 +1,13 @@
-Xenon 3.0.1
+Xenon 3.0.2
 -----------
 
-This is release 3.0.1 of Xenon.
+This is release 3.0.2 of Xenon.
+
+Notable changes compared to v3.0.2:
+-----------------------------------
+
+- updated jaxb dependencies to prevent illegal access warning from JVM
+- removed leftover debug print in webdav 
 
 Notable changes compared to v3.0.1:
 -----------------------------------

@@ -92,14 +92,14 @@ and
 
 ```gradle
 	dependencies {
-	        compile group: 'nl.esciencecenter.xenon', name: 'xenon', version: '3.0.1'
+	        compile group: 'nl.esciencecenter.xenon', name: 'xenon', version: '3.0.2'
 	}
 
 ```
 
 This will give the core adaptors to get cloud, grid and hadoop adaptors add the following dependencies:
 ```gradle
-    compile group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-cloud', version: '3.0.0'
+    compile group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-cloud', version: '3.0.2'
     compile group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-grid', version: '3.0.0'
     compile group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-hadoop', version: '3.0.0'
 ```
