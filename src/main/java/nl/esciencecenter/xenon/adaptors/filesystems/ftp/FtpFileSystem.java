@@ -326,8 +326,12 @@ public class FtpFileSystem extends FileSystem {
 
         String name = path.getFileNameAsString();
 
-        for (FTPFile f : files) {
+        if (name == null) {
+            // special case for the root directory
+            name = ".";
+        }
 
+        for (FTPFile f : files) {
             if (f != null && f.getName().equals(name)) {
                 return f;
             }

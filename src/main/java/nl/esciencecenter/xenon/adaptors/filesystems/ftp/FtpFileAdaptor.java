@@ -101,6 +101,8 @@ public class FtpFileAdaptor extends FileAdaptor {
             throw new XenonException(ADAPTOR_NAME, "Failed to switch to PASSIVE mode");
         }
 
+        LOGGER.debug("Connected to {}", uri);
+
         return ftpClient;
     }
 
@@ -143,6 +145,8 @@ public class FtpFileAdaptor extends FileAdaptor {
             }
             throw e;
         }
+
+        LOGGER.debug("CWD is {}", cwd);
 
         return new FtpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), (int) bufferSize, ftpClient, credential, this, xp);
     }
