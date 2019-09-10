@@ -312,13 +312,15 @@ public class FtpFileSystem extends FileSystem {
     public boolean exists(Path path) throws XenonException {
 
         try {
-            if (path.isEmpty()) {
+            Path tmp = toAbsolutePath(path);
+
+            if (tmp.isEmpty()) {
                 // special case for root. We assume it always exists.
                 return true;
             }
 
             // otherwise, we try to get stats on the file or directory
-            getFTPFileInfo(toAbsolutePath(path));
+            getFTPFileInfo(tmp);
             return true;
         } catch (NoSuchPathException e) {
             return false;
