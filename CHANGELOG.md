@@ -1,7 +1,13 @@
-Xenon 3.0.3
+Xenon 3.0.4
 -----------
 
-This is release 3.0.3 of Xenon.
+This is release 3.0.4 of Xenon.
+
+Notable changes compared to v3.0.3:
+-----------------------------------
+
+- fixed bug in FTP adaptor when listing the root directory
+- fixed bug in SFTP adaptor when listing the root directory
 
 Notable changes compared to v3.0.2:
 -----------------------------------
