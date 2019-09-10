@@ -312,15 +312,12 @@ public class FtpFileSystem extends FileSystem {
     public boolean exists(Path path) throws XenonException {
 
         try {
-            /*
-             * if (path.isEmpty()) { try { // special case for the root directory String originalWorkingDirectory = ftpClient.printWorkingDirectory();
-             * 
-             * boolean pathExists = ftpClient.changeWorkingDirectory(path.toString());
-             * 
-             * ftpClient.changeWorkingDirectory(originalWorkingDirectory);
-             * 
-             * return pathExists; } catch (IOException e) { return false; } }
-             */
+            if (path.isEmpty()) {
+                // special case for root. We assume it always exists.
+                return true;
+            }
+
+            // otherwise, we try to get stats on the file or directory
             getFTPFileInfo(toAbsolutePath(path));
             return true;
         } catch (NoSuchPathException e) {
