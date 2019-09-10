@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -311,6 +312,15 @@ public class FtpFileSystem extends FileSystem {
     public boolean exists(Path path) throws XenonException {
 
         try {
+            /*
+             * if (path.isEmpty()) { try { // special case for the root directory String originalWorkingDirectory = ftpClient.printWorkingDirectory();
+             * 
+             * boolean pathExists = ftpClient.changeWorkingDirectory(path.toString());
+             * 
+             * ftpClient.changeWorkingDirectory(originalWorkingDirectory);
+             * 
+             * return pathExists; } catch (IOException e) { return false; } }
+             */
             getFTPFileInfo(toAbsolutePath(path));
             return true;
         } catch (NoSuchPathException e) {
@@ -326,8 +336,9 @@ public class FtpFileSystem extends FileSystem {
 
         String name = path.getFileNameAsString();
 
-        if (name == null) {
+        if (path.isEmpty()) {
             // special case for the root directory
+            // Some FTP servers show the "." directory so lets use that as a name.
             name = ".";
         }
 
@@ -335,6 +346,17 @@ public class FtpFileSystem extends FileSystem {
             if (f != null && f.getName().equals(name)) {
                 return f;
             }
+        }
+
+        if (path.isEmpty()) {
+            // special case for the root directory
+            // Even though the root dir exists, there no way to get any info on it in some FTP servers. So we'll just return a default here.
+            FTPFile tmp = new FTPFile();
+            tmp.setType(FTPFile.DIRECTORY_TYPE);
+            Calendar time = Calendar.getInstance();
+            time.setTimeInMillis(0);
+            tmp.setTimestamp(time);
+            return tmp;
         }
 
         throw new NoSuchPathException(ADAPTOR_NAME, "Path not found: " + path);
