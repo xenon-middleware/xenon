@@ -126,7 +126,7 @@ public class CopyFileLocalToSftpAbsolutePaths {
         // requires credentials, so we need to create those too.
         //
         // Assume the remote system is actually just a Docker container (e.g.
-        // https://hub.docker.com/r/nlesc/xenon-ssh/), accessible via
+        // https://hub.docker.com/r/xenonmiddleware/ssh/), accessible via
         // port 10022 on localhost
         String location = "localhost:10022";
         String username = "xenon";
@@ -173,7 +173,7 @@ public class SlurmSubmitWordCountJob {
     public static void main(String[] args) throws Exception {
 
         // Assume the remote system is actually just a Docker container (e.g.
-        // https://hub.docker.com/r/nlesc/xenon-slurm/), accessible to user 'xenon' via
+        // https://hub.docker.com/r/xenonmiddleware/slurm/), accessible to user 'xenon' via
         // port 10022 on localhost, using password 'javagat'
         String location = "localhost:10022";
         String username = "xenon";
@@ -204,7 +204,7 @@ public class SlurmSubmitWordCountJob {
 }
 ```
 
-The output of the job will be written to ``/tmp/wc.stdout.txt`` file in the ``nlesc/xenon-slurm`` Docker container.
+The output of the job will be written to ``/tmp/wc.stdout.txt`` file in the ``xenonmiddleware/slurm`` Docker container.
 
 For more examples, see the tutorial at [Read The Docs](http://xenonrse2017.readthedocs.io/).
 
