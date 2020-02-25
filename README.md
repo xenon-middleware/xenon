@@ -9,7 +9,7 @@
 [![Download](https://api.bintray.com/packages/nlesc/xenon/xenon/images/download.svg) ](https://bintray.com/nlesc/xenon/xenon/_latestVersion)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.597993.svg)](https://doi.org/10.5281/zenodo.597993)
 [![Research Software Directory](https://img.shields.io/badge/rsd-xenon-00a3e3.svg)](https://www.research-software.nl/software/xenon)
-
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3692/badge)](https://bestpractices.coreinfrastructure.org/projects/3692)
 
 
 Copyright 2013-2019 The Netherlands eScience Center
