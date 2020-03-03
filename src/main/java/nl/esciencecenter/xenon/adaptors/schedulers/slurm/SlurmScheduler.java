@@ -306,7 +306,7 @@ public class SlurmScheduler extends ScriptingScheduler {
             squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R %k", "--jobs=" + identifiersAsCSList(jobs));
         }
 
-        System.err.println("squeueinfo output is:\n" + squeueOutput + "\n");
+        LOGGER.info("squeueinfo output is:\n" + squeueOutput);
 
         return ScriptingParser.parseTable(squeueOutput, "JOBID", ScriptingParser.WHITESPACE_REGEX, ADAPTOR_NAME, "*", "~");
     }
@@ -314,7 +314,7 @@ public class SlurmScheduler extends ScriptingScheduler {
     private Map<String, Map<String, String>> getSinfoInfo(String... partitions) throws XenonException {
         String output = runCheckedCommand(null, "sinfo", "--format=%P %a %l %F %N %C %D", "--partition=" + ScriptingUtils.asCSList(partitions));
 
-        System.err.println("sinfo output is:\n" + output + "\n");
+        LOGGER.info("sinfo output is:\n" + output);
 
         return ScriptingParser.parseTable(output, "PARTITION", ScriptingParser.WHITESPACE_REGEX, ADAPTOR_NAME, "*", "~");
     }
@@ -347,7 +347,7 @@ public class SlurmScheduler extends ScriptingScheduler {
 
         String output = runner.getStdout();
 
-        System.err.println("sacct output is:\n" + output + "\n");
+        LOGGER.info("sacct output is:\n" + output);
 
         return ScriptingParser.parseTable(output, "JobID", ScriptingParser.BAR_REGEX, ADAPTOR_NAME, "*", "~");
     }
