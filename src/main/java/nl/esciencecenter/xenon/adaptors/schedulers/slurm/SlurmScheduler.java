@@ -306,11 +306,15 @@ public class SlurmScheduler extends ScriptingScheduler {
             squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R %k", "--jobs=" + identifiersAsCSList(jobs));
         }
 
+        System.err.println("squeueinfo output is:\n" + squeueOutput + "\n");
+
         return ScriptingParser.parseTable(squeueOutput, "JOBID", ScriptingParser.WHITESPACE_REGEX, ADAPTOR_NAME, "*", "~");
     }
 
     private Map<String, Map<String, String>> getSinfoInfo(String... partitions) throws XenonException {
         String output = runCheckedCommand(null, "sinfo", "--format=%P %a %l %F %N %C %D", "--partition=" + ScriptingUtils.asCSList(partitions));
+
+        System.err.println("sinfo output is:\n" + output + "\n");
 
         return ScriptingParser.parseTable(output, "PARTITION", ScriptingParser.WHITESPACE_REGEX, ADAPTOR_NAME, "*", "~");
     }
@@ -341,7 +345,11 @@ public class SlurmScheduler extends ScriptingScheduler {
             LOGGER.warn("Sacct produced error output: " + runner.getStderr());
         }
 
-        return ScriptingParser.parseTable(runner.getStdout(), "JobID", ScriptingParser.BAR_REGEX, ADAPTOR_NAME, "*", "~");
+        String output = runner.getStdout();
+
+        System.err.println("sacct output is:\n" + output + "\n");
+
+        return ScriptingParser.parseTable(output, "JobID", ScriptingParser.BAR_REGEX, ADAPTOR_NAME, "*", "~");
     }
 
     @Override
@@ -352,12 +360,14 @@ public class SlurmScheduler extends ScriptingScheduler {
         // try the queue first
         Map<String, Map<String, String>> sQueueInfo = null;
         JobStatus result = null;
+        int failed = 0;
 
         try {
             sQueueInfo = getSqueueInfo(jobIdentifier);
         } catch (Exception e) {
             // The call to squeue may fail if we request a specific job that no longer exist.
-            LOGGER.debug("Squeue produced error output", e);
+            LOGGER.warn("Squeue produced error output", e);
+            failed++;
         }
 
         result = getJobStatusFromSqueueInfo(sQueueInfo, jobIdentifier);
@@ -370,7 +380,8 @@ public class SlurmScheduler extends ScriptingScheduler {
                 sacctInfo = getSacctInfo(jobIdentifier);
             } catch (Exception e) {
                 // The call to squeue may fail if we request a specific job that no longer exist.
-                LOGGER.debug("Sacct produced error output", e);
+                LOGGER.warn("Sacct produced error output", e);
+                failed++;
             }
 
             result = getJobStatusFromSacctInfo(sacctInfo, jobIdentifier);
@@ -384,14 +395,19 @@ public class SlurmScheduler extends ScriptingScheduler {
                 scontrolInfo = getSControlInfo(jobIdentifier);
             } catch (Exception e) {
                 // The call to squeue may fail if we request a specific job that no longer exist.
-                LOGGER.debug("Scontrol produced error output", e);
+                LOGGER.warn("Scontrol produced error output", e);
+                failed++;
             }
             result = getJobStatusFromScontrolInfo(scontrolInfo, jobIdentifier);
         }
 
         // job not found anywhere, give up
         if (result == null) {
-            throw new NoSuchJobException(ADAPTOR_NAME, "Unknown Job: " + jobIdentifier);
+            if (failed < 3) {
+                throw new NoSuchJobException(ADAPTOR_NAME, "Unknown Job: " + jobIdentifier);
+            } else {
+                throw new XenonException(ADAPTOR_NAME, "Status could not be retrieved of job: " + jobIdentifier);
+            }
         }
 
         return result;
