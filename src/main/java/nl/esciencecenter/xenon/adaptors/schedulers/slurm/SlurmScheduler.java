@@ -80,8 +80,19 @@ public class SlurmScheduler extends ScriptingScheduler {
         String output = runCheckedCommand(null, "scontrol", "show", "config");
 
         // Parse output. Ignore some header and footer lines.
-        Map<String, String> info = ScriptingParser.parseKeyValueLines(output, ScriptingParser.EQUALS_REGEX, ADAPTOR_NAME, "Configuration data as of",
-                "Slurmctld(primary/backup) at", "Account Gather");
+        // See:
+        //  - https://github.com/SchedMD/slurm/blob/slurm-20-02-0-1/src/api/config_info.c#L420
+        //  - https://github.com/SchedMD/slurm/blob/slurm-20-02-0-1/src/api/config_info.c#L443
+        Map<String, String> info = ScriptingParser.parseKeyValueLines(output, ScriptingParser.EQUALS_REGEX, ADAPTOR_NAME,
+                "Configuration data as of",
+                "Slurmctld(primary",                            // Slurmctld(primary/backup) or Slurmctld(primary)
+                "Account Gather",
+                "Cgroup Support Configuration",
+                "External Sensors Configuration",
+                "Node Features Configuration",
+                "Slurmctld Plugstack Plugins Configuration",
+                "-----"                                         // When printing plugin configuration (sub-heading)
+        );
 
         setup = new SlurmSetup(info, disableAccounting);
 
