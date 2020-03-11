@@ -33,7 +33,7 @@ matrix:
     - os: osx
       env:
         - INTEGRATION_TEST="livelocal"
-        - JDK=openjdk11
+        - JDK=openjdk13
         - OS=osx
       osx_image: xcode10.1
       script:
