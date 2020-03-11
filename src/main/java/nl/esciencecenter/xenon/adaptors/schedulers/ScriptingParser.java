@@ -169,13 +169,13 @@ public final class ScriptingParser {
 
     /**
      * To support both the old and new slurm output format, we must be able to parse the following:
-     * 
+     *
      * <whitepace*>key<whitespace*>=<whitepace*>value<whitepace*> and so on.
-     * 
+     *
      * The assumption is that each line contains one or more of these key=value statements. Whitespace in keys or values are not allowed at the moment.
-     * 
+     *
      * Empty line, or lines without an "=" will be ignored
-     * 
+     *
      */
     public static Map<String, String> parseKeyValuePairs(String input, String adaptorName, String... ignoredLines) throws XenonException {
         String[] lines = NEWLINE_REGEX.split(input);
