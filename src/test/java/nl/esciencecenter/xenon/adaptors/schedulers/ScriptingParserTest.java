@@ -98,13 +98,6 @@ public class ScriptingParserTest {
         assertEquals("parser does not handle empty lines correctly", expected, result);
     }
 
-    @Test(expected = XenonException.class)
-    public void test01c_parseKeyValuePairs_SpaceInKeyValuePair_ExceptionThrown() throws Exception {
-        String input = "key1 = value1";
-
-        ScriptingParser.parseKeyValuePairs(input, "fake");
-    }
-
     @Test
     public void test02_containsAny() {
         assertTrue(ScriptingParser.containsAny("this sentence contains some words", "contains", "other", "options"));
@@ -774,4 +767,92 @@ public class ScriptingParserTest {
         assertEquals(result.get("JobId"), "2440177");
         assertEquals(result.get("JobState"), "RUNNING");
     }
+
+    @Test
+    public void test_RealSlurm4() throws Exception {
+
+        String input = "AccountingStorageBackupHost = (null)\n" + "AccountingStorageEnforce = none\n" + "AccountingStorageHost   = htp-batch-01\n"
+                + "AccountingStorageLoc    = N/A\n" + "AccountingStoragePort   = 6819\n"
+                + "AccountingStorageTRES   = cpu,mem,energy,node,billing,fs/disk,vmem,pages\n" + "AccountingStorageType   = accounting_storage/slurmdbd\n"
+                + "AccountingStorageUser   = N/A\n" + "AccountingStoreJobComment = Yes\n" + "AcctGatherEnergyType    = acct_gather_energy/none\n"
+                + "AcctGatherFilesystemType = acct_gather_filesystem/none\n" + "AcctGatherInterconnectType = acct_gather_interconnect/none\n"
+                + "AcctGatherNodeFreq      = 0 sec\n" + "AcctGatherProfileType   = acct_gather_profile/none\n" + "AllowSpecResourcesUsage = 0\n"
+                + "AuthAltTypes            = (null)\n" + "AuthInfo                = (null)\n" + "AuthType                = auth/munge\n"
+                + "BatchStartTimeout       = 10 sec\n" + "BOOT_TIME               = 2020-02-17T18:10:10\n" + "BurstBufferType         = (null)\n"
+                + "CheckpointType          = checkpoint/none\n" + "CliFilterPlugins        = (null)\n" + "ClusterName             = spider\n"
+                + "CommunicationParameters = (null)\n" + "CompleteWait            = 0 sec\n" + "CoreSpecPlugin          = core_spec/none\n"
+                + "CpuFreqDef              = Unknown\n" + "CpuFreqGovernors        = Performance,OnDemand,UserSpace\n"
+                + "CredType                = cred/munge\n" + "DebugFlags              = (null)\n" + "DefMemPerCPU            = 8000\n"
+                + "DisableRootJobs         = No\n" + "EioTimeout              = 60\n" + "EnforcePartLimits       = ALL\n"
+                + "Epilog                  = /data/tmpdir-epilogue.sh\n" + "EpilogMsgTime           = 2000 usec\n" + "EpilogSlurmctld         = (null)\n"
+                + "ExtSensorsType          = ext_sensors/none\n" + "ExtSensorsFreq          = 0 sec\n" + "FairShareDampeningFactor = 1\n"
+                + "FastSchedule            = 1\n" + "FederationParameters    = (null)\n" + "FirstJobId              = 1\n" + "GetEnvTimeout           = 2 sec\n"
+                + "GresTypes               = (null)\n" + "GpuFreqDef              = high,memory=high\n" + "GroupUpdateForce        = 1\n"
+                + "GroupUpdateTime         = 600 sec\n" + "HASH_VAL                = Match\n" + "HealthCheckInterval     = 0 sec\n"
+                + "HealthCheckNodeState    = ANY\n" + "HealthCheckProgram      = (null)\n" + "InactiveLimit           = 0 sec\n"
+                + "JobAcctGatherFrequency  = 30\n" + "JobAcctGatherType       = jobacct_gather/linux\n" + "JobAcctGatherParams     = NoOverMemoryKill\n"
+                + "JobCheckpointDir        = /var/slurm/checkpoint\n" + "JobCompHost             = localhost\n"
+                + "JobCompLoc              = /var/log/slurm_jobcomp.log\n" + "JobCompPort             = 0\n" + "JobCompType             = jobcomp/none\n"
+                + "JobCompUser             = root\n" + "JobContainerType        = job_container/none\n" + "JobCredentialPrivateKey = (null)\n"
+                + "JobCredentialPublicCertificate = (null)\n" + "JobDefaults             = (null)\n" + "JobFileAppend           = 0\n"
+                + "JobRequeue              = 0\n" + "JobSubmitPlugins        = (null)\n" + "KeepAliveTime           = SYSTEM_DEFAULT\n"
+                + "KillOnBadExit           = 0\n" + "KillWait                = 30 sec\n" + "LaunchParameters        = (null)\n"
+                + "LaunchType              = launch/slurm\n" + "Layouts                 = \n" + "Licenses                = (null)\n"
+                + "LicensesUsed            = (null)\n" + "LogTimeFormat           = iso8601_ms\n" + "MailDomain              = (null)\n"
+                + "MailProg                = /bin/mail\n" + "MaxArraySize            = 1001\n" + "MaxJobCount             = 10000\n"
+                + "MaxJobId                = 67043328\n" + "MaxMemPerCPU            = 8000\n" + "MaxStepCount            = 40000\n"
+                + "MaxTasksPerNode         = 512\n" + "MCSPlugin               = mcs/none\n" + "MCSParameters           = (null)\n"
+                + "MessageTimeout          = 10 sec\n" + "MinJobAge               = 300 sec\n" + "MpiDefault              = none\n"
+                + "MpiParams               = (null)\n" + "MsgAggregationParams    = (null)\n" + "NEXT_JOB_ID             = 26161\n"
+                + "NodeFeaturesPlugins     = (null)\n" + "OverTimeLimit           = 0 min\n" + "PluginDir               = /usr/lib64/slurm\n"
+                + "PlugStackConfig         = /etc/slurm/plugstack.conf\n" + "PowerParameters         = (null)\n" + "PowerPlugin             = \n"
+                + "PreemptMode             = OFF\n" + "PreemptType             = preempt/none\n" + "PreemptExemptTime       = 00:00:00\n"
+                + "PriorityParameters      = (null)\n" + "PrioritySiteFactorParameters = (null)\n" + "PrioritySiteFactorPlugin = (null)\n"
+                + "PriorityDecayHalfLife   = 1-00:00:00\n" + "PriorityCalcPeriod      = 00:05:00\n" + "PriorityFavorSmall      = No\n"
+                + "PriorityFlags           = \n" + "PriorityMaxAge          = 7-00:00:00\n" + "PriorityUsageResetPeriod = NONE\n"
+                + "PriorityType            = priority/multifactor\n" + "PriorityWeightAge       = 10000\n" + "PriorityWeightAssoc     = 0\n"
+                + "PriorityWeightFairShare = 10000\n" + "PriorityWeightJobSize   = 0\n" + "PriorityWeightPartition = 0\n" + "PriorityWeightQOS       = 10000\n"
+                + "PriorityWeightTRES      = (null)\n" + "PrivateData             = none\n" + "ProctrackType           = proctrack/cgroup\n"
+                + "Prolog                  = (null)\n" + "PrologEpilogTimeout     = 65534\n" + "PrologSlurmctld         = (null)\n"
+                + "PrologFlags             = Alloc,Contain,X11\n" + "PropagatePrioProcess    = 0\n" + "PropagateResourceLimits = ALL\n"
+                + "PropagateResourceLimitsExcept = (null)\n" + "RebootProgram           = (null)\n" + "ReconfigFlags           = (null)\n"
+                + "RequeueExit             = (null)\n" + "RequeueExitHold         = (null)\n" + "ResumeFailProgram       = (null)\n"
+                + "ResumeProgram           = (null)\n" + "ResumeRate              = 300 nodes/min\n" + "ResumeTimeout           = 60 sec\n"
+                + "ResvEpilog              = (null)\n" + "ResvOverRun             = 0 min\n" + "ResvProlog              = (null)\n"
+                + "ReturnToService         = 1\n" + "RoutePlugin             = route/default\n" + "SallocDefaultCommand    = (null)\n"
+                + "SbcastParameters        = (null)\n" + "SchedulerParameters     = (null)\n" + "SchedulerTimeSlice      = 30 sec\n"
+                + "SchedulerType           = sched/backfill\n" + "SelectType              = select/cons_res\n" + "SelectTypeParameters    = CR_CORE_MEMORY\n"
+                + "SlurmUser               = slurm(1001)\n" + "SlurmctldAddr           = (null)\n" + "SlurmctldDebug          = info\n"
+                + "SlurmctldHost[0]        = htp-batch-01(10.0.0.14)\n" + "SlurmctldLogFile        = /var/log/slurm/slurmctld.log\n"
+                + "SlurmctldPort           = 6817\n" + "SlurmctldSyslogDebug    = unknown\n" + "SlurmctldPrimaryOffProg = (null)\n"
+                + "SlurmctldPrimaryOnProg  = (null)\n" + "SlurmctldTimeout        = 120 sec\n" + "SlurmctldParameters     = (null)\n"
+                + "SlurmdDebug             = info\n" + "SlurmdLogFile           = /var/log/slurm/slurmd.log\n" + "SlurmdParameters        = (null)\n"
+                + "SlurmdPidFile           = /var/run/slurmd.pid\n" + "SlurmdPort              = 6818\n" + "SlurmdSpoolDir          = /var/spool/slurmd\n"
+                + "SlurmdSyslogDebug       = unknown\n" + "SlurmdTimeout           = 300 sec\n" + "SlurmdUser              = root(0)\n"
+                + "SlurmSchedLogFile       = (null)\n" + "SlurmSchedLogLevel      = 0\n" + "SlurmctldPidFile        = /var/run/slurmctld.pid\n"
+                + "SlurmctldPlugstack      = (null)\n" + "SLURM_CONF              = /etc/slurm/slurm.conf\n" + "SLURM_VERSION           = 19.05.5\n"
+                + "SrunEpilog              = (null)\n" + "SrunPortRange           = 0-0\n" + "SrunProlog              = (null)\n"
+                + "StateSaveLocation       = /var/spool/slurm_state\n" + "SuspendExcNodes         = (null)\n" + "SuspendExcParts         = (null)\n"
+                + "SuspendProgram          = (null)\n" + "SuspendRate             = 60 nodes/min\n" + "SuspendTime             = NONE\n"
+                + "SuspendTimeout          = 30 sec\n" + "SwitchType              = switch/none\n" + "TaskEpilog              = (null)\n"
+                + "TaskPlugin              = affinity,cgroup\n" + "TaskPluginParam         = (null type)\n" + "TaskProlog              = (null)\n"
+                + "TCPTimeout              = 2 sec\n" + "TmpFS                   = /tmp\n" + "TopologyParam           = (null)\n"
+                + "TopologyPlugin          = topology/none\n" + "TrackWCKey              = No\n" + "TreeWidth               = 50\n"
+                + "UsePam                  = 0\n" + "UnkillableStepProgram   = (null)\n" + "UnkillableStepTimeout   = 60 sec\n"
+                + "VSizeFactor             = 0 percent\n" + "WaitTime                = 0 sec\n" + "X11Parameters           = (null)\n" + "\n"
+                + "Cgroup Support Configuration:\n" + "AllowedDevicesFile      = /etc/slurm/cgroup_allowed_devices_file.conf\n"
+                + "AllowedKmemSpace        = (null)\n" + "AllowedRAMSpace         = 100.0%\n" + "AllowedSwapSpace        = 0.0%\n"
+                + "CgroupAutomount         = yes\n" + "CgroupMountpoint        = /sys/fs/cgroup\n" + "ConstrainCores          = yes\n"
+                + "ConstrainDevices        = no\n" + "ConstrainKmemSpace      = no\n" + "ConstrainRAMSpace       = no\n" + "ConstrainSwapSpace      = no\n"
+                + "MaxKmemPercent          = 100.0%\n" + "MaxRAMPercent           = 100.0%\n" + "MaxSwapPercent          = 100.0%\n"
+                + "MemorySwappiness        = (null)\n" + "MinKmemSpace            = 30 MB\n" + "MinRAMSpace             = 30 MB\n"
+                + "TaskAffinity            = no";
+
+        Map<String, String> result = ScriptingParser.parseKeyValuePairs(input, "slurm-test");
+
+        assertNotNull(result);
+        assertEquals(result.get("MinRAMSpace"), "30 MB");
+        assertEquals(result.get("WaitTime"), "0 sec");
+    }
+
 }

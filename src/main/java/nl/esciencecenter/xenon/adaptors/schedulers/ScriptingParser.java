@@ -42,6 +42,152 @@ public final class ScriptingParser {
         // empty as this is a utility class
     }
 
+    private static class TokenStream {
+
+        String line;
+
+        TokenStream(String line) {
+            this.line = line;
+        }
+
+        boolean hasKeyValue() {
+            return (line != null && line.contains("=") && !line.startsWith("=") && line.length() >= 2);
+        }
+
+        // When getting the next key, we just return everything up to the next '='
+        String nextKey() throws Exception {
+
+            if (line == null) {
+                throw new Exception("No more keys -- line is empty");
+            }
+
+            int index = line.indexOf('=');
+
+            if (index == -1) {
+                throw new Exception("No more keys -- line does not contain = \"" + line + "\"");
+            }
+
+            if (index == 0) {
+                throw new Exception("Error extracting key -- currently reading value = \"" + line + "\"");
+            }
+
+            String tmp = line.substring(0, index);
+
+            line = line.substring(index);
+
+            return tmp.trim();
+        }
+
+        int lowest(int index1, int index2) {
+
+            if (index1 == -1) {
+                return index2;
+            }
+
+            if (index2 == -1) {
+                return index1;
+            }
+
+            // both index1 and index2 are not -1
+            return Math.min(index1, index2);
+        }
+
+        boolean isWhitespace(char c) {
+            return c == ' ' || c == '\t';
+        }
+
+        // When getting the next value, we check if the current line begins with an '='.
+        // Then we need to read on until we encounter whitespace. If we do, we stop reading, but only if we see additional = up ahead.
+        //
+        // This allows us to parse both the old and new formats:
+        //
+        // TRES=cpu=32,node=1
+        // MinRAMSpace = 30 MB
+
+        String nextValue() throws Exception {
+
+            if (line == null) {
+                throw new Exception("No more values -- line is empty");
+            }
+
+            if (!line.startsWith("=")) {
+                throw new Exception("Error extracting value -- line does not start with = \"" + line + "\"");
+            }
+
+            line = line.substring(1).trim();
+
+            if (line.length() == 0) {
+                line = null;
+                return "";
+            }
+
+            int index = line.indexOf("=");
+
+            // Easy case, the last value;
+            if (index == -1) {
+                String tmp = line;
+                line = null;
+                return tmp.trim();
+            }
+
+            if (index == 0) {
+                throw new Exception("Error extracting value -- got duplicate = \"" + line + "\"");
+            }
+
+            index = 0;
+
+            while (index < line.length() && !isWhitespace(line.charAt(index))) {
+                index++;
+            }
+
+            String tmp = line.substring(0, index);
+
+            line = line.substring(index).trim();
+
+            if (line.length() == 0) {
+                line = null;
+            }
+
+            return tmp.trim();
+        }
+    }
+
+    private static void parseKeyValueLine(String line, String adaptorName, Map<String, String> result) throws XenonException {
+
+        TokenStream t = new TokenStream(line.trim());
+
+        while (t.hasKeyValue()) {
+            try {
+                String key = t.nextKey();
+                String value = t.nextValue();
+                result.put(key, value);
+            } catch (Exception e) {
+                throw new XenonException(adaptorName, "Failed to parse key/value pairs \"" + line + "\"", e);
+            }
+        }
+    }
+
+    /**
+     * To support both the old and new slurm output format, we must be able to parse the following:
+     * 
+     * <whitepace*>key<whitespace*>=<whitepace*>value<whitepace*> and so on.
+     * 
+     * The assumption is that each line contains one or more of these key=value statements. Whitespace in keys or values are not allowed at the moment.
+     * 
+     * Empty line, or lines without an "=" will be ignored
+     * 
+     */
+    public static Map<String, String> parseKeyValuePairs(String input, String adaptorName, String... ignoredLines) throws XenonException {
+        String[] lines = NEWLINE_REGEX.split(input);
+        Map<String, String> result = new HashMap<>(lines.length * 4 / 3);
+
+        for (String line : lines) {
+            parseKeyValueLine(line, adaptorName, result);
+        }
+
+        return result;
+    }
+
     /**
      * Parses a output with key=value pairs separated by whitespace, on one or more lines. This function fails if there is any whitespace between the key and
      * value, or whitespace inside the values.
@@ -56,7 +202,7 @@ public final class ScriptingParser {
      * @throws XenonException
      *             if the input cannot be parsed.
      */
-    public static Map<String, String> parseKeyValuePairs(String input, String adaptorName, String... ignoredLines) throws XenonException {
+    private static Map<String, String> parseKeyValuePairs2(String input, String adaptorName, String... ignoredLines) throws XenonException {
         String[] lines = NEWLINE_REGEX.split(input);
         Map<String, String> result = new HashMap<>(lines.length * 4 / 3);
 
@@ -68,7 +214,7 @@ public final class ScriptingParser {
                     String[] elements = EQUALS_REGEX.split(pair, 2);
 
                     if (elements.length != 2) {
-                        throw new XenonException(adaptorName, "Got invalid key/value pair in output: \"" + pair + "\"");
+                        throw new XenonException(adaptorName, "Got invalid key/value pair in output: \"" + pair + "\" " + Arrays.toString(pairs));
                     }
 
                     result.put(elements[0].trim(), elements[1].trim());
