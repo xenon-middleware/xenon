@@ -33,10 +33,11 @@ matrix:
     - os: osx
       env:
         - INTEGRATION_TEST="livelocal"
-        - JDK=openjdk13
+        - JDK=openjdk11
         - OS=osx
       osx_image: xcode10.1
       script:
+        - jdk_switcher use openjdk11
         - ./src/liveTest/resources/scripts/create_symlinks;
         - ./gradlew --version 
         - ./gradlew test liveTest -Dxenon.scheduler=local -Dxenon.filesystem=file -Dxenon.filesystem.location=/ -Dxenon.scheduler.location=$PWD -Dxenon.username=$USERNAME -Dxenon.filesystem.basedir=$PWD -Dxenon.filesystem.expected.workdir=/ -Dxenon.scheduler.workdir=$PWD -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
