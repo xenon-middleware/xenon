@@ -61,7 +61,7 @@ public final class ScriptingParser {
         Map<String, String> result = new HashMap<>(lines.length * 4 / 3);
 
         for (String line : lines) {
-            if (!line.isEmpty() && !containsAny(line, ignoredLines)) {
+            if (!line.isEmpty() && line.contains("=") && !containsAny(line, ignoredLines)) {
                 String[] pairs = WHITESPACE_REGEX.split(line.trim());
 
                 for (String pair : pairs) {
