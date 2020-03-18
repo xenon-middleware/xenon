@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.sshd.agent.local.ProxyAgentFactory;
+import org.apache.sshd.client.ClientFactoryManager;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ChannelDirectTcpip;
 import org.apache.sshd.client.config.hosts.DefaultConfigFileHostEntryResolver;
@@ -43,7 +44,6 @@ import org.apache.sshd.client.keyverifier.AcceptAllServerKeyVerifier;
 import org.apache.sshd.client.keyverifier.DefaultKnownHostsServerKeyVerifier;
 import org.apache.sshd.client.keyverifier.RejectAllServerKeyVerifier;
 import org.apache.sshd.client.session.ClientSession;
-import org.apache.sshd.common.FactoryManager;
 import org.apache.sshd.common.NamedResource;
 import org.apache.sshd.common.config.keys.FilePasswordProvider;
 import org.apache.sshd.common.session.SessionContext;
@@ -191,9 +191,13 @@ public class SSHUtil {
 
         SshClient client = SshClient.setUpDefaultClient();
 
-        client.getProperties().putIfAbsent(FactoryManager.IDLE_TIMEOUT, TimeUnit.SECONDS.toMillis(120L));
-        client.getProperties().putIfAbsent(FactoryManager.NIO2_MIN_WRITE_TIMEOUT, TimeUnit.SECONDS.toMillis(30L));
-        client.getProperties().putIfAbsent(FactoryManager.NIO2_READ_TIMEOUT, TimeUnit.SECONDS.toMillis(60L));
+        // This sets the idle time after which the connection is closed automatically. The default is set to 10 minutes.
+        // client.getProperties().putIfAbsent(FactoryManager.IDLE_TIMEOUT, TimeUnit.SECONDS.toMillis(120L));
+
+        // We set the heartbeat of SSH to once every 10 seconds, and expect a reply within 5 seconds.
+        // This prevents an SSH operation to hang for 10 minutes if the network connection is lost.
+        client.getProperties().putIfAbsent(ClientFactoryManager.HEARTBEAT_INTERVAL, TimeUnit.SECONDS.toMillis(10L));
+        client.getProperties().putIfAbsent(ClientFactoryManager.HEARTBEAT_REPLY_WAIT, TimeUnit.SECONDS.toMillis(5L));
 
         if (useKnownHosts) {
             DefaultKnownHostsServerKeyVerifier tmp;
