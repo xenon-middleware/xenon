@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.sshd.agent.local.ProxyAgentFactory;
 import org.apache.sshd.client.SshClient;
@@ -42,6 +43,7 @@ import org.apache.sshd.client.keyverifier.AcceptAllServerKeyVerifier;
 import org.apache.sshd.client.keyverifier.DefaultKnownHostsServerKeyVerifier;
 import org.apache.sshd.client.keyverifier.RejectAllServerKeyVerifier;
 import org.apache.sshd.client.session.ClientSession;
+import org.apache.sshd.common.FactoryManager;
 import org.apache.sshd.common.NamedResource;
 import org.apache.sshd.common.config.keys.FilePasswordProvider;
 import org.apache.sshd.common.session.SessionContext;
@@ -188,6 +190,10 @@ public class SSHUtil {
             boolean useAgentForwarding) {
 
         SshClient client = SshClient.setUpDefaultClient();
+
+        client.getProperties().putIfAbsent(FactoryManager.IDLE_TIMEOUT, TimeUnit.SECONDS.toMillis(120L));
+        client.getProperties().putIfAbsent(FactoryManager.NIO2_MIN_WRITE_TIMEOUT, TimeUnit.SECONDS.toMillis(30L));
+        client.getProperties().putIfAbsent(FactoryManager.NIO2_READ_TIMEOUT, TimeUnit.SECONDS.toMillis(60L));
 
         if (useKnownHosts) {
             DefaultKnownHostsServerKeyVerifier tmp;
@@ -423,9 +429,7 @@ public class SSHUtil {
 
             session.addPublicKeyIdentity(pair);
 
-        } else if (credential instanceof PasswordCredential)
-
-        {
+        } else if (credential instanceof PasswordCredential) {
 
             PasswordCredential c = (PasswordCredential) credential;
             session.addPasswordIdentity(new String(c.getPassword()));
