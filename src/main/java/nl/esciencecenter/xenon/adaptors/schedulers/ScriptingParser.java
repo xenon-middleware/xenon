@@ -78,20 +78,6 @@ public final class ScriptingParser {
             return tmp.trim();
         }
 
-        int lowest(int index1, int index2) {
-
-            if (index1 == -1) {
-                return index2;
-            }
-
-            if (index2 == -1) {
-                return index1;
-            }
-
-            // both index1 and index2 are not -1
-            return Math.min(index1, index2);
-        }
-
         boolean isWhitespace(char c) {
             return c == ' ' || c == '\t';
         }
@@ -172,7 +158,8 @@ public final class ScriptingParser {
      *
      * <whitepace*>key<whitespace*>=<whitepace*>value<whitepace*> and so on.
      *
-     * The assumption is that each line contains one or more of these key=value statements. Whitespace in keys or values are not allowed at the moment.
+     * The assumption is that each line contains one or more of these key=value statements. Whitespace in keys or values are not allowed at the moment. Note
+     * that values can also include statements like k1=v2,k2=v2.
      *
      * Empty line, or lines without an "=" will be ignored
      *
@@ -183,43 +170,6 @@ public final class ScriptingParser {
 
         for (String line : lines) {
             parseKeyValueLine(line, adaptorName, result);
-        }
-
-        return result;
-    }
-
-    /**
-     * Parses a output with key=value pairs separated by whitespace, on one or more lines. This function fails if there is any whitespace between the key and
-     * value, or whitespace inside the values.
-     *
-     * @param input
-     *            the text to parse.
-     * @param adaptorName
-     *            the adaptor name reported in case an exception occurs.
-     * @param ignoredLines
-     *            lines exactly matching one of these strings will be ignored.
-     * @return a map containing all found key/value pairs.
-     * @throws XenonException
-     *             if the input cannot be parsed.
-     */
-    private static Map<String, String> parseKeyValuePairs2(String input, String adaptorName, String... ignoredLines) throws XenonException {
-        String[] lines = NEWLINE_REGEX.split(input);
-        Map<String, String> result = new HashMap<>(lines.length * 4 / 3);
-
-        for (String line : lines) {
-            if (!line.isEmpty() && line.contains("=") && !containsAny(line, ignoredLines)) {
-                String[] pairs = WHITESPACE_REGEX.split(line.trim());
-
-                for (String pair : pairs) {
-                    String[] elements = EQUALS_REGEX.split(pair, 2);
-
-                    if (elements.length != 2) {
-                        throw new XenonException(adaptorName, "Got invalid key/value pair in output: \"" + pair + "\" " + Arrays.toString(pairs));
-                    }
-
-                    result.put(elements[0].trim(), elements[1].trim());
-                }
-            }
         }
 
         return result;
