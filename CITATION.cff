@@ -79,4 +79,4 @@ license: Apache-2.0
 message: "If you use this software, please cite it using these metadata."
 repository-code: "https://github.com/xenon-middleware/xenon"
 title: Xenon
-version: "3.0.4"
+version: "3.1.0"

@@ -1,7 +1,15 @@
-Xenon 3.0.4
+Xenon 3.1.0
 -----------
 
-This is release 3.0.4 of Xenon.
+This is release 3.1.0 of Xenon.
+
+Notable changes compared to v3.0.4:
+-----------------------------------
+
+- improved error state returned by getJobStatusses to show the difference between no job and connection loss.
+- added support for slurm 19
+- added heartbeat in the SSH adaptor quickly detect lost connections.
+- moved to version 2.4.0 of SSHD 
 
 Notable changes compared to v3.0.3:
 -----------------------------------
