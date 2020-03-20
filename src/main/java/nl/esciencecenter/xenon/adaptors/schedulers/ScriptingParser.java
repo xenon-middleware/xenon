@@ -156,7 +156,7 @@ public final class ScriptingParser {
     /**
      * To support both the old and new slurm output format, we must be able to parse the following:
      *
-     * <whitepace*>key<whitespace*>=<whitepace*>value<whitepace*> and so on.
+     * [whitepace*]key[whitespace*]=[whitepace*]value[whitepace*] and so on.
      *
      * The assumption is that each line contains one or more of these key=value statements. Whitespace in keys or values are not allowed at the moment. Note
      * that values can also include statements like k1=v2,k2=v2.
