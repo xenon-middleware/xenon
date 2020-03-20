@@ -322,7 +322,7 @@ public class SchedulerTest {
         assertEquals("UNKNOWN", result[5].getState());
 
         assertEquals("ERROR", result[6].getJobIdentifier());
-        assertEquals("ERROR", result[6].getState());
+        assertEquals("INTERNAL_ERROR", result[6].getState());
     }
 
 }

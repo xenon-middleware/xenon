@@ -17,6 +17,7 @@ matrix:
           organization: nlesc
       before_install:
         - docker-compose --version
+        - ./gradlew --version 
       install:
         - ./gradlew assemble
       script:
@@ -30,6 +31,7 @@ matrix:
         - sonar-scanner -Dsonar.login=$SONAR_TOKEN;
 
     - os: osx
+      jdk: openjdk11
       env:
         - INTEGRATION_TEST="livelocal"
         - JDK=openjdk11
@@ -37,6 +39,7 @@ matrix:
       osx_image: xcode10.1
       script:
         - ./src/liveTest/resources/scripts/create_symlinks;
+        - ./gradlew --version 
         - ./gradlew test liveTest -Dxenon.scheduler=local -Dxenon.filesystem=file -Dxenon.filesystem.location=/ -Dxenon.scheduler.location=$PWD -Dxenon.username=$USERNAME -Dxenon.filesystem.basedir=$PWD -Dxenon.filesystem.expected.workdir=/ -Dxenon.scheduler.workdir=$PWD -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
       after_script:
        -  ./gradlew jacocoTestReport jacocoLiveTestReport

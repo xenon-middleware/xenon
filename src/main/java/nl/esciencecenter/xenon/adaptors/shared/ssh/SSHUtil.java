@@ -32,8 +32,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.sshd.agent.local.ProxyAgentFactory;
+import org.apache.sshd.client.ClientFactoryManager;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ChannelDirectTcpip;
 import org.apache.sshd.client.config.hosts.DefaultConfigFileHostEntryResolver;
@@ -188,6 +190,14 @@ public class SSHUtil {
             boolean useAgentForwarding) {
 
         SshClient client = SshClient.setUpDefaultClient();
+
+        // This sets the idle time after which the connection is closed automatically. The default is set to 10 minutes.
+        // client.getProperties().putIfAbsent(FactoryManager.IDLE_TIMEOUT, TimeUnit.SECONDS.toMillis(120L));
+
+        // We set the heartbeat of SSH to once every 10 seconds, and expect a reply within 5 seconds.
+        // This prevents an SSH operation to hang for 10 minutes if the network connection is lost.
+        client.getProperties().putIfAbsent(ClientFactoryManager.HEARTBEAT_INTERVAL, TimeUnit.SECONDS.toMillis(10L));
+        client.getProperties().putIfAbsent(ClientFactoryManager.HEARTBEAT_REPLY_WAIT, TimeUnit.SECONDS.toMillis(5L));
 
         if (useKnownHosts) {
             DefaultKnownHostsServerKeyVerifier tmp;
@@ -423,9 +433,7 @@ public class SSHUtil {
 
             session.addPublicKeyIdentity(pair);
 
-        } else if (credential instanceof PasswordCredential)
-
-        {
+        } else if (credential instanceof PasswordCredential) {
 
             PasswordCredential c = (PasswordCredential) credential;
             session.addPasswordIdentity(new String(c.getPassword()));

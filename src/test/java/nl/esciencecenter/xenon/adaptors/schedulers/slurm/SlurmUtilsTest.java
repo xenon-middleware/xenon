@@ -855,7 +855,7 @@ public class SlurmUtilsTest {
         description.setEnvironment(env);
         description.setStartPerTask();
 
-        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --workdir='" + entry.resolve("workdir").toString() + "'\n"
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH -D '" + entry.resolve("workdir").toString() + "'\n"
                 + "#SBATCH --partition=queue\n" + "#SBATCH --ntasks=1\n" + "#SBATCH --cpus-per-task=1\n" + "#SBATCH --time=15\n" + "#SBATCH --input='in.txt'\n"
                 + "#SBATCH --output='out.txt'\n" + "#SBATCH --error='err.txt'\n" + "export key1=\"value1\"\n" + "export key2=\"value2\"\n" + "\n"
                 + "srun exec 'a' 'b' 'c'\n";

@@ -12,7 +12,7 @@
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3692/badge)](https://bestpractices.coreinfrastructure.org/projects/3692)
 
 
-Copyright 2013-2019 The Netherlands eScience Center
+Copyright 2013-2020 The Netherlands eScience Center
 
 ## What problem does Xenon solve?
 
@@ -92,7 +92,7 @@ and
 
 ```gradle
 	dependencies {
-	        compile group: 'nl.esciencecenter.xenon', name: 'xenon', version: '3.0.4'
+	        compile group: 'nl.esciencecenter.xenon', name: 'xenon', version: '3.1.0'
 	}
 
 ```
