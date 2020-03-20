@@ -80,7 +80,7 @@ public class SlurmScheduler extends ScriptingScheduler {
         String output = runCheckedCommand(null, "scontrol", "show", "config");
 
         // Parse output. Ignore some header and footer lines.
-        Map<String, String> info = ScriptingParser.parseKeyValueLines(output, ScriptingParser.EQUALS_REGEX, ADAPTOR_NAME, "Configuration data as of",
+        Map<String, String> info = ScriptingParser.parseKeyValuePairs(output, ADAPTOR_NAME, "Configuration data as of",
                 "Slurmctld(primary/backup) at", "Account Gather");
 
         setup = new SlurmSetup(info, disableAccounting);
