@@ -375,6 +375,9 @@ public final class SlurmUtils {
         // add maximum runtime
         arguments.add("--time=" + runtime);
 
+        // add scheduler arguments
+        arguments.addAll(description.getSchedulerArguments());
+
         arguments.add(description.getExecutable());
         arguments.addAll(description.getArguments());
 

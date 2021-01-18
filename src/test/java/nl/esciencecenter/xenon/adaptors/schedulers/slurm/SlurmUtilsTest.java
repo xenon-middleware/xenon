@@ -642,6 +642,24 @@ public class SlurmUtilsTest {
     }
 
     @Test
+    public void test_generateInterActiveSchedulerArguments() {
+        Path entry = new Path("/entry");
+        UUID tag = new UUID(0, 42);
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("exec");
+        description.setSchedulerArguments(new String[] { "--nodelist=node-2" });
+        description.setArguments(new String[] { "a", "b", "c" });
+
+        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--ntasks=1", "--cpus-per-task=1", "--time=15", "--nodelist=node-2",
+                "exec", "a", "b", "c" };
+
+        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag, 15);
+
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
     public void test_generateInterActiveMemory() {
         Path entry = new Path("/entry");
         UUID tag = new UUID(0, 42);
