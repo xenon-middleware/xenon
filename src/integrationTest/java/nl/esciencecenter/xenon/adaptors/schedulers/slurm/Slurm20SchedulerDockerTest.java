@@ -31,10 +31,10 @@ import nl.esciencecenter.xenon.adaptors.schedulers.SchedulerLocationConfig;
 import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.schedulers.Scheduler;
 
-public class Slurm19SchedulerDockerTest extends SlurmSchedulerTestParent {
+public class Slurm20SchedulerDockerTest extends SlurmSchedulerTestParent {
 
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/slurm-19.yml")
+    public static DockerComposeRule docker = DockerComposeRule.builder().file("src/integrationTest/resources/docker-compose/slurm-20.yml")
             .waitingForService("slurm", HealthChecks.toHaveAllPortsOpen()).build();
 
     @Override
