@@ -28,9 +28,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.schedulers.IncompatibleVersionException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -39,19 +36,24 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.schedulers.IncompatibleVersionException;
+
 /**
- * Parses xml output from various grid engine command line tools. For more info on the output, see the
- * "N1 Grid Engine 6 User's Guide". Retrieved from: http://docs.oracle.com/cd/E19080-01/n1.grid.eng6/817-6117/chp11-1/index.html
+ * Parses xml output from various grid engine command line tools. For more info on the output, see the "N1 Grid Engine 6 User's Guide". Retrieved from:
+ * http://docs.oracle.com/cd/E19080-01/n1.grid.eng6/817-6117/chp11-1/index.html
  *
  */
 public class GridEngineXmlParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GridEngineXmlParser.class);
 
-    //Tag containing version of xml schema used in qstat -xml output
+    // Tag containing version of xml schema used in qstat -xml output
     private static final String SGE62_SCHEMA_ATTRIBUTE = "xmlns:xsd";
 
     private static final String SGE62_SCHEMA_VALUE = "http://gridengine.sunsource.net/source/browse/*checkout*/gridengine/source/dist/util/resources/schemas/qstat/qstat.xsd?revision=1.11";
+
+    private static final String SONOFSGE819_SCHEMA_VALUE = "http://arc.liv.ac.uk/repos/darcs/sge/source/dist/util/resources/schemas/qstat/qstat.xsd";
 
     private final DocumentBuilder documentBuilder;
 
@@ -71,16 +73,14 @@ public class GridEngineXmlParser {
     private void checkVersion(Document document) throws IncompatibleVersionException {
         Element documentElement = document.getDocumentElement();
 
-        if (!documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE).equals(SGE62_SCHEMA_VALUE)) {
+        if (!(documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE).equals(SGE62_SCHEMA_VALUE)
+                || documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE).equals(SONOFSGE819_SCHEMA_VALUE))) {
             if (ignoreVersion) {
-                LOGGER.warn("cannot determine version, version attribute found: \""
-                        + documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE) + "\". Ignoring as requested by "
-                        + IGNORE_VERSION_PROPERTY);
+                LOGGER.warn("cannot determine version, version attribute found: \"" + documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE)
+                        + "\". Ignoring as requested by " + IGNORE_VERSION_PROPERTY);
             } else {
-                throw new IncompatibleVersionException(ADAPTOR_NAME,
-                        "cannot determine version, version attribute found: \""
-                                + documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE) + "\". Use the "
-                                + IGNORE_VERSION_PROPERTY + " property to ignore this error");
+                throw new IncompatibleVersionException(ADAPTOR_NAME, "cannot determine version, version attribute found: \""
+                        + documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE) + "\". Use the " + IGNORE_VERSION_PROPERTY + " property to ignore this error");
             }
 
         }
@@ -107,7 +107,7 @@ public class GridEngineXmlParser {
 
         NodeList tagNodes = root.getChildNodes();
 
-        //fetch tags from the list of tag nodes. Ignores empty values
+        // fetch tags from the list of tag nodes. Ignores empty values
         for (int j = 0; j < tagNodes.getLength(); j++) {
             Node tagNode = tagNodes.item(j);
             if (tagNode.getNodeType() == Node.ELEMENT_NODE) {
