@@ -16,7 +16,8 @@ plugins {
     // code coverage
     id 'jacoco'
     // license
-    id 'com.github.hierynomus.license' version '0.14.0'
+    id 'com.github.hierynomus.license' version '0.15.0'
+    id "com.github.hierynomus.license-report" version"0.15.0"
     // test sets
     id 'org.unbroken-dome.test-sets' version '2.1.1'
 }
