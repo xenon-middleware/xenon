@@ -20,14 +20,15 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: Print the local path 
+      run: pwd
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Create test directory
       run: mkdir build\integrationTest
-    - name: Create symlinks
+    - name: Create necessary symlinks
       run: cd build\integrationTest & ..\..\src\liveTest\resources\scripts\create_symlinks.bat & cd ..\..
     - name: Build with Gradle and run unit tests
       run: ./gradlew test 
     - name: Run live tests 
-      run: pwd
-#      run: ./gradlew liveTest -Dxenon.scheduler=local -Dxenon.scheduler.location=%HomeDrive%\projects\xenon -Dxenon.filesystem=file -Dxenon.filesystem.location=%HomeDrive%\projects\xenon -Dxenon.username=%USERNAME% -Dxenon.filesystem.basedir=\projects\xenon\build\integrationTest -Dxenon.separator=\ -Dxenon.filesystem.expected.workdir=\projects\xenon -Dxenon.scheduler.workdir=\projects\xenon -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
+      run: ./gradlew liveTest -Dxenon.scheduler=local -Dxenon.scheduler.location=%HomeDrive%\a\xenon\xenon -Dxenon.filesystem=file -Dxenon.filesystem.location=%HomeDrive%\a\xenon\xenon -Dxenon.username=%USERNAME% -Dxenon.filesystem.basedir=\a\xenon\xenon\build\integrationTest -Dxenon.separator=\ -Dxenon.filesystem.expected.workdir=\a\xenon\xenon -Dxenon.scheduler.workdir=\a\xenon\xenon -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
