@@ -30,7 +30,7 @@ jobs:
       run: pwd
     - name: Print the local files
       run: ls
-    - name: Build with Gradle and run unit tests
-      run: ./gradlew test 
+#    - name: Build with Gradle and run unit tests
+#      run: ./gradlew test 
     - name: Run live tests 
-      run: ./gradlew liveTest "-Dxenon.scheduler=local" "-Dxenon.scheduler.location=`pwd`" "-Dxenon.filesystem=file" "-Dxenon.filesystem.location=`pwd`" "-Dxenon.username=xenon" "-Dxenon.filesystem.basedir=\a\xenon\xenon\build\integrationTest" "-Dxenon.separator=\" "-Dxenon.filesystem.expected.workdir=\a\xenon\xenon" "-Dxenon.scheduler.workdir=\a\xenon\xenon" "-Dxenon.scheduler.supportsInteractive=1" "-Dxenon.scheduler.isEmbedded=1"
+      run: ./gradlew liveTest "-Dxenon.scheduler=local" "-Dxenon.scheduler.location=D:\a\xenon\xenon" "-Dxenon.filesystem=file" "-Dxenon.filesystem.location=D:\a\xenon\xenon`" "-Dxenon.username=xenon" "-Dxenon.filesystem.basedir=\a\xenon\xenon\build\integrationTest" "-Dxenon.separator=\" "-Dxenon.filesystem.expected.workdir=\a\xenon\xenon" "-Dxenon.scheduler.workdir=\a\xenon\xenon" "-Dxenon.scheduler.supportsInteractive=1" "-Dxenon.scheduler.isEmbedded=1"
