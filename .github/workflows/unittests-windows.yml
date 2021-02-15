@@ -26,5 +26,8 @@ jobs:
       run: mkdir build\integrationTest
     - name: Create symlinks
       run: cd build\integrationTest & ..\..\src\liveTest\resources\scripts\create_symlinks.bat & cd ..\..
-    - name: Build with Gradle
+    - name: Build with Gradle and run unit tests
       run: ./gradlew test 
+    - name: Run live tests 
+      run: pwd
+#      run: ./gradlew liveTest -Dxenon.scheduler=local -Dxenon.scheduler.location=%HomeDrive%\projects\xenon -Dxenon.filesystem=file -Dxenon.filesystem.location=%HomeDrive%\projects\xenon -Dxenon.username=%USERNAME% -Dxenon.filesystem.basedir=\projects\xenon\build\integrationTest -Dxenon.separator=\ -Dxenon.filesystem.expected.workdir=\projects\xenon -Dxenon.scheduler.workdir=\projects\xenon -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
