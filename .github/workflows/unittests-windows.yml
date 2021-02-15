@@ -20,14 +20,16 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
-    - name: Print the local path 
-      run: pwd
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Create test directory
       run: mkdir build\integrationTest
     - name: Create necessary symlinks
       run: cd build\integrationTest & ..\..\src\liveTest\resources\scripts\create_symlinks.bat & cd ..\..
+    - name: Print the local path 
+      run: pwd
+    - name: Print the local files
+      run: ls
     - name: Build with Gradle and run unit tests
       run: ./gradlew test 
     - name: Run live tests 
