@@ -29,7 +29,8 @@ jobs:
       run: chmod +x gradlew
 
     - name: Prepare test directory
-    - run: mkdir build\integrationTest
+      run: mkdir build\integrationTest
+
     - run: cd build\integrationTest 
     - run:  ..\..\src\liveTest\resources\scripts\create_symlinks.bat 
     - run: dir
