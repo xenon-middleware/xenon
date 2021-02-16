@@ -41,8 +41,21 @@ jobs:
     - name: Build with Gradle and run unit and live tests
       run: .\gradlew.bat test liveTest "-Dxenon.scheduler=local" "-Dxenon.scheduler.location=D:\a\xenon\xenon" "-Dxenon.filesystem=file" "-Dxenon.filesystem.location=D:\a\xenon\xenon" "-Dxenon.username=xenon" "-Dxenon.filesystem.basedir=\a\xenon\xenon\build\integrationTest" "-Dxenon.separator=\" "-Dxenon.filesystem.expected.workdir=\a\xenon\xenon" "-Dxenon.scheduler.workdir=\a\xenon\xenon" "-Dxenon.scheduler.supportsInteractive=1" "-Dxenon.scheduler.isEmbedded=1"
 
-    - name: Upload test report 
-      uses: actions/upload-artifact@v2
+    - name: Create test reports
+      run: ./gradlew jacocoTestReport jacocoLiveTestReport
+
+    - name: Set up Python 3.x
+      uses: actions/setup-python@v2
       with:
-        name: windows-test-report
-        path: 
+        python-version: '3.x'
+
+    - name: Install codecov
+      run: pip install codecov
+
+    - name: Upload test reports
+      run: |
+        codecov -e OS,JDK -F unit -f build\reports\jacoco\test\jacocoTestReport.xml
+        codecov -e OS,JDK,INTEGRATION_TEST -F livelocal -f build\reports\jacoco\jacocoLiveTestReport\jacocoLiveTestReport.xml
+      env: 
+        OS: windows
+        JDK: openjdk11
