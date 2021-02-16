@@ -42,7 +42,7 @@ jobs:
         bash <(curl -s https://codecov.io/bash) -e JDK,OS -F unit -f build/reports/jacoco/test/jacocoTestReport.xml
         bash <(curl -s https://codecov.io/bash) -e JDK,OS -F livelocal -f build/reports/jacoco/jacocoLiveTestReport/jacocoLiveTestReport.xml
       env: 
-        OS=osx
-        JDK=openjdk11
+        OS: osx
+        JDK: openjdk11
   
 

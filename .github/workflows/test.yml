@@ -36,6 +36,6 @@ jobs:
         bash <(curl -s https://codecov.io/bash) -e JDK,OS -F integration -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml;
         bash <(curl -s https://codecov.io/bash) -e JDK,OS -F fixedclientenvironment -f build/reports/jacoco/jacocoFixedClientEnvironmentTestReport/jacocoFixedClientEnvironmentTestReport.xml
       env: 
-        OS=linux
-        JDK=openjdk11
+        OS: linux
+        JDK: openjdk11
 
