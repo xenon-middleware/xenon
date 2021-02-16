@@ -22,7 +22,7 @@ jobs:
         java-version: 11
 
     - name: Run integration tests 
-      run: ./gradlew integrationTests
+      run: ./gradlew integrationTest
 
     - name: Generate test reports and upload to codecov
       run: | 
