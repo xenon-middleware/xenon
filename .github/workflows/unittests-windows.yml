@@ -12,26 +12,33 @@ on:
 jobs:
   build:
 
+    name: Build on Windows and run unit and live tests
+
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
+
     - name: Set up JDK 11
       uses: actions/setup-java@v1
       with:
         java-version: 11
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Create test directory
-      run: mkdir build\integrationTest
-    - name: Create necessary symlinks
-      run: cd build\integrationTest & ..\..\src\liveTest\resources\scripts\create_symlinks.bat 
-    - name: Print the local files
-      run: dir
-    - name: Print the local path 
-      run: pwd
+
+    - name: Prepare test directory
+    - run: mkdir build\integrationTest
+    - run: cd build\integrationTest 
+    - run:  ..\..\src\liveTest\resources\scripts\create_symlinks.bat 
+    - run: dir
+    - run: pwd
+    - run: cd ..\..
+
     - name: Build with Gradle and run unit and live tests
-      run: cd ..\.. & .\gradlew.bat test liveTest "-Dxenon.scheduler=local" "-Dxenon.scheduler.location=D:\a\xenon\xenon" "-Dxenon.filesystem=file" "-Dxenon.filesystem.location=D:\a\xenon\xenon" "-Dxenon.username=xenon" "-Dxenon.filesystem.basedir=\a\xenon\xenon\build\integrationTest" "-Dxenon.separator=\" "-Dxenon.filesystem.expected.workdir=\a\xenon\xenon" "-Dxenon.scheduler.workdir=\a\xenon\xenon" "-Dxenon.scheduler.supportsInteractive=1" "-Dxenon.scheduler.isEmbedded=1"
+      run: .\gradlew.bat test liveTest "-Dxenon.scheduler=local" "-Dxenon.scheduler.location=D:\a\xenon\xenon" "-Dxenon.filesystem=file" "-Dxenon.filesystem.location=D:\a\xenon\xenon" "-Dxenon.username=xenon" "-Dxenon.filesystem.basedir=\a\xenon\xenon\build\integrationTest" "-Dxenon.separator=\" "-Dxenon.filesystem.expected.workdir=\a\xenon\xenon" "-Dxenon.scheduler.workdir=\a\xenon\xenon" "-Dxenon.scheduler.supportsInteractive=1" "-Dxenon.scheduler.isEmbedded=1"
+
     - name: Upload test report 
       uses: actions/upload-artifact@v2
       with:
