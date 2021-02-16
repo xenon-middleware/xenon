@@ -25,7 +25,7 @@ docker run \
 --volume $HOME/.m2:/home/xenon/.m2 \
 --volume /var/run/docker.sock:/var/run/docker.sock \
 --volume $PWD:/code \
---tty --interactive --rm \
+--tty --rm \
 --name=xenon-fixed-client \
 xenonmiddleware/fixed-client \
 ./gradlew --no-daemon fixedClientEnvironmentTest "$@"
