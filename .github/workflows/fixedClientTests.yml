@@ -21,19 +21,14 @@ jobs:
       with:
         java-version: 11
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
     - name: Run unit, integration and fixed client tests 
       run: | 
-        ./gradlew check
+        ./gradlew assemble
         ./src/fixedClientEnvironmentTest/resources/run-fixed-client-environment-test.sh
 
     - name: Generate test reports and upload them
       run: | 
-        ./gradlew jacocoTestReport jacocoIntegrationTestReport jacocoFixedClientEnvironmentTestReport;
-        bash <(curl -s https://codecov.io/bash) -e JDK,OS -F unit -f build/reports/jacoco/test/jacocoTestReport.xml;
-        bash <(curl -s https://codecov.io/bash) -e JDK,OS -F integration -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml;
+        ./gradlew jacocoFixedClientEnvironmentTestReport
         bash <(curl -s https://codecov.io/bash) -e JDK,OS -F fixedclientenvironment -f build/reports/jacoco/jacocoFixedClientEnvironmentTestReport/jacocoFixedClientEnvironmentTestReport.xml
       env: 
         OS: linux
