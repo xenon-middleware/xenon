@@ -282,7 +282,7 @@ public class AtUtils {
             return index;
         }
 
-        result.put("xenon.info.file", line.substring("XENON_INFO_FILE: ".length()));
+        result.put("xenon.info.file", line.substring("START_XENON_INFO_FILE: ".length()));
 
         while (index < lines.length) {
 
@@ -353,7 +353,7 @@ public class AtUtils {
             return index;
         }
 
-        result.put("xenon.stats.file", line.substring("XENON_STATS_FILE: ".length()));
+        result.put("xenon.stats.file", line.substring("START_XENON_STATS_FILE: ".length()));
 
         while (index < lines.length) {
 
