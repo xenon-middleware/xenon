@@ -97,7 +97,7 @@ public class AtUtilsTest {
 
     @Test
     public void test_atq_parser_null() {
-        Map<String, Map<String, String>> result = AtUtils.parseJobInfo(null, null);
+        Map<String, Map<String, String>> result = AtUtils.parseATQJobInfo(null, null);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -105,7 +105,7 @@ public class AtUtilsTest {
 
     @Test
     public void test_atq_parser_empty() {
-        Map<String, Map<String, String>> result = AtUtils.parseJobInfo("", null);
+        Map<String, Map<String, String>> result = AtUtils.parseATQJobInfo("", null);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -113,7 +113,7 @@ public class AtUtilsTest {
 
     @Test
     public void test_atq_parser_whiteSpace() {
-        Map<String, Map<String, String>> result = AtUtils.parseJobInfo("  ", null);
+        Map<String, Map<String, String>> result = AtUtils.parseATQJobInfo("  ", null);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -123,7 +123,7 @@ public class AtUtilsTest {
     public void test_atq_parser_single_line() {
         String tmp = "11 Mon Jul 2 10:22:00 2018 = jason";
 
-        Map<String, Map<String, String>> result = AtUtils.parseJobInfo(tmp, null);
+        Map<String, Map<String, String>> result = AtUtils.parseATQJobInfo(tmp, null);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -141,7 +141,7 @@ public class AtUtilsTest {
     public void test_atq_parser_multi_line() {
         String tmp = "11 Mon Jul 2 10:22:00 2018 = jason\n16    Wed Jul  4 16:00:00 2018 a jason\n";
 
-        Map<String, Map<String, String>> result = AtUtils.parseJobInfo(tmp, null);
+        Map<String, Map<String, String>> result = AtUtils.parseATQJobInfo(tmp, null);
 
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -155,7 +155,7 @@ public class AtUtilsTest {
     public void test_atq_parser_multi_line_empty() {
         String tmp = "11 Mon Jul 2 10:22:00 2018 = jason\n\n\n16    Wed Jul  4 16:00:00 2018 a jason";
 
-        Map<String, Map<String, String>> result = AtUtils.parseJobInfo(tmp, null);
+        Map<String, Map<String, String>> result = AtUtils.parseATQJobInfo(tmp, null);
 
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -169,7 +169,7 @@ public class AtUtilsTest {
     public void test_atq_parser_multi_line_whitespace() {
         String tmp = "  \n11 Mon Jul 2 10:22:00 2018 = jason\n  \n  \n16    Wed Jul  4 16:00:00 2018 a jason\n  \n  \n";
 
-        Map<String, Map<String, String>> result = AtUtils.parseJobInfo(tmp, null);
+        Map<String, Map<String, String>> result = AtUtils.parseATQJobInfo(tmp, null);
 
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -181,7 +181,7 @@ public class AtUtilsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void test_atq_parser_invalid() {
-        AtUtils.parseJobInfo("Hello World!", null);
+        AtUtils.parseATQJobInfo("Hello World!", null);
     }
 
     @Test
@@ -190,7 +190,7 @@ public class AtUtilsTest {
 
         Set<String> queues = new HashSet<String>();
 
-        Map<String, Map<String, String>> result = AtUtils.parseJobInfo(tmp, queues);
+        Map<String, Map<String, String>> result = AtUtils.parseATQJobInfo(tmp, queues);
 
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -203,7 +203,7 @@ public class AtUtilsTest {
         Set<String> queues = new HashSet<String>();
         queues.add("a");
 
-        Map<String, Map<String, String>> result = AtUtils.parseJobInfo(tmp, queues);
+        Map<String, Map<String, String>> result = AtUtils.parseATQJobInfo(tmp, queues);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -218,7 +218,7 @@ public class AtUtilsTest {
         Set<String> queues = new HashSet<String>();
         queues.add("b");
 
-        Map<String, Map<String, String>> result = AtUtils.parseJobInfo(tmp, queues);
+        Map<String, Map<String, String>> result = AtUtils.parseATQJobInfo(tmp, queues);
 
         assertNotNull(result);
         assertEquals(0, result.size());
@@ -232,7 +232,7 @@ public class AtUtilsTest {
         queues.add("a");
         queues.add("=");
 
-        Map<String, Map<String, String>> result = AtUtils.parseJobInfo(tmp, queues);
+        Map<String, Map<String, String>> result = AtUtils.parseATQJobInfo(tmp, queues);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -248,7 +248,7 @@ public class AtUtilsTest {
         queues.add("a");
         queues.add("=");
 
-        Map<String, Map<String, String>> result = AtUtils.parseJobInfo(tmp, queues);
+        Map<String, Map<String, String>> result = AtUtils.parseATQJobInfo(tmp, queues);
 
         assertNotNull(result);
         assertEquals(1, result.size());

@@ -21,6 +21,7 @@ import static nl.esciencecenter.xenon.adaptors.schedulers.at.AtSchedulerAdaptor.
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ import nl.esciencecenter.xenon.adaptors.schedulers.JobStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.QueueStatusImplementation;
 import nl.esciencecenter.xenon.adaptors.schedulers.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingScheduler;
+import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 import nl.esciencecenter.xenon.schedulers.JobStatus;
@@ -91,6 +93,8 @@ public class AtScheduler extends ScriptingScheduler {
     private static final String DEFAULT_QUEUE = "a";
 
     private final JobSeenMap jobSeenMap;
+
+    private final String uniqueIDBase = UUID.randomUUID().toString() + ".";
 
     private long nextUniqueID = 0;
 
@@ -166,13 +170,25 @@ public class AtScheduler extends ScriptingScheduler {
             queues = new HashSet<>(Arrays.asList(queueNames));
         }
 
-        RemoteCommandRunner runner = runCommand(null, "atq", new String[0]);
+        String script = AtUtils.generateListingScript();
 
-        if (runner.success()) {
-            return AtUtils.parseJobInfo(runner.getStdout(), queues);
-        } else {
-            throw new XenonException(getAdaptorName(), "Failed to get queue status using atq: (" + runner.getExitCode() + ") " + runner.getStderr());
+        RemoteCommandRunner runner = runCommand(script, "/bin/bash");
+
+        if (!runner.successIgnoreError()) {
+            throw new XenonException(getAdaptorName(),
+                    "Failed to retrieve job info: (" + runner.getExitCode() + ") " + runner.getStderr());
         }
+
+        return AtUtils.parseFileDumpJobInfo(runner.getStdout(), queues);
+
+        /*
+         * RemoteCommandRunner runner = runCommand(null, "atq", new String[0]);
+         * 
+         * if (runner.success()) { return AtUtils.parseATQJobInfo(runner.getStdout(), queues); } else { throw new XenonException(getAdaptorName(),
+         * "Failed to get queue status using atq: (" + runner.getExitCode() + ") " + runner.getStderr()); }
+         * 
+         */
+
     }
 
     @Override
@@ -221,7 +237,7 @@ public class AtScheduler extends ScriptingScheduler {
     }
 
     private synchronized String getUniqueID() {
-        return Long.toString(nextUniqueID++);
+        return uniqueIDBase + Long.toString(nextUniqueID++);
     }
 
     @Override
@@ -230,19 +246,52 @@ public class AtScheduler extends ScriptingScheduler {
         // Verify the job description
         AtUtils.verifyJobDescription(description, QNAMES);
 
-        // Generate a job script.
-        String script = AtUtils.generateJobScript(description, getWorkingDirectory(), getUniqueID());
+        String uniqueID = getUniqueID();
 
-        // Submit it.
-        RemoteCommandRunner runner = runCommand(script, "at", new String[] { description.getStartTime() });
+        String workingDir = ScriptingUtils.getWorkingDirPath(description, getWorkingDirectory());
+
+        // Generate a script to store the essential info about the job and run it wherever we will run the job
+        String script = AtUtils.generateJobInfoScript(description, workingDir, uniqueID);
+        RemoteCommandRunner runner = runCommand(script, "/bin/bash");
+
+        // Check if we where succesfull
+        if (!runner.successIgnoreError()) {
+            throw new XenonException(getAdaptorName(),
+                    "Failed to submit job using at while storing job info: (" + runner.getExitCode() + ") " + runner.getStderr());
+        }
+
+        // Generate script which will start the job and submit this to 'at'
+        script = AtUtils.generateJobScript(description, workingDir, uniqueID);
+        runner = runCommand(script, "at", new String[] { description.getStartTime() });
 
         // Retrieve the job ID from the output and return it.
         if (!runner.successIgnoreError()) {
-            throw new XenonException(getAdaptorName(), "Failed to submit job using at: (" + runner.getExitCode() + ") " + runner.getStderr());
+            // Try to store the error in the job info file
+            int exit = runner.getExitCode();
+            String out = runner.getStderr();
+            String err = runner.getStderr();
+
+            script = AtUtils.generateJobErrorScript(uniqueID, exit, out, err);
+            runner = runCommand(script, "/bin/bash");
+
+            // NOTE: we intentionally ignore the status of running the job error script.
+            throw new XenonException(getAdaptorName(), "Failed to submit job using at: (" + exit + ") " + err);
         }
 
         String jobID = AtUtils.parseSubmitOutput(runner.getStderr());
         jobSeenMap.updateRecentlySeen(jobID);
+
+        // Write a file to store the relation between the xenon uniqueID and at job ID. This allows us to retrieve the status and statistics about the
+        // job even after it has finished and 'at' has forgotten about it.
+
+        // Retrieve script.
+        script = AtUtils.generateJobIDScript(jobID, uniqueID);
+        runner = runCommand(script, "/bin/bash");
+
+        if (!runner.successIgnoreError()) {
+            LOGGER.warn("Failed to store job mapping for AT job " + jobID + " / " + uniqueID + ": (" + runner.getExitCode() + ") " + runner.getStderr());
+        }
+
         return jobID;
     }
 
@@ -260,25 +309,48 @@ public class AtScheduler extends ScriptingScheduler {
 
         Map<String, String> tmp = info.get(jobIdentifier);
 
-        String state = "UNKNOWN";
-
-        if (tmp != null) {
-            String queue = tmp.get("queue");
-
-            if (queue != null) {
-                if (queue.equals("=")) {
-                    state = "RUNNING";
-                } else {
-                    state = "PENDING";
-                }
-            }
-        } else if (jobSeenMap.haveRecentlySeen(jobIdentifier)) {
-            state = "DONE";
-        } else {
+        if (tmp == null) {
             throw new NoSuchJobException(ADAPTOR_NAME, "Job " + jobIdentifier + " could not be found!");
         }
 
-        return new JobStatusImplementation(jobIdentifier, "unknown", state, 0, null, state.equals("RUNNING"), state.equals("DONE"), tmp);
+        String state = "UNKNOWN";
+        int exit = 0;
+
+        if (tmp.containsKey("xenon.DONE")) {
+            state = "DONE";
+
+            if (tmp.containsKey("xenon.EXIT")) {
+                exit = Integer.parseInt(tmp.get("xenon.EXIT"));
+            }
+        } else if (tmp.containsKey("xenon.RUNNING")) {
+            state = "RUNNING";
+        } else if (tmp.containsKey("xenon.STARTING")) {
+            state = "STARTING";
+        } else if (tmp.containsKey("xenon.SUBMITTED")) {
+            state = "WAITING";
+        }
+
+        String name = "unknown";
+
+        if (tmp.containsKey("xenon.JOBNAME")) {
+            name = tmp.get("xenon.JOBNAME");
+        }
+
+        return new JobStatusImplementation(jobIdentifier, name, state, exit, null, state.equals("RUNNING"), state.equals("DONE"), tmp);
+
+        /*
+         * String state = "UNKNOWN";
+         * 
+         * if (tmp != null) { String queue = tmp.get("queue");
+         * 
+         * if (queue != null) { if (queue.equals("=")) { state = "RUNNING"; } else { state = "PENDING"; } } } else if
+         * (jobSeenMap.haveRecentlySeen(jobIdentifier)) { state = "DONE";
+         * 
+         * // TODO: scan target to find the output of the job? } else { throw new NoSuchJobException(ADAPTOR_NAME, "Job " + jobIdentifier +
+         * " could not be found!"); }
+         * 
+         * return new JobStatusImplementation(jobIdentifier, "unknown", state, 0, null, state.equals("RUNNING"), state.equals("DONE"), tmp);
+         */
     }
 
     @Override

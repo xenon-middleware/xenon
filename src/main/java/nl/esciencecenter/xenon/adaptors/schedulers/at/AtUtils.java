@@ -30,11 +30,18 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingParser;
 import nl.esciencecenter.xenon.adaptors.schedulers.ScriptingUtils;
-import nl.esciencecenter.xenon.filesystems.Path;
 import nl.esciencecenter.xenon.schedulers.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.schedulers.JobDescription;
 
 public class AtUtils {
+
+    private static final String FORMAT_VERSION = "1.0.0";
+
+    private static final String INFO_FILE_NAME = "/tmp/xenon.at.info.";
+    private static final String STATS_FILE_NAME = "/tmp/xenon.at.stats.";
+    private static final String JOBID_FILE_NAME = "/tmp/xenon.at.jobid.";
+
+    private static final String TIMESTAMP_COMMAND = "`/usr/bin/date --iso-8601=sec`";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AtUtils.class);
 
@@ -105,7 +112,7 @@ public class AtUtils {
      *            the queues to return the jobs for.
      * @return the parsed output
      */
-    public static HashMap<String, Map<String, String>> parseJobInfo(String atqOutput, Set<String> queues) {
+    public static HashMap<String, Map<String, String>> parseATQJobInfo(String atqOutput, Set<String> queues) {
 
         HashMap<String, Map<String, String>> result = new HashMap<>();
 
@@ -119,6 +126,284 @@ public class AtUtils {
         }
 
         return result;
+    }
+
+    /**
+     * Parse one or more records of job info as produced by the <code>generateListingScript<code> script.
+     *
+     * These lines have the following syntax:
+     *
+     * AT JOB LIST AT JOB: /tmp/xenon.at.jobid.<atID> XENON_JOB_ID: <xenonID> XENON_INFO_FILE: /tmp/xenon.at.info.<xenonID> <content of
+     * /tmp/xenon.at.info.<xenonID>> END_XENON_INFO_FILE: /tmp/xenon.at.info.<xenonID> XENON_STATS_FILE: /tmp/xenon.at.stats.<xenonID> <content of
+     * /tmp/xenon.at.stats.<xenonID>> END_XENON_STATS_FILE: /tmp/xenon.at.stats.<xenonID>
+     *
+     * The parsed output will be split into "jobID", "jobStatus", "JobName", "exitCode" and "Misc" data, which is combined in a Map (each using the respective
+     * keys). Each of this Maps is stored is a larger Map using the "jobID" as a key. This larger map is returned as the return value this method.
+     *
+     * @param atqOutput
+     *            the output as produced by atq
+     * @param queues
+     *            the queues to return the jobs for.
+     * @return the parsed output
+     */
+    public static HashMap<String, Map<String, String>> parseFileDumpJobInfo(String listOutput, Set<String> queues) {
+
+        HashMap<String, Map<String, String>> result = new HashMap<>();
+
+        if (listOutput == null || listOutput.isEmpty()) {
+            return result;
+        }
+
+        String[] lines = listOutput.split("\\r?\\n");
+
+        if (lines == null || lines.length == 0) {
+            LOGGER.warn("Failed to parse script output.");
+            return result;
+        }
+
+        if (!"AT JOB LIST".equals(lines[0])) {
+            LOGGER.warn("Failed to parse script output. Unexpected header: " + lines[0]);
+            return result;
+        }
+
+        int index = 1;
+
+        while (index < lines.length) {
+            HashMap<String, String> jobInfo = new HashMap<>();
+
+            index = parseJob(lines, index, jobInfo);
+
+            String id = jobInfo.get("at.ID");
+
+            if (id != null) {
+
+                if (queues != null) {
+                    String q = jobInfo.get("xenon.QUEUE");
+
+                    if (q != null && queues.contains(q)) {
+                        result.put(id, jobInfo);
+                    }
+                } else {
+                    result.put(id, jobInfo);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private static String parseJobID(String line) {
+
+        // The expect line looks like this:
+        //
+        // AT JOB: /tmp/xenon.at.jobid.24
+        //
+        // We check the prefix "AT JOB: " and then extract the postfix (in this case ".24") which is the job ID number as assigned by at.
+        // Whenever we run into problems, we simply print a warning and give up.
+
+        if (line == null || !line.startsWith("AT JOB: ")) {
+            LOGGER.warn("Failed to parse job. Unexpected line: " + line);
+            return null;
+        }
+
+        int dot = line.lastIndexOf(".");
+
+        if (dot == -1) {
+            LOGGER.warn("Failed to parse job. JobID not found: " + line);
+            return null;
+        }
+
+        String jobID = line.substring(dot + 1);
+
+        if (jobID == null || line.isEmpty()) {
+            LOGGER.warn("Failed to parse job. JobID not valid: " + line);
+            return null;
+        }
+
+        return jobID;
+    }
+
+    private static String parseXenonID(String line) {
+
+        // The expect line looks like this:
+        //
+        // XENON_JOB_ID: 18087e0a-1b63-444a-b0eb-aab37068426c.0
+        //
+        // We check the prefix "XENON_JOB_ID: " and then extract the postfix after ": ". This is the ID assigned by Xenon.
+        // Whenever we run into problems, we simply print a warning and give up.
+
+        if (line == null || !line.startsWith("XENON_JOB_ID: ")) {
+            LOGGER.warn("Failed to parse job. Unexpected line: " + line);
+            return null;
+        }
+
+        String xenonID = line.substring("XENON_JOB_ID: ".length());
+
+        if (xenonID == null || line.isEmpty()) {
+            LOGGER.warn("Failed to parse job. XenonID not valid: " + line);
+            return null;
+        }
+
+        return xenonID;
+    }
+
+    private static int parseInfoFile(String[] lines, int index, HashMap<String, String> result) {
+
+        // The expect input looks like this:
+        //
+        // XENON_INFO_FILE: /tmp/xenon.at.info.18087e0a-1b63-444a-b0eb-aab37068426c.0
+        // #AT_JOBNAME xenon
+        // #AT_WORKDIR /home/jason/test_at
+        // #AT_STARTTIME now
+        // #AT_INPUT /dev/null
+        // #AT_OUTPUT /dev/null
+        // #AT_ERROR /dev/null
+        // #AT_EXEC /bin/sleep
+        // #AT_EXEC_PARAM 'aap'
+        // #AT_SUBMITTED 2021-09-15T14:03:33+02:00
+        // #AT_STARTING 2021-09-15T14:03:33+02:00
+        // #AT_PID 14073
+        // #AT_RUNNING 2021-09-15T14:03:33+02:00
+        // #AT_DONE 2021-09-15T14:03:33+02:00
+        // #AT_EXIT 0
+        // END_XENON_INFO_FILE: /tmp/xenon.at.info.18087e0a-1b63-444a-b0eb-aab37068426c.0
+        //
+        // We check if the first line starts with "XENON_INFO_FILE:" and then parse everything until we encounter "END_XENON_INFO_FILE:".
+        // Whenever we run into problems, we simply print a warning and give up.
+
+        if (index >= lines.length) {
+            return index;
+        }
+
+        String line = lines[index++];
+
+        if (line == null || !line.startsWith("START_XENON_INFO_FILE: ")) {
+            LOGGER.warn("Failed to parse job info. Expected \"XENON_INFO_FILE\", not: " + line);
+            return index;
+        }
+
+        result.put("xenon.info.file", line.substring("XENON_INFO_FILE: ".length()));
+
+        while (index < lines.length) {
+
+            line = lines[index++];
+
+            if (line != null && line.startsWith("END_XENON_INFO_FILE: ")) {
+                // we are done with this info block
+                break;
+            }
+
+            if (line != null && line.startsWith("#AT_")) {
+                // we found info about the job. Let's record it
+                int split = line.indexOf(" ");
+
+                String tag = line.substring("#AT_".length(), split);
+                String value = line.substring(split + 1).trim();
+
+                result.put("xenon." + tag, value);
+            } else {
+                LOGGER.warn("Failed to parse job info. Unexpected line: " + line);
+            }
+        }
+
+        return index;
+    }
+
+    private static int parseStatsFile(String[] lines, int index, HashMap<String, String> result) {
+
+        // The expect input looks like this:
+        //
+        // XENON_STATS_FILE: /tmp/xenon.at.stats.81f476c5-7ae7-4e86-83f9-0bd9d13066dd.0
+        // Command being timed: "/bin/sleep 10"
+        // User time (seconds): 0.00
+        // System time (seconds): 0.00
+        // Percent of CPU this job got: 0%
+        // Elapsed (wall clock) time (h:mm:ss or m:ss): 0:10.00
+        // Average shared text size (kbytes): 0
+        // Average unshared data size (kbytes): 0
+        // Average stack size (kbytes): 0
+        // Average total size (kbytes): 0
+        // Maximum resident set size (kbytes): 1976
+        // Average resident set size (kbytes): 0
+        // Major (requiring I/O) page faults: 0
+        // Minor (reclaiming a frame) page faults: 73
+        // Voluntary context switches: 1
+        // Involuntary context switches: 1
+        // Swaps: 0
+        // File system inputs: 0
+        // File system outputs: 0
+        // Socket messages sent: 0
+        // Socket messages received: 0
+        // Signals delivered: 0
+        // Page size (bytes): 4096
+        // Exit status: 0
+        // END_XENON_STATS_FILE: /tmp/xenon.at.stats.81f476c5-7ae7-4e86-83f9-0bd9d13066dd.0
+        //
+        // We check if the first line starts with "XENON_INFO_FILE:" and then parse everything until we encounter "END_XENON_INFO_FILE:".
+        // Whenever we run into problems, we simply print a warning and give up.
+
+        if (index >= lines.length) {
+            return index;
+        }
+
+        String line = lines[index++];
+
+        if (line == null || !line.startsWith("START_XENON_STATS_FILE: ")) {
+            LOGGER.warn("Failed to parse job stats. Expected \"XENON_STATS_FILE\", not: " + line);
+            return index;
+        }
+
+        result.put("xenon.stats.file", line.substring("XENON_STATS_FILE: ".length()));
+
+        while (index < lines.length) {
+
+            line = lines[index++];
+
+            if (line != null && line.startsWith("END_XENON_STATS_FILE: ")) {
+                // we are done with this info block
+                break;
+            }
+
+            if (line != null && !line.startsWith("Command exited with non-zero status")) {
+                // we found info about the job. Let's record it
+                int split = line.indexOf(": ");
+
+                String tag = line.substring(0, split).trim();
+                String value = line.substring(split + 1).trim();
+
+                result.put(tag, value);
+            } else {
+                LOGGER.warn("Failed to parse job stats. Unexpected line: " + line);
+            }
+        }
+
+        return index;
+    }
+
+    private static int parseJob(String[] lines, int index, HashMap<String, String> jobInfo) {
+
+        if (index >= lines.length) {
+            return index;
+        }
+
+        // Try to retrieve the jobID;
+        String jobID = parseJobID(lines[index++]);
+
+        if (jobID == null) {
+            return index;
+        }
+
+        jobInfo.put("at.ID", jobID);
+
+        String xenonID = parseXenonID(lines[index++]);
+
+        jobInfo.put("xenon.ID", xenonID);
+
+        index = parseInfoFile(lines, index, jobInfo);
+
+        index = parseStatsFile(lines, index, jobInfo);
+
+        return index;
     }
 
     public static String parseSubmitOutput(String output) throws XenonException {
@@ -194,54 +479,30 @@ public class AtUtils {
         return path.replace("%j", jobID);
     }
 
-    public static String generateJobScript(JobDescription description, Path fsEntryPath, String tmpID) {
+    private static String getInfoFile(String uniqueID) {
+        return INFO_FILE_NAME + uniqueID;
+    }
+
+    private static String getStatsFile(String uniqueID) {
+        return STATS_FILE_NAME + uniqueID;
+    }
+
+    private static String getJobIDFile(String uniqueID) {
+        return JOBID_FILE_NAME + uniqueID;
+    }
+
+    public static String generateJobScript(JobDescription description, String workingDir, String tmpID) {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
-        // script.format("%s\n", "#!/bin/sh");
-        String name = description.getName();
+        String infoFile = getInfoFile(tmpID);
+        String statsFile = getStatsFile(tmpID);
 
-        if (name == null || name.trim().isEmpty()) {
-            name = "xenon";
-        }
-
-        String workingDir = ScriptingUtils.getWorkingDirPath(description, fsEntryPath);
-
-        String tmpFile = "/tmp/xenon.at." + tmpID;
-
-        // Save some info on the job to the tmpFile so we can reconstruct it later.
-
-        // set name of job to xenon
-        echo(script, "JOBNAME", name, tmpFile);
-        echo(script, "WORKDIR", workingDir, tmpFile);
-
-        if (description.getQueueName() != null) {
-            echo(script, "QUEUE", description.getQueueName(), tmpFile);
-        }
-
-        if (description.getStartTime() != null) {
-            echo(script, "STARTTIME", description.getStartTime(), tmpFile);
-        }
+        // String workingDir = ScriptingUtils.getWorkingDirPath(description, fsEntryPath);
 
         String stdin = getStream(description.getStdin());
         String stderr = getStream(substituteJobID(description.getStderr(), tmpID));
         String stdout = getStream(substituteJobID(description.getStdout(), tmpID));
-
-        echo(script, "INPUT", stdin, tmpFile);
-        echo(script, "OUTPUT", stdout, tmpFile);
-        echo(script, "ERROR", stderr, tmpFile);
-
-        if (!description.getEnvironment().isEmpty()) {
-            for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
-                echo(script, "ENV", entry.getKey() + "=" + entry.getValue(), tmpFile);
-            }
-        }
-
-        echo(script, "EXEC", description.getExecutable(), tmpFile);
-
-        for (String argument : description.getArguments()) {
-            echo(script, "EXEC_PARAM", ScriptingUtils.protectAgainstShellMetas(argument), tmpFile);
-        }
 
         if (!description.getEnvironment().isEmpty()) {
             for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
@@ -249,8 +510,21 @@ public class AtUtils {
             }
         }
 
+        // We would like to use /bin/time or /usr/bin/time to get some statistics on the process. Check if either exists
+        script.format("if [ -x /bin/time ]; then\n" +
+                "    TIME=\"/bin/time -v -o %s\"\n" +
+                "elif [ -x /usr/bin/time ]; then\n" +
+                "    TIME=\"/usr/bin/time -v -o %s\"\n" +
+                "else\n" +
+                "    TIME=\"\"\n" +
+                "fi\n",
+                statsFile, statsFile);
+
+        echo(script, "STARTING", "`/usr/bin/date --iso-8601=sec`", infoFile);
+
+        // TODO: it may either be /bin/time or /usr/bin/time? We should check for this!
         script.format("cd '%s' && ", workingDir);
-        script.format("%s", description.getExecutable());
+        script.format("$TIME %s ", description.getExecutable());
 
         for (String argument : description.getArguments()) {
             script.format(" %s", ScriptingUtils.protectAgainstShellMetas(argument));
@@ -260,12 +534,14 @@ public class AtUtils {
 
         script.format("PID=$!\n");
 
-        echo(script, "PID", "$PID", tmpFile);
-        script.format("wait $PID\n");
+        echo(script, "PID", "$PID", infoFile);
+        echo(script, "RUNNING", "`/usr/bin/date --iso-8601=sec`", infoFile);
 
+        script.format("wait $PID\n");
         script.format("EXIT_CODE=$?\n");
 
-        echo(script, "EXIT", "$EXIT_CODE", tmpFile);
+        echo(script, "DONE", "`/usr/bin/date --iso-8601=sec`", infoFile);
+        echo(script, "EXIT", "$EXIT_CODE", infoFile);
         script.close();
 
         LOGGER.debug("Created job script:{} from description {}", stringBuilder, description);
@@ -273,4 +549,132 @@ public class AtUtils {
         return stringBuilder.toString();
     }
 
+    public static String generateJobInfoScript(JobDescription description, String workingDir, String uniqueID) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        Formatter script = new Formatter(stringBuilder, Locale.US);
+
+        String file = getInfoFile(uniqueID);
+
+        echo(script, "INFO_VERSION", FORMAT_VERSION, file);
+
+        String name = description.getName();
+
+        if (name == null || name.isEmpty()) {
+            name = "xenon";
+        }
+
+        echo(script, "JOBNAME", name, file);
+        echo(script, "WORKDIR", workingDir, file);
+
+        if (description.getQueueName() != null) {
+            echo(script, "QUEUE", description.getQueueName(), file);
+        }
+
+        if (description.getStartTime() != null) {
+            echo(script, "STARTTIME", description.getStartTime(), file);
+        }
+
+        String stdin = getStream(description.getStdin());
+        String stderr = getStream(substituteJobID(description.getStderr(), uniqueID));
+        String stdout = getStream(substituteJobID(description.getStdout(), uniqueID));
+
+        echo(script, "INPUT", stdin, file);
+        echo(script, "OUTPUT", stdout, file);
+        echo(script, "ERROR", stderr, file);
+
+        if (!description.getEnvironment().isEmpty()) {
+            for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
+                echo(script, "ENV", entry.getKey() + "=" + entry.getValue(), file);
+            }
+        }
+
+        echo(script, "EXEC", description.getExecutable(), file);
+
+        for (String argument : description.getArguments()) {
+            echo(script, "EXEC_PARAM", ScriptingUtils.protectAgainstShellMetas(argument), file);
+        }
+
+        echo(script, "SUBMITTED", "`/usr/bin/date --iso-8601=sec`", file);
+        script.close();
+
+        LOGGER.debug("Created job info script:{} from description {}", stringBuilder, description);
+
+        return stringBuilder.toString();
+    }
+
+    public static String generateJobErrorScript(String uniqueID, int exit, String out, String err) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        Formatter script = new Formatter(stringBuilder, Locale.US);
+
+        String file = getInfoFile(uniqueID);
+
+        echo(script, "FAILED", "`/usr/bin/date --iso-8601=sec`", file);
+        echo(script, "EXIT", Integer.toString(exit), file);
+        echo(script, "STDOUT", out, file);
+        echo(script, "STDERR", err, file);
+
+        script.close();
+
+        LOGGER.debug("Created job error script:{} from exit code {} and output: {} error: {}", stringBuilder, exit, out, err);
+
+        return stringBuilder.toString();
+    }
+
+    public static String generateJobIDScript(String jobID, String uniqueID) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        Formatter script = new Formatter(stringBuilder, Locale.US);
+
+        String file = getJobIDFile(jobID);
+
+        script.format("echo %s > %s\n", uniqueID, file);
+        script.close();
+
+        LOGGER.debug("Created job id script:{} from id {} -> {}", stringBuilder, jobID, uniqueID);
+
+        return stringBuilder.toString();
+    }
+
+    public static String generateListingScript() {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        Formatter script = new Formatter(stringBuilder, Locale.US);
+
+        String jobIDFiles = getJobIDFile("*");
+        String infoFiles = getInfoFile("");
+        String statsFiles = getStatsFile("");
+
+        script.format("XENONJOBS=`ls %s 2> /dev/null`\n\n", jobIDFiles);
+        script.format("EXIT_CODE=$?\n\n");
+        script.format("echo AT JOB LIST\n\n");
+        script.format("if [ $EXIT_CODE -ne 0 ]; then\n");
+        script.format("    exit 0\n");
+        script.format("fi\n\n");
+        script.format("for XENONJOB in $XENONJOBS\n");
+        script.format("do\n");
+        script.format("   XENON_INFO_FILE=\"%s\"`cat $XENONJOB`\n", infoFiles);
+        script.format("   XENON_STATS_FILE=\"%s\"`cat $XENONJOB`\n", statsFiles);
+        script.format("   echo \"AT JOB:\" $XENONJOB\n");
+        script.format("   echo \"XENON_JOB_ID:\" `cat $XENONJOB`\n");
+        script.format("   echo \"START_XENON_INFO_FILE:\" $XENON_INFO_FILE\n");
+        script.format("   if [ -f \"$XENON_INFO_FILE\" ]; then\n");
+        script.format("      cat $XENON_INFO_FILE\n");
+        script.format("   fi\n");
+        script.format("   echo \"END_XENON_INFO_FILE:\" $XENON_INFO_FILE\n");
+        script.format("   echo \"START_XENON_STATS_FILE:\" $XENON_STATS_FILE\n");
+        script.format("   if [ -f \"$XENON_STATS_FILE\" ]; then\n");
+        script.format("      cat $XENON_STATS_FILE\n");
+        script.format("   fi\n");
+        script.format("   echo \"END_XENON_STATS_FILE:\" $XENON_STATS_FILE\n");
+        script.format("done\n");
+
+        script.close();
+
+        LOGGER.debug("Created job listing script:{} from id {} -> {}", stringBuilder);
+
+        return stringBuilder.toString();
+
+    }
 }
