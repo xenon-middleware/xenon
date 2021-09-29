@@ -544,7 +544,8 @@ public class AtUtils {
         echo(script, "EXIT", "$EXIT_CODE", infoFile);
         script.close();
 
-        LOGGER.debug("Created job script:{} from description {}", stringBuilder, description);
+        LOGGER.debug("Created job script from tmpID {} description {} and workdir {}:\n--script below this line--\n{}\n--end of script--\n", tmpID, description,
+                workingDir, stringBuilder);
 
         return stringBuilder.toString();
     }
@@ -598,7 +599,8 @@ public class AtUtils {
         echo(script, "SUBMITTED", "`/usr/bin/date --iso-8601=sec`", file);
         script.close();
 
-        LOGGER.debug("Created job info script:{} from description {}", stringBuilder, description);
+        LOGGER.debug("Created job info script from description {} and workdir {}:\n--script below this line--\n{}\n--end of script--\n", description,
+                workingDir, stringBuilder);
 
         return stringBuilder.toString();
     }
@@ -617,7 +619,7 @@ public class AtUtils {
 
         script.close();
 
-        LOGGER.debug("Created job error script:{} from exit code {} and output: {} error: {}", stringBuilder, exit, out, err);
+        LOGGER.debug("Created job error script for id {}:\n--script below this line--\n{}\n--end of script--\n", uniqueID, stringBuilder);
 
         return stringBuilder.toString();
     }
@@ -632,7 +634,7 @@ public class AtUtils {
         script.format("echo %s > %s\n", uniqueID, file);
         script.close();
 
-        LOGGER.debug("Created job id script:{} from id {} -> {}", stringBuilder, jobID, uniqueID);
+        LOGGER.debug("Created job id script for id {} -> {}:\n--script below this line--\n{}\n--end of script--\n", jobID, uniqueID, stringBuilder);
 
         return stringBuilder.toString();
     }
@@ -672,7 +674,7 @@ public class AtUtils {
 
         script.close();
 
-        LOGGER.debug("Created job listing script:{} from id {} -> {}", stringBuilder);
+        LOGGER.debug("Created job listing script:\n--script below this line--\n{}\n--end of script--\n", stringBuilder);
 
         return stringBuilder.toString();
 

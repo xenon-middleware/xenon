@@ -106,7 +106,9 @@ public class CommandRunner {
             out.waitUntilFinished();
             err.waitUntilFinished();
 
-            LOGGER.debug("CommandRunner out: {}\nCommandRunner err: {}\n", out.getResultAsString(), err.getResultAsString());
+            LOGGER.debug("exit:{}", exit);
+            LOGGER.debug("stdout:\n```\n{}```", out.getResultAsString());
+            LOGGER.debug("stderr:\n```\n{}```", err.getResultAsString());
 
         } catch (InterruptedException e) {
             LOGGER.warn("CommandRunner was interrupted before termination!");
