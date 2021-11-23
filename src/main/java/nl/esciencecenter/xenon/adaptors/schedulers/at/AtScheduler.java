@@ -183,10 +183,10 @@ public class AtScheduler extends ScriptingScheduler {
 
         /*
          * RemoteCommandRunner runner = runCommand(null, "atq", new String[0]);
-         * 
+         *
          * if (runner.success()) { return AtUtils.parseATQJobInfo(runner.getStdout(), queues); } else { throw new XenonException(getAdaptorName(),
          * "Failed to get queue status using atq: (" + runner.getExitCode() + ") " + runner.getStderr()); }
-         * 
+         *
          */
 
     }
@@ -340,15 +340,15 @@ public class AtScheduler extends ScriptingScheduler {
 
         /*
          * String state = "UNKNOWN";
-         * 
+         *
          * if (tmp != null) { String queue = tmp.get("queue");
-         * 
+         *
          * if (queue != null) { if (queue.equals("=")) { state = "RUNNING"; } else { state = "PENDING"; } } } else if
          * (jobSeenMap.haveRecentlySeen(jobIdentifier)) { state = "DONE";
-         * 
+         *
          * // TODO: scan target to find the output of the job? } else { throw new NoSuchJobException(ADAPTOR_NAME, "Job " + jobIdentifier +
          * " could not be found!"); }
-         * 
+         *
          * return new JobStatusImplementation(jobIdentifier, "unknown", state, 0, null, state.equals("RUNNING"), state.equals("DONE"), tmp);
          */
     }

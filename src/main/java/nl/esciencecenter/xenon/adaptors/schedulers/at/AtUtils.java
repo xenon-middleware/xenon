@@ -133,28 +133,28 @@ public class AtUtils {
      *
      * These lines have the following syntax:
      *
-     * AT JOB LIST AT JOB: /tmp/xenon.at.jobid.<atID> XENON_JOB_ID: <xenonID> XENON_INFO_FILE: /tmp/xenon.at.info.<xenonID> <content of
-     * /tmp/xenon.at.info.<xenonID>> END_XENON_INFO_FILE: /tmp/xenon.at.info.<xenonID> XENON_STATS_FILE: /tmp/xenon.at.stats.<xenonID> <content of
-     * /tmp/xenon.at.stats.<xenonID>> END_XENON_STATS_FILE: /tmp/xenon.at.stats.<xenonID>
+     * AT JOB LIST AT JOB: /tmp/xenon.at.jobid.{atID} XENON_JOB_ID: {xenonID} XENON_INFO_FILE: /tmp/xenon.at.info.{xenonID} [content of
+     * /tmp/xenon.at.info.{xenonID}] END_XENON_INFO_FILE: /tmp/xenon.at.info.{xenonID} XENON_STATS_FILE: /tmp/xenon.at.stats.{xenonID} [content of
+     * /tmp/xenon.at.stats.{xenonID}] END_XENON_STATS_FILE: /tmp/xenon.at.stats.{xenonID}
      *
      * The parsed output will be split into "jobID", "jobStatus", "JobName", "exitCode" and "Misc" data, which is combined in a Map (each using the respective
      * keys). Each of this Maps is stored is a larger Map using the "jobID" as a key. This larger map is returned as the return value this method.
      *
-     * @param atqOutput
+     * @param output
      *            the output as produced by atq
      * @param queues
      *            the queues to return the jobs for.
      * @return the parsed output
      */
-    public static HashMap<String, Map<String, String>> parseFileDumpJobInfo(String listOutput, Set<String> queues) {
+    public static HashMap<String, Map<String, String>> parseFileDumpJobInfo(String output, Set<String> queues) {
 
         HashMap<String, Map<String, String>> result = new HashMap<>();
 
-        if (listOutput == null || listOutput.isEmpty()) {
+        if (output == null || output.isEmpty()) {
             return result;
         }
 
-        String[] lines = listOutput.split("\\r?\\n");
+        String[] lines = output.split("\\r?\\n");
 
         if (lines == null || lines.length == 0) {
             LOGGER.warn("Failed to parse script output.");
