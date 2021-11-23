@@ -376,8 +376,9 @@ public class JobQueueScheduler extends Scheduler {
         executor.waitUntilRunning(0);
 
         if (executor.isDone() && !executor.hasRun()) {
-            cleanupJob(executor.getJobIdentifier());
-            throw new XenonException(adaptorName, "Interactive job failed to start!", executor.getError());
+            String id = executor.getJobIdentifier();
+            cleanupJob(id);
+            throw new XenonException(adaptorName, "Interactive job " + id + " failed to start!", executor.getError());
         }
 
         return executor.getStreams();
