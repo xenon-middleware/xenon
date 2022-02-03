@@ -1,0 +1,48 @@
+# This workflow will build a Java project with Gradle
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Unit tests macos-latest
+
+on:
+  push:
+    branches: [ ci_iss680 ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Check gradle version
+      run: ./gradlew --version
+
+    - name: Prepare fixtures
+      run: ./src/liveTest/resources/scripts/create_symlinks
+
+    - name: Run unit and live tests 
+      run: ./gradlew test liveTest -Dxenon.scheduler=local -Dxenon.filesystem=file -Dxenon.filesystem.location=/ -Dxenon.scheduler.location=$PWD -Dxenon.username=$USERNAME -Dxenon.filesystem.basedir=$PWD -Dxenon.filesystem.expected.workdir=/ -Dxenon.scheduler.workdir=$PWD -Dxenon.scheduler.supportsInteractive=1 -Dxenon.scheduler.isEmbedded=1
+
+    - name: Create test reports
+      run: ./gradlew jacocoTestReport jacocoLiveTestReport
+
+    - name: Upload test reports
+      run: | 
+        bash <(curl -s https://codecov.io/bash) -e JDK,OS -F unit -f build/reports/jacoco/test/jacocoTestReport.xml
+        bash <(curl -s https://codecov.io/bash) -e JDK,OS -F livelocal -f build/reports/jacoco/jacocoLiveTestReport/jacocoLiveTestReport.xml
+      env: 
+        OS: osx
+        JDK: openjdk11
+  
+
