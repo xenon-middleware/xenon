@@ -6,24 +6,24 @@
 
 //  PUBLISH ARTIFACTS
 // ==================
-bintray {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_KEY')
-    publish = true
-    pkg {
-        repo = 'xenon'
-        name = 'xenon'
-        desc = description
-        userOrg = 'nlesc'
-        licenses = ['Apache-2.0']
-        websiteUrl = 'https://nlesc.github.io/Xenon'
-        vcsUrl = 'https://github.com/NLeSC/Xenon.git'
-        issueTrackerUrl = 'https://github.com/NLeSC/Xenon/issues'
-    }
-    publications = ['MyPublication']
-}
+//bintray {
+//    user = System.getenv('BINTRAY_USER')
+//    key = System.getenv('BINTRAY_KEY')
+//    publish = true
+//    pkg {
+//        repo = 'xenon'
+//        name = 'xenon'
+//        desc = description
+//        userOrg = 'nlesc'
+//        licenses = ['Apache-2.0']
+//        websiteUrl = 'https://nlesc.github.io/Xenon'
+//        vcsUrl = 'https://github.com/NLeSC/Xenon.git'
+//        issueTrackerUrl = 'https://github.com/NLeSC/Xenon/issues'
+//    }
+//    publications = ['MyPublication']
+//}
 
-tasks.publish.dependsOn 'bintrayUpload'
+//tasks.publish.dependsOn 'bintrayUpload'
 
 // PUBLISH DOCUMENTATION
 
@@ -55,8 +55,8 @@ task publishSite() {
     dependsOn 'versionSite', 'copyJavadoc'
 }
 
-task publishToBintray() {
-    dependsOn 'bintrayUpload',
-        'publishDocGeneratorPublicationPublicationToDocGeneratorRepoRepository',
-        'publishTestApiPublicationPublicationToTestApiRepoRepository'
-}
+// task publishToBintray() {
+//     dependsOn 'bintrayUpload',
+//         'publishDocGeneratorPublicationPublicationToDocGeneratorRepoRepository',
+//         'publishTestApiPublicationPublicationToTestApiRepoRepository'
+// }

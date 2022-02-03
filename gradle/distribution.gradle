@@ -49,6 +49,11 @@ artifacts {
     archives javadocJar
 }
 
+signing {
+    sign configurations.archives
+}
+
+
 // Distributions:
 // 1. for maven, xenon.jar, xenon-sources.jar, xenon-javadoc.jar, published on JCenter
 // 2. tarball, xenon.jar + deps*.jar + javadoc, published on Github release
@@ -85,6 +90,57 @@ installDist.dependsOn javadoc
 
 //     PUBLISH
 // ==============
+
+
+uploadArchives {
+
+  repositories {
+    mavenDeployer {
+
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(userName: System.getenv('OSSRH_USER'), password: System.getenv('OSSRH_KEY'))
+      }
+
+      snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+        authentication(userName: System.getenv('OSSRH_USER'), password: System.getenv('OSSRH_KEY'))
+      }
+
+      pom.project {
+        name 'Xenon'
+        packaging 'jar'
+        // optionally artifactId can be defined here
+        description description
+        url 'https://xenon-middleware.github.io/xenon'
+
+        scm {
+          connection 'scm:git:https://github.com/xenon-middleware/xenon.git'
+          developerConnection 'scm:git:https://github.com/xenon-middleware/xenon.git'
+          url 'https://github.com/xenon-middleware/xenon'
+        }
+
+        licenses {
+          license {
+            name 'The Apache License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          }
+        }
+
+        developers {
+          developer {
+            id 'jmaassen'
+            name 'Jason Maassen'
+            email 'j.maassen@esciencecenter.nl'
+          }
+        }
+      }
+    }
+  }
+}
+
+
+/*
 publishing {
     publications {
         MyPublication(MavenPublication) {
@@ -195,3 +251,4 @@ publishing {
         }
     }
 }
+*/

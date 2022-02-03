@@ -6,8 +6,10 @@ plugins {
     id 'java'
     id 'distribution'
     // publishing
-    id 'maven-publish'
-    id 'com.jfrog.bintray' version '1.8.2'
+    id 'maven'
+    id 'signing'
+//    id 'maven-publish'
+//    id 'com.jfrog.bintray' version '1.8.2'
     // ide
     id 'idea'
     id 'eclipse'
@@ -38,7 +40,6 @@ apply from: 'gradle/license.gradle'
 repositories {
     mavenLocal()
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
