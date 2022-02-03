@@ -24,11 +24,26 @@ jobs:
     - name: Run unit tests 
       run: ./gradlew test
 
-    - name: Generate test reports and upload to codecov
-      run: | 
-        ./gradlew jacocoTestReport 
-        bash <(curl -s https://codecov.io/bash) -e JDK,OS -F unit -f build/reports/jacoco/test/jacocoTestReport.xml;
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        directory: ./build/reports/jacoco/test/
+        env_vars: OS,JDK
+        fail_ci_if_error: true
+        files: ./jacocoTestReport.xml
+        flags: unit
+        name: codecov-umbrella
+        path_to_write_report: ./coverage/codecov_report.txt
+        verbose: true
       env: 
         OS: linux
         JDK: openjdk11
+
+#    - name: Generate test reports and upload to codecov
+#      run: | 
+#        ./gradlew jacocoTestReport 
+#        bash <(curl -s https://codecov.io/bash) -e JDK,OS -F unit -f build/reports/jacoco/test/jacocoTestReport.xml;
+#      env: 
+#        OS: linux
+#        JDK: openjdk11
 
