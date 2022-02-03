@@ -30,7 +30,7 @@ jobs:
         directory: ./build/reports/jacoco/test/
         env_vars: OS,JDK
         fail_ci_if_error: true
-        files: ./jacocoTestReport.xml
+        files: /home/runner/work/xenon/xenon/build/reports/jacoco/test/jacocoTestReport.xml
         flags: unit
         name: codecov-umbrella
         verbose: true
