@@ -5,7 +5,7 @@ name: Fixed client tests
 
 on:
   push:
-    branches: [ ci_iss680 ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -28,11 +28,27 @@ jobs:
       run: ./src/fixedClientEnvironmentTest/resources/run-fixed-client-environment-test.sh
       shell: bash
 
-    - name: Generate test reports and upload them
-      run: | 
-        ./gradlew jacocoFixedClientEnvironmentTestReport
-        bash <(curl -s https://codecov.io/bash) -e JDK,OS -F fixedclientenvironment -f build/reports/jacoco/jacocoFixedClientEnvironmentTestReport/jacocoFixedClientEnvironmentTestReport.xml
-      env: 
+    - name: Generate test reports
+      run: ./gradlew jacocoFixedClientEnvironmentTestReport
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        env_vars: OS,JDK
+        fail_ci_if_error: true
+        files: ./build/reports/jacoco/jacocoFixedClientEnvironmentTestReport/jacocoFixedClientEnvironmentTestReport.xml
+        flags: fixedclientenvironment
+        name: codecov-umbrella
+        verbose: true
+      env:
         OS: linux
         JDK: openjdk11
+
+#    - name: Generate test reports and upload them
+#      run: | 
+#        ./gradlew jacocoFixedClientEnvironmentTestReport
+#        bash <(curl -s https://codecov.io/bash) -e JDK,OS -F fixedclientenvironment -f build/reports/jacoco/jacocoFixedClientEnvironmentTestReport/jacocoFixedClientEnvironmentTestReport.xml
+#      env: 
+#        OS: linux
+#        JDK: openjdk11
 

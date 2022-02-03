@@ -24,11 +24,27 @@ jobs:
     - name: Run integration tests 
       run: ./gradlew integrationTest
 
-    - name: Generate test reports and upload to codecov
-      run: | 
-        ./gradlew jacocoIntegrationTestReport 
-        bash <(curl -s https://codecov.io/bash) -e JDK,OS -F integration -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml
-      env: 
+    - name: Generate test reports
+      run: ./gradlew jacocoIntegrationTestReport 
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        env_vars: OS,JDK
+        fail_ci_if_error: true
+        files: ./build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml
+        flags: integration
+        name: codecov-umbrella
+        verbose: true
+      env:
         OS: linux
         JDK: openjdk11
+
+#    - name: Generate test reports and upload to codecov
+#      run: | 
+#        ./gradlew jacocoIntegrationTestReport 
+#        bash <(curl -s https://codecov.io/bash) -e JDK,OS -F integration -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml
+#      env: 
+#        OS: linux
+#        JDK: openjdk11
 

@@ -5,7 +5,7 @@ name: Unit tests windows-latest
 
 on:
   push:
-    branches: [ ci_iss680 ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -44,18 +44,45 @@ jobs:
     - name: Create test reports
       run: ./gradlew jacocoTestReport jacocoLiveTestReport
 
-    - name: Set up Python 3.x
-      uses: actions/setup-python@v2
+    - name: Upload unit coverage to Codecov
+      uses: codecov/codecov-action@v2
       with:
-        python-version: '3.x'
-
-    - name: Install codecov
-      run: pip install codecov
-
-    - name: Upload test reports
-      run: |
-        codecov -e OS,JDK -F unit -f build\reports\jacoco\test\jacocoTestReport.xml
-        codecov -e OS,JDK,INTEGRATION_TEST -F livelocal -f build\reports\jacoco\jacocoLiveTestReport\jacocoLiveTestReport.xml
-      env: 
+        env_vars: OS,JDK
+        fail_ci_if_error: true
+        files: ./build/reports/jacoco/test/jacocoTestReport.xml
+        flags: unit
+        name: codecov-umbrella
+        verbose: true
+      env:
         OS: windows
         JDK: openjdk11
+
+    - name: Upload live coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        env_vars: OS,JDK,INTEGRATION_TEST
+        fail_ci_if_error: true
+        files: ./build/reports/jacoco/jacocoLiveTestRepost/jacocoLiveTestReport.xml
+        flags: livelocal
+        name: codecov-umbrella
+        verbose: true
+      env:
+        OS: windows
+        JDK: openjdk11
+
+
+#    - name: Set up Python 3.x
+#      uses: actions/setup-python@v2
+#      with:
+#        python-version: '3.x'
+
+#    - name: Install codecov
+#      run: pip install codecov
+
+#    - name: Upload test reports
+#      run: |
+#        codecov -e OS,JDK -F unit -f build\reports\jacoco\test\jacocoTestReport.xml
+#        codecov -e OS,JDK,INTEGRATION_TEST -F livelocal -f build\reports\jacoco\jacocoLiveTestReport\jacocoLiveTestReport.xml
+#      env: 
+#        OS: windows
+#        JDK: openjdk11
