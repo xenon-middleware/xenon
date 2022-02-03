@@ -62,7 +62,7 @@ jobs:
       with:
         env_vars: OS,JDK,INTEGRATION_TEST
         fail_ci_if_error: true
-        files: ./build/reports/jacoco/jacocoLiveTestRepost/jacocoLiveTestReport.xml
+        files: ./build/reports/jacoco/jacocoLiveTestReport/jacocoLiveTestReport.xml
         flags: livelocal
         name: codecov-umbrella
         verbose: true
