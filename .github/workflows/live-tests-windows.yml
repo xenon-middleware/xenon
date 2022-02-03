@@ -12,7 +12,7 @@ on:
 jobs:
   build:
 
-    name: Build on Windows and run unit tests
+    name: Build on Windows and run live tests
 
     runs-on: windows-latest
 
@@ -28,22 +28,33 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
+    - name: Prepare fixtures 
+      run: | 
+         mkdir build\integrationTest
+         cd build\integrationTest 
+         dir
+         ..\..\src\liveTest\resources\scripts\create_symlinks.bat 
+         dir
+         cd ..\..
+      shell: cmd
+
     - name: Build with Gradle and run unit and live tests
-      run: .\gradlew.bat test 
+      run: .\gradlew.bat liveTest "-Dxenon.scheduler=local" "-Dxenon.scheduler.location=D:\a\xenon\xenon" "-Dxenon.filesystem=file" "-Dxenon.filesystem.location=D:\a\xenon\xenon" "-Dxenon.username=xenon" "-Dxenon.filesystem.basedir=\a\xenon\xenon\build\integrationTest" "-Dxenon.separator=\" "-Dxenon.filesystem.expected.workdir=\a\xenon\xenon" "-Dxenon.scheduler.workdir=\a\xenon\xenon" "-Dxenon.scheduler.supportsInteractive=1" "-Dxenon.scheduler.isEmbedded=1"
 
     - name: Create test reports
-      run: ./gradlew jacocoTestReport 
+      run: ./gradlew jacocoLiveTestReport
 
     - name: Upload unit coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
         env_vars: OS,JDK
         fail_ci_if_error: true
-        files: ./build/reports/jacoco/test/jacocoTestReport.xml
-        flags: unit
+        files: ./build/reports/jacoco/jacocoLiveTestReport/jacocoLiveTestReport.xml
+        flags: livelocal
         name: codecov-umbrella
         verbose: true
       env:
         OS: windows
         JDK: openjdk11
+
 
