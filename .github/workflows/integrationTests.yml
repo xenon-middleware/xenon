@@ -5,7 +5,7 @@ name: Integration tests
 
 on:
   push:
-    branches: [ ci_iss680 ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
