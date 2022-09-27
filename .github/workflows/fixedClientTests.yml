@@ -21,9 +21,6 @@ jobs:
       with:
         java-version: 11
 
-    - name: Build code
-      run: ./gradlew assemble
-
     - name: Run fixed client tests 
       run: ./src/fixedClientEnvironmentTest/resources/run-fixed-client-environment-test.sh
       shell: bash
