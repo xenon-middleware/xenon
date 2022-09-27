@@ -17,7 +17,7 @@
 version: '3'
 services:
   webdav:
-    image: nlesc/xenon-webdav
+    image: xenonmiddleware/webdav
     ports:
     - 80
     - 443

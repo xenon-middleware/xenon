@@ -90,8 +90,9 @@ public class RemoteCommandRunner {
 
         long runtime = System.currentTimeMillis() - start;
 
-        LOGGER.debug("CommandRunner took {} ms, executable = {}, arguments = {}, exitcode = {}, stdout:\n{}\nstderr:\n{}", runtime, executable, arguments,
-                exitCode, output, error);
+        LOGGER.debug("Remote command took {} ms, executable = {}, arguments = {}, exitcode = {}", runtime, executable, arguments, exitCode);
+        LOGGER.debug("Remote command stdout:\n--output below this line--\n{}--end of output--", output);
+        LOGGER.debug("Remote command stderr:\n--output below this line--\n{}--end of output--", error);
     }
 
     public String getStdout() {

@@ -17,7 +17,7 @@
 version: '3'
 services:
   ftp:
-    image: nlesc/xenon-ftp
+    image: xenonmiddleware/ftp
     ports:
     - 21
     - "3000-3100:3000-3100"

@@ -21,6 +21,7 @@ import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.Map;
 
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,9 +96,12 @@ public class FtpFileAdaptor extends FileAdaptor {
 
         try {
             ftpClient.enterLocalPassiveMode();
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
         } catch (Exception e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to switch to PASSIVE mode");
         }
+
+        LOGGER.debug("Connected to {}", uri);
 
         return ftpClient;
     }
@@ -141,6 +145,8 @@ public class FtpFileAdaptor extends FileAdaptor {
             }
             throw e;
         }
+
+        LOGGER.debug("CWD is {}", cwd);
 
         return new FtpFileSystem(getNewUniqueID(), ADAPTOR_NAME, location, new Path(cwd), (int) bufferSize, ftpClient, credential, this, xp);
     }

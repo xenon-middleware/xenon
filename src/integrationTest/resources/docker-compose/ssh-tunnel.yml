@@ -20,21 +20,21 @@ services:
   ssh1:
 #    healthcheck:
 #       disable: true
-    image: nlesc/xenon-ssh
+    image: xenonmiddleware/ssh
     hostname: ssh1
     ports:
     - "1000:22" # ssh
   ssh2:
 #    healthcheck:
 #       disable: true
-    image: nlesc/xenon-ssh
+    image: xenonmiddleware/ssh
     hostname: ssh2
     ports:
     - "2000:22" # ssh
   ssh3:
 #    healthcheck:
 #       disable: true
-    image: nlesc/xenon-ssh
+    image: xenonmiddleware/ssh
     hostname: ssh3
     ports:
     - "3000:22" # ssh

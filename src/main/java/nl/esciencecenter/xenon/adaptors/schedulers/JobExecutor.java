@@ -17,6 +17,9 @@ package nl.esciencecenter.xenon.adaptors.schedulers;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.filesystems.FileSystem;
 import nl.esciencecenter.xenon.filesystems.Path;
@@ -29,6 +32,8 @@ import nl.esciencecenter.xenon.utils.LocalFileSystemUtils;
  *
  */
 public class JobExecutor implements Runnable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobExecutor.class);
 
     private static final String PENDING_STATE = "PENDING";
     private static final String RUNNING_STATE = "RUNNING";
@@ -82,6 +87,9 @@ public class JobExecutor implements Runnable {
         this.factory = factory;
         this.pollingDelay = pollingDelay;
         this.startupTimeout = startupTimeout;
+
+        LOGGER.debug("{}/{} new JobExecutor interactive={} pollingDelay={} startupTimeout={} Jobdescription={}", adaptorName, jobIdentifier, interactive,
+                pollingDelay, startupTimeout, description);
     }
 
     public synchronized boolean hasRun() {
@@ -176,6 +184,8 @@ public class JobExecutor implements Runnable {
 
         long leftover = deadline - System.currentTimeMillis();
 
+        LOGGER.debug("{}/{} waiting for job to START timeout={} leftover={} state={}", adaptorName, jobIdentifier, timeout, leftover, state);
+
         while (leftover > 0 && PENDING_STATE.equals(state)) {
             try {
                 wait(leftover);
@@ -188,6 +198,8 @@ public class JobExecutor implements Runnable {
             leftover = deadline - System.currentTimeMillis();
         }
 
+        LOGGER.debug("{}/{} done waiting for job to START {}", adaptorName, jobIdentifier, getStatus());
+
         return getStatus();
     }
 
@@ -198,6 +210,8 @@ public class JobExecutor implements Runnable {
         triggerStatusUpdate();
 
         long leftover = deadline - System.currentTimeMillis();
+
+        LOGGER.debug("{}/{} waiting for job to FINISH timeout={} leftover={} state={}", adaptorName, jobIdentifier, timeout, leftover, state);
 
         while (leftover > 0 && !done) {
 
@@ -212,6 +226,8 @@ public class JobExecutor implements Runnable {
             leftover = deadline - System.currentTimeMillis();
 
         }
+
+        LOGGER.debug("{}/{} done waiting for job to FINISH {}", adaptorName, jobIdentifier, getStatus());
 
         return getStatus();
     }
@@ -314,8 +330,11 @@ public class JobExecutor implements Runnable {
     public void run() {
         Process process;
 
+        LOGGER.debug("{}/{} starting job", adaptorName, jobIdentifier);
+
         if (getKilled()) {
             updateState(KILLED_STATE, -1, new JobCanceledException(adaptorName, "Process cancelled by user."));
+            LOGGER.debug("{}/{} KILLED before start", adaptorName, jobIdentifier);
             return;
         }
 
@@ -326,6 +345,8 @@ public class JobExecutor implements Runnable {
             endTime = System.currentTimeMillis() + maxTime * MILLISECONDS_PER_MINUTE;
         }
 
+        LOGGER.debug("{}/{} endTime set to {}", adaptorName, jobIdentifier, endTime);
+
         try {
             // Retrieve the filesystem that goes with the scheduler and resolve the workdir if needed.
             Path workdir = processPath(workingDirectory, description.getWorkingDirectory());
@@ -335,31 +356,39 @@ public class JobExecutor implements Runnable {
             }
 
             if (interactive) {
+                LOGGER.debug("{}/{} starting interactive process", adaptorName, jobIdentifier);
                 InteractiveProcess p = factory.createInteractiveProcess(description, workdir.toString(), jobIdentifier, startupTimeout);
                 setStreams(p.getStreams());
                 process = p;
             } else {
+                LOGGER.debug("{}/{} starting batch process", adaptorName, jobIdentifier);
                 process = new BatchProcess(filesystem, workdir, description, jobIdentifier, factory, startupTimeout);
             }
         } catch (XenonException e) {
+            LOGGER.debug("{}/{} ERROR {}", adaptorName, jobIdentifier, e);
             updateState(ERROR_STATE, -1, e);
             return;
         } catch (IOException e) {
+            LOGGER.debug("{}/{} ERROR {}", adaptorName, jobIdentifier, e);
             updateState(ERROR_STATE, -1, new XenonException(adaptorName, "Error starting job.", e));
             return;
         }
 
         updateState(RUNNING_STATE, -1, null);
 
+        LOGGER.debug("{}/{} RUNNING");
+
         while (true) {
 
             if (process.isDone()) {
+                LOGGER.debug("{}/{} DONE with exit {}", process.getExitStatus());
                 updateState(DONE_STATE, process.getExitStatus(), null);
                 return;
             }
 
             if (getKilled()) {
                 // Destroy first, update state last, otherwise we have a race condition!
+                LOGGER.debug("{}/{} KILLED (after start)");
                 process.destroy();
                 updateState(KILLED_STATE, -1, new JobCanceledException(adaptorName, "Process cancelled by user."));
                 return;
@@ -367,6 +396,7 @@ public class JobExecutor implements Runnable {
 
             if (maxTime > 0 && System.currentTimeMillis() > endTime) {
                 // Destroy first, update state last, otherwise we have a race condition!
+                LOGGER.debug("{}/{} KILLED (ran out of time)");
                 process.destroy();
                 updateState(KILLED_STATE, -1, new JobCanceledException(adaptorName, "Process timed out."));
                 return;
@@ -375,6 +405,8 @@ public class JobExecutor implements Runnable {
             clearUpdateRequest();
 
             sleep(pollingDelay);
+
+            LOGGER.trace("{}/{} polling");
         }
     }
 

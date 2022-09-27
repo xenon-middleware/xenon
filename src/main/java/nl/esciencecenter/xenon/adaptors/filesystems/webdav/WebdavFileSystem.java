@@ -243,9 +243,6 @@ public class WebdavFileSystem extends FileSystem {
         Path absPath = toAbsolutePath(path);
 
         try {
-            System.out.println("Exists: " + getDirectoryPath(absPath));
-            System.out.println("Exists: " + getFilePath(absPath));
-
             return client.exists(getDirectoryPath(absPath)) || client.exists(getFilePath(absPath));
         } catch (IOException e) {
             throw new XenonException(ADAPTOR_NAME, "Failed to check existence of directory: " + absPath, e);

@@ -450,9 +450,19 @@ public abstract class SchedulerTestParent {
         String jobID = scheduler.submitBatchJob(getSleepJob(queueNames[0], 1));
 
         JobStatus status = scheduler.waitUntilDone(jobID, 5000);
-
         assertNotNull(status);
         Assert.assertEquals(jobID, status.getJobIdentifier());
+
+        // NOTE: Some schedulers have issues changing the job status to "finished" quickly enough. Therefore, we retry a number of times.
+        int retry = 1;
+
+        while (retry < 12 && !status.isDone()) {
+            retry++;
+            status = scheduler.waitUntilDone(jobID, 5000);
+            assertNotNull(status);
+            Assert.assertEquals(jobID, status.getJobIdentifier());
+        }
+
         assertTrue(status.isDone());
 
         // Wait for a while and see if we can still get the job info.

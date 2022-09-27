@@ -395,7 +395,9 @@ public class SftpFileSystem extends FileSystem {
         result.setOwner(attributes.getOwner());
 
         // assume UNIX-like filesystem
-        result.setHidden(path.getFileNameAsString().startsWith("."));
+        if (!path.isEmpty()) {
+            result.setHidden(path.getFileNameAsString().startsWith("."));
+        }
 
         return result;
     }
