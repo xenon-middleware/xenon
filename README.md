@@ -1,11 +1,11 @@
 
 # Xenon
 
-[![Unit tests linux](https://github.com/xenon-middleware/xenon/actions/workflows/unitTests.yml/badge.svg)
-[![Unit tests windows](https://github.com/xenon-middleware/xenon/actions/workflows/tests-windows.yml/badge.svg)
-[![Unit tests macos](https://github.com/xenon-middleware/xenon/actions/workflows/tests-macos.yml/badge.svg)
-[![Integration tests](https://github.com/xenon-middleware/xenon/actions/workflows/integrationTests.yml/badge.svg)
-[![Fixed client tests](https://github.com/xenon-middleware/xenon/actions/workflows/fixedClientTests.yml/badge.svg)
+[![Unit tests linux](https://github.com/xenon-middleware/xenon/actions/workflows/unitTests.yml/badge.svg)](https://github.com/xenon-middleware/xenon/actions/workflows/unitTests.yml)
+[![Unit tests windows](https://github.com/xenon-middleware/xenon/actions/workflows/tests-windows.yml/badge.svg)](https://github.com/xenon-middleware/xenon/actions/workflows/tests-windows.yml)
+[![Unit tests macos](https://github.com/xenon-middleware/xenon/actions/workflows/tests-macos.yml/badge.svg)](https://github.com/xenon-middleware/xenon/actions/workflows/tests-macos.yml)
+[![Integration tests](https://github.com/xenon-middleware/xenon/actions/workflows/integrationTests.yml/badge.svg)](https://github.com/xenon-middleware/xenon/actions/workflows/integrationTests.yml)
+[![Fixed client tests](https://github.com/xenon-middleware/xenon/actions/workflows/fixedClientTests.yml/badge.svg)](https://github.com/xenon-middleware/xenon/actions/workflows/fixedClientTests.yml)
 [![codecov](https://codecov.io/gh/xenon-middleware/xenon/branch/master/graph/badge.svg)](https://codecov.io/gh/xenon-middleware/xenon)
 [![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=xenon-middleware_xenon&metric=alert_status)](https://sonarcloud.io/dashboard?id=xenon-middleware_xenon)
 [![cffvalidation]( https://github.com/xenon-middleware/xenon/actions/workflows/cffconvert.yml/badge.svg)
