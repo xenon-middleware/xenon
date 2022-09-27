@@ -19,9 +19,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.sshd.client.channel.ChannelExec;
 import org.apache.sshd.client.future.OpenFuture;
+import org.apache.sshd.common.channel.PtyChannelConfigurationHolder;
 import org.apache.sshd.common.future.SshFutureListener;
 
 public class MockChannelExec extends ChannelExec {
@@ -32,10 +34,10 @@ public class MockChannelExec extends ChannelExec {
 
     public boolean closeThrows = false;
 
-    public HashMap<String, String> env = new HashMap<>();
+    public HashMap<String, Object> env = new HashMap<>();
 
-    public MockChannelExec(String command) {
-        super(command);
+    public MockChannelExec(String command, PtyChannelConfigurationHolder configHolder, Map<String, ?> env) {
+        super(command, configHolder, env);
         this.command = command;
     }
 
@@ -45,8 +47,8 @@ public class MockChannelExec extends ChannelExec {
     }
 
     @Override
-    public void setEnv(String key, String value) {
-        env.put(key, value);
+    public Object setEnv(String key, Object value) {
+        return env.put(key, value);
     }
 
     @Override

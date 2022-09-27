@@ -230,11 +230,24 @@ final class GridEngineUtils {
         ScriptingUtils.verifyJobInfo(info, jobIdentifier, ADAPTOR_NAME, "jobnumber", "jobname", "exit_status", "failed");
 
         String name = info.get("jobname");
-        String exitcodeString = info.get("exit_status");
+        String exitcodeString = info.get("exit_status").trim();
         String failedString = info.get("failed");
 
+        // Parse the exit code. Note that GridEngine return something like "123" while son-of-gridengine returns something like "137 (Killed)". We'll
+        // Attempt to figure out what we are looking at and parse that.
+
+        if (exitcodeString == null || exitcodeString.length() == 0) {
+            throw new XenonException(ADAPTOR_NAME, "cannot parse exit code of job " + jobIdentifier + " from empty string");
+        }
+
+        if (exitcodeString.matches(".*\\s.*")) {
+            // contains whitespace. Assume first substring is the exit code.
+            exitcodeString = exitcodeString.split("\\s+")[0];
+        }
+
+        // no whitespace (left), assume whole string is the exit code.
         try {
-            exitcode = Integer.parseInt(info.get("exit_status"));
+            exitcode = Integer.parseInt(exitcodeString);
         } catch (NumberFormatException e) {
             throw new XenonException(ADAPTOR_NAME, "cannot parse exit code of job " + jobIdentifier + " from string " + exitcodeString, e);
         }

@@ -18,7 +18,7 @@
 version: '3'
 services:
   torque:
-    image: nlesc/xenon-torque
+    image: xenonmiddleware/torque
     hostname: xenon-torque
     ports:
     - 22 # ssh

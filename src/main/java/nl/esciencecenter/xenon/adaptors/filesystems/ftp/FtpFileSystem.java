@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -311,7 +312,15 @@ public class FtpFileSystem extends FileSystem {
     public boolean exists(Path path) throws XenonException {
 
         try {
-            getFTPFileInfo(toAbsolutePath(path));
+            Path tmp = toAbsolutePath(path);
+
+            if (tmp.isEmpty()) {
+                // special case for root. We assume it always exists.
+                return true;
+            }
+
+            // otherwise, we try to get stats on the file or directory
+            getFTPFileInfo(tmp);
             return true;
         } catch (NoSuchPathException e) {
             return false;
@@ -326,11 +335,27 @@ public class FtpFileSystem extends FileSystem {
 
         String name = path.getFileNameAsString();
 
-        for (FTPFile f : files) {
+        if (path.isEmpty()) {
+            // special case for the root directory
+            // Some FTP servers show the "." directory so lets use that as a name.
+            name = ".";
+        }
 
+        for (FTPFile f : files) {
             if (f != null && f.getName().equals(name)) {
                 return f;
             }
+        }
+
+        if (path.isEmpty()) {
+            // special case for the root directory
+            // Even though the root dir exists, there no way to get any info on it in some FTP servers. So we'll just return a default here.
+            FTPFile tmp = new FTPFile();
+            tmp.setType(FTPFile.DIRECTORY_TYPE);
+            Calendar time = Calendar.getInstance();
+            time.setTimeInMillis(0);
+            tmp.setTimestamp(time);
+            return tmp;
         }
 
         throw new NoSuchPathException(ADAPTOR_NAME, "Path not found: " + path);

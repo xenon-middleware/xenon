@@ -1,7 +1,38 @@
-Xenon 3.0.0
+Xenon 3.1.0
 -----------
 
-This is release 3.0.0 of Xenon.
+This is release 3.1.0 of Xenon.
+
+Notable changes compared to v3.0.4:
+-----------------------------------
+
+- improved error state returned by getJobStatusses to show the difference between no job and connection loss.
+- added support for slurm 19
+- added heartbeat in the SSH adaptor quickly detect lost connections.
+- moved to version 2.4.0 of SSHD 
+
+Notable changes compared to v3.0.3:
+-----------------------------------
+
+- fixed bug in FTP adaptor when listing the root directory
+- fixed bug in SFTP adaptor when listing the root directory
+
+Notable changes compared to v3.0.2:
+-----------------------------------
+
+- fixed the FTP adaptor which lost bytes due to being in ASCII mode 
+- fixed the numbering in this changelog
+
+Notable changes compared to v3.0.1:
+-----------------------------------
+
+- updated jaxb dependencies to prevent illegal access warning from JVM
+- removed leftover debug print in webdav 
+
+Notable changes compared to v3.0.0:
+-----------------------------------
+
+- fixed minute delay on shutdown when SSH adaptor was used (discussed as part of #654).
 
 Notable changes compared to v2.6.2:
 -----------------------------------

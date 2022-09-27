@@ -45,7 +45,7 @@ public class MockFileSystem extends FileSystem {
 
         @Override
         public synchronized boolean isCancelled() {
-            return (bytesCopied >= maxBytes);
+            return (getBytesCopied() >= maxBytes);
         }
     }
 

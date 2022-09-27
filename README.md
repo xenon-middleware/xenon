@@ -6,11 +6,12 @@
 [![codecov](https://codecov.io/gh/xenon-middleware/xenon/branch/master/graph/badge.svg)](https://codecov.io/gh/xenon-middleware/xenon)
 [![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=xenon-middleware_xenon&metric=alert_status)](https://sonarcloud.io/dashboard?id=xenon-middleware_xenon)
 [![GitHub license](https://img.shields.io/badge/license-Apache--2.0%20-blue.svg)](https://github.com/xenon-middleware/xenon/blob/master/LICENSE)
-[![Download](https://jitpack.io/v/xenon-middleware/xenon.svg)](https://jitpack.io/#xenon-middleware/xenon)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.597993.svg)](https://doi.org/10.5281/zenodo.597993)
 [![Research Software Directory](https://img.shields.io/badge/rsd-xenon-00a3e3.svg)](https://www.research-software.nl/software/xenon)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3692/badge)](https://bestpractices.coreinfrastructure.org/projects/3692)
+[![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)
 
-Copyright 2013-2019 The Netherlands eScience Center
+Copyright 2013-2021 The Netherlands eScience Center
 
 ## What problem does Xenon solve?
 
@@ -90,14 +91,14 @@ and
 
 ```gradle
 	dependencies {
-	        compile group: 'nl.esciencecenter.xenon', name: 'xenon', version: '3.0.0'
+	        compile group: 'nl.esciencecenter.xenon', name: 'xenon', version: '3.1.0'
 	}
 
 ```
 
 This will give the core adaptors to get cloud, grid and hadoop adaptors add the following dependencies:
 ```gradle
-    compile group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-cloud', version: '3.0.0'
+    compile group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-cloud', version: '3.0.2'
     compile group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-grid', version: '3.0.0'
     compile group: 'nl.esciencecenter.xenon.adaptors', name: 'xenon-adaptors-hadoop', version: '3.0.0'
 ```
@@ -124,7 +125,7 @@ public class CopyFileLocalToSftpAbsolutePaths {
         // requires credentials, so we need to create those too.
         //
         // Assume the remote system is actually just a Docker container (e.g.
-        // https://hub.docker.com/r/nlesc/xenon-ssh/), accessible via
+        // https://hub.docker.com/r/xenonmiddleware/ssh/), accessible via
         // port 10022 on localhost
         String location = "localhost:10022";
         String username = "xenon";
@@ -171,7 +172,7 @@ public class SlurmSubmitWordCountJob {
     public static void main(String[] args) throws Exception {
 
         // Assume the remote system is actually just a Docker container (e.g.
-        // https://hub.docker.com/r/nlesc/xenon-slurm/), accessible to user 'xenon' via
+        // https://hub.docker.com/r/xenonmiddleware/slurm/), accessible to user 'xenon' via
         // port 10022 on localhost, using password 'javagat'
         String location = "localhost:10022";
         String username = "xenon";
@@ -202,7 +203,7 @@ public class SlurmSubmitWordCountJob {
 }
 ```
 
-The output of the job will be written to ``/tmp/wc.stdout.txt`` file in the ``nlesc/xenon-slurm`` Docker container.
+The output of the job will be written to ``/tmp/wc.stdout.txt`` file in the ``xenonmiddleware/slurm`` Docker container.
 
 For more examples, see the tutorial at [Read The Docs](http://xenonrse2017.readthedocs.io/).
 
@@ -210,7 +211,10 @@ For more examples, see the tutorial at [Read The Docs](http://xenonrse2017.readt
 
 Xenon's JavaDoc is available online at <http://xenon-middleware.github.io/xenon/>.
 
+## Documentation for maintainers
+
 For developers of Xenon itself 
+
 * see [RELEASE.md](RELEASE.md) how to perform a release.
 * see [ADAPTOR_DEVELOPMENT.md](ADAPTOR_DEVELOPMENT.md) how to write a new adaptor.
 

@@ -642,6 +642,24 @@ public class SlurmUtilsTest {
     }
 
     @Test
+    public void test_generateInterActiveSchedulerArguments() {
+        Path entry = new Path("/entry");
+        UUID tag = new UUID(0, 42);
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("exec");
+        description.setSchedulerArguments(new String[] { "--nodelist=node-2" });
+        description.setArguments(new String[] { "a", "b", "c" });
+
+        String[] expected = new String[] { "--quiet", "--job-name=" + tag.toString(), "--ntasks=1", "--cpus-per-task=1", "--time=15", "--nodelist=node-2",
+                "exec", "a", "b", "c" };
+
+        String[] result = SlurmUtils.generateInteractiveArguments(description, entry, tag, 15);
+
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
     public void test_generateInterActiveMemory() {
         Path entry = new Path("/entry");
         UUID tag = new UUID(0, 42);
@@ -855,7 +873,7 @@ public class SlurmUtilsTest {
         description.setEnvironment(env);
         description.setStartPerTask();
 
-        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH --workdir='" + entry.resolve("workdir").toString() + "'\n"
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name='xenon'\n" + "#SBATCH -D '" + entry.resolve("workdir").toString() + "'\n"
                 + "#SBATCH --partition=queue\n" + "#SBATCH --ntasks=1\n" + "#SBATCH --cpus-per-task=1\n" + "#SBATCH --time=15\n" + "#SBATCH --input='in.txt'\n"
                 + "#SBATCH --output='out.txt'\n" + "#SBATCH --error='err.txt'\n" + "export key1=\"value1\"\n" + "export key2=\"value2\"\n" + "\n"
                 + "srun exec 'a' 'b' 'c'\n";

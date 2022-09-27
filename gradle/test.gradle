@@ -6,7 +6,7 @@
 
 liveTest.description = 'Runs the integration tests against live systems'
 integrationTest.description = 'Run the integration tests against docker containers'
-fixedClientEnvironmentTest.description = 'Run the integration tests within and against docker containers, should be run within `nlesc/xenon-fixed-client` docker container'
+fixedClientEnvironmentTest.description = 'Run the integration tests within and against docker containers, should be run within `xenonmiddleware/fixed-client` docker container'
 
 // Never up to date, can not verify same config/props/remote is used second time
 liveTest.outputs.upToDateWhen {

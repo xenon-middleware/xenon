@@ -46,12 +46,10 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
-
-        assertEquals("MockS", s.getAdaptorName());
-
-        s.end();
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
+            assertEquals("MockS", s.getAdaptorName());
+        }
     }
 
     @Test(expected = BadParameterException.class)
@@ -91,12 +89,10 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
-
-        assertEquals("single", s.getDefaultQueueName());
-
-        s.end();
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
+            assertEquals("single", s.getDefaultQueueName());
+        }
     }
 
     @Test
@@ -106,12 +102,10 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
-
-        assertArrayEquals(new String[] { "single", "multi", "unlimited" }, s.getQueueNames());
-
-        s.end();
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
+            assertArrayEquals(new String[] { "single", "multi", "unlimited" }, s.getQueueNames());
+        }
     }
 
     @Test
@@ -121,10 +115,10 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
-
-        s.getCurrentJobID(); // BS test for coverage.
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
+            s.getCurrentJobID();
+        }
     }
 
     @Test(expected = NoSuchQueueException.class)
@@ -134,18 +128,13 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        ;
-        job.setQueueName("foobar");
-
-        try {
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setQueueName("foobar");
             s.submitBatchJob(job);
-        } finally {
-            s.end();
         }
     }
 
@@ -156,15 +145,11 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-
-        try {
+            JobDescription job = new JobDescription();
             s.submitBatchJob(job);
-        } finally {
-            s.end();
         }
     }
 
@@ -175,16 +160,12 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
-
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        job.setTasks(42);
-        try {
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setTasks(42);
             s.submitBatchJob(job);
-        } finally {
-            s.end();
         }
     }
 
@@ -195,16 +176,12 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
-
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        job.setTasksPerNode(42);
-        try {
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setTasksPerNode(42);
             s.submitBatchJob(job);
-        } finally {
-            s.end();
         }
     }
 
@@ -215,18 +192,13 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        ;
-        job.setMaxRuntime(-3);
-
-        try {
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setMaxRuntime(-3);
             s.submitBatchJob(job);
-        } finally {
-            s.end();
         }
     }
 
@@ -237,18 +209,13 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        ;
-        job.setStdin("/tmp/stdin.txt");
-
-        try {
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setStdin("/tmp/stdin.txt");
             s.submitInteractiveJob(job);
-        } finally {
-            s.end();
         }
     }
 
@@ -259,18 +226,13 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        ;
-        job.setStdout("/tmp/stdout.txt");
-
-        try {
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setStdout("/tmp/stdout.txt");
             s.submitInteractiveJob(job);
-        } finally {
-            s.end();
         }
     }
 
@@ -281,18 +243,13 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        ;
-        job.setStderr("/tmp/stderr.txt");
-
-        try {
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setStderr("/tmp/stderr.txt");
             s.submitInteractiveJob(job);
-        } finally {
-            s.end();
         }
     }
 
@@ -303,15 +260,13 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        String[] result = s.getJobs();
-
-        assertNotNull(result);
-        assertTrue(result.length == 0);
-
-        s.end();
+            String[] result = s.getJobs();
+            assertNotNull(result);
+            assertTrue(result.length == 0);
+        }
     }
 
     @Test
@@ -321,16 +276,15 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        String[] queues = null;
-        String[] result = s.getJobs(queues);
+            String[] queues = null;
+            String[] result = s.getJobs(queues);
 
-        assertNotNull(result);
-        assertTrue(result.length == 0);
-
-        s.end();
+            assertNotNull(result);
+            assertTrue(result.length == 0);
+        }
     }
 
     @Test
@@ -340,22 +294,20 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        ;
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
 
-        String jobID = s.submitBatchJob(job);
+            String jobID = s.submitBatchJob(job);
 
-        String[] result = s.getJobs(new String[0]);
+            String[] result = s.getJobs(new String[0]);
 
-        assertNotNull(result);
-        assertTrue(result.length == 1);
-        assertEquals(jobID, result[0]);
-
-        s.end();
+            assertNotNull(result);
+            assertTrue(result.length == 1);
+            assertEquals(jobID, result[0]);
+        }
     }
 
     @Test(expected = NoSuchQueueException.class)
@@ -365,13 +317,9 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
-
-        try {
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
             s.getJobs("foobar");
-        } finally {
-            s.end();
         }
     }
 
@@ -382,32 +330,31 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        job.setQueueName("multi");
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setQueueName("multi");
 
-        String jobID = s.submitBatchJob(job);
+            String jobID = s.submitBatchJob(job);
 
-        String[] result = s.getJobs("single");
+            String[] result = s.getJobs("single");
 
-        assertNotNull(result);
-        assertTrue(result.length == 0);
+            assertNotNull(result);
+            assertTrue(result.length == 0);
 
-        result = s.getJobs("multi");
+            result = s.getJobs("multi");
 
-        assertNotNull(result);
-        assertTrue(result.length == 1);
-        assertEquals(jobID, result[0]);
+            assertNotNull(result);
+            assertTrue(result.length == 1);
+            assertEquals(jobID, result[0]);
 
-        result = s.getJobs("unlimited");
+            result = s.getJobs("unlimited");
 
-        assertNotNull(result);
-        assertTrue(result.length == 0);
-
-        s.end();
+            assertNotNull(result);
+            assertTrue(result.length == 0);
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -417,13 +364,9 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
-
-        try {
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
             s.getJobStatus(null);
-        } finally {
-            s.end();
         }
     }
 
@@ -434,13 +377,9 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
-
-        try {
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
             s.getJobStatus(null);
-        } finally {
-            s.end();
         }
     }
 
@@ -451,13 +390,9 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
-
-        try {
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
             s.getJobStatus("foo");
-        } finally {
-            s.end();
         }
     }
 
@@ -468,25 +403,21 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        job.setQueueName("unlimited");
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setQueueName("unlimited");
 
-        String jobID = s.submitBatchJob(job);
+            String jobID = s.submitBatchJob(job);
 
-        JobStatus status = s.getJobStatus(jobID);
+            JobStatus status = s.getJobStatus(jobID);
 
-        status = s.waitUntilDone(jobID, 1000);
+            status = s.waitUntilDone(jobID, 1000);
 
-        assertTrue(status.isDone());
-
-        // System.out.println(status.getJobIdentifier() + " " + status.getState() + " " + status.isDone() + " " + status.isRunning() + " " +
-        // status.hasException());
-
-        s.end();
+            assertTrue(status.isDone());
+        }
     }
 
     @Test
@@ -496,24 +427,22 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(50);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        job.setQueueName("unlimited");
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setQueueName("unlimited");
 
-        // Submit 50 ms job.
-        String jobID = s.submitBatchJob(job);
+            // Submit 50 ms job.
+            String jobID = s.submitBatchJob(job);
 
-        // Wait for 250 ms for the job to finish.
-        Thread.sleep(250);
+            // Wait for 250 ms for the job to finish.
+            Thread.sleep(250);
 
-        JobStatus status = s.getJobStatus(jobID);
-
-        assertTrue(status.isDone());
-
-        s.end();
+            JobStatus status = s.getJobStatus(jobID);
+            assertTrue(status.isDone());
+        }
     }
 
     @Test
@@ -523,30 +452,29 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        job.setQueueName("single");
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setQueueName("single");
 
-        // Submit 2 100 ms. jobs that will be run sequentially
-        String jobID1 = s.submitBatchJob(job);
-        String jobID2 = s.submitBatchJob(job);
+            // Submit 2 100 ms. jobs that will be run sequentially
+            String jobID1 = s.submitBatchJob(job);
+            String jobID2 = s.submitBatchJob(job);
 
-        // Wait up to 1000 ms for second job to start.
-        JobStatus status = s.waitUntilRunning(jobID2, 1000);
+            // Wait up to 1000 ms for second job to start.
+            JobStatus status = s.waitUntilRunning(jobID2, 1000);
 
-        // Second job should have started after this time.
-        assertTrue(status.isRunning());
+            // Second job should have started after this time.
+            assertTrue(status.isRunning());
 
-        // Wait up to 1000 ms for second job to finish.
-        status = s.waitUntilDone(jobID2, 1000);
+            // Wait up to 1000 ms for second job to finish.
+            status = s.waitUntilDone(jobID2, 1000);
 
-        // Second job should have finished after this time.
-        assertTrue(status.isDone());
-
-        s.end();
+            // Second job should have finished after this time.
+            assertTrue(status.isDone());
+        }
     }
 
     @Test
@@ -556,24 +484,30 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        job.setQueueName("single");
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setQueueName("single");
 
-        // Submit 2 100 ms. jobs that will be run sequentially
-        String jobID1 = s.submitBatchJob(job);
-        String jobID2 = s.submitBatchJob(job);
+            // Submit 2 100 ms. jobs that will be run sequentially
+            String jobID1 = s.submitBatchJob(job);
+            String jobID2 = s.submitBatchJob(job);
 
-        // Wait up to 1000 ms for second job to start.
-        JobStatus status = s.waitUntilDone(jobID2, 1000);
+            // Wait up to 1000 ms for second job to start.
+            JobStatus status = s.waitUntilDone(jobID2, 1000);
 
-        // Second job should have finished after this time.
-        assertTrue(status.isDone());
+            // Second job should have finished after this time.
+            assertTrue(status.isDone());
 
-        s.end();
+            // Wait up to 1000 ms for first job to start (should have been done?)
+            status = s.waitUntilDone(jobID1, 1000);
+
+            // First job should have finished after this time.
+            assertTrue(status.isDone());
+
+        }
     }
 
     @Test
@@ -583,29 +517,28 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        job.setQueueName("single");
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setQueueName("single");
 
-        // Submit 2 100 ms. jobs that will be run sequentially
-        String jobID1 = s.submitBatchJob(job);
-        String jobID2 = s.submitBatchJob(job);
+            // Submit 2 100 ms. jobs that will be run sequentially
+            String jobID1 = s.submitBatchJob(job);
+            String jobID2 = s.submitBatchJob(job);
 
-        // Wait up to 1000 ms for second job to start.
-        JobStatus status = s.waitUntilDone(jobID2, 1000);
+            // Wait up to 1000 ms for second job to start.
+            JobStatus status = s.waitUntilDone(jobID2, 1000);
 
-        // Both jobs should have finished after this time.
-        assertTrue(status.isDone());
+            // Both jobs should have finished after this time.
+            assertTrue(status.isDone());
 
-        // First job should already be done!
-        status = s.waitUntilRunning(jobID1, 1000);
+            // First job should already be done!
+            status = s.waitUntilRunning(jobID1, 1000);
 
-        assertTrue(status.isDone());
-
-        s.end();
+            assertTrue(status.isDone());
+        }
     }
 
     @Test
@@ -615,35 +548,34 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(500);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        job.setQueueName("single");
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setQueueName("single");
 
-        // Submit a 500 ms. job
-        String jobID = s.submitBatchJob(job);
+            // Submit a 500 ms. job
+            String jobID = s.submitBatchJob(job);
 
-        // Wait up to 100 ms for job to start.
-        JobStatus status = s.waitUntilRunning(jobID, 100);
+            // Wait up to 100 ms for job to start.
+            JobStatus status = s.waitUntilRunning(jobID, 100);
 
-        // Job should be running now
-        assertTrue(status.isRunning());
+            // Job should be running now
+            assertTrue(status.isRunning());
 
-        // Wait up to 100 ms for job to finish.
-        status = s.waitUntilDone(jobID, 100);
+            // Wait up to 100 ms for job to finish.
+            status = s.waitUntilDone(jobID, 100);
 
-        // Job should not be done
-        assertFalse(status.isDone());
+            // Job should not be done
+            assertFalse(status.isDone());
 
-        // Now wait up to 1000 ms for job to finish
-        status = s.waitUntilDone(jobID, 1000);
+            // Now wait up to 1000 ms for job to finish
+            status = s.waitUntilDone(jobID, 1000);
 
-        // And now it should be done!
-        assertTrue(status.isDone());
-
-        s.end();
+            // And now it should be done!
+            assertTrue(status.isDone());
+        }
     }
 
     @Test
@@ -653,21 +585,20 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(500);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        job.setQueueName("unlimited");
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setQueueName("unlimited");
 
-        // Submit 50 ms job.
-        String jobID = s.submitBatchJob(job);
+            // Submit 50 ms job.
+            String jobID = s.submitBatchJob(job);
 
-        JobStatus status = s.cancelJob(jobID);
+            JobStatus status = s.cancelJob(jobID);
 
-        assertTrue(status.isDone());
-
-        s.end();
+            assertTrue(status.isDone());
+        }
     }
 
     @Test
@@ -677,25 +608,24 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(500);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        job.setQueueName("unlimited");
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setQueueName("unlimited");
 
-        // Submit 50 ms job.
-        String jobID = s.submitBatchJob(job);
+            // Submit 50 ms job.
+            String jobID = s.submitBatchJob(job);
 
-        JobStatus status = s.waitUntilRunning(jobID, 250);
+            JobStatus status = s.waitUntilRunning(jobID, 250);
 
-        assertTrue(status.isRunning());
+            assertTrue(status.isRunning());
 
-        status = s.cancelJob(jobID);
+            status = s.cancelJob(jobID);
 
-        assertTrue(status.isDone());
-
-        s.end();
+            assertTrue(status.isDone());
+        }
     }
 
     @Test
@@ -705,27 +635,26 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
-        job.setQueueName("unlimited");
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
+            job.setQueueName("unlimited");
 
-        // Submit 100 ms job.
-        String jobID = s.submitBatchJob(job);
+            // Submit 100 ms job.
+            String jobID = s.submitBatchJob(job);
 
-        JobStatus status = s.waitUntilRunning(jobID, 500);
+            JobStatus status = s.waitUntilRunning(jobID, 500);
 
-        assertTrue(status.isRunning());
+            assertTrue(status.isRunning());
 
-        Thread.sleep(200);
+            Thread.sleep(200);
 
-        status = s.cancelJob(jobID);
+            status = s.cancelJob(jobID);
 
-        assertTrue(status.isDone());
-
-        s.end();
+            assertTrue(status.isDone());
+        }
     }
 
     @Test
@@ -735,32 +664,33 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory();
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        JobDescription job = new JobDescription();
-        job.setExecutable("/bin/aap");
+            JobDescription job = new JobDescription();
+            job.setExecutable("/bin/aap");
 
-        // Submit 100 ms job.
-        Streams streams = s.submitInteractiveJob(job);
+            // Submit 100 ms job.
+            Streams streams = s.submitInteractiveJob(job);
 
-        OutputReader stdout = new OutputReader(streams.getStdout());
-        OutputReader stderr = new OutputReader(streams.getStderr());
+            OutputReader stdout = new OutputReader(streams.getStdout());
+            OutputReader stderr = new OutputReader(streams.getStderr());
 
-        streams.getStdin().close();
+            streams.getStdin().close();
 
-        stdout.waitUntilFinished();
+            stderr.waitUntilFinished();
+            stdout.waitUntilFinished();
 
-        assertEquals("Hello World\n", stdout.getResultAsString());
+            assertEquals("Hello World\n", stdout.getResultAsString());
 
-        JobStatus status = s.cancelJob(streams.getJobIdentifier());
+            JobStatus status = s.cancelJob(streams.getJobIdentifier());
 
-        if (!status.isDone()) {
-            status = s.waitUntilDone(streams.getJobIdentifier(), 1000);
+            if (!status.isDone()) {
+                status = s.waitUntilDone(streams.getJobIdentifier(), 1000);
+            }
+
+            assertTrue(status.isDone());
         }
-
-        assertTrue(status.isDone());
-        s.end();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -770,13 +700,9 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
-
-        try {
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
             s.getQueueStatus(null);
-        } finally {
-            s.end();
         }
     }
 
@@ -787,13 +713,9 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
-
-        try {
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
             s.getQueueStatus("foobar");
-        } finally {
-            s.end();
         }
     }
 
@@ -804,16 +726,16 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        String[] queueNames = s.getQueueNames();
+            String[] queueNames = s.getQueueNames();
 
-        for (String q : queueNames) {
-            QueueStatus status = s.getQueueStatus(q);
-            assertEquals(q, status.getQueueName());
+            for (String q : queueNames) {
+                QueueStatus status = s.getQueueStatus(q);
+                assertEquals(q, status.getQueueName());
+            }
         }
-        s.end();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -823,15 +745,11 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        String[] q = null;
-
-        try {
+            String[] q = null;
             s.getQueueStatuses(q);
-        } finally {
-            s.end();
         }
     }
 
@@ -842,18 +760,17 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        QueueStatus[] status = s.getQueueStatuses();
+            QueueStatus[] status = s.getQueueStatuses();
 
-        assertNotNull(status);
-        assertTrue(status.length == 3);
-        assertEquals("single", status[0].getQueueName());
-        assertEquals("multi", status[1].getQueueName());
-        assertEquals("unlimited", status[2].getQueueName());
-
-        s.end();
+            assertNotNull(status);
+            assertTrue(status.length == 3);
+            assertEquals("single", status[0].getQueueName());
+            assertEquals("multi", status[1].getQueueName());
+            assertEquals("unlimited", status[2].getQueueName());
+        }
     }
 
     @Test
@@ -863,18 +780,17 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        QueueStatus[] status = s.getQueueStatuses(s.getQueueNames());
+            QueueStatus[] status = s.getQueueStatuses(s.getQueueNames());
 
-        assertNotNull(status);
-        assertTrue(status.length == 3);
-        assertEquals("single", status[0].getQueueName());
-        assertEquals("multi", status[1].getQueueName());
-        assertEquals("unlimited", status[2].getQueueName());
-
-        s.end();
+            assertNotNull(status);
+            assertTrue(status.length == 3);
+            assertEquals("single", status[0].getQueueName());
+            assertEquals("multi", status[1].getQueueName());
+            assertEquals("unlimited", status[2].getQueueName());
+        }
     }
 
     @Test
@@ -884,18 +800,17 @@ public class JobQueueSchedulerTest {
 
         MockInteractiveProcessFactory factory = new MockInteractiveProcessFactory(100);
 
-        JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100, 10000L,
-                null);
+        try (JobQueueScheduler s = new JobQueueScheduler("SID", "MockS", "location", new DefaultCredential(), factory, fs, new Path("/home/xenon"), 2, 100,
+                10000L, null)) {
 
-        QueueStatus[] status = s.getQueueStatuses(new String[] { "multi", null, "single" });
+            QueueStatus[] status = s.getQueueStatuses(new String[] { "multi", null, "single" });
 
-        assertNotNull(status);
-        assertTrue(status.length == 3);
-        assertEquals("multi", status[0].getQueueName());
-        assertNull(status[1]);
-        assertEquals("single", status[2].getQueueName());
-
-        s.end();
+            assertNotNull(status);
+            assertTrue(status.length == 3);
+            assertEquals("multi", status[0].getQueueName());
+            assertNull(status[1]);
+            assertEquals("single", status[2].getQueueName());
+        }
     }
 
 }

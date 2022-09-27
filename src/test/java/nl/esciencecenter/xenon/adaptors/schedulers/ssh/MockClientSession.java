@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.sshd.client.ClientFactoryManager;
 import org.apache.sshd.client.auth.AuthenticationIdentitiesProvider;
-import org.apache.sshd.client.auth.UserAuth;
+import org.apache.sshd.client.auth.UserAuthFactory;
 import org.apache.sshd.client.auth.keyboard.UserInteraction;
 import org.apache.sshd.client.auth.password.PasswordIdentityProvider;
 import org.apache.sshd.client.channel.ChannelDirectTcpip;
@@ -44,6 +44,7 @@ import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.PropertyResolver;
 import org.apache.sshd.common.Service;
 import org.apache.sshd.common.channel.ChannelListener;
+import org.apache.sshd.common.channel.PtyChannelConfigurationHolder;
 import org.apache.sshd.common.channel.throttle.ChannelStreamPacketWriterResolver;
 import org.apache.sshd.common.cipher.Cipher;
 import org.apache.sshd.common.cipher.CipherInformation;
@@ -56,13 +57,18 @@ import org.apache.sshd.common.future.SshFutureListener;
 import org.apache.sshd.common.io.IoSession;
 import org.apache.sshd.common.io.IoWriteFuture;
 import org.apache.sshd.common.kex.KexProposalOption;
+import org.apache.sshd.common.kex.KexState;
 import org.apache.sshd.common.kex.KeyExchange;
+import org.apache.sshd.common.kex.KeyExchangeFactory;
+import org.apache.sshd.common.kex.extension.KexExtensionHandler;
 import org.apache.sshd.common.keyprovider.KeyIdentityProvider;
 import org.apache.sshd.common.mac.Mac;
 import org.apache.sshd.common.mac.MacInformation;
 import org.apache.sshd.common.session.ReservedSessionMessagesHandler;
+import org.apache.sshd.common.session.SessionDisconnectHandler;
 import org.apache.sshd.common.session.SessionListener;
 import org.apache.sshd.common.session.UnknownChannelReferenceHandler;
+import org.apache.sshd.common.session.helpers.TimeoutIndicator;
 import org.apache.sshd.common.signature.Signature;
 import org.apache.sshd.common.util.buffer.Buffer;
 import org.apache.sshd.common.util.net.SshdSocketAddress;
@@ -189,10 +195,10 @@ public class MockClientSession implements ClientSession {
         throw new RuntimeException("Not implemented");
     }
 
-    @Override
-    public TimeoutStatus getTimeoutStatus() {
-        throw new RuntimeException("Not implemented");
-    }
+    // @Override
+    // public TimeoutIndicator getTimeoutStatus() {
+    // throw new RuntimeException("Not implemented");
+    // }
 
     @Override
     public long getAuthTimeout() {
@@ -251,22 +257,22 @@ public class MockClientSession implements ClientSession {
 
     }
 
-    @Override
-    public void startService(String name) throws Exception {
-        throw new RuntimeException("Not implemented");
+    // @Override
+    // public void startService(String name) throws Exception {
+    // throw new RuntimeException("Not implemented");
+    //
+    // }
 
-    }
-
-    @Override
-    public List<NamedFactory<KeyExchange>> getKeyExchangeFactories() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public void setKeyExchangeFactories(List<NamedFactory<KeyExchange>> keyExchangeFactories) {
-        throw new RuntimeException("Not implemented");
-
-    }
+    // @Override
+    // public List<NamedFactory<KeyExchange>> getKeyExchangeFactories() {
+    // throw new RuntimeException("Not implemented");
+    // }
+    //
+    // @Override
+    // public void setKeyExchangeFactories(List<NamedFactory<KeyExchange>> keyExchangeFactories) {
+    // throw new RuntimeException("Not implemented");
+    //
+    // }
 
     @Override
     public List<NamedFactory<Cipher>> getCipherFactories() {
@@ -570,20 +576,19 @@ public class MockClientSession implements ClientSession {
 
     }
 
-    @Override
-    public List<NamedFactory<UserAuth>> getUserAuthFactories() {
-        throw new RuntimeException("Not implemented");
-    }
+    // @Override
+    // public List<NamedFactory<UserAuth>> getUserAuthFactories() {
+    // throw new RuntimeException("Not implemented");
+    // }
+    //
+    // @Override
+    // public void setUserAuthFactories(List<NamedFactory<UserAuth>> userAuthFactories) {
+    // throw new RuntimeException("Not implemented");
+    //
+    // }
 
     @Override
-    public void setUserAuthFactories(List<NamedFactory<UserAuth>> userAuthFactories) {
-        throw new RuntimeException("Not implemented");
-
-    }
-
-    @Override
-    public SshdSocketAddress startLocalPortForwarding(SshdSocketAddress local, SshdSocketAddress remote)
-            throws IOException {
+    public SshdSocketAddress startLocalPortForwarding(SshdSocketAddress local, SshdSocketAddress remote) throws IOException {
         throw new RuntimeException("Not implemented");
     }
 
@@ -594,8 +599,7 @@ public class MockClientSession implements ClientSession {
     }
 
     @Override
-    public SshdSocketAddress startRemotePortForwarding(SshdSocketAddress remote, SshdSocketAddress local)
-            throws IOException {
+    public SshdSocketAddress startRemotePortForwarding(SshdSocketAddress remote, SshdSocketAddress local) throws IOException {
         throw new RuntimeException("Not implemented");
     }
 
@@ -653,7 +657,7 @@ public class MockClientSession implements ClientSession {
             throw new IOException("Bang!");
         }
 
-        exec = new MockChannelExec(command);
+        exec = new MockChannelExec(command, null, null);
         return exec;
     }
 
@@ -663,8 +667,7 @@ public class MockClientSession implements ClientSession {
     }
 
     @Override
-    public ChannelDirectTcpip createDirectTcpipChannel(SshdSocketAddress local, SshdSocketAddress remote)
-            throws IOException {
+    public ChannelDirectTcpip createDirectTcpipChannel(SshdSocketAddress local, SshdSocketAddress remote) throws IOException {
         throw new RuntimeException("Not implemented");
     }
 
@@ -750,6 +753,114 @@ public class MockClientSession implements ClientSession {
 
     @Override
     public UnknownChannelReferenceHandler resolveUnknownChannelReferenceHandler() {
+        return null;
+    }
+
+    @Override
+    public TimeoutIndicator getTimeoutStatus() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void startService(String name, Buffer buffer) throws Exception {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public boolean isServerSession() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public Map<KexProposalOption, String> getClientKexProposals() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Map<KexProposalOption, String> getServerKexProposals() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public KexState getKexState() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Map<KexProposalOption, String> getKexNegotiationResult() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setKeyExchangeFactories(List<KeyExchangeFactory> keyExchangeFactories) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public KexExtensionHandler getKexExtensionHandler() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setKexExtensionHandler(KexExtensionHandler handler) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public SessionDisconnectHandler getSessionDisconnectHandler() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setSessionDisconnectHandler(SessionDisconnectHandler handler) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void setUserAuthFactories(List<UserAuthFactory> userAuthFactories) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public ChannelShell createShellChannel(PtyChannelConfigurationHolder ptyConfig, Map<String, ?> env) throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ChannelExec createExecChannel(String command, PtyChannelConfigurationHolder ptyConfig, Map<String, ?> env) throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Set<ClientSessionEvent> getSessionState() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<KeyExchangeFactory> getKeyExchangeFactories() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<UserAuthFactory> getUserAuthFactories() {
+        // TODO Auto-generated method stub
         return null;
     }
 }

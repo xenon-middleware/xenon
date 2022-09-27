@@ -21,8 +21,10 @@ import nl.esciencecenter.xenon.adaptors.shared.ssh.SSHConnection;
 
 public class MockSSHConnection extends SSHConnection {
 
+    boolean closed = false;
+
     protected MockSSHConnection() {
-        super(0);
+        super(new MockSSHClient(), 0);
     }
 
     @Override

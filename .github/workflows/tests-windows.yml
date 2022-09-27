@@ -1,0 +1,49 @@
+# This workflow will build a Java project with Gradle
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Unit tests windows-latest
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    name: Build on Windows and run unit tests
+
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Build with Gradle and run unit and live tests
+      run: .\gradlew.bat test 
+
+    - name: Create test reports
+      run: ./gradlew jacocoTestReport 
+
+    - name: Upload unit coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        env_vars: OS,JDK
+        fail_ci_if_error: true
+        files: ./build/reports/jacoco/test/jacocoTestReport.xml
+        flags: unit
+        name: codecov-umbrella
+        verbose: true
+      env:
+        OS: windows
+        JDK: openjdk11
+

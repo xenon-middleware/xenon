@@ -375,6 +375,9 @@ public final class SlurmUtils {
         // add maximum runtime
         arguments.add("--time=" + runtime);
 
+        // add scheduler arguments
+        arguments.addAll(description.getSchedulerArguments());
+
         arguments.add(description.getExecutable());
         arguments.addAll(description.getArguments());
 
@@ -396,10 +399,10 @@ public final class SlurmUtils {
         // set name of job to xenon
         script.format("#SBATCH --job-name='%s'\n", name);
 
-        // set working directory
+        // set working directory. Note: we use the short argument '-D' instead of the long one, as it changed in slurm 17.11.0 from "--workdir" to "--chdir"
         if (description.getWorkingDirectory() != null) {
             String path = ScriptingUtils.getWorkingDirPath(description, fsEntryPath);
-            script.format("#SBATCH --workdir='%s'\n", path);
+            script.format("#SBATCH -D '%s'\n", path);
         }
 
         if (description.getQueueName() != null) {

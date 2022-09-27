@@ -16,10 +16,11 @@
 package nl.esciencecenter.xenon.utils;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.Set;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
@@ -32,13 +33,42 @@ import nl.esciencecenter.xenon.schedulers.SchedulerAdaptorDescription;
  * Generates html snippet with options of all adaptors.
  */
 public class AdaptorDocGenerator {
-    public static void main(String[] args) throws FileNotFoundException {
-        if (args.length != 1) {
+    private final Set<String> schedulers;
+    private final Set<String> filesystems;
+    private final String javadocRootUrl;
+
+    /**
+     *  @param schedulers Set of scheduler names to generate html for, if empty all scheduler adaptors are selected
+     * @param filesystems Set of filesystem names to generate html for, if empty all filesystem adaptors are selected
+     * @param javadocRootUrl
+     */
+    public AdaptorDocGenerator(Set<String> schedulers, Set<String> filesystems, String javadocRootUrl) {
+        this.schedulers = schedulers;
+        this.filesystems = filesystems;
+        this.javadocRootUrl = javadocRootUrl;
+    }
+
+    public static void main(String[] args)  {
+        if (args.length != 1 && args.length != 3 && args.length != 4) {
             System.err.println("Name of output file is required!");
+            System.err.println("Optionally:");
+            System.err.println(" 1. comma separated schedulers to generate html for");
+            System.err.println(" 2. comma separated filesystems to generate html for");
+            System.err.println(" 3. URL to Xenon javadoc eg. https://xenon-middleware.github.io/xenon/versions/3.0.0/javadoc/");
             System.exit(1);
         }
+        Set<String> schedulers = Collections.emptySet();
+        Set<String> filesystems = Collections.emptySet();
+        if (args.length >= 3) {
+            schedulers = Set.of(args[1].split(","));
+            filesystems = Set.of(args[2].split(","));
+        }
+        String javadocRootUrl = "";
+        if (args.length == 4) {
+            javadocRootUrl = args[3];
+        }
 
-        AdaptorDocGenerator generator = new AdaptorDocGenerator();
+        AdaptorDocGenerator generator = new AdaptorDocGenerator(schedulers, filesystems, javadocRootUrl);
         generator.toFile(args[0]);
     }
 
@@ -68,8 +98,8 @@ public class AdaptorDocGenerator {
         out.println("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Xenon Javadoc overview</title></head><body>");
         out.println("<p>A middleware abstraction library that provides a simple programming interface to various compute and storage resources.</p>");
         out.println("The main entry points are<ul>");
-        out.println("<li><a href=\"nl/esciencecenter/xenon/schedulers/Scheduler.html\">nl.esciencecenter.xenon.schedulers.Scheduler</a></li>");
-        out.println("<li><a href=\"nl/esciencecenter/xenon/filesystems/FileSystem.html\">nl.esciencecenter.xenon.filesystems.FileSystem</a></li>");
+        out.println("<li><a href=\"" + javadocRootUrl+ "nl/esciencecenter/xenon/schedulers/Scheduler.html\">nl.esciencecenter.xenon.schedulers.Scheduler</a></li>");
+        out.println("<li><a href=\"" + javadocRootUrl+ "nl/esciencecenter/xenon/filesystems/FileSystem.html\">nl.esciencecenter.xenon.filesystems.FileSystem</a></li>");
         out.println("</ul>");
         out.println("<h1>Adaptor Documentation</h1>");
         out.println("<p>This section contains the adaptor documentation which is generated "
@@ -86,12 +116,16 @@ public class AdaptorDocGenerator {
         out.println("<ul>");
         out.println("<li><a href=\"#schedulers\">Schedulers</a><ul>");
         for (String name: Scheduler.getAdaptorNames()) {
-            out.println(String.format("<li><a href=\"#%s\">%s</a></li>", name, name));
+            if (schedulers.isEmpty() || schedulers.contains(name)) {
+                out.println(String.format("<li><a href=\"#%s\">%s</a></li>", name, name));
+            }
         }
         out.println("</ul></li>");
         out.println("<li><a href=\"#filesystems\">File systems</a><ul>");
         for (String name: FileSystem.getAdaptorNames()) {
-            out.println(String.format("<li><a href=\"#%s\">%s</a></li>", name, name));
+            if (filesystems.isEmpty() || filesystems.contains(name)) {
+                out.println(String.format("<li><a href=\"#%s\">%s</a></li>", name, name));
+            }
         }
         out.println("</ul></li>");
         out.println("</ul>");
@@ -100,7 +134,9 @@ public class AdaptorDocGenerator {
     private void generateFileSystems(PrintWriter out) throws XenonException {
         out.println("<h2><a id=\"filesystems\">File systems</a></h2>");
         for (FileSystemAdaptorDescription description : FileSystem.getAdaptorDescriptions()) {
-            generateFileSystem(description, out);
+            if (filesystems.isEmpty() || filesystems.contains(description.getName())) {
+                generateFileSystem(description, out);
+            }
         }
     }
 
@@ -143,7 +179,9 @@ public class AdaptorDocGenerator {
     private void generateSchedulers(PrintWriter out) throws XenonException {
         out.println("<h2><a id=\"schedulers\">Schedulers</a></h2>");
         for (SchedulerAdaptorDescription description : Scheduler.getAdaptorDescriptions()) {
-            generateScheduler(description, out);
+            if (schedulers.isEmpty() || schedulers.contains(description.getName())) {
+                generateScheduler(description, out);
+            }
         }
     }
 

@@ -16,15 +16,13 @@ plugins {
     // code coverage
     id 'jacoco'
     // license
-    id 'com.github.hierynomus.license' version '0.14.0'
+    id 'com.github.hierynomus.license' version '0.15.0'
+    id "com.github.hierynomus.license-report" version"0.15.0"
     // test sets
     id 'org.unbroken-dome.test-sets' version '2.1.1'
+    // docker compose
+    // id "com.palantir.docker-compose" version "0.31.0-rc1"
 }
-
-//    METADATA
-// ==============
-version = '3.0.0'
-description = 'Xenon: a middleware abstraction library that provides a simple programming interface to various compute and storage resources.'
 
 //    IMPORTS
 // =============
@@ -42,9 +40,6 @@ repositories {
     mavenLocal()
     mavenCentral()
     jcenter()
-    maven {
-        url 'https://dl.bintray.com/palantir/releases' // docker-compose-rule is published on bintray
-    }
 }
 
 dependencies {
@@ -55,15 +50,15 @@ dependencies {
     compile group: 'commons-net', name: 'commons-net', version: '3.3'
 
     // ssh and sftp 
-    compile group: 'org.apache.sshd', name: 'sshd-mina', version: '2.2.0'
-    compile group: 'org.apache.sshd', name: 'sshd-sftp', version: '2.2.0'
+    compile group: 'org.apache.sshd', name: 'sshd-mina', version: '2.4.0'
+    compile group: 'org.apache.sshd', name: 'sshd-sftp', version: '2.4.0'
     compile group: 'net.i2p.crypto', name: 'eddsa', version: '0.3.0'
     compile group: 'com.google.guava', name: 'guava', version: '19.0'
 
     // webdav
-    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
-    compile group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0'
-    compile group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0'
+    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    compile group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0.1'
+    compile group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
     compile group: 'javax.activation', name: 'activation', version: '1.1.1'
     compile group: 'com.github.lookfirst', name: 'sardine', version: '5.8'
 
@@ -84,7 +79,7 @@ dependencies {
     testApiCompile group: 'junit', name: 'junit', version: '4.12'
 
     integrationTestCompile sourceSets.testApi.output
-    integrationTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.35.0'
+    integrationTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:1.0.0'
 
     // allow isolated and live tests to import from integration test,
     // so abstract test classes and docker compose files can be extended and reused
@@ -94,7 +89,7 @@ dependencies {
 
     // TODO fixedClientEnvironmentTest should have same dependencies as integrationTest,
     // do no copy deps but append integrationTest.deps to fixedClientEnvironmentTest.deps
-    fixedClientEnvironmentTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:0.35.0'
+    fixedClientEnvironmentTestCompile 'com.palantir.docker.compose:docker-compose-rule-junit4:1.0.0'
 
     docGeneratorCompile sourceSets.main.output
     docGeneratorRuntime configurations.runtime
