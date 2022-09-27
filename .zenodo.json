@@ -1,77 +1,79 @@
 {
-    "creators": [
-        {
-            "affiliation": "Netherlands eScience Center",
-            "name": "Maassen, Jason",
-            "orcid": "0000-0002-8172-4865"
-        },
-        {
-            "affiliation": "Netherlands eScience Center",
-            "name": "Verhoeven, Stefan",
-            "orcid": "0000-0002-5821-2060"
-        },
-        {
-            "affiliation": "Netherlands eScience Center",
-            "name": "Borgdorff, Joris",
-            "orcid": "0000-0001-7911-9490"
-        },
-        {
-            "affiliation": "Netherlands eScience Center",
-            "name": "Spaaks, Jurriaan H.",
-            "orcid": "0000-0002-7064-4069"
-        },
-        {
-            "affiliation": "Netherlands eScience Center",
-            "name": "Drost, Niels",
-            "orcid": "0000-0001-9795-7981"
-        },
-        {
-            "affiliation": "Netherlands eScience Center",
-            "name": "Meijer, Christiaan"
-        },
-        {
-            "affiliation": "Netherlands eScience Center",
-            "name": "van der Ploeg, Atze"
-        },
-        {
-            "affiliation": "Netherlands eScience Center",
-            "name": "de Boer, Piter T."
-        },
-        {
-            "affiliation": "Netherlands eScience Center",
-            "name": "van Nieuwpoort, Rob",
-            "orcid": "0000-0002-2947-9444"
-        },
-        {
-            "affiliation": "Netherlands eScience Center",
-            "name": "van Werkhoven, Ben",
-            "orcid": "0000-0002-7508-3272"
-        },
-        {
-            "affiliation": "Netherlands eScience Center",
-            "name": "Kuzniar, Arnold",
-            "orcid": "0000-0003-1711-7961"
-        }
-    ],
-    "description": "Many applications use remote storage and compute resources. To do so, they need to include code to interact with the scheduling systems and file transfer protocols used on those remote machines. Unfortunately, many different scheduler systems and file transfer protocols exist, often with completely different programming interfaces. This makes it hard for applications to switch to a different system or support multiple remote systems simultaneously. Xenon solves this problem by providing a single programming interface to many different types of remote resources, allowing applications to switch without changing a single line of code.",
-    "keywords": [
-        "Java",
-        "batch-job",
-        "middleware",
-        "library",
-        "FTP",
-        "S3",
-        "SFTP",
-        "WebDAV",
-        "HDFS",
-        "SGE",
-        "SLURM",
-        "SSH",
-        "Torque",
-        "distributed computing"
-    ],
-    "license": {
-        "id": "Apache-2.0"
+  "creators": [
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "Maassen, Jason",
+      "orcid": "0000-0002-8172-4865"
     },
-    "title": "Xenon"
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "Verhoeven, Stefan",
+      "orcid": "0000-0002-5821-2060"
+    },
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "Borgdorff, Joris",
+      "orcid": "0000-0001-7911-9490"
+    },
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "Spaaks, Jurriaan H.",
+      "orcid": "0000-0002-7064-4069"
+    },
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "Drost, Niels",
+      "orcid": "0000-0001-9795-7981"
+    },
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "Meijer, Christiaan"
+    },
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "van der Ploeg, Atze"
+    },
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "de Boer, Piter T."
+    },
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "van Nieuwpoort, Rob",
+      "orcid": "0000-0002-2947-9444"
+    },
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "van Werkhoven, Ben",
+      "orcid": "0000-0002-7508-3272"
+    },
+    {
+      "affiliation": "Netherlands eScience Center",
+      "name": "Kuzniar, Arnold",
+      "orcid": "0000-0003-1711-7961"
+    }
+  ],
+  "description": "Many applications use remote storage and compute resources. To do so, they need to include code to interact with the scheduling systems and file transfer protocols used on those remote machines. Unfortunately, many different scheduler systems and file transfer protocols exist, often with completely different programming interfaces. This makes it hard for applications to switch to a different system or support multiple remote systems simultaneously. Xenon solves this problem by providing a single programming interface to many different types of remote resources, allowing applications to switch without changing a single line of code.",
+  "keywords": [
+    "Java",
+    "batch-job",
+    "middleware",
+    "library",
+    "FTP",
+    "S3",
+    "SFTP",
+    "WebDAV",
+    "HDFS",
+    "SGE",
+    "SLURM",
+    "SSH",
+    "Torque",
+    "distributed computing"
+  ],
+  "license": {
+    "id": "Apache-2.0"
+  },
+  "publication_date": "2020-03-20",
+  "title": "Xenon",
+  "version": "3.2.0"
 }

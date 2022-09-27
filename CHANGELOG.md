@@ -1,7 +1,14 @@
 Xenon 3.1.0
 -----------
 
-This is release 3.1.0 of Xenon.
+This is release 3.2.0 of Xenon.
+
+Notable changes compared to v3.1.0:
+-----------------------------------
+
+- improved the behavior of the AT adaptor. 
+- switched to github actions for CI
+- switched from jcenter/bintray to Maven Central for distribution of jar files
 
 Notable changes compared to v3.0.4:
 -----------------------------------

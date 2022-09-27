@@ -91,7 +91,7 @@ and
 
 ```gradle
 	dependencies {
-	        compile group: 'nl.esciencecenter.xenon', name: 'xenon', version: '3.1.0'
+	        compile group: 'nl.esciencecenter.xenon', name: 'xenon', version: '3.2.0'
 	}
 
 ```

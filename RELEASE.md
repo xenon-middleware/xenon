@@ -48,7 +48,7 @@ cd <directory where the CITATION.cff lives>
 cffconvert --validate
 
 # generate the zenodo file by (note the dot in the file name):
-cffconvert --outputformat zenodo --ignore-suspect-keys > .zenodo.json
+cffconvert --format zenodo > .zenodo.json
 ```
 
 
@@ -69,12 +69,12 @@ you should get something like this:
 	modified:   CHANGELOG.md
 	modified:   README.md
 	modified:   gradle/common.gradle
-    modified:   docs/_config.yml
+        modified:   docs/_config.yml
 
     Untracked files:
     (use "git add <file>..." to include in what will be committed)
 
-	docs/versions/3.0.1/
+	docs/versions/X.Y.Z/
 
 Add and commit these files using `git add` and `git commit` and `git push`.
 
