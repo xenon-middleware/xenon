@@ -8,7 +8,7 @@
 [![Fixed client tests](https://github.com/xenon-middleware/xenon/actions/workflows/fixedClientTests.yml/badge.svg)](https://github.com/xenon-middleware/xenon/actions/workflows/fixedClientTests.yml)
 [![codecov](https://codecov.io/gh/xenon-middleware/xenon/branch/master/graph/badge.svg)](https://codecov.io/gh/xenon-middleware/xenon)
 [![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=xenon-middleware_xenon&metric=alert_status)](https://sonarcloud.io/dashboard?id=xenon-middleware_xenon)
-[![cffvalidation]( https://github.com/xenon-middleware/xenon/actions/workflows/cffconvert.yml/badge.svg)
+[![cffvalidation](https://github.com/xenon-middleware/xenon/actions/workflows/cffconvert.yml/badge.svg)](https://github.com/xenon-middleware/xenon/actions/workflows/cffconvert.yml)
 [![GitHub license](https://img.shields.io/badge/license-Apache--2.0%20-blue.svg)](https://github.com/xenon-middleware/xenon/blob/master/LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.597993.svg)](https://doi.org/10.5281/zenodo.597993)
 [![Research Software Directory](https://img.shields.io/badge/rsd-xenon-00a3e3.svg)](https://www.research-software.nl/software/xenon)
