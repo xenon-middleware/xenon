@@ -24,6 +24,7 @@ plugins {
     id 'org.unbroken-dome.test-sets' version '2.1.1'
     // docker compose
     // id "com.palantir.docker-compose" version "0.31.0-rc1"
+    id "org.sonarqube" version "3.4.0.2513"
 }
 
 //    IMPORTS
@@ -41,6 +42,14 @@ apply from: 'gradle/license.gradle'
 repositories {
     mavenLocal()
     mavenCentral()
+}
+
+sonarqube {
+  properties {
+    property "sonar.projectKey", "xenon-middleware_xenon"
+    property "sonar.organization", "xenon-middleware"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
 }
 
 dependencies {
