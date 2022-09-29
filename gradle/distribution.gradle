@@ -53,6 +53,10 @@ signing {
     sign configurations.archives
 }
 
+tasks.withType(Sign) {
+    onlyIf { isReleaseVersion }
+}
+
 
 // Distributions:
 // 1. for maven, xenon.jar, xenon-sources.jar, xenon-javadoc.jar, published on JCenter
