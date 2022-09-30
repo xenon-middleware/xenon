@@ -57,4 +57,10 @@ jobs:
         OS: windows
         JDK: openjdk11
 
-
+    - name: Upload to sonarcube
+      run: ./gradlew sonarqube --info
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        OS: windows
+        JDK: openjdk11
