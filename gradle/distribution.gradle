@@ -95,7 +95,7 @@ installDist.dependsOn javadoc
 //     PUBLISH
 // ==============
 
-
+/*
 uploadArchives {
 
   repositories {
@@ -142,7 +142,7 @@ uploadArchives {
     }
   }
 }
-
+*/
 
 /*
 publishing {
