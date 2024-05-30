@@ -40,7 +40,7 @@ Xenon is an abstraction layer that sits between your application and the (usuall
 resource it uses. Xenon is written in Java, but is also accessible from other
 languages (e.g. Python) through its gRPC interface and via the command line.
 
-![Xenon API](/docs/images/readme-xenon-api.svg.png "Xenon API")
+![Xenon API](https://github.com/xenon-middleware/xenon/blob/master/docs/images/readme-xenon-api.svg.png?raw=true "Xenon API")
 
 ### Overview of the Xenon ecosystem of tools
 
