@@ -32,7 +32,7 @@ Xenon solves this problem by providing a single programming interface to many
 different types of remote resources, allowing applications to switch without
 changing a single line of code.
 
-![Xenon abstraction](https://github.com/xenon-middleware/xenon/blob/master/docs/images/readme-xenon-abstraction.svg.png?raw=true "Xenon abstraction")
+![Xenon abstraction](https://raw.githubusercontent.com/xenon-middleware/xenon/master/docs/images/readme-xenon-abstraction.svg.png "Xenon abstraction")
 
 ## How does Xenon work?
 
@@ -40,7 +40,7 @@ Xenon is an abstraction layer that sits between your application and the (usuall
 resource it uses. Xenon is written in Java, but is also accessible from other
 languages (e.g. Python) through its gRPC interface and via the command line.
 
-![Xenon API](https://github.com/xenon-middleware/xenon/blob/master/docs/images/readme-xenon-api.svg.png?raw=true "Xenon API")
+![Xenon API](xhttps://raw.githubusercontent.com/xenon-middleware/xenon/blob/master/docs/images/readme-xenon-api.svg.png?raw=true "Xenon API")
 
 ### Overview of the Xenon ecosystem of tools
 
