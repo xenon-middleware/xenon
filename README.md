@@ -32,7 +32,7 @@ Xenon solves this problem by providing a single programming interface to many
 different types of remote resources, allowing applications to switch without
 changing a single line of code.
 
-![Xenon abstraction](/docs/images/readme-xenon-abstraction.svg.png "Xenon abstraction")
+![Xenon abstraction](https://github.com/xenon-middleware/xenon/blob/master/docs/images/readme-xenon-abstraction.svg.png?raw=true "Xenon abstraction")
 
 ## How does Xenon work?
 
